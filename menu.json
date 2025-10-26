@@ -2,6 +2,11 @@
   {
     "id": "games",
     "label": "게임",
-    "items": []
+    "items": [
+      { "id": "space-catcher", "label": "우주 장윤이(별 먹기)", "path": "space-catcher/index.html" },
+      { "id": "runner-game", "label": "달리는 장윤이", "path": "runner-game/index.html" },
+      { "id": "typing", "label": "장윤 한글 타이핑 (로컬)", "path": "typing/index.html" },
+      { "id": "typing-web", "label": "장윤 한글 타이핑 (웹)", "path": "https://shinjaehyun20.github.io/02-hangul-typing-game/#home" }
+    ]
   }
 ]
