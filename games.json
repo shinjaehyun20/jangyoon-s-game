@@ -17,10 +17,18 @@
   },
   {
     "id": "typing",
-    "title": "Typing",
-    "title_ko": "장윤 한글 타이핑",
-    "description": "한글 단어를 입력하는 타자 연습 게임",
+    "title": "Typing (로컬)",
+    "title_ko": "장윤 한글 타이핑 (로컬)",
+    "description": "한글 단어를 입력하는 타자 연습 게임 (로컬 실행)",
     "thumbnail": "typing/thumb.svg",
     "path": "typing/index.html"
+  },
+  {
+    "id": "typing-web",
+    "title": "Typing (웹 배포)",
+    "title_ko": "장윤 한글 타이핑 (웹)",
+    "description": "한글 단어를 입력하는 타자 연습 게임 (GitHub Pages)",
+    "thumbnail": "typing/thumb.svg",
+    "path": "https://shinjaehyun20.github.io/02-hangul-typing-game/#home"
   }
 ]
