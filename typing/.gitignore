@@ -1,0 +1,165 @@
+# === 공통 대용량/산출물/캐시/가상환경/로그/데이터 무시 ===
+*.pyc
+__pycache__/
+*.pkl
+*.h5
+*.pth
+*.pt
+*.onnx
+*.npz
+*.npy
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+*.sqlite3
+*.db
+*.egg-info/
+*.ipynb_checkpoints/
+*.csv
+*.xlsx
+*.xls
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.gz
+*.pdf
+*.docx
+*.pptx
+*.exe
+*.dll
+*.so
+*.o
+*.a
+*.out
+*.class
+*.jar
+*.iml
+*.idea/
+*.vscode/
+node_modules/
+venv/
+.env
+.env.*
+
+# === SimSwap 및 유사 모델/데이터/임시/결과 폴더 ===
+pythonw/SimSwap/checkpoints/
+pythonw/SimSwap/output/
+pythonw/SimSwap/temp_results/
+pythonw/SimSwap/crop_224/
+pythonw/SimSwap/data/
+pythonw/SimSwap/inputs/
+pythonw/SimSwap/models/
+pythonw/SimSwap/arcface_model/
+pythonw/SimSwap/insightface_func/models/
+pythonw/SimSwap/insightface_func/__pycache__/
+pythonw/SimSwap/models/__pycache__/
+pythonw/SimSwap/options/__pycache__/
+pythonw/SimSwap/parsing_model/__pycache__/
+pythonw/SimSwap/util/__pycache__/
+pythonw/SimSwap/pg_modules/__pycache__/
+pythonw/SimSwap/docs/img/id/
+pythonw/SimSwap/simswaplogo/
+pythonw/SimSwap/videos/
+pythonw/SimSwap/parsing_model/checkpoint/
+pythonw/SimSwap/parsing_model/79999_iter.pth
+pythonw/SimSwap/docs/css/
+pythonw/SimSwap/docs/fonts/
+pythonw/SimSwap/docs/js/vendor/
+fingerprint_recognition/
+
+# === competitor-dashboard ===
+pythonw/competitor-dashboard/logs/
+pythonw/competitor-dashboard/__pycache__/
+pythonw/competitor-dashboard/.env
+pythonw/competitor-dashboard/.env.*
+
+# === fingerprint_recognition ===
+pythonw/fingerprint_recognition/result/
+pythonw/fingerprint_recognition/dataset/
+pythonw/fingerprint_recognition/__pycache__/
+
+# === games, lottoGen_251011, toyproject, webCrwaler 등 ===
+pythonw/games/**/__pycache__/
+pythonw/lottoGen_251011/data/
+pythonw/lottoGen_251011/scripts/__pycache__/
+pythonw/lottoGen_251011/utils/__pycache__/
+pythonw/toyproject/**/__pycache__/
+pythonw/toyproject2/**/__pycache__/
+pythonw/webCrwaler/**/__pycache__/
+
+# === 기타 ===
+old/
+works/
+*.drawio.bak
+*.drawio~
+*.tmp
+tmp/
+# 'old' 폴더 전체 무시
+old/
+# 'AgentDocument' 폴더 전체 무시
+00. AgentDocuments/
+
+# 'pythonw/SimSwap/' 전체 무시
+pythonw/SimSwap/
+
+# 'fingerprint_recognition/' 전체 무시
+fingerprint_recognition/
+
+# 'lottoGen_251011/' 전체 무시
+lottoGen_251011/
+
+# 'SimSwap_251023/' 전체 무시
+SimSwap_251023/
+
+
+
+works/
+
+# 민감정보 및 불필요 파일/폴더 무시
+# 환경설정/시크릿/캐시/빌드 산출물 등
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.der
+*.cer
+*.db
+*.sqlite*
+*.log
+*.pyc
+__pycache__/
+.vscode/
+.DS_Store
+node_modules/
+dist/
+build/
+tmp/
+logs/
+*.bak
+*.swp
+*.swo
+*.~
+*.cache
+*.continue/
+*.idea/
+*.iml
+*.egg-info/
+*.ipynb_checkpoints/
+*seoul.pem
+*aws.pem
+*GoogleAPI/
+*kakaoapi/
+venv/
+*.pyc
+__pycache__/
+*.pkl
+*.h5
+*.pth
+.DS_Store

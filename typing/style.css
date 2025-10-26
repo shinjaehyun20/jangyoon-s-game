@@ -1,0 +1,74 @@
+body {
+  margin: 0;
+  font-family: "Apple SD Gothic Neo", sans-serif;
+  background: linear-gradient(to bottom, #a3d977, #3a732a);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  color: #fff;
+}
+.game-container {
+  position: relative;
+  width: 360px;
+  height: 480px;
+  background: #609636 url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Forest_Background_Illustration.svg/360px-Forest_Background_Illustration.svg.png') no-repeat center bottom;
+  background-size: cover;
+  border-radius: 16px;
+  box-shadow: 0 0 10px #2a5010;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.elephant {
+  width: 120px;
+  height: 120px;
+  background: url('https://cdn-icons-png.flaticon.com/512/616/616408.png') no-repeat center center;
+  background-size: contain;
+  margin: 0 auto;
+  filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.3));
+}
+.mission {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 20px;
+  text-shadow: 2px 2px 4px #2a4d10;
+}
+input[type="text"] {
+  font-size: 22px;
+  text-align: center;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.message {
+  margin-top: 15px;
+  height: 24px;
+  text-align: center;
+  font-weight: 600;
+}
+.next-btn {
+  margin-top: 20px;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 14px 24px;
+  font-size: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: none;
+  user-select: none;
+}
+.next-btn:hover {
+  background-color: #45a049;
+}
+.stage-info {
+  font-weight: bold;
+  font-size: 18px;
+  text-shadow: 1px 1px 3px #21510c;
+}

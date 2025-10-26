@@ -1,0 +1,26 @@
+:root{
+  --bg:#071126;
+  --panel:#0c2a4a;
+  --accent:#ffd166;
+  --text:#f6f7fb;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI, 'Noto Sans KR', Arial, sans-serif;background:linear-gradient(180deg,var(--bg),#001129);color:var(--text);display:flex;align-items:center;justify-content:center;height:100vh}
+.game-wrap{width:100%;max-width:540px;padding:18px}
+header h1{margin:0;font-size:32px;text-align:center}
+.sub{text-align:center;color:#bcd6ff;margin-top:6px}
+#hud{display:flex;justify-content:space-between;align-items:center;margin:12px 0}
+#hud div{background:rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px}
+#startBtn{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer}
+#gameArea{position:relative;height:480px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#031028 0%, #04203a 100%);box-shadow:0 8px 20px rgba(0,0,0,0.6);outline:none}
+/* prevent default touch scrolling when dragging inside game area */
+#gameArea, .ship { touch-action: none; -ms-touch-action: none; }
+.ship{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:72px;height:72px;background:linear-gradient(180deg,#ffb57b,#ff7a7a);border-radius:14px;box-shadow:0 6px 18px rgba(255,120,120,0.12), inset 0 -6px 20px rgba(0,0,0,0.2)}
+.player-eye{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:22px;height:22px;background:#fff;border-radius:50%}
+.star{position:absolute;width:48px;height:48px;background:url('images/jangyoon.PNG') center/contain no-repeat;filter:drop-shadow(0 4px 8px rgba(255,255,255,0.15))}
+#controls{display:flex;justify-content:center;gap:12px;margin-top:10px}
+#controls button{width:72px;height:48px;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:var(--text);font-size:22px}
+#message{position:relative;text-align:center;margin-top:12px;padding:10px;background:rgba(255,255,255,0.03);border-radius:10px}
+.hidden{display:none}
+/* small responsive */
+@media (max-width:420px){#gameArea{height:360px}.ship{width:56px;height:56px}}

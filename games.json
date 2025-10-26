@@ -1,0 +1,26 @@
+[
+  {
+    "id": "space-catcher",
+    "title": "Space Catcher",
+    "title_ko": "우주 장윤이(별 먹기)",
+    "description": "장윤이 이미지를 모아서 점수를 얻는 간단한 게임",
+    "thumbnail": "space-catcher/thumb.svg",
+    "path": "space-catcher/index.html"
+  },
+  {
+    "id": "runner-game",
+    "title": "Runner",
+    "title_ko": "달리는 장윤이",
+    "description": "좌우 스크롤에서 위/아래로 이동하며 아이템을 모으세요",
+    "thumbnail": "runner-game/thumb.svg",
+    "path": "runner-game/index.html"
+  },
+  {
+    "id": "typing",
+    "title": "Typing",
+    "title_ko": "장윤 한글 타이핑",
+    "description": "한글 단어를 입력하는 타자 연습 게임",
+    "thumbnail": "typing/thumb.svg",
+    "path": "typing/index.html"
+  }
+]

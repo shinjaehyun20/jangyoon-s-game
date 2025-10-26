@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>장윤이 잡기 게임</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-wrap">
+    <header>
+      <h1>장윤이 잡기</h1>
+      <p class="sub">장윤이를 잡아보세요! 키보드 ← → / 터치로 이동</p>
+    </header>
+    
+    <main>
+      <div id="hud">
+        <div>점수: <span id="score">0</span></div>
+        <div>시간: <span id="time">60</span>s</div>
+        <button id="startBtn">시작</button>
+      </div>
+
+      <div id="gameArea" tabindex="0">
+        <div id="player" class="ship" aria-label="플레이어"></div>
+      </div>
+
+      <div id="controls">
+        <button id="leftBtn">◀</button>
+        <button id="rightBtn">▶</button>
+      </div>
+
+      <div id="message" class="hidden"></div>
+    </main>
+
+    <footer>
+      <p><small>장윤이를 위한 특별한 게임 🎮</small></p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

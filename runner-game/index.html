@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>달리는 장윤이</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-wrap">
+    <header>
+      <h1>달리는 장윤이</h1>
+      <p class="sub">위/아래(↑↓) 키로 이동해서 장윤이를 모아요!</p>
+    </header>
+
+    <main>
+      <div id="hud">
+        <div>점수: <span id="score">0</span></div>
+        <div>시간: <span id="time">30</span>s</div>
+        <button id="startBtn">시작하기</button>
+      </div>
+
+      <div id="gameArea" tabindex="0">
+        <div class="scrolling-bg" aria-hidden="true">
+          <div class="bg-layer"></div>
+          <div class="bg-layer"></div>
+        </div>
+        <div id="player" class="runner" aria-label="플레이어">
+          <img src="images/jangyoon.PNG" alt="장윤이" class="player-img">
+        </div>
+      </div>
+
+      <div id="controls" class="touch-controls">
+        <button id="upBtn">▲</button>
+        <button id="downBtn">▼</button>
+      </div>
+
+      <div id="message" class="hidden"></div>
+    </main>
+
+    <footer>
+      <p><small>장윤이의 달리기 모험 🏃‍♂️</small></p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
