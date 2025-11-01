@@ -30,5 +30,13 @@
     "description": "한글 단어를 입력하는 타자 연습 게임 (GitHub Pages)",
     "thumbnail": "typing/thumb.svg",
     "path": "https://shinjaehyun20.github.io/02-hangul-typing-game/#home"
+  },
+  {
+    "id": "tetris-javascript",
+    "title": "Javascript Tetris",
+    "title_ko": "자바스크립트 테트리스",
+    "description": "클래식 테트리스 게임 (자바스크립트)",
+    "thumbnail": "tetris_javascript/texture.jpg",
+    "path": "tetris_javascript/index.html"
   }
 ]
