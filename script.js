@@ -52,13 +52,17 @@ function renderSidebar(menu) {
     h.textContent = section.label;
     el.appendChild(h);
 
-    // 현재는 항목 비어있음; 추후 프로그램으로 채움
     const ul = document.createElement('ul');
     ul.className = 'menu-items';
     if (section.items && section.items.length) {
       section.items.forEach(it => {
         const li = document.createElement('li');
-        li.textContent = it.label || it;
+        const link = document.createElement('a');
+        link.textContent = it.label || it;
+        link.href = it.path || '#';
+        link.style.textDecoration = 'none';
+        link.style.color = 'inherit';
+        li.appendChild(link);
         ul.appendChild(li);
       });
     }

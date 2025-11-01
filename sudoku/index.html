@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko" style="--digitColor: black; --digitBackgroundColor: #EEEEEE; --scalingFactorForTimer: 0.6;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>웹 스도쿠 퍼즐 게임</title>
+    <link href="sudoku-icon.png" rel="icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="./CSSstyles/mybootstrap.css" rel="stylesheet">
+    <link href="./CSSstyles/social-media-panel.css" rel="stylesheet">
+    <link href="./CSSstyles/digital-timer.css" rel="stylesheet">
+    <link href="./CSSstyles/progress-bar.css" rel="stylesheet">
+    <link href="./CSSstyles/animated-countdown-timer.css" rel="stylesheet">
+    <link href="./CSSstyles/snackbar-and-alert.css" rel="stylesheet">
+    <link href="./CSSstyles/theme-toggle-button.css" rel="stylesheet">
+    <link href="./CSSstyles/styles.css" rel="stylesheet">
+    <!-- UI overrides -->
+    <link href="./CSSstyles/overrides.css" rel="stylesheet">
+</head>
+
+<body class="light">
+    <header class="center-screen">
+        <h1>스도쿠</h1>
+    </header>
+
+    <div align="center" id="spinner-container" class="hidden">
+        <div class="row">
+            <div id="spinner-element-1" class="spinner-border" style="margin-top: 35px; width: 4rem; height: 4rem; color: rgb(255, 148, 25);" role="status"></div>
+        </div>
+        <br>
+        <div id="spinner-element-2" class="row" style="font-size: 20px; color: rgb(255, 148, 25);">
+            <strong>퍼즐 불러오는 중...</strong>
+        </div>
+    </div>
+
+    <div id="game-container" style="visibility: visible;">
+        <div class="alert alert-warning center-screen hidden" id="alert-pause" role="alert" style="display: block;">
+            <i class="far fa-pause-circle"></i> 일시정지
+        </div>
+
+        <div id="stats" class="center-screen">
+            <!-- Countdown timer -->
+            
+            <!-- Stopwatch -->
+            <div id="time-2" class="hidden">
+                <div id="stopwatch-container" class="hidden" style="margin-top: 35px"></div>
+            </div>
+            <div class="snackbar" id="snackbar-win">성공!🏆</div>
+            <div class="snackbar" id="snackbar-lose">실패!☹️</div>
+        </div>
+
+        <div id="game" class="center-screen">
+            <div class="board-wrapper">
+                <!-- 보드 위 시작 버튼 오버레이 -->
+                <div class="start-overlay hidden" id="start-overlay">
+                    <button type="button" class="start-overlay-btn" id="start-overlay-btn">
+                        <i class="fas fa-play-circle"></i>
+                        <span>시작</span>
+                    </button>
+                </div>
+                
+                <div id="board"><p id="0" class="tile">3</p><p id="1" class="tile"></p><p id="2" class="tile rightBorder">4</p><p id="3" class="tile"></p><p id="4" class="tile">6</p><p id="5" class="tile rightBorder">9</p><p id="6" class="tile"></p><p id="7" class="tile">5</p><p id="8" class="tile"></p><p id="9" class="tile"></p><p id="10" class="tile"></p><p id="11" class="tile rightBorder"></p><p id="12" class="tile">2</p><p id="13" class="tile">7</p><p id="14" class="tile rightBorder"></p><p id="15" class="tile"></p><p id="16" class="tile"></p><p id="17" class="tile">4</p><p id="18" class="tile bottomBorder">9</p><p id="19" class="tile bottomBorder"></p><p id="20" class="tile rightBorder bottomBorder">2</p><p id="21" class="tile bottomBorder"></p><p id="22" class="tile bottomBorder"></p><p id="23" class="tile rightBorder bottomBorder">4</p><p id="24" class="tile bottomBorder"></p><p id="25" class="tile bottomBorder"></p><p id="26" class="tile bottomBorder"></p><p id="27" class="tile"></p><p id="28" class="tile">2</p><p id="29" class="tile rightBorder"></p><p id="30" class="tile"></p><p id="31" class="tile">8</p><p id="32" class="tile rightBorder">5</p><p id="33" class="tile"></p><p id="34" class="tile">1</p><p id="35" class="tile">9</p><p id="36" class="tile">8</p><p id="37" class="tile"></p><p id="38" class="tile rightBorder">9</p><p id="39" class="tile"></p><p id="40" class="tile"></p><p id="41" class="tile rightBorder"></p><p id="42" class="tile">2</p><p id="43" class="tile"></p><p id="44" class="tile">5</p><p id="45" class="tile bottomBorder">5</p><p id="46" class="tile bottomBorder">1</p><p id="47" class="tile rightBorder bottomBorder"></p><p id="48" class="tile bottomBorder">3</p><p id="49" class="tile bottomBorder">9</p><p id="50" class="tile rightBorder bottomBorder"></p><p id="51" class="tile bottomBorder"></p><p id="52" class="tile bottomBorder">6</p><p id="53" class="tile bottomBorder"></p><p id="54" class="tile"></p><p id="55" class="tile"></p><p id="56" class="tile rightBorder"></p><p id="57" class="tile">8</p><p id="58" class="tile"></p><p id="59" class="tile rightBorder"></p><p id="60" class="tile">5</p><p id="61" class="tile"></p><p id="62" class="tile">3</p><p id="63" class="tile">2</p><p id="64" class="tile"></p><p id="65" class="tile rightBorder"></p><p id="66" class="tile"></p><p id="67" class="tile">4</p><p id="68" class="tile rightBorder">6</p><p id="69" class="tile"></p><p id="70" class="tile"></p><p id="71" class="tile"></p><p id="72" class="tile"></p><p id="73" class="tile">4</p><p id="74" class="tile rightBorder"></p><p id="75" class="tile">7</p><p id="76" class="tile">5</p><p id="77" class="tile rightBorder"></p><p id="78" class="tile">9</p><p id="79" class="tile"></p><p id="80" class="tile">6</p></div>
+                
+                <div id="number-container" class="">
+                    <p id="one">1</p>
+                    <p id="two">2</p>
+                    <p id="three">3</p>
+                    <p id="four">4</p>
+                    <p id="five">5</p>
+                    <p id="six">6</p>
+                    <p id="seven">7</p>
+                    <p id="eight">8</p>
+                    <p id="nine">9</p>
+                </div>
+            </div>
+
+            <div class="game-sidebar">
+                <div id="time-1">
+                <!-- Type 1 -->
+                <div id="animated-timer-container" class="placement" style="margin-top: 35px"><div class="base-timer">
+				<svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+					<g class="base-timer__circle">
+						<circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+						<path id="base-timer-path-remaining" stroke-dasharray="-2 283" class="base-timer__path-remaining red" d="
+								M 50, 50
+								m -45, 0
+								a 45,45 0 1,0 90,0
+								a 45,45 0 1,0 -90,0
+							"></path>
+					</g>
+				</svg>
+				<div id="base-timer-label" class="base-timer__label">
+					<span class="digit zero"></span>
+					<span class="digit zero"></span>
+					<span class="colon"></span>
+					<span class="digit zero"></span>
+					<span class="digit zero"></span>
+				</div>
+			</div></div>
+                <!-- Type 2 -->
+                <div id="digital-timer-container" class="hidden" style="margin-top: 35px"></div>
+                <div id="progress-bar-container" class="hidden"></div>
+            </div><div class="timer-compact">
+                    <!-- Countdown timer -->
+                    <div id="time-1">
+                        <div id="animated-timer-container" class="hidden"></div>
+                        <div id="digital-timer-container" class="hidden"></div>
+                        <div id="progress-bar-container" class="hidden"></div>
+                    </div>
+                    <!-- Stopwatch -->
+                    <div id="time-2">
+                        <div id="stopwatch-container" class="hidden"></div>
+                    </div>
+                </div>
+                
+                <p id="lives">Lives: 🖤🖤🖤</p>
+
+                <div class="btn-group" role="group">
+                    <button type="button" id="solve-btn" class="btn btn-secondary btn-sm" rel="tooltip" title="현재 퍼즐의 정답을 보여줍니다." data-placement="bottom" disabled="">
+                        <i class="far fa-lightbulb"></i> 정답 보기
+                    </button>
+
+                    <button type="button" id="solve-one-step-btn" class="btn btn-secondary btn-sm" rel="tooltip" title="현재 퍼즐에서 한 칸만 풉니다." data-placement="bottom" disabled="">
+                        <i class="fas fa-angle-double-right"></i> 한 칸 풀기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="myToast" style="position: absolute; top: 50%; right: 0; display: none;">
+        <div class="toast-header" style="font-size: 26px; background-color: #dfd8cf; color: black;">
+            <strong class="me-auto"><i class="fas fa-atom"></i> 팁</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" style="font-size: 24px; background-color: #dfd8cf; color: black;"></div>
+    </div>
+
+    <p>
+        </p><div class="center-screen" style="display: none;">
+            <div class="btn-group" role="group" style="display: none;">
+                <button type="button" id="refresh-btn" class="btn btn-secondary btn-sm" rel="tooltip" title="같은 난이도로 퍼즐을 새로고침합니다." data-placement="bottom">
+					<i class="fas fa-sync"></i> 퍼즐 새로고침
+				</button>
+
+                <button type="button" id="restart-btn" class="btn btn-secondary btn-sm" rel="tooltip" title="지금까지 입력한 값을 지우고 처음부터 시작합니다." data-placement="bottom">
+					<i class="fas fa-undo"></i> 처음부터
+				</button>
+            </div>
+            <div class="btn-group" role="group" style="display: none;">
+                <button type="button" id="pause-btn" class="btn btn-secondary btn-sm" disabled="">
+					<i class="fas fa-pause"></i> 일시정지
+				</button>
+
+                <button type="button" id="resume-btn" class="btn btn-secondary btn-sm" disabled="">
+					<i class="fas fa-hourglass-half"></i> 재개
+				</button>
+            </div>
+        </div>
+    
+    <!-- 하단 컨트롤 버튼 -->
+    <div id="bottom-controls" class="center-screen">
+        <button type="button" id="start-btn" class="control-btn">
+            <i class="fas fa-play"></i>
+            <span>새 게임!</span>
+        </button>
+        <button type="button" id="pause-btn" class="control-btn" style="display: flex;">
+            <i class="fas fa-pause"></i>
+            <span>일시정지</span>
+        </button>
+        <button type="button" id="settings-btn" class="control-btn">
+            <i class="fas fa-cog"></i>
+            <span>옵션</span>
+        </button>
+    </div>
+    
+    <p></p>
+
+    <!-- 일시정지 오버레이 -->
+    <div id="pause-overlay" class="game-overlay">
+        <button type="button" id="resume-overlay-btn" class="resume-overlay-btn">
+            <i class="fas fa-play-circle"></i>
+            <span>재개</span>
+        </button>
+    </div>
+
+    <!-- 인트로 모달 (첫 진입 시) -->
+    <div id="intro-modal" class="settings-modal active">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>스도쿠</h3>
+            </div>
+            <div class="modal-body">
+                <button class="settings-menu-item" data-action="intro-difficulty">
+                    <i class="fas fa-dice-three"></i>
+                    <span>난이도 선택</span>
+                </button>
+                <button class="settings-menu-item" data-action="intro-time">
+                    <i class="fas fa-hourglass-start"></i>
+                    <span>시간 선택</span>
+                </button>
+                <button class="settings-menu-item" id="intro-start-btn">
+                    <i class="fas fa-play"></i>
+                    <span>시작하기</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 옵션 메뉴 모달 -->
+    <div id="settings-menu-modal" class="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>옵션</h3>
+                <button class="modal-close" data-modal="settings-menu-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <button class="settings-menu-item" data-action="difficulty">
+                    <i class="fas fa-dice-three"></i>
+                    <span>난이도 선택</span>
+                </button>
+                <button class="settings-menu-item" data-action="time">
+                    <i class="fas fa-hourglass-start"></i>
+                    <span>시간 선택</span>
+                </button>
+                <button class="settings-menu-item" data-action="restart">
+                    <i class="fas fa-undo"></i>
+                    <span>다시하기</span>
+                </button>
+                <button class="settings-menu-item modal-back-btn" data-action="back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>뒤로</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 난이도 선택 모달 -->
+    <div id="difficulty-modal" class="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>난이도 선택</h3>
+                <button class="modal-close" data-modal="difficulty-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="radio" class="btn-check" id="difficulty-easy" name="diff" value="easy" autocomplete="off" checked="">
+                <label class="modal-option-btn" for="difficulty-easy">
+                    <i class="fas fa-dice-one"></i> 쉬움
+                </label>
+
+                <input type="radio" class="btn-check" id="difficulty-medium" name="diff" value="medium" autocomplete="off">
+                <label class="modal-option-btn" for="difficulty-medium">
+                    <i class="fas fa-dice-two"></i> 보통
+                </label>
+
+                <input type="radio" class="btn-check" id="difficulty-hard" name="diff" value="hard" autocomplete="off">
+                <label class="modal-option-btn" for="difficulty-hard">
+                    <i class="fas fa-dice-three"></i> 어려움
+                </label>
+
+                <input type="radio" class="btn-check" id="difficulty-veryhard" name="diff" value="veryhard" autocomplete="off">
+                <label class="modal-option-btn" for="difficulty-veryhard">
+                    <i class="fas fa-dice-four"></i> 매우 어려움
+                </label>
+                
+                <button class="modal-back-btn" data-modal="difficulty-modal">
+                    <i class="fas fa-arrow-left"></i> 뒤로
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 시간 선택 모달 -->
+    <div id="time-modal" class="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>시간 선택</h3>
+                <button class="modal-close" data-modal="time-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="radio" class="btn-check" id="time-3mins" name="time" value="three" autocomplete="off" checked="">
+                <label class="modal-option-btn" for="time-3mins">
+                    <i class="fas fa-hourglass-start"></i> 3분
+                </label>
+
+                <input type="radio" class="btn-check" id="time-5mins" name="time" value="five" autocomplete="off">
+                <label class="modal-option-btn" for="time-5mins">
+                    <i class="fas fa-hourglass-start"></i> 5분
+                </label>
+
+                <input type="radio" class="btn-check" id="time-10mins" name="time" value="ten" autocomplete="off">
+                <label class="modal-option-btn" for="time-10mins">
+                    <i class="fas fa-hourglass-start"></i> 10분
+                </label>
+
+                <input type="radio" class="btn-check" id="time-unlimited" name="time" value="unlimited" autocomplete="off">
+                <label class="modal-option-btn" for="time-unlimited">
+                    <i class="fas fa-infinity"></i> 제한 없음
+                </label>
+
+                <input type="radio" class="btn-check" id="time-stopwatch" name="time" value="stopwatch" autocomplete="off">
+                <label class="modal-option-btn" for="time-stopwatch">
+                    <i class="fas fa-stopwatch"></i> 스톱워치
+                </label>
+                
+                <button class="modal-back-btn" data-modal="time-modal">
+                    <i class="fas fa-arrow-left"></i> 뒤로
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+
+    
+
+    <div class="social-panel-container">
+        <div class="social-panel">
+            <p>
+                Created with <i class="fa fa-heart" id="heart"></i> by
+                <a target="_blank" href="https://huaminghuangtw.github.io">Hua-Ming Huang</a>
+            </p>
+            <button class="close-btn"><i class="fas fa-times"></i></button>
+            <h4>Reach me out on</h4>
+            <ul>
+                <li>
+                    <a href="mailto:huaming.huang.tw@gmail.com" target="_blank">
+                        <i class="fas fa-at"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.linkedin.com/in/huaminghuangtw" target="_blank">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://github.com/huaminghuangtw" target="_blank">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.strava.com/athletes/huaminghuang" target="_blank">
+                        <i class="fab fa-strava"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/huaming.huang.tw/" target="_blank">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.instagram.com/hmhuang__/" target="_blank">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </li>
+                <!-- <li>
+                    <a href="https://api.whatsapp.com/send?phone=491786042963&text=Hello!" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </li> -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Floating toggle button removed as requested -->
+
+    <!-- JavaScript (Placed at the bottom of body tag so that the DOM could load faster) -->
+    <script async="" defer="" src="https://buttons.github.io/buttons.js"></script>
+    <!-- jQuery first, then Bootstrap Bundle JS (single include) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="./JSscripts/helperSudoku.js"></script>
+    <script src="./JSscripts/puzzleBank.js"></script>
+    <script src="./JSscripts/utilitySudoku.js"></script>
+    <script src="./JSscripts/solveSudoku.js"></script>
+    <script src="./JSscripts/generateSudoku.js"></script>
+    <script src="./JSscripts/candidatesSudoku.js"></script>
+    <script src="./JSscripts/stopwatch.js"></script>
+    <script src="./JSscripts/countdown-timer.js"></script>
+    <script src="./JSscripts/progress-bar.js"></script>
+    <script src="./JSscripts/app.js"></script>
+    <script src="./JSscripts/settings-modal.js"></script>
+
+
+</body></html>
