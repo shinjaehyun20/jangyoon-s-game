@@ -38,5 +38,13 @@
     "description": "클래식 테트리스 게임 (자바스크립트)",
     "thumbnail": "tetris_javascript/texture.jpg",
     "path": "tetris_javascript/index.html"
+  },
+  {
+    "id": "2048",
+    "title": "2048",
+    "title_ko": "2048 퍼즐",
+    "description": "2048 숫자 퍼즐 게임 (오픈소스)",
+    "thumbnail": "2048/favicon.ico",
+    "path": "2048/index.html"
   }
 ]
