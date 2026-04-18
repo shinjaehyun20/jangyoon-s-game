@@ -199,9 +199,24 @@ header h1 {
 /* 모바일 대응 */
 @media (max-width: 640px) {
   .game-wrap { padding: 10px; }
-  #gameArea { height: 360px; }
-  .touch-controls { display: flex; }
-  .sub { font-size: 14px; }
+  #gameArea { height: calc(100svh - 230px); min-height: 280px; }
+  .touch-controls {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 12px 0;
+    margin-top: 10px;
+  }
+  .touch-controls button {
+    width: 80px;
+    height: 80px;
+    font-size: 30px;
+    border-radius: 50%;
+  }
+  .sub { font-size: 13px; }
+  header h1 { font-size: 22px; }
+  #hud { padding: 8px; }
+  #hud div { padding: 6px 10px; font-size: 13px; }
 }
 
 /* 점수 효과 */

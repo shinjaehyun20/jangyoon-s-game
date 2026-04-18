@@ -57,11 +57,12 @@
     @media screen and (min-width: 700px) and (min-height: 700px)  { #tetris { font-size: 1.75em; width: 650px; } #menu { width: 300px; height: 600px; } #upcoming { width: 150px; height: 150px; } #canvas { width: 300px; height: 600px; } } /* 30px chunks */
     @media screen and (min-width: 800px) and (min-height: 800px)  { #tetris { font-size: 2.00em; width: 750px; } #menu { width: 350px; height: 700px; } #upcoming { width: 175px; height: 175px; } #canvas { width: 350px; height: 700px; } } /* 35px chunks */
     @media screen and (min-width: 900px) and (min-height: 900px)  { #tetris { font-size: 2.25em; width: 850px; } #menu { width: 400px; height: 800px; } #upcoming { width: 200px; height: 200px; } #canvas { width: 400px; height: 800px; } } /* 40px chunks */
-    @media (pointer: coarse), (max-width: 820px) {
+    @media (pointer: coarse), (max-width: 600px) {
       body { padding: 0.75rem; }
       #tetris { width: min(100%, 25rem); }
       #mobile-controls { display: block; }
       .mobile-home-link { display: block; }
+      body { overflow-x: hidden; }
     }
   </style>
 </head>
@@ -257,6 +258,8 @@
       document.addEventListener('keydown', keydown, false);
       window.addEventListener('resize', resize, false);
       bindTouchControls();
+      bindSwipeControls();
+      bindStartTouch();
     }
 
     function bindTouchControls() {
@@ -272,6 +275,36 @@
           }, false);
         });
       });
+    }
+
+    function bindSwipeControls() {
+      var swipeStartX = 0;
+      var swipeStartY = 0;
+      canvas.addEventListener('touchstart', function(ev) {
+        swipeStartX = ev.touches[0].clientX;
+        swipeStartY = ev.touches[0].clientY;
+        ev.preventDefault();
+      }, { passive: false });
+      canvas.addEventListener('touchend', function(ev) {
+        var deltaX = ev.changedTouches[0].clientX - swipeStartX;
+        var deltaY = ev.changedTouches[0].clientY - swipeStartY;
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          actions.push(deltaX > 0 ? DIR.RIGHT : DIR.LEFT);
+        }
+        else {
+          actions.push(deltaY > 0 ? DIR.DOWN : DIR.UP);
+        }
+        ev.preventDefault();
+      }, { passive: false });
+    }
+
+    function bindStartTouch() {
+      get('start').addEventListener('click', function(ev) {
+        if (!playing) {
+          play();
+          ev.preventDefault();
+        }
+      }, false);
     }
 
     function mapTouchAction(action) {

@@ -30,3 +30,10 @@ body{margin:0;font-family:Segoe UI, 'Noto Sans KR', system-ui;background:linear-
   /* On narrow screens hide the sidebar to avoid duplicate '메뉴' / '게임' at bottom */
   .sidebar{display:none}
 }
+
+@media (max-width:480px){
+  .game-grid{grid-template-columns:1fr;gap:12px}
+  .game-thumbnail{height:120px}
+  .game-title{font-size:16px}
+  .content h1{font-size:22px}
+}
