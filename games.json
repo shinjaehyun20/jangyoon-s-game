@@ -54,5 +54,13 @@
     "description": "숫자 퍼즐 게임 - 난이도 선택, 타이머, Lives 시스템 포함",
     "thumbnail": "sudoku/thumb.svg",
     "path": "sudoku/index.html"
+  },
+  {
+    "id": "ubongo",
+    "title": "Ubongo",
+    "title_ko": "우봉고",
+    "description": "폴리오미노 조각으로 목표 모양을 완성하는 속도 퍼즐 게임 (9라운드)",
+    "thumbnail": "ubongo/thumb.svg",
+    "path": "ubongo/index.html"
   }
 ]

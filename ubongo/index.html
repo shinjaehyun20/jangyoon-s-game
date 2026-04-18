@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>우봉고 — 장윤이 게임</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- 상단 헤더 (공통) -->
+    <header class="topbar">
+      <a href="../index.html" class="back-link">← 게임 목록</a>
+      <div class="brand">
+        <span class="brand-mark">U</span>
+        <span class="brand-name">UBONGO</span>
+      </div>
+      <div class="topbar-spacer"></div>
+    </header>
+
+    <!-- 시작 화면 -->
+    <section id="introScreen" class="screen intro">
+      <div class="intro-card">
+        <h1 class="intro-title">UBONGO</h1>
+        <p class="intro-sub">폴리오미노 퍼즐을 9라운드에 걸쳐 속도전으로 풀어내라</p>
+
+        <div class="intro-rules">
+          <h3>규칙</h3>
+          <ul>
+            <li><strong>9라운드</strong> 동안 연속된 퍼즐을 푼다</li>
+            <li>화면에 표시된 조각들을 <strong>모두 사용해</strong> 목표 모양을 완성</li>
+            <li>시간 내 완성 시 <strong>보석</strong>을 획득하고 점수가 쌓인다</li>
+            <li>실패해도 다음 라운드로 진행</li>
+          </ul>
+        </div>
+
+        <div class="intro-controls">
+          <h3>조작</h3>
+          <div class="ctrl-grid">
+            <div><span class="kbd">드래그</span> 조각 이동</div>
+            <div><span class="kbd">R</span> / <span class="kbd">↻</span> 회전</div>
+            <div><span class="kbd">F</span> / <span class="kbd">⇆</span> 반전</div>
+            <div><span class="kbd">Esc</span> / <span class="kbd">✕</span> 되돌리기</div>
+          </div>
+        </div>
+
+        <div class="diff-picker">
+          <h3>난이도</h3>
+          <div class="diff-buttons">
+            <button class="diff-btn active" data-diff="easy">
+              <span class="diff-label">EASY</span>
+              <span class="diff-desc">3조각 · 60초</span>
+            </button>
+            <button class="diff-btn" data-diff="hard">
+              <span class="diff-label">HARD</span>
+              <span class="diff-desc">4조각 · 90초</span>
+            </button>
+          </div>
+        </div>
+
+        <button id="startBtn" class="btn-primary">게임 시작</button>
+      </div>
+    </section>
+
+    <!-- 게임 플레이 화면 -->
+    <section id="gameScreen" class="screen game hidden">
+      <!-- HUD -->
+      <div class="hud">
+        <div class="hud-item">
+          <div class="hud-label">라운드</div>
+          <div class="hud-value" id="roundLabel">1 / 9</div>
+        </div>
+        <div class="hud-item hud-timer">
+          <div class="hud-label">남은 시간</div>
+          <div class="hud-value" id="timerLabel">1:00</div>
+        </div>
+        <div class="hud-item">
+          <div class="hud-label">점수</div>
+          <div class="hud-value" id="scoreLabel">0</div>
+        </div>
+        <div class="hud-item hud-gems">
+          <div class="hud-label">보석</div>
+          <div class="hud-value gems" id="gemsLabel">
+            <span class="gem gem-red">💎0</span>
+            <span class="gem gem-blue">💎0</span>
+            <span class="gem gem-green">💎0</span>
+            <span class="gem gem-brown">💎0</span>
+          </div>
+        </div>
+        <button id="skipBtn" class="btn-ghost">건너뛰기</button>
+      </div>
+
+      <!-- 보드 + 트레이 레이아웃 -->
+      <div class="play-area">
+        <div class="board-wrap">
+          <canvas id="boardCanvas"></canvas>
+        </div>
+
+        <div class="tray-wrap">
+          <div class="tray-label">사용할 조각</div>
+          <div id="trayArea" class="tray-area"></div>
+
+          <!-- 모바일/터치용 조작 바 -->
+          <div id="mobileControls" class="mobile-controls">
+            <button id="rotateBtn" class="ctrl-btn" aria-label="회전">
+              <span class="ctrl-icon">↻</span>
+              <span class="ctrl-text">회전</span>
+            </button>
+            <button id="flipBtn" class="ctrl-btn" aria-label="반전">
+              <span class="ctrl-icon">⇆</span>
+              <span class="ctrl-text">반전</span>
+            </button>
+            <button id="returnBtn" class="ctrl-btn" aria-label="되돌리기">
+              <span class="ctrl-icon">✕</span>
+              <span class="ctrl-text">되돌리기</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 라운드 종료 모달 -->
+    <div id="roundEndModal" class="modal hidden">
+      <div class="modal-card">
+        <h2 id="roundEndTitle">🎉 Ubongo!</h2>
+        <div id="roundEndBody" class="modal-body"></div>
+        <button id="nextRoundBtn" class="btn-primary">다음 라운드</button>
+      </div>
+    </div>
+
+    <!-- 최종 결과 화면 -->
+    <section id="endScreen" class="screen end hidden">
+      <div class="end-card">
+        <h1 class="end-title">게임 종료</h1>
+        <div id="newRecord" class="new-record hidden">🏆 최고 기록 갱신!</div>
+
+        <div class="end-stats">
+          <div class="stat">
+            <div class="stat-label">총점</div>
+            <div class="stat-value" id="finalScore">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">해결 라운드</div>
+            <div class="stat-value" id="finalSolved">0/9</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">이전 최고</div>
+            <div class="stat-value" id="bestScore">0</div>
+          </div>
+        </div>
+
+        <div class="end-gems" id="finalGems"></div>
+
+        <button id="restartBtn" class="btn-primary">다시 플레이</button>
+        <a href="../index.html" class="btn-ghost">게임 목록으로</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- Scripts -->
+  <script src="pieces.js"></script>
+  <script src="puzzles.js"></script>
+  <script src="renderer.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

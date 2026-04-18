@@ -9,7 +9,8 @@
       { "id": "typing-web", "label": "장윤 한글 타이핑 (웹)", "path": "https://shinjaehyun20.github.io/02-hangul-typing-game/#home" },
       { "id": "tetris", "label": "자바스크립트 테트리스", "path": "tetris/index.html" },
       { "id": "2048", "label": "2048 퍼즐", "path": "2048/index.html" },
-      { "id": "sudoku", "label": "스도쿠", "path": "sudoku/index.html" }
+      { "id": "sudoku", "label": "스도쿠", "path": "sudoku/index.html" },
+      { "id": "ubongo", "label": "우봉고", "path": "ubongo/index.html" }
     ]
   }
 ]

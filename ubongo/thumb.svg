@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1422"/>
+      <stop offset="1" stop-color="#071021"/>
+    </linearGradient>
+    <linearGradient id="gAmber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="gPink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f472b6"/>
+      <stop offset="1" stop-color="#db2777"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+
+  <!-- 장식 원 (글로우) -->
+  <circle cx="80" cy="90" r="70" fill="#eab308" opacity="0.06"/>
+  <circle cx="260" cy="90" r="50" fill="#3ea6ff" opacity="0.05"/>
+
+  <!-- 타겟 모양 (점선 아웃라인) -->
+  <g transform="translate(36, 38)" opacity="0.7">
+    <g stroke="#eab308" stroke-width="1" stroke-dasharray="3 2" fill="rgba(255,255,255,0.04)">
+      <rect x="26" y="0" width="26" height="26"/>
+      <rect x="0" y="26" width="26" height="26"/>
+      <rect x="26" y="26" width="26" height="26"/>
+      <rect x="52" y="26" width="26" height="26"/>
+      <rect x="78" y="26" width="26" height="26"/>
+      <rect x="26" y="52" width="26" height="26"/>
+      <rect x="52" y="52" width="26" height="26"/>
+      <rect x="52" y="78" width="26" height="26"/>
+    </g>
+  </g>
+
+  <!-- 배치된 폴리오미노 (L형) -->
+  <g transform="translate(62, 38)">
+    <rect x="0" y="26" width="24" height="24" fill="url(#gAmber)" stroke="#92400e" stroke-width="1"/>
+    <rect x="0" y="52" width="24" height="24" fill="url(#gAmber)" stroke="#92400e" stroke-width="1"/>
+    <rect x="0" y="78" width="24" height="24" fill="url(#gAmber)" stroke="#92400e" stroke-width="1"/>
+    <rect x="26" y="78" width="24" height="24" fill="url(#gAmber)" stroke="#92400e" stroke-width="1"/>
+  </g>
+
+  <!-- T형 -->
+  <g transform="translate(114, 38)">
+    <rect x="0" y="26" width="24" height="24" fill="url(#gBlue)" stroke="#1e40af" stroke-width="1"/>
+    <rect x="26" y="26" width="24" height="24" fill="url(#gBlue)" stroke="#1e40af" stroke-width="1"/>
+    <rect x="52" y="26" width="24" height="24" fill="url(#gBlue)" stroke="#1e40af" stroke-width="1"/>
+    <rect x="26" y="52" width="24" height="24" fill="url(#gBlue)" stroke="#1e40af" stroke-width="1"/>
+  </g>
+
+  <!-- 로고 텍스트 -->
+  <g transform="translate(170, 105)">
+    <text x="0" y="0" font-family="Impact, 'Arial Black', sans-serif" font-size="36" font-weight="900" fill="#eab308" letter-spacing="3">UBONGO</text>
+    <text x="2" y="20" font-family="'Noto Sans KR', sans-serif" font-size="11" fill="#8fa0b4" letter-spacing="4">POLYOMINO SPRINT</text>
+  </g>
+
+  <!-- 힌트 타일 (우측 상단 작게) -->
+  <g transform="translate(260, 30)">
+    <rect x="0" y="0" width="12" height="12" fill="url(#gGreen)" opacity="0.7"/>
+    <rect x="12" y="0" width="12" height="12" fill="url(#gGreen)" opacity="0.7"/>
+    <rect x="0" y="12" width="12" height="12" fill="url(#gGreen)" opacity="0.7"/>
+  </g>
+  <g transform="translate(290, 30)">
+    <rect x="0" y="0" width="10" height="10" fill="url(#gPink)" opacity="0.7"/>
+    <rect x="0" y="10" width="10" height="10" fill="url(#gPink)" opacity="0.7"/>
+    <rect x="10" y="10" width="10" height="10" fill="url(#gPink)" opacity="0.7"/>
+  </g>
+</svg>
