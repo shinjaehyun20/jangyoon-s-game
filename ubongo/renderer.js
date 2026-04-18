@@ -14,6 +14,16 @@ class BoardRenderer {
     this.placed = []; // [{pieceId, r, c, rotation, flipped, shape}]
     this.ghost = null; // 드래그 중 미리보기
     this.dpr = window.devicePixelRatio || 1;
+    this._lastCssW = 0;
+    this._lastCssH = 0;
+
+    // ResizeObserver로 캔버스 크기 변화 자동 감지 → resize() 자동 호출
+    if (typeof ResizeObserver !== 'undefined') {
+      this._ro = new ResizeObserver(() => {
+        if (this.puzzle) this.resize();
+      });
+      this._ro.observe(canvas);
+    }
   }
 
   setPuzzle(puzzle) {
@@ -31,14 +41,17 @@ class BoardRenderer {
     const H = this.puzzle.shape.length;
     // 캔버스 실제 크기를 CSS 크기에 맞춤
     const rect = this.canvas.getBoundingClientRect();
-    const cssW = rect.width;
-    const cssH = rect.height;
-    this.canvas.width = cssW * this.dpr;
-    this.canvas.height = cssH * this.dpr;
+    const cssW = Math.max(1, rect.width);
+    const cssH = Math.max(1, rect.height);
+    this.dpr = window.devicePixelRatio || 1;
+    this.canvas.width = Math.round(cssW * this.dpr);
+    this.canvas.height = Math.round(cssH * this.dpr);
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    this._lastCssW = cssW;
+    this._lastCssH = cssH;
 
     // 셀 크기 = min(캔버스폭/W, 캔버스높이/H) × 0.9
-    const maxCell = Math.min(cssW / (W + 1), cssH / (H + 1));
+    const maxCell = Math.min(cssW / (W + 0.5), cssH / (H + 0.5));
     this.cellSize = Math.floor(maxCell);
     this.offsetX = (cssW - this.cellSize * W) / 2;
     this.offsetY = (cssH - this.cellSize * H) / 2;
@@ -63,7 +76,20 @@ class BoardRenderer {
   draw() {
     const ctx = this.ctx;
     const rect = this.canvas.getBoundingClientRect();
-    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    // CSS 크기 변화 감지 → 필요 시 re-resize
+    if (rect.width !== this._lastCssW || rect.height !== this._lastCssH) {
+      if (this.puzzle && rect.width > 0 && rect.height > 0) {
+        this.resize();
+        return; // resize()가 draw()를 재호출함
+      }
+    }
+
+    // 변환 리셋 후 전체 버퍼 클리어 → 그 다음 DPR 변환 재적용
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.restore();
     if (!this.puzzle) return;
 
     const shape = this.puzzle.shape;

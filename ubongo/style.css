@@ -35,9 +35,12 @@
 * { box-sizing: border-box; }
 html, body {
   margin: 0; padding: 0;
-  width: 100%; height: 100%;
-  overflow: hidden;  /* 게임 자체는 한 화면 */
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   touch-action: manipulation;
+  overscroll-behavior: none;
 }
 body {
   font-family: var(--font-body);
@@ -52,9 +55,12 @@ body {
 .hidden { display: none !important; }
 
 .app {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* --------------------------- 상단바 --------------------------- */
@@ -521,15 +527,21 @@ body {
   .play-area {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(0, 1fr) auto;
-    gap: 10px;
-    padding: 10px;
+    gap: 8px;
+    padding: 8px;
+  }
+  .board-wrap {
+    padding: 8px;
+    min-height: 0;
   }
   .tray-wrap {
-    max-height: 40vh;
+    padding: 10px 12px;
+    max-height: 38vh;
+    max-height: 38dvh;
   }
   .tray-area {
     grid-template-columns: repeat(4, 1fr);
-    max-height: 160px;
+    max-height: 140px;
   }
   .hud {
     gap: 10px;
