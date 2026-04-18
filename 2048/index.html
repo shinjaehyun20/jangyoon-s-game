@@ -15,6 +15,24 @@
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+  <style>
+    .mobile-home-link {
+      display: none;
+      width: min(100% - 32px, 420px);
+      margin: 20px auto 28px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: #8f7a66;
+      color: #f9f6f2;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 700;
+      box-sizing: border-box;
+    }
+    @media (pointer: coarse), (max-width: 820px) {
+      .mobile-home-link { display: block; }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -84,6 +102,7 @@
     Created by <a href="http://gabrielecirulli.com" target="_blank">Gabriele Cirulli.</a> Based on <a href="https://itunes.apple.com/us/app/1024!/id823499224" target="_blank">1024 by Veewo Studio</a> and conceptually similar to <a href="http://asherv.com/threes/" target="_blank">Threes by Asher Vollmer.</a>
     </p>
   </div>
+  <a class="mobile-home-link" href="../index.html">홈으로</a>
 
   <script src="js/bind_polyfill.js"></script>
   <script src="js/classlist_polyfill.js"></script>

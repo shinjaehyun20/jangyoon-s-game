@@ -5,6 +5,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>장윤이 잡기 게임</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .mobile-home-link {
+      display: none;
+      width: min(100%, 24rem);
+      margin: 1rem auto 0;
+      padding: 0.95rem 1rem;
+      border-radius: 14px;
+      background: #1f2937;
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 700;
+      box-sizing: border-box;
+    }
+    @media (pointer: coarse), (max-width: 820px) {
+      .mobile-home-link { display: block; }
+    }
+  </style>
 </head>
 <body>
   <div class="game-wrap">
@@ -34,6 +52,7 @@
 
     <footer>
       <p><small>장윤이를 위한 특별한 게임 🎮</small></p>
+      <a class="mobile-home-link" href="../index.html">홈으로</a>
     </footer>
   </div>
 

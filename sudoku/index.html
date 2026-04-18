@@ -16,6 +16,24 @@
     <link href="./CSSstyles/styles.css" rel="stylesheet">
     <!-- UI overrides -->
     <link href="./CSSstyles/overrides.css" rel="stylesheet">
+    <style>
+      .mobile-home-link {
+        display: none;
+        width: min(100% - 32px, 420px);
+        margin: 24px auto 32px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: #1f2937;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+        box-sizing: border-box;
+      }
+      @media (pointer: coarse), (max-width: 820px) {
+        .mobile-home-link { display: block; }
+      }
+    </style>
 </head>
 
 <body class="light">
@@ -382,5 +400,6 @@
     <script src="./JSscripts/app.js"></script>
     <script src="./JSscripts/settings-modal.js"></script>
 
+    <a class="mobile-home-link" href="../index.html">홈으로</a>
 
 </body></html>
