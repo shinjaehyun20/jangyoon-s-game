@@ -1,97 +1,155 @@
-// 기본값 (fetch 실패 시 사용)
-let gamesData = [];
+/**
+ * 장윤이 게임 모음 — 루트 목록 페이지 스크립트
+ *
+ * 책임:
+ *  1. games.json / menu.json 로드 (fetch 실패 대비 에러 표시)
+ *  2. 게임 타일 그리드 렌더링
+ *  3. 사이드바 메뉴 렌더링
+ *
+ * 모든 HTML은 document.createElement로 생성해 XSS를 원천 차단한다.
+ */
 
-async function loadJSON(path) {
-  try {
-    const res = await fetch(path);
-    if (!res.ok) throw new Error('Fetch failed');
-    return await res.json();
-  } catch (e) {
-    console.warn('Could not load', path, e);
-    return null;
+(function () {
+  'use strict';
+
+  const ROOT = {
+    grid: document.getElementById('gameGrid'),
+    count: document.getElementById('gameCount'),
+    sidebar: document.getElementById('sidebarNav'),
+  };
+
+  /** 안전한 JSON fetch — 실패 시 null 반환 */
+  async function loadJSON(path) {
+    try {
+      const res = await fetch(path, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.warn(`[games] Failed to load ${path}:`, err);
+      return null;
+    }
   }
-}
 
-function createGameTile(game) {
-  const tile = document.createElement('a');
-  tile.className = 'game-tile';
-  tile.href = game.path || '#';
-  tile.rel = 'noopener';
-
-  const thumb = document.createElement('div');
-  thumb.className = 'game-thumbnail';
-  // 상대 경로가 있을 때 로드 가능하도록 처리
-  thumb.style.backgroundImage = `url('${game.thumbnail || 'https://via.placeholder.com/320x180?text=No+Image'}')`;
-
-  const info = document.createElement('div');
-  info.className = 'game-info';
-
-  const title = document.createElement('h3');
-  title.className = 'game-title';
-  title.textContent = game.title_ko || game.title || 'Untitled';
-
-  const desc = document.createElement('p');
-  desc.className = 'game-description';
-  desc.textContent = game.description || '';
-
-  info.appendChild(title);
-  info.appendChild(desc);
-  tile.appendChild(thumb);
-  tile.appendChild(info);
-  return tile;
-}
-
-function renderSidebar(menu) {
-  const nav = document.querySelector('.sidebar');
-  nav.innerHTML = '<h2>메뉴</h2>';
-  if (!menu) return;
-  menu.forEach(section => {
-    const el = document.createElement('div');
-    el.className = 'menu-section';
-    const h = document.createElement('h4');
-    h.textContent = section.label;
-    el.appendChild(h);
-
-    const ul = document.createElement('ul');
-    ul.className = 'menu-items';
-    if (section.items && section.items.length) {
-      section.items.forEach(it => {
-        const li = document.createElement('li');
-        const link = document.createElement('a');
-        link.textContent = it.label || it;
-        link.href = it.path || '#';
-        link.style.textDecoration = 'none';
-        link.style.color = 'inherit';
-        li.appendChild(link);
-        ul.appendChild(li);
-      });
+  /** 게임 타일 생성 */
+  function createGameTile(game) {
+    const tile = document.createElement('a');
+    tile.className = 'game-tile';
+    tile.href = game.path || '#';
+    tile.setAttribute('role', 'listitem');
+    tile.setAttribute('aria-label', `${game.title_ko || game.title || '게임'} 플레이`);
+    // 외부 링크면 새 탭
+    if (/^https?:\/\//.test(game.path)) {
+      tile.target = '_blank';
+      tile.rel = 'noopener noreferrer';
     }
 
-    el.appendChild(ul);
-    nav.appendChild(el);
-  });
-}
+    const thumb = document.createElement('div');
+    thumb.className = 'game-thumbnail';
+    if (game.thumbnail) {
+      thumb.style.backgroundImage = `url('${encodeURI(game.thumbnail)}')`;
+    } else {
+      thumb.classList.add('no-thumb');
+      thumb.textContent = (game.title_ko || game.title || '?').charAt(0);
+    }
 
-async function renderGames() {
-  const gameGrid = document.getElementById('gameGrid');
-  gameGrid.innerHTML = '';
+    const info = document.createElement('div');
+    info.className = 'game-info';
 
-  // load data files
-  const menu = await loadJSON('menu.json');
-  renderSidebar(menu || [{id:'games', label:'게임', items:[]}]);
+    const title = document.createElement('h3');
+    title.className = 'game-title';
+    title.textContent = game.title_ko || game.title || 'Untitled';
 
-  const list = await loadJSON('games.json');
-  gamesData = list || gamesData;
+    const desc = document.createElement('p');
+    desc.className = 'game-description';
+    desc.textContent = game.description || '';
 
-  if (!gamesData || !gamesData.length) {
-    gameGrid.innerHTML = '<p class="empty">등록된 게임이 없습니다.</p>';
-    return;
+    info.appendChild(title);
+    info.appendChild(desc);
+    tile.appendChild(thumb);
+    tile.appendChild(info);
+
+    // 외부 링크 표시
+    if (/^https?:\/\//.test(game.path)) {
+      const badge = document.createElement('span');
+      badge.className = 'external-badge';
+      badge.textContent = '↗';
+      badge.setAttribute('aria-label', '외부 링크');
+      tile.appendChild(badge);
+    }
+
+    return tile;
   }
 
-  gamesData.forEach(g => {
-    const tile = createGameTile(g);
-    gameGrid.appendChild(tile);
-  });
-}
+  /** 빈 상태 렌더링 */
+  function renderEmpty(grid, message) {
+    grid.innerHTML = '';
+    const empty = document.createElement('p');
+    empty.className = 'empty';
+    empty.textContent = message;
+    grid.appendChild(empty);
+  }
 
-document.addEventListener('DOMContentLoaded', renderGames);
+  /** 게임 그리드 렌더링 */
+  function renderGames(games) {
+    const grid = ROOT.grid;
+    grid.innerHTML = '';
+    if (!games || games.length === 0) {
+      renderEmpty(grid, '등록된 게임이 없습니다.');
+      ROOT.count.textContent = '';
+      return;
+    }
+    games.forEach(g => grid.appendChild(createGameTile(g)));
+    ROOT.count.textContent = `총 ${games.length}개 게임`;
+  }
+
+  /** 사이드바 렌더링 */
+  function renderSidebar(menu) {
+    const nav = ROOT.sidebar;
+    nav.innerHTML = '';
+    if (!Array.isArray(menu) || menu.length === 0) return;
+
+    menu.forEach(section => {
+      const wrap = document.createElement('div');
+      wrap.className = 'menu-section';
+      if (section.label) {
+        const h = document.createElement('h4');
+        h.className = 'menu-section-title';
+        h.textContent = section.label;
+        wrap.appendChild(h);
+      }
+      const ul = document.createElement('ul');
+      ul.className = 'menu-items';
+      (section.items || []).forEach(item => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = item.path || '#';
+        a.textContent = item.label || item.id || '';
+        if (/^https?:\/\//.test(item.path)) {
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+        }
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      wrap.appendChild(ul);
+      nav.appendChild(wrap);
+    });
+  }
+
+  /** 부팅 */
+  async function boot() {
+    const [games, menu] = await Promise.all([
+      loadJSON('games.json'),
+      loadJSON('menu.json')
+    ]);
+    renderGames(games);
+    renderSidebar(menu);
+  }
+
+  // 페이지 로드 시 실행
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();

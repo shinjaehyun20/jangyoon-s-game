@@ -1,230 +1,239 @@
-// 달리는 장윤이 - 게임 로직
-const gameArea = document.getElementById('gameArea');
-const player = document.getElementById('player');
-const scoreEl = document.getElementById('score');
-const timeEl = document.getElementById('time');
-const startBtn = document.getElementById('startBtn');
-const upBtn = document.getElementById('upBtn');
-const downBtn = document.getElementById('downBtn');
-const message = document.getElementById('message');
+/**
+ * 달리는 장윤이 (Runner)
+ * 좌/우 스크롤 방식에서 위/아래로 이동해 떨어지는 아이템을 모은다.
+ * 제어: 키보드(↑↓ / WS), 버튼(▲▼), 드래그, 스페이스바로 시작.
+ */
 
-let score = 0;
-let timeLeft = 30;
-let gameTimer = null;
-let spawnTimer = null;
-let gameActive = false;
-let playerPos = 50; // 퍼센트 단위
-let items = new Set();
-let animationId = null;
+(function () {
+  'use strict';
 
-function resetGame() {
-    score = 0;
-    timeLeft = 30;
-    gameActive = false;
-    playerPos = 50;
-    scoreEl.textContent = score;
-    timeEl.textContent = timeLeft;
+  // ================== 설정 ==================
+  const CONFIG = {
+    TOTAL_TIME: 30,              // 초
+    SPAWN_INTERVAL: 800,         // ms
+    SPAWN_PROBABILITY: 0.7,      // 스폰 주기마다 실제 생성 확률
+    POINT_PER_ITEM: 10,
+    ITEM_SPEED: 6,               // px/frame (좌측 이동)
+    PLAYER_STEP: 10,             // 이동 단위 (%)
+    PLAYER_MIN_Y: 10,            // %
+    PLAYER_MAX_Y: 90,            // %
+    HOLD_INTERVAL: 50,           // 버튼 홀드 시 반복 이동 간격 (ms)
+    SCORE_POPUP_DURATION: 600,   // ms
+    STORAGE_KEY: 'runnerHighScore'
+  };
+
+  // ================== DOM ==================
+  const $ = (id) => document.getElementById(id);
+  const gameArea = $('gameArea');
+  const player = $('player');
+  const scoreEl = $('score');
+  const timeEl = $('time');
+  const startBtn = $('startBtn');
+  const upBtn = $('upBtn');
+  const downBtn = $('downBtn');
+  const message = $('message');
+
+  // ================== 상태 ==================
+  const state = {
+    score: 0,
+    timeLeft: CONFIG.TOTAL_TIME,
+    active: false,
+    playerY: 50,           // 세로 위치 (%)
+    items: new Set(),
+    gameTimer: null,
+    spawnTimer: null,
+    animationId: null,
+    drag: { isDragging: false, pointerId: null },
+  };
+
+  // ================== 게임 플로우 ==================
+  function resetGame() {
+    state.score = 0;
+    state.timeLeft = CONFIG.TOTAL_TIME;
+    state.active = false;
+    state.playerY = 50;
+    scoreEl.textContent = state.score;
+    timeEl.textContent = state.timeLeft;
     message.classList.add('hidden');
-    items.forEach(item => item.remove());
-    items.clear();
-    player.style.top = `${playerPos}%`;
-    if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
+    state.items.forEach(item => item.remove());
+    state.items.clear();
+    player.style.top = `${state.playerY}%`;
+    if (state.animationId) {
+      cancelAnimationFrame(state.animationId);
+      state.animationId = null;
     }
-}
+  }
 
-function startGame() {
-    if (gameActive) return;
-    
+  function startGame() {
+    if (state.active) return;
     resetGame();
-    gameActive = true;
+    state.active = true;
     startBtn.textContent = '다시 시작';
-    message.classList.add('hidden');
-    
-    // 타이머 시작
-    gameTimer = setInterval(() => {
-        timeLeft--;
-        timeEl.textContent = timeLeft;
-        if (timeLeft <= 0) endGame();
-    }, 1000);
 
-    // 아이템 생성 시작
-    spawnTimer = setInterval(() => {
-        // 더 자주 아이템 생성
-        if (Math.random() < 0.7) spawnItem();
-    }, 800);
-
-    // 게임 루프 시작
+    state.gameTimer = setInterval(tickTimer, 1000);
+    state.spawnTimer = setInterval(() => {
+      if (Math.random() < CONFIG.SPAWN_PROBABILITY) spawnItem();
+    }, CONFIG.SPAWN_INTERVAL);
     gameLoop();
-}
+  }
 
-function endGame() {
-    gameActive = false;
-    clearInterval(gameTimer);
-    clearInterval(spawnTimer);
-    if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
+  function endGame() {
+    state.active = false;
+    clearInterval(state.gameTimer);
+    clearInterval(state.spawnTimer);
+    if (state.animationId) {
+      cancelAnimationFrame(state.animationId);
+      state.animationId = null;
     }
-    
-    const highScore = localStorage.getItem('runnerHighScore') || 0;
-    if (score > highScore) {
-        localStorage.setItem('runnerHighScore', score);
-        message.textContent = `새로운 기록! ${score}점 달성! 🎉`;
+
+    const highScore = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    if (state.score > highScore) {
+      localStorage.setItem(CONFIG.STORAGE_KEY, state.score);
+      message.textContent = `새로운 기록! ${state.score}점 달성! 🎉`;
     } else {
-        message.textContent = `게임 종료! ${score}점 획득! �`;
+      message.textContent = `게임 종료! ${state.score}점 획득! 🏁`;
     }
     message.classList.remove('hidden');
     startBtn.textContent = '다시 시작';
-}
+  }
 
-function spawnItem() {
-    if (!gameActive) return;
-    
+  function tickTimer() {
+    state.timeLeft--;
+    timeEl.textContent = state.timeLeft;
+    if (state.timeLeft <= 0) endGame();
+  }
+
+  // ================== 아이템 ==================
+  function spawnItem() {
+    if (!state.active) return;
     const item = document.createElement('div');
     item.className = 'item';
-    
-    // 아이템 세로 위치 (10%-90%)
-    const y = 10 + Math.random() * 80;
+    // 세로 위치 10%~90%
+    const y = CONFIG.PLAYER_MIN_Y + Math.random() * (CONFIG.PLAYER_MAX_Y - CONFIG.PLAYER_MIN_Y);
     item.style.top = `${y}%`;
-    
-    // 게임 영역에 추가
     gameArea.appendChild(item);
-    items.add(item);
-}
+    state.items.add(item);
+  }
 
-function createScorePopup(x, y) {
+  function createScorePopup(x, y) {
     const popup = document.createElement('div');
     popup.className = 'score-popup';
-    popup.textContent = '+10';
+    popup.textContent = `+${CONFIG.POINT_PER_ITEM}`;
     popup.style.left = x + 'px';
     popup.style.top = y + 'px';
     gameArea.appendChild(popup);
-    
-    // 애니메이션 끝나면 제거
-    setTimeout(() => popup.remove(), 600);
-}
+    setTimeout(() => popup.remove(), CONFIG.SCORE_POPUP_DURATION);
+  }
 
-function gameLoop() {
-    if (!gameActive) return;
+  function collidesWithPlayer(itemRect, playerRect) {
+    return !(itemRect.right < playerRect.left ||
+             itemRect.left > playerRect.right ||
+             itemRect.bottom < playerRect.top ||
+             itemRect.top > playerRect.bottom);
+  }
 
-    // 아이템 이동 및 충돌 검사
-    items.forEach(item => {
-        const x = item.offsetLeft - 6; // 더 빠른 이동
-        
-        if (x < -50) {
-            items.delete(item);
-            item.remove();
-        } else {
-            item.style.left = x + 'px';
-            
-            // 충돌 검사
-            const itemRect = item.getBoundingClientRect();
-            const playerRect = player.getBoundingClientRect();
-            
-            if (!(itemRect.right < playerRect.left || 
-                itemRect.left > playerRect.right || 
-                itemRect.bottom < playerRect.top || 
-                itemRect.top > playerRect.bottom)) {
-                
-                // 아이템 획득!
-                items.delete(item);
-                item.remove();
-                score += 10;
-                scoreEl.textContent = score;
-                createScorePopup(itemRect.left, itemRect.top);
-            }
-        }
+  function gameLoop() {
+    if (!state.active) return;
+    const playerRect = player.getBoundingClientRect();
+
+    state.items.forEach(item => {
+      const newX = item.offsetLeft - CONFIG.ITEM_SPEED;
+      if (newX < -50) {
+        state.items.delete(item);
+        item.remove();
+        return;
+      }
+      item.style.left = newX + 'px';
+
+      const itemRect = item.getBoundingClientRect();
+      if (collidesWithPlayer(itemRect, playerRect)) {
+        state.items.delete(item);
+        item.remove();
+        state.score += CONFIG.POINT_PER_ITEM;
+        scoreEl.textContent = state.score;
+        createScorePopup(itemRect.left, itemRect.top);
+      }
     });
 
-    animationId = requestAnimationFrame(gameLoop);
-}
+    state.animationId = requestAnimationFrame(gameLoop);
+  }
 
-// 플레이어 이동
-function movePlayer(direction) {
-    if (!gameActive) return;
-    
-    const step = 10;
-    const newPos = direction === 'up' 
-        ? Math.max(10, playerPos - step)
-        : Math.min(90, playerPos + step);
-    
-    if (newPos !== playerPos) {
-        playerPos = newPos;
-        player.style.top = `${playerPos}%`;
+  // ================== 플레이어 이동 ==================
+  function movePlayer(direction) {
+    if (!state.active) return;
+    const newPos = direction === 'up'
+      ? Math.max(CONFIG.PLAYER_MIN_Y, state.playerY - CONFIG.PLAYER_STEP)
+      : Math.min(CONFIG.PLAYER_MAX_Y, state.playerY + CONFIG.PLAYER_STEP);
+    if (newPos !== state.playerY) {
+      state.playerY = newPos;
+      player.style.top = `${state.playerY}%`;
     }
-}
+  }
 
-// 키보드 컨트롤
-window.addEventListener('keydown', e => {
-    if (e.key === 'ArrowUp' || e.key === 'w') movePlayer('up');
-    if (e.key === 'ArrowDown' || e.key === 's') movePlayer('down');
-    if (e.key === ' ' && !gameActive) startGame();
-});
+  // ================== 입력 ==================
+  function bindKeyboard() {
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'w') movePlayer('up');
+      else if (e.key === 'ArrowDown' || e.key === 's') movePlayer('down');
+      else if (e.key === ' ' && !state.active) startGame();
+    });
+  }
 
-// 터치/마우스 컨트롤
-upBtn.addEventListener('pointerdown', () => {
-    const interval = setInterval(() => movePlayer('up'), 50);
-    const stopMoving = () => clearInterval(interval);
-    upBtn.addEventListener('pointerup', stopMoving, {once: true});
-    upBtn.addEventListener('pointerleave', stopMoving, {once: true});
-});
+  function bindHoldButton(btn, direction) {
+    let intervalId = null;
+    const start = () => {
+      movePlayer(direction); // 즉시 한 번
+      intervalId = setInterval(() => movePlayer(direction), CONFIG.HOLD_INTERVAL);
+    };
+    const stop = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', stop);
+    btn.addEventListener('pointerleave', stop);
+    btn.addEventListener('pointercancel', stop);
+  }
 
-downBtn.addEventListener('pointerdown', () => {
-    const interval = setInterval(() => movePlayer('down'), 50);
-    const stopMoving = () => clearInterval(interval);
-    downBtn.addEventListener('pointerup', stopMoving, {once: true});
-    downBtn.addEventListener('pointerleave', stopMoving, {once: true});
-});
+  function bindDrag() {
+    const startDrag = (e) => {
+      try { gameArea.focus(); } catch (_) {}
+      state.drag.isDragging = true;
+      state.drag.pointerId = e.pointerId;
+      try { gameArea.setPointerCapture(e.pointerId); } catch (_) {}
+    };
+    const stopDrag = () => {
+      if (!state.drag.isDragging) return;
+      state.drag.isDragging = false;
+      try { gameArea.releasePointerCapture(state.drag.pointerId); } catch (_) {}
+      state.drag.pointerId = null;
+    };
+    const onMove = (e) => {
+      if (!state.drag.isDragging || e.pointerId !== state.drag.pointerId) return;
+      const rect = gameArea.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      const pct = (y / rect.height) * 100;
+      state.playerY = Math.max(CONFIG.PLAYER_MIN_Y, Math.min(CONFIG.PLAYER_MAX_Y, pct));
+      player.style.top = `${state.playerY}%`;
+    };
 
-// 시작 버튼
-startBtn.addEventListener('click', startGame);
+    player.addEventListener('pointerdown', startDrag);
+    gameArea.addEventListener('pointerdown', (e) => {
+      if (e.target === gameArea) { startDrag(e); onMove(e); }
+    });
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', stopDrag);
+    window.addEventListener('pointercancel', stopDrag);
+  }
 
-// 게임 영역 포커스 (키보드 컨트롤용)
-gameArea.addEventListener('click', () => gameArea.focus());
-
-// 초기화
-resetGame();
-
-// --- Mobile hold-and-drag support (vertical) ---
-let dragging = false;
-let dragPointerId = null;
-
-function startVerticalDrag(e) {
-    // ensure keyboard focus remains on the game area so arrow keys still work
-    try { gameArea.focus(); } catch (err) {}
-    dragging = true;
-    dragPointerId = e.pointerId;
-    gameArea.setPointerCapture(dragPointerId);
-}
-
-function stopVerticalDrag(e) {
-    if (!dragging) return;
-    dragging = false;
-    try { gameArea.releasePointerCapture(dragPointerId); } catch (er) {}
-    dragPointerId = null;
-}
-
-function onVerticalMove(e) {
-    if (!dragging || e.pointerId !== dragPointerId) return;
-    const rect = gameArea.getBoundingClientRect();
-    // calculate percentage position (10%..90%)
-    const y = e.clientY - rect.top;
-    const pct = (y / rect.height) * 100;
-    const clamped = Math.max(10, Math.min(90, pct));
-    playerPos = clamped;
-    player.style.top = `${playerPos}%`;
-}
-
-// attach to player and area
-player.addEventListener('pointerdown', startVerticalDrag);
-gameArea.addEventListener('pointerdown', (e) => {
-    if (e.target === gameArea) {
-        startVerticalDrag(e);
-        onVerticalMove(e);
-    }
-});
-window.addEventListener('pointermove', onVerticalMove);
-window.addEventListener('pointerup', stopVerticalDrag);
-window.addEventListener('pointercancel', stopVerticalDrag);
+  // ================== 초기화 ==================
+  bindKeyboard();
+  bindHoldButton(upBtn, 'up');
+  bindHoldButton(downBtn, 'down');
+  bindDrag();
+  startBtn.addEventListener('click', startGame);
+  gameArea.addEventListener('click', () => gameArea.focus());
+  resetGame();
+})();

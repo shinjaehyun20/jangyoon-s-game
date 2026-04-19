@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  
+  <defs>
+    
+    <linearGradient id="tile2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eee4da"/><stop offset="1" stop-color="#d8cfc1"/>
+    </linearGradient>
+    <linearGradient id="tile4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ede0c8"/><stop offset="1" stop-color="#d6c8ac"/>
+    </linearGradient>
+    <linearGradient id="tile8" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2b179"/><stop offset="1" stop-color="#d28f54"/>
+    </linearGradient>
+    <linearGradient id="tile2048" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#edc22e"/><stop offset="1" stop-color="#bd9715"/>
+    </linearGradient>
+  
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      
+    <stop offset="0" stop-color="#faf8ef"/>
+    <stop offset="1" stop-color="#eee4da"/>
+  
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect width="320" height="180" fill="url(#sheen)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  
+  <!-- 타일 그리드 (좌측) -->
+  <g transform="translate(24, 30)" font-family="'Pretendard', sans-serif" font-weight="900">
+    <!-- 2x2 grid -->
+    <rect x="0" y="0" width="54" height="54" rx="6" fill="url(#tile2)" stroke="rgba(0,0,0,0.08)"/>
+    <text x="27" y="36" text-anchor="middle" font-size="22" fill="#776e65">2</text>
+
+    <rect x="60" y="0" width="54" height="54" rx="6" fill="url(#tile4)" stroke="rgba(0,0,0,0.08)"/>
+    <text x="87" y="36" text-anchor="middle" font-size="22" fill="#776e65">4</text>
+
+    <rect x="0" y="60" width="54" height="54" rx="6" fill="url(#tile8)" stroke="rgba(0,0,0,0.08)"/>
+    <text x="27" y="96" text-anchor="middle" font-size="22" fill="#fff">8</text>
+
+    <rect x="60" y="60" width="54" height="54" rx="6" fill="url(#tile2048)" stroke="rgba(0,0,0,0.08)"/>
+    <text x="87" y="97" text-anchor="middle" font-size="18" fill="#fff">2048</text>
+  </g>
+  <!-- 화살표 힌트 -->
+  <g transform="translate(170, 90)" stroke="#8f7a66" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M -10 0 L 10 0 M 5 -5 L 10 0 L 5 5"/>
+  </g>
+  
+  <g font-family="'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#8f7a66" letter-spacing="-0.5">2048</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">NUMBER PUZZLE</text>
+  </g>
+  
+</svg>

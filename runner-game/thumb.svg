@@ -1,4 +1,59 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360">
-  <rect width="100%" height="100%" fill="#071225" />
-  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#3ea6ff" font-size="36">Runner Game</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  
+  <defs>
+    
+    <linearGradient id="trail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#10b981" stop-opacity="0"/>
+      <stop offset="1" stop-color="#34d399" stop-opacity="0.7"/>
+    </linearGradient>
+    <radialGradient id="runnerGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#0891b2"/>
+    </radialGradient>
+  
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      
+    <stop offset="0" stop-color="#0c1a2e"/>
+    <stop offset="1" stop-color="#071522"/>
+  
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect width="320" height="180" fill="url(#sheen)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  
+  <!-- 배경 수직 줄무늬 (속도감) -->
+  <g opacity="0.08">
+    <rect x="0" y="0" width="16" height="180" fill="#34d399"/><rect x="32" y="0" width="16" height="180" fill="#34d399"/><rect x="64" y="0" width="16" height="180" fill="#34d399"/><rect x="96" y="0" width="16" height="180" fill="#34d399"/><rect x="128" y="0" width="16" height="180" fill="#34d399"/><rect x="160" y="0" width="16" height="180" fill="#34d399"/><rect x="192" y="0" width="16" height="180" fill="#34d399"/><rect x="224" y="0" width="16" height="180" fill="#34d399"/><rect x="256" y="0" width="16" height="180" fill="#34d399"/><rect x="288" y="0" width="16" height="180" fill="#34d399"/>
+  </g>
+  <!-- 모션 트레일 -->
+  <rect x="20" y="85" width="180" height="24" fill="url(#trail)" opacity="0.4"/>
+  <!-- 주로 라인 -->
+  <line x1="0" y1="120" x2="320" y2="120" stroke="rgba(52, 211, 153, 0.3)" stroke-width="1" stroke-dasharray="8 6"/>
+  <!-- 러너 캐릭터 (간략화) -->
+  <g transform="translate(170, 90)">
+    <circle cx="0" cy="0" r="22" fill="url(#runnerGlow)" opacity="0.3"/>
+    <circle cx="0" cy="0" r="16" fill="#34d399"/>
+    <circle cx="-4" cy="-3" r="2" fill="#071522"/>
+    <circle cx="4" cy="-3" r="2" fill="#071522"/>
+    <path d="M -5 4 Q 0 8 5 4" stroke="#071522" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- 수집 아이템 -->
+  <g transform="translate(250, 60)">
+    <circle r="6" fill="#fbbf24"/>
+    <text x="0" y="3" text-anchor="middle" font-size="8" font-weight="900" fill="#92400e">★</text>
+  </g>
+  <g transform="translate(80, 140)">
+    <circle r="5" fill="#fbbf24" opacity="0.7"/>
+  </g>
+  
+  <g font-family="'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#34d399" letter-spacing="-0.5">달리는 장윤이</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">RUNNER</text>
+  </g>
+  
 </svg>

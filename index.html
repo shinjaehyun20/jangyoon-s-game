@@ -3,24 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>장 갓 디 스</title>
+  <meta name="description" content="장윤이를 위한 게임 모음 - 타이핑, 퍼즐, 액션 게임을 한 곳에서" />
+  <meta name="theme-color" content="#0f1724" />
+  <title>장윤이 게임 모음</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%233ea6ff'/><text x='16' y='22' text-anchor='middle' font-size='20' font-weight='900' fill='%23071021' font-family='sans-serif'>장</text></svg>" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
-    <nav class="sidebar">
-      <h2>메뉴</h2>
-      <!-- 메뉴 항목 추가 가능 -->
-    </nav>
+    <aside class="sidebar" aria-label="메뉴">
+      <h2 class="sidebar-title">메뉴</h2>
+      <nav id="sidebarNav"></nav>
+    </aside>
+
     <main class="content">
-      <h1>게임 목록</h1>
-      <div id="gameGrid" class="game-grid"></div>
+      <header class="content-header">
+        <h1 class="content-title">게임 목록</h1>
+        <p class="content-sub" id="gameCount">불러오는 중…</p>
+      </header>
+
+      <div id="gameGrid" class="game-grid" role="list" aria-live="polite">
+        <div class="game-tile skeleton" aria-hidden="true"><div class="game-thumbnail"></div><div class="game-info"><div class="sk-line sk-title"></div><div class="sk-line"></div></div></div>
+        <div class="game-tile skeleton" aria-hidden="true"><div class="game-thumbnail"></div><div class="game-info"><div class="sk-line sk-title"></div><div class="sk-line"></div></div></div>
+        <div class="game-tile skeleton" aria-hidden="true"><div class="game-thumbnail"></div><div class="game-info"><div class="sk-line sk-title"></div><div class="sk-line"></div></div></div>
+      </div>
     </main>
   </div>
 
   <script src="script.js"></script>
 </body>
 </html>
-
-
-

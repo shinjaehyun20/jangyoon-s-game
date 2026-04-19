@@ -1,4 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360">
-  <rect width="100%" height="100%" fill="#071225" />
-  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#ffd166" font-size="36">Typing Game</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  
+  <defs>
+    
+    <linearGradient id="keyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#86efac"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+  
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      
+    <stop offset="0" stop-color="#14532d"/>
+    <stop offset="1" stop-color="#052e16"/>
+  
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect width="320" height="180" fill="url(#sheen)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  
+  <!-- 키캡 배경 -->
+  <g font-family="'Pretendard', sans-serif" font-weight="900">
+    <g transform="translate(40, 56)">
+      <rect width="52" height="52" rx="8" fill="url(#keyGrad)" stroke="#166534" stroke-width="1"/>
+      <rect x="2" y="2" width="48" height="4" fill="rgba(255,255,255,0.35)" rx="2"/>
+      <text x="26" y="38" text-anchor="middle" font-size="28" fill="#14532d">가</text>
+    </g>
+    <g transform="translate(110, 56)">
+      <rect width="52" height="52" rx="8" fill="url(#keyGrad)" stroke="#166534" stroke-width="1"/>
+      <rect x="2" y="2" width="48" height="4" fill="rgba(255,255,255,0.35)" rx="2"/>
+      <text x="26" y="38" text-anchor="middle" font-size="28" fill="#14532d">나</text>
+    </g>
+    <g transform="translate(180, 56)">
+      <rect width="52" height="52" rx="8" fill="url(#keyGrad)" stroke="#166534" stroke-width="1"/>
+      <rect x="2" y="2" width="48" height="4" fill="rgba(255,255,255,0.35)" rx="2"/>
+      <text x="26" y="38" text-anchor="middle" font-size="28" fill="#14532d">다</text>
+    </g>
+  </g>
+  <!-- 커서 라인 -->
+  <line x1="250" y1="68" x2="250" y2="96" stroke="#86efac" stroke-width="2">
+    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+  </line>
+  
+  <g font-family="'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#86efac" letter-spacing="-0.5">한글 타이핑</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">HANGUL TYPING</text>
+  </g>
+  
 </svg>
