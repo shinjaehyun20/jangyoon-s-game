@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>색깔 맞추기</title>
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --panel: rgba(255,255,255,0.07);
+      --accent: #a78bfa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh; overflow: hidden;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      touch-action: manipulation;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 14px 8px; gap: 10px;
+    }
+    h1 { font-size: clamp(20px, 5vw, 26px); text-align: center; color: var(--accent); }
+    .hud {
+      display: flex; justify-content: space-around;
+      background: var(--panel); border-radius: 12px; padding: 10px 8px;
+      flex-shrink: 0;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 10px; opacity: 0.7; letter-spacing: 1px; text-transform: uppercase; }
+    .hud-value { font-size: 24px; font-weight: 900; }
+
+    /* 타이머 바 */
+    .timer-wrap { position: relative; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; flex-shrink: 0; overflow: hidden; }
+    .timer-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: background 0.3s; }
+
+    /* 단어 표시 */
+    .word-area {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+    }
+    .instruction {
+      font-size: clamp(13px, 3.5vw, 16px); opacity: 0.7; text-align: center; line-height: 1.5;
+    }
+    .word {
+      font-size: clamp(52px, 16vw, 88px); font-weight: 900;
+      letter-spacing: -2px; text-align: center;
+      text-shadow: 0 4px 24px rgba(0,0,0,0.5);
+      line-height: 1;
+      transition: transform 0.12s;
+    }
+    .word.pop { transform: scale(1.15); }
+
+    /* 피드백 바 */
+    .feedback {
+      font-size: clamp(18px, 5vw, 24px); font-weight: 900;
+      text-align: center; height: 32px; line-height: 32px;
+      transition: opacity 0.2s;
+    }
+
+    /* 선택 버튼 */
+    .btn-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .color-btn {
+      padding: clamp(18px, 5vw, 28px) 0;
+      border-radius: 16px;
+      border: none;
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s, box-shadow 0.1s;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.35);
+      color: #fff;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+    }
+    .color-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.35); }
+    .color-btn.correct { animation: flash-ok 0.25s; }
+    .color-btn.wrong   { animation: flash-err 0.25s; }
+    @keyframes flash-ok  { 0%,100%{filter:none} 50%{filter:brightness(1.6)} }
+    @keyframes flash-err { 0%,100%{filter:none} 50%{filter:brightness(0.5)} }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; opacity: 0.5; }
+    .home-link {
+      padding: 6px 14px; border-radius: 8px;
+      background: rgba(255,255,255,0.07); color: #fff;
+      text-decoration: none; font-size: 12px; font-weight: 600;
+    }
+
+    /* 오버레이 */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10; }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1a1a2e; border-radius: 20px; padding: 28px 24px;
+      text-align: center; width: min(340px, 90vw);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      border: 1px solid rgba(167,139,250,0.3);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; color: var(--accent); }
+    .overlay-card p  { font-size: 14px; opacity: 0.85; margin-bottom: 18px; line-height: 1.7; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); margin: 6px 0; }
+    .result-detail { font-size: 13px; opacity: 0.7; margin-bottom: 16px; }
+    .btn-start {
+      background: var(--accent); border: none; color: #111;
+      font-size: 20px; font-weight: 900;
+      padding: 14px 36px; border-radius: 14px;
+      cursor: pointer; touch-action: manipulation;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+    }
+    .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎨 색깔 맞추기</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <div class="hud-label">점수</div>
+      <div class="hud-value" id="scoreEl">0</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">콤보</div>
+      <div class="hud-value" id="comboEl">0</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">남은시간</div>
+      <div class="hud-value" id="timeEl">30</div>
+    </div>
+  </div>
+
+  <div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div>
+
+  <div class="word-area">
+    <p class="instruction" id="instruction">글자의 <strong>색깔</strong>을 골라요!<br>(글자가 뭐라고 써있는지는 무시!)</p>
+    <div class="word" id="wordEl">준비!</div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div class="btn-area" id="btnArea"></div>
+
+  <footer>
+    <small>글자 내용이 아닌 글자 색을 눌러요</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🎨 색깔 맞추기</h2>
+    <p>글자가 <strong>어떤 색</strong>으로 쓰여있는지<br>아래 버튼에서 골라요!<br><br>
+    📌 글자가 뭐라고 <em>써있는지</em>는 무시!<br>글자의 <em>색깔</em>만 봐요!</p>
+    <button class="btn-start" id="startBtn">도전!</button>
+  </div>
+</div>
+
+<!-- 결과 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 시간 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="result-detail" id="finalDetail"></div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const COLORS = [
+    { name: '빨강', hex: '#ef4444' },
+    { name: '파랑', hex: '#3b82f6' },
+    { name: '초록', hex: '#22c55e' },
+    { name: '노랑', hex: '#facc15' },
+  ];
+
+  const CONFIG = {
+    TOTAL_TIME: 30,
+    BASE_SCORE: 10,
+    COMBO_BONUS: 3,
+    WRONG_PENALTY: 5,
+    COMBO_RESET_ON_WRONG: true,
+  };
+
+  const wordEl    = document.getElementById('wordEl');
+  const scoreEl   = document.getElementById('scoreEl');
+  const comboEl   = document.getElementById('comboEl');
+  const timeEl    = document.getElementById('timeEl');
+  const timerBar  = document.getElementById('timerBar');
+  const feedback  = document.getElementById('feedback');
+  const btnArea   = document.getElementById('btnArea');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay   = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const finalDetailEl= document.getElementById('finalDetail');
+  const resultMsg    = document.getElementById('resultMsg');
+
+  const state = {
+    score: 0, combo: 0, correct: 0, wrong: 0,
+    timeLeft: 0, active: false,
+    currentColor: null,
+    gameTimer: null, feedbackTimer: null,
+  };
+
+  // 버튼 생성 (4개 고정)
+  const buttons = [];
+  COLORS.forEach((c) => {
+    const btn = document.createElement('button');
+    btn.className = 'color-btn';
+    btn.textContent = c.name;
+    btn.style.background = c.hex;
+    btn.dataset.name = c.name;
+    btn.addEventListener('click', () => onAnswer(c.name));
+    btnArea.appendChild(btn);
+    buttons.push(btn);
+  });
+
+  function nextWord() {
+    if (!state.active) return;
+    // 표시할 색이름과 실제 글자 색을 다르게 설정 (항상 다를 확률 70%)
+    const textColorIdx = Math.floor(Math.random() * COLORS.length);
+    let displayIdx;
+    if (Math.random() < 0.7) {
+      // 불일치 (더 어렵고 재밌음)
+      do { displayIdx = Math.floor(Math.random() * COLORS.length); }
+      while (displayIdx === textColorIdx);
+    } else {
+      displayIdx = textColorIdx;
+    }
+    state.currentColor = COLORS[textColorIdx].name;
+    wordEl.textContent = COLORS[displayIdx].name;
+    wordEl.style.color = COLORS[textColorIdx].hex;
+    wordEl.classList.remove('pop');
+    void wordEl.offsetWidth; // reflow
+    wordEl.classList.add('pop');
+  }
+
+  function onAnswer(chosen) {
+    if (!state.active) return;
+    const correct = chosen === state.currentColor;
+    clearTimeout(state.feedbackTimer);
+
+    if (correct) {
+      state.combo++;
+      const earned = CONFIG.BASE_SCORE + (state.combo - 1) * CONFIG.COMBO_BONUS;
+      state.score += earned;
+      state.correct++;
+      feedback.textContent = `+${earned} ✅`;
+      feedback.style.color = '#4ade80';
+      // 정답 버튼 플래시
+      buttons.find(b => b.dataset.name === chosen)?.classList.add('correct');
+      setTimeout(() => buttons.forEach(b => b.classList.remove('correct')), 250);
+    } else {
+      if (CONFIG.COMBO_RESET_ON_WRONG) state.combo = 0;
+      state.score = Math.max(0, state.score - CONFIG.WRONG_PENALTY);
+      state.wrong++;
+      feedback.textContent = `-${CONFIG.WRONG_PENALTY} ❌`;
+      feedback.style.color = '#f87171';
+      buttons.find(b => b.dataset.name === chosen)?.classList.add('wrong');
+      setTimeout(() => buttons.forEach(b => b.classList.remove('wrong')), 250);
+    }
+
+    scoreEl.textContent = state.score;
+    comboEl.textContent = state.combo;
+    state.feedbackTimer = setTimeout(() => { feedback.textContent = ''; }, 600);
+    nextWord();
+  }
+
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    state.score = 0; state.combo = 0; state.correct = 0; state.wrong = 0;
+    state.timeLeft = CONFIG.TOTAL_TIME; state.active = true;
+    scoreEl.textContent = '0'; comboEl.textContent = '0';
+    timeEl.textContent = CONFIG.TOTAL_TIME;
+    timerBar.style.width = '100%';
+    timerBar.style.background = '#a78bfa';
+    feedback.textContent = '';
+
+    state.gameTimer = setInterval(() => {
+      state.timeLeft--;
+      timeEl.textContent = state.timeLeft;
+      const pct = (state.timeLeft / CONFIG.TOTAL_TIME) * 100;
+      timerBar.style.width = pct + '%';
+      if (state.timeLeft <= 8) timerBar.style.background = '#ef4444';
+      else if (state.timeLeft <= 15) timerBar.style.background = '#f59e0b';
+      if (state.timeLeft <= 0) endGame();
+    }, 1000);
+
+    nextWord();
+  }
+
+  function endGame() {
+    state.active = false;
+    clearInterval(state.gameTimer);
+    wordEl.textContent = '🎉';
+    wordEl.style.color = '#fff';
+    feedback.textContent = '';
+
+    finalScoreEl.textContent = state.score;
+    finalDetailEl.textContent = `정답 ${state.correct}번 · 오답 ${state.wrong}번`;
+    const key = 'colortap_best';
+    const best = parseInt(localStorage.getItem(key) || '0', 10);
+    if (state.score > best) {
+      localStorage.setItem(key, state.score);
+      resultMsg.textContent = `🏆 최고 기록 갱신!`;
+    } else {
+      resultMsg.textContent = `최고 기록: ${best}점`;
+    }
+    endOverlay.classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('restartBtn').addEventListener('click', startGame);
+})();
+</script>
+</body>
+</html>

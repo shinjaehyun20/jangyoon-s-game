@@ -16,6 +16,30 @@
     "path": "runner-game/index.html"
   },
   {
+    "id": "whack-a-mole",
+    "title": "Whack-a-Mole",
+    "title_ko": "두더지 잡기",
+    "description": "올라오는 두더지를 빠르게 탭해서 잡아요! 연속 콤보 보너스",
+    "thumbnail": "whack-a-mole/thumb.svg",
+    "path": "whack-a-mole/index.html"
+  },
+  {
+    "id": "memory-match",
+    "title": "Memory Match",
+    "title_ko": "기억력 카드",
+    "description": "같은 이모지 카드 두 장을 기억해서 찾아보세요. 쉬움/보통/어려움",
+    "thumbnail": "memory-match/thumb.svg",
+    "path": "memory-match/index.html"
+  },
+  {
+    "id": "color-tap",
+    "title": "Color Tap",
+    "title_ko": "색깔 맞추기",
+    "description": "글자가 어떤 색으로 쓰여있는지 골라요! 내용이 아닌 색깔을!",
+    "thumbnail": "color-tap/thumb.svg",
+    "path": "color-tap/index.html"
+  },
+  {
     "id": "typing",
     "title": "Typing (로컬)",
     "title_ko": "장윤 한글 타이핑 (로컬)",

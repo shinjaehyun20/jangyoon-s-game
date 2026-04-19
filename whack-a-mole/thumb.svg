@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b5e20"/><stop offset="1" stop-color="#2e7d32"/>
+    </linearGradient>
+    <linearGradient id="dirt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5d4037"/><stop offset="1" stop-color="#3e2723"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <!-- 잔디 줄무늬 -->
+  <rect x="0" y="120" width="320" height="60" fill="rgba(0,0,0,0.15)"/>
+  <!-- 구멍 3개 -->
+  <ellipse cx="60" cy="115" rx="36" ry="20" fill="url(#dirt)"/>
+  <ellipse cx="160" cy="105" rx="36" ry="20" fill="url(#dirt)"/>
+  <ellipse cx="260" cy="115" rx="36" ry="20" fill="url(#dirt)"/>
+  <!-- 두더지 이모지 -->
+  <text x="160" y="88" text-anchor="middle" font-size="52">🐹</text>
+  <text x="60" y="104" text-anchor="middle" font-size="36" opacity="0.5">🐭</text>
+  <text x="260" y="104" text-anchor="middle" font-size="36" opacity="0.5">🦔</text>
+  <!-- 망치 -->
+  <text x="220" y="62" text-anchor="middle" font-size="40" transform="rotate(-30 220 62)">🔨</text>
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffeb3b">두더지 잡기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">WHACK-A-MOLE</text>
+  </g>
+</svg>

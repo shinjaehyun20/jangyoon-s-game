@@ -139,6 +139,7 @@ VS Code `Live Server` 확장을 써도 된다.
 - **중복 폴더 정리** — `tetris_javascript/` 제거 (원작자 MIT LICENSE는 `tetris/LICENSE`로 보존)
 - **커스텀 게임 코드 정리** — space-catcher, runner-game, typing의 `script.js` 리팩토링 (로직은 100% 보존)
 - **runner-game 버그 수정** — 게임 종료 메시지의 깨진 문자 복구
+- **테트리스 모바일 레이아웃 수정** — viewport meta 추가 + 캔버스 크기 재설계로 모바일에서 보드가 화면의 ~50% 차지 (이전 ~30%)
 - **우봉고 안정화** — 모바일 드래그 중 캔버스 잔상 문제 해결 (ResizeObserver 적용)
 
 자세한 내용은 [CHANGES.md](./CHANGES.md) 참조.

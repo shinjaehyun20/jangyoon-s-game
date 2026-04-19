@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d0d1a"/><stop offset="1" stop-color="#1a1a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <!-- 큰 컬러 단어 -->
+  <text x="88" y="100" text-anchor="middle" font-size="58" font-weight="900" fill="#3b82f6"
+        font-family="'Pretendard','Noto Sans KR',sans-serif">빨강</text>
+  <!-- 물음표 -->
+  <text x="172" y="75" text-anchor="middle" font-size="28" fill="rgba(255,255,255,0.3)">?</text>
+  <!-- 컬러 버튼 4개 -->
+  <rect x="16" y="120" width="62" height="38" rx="8" fill="#ef4444"/>
+  <text x="47" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="sans-serif">빨강</text>
+  <rect x="86" y="120" width="62" height="38" rx="8" fill="#3b82f6"/>
+  <text x="117" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="sans-serif">파랑</text>
+  <rect x="156" y="120" width="62" height="38" rx="8" fill="#22c55e"/>
+  <text x="187" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="sans-serif">초록</text>
+  <rect x="226" y="120" width="62" height="38" rx="8" fill="#facc15"/>
+  <text x="257" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#111" font-family="sans-serif">노랑</text>
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="168" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">COLOR TAP</text>
+  </g>
+  <text x="88" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="rgba(255,255,255,0.7)" font-family="sans-serif">글자 색깔을 골라요!</text>
+</svg>

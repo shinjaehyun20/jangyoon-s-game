@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>기억력 카드</title>
+  <style>
+    :root {
+      --bg1: #1a237e; --bg2: #283593;
+      --card-back: #3949ab;
+      --card-front: #fff;
+      --accent: #ffeb3b;
+      --matched: #66bb6a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh; overflow: hidden;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      touch-action: manipulation;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+    }
+    h1 { font-size: clamp(20px, 5.5vw, 28px); text-align: center; text-shadow: 1px 2px 0 rgba(0,0,0,0.3); }
+    .hud {
+      display: flex; justify-content: space-around; align-items: center;
+      background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px;
+      flex-shrink: 0;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 10px; opacity: 0.8; letter-spacing: 1px; text-transform: uppercase; }
+    .hud-value { font-size: 22px; font-weight: 900; }
+    /* 카드 그리드 */
+    .grid {
+      flex: 1; display: grid;
+      gap: clamp(6px, 2vw, 12px);
+      align-content: center;
+    }
+    /* 난이도별 컬럼수 */
+    .grid.easy   { grid-template-columns: repeat(4, 1fr); } /* 4×3 = 12장 */
+    .grid.medium { grid-template-columns: repeat(4, 1fr); } /* 4×4 = 16장 */
+    .grid.hard   { grid-template-columns: repeat(5, 1fr); } /* 5×4 = 20장 */
+    /* 카드 3D 뒤집기 */
+    .card {
+      aspect-ratio: 1;
+      perspective: 600px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .card-inner {
+      width: 100%; height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.35s ease;
+      border-radius: clamp(8px, 2vw, 14px);
+    }
+    .card.flipped .card-inner  { transform: rotateY(180deg); }
+    .card.matched .card-inner  { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute; inset: 0;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      border-radius: inherit;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(22px, 7vw, 42px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .card-back {
+      background: linear-gradient(135deg, var(--card-back), #283593);
+      border: 2px solid rgba(255,255,255,0.15);
+      font-size: clamp(18px, 5vw, 28px);
+    }
+    .card-front {
+      background: var(--card-front);
+      transform: rotateY(180deg);
+    }
+    .card.matched .card-front {
+      background: #e8f5e9;
+      box-shadow: 0 0 0 3px var(--matched), 0 4px 12px rgba(0,0,0,0.2);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #283593; border-radius: 20px; padding: 28px 24px;
+      text-align: center; width: min(340px, 90vw);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
+    .overlay-card p  { font-size: 14px; opacity: 0.9; margin-bottom: 16px; line-height: 1.6; }
+    .diff-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; }
+    .diff-btn {
+      padding: 10px 18px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1); color: #fff;
+      font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation;
+      transition: all 0.15s;
+    }
+    .diff-btn.active { background: var(--accent); color: #111; border-color: var(--accent); }
+    .result-time { font-size: 44px; font-weight: 900; color: var(--accent); margin: 6px 0; }
+    .result-moves { font-size: 16px; opacity: 0.85; margin-bottom: 14px; }
+    .btn-start {
+      background: var(--accent); border: none;
+      color: #111; font-size: 20px; font-weight: 900;
+      padding: 14px 36px; border-radius: 14px;
+      cursor: pointer; touch-action: manipulation;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+      letter-spacing: 1px;
+    }
+    .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; opacity: 0.7; }
+    .home-link {
+      padding: 6px 14px; border-radius: 8px;
+      background: rgba(255,255,255,0.1); color: #fff;
+      text-decoration: none; font-size: 12px; font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🧠 기억력 카드</h1>
+  <div class="hud">
+    <div class="hud-item">
+      <div class="hud-label">시간</div>
+      <div class="hud-value" id="timeEl">0:00</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">시도</div>
+      <div class="hud-value" id="movesEl">0</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">맞춘쌍</div>
+      <div class="hud-value" id="matchedEl">0</div>
+    </div>
+  </div>
+  <div class="grid easy" id="grid"></div>
+  <footer>
+    <small>같은 카드 두 장을 찾아요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🧠 기억력 카드</h2>
+    <p>같은 이모지 카드 두 장을<br>기억해서 찾아보세요!</p>
+    <div class="diff-buttons">
+      <button class="diff-btn active" data-diff="easy">쉬움<br><small>12장</small></button>
+      <button class="diff-btn" data-diff="medium">보통<br><small>16장</small></button>
+      <button class="diff-btn" data-diff="hard">어려움<br><small>20장</small></button>
+    </div>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 완성!</h2>
+    <div class="result-time" id="finalTime">0:00</div>
+    <div class="result-moves" id="finalMoves"></div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const EMOJIS_POOL = [
+    '🦁','🐯','🐻','🐼','🐸','🐵','🦊','🐺',
+    '🦄','🐲','🦋','🌈','⭐','🍎','🍕','🎮',
+    '🚀','🎈','🎁','🎵','🏆','💎','🌸','🍦',
+  ];
+
+  const DIFF = {
+    easy:   { pairs: 6,  cols: 'easy' },
+    medium: { pairs: 8,  cols: 'medium' },
+    hard:   { pairs: 10, cols: 'hard' },
+  };
+
+  const grid        = document.getElementById('grid');
+  const timeEl      = document.getElementById('timeEl');
+  const movesEl     = document.getElementById('movesEl');
+  const matchedEl   = document.getElementById('matchedEl');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay   = document.getElementById('endOverlay');
+  const finalTimeEl  = document.getElementById('finalTime');
+  const finalMovesEl = document.getElementById('finalMoves');
+  const resultMsg    = document.getElementById('resultMsg');
+
+  const state = {
+    difficulty: 'easy',
+    flipped: [],
+    matched: 0,
+    moves: 0,
+    totalPairs: 0,
+    locked: false,
+    startTime: 0,
+    timerInterval: null,
+  };
+
+  function fmtTime(ms) {
+    const s = Math.floor(ms / 1000);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function buildGrid(diff) {
+    const cfg = DIFF[diff];
+    const emojis = shuffle(EMOJIS_POOL).slice(0, cfg.pairs);
+    const cards = shuffle([...emojis, ...emojis]);
+    state.totalPairs = cfg.pairs;
+    state.matched = 0; state.moves = 0; state.flipped = []; state.locked = false;
+    movesEl.textContent = '0'; matchedEl.textContent = '0'; timeEl.textContent = '0:00';
+
+    grid.className = `grid ${cfg.cols}`;
+    grid.innerHTML = '';
+
+    cards.forEach((emoji, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.emoji = emoji;
+      card.dataset.idx = idx;
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-back">🃏</div>
+          <div class="card-face card-front">${emoji}</div>
+        </div>`;
+      card.addEventListener('click', () => onCardClick(card));
+      grid.appendChild(card);
+    });
+  }
+
+  function onCardClick(card) {
+    if (state.locked) return;
+    if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+    // 첫 카드: 타이머 시작
+    if (state.flipped.length === 0 && state.moves === 0) {
+      state.startTime = Date.now();
+      state.timerInterval = setInterval(() => {
+        timeEl.textContent = fmtTime(Date.now() - state.startTime);
+      }, 200);
+    }
+
+    card.classList.add('flipped');
+    state.flipped.push(card);
+
+    if (state.flipped.length < 2) return;
+
+    // 두 장 공개 상태
+    state.moves++;
+    movesEl.textContent = state.moves;
+    state.locked = true;
+
+    const [a, b] = state.flipped;
+    if (a.dataset.emoji === b.dataset.emoji) {
+      // 매칭 성공
+      setTimeout(() => {
+        a.classList.add('matched'); b.classList.add('matched');
+        a.classList.remove('flipped'); b.classList.remove('flipped');
+        state.flipped = [];
+        state.matched++;
+        matchedEl.textContent = state.matched;
+        state.locked = false;
+        if (state.matched === state.totalPairs) endGame();
+      }, 350);
+    } else {
+      // 매칭 실패
+      setTimeout(() => {
+        a.classList.remove('flipped'); b.classList.remove('flipped');
+        state.flipped = [];
+        state.locked = false;
+      }, 900);
+    }
+  }
+
+  function endGame() {
+    clearInterval(state.timerInterval);
+    const elapsed = Date.now() - state.startTime;
+    finalTimeEl.textContent = fmtTime(elapsed);
+    finalMovesEl.textContent = `시도 횟수: ${state.moves}번`;
+    // 최고 기록 (시간 기준)
+    const key = `mem_best_${state.difficulty}`;
+    const best = parseInt(localStorage.getItem(key) || '999999', 10);
+    if (elapsed < best) {
+      localStorage.setItem(key, elapsed);
+      resultMsg.textContent = `🏆 ${state.difficulty} 최고 기록! 이전: ${fmtTime(best === 999999 ? elapsed : best)}`;
+    } else {
+      resultMsg.textContent = `최고 기록: ${fmtTime(best)} | 더 빨리 도전해봐요!`;
+    }
+    endOverlay.classList.remove('hidden');
+  }
+
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    clearInterval(state.timerInterval);
+    buildGrid(state.difficulty);
+  }
+
+  // 난이도 버튼
+  document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.difficulty = btn.dataset.diff;
+    });
+  });
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    endOverlay.classList.add('hidden');
+    startOverlay.classList.remove('hidden');
+  });
+})();
+</script>
+</body>
+</html>

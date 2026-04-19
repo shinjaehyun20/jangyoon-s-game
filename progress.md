@@ -18,3 +18,10 @@ Original prompt: https://shinjaehyun20.github.io/jangyoon-s-game/ 여기 디렉�
 - 2026-04-19: Refactored custom game scripts (`space-catcher`, `runner-game`, `typing`) — CONFIG constants, IIFE wrapper, state objects, helper functions. Logic preserved 100%.
 - 2026-04-19: Fixed runner-game bug — broken emoji character (`�`) in end-game message → 🏁.
 - 2026-04-19: Updated `games.json` thumbnail paths: `tetris/texture.jpg` → `tetris/thumb.svg`, `2048/favicon.ico` → `2048/thumb.svg`.
+- 2026-04-19: Fixed `tetris/index.html` mobile layout — added missing viewport meta tag (root cause: page was rendering in 980px desktop mode), introduced flex-based menu layout, sized canvas as `min(55vw, 14rem)` with 2:1 aspect ratio (10×20 격자), hid FPS widget on mobile. Result: canvas 219×433 fills ~50% of mobile viewport vs. previous ~30%.
+- 2026-04-19: Refactored `space-catcher` and `runner-game` layout — replaced `height:100vh` fixed body with `flex` column + `100dvh`. Scroll eliminated on mobile (verified `scroll:false`). Unified footer/home-link style.
+- 2026-04-19: Added 3 new kids' games (7-year-old optimized, mobile-first, single-file HTML):
+  - `whack-a-mole/` — 두더지 잡기: 9-hole grid, 30s timer, level-up speed, combo bonus, localStorage best score
+  - `memory-match/` — 기억력 카드: 3 difficulties (12/16/20 cards), 3D flip animation, time/moves tracking, localStorage best time per difficulty
+  - `color-tap/` — 색깔 맞추기: Stroop-effect color naming game, 4 colors, 30s timer, combo scoring, wrong-answer penalty
+- 2026-04-19: Updated `games.json` to 11 games total. Restructured `menu.json` into 3 categories: 어린이 추천 / 퍼즐 / 타이핑.

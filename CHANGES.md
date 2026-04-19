@@ -74,6 +74,20 @@
 - `clearRect`를 버퍼 크기 기준으로 지우도록 변경
 - `100dvh` 적용으로 iOS 주소창 대응
 
+## 테트리스 모바일 레이아웃 수정 (2026-04-19 추가)
+모바일에서 게임 보드가 화면의 ~30%만 차지하던 문제 해결.
+
+**근본 원인**: `tetris/index.html`에 viewport meta 태그가 없어 모바일 브라우저가 980px 데스크톱 모드로 페이지를 렌더링.
+
+**수정사항** (모두 `tetris/index.html` CSS만 변경, 게임 로직은 무변경):
+- `<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />` 추가
+- 모바일 미디어 쿼리(`(pointer: coarse), (max-width: 700px)`) 전면 재작성:
+  - `#menu`: `inline-block` → `flex` 가로 압축 배치 (캔버스 위)
+  - `#canvas`: `min(55vw, 14rem) × min(110vw, 28rem)` — **항상 2:1 비율 유지** (테트리스 10×20 격자)
+  - 모바일 컨트롤 버튼 크기·간격 조정
+  - FPS 디버그 위젯 모바일에서 숨김
+- 결과: iPhone 12 viewport(390×664) 기준 canvas 219×433 — 화면의 ~50% 차지
+
 ## 미변경 파일
 다음은 오픈소스 기반이라 **의도적으로 건드리지 않음** (기능 회귀 리스크 방지):
 - `2048/` (전체)
