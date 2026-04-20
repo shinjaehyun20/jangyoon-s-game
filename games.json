@@ -86,5 +86,21 @@
     "description": "폴리오미노 조각으로 목표 모양을 완성하는 속도 퍼즐 게임 (9라운드)",
     "thumbnail": "ubongo/thumb.svg",
     "path": "ubongo/index.html"
+  },
+  {
+    "id": "balloon-pop",
+    "title": "Balloon Pop",
+    "title_ko": "🎈 풍선 터뜨리기",
+    "description": "올라오는 풍선을 터치하고 폭탄은 피하세요! 30초 도전",
+    "thumbnail": "balloon-pop/thumb.svg",
+    "path": "balloon-pop/index.html"
+  },
+  {
+    "id": "number-order",
+    "title": "Number Order",
+    "title_ko": "🔢 숫자 순서 맞추기",
+    "description": "흩어진 숫자를 1부터 순서대로 빠르게 터치! 레벨 클리어 도전",
+    "thumbnail": "number-order/thumb.svg",
+    "path": "number-order/index.html"
   }
 ]

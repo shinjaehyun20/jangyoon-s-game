@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 풍선들 -->
+  <!-- 빨간 풍선 -->
+  <ellipse cx="60" cy="95" rx="28" ry="34" fill="#ff6b6b"/>
+  <ellipse cx="52" cy="80" rx="9" ry="7" fill="rgba(255,255,255,0.32)"/>
+  <polygon points="56,129 64,129 60,138" fill="#ff6b6b"/>
+  <line x1="60" y1="138" x2="60" y2="155" stroke="#ff6b6bcc" stroke-width="2" stroke-dasharray="3,2"/>
+
+  <!-- 노랑 풍선 -->
+  <ellipse cx="130" cy="75" rx="30" ry="36" fill="#ffd700"/>
+  <ellipse cx="120" cy="58" rx="10" ry="7" fill="rgba(255,255,255,0.35)"/>
+  <polygon points="126,111 134,111 130,120" fill="#ffd700"/>
+  <line x1="130" y1="120" x2="130" y2="140" stroke="#ffd700cc" stroke-width="2" stroke-dasharray="3,2"/>
+
+  <!-- 파랑 풍선 -->
+  <ellipse cx="200" cy="90" rx="26" ry="32" fill="#48dbfb"/>
+  <ellipse cx="192" cy="77" rx="8" ry="6" fill="rgba(255,255,255,0.3)"/>
+  <polygon points="196,122 204,122 200,131" fill="#48dbfb"/>
+  <line x1="200" y1="131" x2="200" y2="150" stroke="#48dbfbcc" stroke-width="2" stroke-dasharray="3,2"/>
+
+  <!-- 폭탄 -->
+  <ellipse cx="265" cy="108" rx="22" ry="22" fill="#333"/>
+  <text x="265" y="118" text-anchor="middle" font-size="22">💣</text>
+
+  <!-- 팝 이펙트 -->
+  <text x="170" y="45" font-size="22" text-anchor="middle">✨</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd700">풍선 터뜨리기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">BALLOON POP</text>
+  </g>
+</svg>

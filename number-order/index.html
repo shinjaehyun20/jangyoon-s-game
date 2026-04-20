@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🔢 숫자 순서 맞추기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(160deg, #0d1b2a 0%, #1b2838 50%, #0f2027 100%);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex; gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: #fff;
+      font-size: clamp(13px, 3.5vw, 16px);
+      font-weight: 700;
+      align-items: center;
+    }
+    .hud > span { flex: 1; text-align: center; }
+    #gameArea {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .next-hint {
+      color: rgba(255,255,255,0.6);
+      font-size: clamp(14px, 3.5vw, 16px);
+      text-align: center;
+    }
+    .next-hint strong {
+      color: #ffd700;
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+    }
+    .num-btn {
+      aspect-ratio: 1;
+      border-radius: 16px;
+      border: 3px solid transparent;
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 900;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.1s, opacity 0.15s;
+      min-height: 64px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .num-btn:not(.done):active { transform: scale(0.9); }
+    .num-btn.done {
+      opacity: 0.3;
+      pointer-events: none;
+      transform: scale(0.85);
+    }
+    .num-btn.wrong {
+      animation: shake 0.35s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+    .level-badge {
+      background: rgba(255,215,0,0.15);
+      border: 1px solid rgba(255,215,0,0.35);
+      border-radius: 20px;
+      padding: 4px 16px;
+      color: #ffd700;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: rgba(255,255,255,0.45);
+      font-size: 11px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1b3a5f, #0a2540);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      color: #fff;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; }
+    .overlay-card p  { font-size: 14px; color: rgba(255,255,255,0.75); margin-bottom: 16px; line-height: 1.6; }
+    .result-score { font-size: 52px; font-weight: 900; color: #ffd700; margin: 8px 0; }
+    .best-label   { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 18px; }
+    .btn-start {
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      color: #0d1b2a;
+      border: none; border-radius: 14px;
+      font-size: 18px; font-weight: 900;
+      padding: 14px 40px;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 16px rgba(247,151,30,0.4);
+    }
+    .btn-start:active { transform: scale(0.97); }
+    /* 레벨 클리어 FX */
+    .clear-fx {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 80px;
+      z-index: 50;
+      pointer-events: none;
+      animation: clearAnim 0.7s ease-out forwards;
+    }
+    @keyframes clearAnim {
+      0%   { transform: scale(0.3); opacity: 1; }
+      60%  { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔢 숫자 순서 맞추기</h1>
+  <div class="hud">
+    <span>⭐ <span id="score">0</span></span>
+    <span>❤️ <span id="lives">3</span></span>
+    <span>⏱ <span id="timer">20</span>s</span>
+    <span>🏆 <span id="best">0</span></span>
+  </div>
+  <div id="gameArea">
+    <div class="next-hint" id="hintArea">다음: <strong id="nextNum">1</strong></div>
+    <div class="grid" id="grid"></div>
+    <div class="level-badge" id="levelBadge">레벨 1</div>
+  </div>
+  <footer>
+    <small>💡 숫자를 1부터 순서대로 눌러요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🔢 숫자 순서 맞추기</h2>
+    <p>흩어진 숫자들을 <strong>1부터 순서대로</strong> 터치하세요!<br>시간 안에 빨리 맞출수록 점수가 올라가요.</p>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <div class="best-label" id="bestLabel"></div>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    baseTime: 20,
+    livesStart: 3,
+    gridSize: 12,    // 숫자 개수 (레벨에 따라 증가)
+    bestKey: 'number_order_best',
+    colors: [
+      '#ff6b6b','#ff9f43','#ffd700','#26de81','#45aaf2',
+      '#a29bfe','#fd79a8','#00cec9','#e17055','#74b9ff',
+      '#55efc4','#fdcb6e',
+    ],
+  };
+
+  let state = {};
+  let timerId = null;
+
+  const scoreEl   = document.getElementById('score');
+  const livesEl   = document.getElementById('lives');
+  const timerEl   = document.getElementById('timer');
+  const bestEl    = document.getElementById('best');
+  const nextNumEl = document.getElementById('nextNum');
+  const gridEl    = document.getElementById('grid');
+  const levelEl   = document.getElementById('levelBadge');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay   = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl  = document.getElementById('resultMsg');
+  const bestLabelEl  = document.getElementById('bestLabel');
+
+  function getBest() { return parseInt(localStorage.getItem(CONFIG.bestKey) || '0', 10); }
+  function saveBest(v) { localStorage.setItem(CONFIG.bestKey, v); }
+  bestEl.textContent = getBest();
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function levelCount(level) {
+    // 레벨 1→8개, 레벨 2→10개, 레벨 3+→12개
+    if (level === 1) return 8;
+    if (level === 2) return 10;
+    return 12;
+  }
+
+  function levelTime(level) {
+    return Math.max(10, CONFIG.baseTime - (level - 1) * 3);
+  }
+
+  function buildGrid(count) {
+    gridEl.innerHTML = '';
+    const nums = shuffle(Array.from({ length: count }, (_, i) => i + 1));
+    const cols = count <= 8 ? 4 : 4;
+    gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+    nums.forEach((n) => {
+      const btn = document.createElement('button');
+      btn.className = 'num-btn';
+      btn.textContent = n;
+      btn.dataset.num = n;
+      const color = CONFIG.colors[(n - 1) % CONFIG.colors.length];
+      btn.style.background = `linear-gradient(135deg, ${color}dd, ${color}88)`;
+      btn.style.color = '#fff';
+      btn.style.boxShadow = `0 4px 12px ${color}55`;
+      btn.addEventListener('pointerdown', onNumTap);
+      gridEl.appendChild(btn);
+    });
+  }
+
+  function onNumTap(e) {
+    if (!state.running) return;
+    const n = parseInt(e.currentTarget.dataset.num, 10);
+    if (n !== state.next) {
+      // 틀림
+      e.currentTarget.classList.add('wrong');
+      e.currentTarget.addEventListener('animationend', () => e.currentTarget.classList.remove('wrong'), { once: true });
+      state.lives--;
+      livesEl.textContent = state.lives;
+      if (state.lives <= 0) { endGame(); return; }
+    } else {
+      // 맞음
+      e.currentTarget.classList.add('done');
+      state.next++;
+      nextNumEl.textContent = state.next;
+      state.score++;
+      scoreEl.textContent = state.score;
+
+      if (state.next > state.count) {
+        // 레벨 클리어
+        clearLevel();
+      }
+    }
+  }
+
+  function clearLevel() {
+    state.running = false;
+    clearInterval(timerId);
+
+    const fx = document.createElement('div');
+    fx.className = 'clear-fx';
+    fx.textContent = '⭐';
+    document.body.appendChild(fx);
+    fx.addEventListener('animationend', () => fx.remove());
+
+    setTimeout(() => {
+      if (!state.active) return;
+      state.level++;
+      startLevel();
+    }, 800);
+  }
+
+  function startLevel() {
+    state.count   = levelCount(state.level);
+    state.timeLeft = levelTime(state.level);
+    state.next    = 1;
+    state.running = true;
+
+    levelEl.textContent = `레벨 ${state.level}`;
+    timerEl.textContent = state.timeLeft;
+    nextNumEl.textContent = 1;
+    buildGrid(state.count);
+
+    clearInterval(timerId);
+    timerId = setInterval(() => {
+      if (!state.running) return;
+      state.timeLeft--;
+      timerEl.textContent = state.timeLeft;
+      if (state.timeLeft <= 0) { endGame(); }
+    }, 1000);
+  }
+
+  function startGame() {
+    state = { running: false, active: true, score: 0, lives: CONFIG.livesStart, level: 1 };
+    scoreEl.textContent = '0';
+    livesEl.textContent = CONFIG.livesStart;
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    startLevel();
+  }
+
+  function endGame() {
+    state.running = false;
+    state.active  = false;
+    clearInterval(timerId);
+
+    const score = state.score;
+    const prev  = getBest();
+    const isNew = score > prev;
+    if (isNew) saveBest(score);
+    bestEl.textContent = isNew ? score : prev;
+
+    finalScoreEl.textContent = score;
+    resultMsgEl.textContent  = score >= 20 ? '🔥 숫자 천재! 정말 빠르네요!' : score >= 10 ? '👍 잘했어요! 다음엔 더 빠르게!' : '😊 숫자를 순서대로 잘 누르면 돼요!';
+    bestLabelEl.textContent  = isNew ? '🎉 새 최고 기록!' : `🏆 최고 기록: ${prev}점`;
+    endOverlay.classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+  document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+})();
+</script>
+</body>
+</html>
