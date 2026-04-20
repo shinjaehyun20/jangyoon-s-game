@@ -55,6 +55,7 @@
       touch-action: none;
     }
     .balloon:active { transform: scale(1.15); }
+    .balloon > * { pointer-events: none; }
     .balloon-body {
       width: 52px; height: 56px;
       border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
@@ -259,6 +260,7 @@
     el.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       if (!state.running) return;
+      if (!el.parentNode) return; // 이미 제거된 경우 무시
       const bomb = el.dataset.bomb === '1';
       popBalloon(el, bomb, xPos + 28, yPos + 26);
     });
