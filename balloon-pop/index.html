@@ -47,15 +47,46 @@
     }
     .balloon {
       position: absolute;
-      width: 56px; height: 70px;
+      width: 56px; height: 72px;
       cursor: pointer;
       user-select: none;
       will-change: transform;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
-      transition: transform 0.08s;
+      display: flex; flex-direction: column; align-items: center;
+      touch-action: none;
     }
     .balloon:active { transform: scale(1.15); }
-    .balloon.bomb { filter: drop-shadow(0 4px 12px rgba(255,80,80,0.5)); }
+    .balloon-body {
+      width: 52px; height: 56px;
+      border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset -6px -4px 0 rgba(0,0,0,0.15), 0 4px 10px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .balloon-shine {
+      position: absolute;
+      top: 8px; left: 10px;
+      width: 14px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.38);
+    }
+    .bomb-body {
+      background: #2d2d2d;
+      font-size: 30px;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(255,80,80,0.45);
+    }
+    .balloon-knot {
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 8px solid #ff6b6b;
+      margin-top: -1px;
+    }
+    .balloon-string {
+      width: 1px; height: 14px;
+      background: rgba(255,255,255,0.4);
+      margin-top: 1px;
+    }
     .pop-fx {
       position: absolute;
       font-size: 36px;
@@ -193,14 +224,6 @@
 
   function randBetween(a, b) { return Math.random() * (b - a) + a; }
 
-  function makeBalloonSVG(color, isBomb) {
-    if (isBomb) {
-      return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 70"><ellipse cx="28" cy="26" rx="22" ry="26" fill="#333"/><text x="28" y="36" text-anchor="middle" font-size="28">💣</text><line x1="28" y1="52" x2="28" y2="68" stroke="#888" stroke-width="2"/></svg>`)}`;
-    }
-    const shade = color + 'cc';
-    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 70"><ellipse cx="28" cy="26" rx="22" ry="26" fill="${color}"/><ellipse cx="22" cy="18" rx="7" ry="5" fill="rgba(255,255,255,0.35)"/><polygon points="26,52 30,52 28,58" fill="${color}"/><line x1="28" y1="58" x2="28" y2="68" stroke="${shade}" stroke-width="2" stroke-dasharray="3,2"/></svg>`)}`;
-  }
-
   function spawnBalloon() {
     if (!state.running) return;
 
@@ -209,10 +232,20 @@
     const isBomb = Math.random() < CONFIG.bombChance;
     const color = CONFIG.balloonColors[Math.floor(Math.random() * CONFIG.balloonColors.length)];
 
-    const el = document.createElement('img');
+    const el = document.createElement('div');
     el.className = 'balloon' + (isBomb ? ' bomb' : '');
-    el.src = makeBalloonSVG(color, isBomb);
-    el.draggable = false;
+    el.dataset.bomb = isBomb ? '1' : '0';
+
+    if (isBomb) {
+      el.innerHTML = `<span class="balloon-body bomb-body">💣</span>`;
+    } else {
+      el.innerHTML = `
+        <span class="balloon-body" style="background:${color};">
+          <span class="balloon-shine"></span>
+        </span>
+        <span class="balloon-knot" style="border-top-color:${color};"></span>
+        <span class="balloon-string"></span>`;
+    }
 
     const xPos = randBetween(4, areaW - 60);
     el.style.left = xPos + 'px';
@@ -226,7 +259,8 @@
     el.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       if (!state.running) return;
-      popBalloon(el, isBomb, xPos + 28, yPos + 26);
+      const bomb = el.dataset.bomb === '1';
+      popBalloon(el, bomb, xPos + 28, yPos + 26);
     });
 
     function tick() {
