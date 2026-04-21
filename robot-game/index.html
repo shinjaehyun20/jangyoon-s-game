@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>로봇 배틀</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0f1e;
+      --panel: rgba(0, 212, 255, 0.07);
+      --accent: #00d4ff;
+      --accent2: #0066ff;
+      --enemy: #ff3c6e;
+      --enemy2: #aa0033;
+      --green: #00ff99;
+      --yellow: #ffe066;
+      --white: #e8f4ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh; overflow: hidden;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 10px;
+      gap: 6px;
+      position: relative;
+    }
+
+    /* ── HUD 상단 ── */
+    .hud {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--panel);
+      border: 1px solid rgba(0,212,255,0.15);
+      border-radius: 14px; padding: 8px 12px;
+      flex-shrink: 0;
+    }
+    .hp-block { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .hp-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.65; }
+    .hp-hearts { display: flex; gap: 4px; }
+    .heart {
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; line-height: 1;
+      filter: drop-shadow(0 0 4px currentColor);
+      transition: transform 0.2s;
+    }
+    .heart.player { color: var(--accent); }
+    .heart.enemy  { color: var(--enemy); }
+    .heart.lost   { opacity: 0.18; filter: none; }
+    .round-block { text-align: center; }
+    .round-label { font-size: 9px; letter-spacing: 1.5px; opacity: 0.65; text-transform: uppercase; }
+    .round-value {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(20px, 5vw, 28px);
+      color: var(--yellow);
+      text-shadow: 0 0 10px var(--yellow);
+      line-height: 1;
+    }
+    .score-block { text-align: right; }
+    .score-label { font-size: 9px; letter-spacing: 1.5px; opacity: 0.65; text-transform: uppercase; }
+    .score-value {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(18px, 4vw, 24px);
+      color: var(--accent);
+      text-shadow: 0 0 8px var(--accent);
+    }
+
+    /* ── 배틀 아레나 ── */
+    .arena {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-between;
+      position: relative;
+      background: var(--panel);
+      border: 1px solid rgba(0,212,255,0.12);
+      border-radius: 18px;
+      overflow: hidden;
+      padding: 8px 0 6px;
+      min-height: 0;
+    }
+
+    /* 바닥 그리드 라인 */
+    .arena::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    /* 로봇 공통 */
+    .robot-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      position: relative; z-index: 2;
+      gap: 2px;
+    }
+    .attack-warning {
+      font-size: 11px; font-weight: 900; letter-spacing: 1px;
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(255,60,110,0.22);
+      border: 1px solid var(--enemy);
+      color: var(--enemy);
+      text-shadow: 0 0 6px var(--enemy);
+      opacity: 0; transition: opacity 0.2s;
+      min-height: 22px;
+    }
+    .attack-warning.show { opacity: 1; }
+
+    /* ── SVG 로봇 ── */
+    .robot-svg { width: clamp(80px, 22vw, 110px); height: auto; }
+
+    /* 로봇 타격 애니메이션 */
+    .robot-wrap.hit { animation: robotHit 0.35s; }
+    @keyframes robotHit {
+      0%   { transform: translateX(0); }
+      20%  { transform: translateX(-10px); }
+      40%  { transform: translateX(10px); }
+      60%  { transform: translateX(-6px); }
+      80%  { transform: translateX(6px); }
+      100% { transform: translateX(0); }
+    }
+    .robot-wrap.attack { animation: robotAttack 0.3s; }
+    @keyframes robotAttack {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.12) translateY(-4px); }
+    }
+    .robot-wrap.block { animation: robotBlock 0.3s; }
+    @keyframes robotBlock {
+      0%,100% { transform: rotate(0deg); }
+      30%     { transform: rotate(-5deg); }
+      70%     { transform: rotate(5deg); }
+    }
+
+    /* 전투 메시지 */
+    .battle-msg {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      top: 50%; margin-top: -20px;
+      z-index: 10;
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(22px, 6vw, 34px);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      text-shadow: 0 0 20px currentColor;
+    }
+    .battle-msg.show { animation: msgPop 0.9s forwards; }
+    @keyframes msgPop {
+      0%   { opacity: 0; transform: translateX(-50%) scale(0.6) translateY(0); }
+      20%  { opacity: 1; transform: translateX(-50%) scale(1.1) translateY(-8px); }
+      60%  { opacity: 1; transform: translateX(-50%) scale(1) translateY(-8px); }
+      100% { opacity: 0; transform: translateX(-50%) scale(0.9) translateY(-20px); }
+    }
+
+    /* 카운터 찬스 표시 */
+    .counter-bar {
+      position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+      z-index: 5;
+      background: rgba(255,224,102,0.18);
+      border: 1.5px solid var(--yellow);
+      border-radius: 20px;
+      padding: 3px 14px;
+      font-size: 11px; font-weight: 900;
+      color: var(--yellow);
+      text-shadow: 0 0 8px var(--yellow);
+      display: none;
+    }
+    .counter-bar.show { display: block; animation: pulseBadge 0.5s infinite alternate; }
+    @keyframes pulseBadge { from { opacity: 0.7; } to { opacity: 1; } }
+
+    /* ── 화면 플래시 ── */
+    .flash-overlay {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 100;
+      opacity: 0;
+    }
+    .flash-overlay.flash-hit  { background: rgba(255,60,110,0.35); animation: flashAnim 0.25s; }
+    .flash-overlay.flash-good { background: rgba(0,212,255,0.25);  animation: flashAnim 0.25s; }
+    .flash-overlay.flash-block{ background: rgba(0,255,153,0.22);  animation: flashAnim 0.25s; }
+    @keyframes flashAnim { 0%,100%{opacity:0} 30%{opacity:1} }
+
+    /* ── 액션 버튼 ── */
+    .btn-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .action-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: clamp(10px,3vw,14px) 4px;
+      border-radius: 14px;
+      border: 2px solid transparent;
+      font-size: clamp(9px, 2.4vw, 12px);
+      font-weight: 900;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s, box-shadow 0.1s;
+      user-select: none;
+      gap: 4px;
+    }
+    .action-btn .btn-icon { font-size: clamp(22px, 6vw, 30px); line-height: 1; }
+    .action-btn:active { transform: translateY(3px) scale(0.96); box-shadow: none !important; }
+    .action-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+    .btn-punch-l {
+      background: linear-gradient(145deg, #003a5e, #005a8e);
+      border-color: var(--accent); color: var(--accent);
+      box-shadow: 0 5px 0 #001f3a, 0 0 12px rgba(0,212,255,0.2);
+    }
+    .btn-kick {
+      background: linear-gradient(145deg, #1a0050, #2a0080);
+      border-color: #a855f7; color: #c084fc;
+      box-shadow: 0 5px 0 #0d0030, 0 0 12px rgba(168,85,247,0.2);
+    }
+    .btn-block {
+      background: linear-gradient(145deg, #003d1a, #006630);
+      border-color: var(--green); color: var(--green);
+      box-shadow: 0 5px 0 #001a0a, 0 0 12px rgba(0,255,153,0.2);
+    }
+    .btn-punch-r {
+      background: linear-gradient(145deg, #003a5e, #005a8e);
+      border-color: var(--accent); color: var(--accent);
+      box-shadow: 0 5px 0 #001f3a, 0 0 12px rgba(0,212,255,0.2);
+    }
+
+    .btn-block.highlight {
+      animation: blockHighlight 0.5s infinite alternate;
+    }
+    @keyframes blockHighlight {
+      from { box-shadow: 0 5px 0 #001a0a, 0 0 8px rgba(0,255,153,0.3); }
+      to   { box-shadow: 0 5px 0 #001a0a, 0 0 24px rgba(0,255,153,0.9); border-color: #fff; }
+    }
+    .btn-block.counter-ready {
+      animation: counterReady 0.4s infinite alternate;
+    }
+    @keyframes counterReady {
+      from { box-shadow: 0 5px 0 #001a0a, 0 0 8px rgba(255,224,102,0.4); border-color: var(--green); }
+      to   { box-shadow: 0 5px 0 #001a0a, 0 0 28px rgba(255,224,102,1); border-color: var(--yellow); }
+    }
+
+    /* 홈 링크 */
+    .footer-row {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0; padding: 0 2px;
+    }
+    .home-link {
+      padding: 5px 12px; border-radius: 8px;
+      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.55);
+      text-decoration: none; font-size: 11px; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .tip-text { font-size: 10px; opacity: 0.38; }
+
+    /* ── 오버레이 ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #0d1428;
+      border-radius: 22px; padding: 28px 22px 24px;
+      text-align: center; width: min(340px, 92vw);
+      box-shadow: 0 0 40px rgba(0,212,255,0.25), 0 12px 36px rgba(0,0,0,0.7);
+      border: 1px solid rgba(0,212,255,0.25);
+    }
+    .overlay-title {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(26px, 7vw, 34px);
+      margin-bottom: 10px;
+    }
+    .overlay-title.win  { color: var(--accent); text-shadow: 0 0 20px var(--accent); }
+    .overlay-title.lose { color: var(--enemy);  text-shadow: 0 0 20px var(--enemy); }
+    .overlay-title.info { color: var(--yellow); text-shadow: 0 0 16px var(--yellow); }
+    .overlay-card p {
+      font-size: 13px; line-height: 1.75; opacity: 0.85;
+      margin-bottom: 14px;
+    }
+    .big-score {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 56px; color: var(--yellow);
+      text-shadow: 0 0 20px var(--yellow);
+      margin: 4px 0 6px;
+    }
+    .score-detail { font-size: 12px; opacity: 0.65; margin-bottom: 18px; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border: none; color: #001a2e;
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(18px, 5vw, 22px);
+      padding: 13px 36px; border-radius: 14px;
+      cursor: pointer; touch-action: manipulation;
+      box-shadow: 0 5px 0 #001020, 0 0 20px rgba(0,212,255,0.5);
+      display: inline-block; margin-top: 4px;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: 0 2px 0 #001020; }
+
+    /* ── 라운드 전환 ── */
+    .round-banner {
+      position: fixed; inset: 0; z-index: 150;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.6);
+      pointer-events: none;
+    }
+    .round-banner.hidden { display: none; }
+    .round-banner-text {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(48px, 14vw, 80px);
+      color: var(--yellow);
+      text-shadow: 0 0 40px var(--yellow), 0 0 80px var(--accent);
+      animation: bannerIn 1.6s forwards;
+    }
+    @keyframes bannerIn {
+      0%  { opacity:0; transform: scale(0.4); }
+      30% { opacity:1; transform: scale(1.1); }
+      60% { opacity:1; transform: scale(1); }
+      85% { opacity:1; }
+      100%{ opacity:0; transform: scale(1.2); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 화면 플래시 -->
+<div class="flash-overlay" id="flashOverlay"></div>
+
+<!-- 라운드 배너 -->
+<div class="round-banner hidden" id="roundBanner">
+  <div class="round-banner-text" id="roundBannerText">ROUND 1</div>
+</div>
+
+<div class="wrap">
+  <!-- ── HUD ── -->
+  <div class="hud">
+    <div class="hp-block">
+      <div class="hp-label">내 HP</div>
+      <div class="hp-hearts" id="playerHp"></div>
+    </div>
+    <div class="round-block">
+      <div class="round-label">ROUND</div>
+      <div class="round-value" id="roundEl">1</div>
+    </div>
+    <div class="score-block">
+      <div class="score-label">SCORE</div>
+      <div class="score-value" id="scoreEl">0</div>
+    </div>
+    <div class="hp-block" style="align-items:flex-end">
+      <div class="hp-label">적 HP</div>
+      <div class="hp-hearts" id="enemyHp"></div>
+    </div>
+  </div>
+
+  <!-- ── 배틀 아레나 ── -->
+  <div class="arena" id="arena">
+    <!-- 적 로봇 (상단) -->
+    <div class="robot-wrap" id="enemyRobot">
+      <div class="attack-warning" id="attackWarning">⚠ 공격!</div>
+      <!-- 적 로봇 SVG -->
+      <svg class="robot-svg" viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 안테나 -->
+        <line x1="50" y1="8" x2="50" y2="18" stroke="#ff3c6e" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="50" cy="6" r="4" fill="#ff3c6e" filter="url(#glowR)"/>
+        <!-- 머리 -->
+        <rect x="28" y="18" width="44" height="34" rx="8" fill="#1a0020" stroke="#ff3c6e" stroke-width="2"/>
+        <!-- 눈 -->
+        <rect x="35" y="26" width="13" height="8" rx="3" fill="#ff3c6e" opacity="0.9"/>
+        <rect x="52" y="26" width="13" height="8" rx="3" fill="#ff3c6e" opacity="0.9"/>
+        <!-- 입 -->
+        <rect x="36" y="39" width="28" height="5" rx="2.5" fill="#ff3c6e" opacity="0.6"/>
+        <!-- 목 -->
+        <rect x="44" y="52" width="12" height="7" rx="3" fill="#330010" stroke="#ff3c6e" stroke-width="1.5"/>
+        <!-- 몸통 -->
+        <rect x="22" y="59" width="56" height="40" rx="10" fill="#1a0020" stroke="#ff3c6e" stroke-width="2"/>
+        <!-- 가슴 코어 -->
+        <circle cx="50" cy="79" r="10" fill="#ff003c" opacity="0.25"/>
+        <circle cx="50" cy="79" r="6" fill="#ff3c6e" opacity="0.7" filter="url(#glowR)"/>
+        <!-- 팔 왼쪽 -->
+        <rect x="6" y="62" width="14" height="32" rx="6" fill="#1a0020" stroke="#ff3c6e" stroke-width="1.5"/>
+        <rect x="4" y="91" width="18" height="10" rx="5" fill="#ff3c6e" opacity="0.8"/>
+        <!-- 팔 오른쪽 -->
+        <rect x="80" y="62" width="14" height="32" rx="6" fill="#1a0020" stroke="#ff3c6e" stroke-width="1.5"/>
+        <rect x="78" y="91" width="18" height="10" rx="5" fill="#ff3c6e" opacity="0.8"/>
+        <!-- 다리 왼쪽 -->
+        <rect x="30" y="99" width="16" height="24" rx="6" fill="#1a0020" stroke="#ff3c6e" stroke-width="1.5"/>
+        <rect x="27" y="120" width="22" height="10" rx="5" fill="#ff3c6e" opacity="0.7"/>
+        <!-- 다리 오른쪽 -->
+        <rect x="54" y="99" width="16" height="24" rx="6" fill="#1a0020" stroke="#ff3c6e" stroke-width="1.5"/>
+        <rect x="51" y="120" width="22" height="10" rx="5" fill="#ff3c6e" opacity="0.7"/>
+        <defs>
+          <filter id="glowR" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- 전투 메시지 -->
+    <div class="battle-msg" id="battleMsg"></div>
+
+    <!-- 카운터 찬스 -->
+    <div class="counter-bar" id="counterBar">⚡ 카운터 찬스!</div>
+
+    <!-- 내 로봇 (하단) -->
+    <div class="robot-wrap" id="playerRobot">
+      <!-- 내 로봇 SVG -->
+      <svg class="robot-svg" viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 안테나 -->
+        <line x1="50" y1="8" x2="50" y2="18" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="50" cy="6" r="4" fill="#00d4ff" filter="url(#glowB)"/>
+        <!-- 머리 -->
+        <rect x="28" y="18" width="44" height="34" rx="8" fill="#001a2e" stroke="#00d4ff" stroke-width="2"/>
+        <!-- 눈 -->
+        <rect x="35" y="26" width="13" height="8" rx="3" fill="#00d4ff" opacity="0.9"/>
+        <rect x="52" y="26" width="13" height="8" rx="3" fill="#00d4ff" opacity="0.9"/>
+        <!-- 입 -->
+        <path d="M36 41 Q50 50 64 41" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+        <!-- 목 -->
+        <rect x="44" y="52" width="12" height="7" rx="3" fill="#001020" stroke="#00d4ff" stroke-width="1.5"/>
+        <!-- 몸통 -->
+        <rect x="22" y="59" width="56" height="40" rx="10" fill="#001a2e" stroke="#00d4ff" stroke-width="2"/>
+        <!-- 가슴 코어 -->
+        <circle cx="50" cy="79" r="10" fill="#0044ff" opacity="0.25"/>
+        <circle cx="50" cy="79" r="6" fill="#00d4ff" opacity="0.7" filter="url(#glowB)"/>
+        <!-- 팔 왼쪽 -->
+        <rect x="6" y="62" width="14" height="32" rx="6" fill="#001a2e" stroke="#00d4ff" stroke-width="1.5"/>
+        <rect x="4" y="91" width="18" height="10" rx="5" fill="#00d4ff" opacity="0.8"/>
+        <!-- 팔 오른쪽 -->
+        <rect x="80" y="62" width="14" height="32" rx="6" fill="#001a2e" stroke="#00d4ff" stroke-width="1.5"/>
+        <rect x="78" y="91" width="18" height="10" rx="5" fill="#00d4ff" opacity="0.8"/>
+        <!-- 다리 왼쪽 -->
+        <rect x="30" y="99" width="16" height="24" rx="6" fill="#001a2e" stroke="#00d4ff" stroke-width="1.5"/>
+        <rect x="27" y="120" width="22" height="10" rx="5" fill="#00d4ff" opacity="0.7"/>
+        <!-- 다리 오른쪽 -->
+        <rect x="54" y="99" width="16" height="24" rx="6" fill="#001a2e" stroke="#00d4ff" stroke-width="1.5"/>
+        <rect x="51" y="120" width="22" height="10" rx="5" fill="#00d4ff" opacity="0.7"/>
+        <defs>
+          <filter id="glowB" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ── 액션 버튼 ── -->
+  <div class="btn-area">
+    <button class="action-btn btn-punch-l" id="btnPunchL" data-action="punchL">
+      <span class="btn-icon">👊</span>
+      <span>펀치L</span>
+    </button>
+    <button class="action-btn btn-kick" id="btnKick" data-action="kick">
+      <span class="btn-icon">🦵</span>
+      <span>킥</span>
+    </button>
+    <button class="action-btn btn-block" id="btnBlock" data-action="block">
+      <span class="btn-icon">🛡</span>
+      <span>방어</span>
+    </button>
+    <button class="action-btn btn-punch-r" id="btnPunchR" data-action="punchR">
+      <span class="btn-icon">👊</span>
+      <span>펀치R</span>
+    </button>
+  </div>
+
+  <!-- ── 푸터 ── -->
+  <div class="footer-row">
+    <a class="home-link" href="../index.html">← 게임 목록</a>
+    <span class="tip-text">방어 타이밍을 노려라!</span>
+  </div>
+</div>
+
+<!-- ── 시작 오버레이 ── -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <div class="overlay-title info">🤖 로봇 배틀</div>
+    <p>
+      적 로봇이 <strong style="color:#ff3c6e">⚠ 공격!</strong> 표시를 하면<br>
+      재빨리 <strong style="color:#00ff99">🛡 방어</strong> 버튼을 눌러요!<br><br>
+      방어 성공 → <strong style="color:#ffe066">⚡ 카운터 찬스!</strong><br>
+      공격 버튼으로 2배 데미지를 줘요!<br><br>
+      3라운드 동안 가장 높은 점수를 내세요!
+    </p>
+    <button class="btn-start" id="startBtn">전투 시작!</button>
+  </div>
+</div>
+
+<!-- ── 라운드 승리 오버레이 ── -->
+<div class="overlay hidden" id="roundWinOverlay">
+  <div class="overlay-card">
+    <div class="overlay-title win" id="roundWinTitle">라운드 클리어!</div>
+    <p id="roundWinMsg"></p>
+    <button class="btn-start" id="nextRoundBtn">다음 라운드!</button>
+  </div>
+</div>
+
+<!-- ── 게임오버 오버레이 ── -->
+<div class="overlay hidden" id="gameOverOverlay">
+  <div class="overlay-card">
+    <div class="overlay-title lose">💀 게임 오버</div>
+    <div class="big-score" id="goScoreEl">0</div>
+    <div class="score-detail" id="goDetailEl"></div>
+    <p id="goMsgEl"></p>
+    <button class="btn-start" id="retryBtn">다시 도전!</button>
+  </div>
+</div>
+
+<!-- ── 최종 승리 오버레이 ── -->
+<div class="overlay hidden" id="finalWinOverlay">
+  <div class="overlay-card">
+    <div class="overlay-title win">🏆 완전 승리!</div>
+    <div class="big-score" id="fwScoreEl">0</div>
+    <div class="score-detail" id="fwDetailEl"></div>
+    <p id="fwMsgEl"></p>
+    <button class="btn-start" id="playAgainBtn">한 번 더!</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── 상수 ── */
+  const MAX_ROUNDS  = 3;
+  const MAX_HP      = 5;
+  const ATTACK_WARN_MS  = 700;   // 예고 → 실제 공격 딜레이
+  const BLOCK_WINDOW_MS = 800;   // 방어 허용 윈도우
+  const COUNTER_MS      = 1500;  // 카운터 찬스 지속
+  const ATTACK_INTERVAL_MIN = 1000;
+  const ATTACK_INTERVAL_MAX = 2200;
+  const HIT_PROB    = 0.5;       // 내 공격 히트 확률
+
+  /* 라운드별 난이도 */
+  const ROUND_SPEED = [1.0, 1.2, 1.4]; // 배율 (간격 축소)
+
+  /* ── 엘리먼트 ── */
+  const playerHpEl     = document.getElementById('playerHp');
+  const enemyHpEl      = document.getElementById('enemyHp');
+  const roundEl        = document.getElementById('roundEl');
+  const scoreEl        = document.getElementById('scoreEl');
+  const attackWarning  = document.getElementById('attackWarning');
+  const battleMsg      = document.getElementById('battleMsg');
+  const counterBar     = document.getElementById('counterBar');
+  const flashOverlay   = document.getElementById('flashOverlay');
+  const roundBanner    = document.getElementById('roundBanner');
+  const roundBannerText= document.getElementById('roundBannerText');
+  const playerRobot    = document.getElementById('playerRobot');
+  const enemyRobot     = document.getElementById('enemyRobot');
+  const btnBlock       = document.getElementById('btnBlock');
+
+  const startOverlay   = document.getElementById('startOverlay');
+  const roundWinOverlay= document.getElementById('roundWinOverlay');
+  const gameOverOverlay= document.getElementById('gameOverOverlay');
+  const finalWinOverlay= document.getElementById('finalWinOverlay');
+
+  /* ── 상태 ── */
+  const state = {
+    round: 1,
+    score: 0,
+    playerHp: MAX_HP,
+    enemyHp: MAX_HP,
+    active: false,
+    blocking: false,
+    counterChance: false,
+    enemyAttacking: false,
+    attackTimer: null,
+    counterTimer: null,
+    warnTimer: null,
+    nextAttackTimer: null,
+  };
+
+  /* ── HP 렌더 ── */
+  function renderHp() {
+    renderHpRow(playerHpEl, state.playerHp, 'player');
+    renderHpRow(enemyHpEl,  state.enemyHp,  'enemy');
+  }
+  function renderHpRow(el, hp, type) {
+    el.innerHTML = '';
+    for (let i = 0; i < MAX_HP; i++) {
+      const span = document.createElement('span');
+      span.className = 'heart ' + type + (i >= hp ? ' lost' : '');
+      span.textContent = type === 'player' ? '🔵' : '🔴';
+      el.appendChild(span);
+    }
+  }
+
+  /* ── 전투 메시지 ── */
+  let msgTimer = null;
+  function showMsg(text, color) {
+    clearTimeout(msgTimer);
+    battleMsg.textContent = text;
+    battleMsg.style.color = color || '#fff';
+    battleMsg.classList.remove('show');
+    void battleMsg.offsetWidth;
+    battleMsg.classList.add('show');
+    msgTimer = setTimeout(() => battleMsg.classList.remove('show'), 900);
+  }
+
+  /* ── 화면 플래시 ── */
+  function flash(type) {
+    flashOverlay.className = 'flash-overlay';
+    void flashOverlay.offsetWidth;
+    flashOverlay.classList.add('flash-' + type);
+    setTimeout(() => flashOverlay.className = 'flash-overlay', 280);
+  }
+
+  /* ── 로봇 애니메이션 ── */
+  function animateRobot(el, anim) {
+    el.classList.remove('hit', 'attack', 'block');
+    void el.offsetWidth;
+    el.classList.add(anim);
+    setTimeout(() => el.classList.remove(anim), 380);
+  }
+
+  /* ── HP 렌더 + 점수 ── */
+  function updateScore(delta) {
+    state.score = Math.max(0, state.score + delta);
+    scoreEl.textContent = state.score;
+  }
+
+  /* ── 내 공격 ── */
+  function playerAttack(type) {
+    if (!state.active) return;
+
+    // 카운터 찬스 처리
+    const isCounter = state.counterChance;
+    if (isCounter) {
+      clearTimeout(state.counterTimer);
+      state.counterChance = false;
+      counterBar.classList.remove('show');
+      btnBlock.classList.remove('counter-ready');
+    }
+
+    const hit = Math.random() < HIT_PROB;
+    animateRobot(playerRobot, 'attack');
+
+    if (hit) {
+      const dmg = isCounter ? 2 : 1;
+      state.enemyHp = Math.max(0, state.enemyHp - dmg);
+      renderHp();
+      animateRobot(enemyRobot, 'hit');
+      flash('good');
+
+      if (isCounter) {
+        updateScore(300);
+        showMsg('⚡ 카운터! ' + (dmg > 1 ? '×2!' : ''), '#ffe066');
+      } else {
+        updateScore(100);
+        const labels = { punchL: '펀치 히트!', punchR: '펀치 히트!', kick: '킥 히트!' };
+        showMsg('💥 ' + (labels[type] || '히트!'), '#00d4ff');
+      }
+
+      if (state.enemyHp <= 0) {
+        setTimeout(roundWin, 400);
+        return;
+      }
+    } else {
+      const labels = { punchL: '펀치 빗나감', punchR: '펀치 빗나감', kick: '킥 빗나감' };
+      showMsg('💨 ' + (labels[type] || '빗나감!'), '#888');
+    }
+  }
+
+  /* ── 적 공격 예고 및 실행 ── */
+  function scheduleEnemyAttack() {
+    if (!state.active) return;
+    const speedMult = ROUND_SPEED[state.round - 1];
+    const minMs = ATTACK_INTERVAL_MIN / speedMult;
+    const maxMs = ATTACK_INTERVAL_MAX / speedMult;
+    const delay = minMs + Math.random() * (maxMs - minMs);
+
+    state.nextAttackTimer = setTimeout(doEnemyWarn, delay);
+  }
+
+  function doEnemyWarn() {
+    if (!state.active) return;
+    state.enemyAttacking = true;
+    state.blocking = false;
+
+    // 경고 표시
+    attackWarning.classList.add('show');
+    btnBlock.classList.add('highlight');
+
+    state.warnTimer = setTimeout(doEnemyAttack, ATTACK_WARN_MS);
+  }
+
+  function doEnemyAttack() {
+    if (!state.active) return;
+    state.enemyAttacking = false;
+    attackWarning.classList.remove('show');
+    btnBlock.classList.remove('highlight');
+
+    if (state.blocking) {
+      // 방어 성공 → 카운터 찬스
+      state.blocking = false;
+      flash('block');
+      animateRobot(playerRobot, 'block');
+      animateRobot(enemyRobot, 'hit');
+      showMsg('🛡 방어 성공!', '#00ff99');
+      updateScore(150);
+
+      state.counterChance = true;
+      counterBar.classList.add('show');
+      btnBlock.classList.add('counter-ready');
+
+      state.counterTimer = setTimeout(() => {
+        state.counterChance = false;
+        counterBar.classList.remove('show');
+        btnBlock.classList.remove('counter-ready');
+      }, COUNTER_MS);
+
+    } else {
+      // 방어 실패 → 피해
+      animateRobot(enemyRobot, 'attack');
+      animateRobot(playerRobot, 'hit');
+      flash('hit');
+      state.playerHp = Math.max(0, state.playerHp - 1);
+      renderHp();
+      showMsg('💢 피격!', '#ff3c6e');
+
+      if (state.playerHp <= 0) {
+        setTimeout(gameOver, 400);
+        return;
+      }
+    }
+
+    scheduleEnemyAttack();
+  }
+
+  /* ── 방어 버튼 ── */
+  function handleBlock() {
+    if (!state.active) return;
+    if (state.enemyAttacking) {
+      state.blocking = true;
+    }
+  }
+
+  /* ── 버튼 이벤트 ── */
+  document.querySelectorAll('.action-btn').forEach(btn => {
+    const action = btn.dataset.action;
+    const onPress = (e) => {
+      e.preventDefault();
+      if (!state.active) return;
+      if (action === 'block') {
+        handleBlock();
+      } else {
+        playerAttack(action);
+      }
+    };
+    btn.addEventListener('touchstart', onPress, { passive: false });
+    btn.addEventListener('mousedown', onPress);
+  });
+
+  /* ── 라운드 승리 ── */
+  function roundWin() {
+    state.active = false;
+    clearAllTimers();
+    attackWarning.classList.remove('show');
+    btnBlock.classList.remove('highlight', 'counter-ready');
+    counterBar.classList.remove('show');
+
+    const bonus = state.playerHp * 50;
+    updateScore(bonus);
+
+    if (state.round >= MAX_ROUNDS) {
+      // 최종 승리
+      setTimeout(finalWin, 300);
+    } else {
+      const title = document.getElementById('roundWinTitle');
+      const msg   = document.getElementById('roundWinMsg');
+      title.textContent = `라운드 ${state.round} 클리어!`;
+      msg.textContent = `HP 보너스: +${bonus}점 · 총 점수: ${state.score}점\n다음 라운드는 더 빨라요!`;
+      roundWinOverlay.classList.remove('hidden');
+    }
+  }
+
+  /* ── 게임 오버 ── */
+  function gameOver() {
+    state.active = false;
+    clearAllTimers();
+    attackWarning.classList.remove('show');
+    btnBlock.classList.remove('highlight', 'counter-ready');
+    counterBar.classList.remove('show');
+
+    const best = checkBest(state.score);
+    document.getElementById('goScoreEl').textContent = state.score;
+    document.getElementById('goDetailEl').textContent = `라운드 ${state.round} · HP 잔여 ${state.playerHp}`;
+    document.getElementById('goMsgEl').textContent = best ? '🏆 최고 기록 갱신!' : `최고 기록: ${getBest()}점`;
+    gameOverOverlay.classList.remove('hidden');
+  }
+
+  /* ── 최종 승리 ── */
+  function finalWin() {
+    const best = checkBest(state.score);
+    document.getElementById('fwScoreEl').textContent = state.score;
+    document.getElementById('fwDetailEl').textContent = `3라운드 완료 · 남은 HP ${state.playerHp}`;
+    document.getElementById('fwMsgEl').textContent = best ? '🏆 새 최고 기록!' : `최고 기록: ${getBest()}점`;
+    finalWinOverlay.classList.remove('hidden');
+  }
+
+  /* ── 로컬스토리지 ── */
+  const LS_KEY = 'robotbattle_best';
+  function getBest() { return parseInt(localStorage.getItem(LS_KEY) || '0', 10); }
+  function checkBest(score) {
+    const prev = getBest();
+    if (score > prev) { localStorage.setItem(LS_KEY, score); return true; }
+    return false;
+  }
+
+  /* ── 타이머 정리 ── */
+  function clearAllTimers() {
+    clearTimeout(state.attackTimer);
+    clearTimeout(state.counterTimer);
+    clearTimeout(state.warnTimer);
+    clearTimeout(state.nextAttackTimer);
+    state.enemyAttacking = false;
+    state.blocking = false;
+  }
+
+  /* ── 라운드 시작 ── */
+  function startRound() {
+    roundWinOverlay.classList.add('hidden');
+
+    state.playerHp  = MAX_HP;
+    state.enemyHp   = MAX_HP;
+    state.counterChance = false;
+    state.blocking  = false;
+    state.enemyAttacking = false;
+
+    roundEl.textContent = state.round;
+    renderHp();
+    updateScore(0);
+
+    // 라운드 배너
+    roundBannerText.textContent = `ROUND ${state.round}`;
+    roundBanner.classList.remove('hidden');
+    setTimeout(() => {
+      roundBanner.classList.add('hidden');
+      state.active = true;
+      scheduleEnemyAttack();
+    }, 1600);
+  }
+
+  /* ── 게임 시작 (전체 초기화) ── */
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    gameOverOverlay.classList.add('hidden');
+    finalWinOverlay.classList.add('hidden');
+    roundWinOverlay.classList.add('hidden');
+    clearAllTimers();
+
+    state.round = 1;
+    state.score = 0;
+    scoreEl.textContent = '0';
+
+    startRound();
+  }
+
+  /* ── 다음 라운드 ── */
+  function goNextRound() {
+    state.round++;
+    startRound();
+  }
+
+  /* ── 이벤트 바인딩 ── */
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('nextRoundBtn').addEventListener('click', goNextRound);
+  document.getElementById('retryBtn').addEventListener('click', startGame);
+  document.getElementById('playAgainBtn').addEventListener('click', startGame);
+
+  /* 터치 이벤트 */
+  document.getElementById('startBtn').addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); }, { passive: false });
+  document.getElementById('nextRoundBtn').addEventListener('touchstart', (e) => { e.preventDefault(); goNextRound(); }, { passive: false });
+  document.getElementById('retryBtn').addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); }, { passive: false });
+  document.getElementById('playAgainBtn').addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); }, { passive: false });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <!-- 배경 그라디언트: 다크 블루/시안 계열 -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#000c1a"/>
+      <stop offset="100%" stop-color="#001a2e"/>
+    </linearGradient>
+    <!-- 로봇 몸체 그라디언트 -->
+    <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0d2340"/>
+    </linearGradient>
+    <!-- 에너지 게이지 그라디언트 -->
+    <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00f5ff"/>
+      <stop offset="60%" stop-color="#0099ff"/>
+      <stop offset="100%" stop-color="#0055ff"/>
+    </linearGradient>
+    <!-- 배경 글로우: 시안 -->
+    <radialGradient id="glowCyan" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 배경 글로우: 블루 -->
+    <radialGradient id="glowBlue" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2979ff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#2979ff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 눈 발광 그라디언트 -->
+    <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00ffff"/>
+      <stop offset="100%" stop-color="#0088ff"/>
+    </radialGradient>
+    <!-- 네온 글로우 필터 (약함) -->
+    <filter id="neon" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 네온 글로우 필터 (강함) -->
+    <filter id="glowStrong" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 눈 글로우 필터 -->
+    <filter id="eyeFilter" x="-80%" y="-80%" width="360%" height="360%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 스파크 필터 -->
+    <filter id="sparkFilter" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(0,229,255,0.12)"/>
+
+  <!-- 배경 글로우 -->
+  <ellipse cx="110" cy="90" rx="90" ry="70" fill="url(#glowCyan)"/>
+  <ellipse cx="220" cy="80" rx="70" ry="55" fill="url(#glowBlue)"/>
+
+  <!-- 배경 회로 패턴 (장식) -->
+  <line x1="0" y1="30" x2="30" y2="30" stroke="rgba(0,229,255,0.15)" stroke-width="1"/>
+  <line x1="30" y1="30" x2="30" y2="50" stroke="rgba(0,229,255,0.15)" stroke-width="1"/>
+  <line x1="30" y1="50" x2="60" y2="50" stroke="rgba(0,229,255,0.15)" stroke-width="1"/>
+  <circle cx="60" cy="50" r="2.5" fill="rgba(0,229,255,0.3)"/>
+  <line x1="290" y1="140" x2="320" y2="140" stroke="rgba(0,153,255,0.15)" stroke-width="1"/>
+  <line x1="290" y1="130" x2="290" y2="140" stroke="rgba(0,153,255,0.15)" stroke-width="1"/>
+  <circle cx="290" cy="130" r="2" fill="rgba(0,153,255,0.25)"/>
+
+  <!-- 배경 파티클 (별처럼) -->
+  <circle cx="18" cy="18" r="1.5" fill="#00e5ff" opacity="0.6"/>
+  <circle cx="50" cy="8" r="1" fill="#2979ff" opacity="0.5"/>
+  <circle cx="305" cy="12" r="1.5" fill="#00e5ff" opacity="0.7"/>
+  <circle cx="285" cy="170" r="1" fill="#2979ff" opacity="0.5"/>
+  <circle cx="12" cy="165" r="1.5" fill="#00bcd4" opacity="0.6"/>
+  <circle cx="160" cy="6" r="1" fill="#00e5ff" opacity="0.4"/>
+  <circle cx="240" cy="170" r="1.5" fill="#2979ff" opacity="0.5"/>
+
+  <!-- ═══════════════════════════ 로봇 캐릭터 ═══════════════════════════ -->
+
+  <!-- 로봇 안테나 -->
+  <line x1="110" y1="30" x2="110" y2="20" stroke="#00e5ff" stroke-width="2" filter="url(#neon)"/>
+  <circle cx="110" cy="17" r="4" fill="#00ffff" filter="url(#eyeFilter)" opacity="0.9"/>
+  <circle cx="110" cy="17" r="2" fill="#ffffff"/>
+
+  <!-- 로봇 머리 -->
+  <rect x="82" y="30" width="56" height="42" rx="8" fill="url(#bodyGrad)" stroke="#1565c0" stroke-width="1.5"/>
+  <rect x="82" y="30" width="56" height="42" rx="8" fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.6" filter="url(#neon)"/>
+
+  <!-- 로봇 눈 (발광) — 핵심 요소 -->
+  <!-- 왼쪽 눈 -->
+  <rect x="89" y="38" width="16" height="12" rx="3" fill="#001a3a"/>
+  <rect x="89" y="38" width="16" height="12" rx="3" fill="none" stroke="#00e5ff" stroke-width="1"/>
+  <rect x="91" y="40" width="12" height="8" rx="2" fill="url(#eyeGlow)" filter="url(#eyeFilter)"/>
+  <rect x="94" y="42" width="6" height="4" rx="1" fill="#ffffff" opacity="0.9"/>
+  <!-- 오른쪽 눈 -->
+  <rect x="115" y="38" width="16" height="12" rx="3" fill="#001a3a"/>
+  <rect x="115" y="38" width="16" height="12" rx="3" fill="none" stroke="#00e5ff" stroke-width="1"/>
+  <rect x="117" y="40" width="12" height="8" rx="2" fill="url(#eyeGlow)" filter="url(#eyeFilter)"/>
+  <rect x="120" y="42" width="6" height="4" rx="1" fill="#ffffff" opacity="0.9"/>
+
+  <!-- 로봇 입 (LED 바) -->
+  <rect x="91" y="58" width="38" height="6" rx="3" fill="#001a2e" stroke="rgba(0,229,255,0.4)" stroke-width="0.8"/>
+  <rect x="93" y="59.5" width="7" height="3" rx="1.5" fill="#00e5ff" opacity="0.8"/>
+  <rect x="102" y="59.5" width="5" height="3" rx="1.5" fill="#00e5ff" opacity="0.5"/>
+  <rect x="109" y="59.5" width="9" height="3" rx="1.5" fill="#00e5ff" opacity="0.7"/>
+  <rect x="120" y="59.5" width="5" height="3" rx="1.5" fill="#0088ff" opacity="0.6"/>
+
+  <!-- 로봇 몸통 -->
+  <rect x="78" y="74" width="64" height="52" rx="8" fill="url(#bodyGrad)" stroke="#1565c0" stroke-width="1.5"/>
+  <rect x="78" y="74" width="64" height="52" rx="8" fill="none" stroke="#00bcd4" stroke-width="1" opacity="0.5" filter="url(#neon)"/>
+
+  <!-- 몸통 중앙 에너지 코어 -->
+  <circle cx="110" cy="96" r="12" fill="#001a3a" stroke="#00e5ff" stroke-width="1.5"/>
+  <circle cx="110" cy="96" r="8" fill="#003366" filter="url(#eyeFilter)"/>
+  <circle cx="110" cy="96" r="5" fill="#00e5ff" opacity="0.8" filter="url(#glowStrong)"/>
+  <circle cx="110" cy="96" r="3" fill="#ffffff" opacity="0.9"/>
+
+  <!-- 몸통 볼트 -->
+  <circle cx="85" cy="80" r="3" fill="#1e3a5f" stroke="#2979ff" stroke-width="1"/>
+  <circle cx="85" cy="80" r="1.5" fill="#2979ff" opacity="0.7"/>
+  <circle cx="135" cy="80" r="3" fill="#1e3a5f" stroke="#2979ff" stroke-width="1"/>
+  <circle cx="135" cy="80" r="1.5" fill="#2979ff" opacity="0.7"/>
+  <circle cx="85" cy="120" r="3" fill="#1e3a5f" stroke="#00e5ff" stroke-width="1"/>
+  <circle cx="85" cy="120" r="1.5" fill="#00e5ff" opacity="0.7"/>
+  <circle cx="135" cy="120" r="3" fill="#1e3a5f" stroke="#00e5ff" stroke-width="1"/>
+  <circle cx="135" cy="120" r="1.5" fill="#00e5ff" opacity="0.7"/>
+
+  <!-- 왼팔 -->
+  <rect x="58" y="76" width="20" height="38" rx="7" fill="url(#bodyGrad)" stroke="#1565c0" stroke-width="1.5"/>
+  <rect x="58" y="76" width="20" height="38" rx="7" fill="none" stroke="#00e5ff" stroke-width="0.8" opacity="0.4"/>
+  <!-- 왼팔 기어 -->
+  <circle cx="68" cy="95" r="6" fill="#0d2340" stroke="#2979ff" stroke-width="1.2"/>
+  <circle cx="68" cy="95" r="3" fill="#2979ff" opacity="0.6"/>
+  <!-- 왼 주먹 -->
+  <rect x="55" y="112" width="26" height="18" rx="5" fill="#1e3a5f" stroke="#00e5ff" stroke-width="1.2" filter="url(#neon)"/>
+
+  <!-- 오른팔 -->
+  <rect x="142" y="76" width="20" height="38" rx="7" fill="url(#bodyGrad)" stroke="#1565c0" stroke-width="1.5"/>
+  <rect x="142" y="76" width="20" height="38" rx="7" fill="none" stroke="#00e5ff" stroke-width="0.8" opacity="0.4"/>
+  <!-- 오른팔 기어 -->
+  <circle cx="152" cy="95" r="6" fill="#0d2340" stroke="#00bcd4" stroke-width="1.2"/>
+  <circle cx="152" cy="95" r="3" fill="#00bcd4" opacity="0.6"/>
+  <!-- 오른 주먹 / 무기 -->
+  <rect x="139" y="112" width="30" height="18" rx="5" fill="#1e3a5f" stroke="#00e5ff" stroke-width="1.2" filter="url(#neon)"/>
+  <!-- 에너지 발사 이펙트 -->
+  <line x1="169" y1="121" x2="200" y2="115" stroke="#00ffff" stroke-width="2.5" filter="url(#sparkFilter)" opacity="0.8"/>
+  <line x1="169" y1="121" x2="205" y2="122" stroke="#00e5ff" stroke-width="1.5" filter="url(#sparkFilter)" opacity="0.6"/>
+  <polygon points="198,108 210,121 198,130" fill="#00e5ff" opacity="0.7" filter="url(#sparkFilter)"/>
+
+  <!-- 다리 -->
+  <rect x="86" y="126" width="20" height="26" rx="5" fill="url(#bodyGrad)" stroke="#1565c0" stroke-width="1.2"/>
+  <rect x="114" y="126" width="20" height="26" rx="5" fill="url(#bodyGrad)" stroke="#1565c0" stroke-width="1.2"/>
+  <!-- 발 -->
+  <rect x="82" y="148" width="28" height="12" rx="4" fill="#1e3a5f" stroke="#00e5ff" stroke-width="1" opacity="0.9"/>
+  <rect x="110" y="148" width="28" height="12" rx="4" fill="#1e3a5f" stroke="#00e5ff" stroke-width="1" opacity="0.9"/>
+
+  <!-- ═══════════════════════════ UI 요소 ═══════════════════════════ -->
+
+  <!-- 오른쪽 패널: 에너지 게이지 -->
+  <rect x="222" y="28" width="84" height="52" rx="8" fill="rgba(0,20,40,0.7)" stroke="rgba(0,229,255,0.3)" stroke-width="1"/>
+  <text x="230" y="43" font-size="9" font-weight="700" fill="#00e5ff" font-family="sans-serif" letter-spacing="1">ENERGY</text>
+  <!-- 게이지 바 배경 -->
+  <rect x="230" y="48" width="68" height="8" rx="4" fill="rgba(255,255,255,0.07)"/>
+  <!-- 게이지 바 값 (80%) -->
+  <rect x="230" y="48" width="54" height="8" rx="4" fill="url(#gaugeGrad)" filter="url(#neon)"/>
+  <text x="264" y="70" text-anchor="middle" font-size="14" font-weight="900" fill="#00e5ff" font-family="sans-serif" filter="url(#neon)">80%</text>
+
+  <!-- 점수 표시 -->
+  <rect x="222" y="88" width="84" height="30" rx="8" fill="rgba(255,215,0,0.1)" stroke="#ffd700" stroke-width="1.2"/>
+  <text x="230" y="103" font-size="9" font-weight="700" fill="#ffd700" font-family="sans-serif" letter-spacing="1">SCORE</text>
+  <text x="302" y="112" text-anchor="end" font-size="14" font-weight="900" fill="#ffd700" font-family="sans-serif">9480</text>
+
+  <!-- 스파크/이펙트 장식 -->
+  <text x="214" y="74" font-size="14" fill="#00e5ff" filter="url(#sparkFilter)" opacity="0.8">⚡</text>
+  <text x="218" y="124" font-size="11" fill="#ffd700" filter="url(#sparkFilter)" opacity="0.7">✦</text>
+
+  <!-- ═══════════════════════════ 타이틀 텍스트 ═══════════════════════════ -->
+  <g font-family="'Pretendard','Noto Sans KR',Arial Black,sans-serif">
+    <!-- 타이틀 배경 강조선 -->
+    <rect x="0" y="152" width="320" height="28" fill="rgba(0,0,0,0.4)"/>
+    <line x1="0" y1="152" x2="320" y2="152" stroke="rgba(0,229,255,0.25)" stroke-width="1"/>
+    <text x="204" y="166" text-anchor="end" font-size="20" font-weight="900" fill="#00e5ff" filter="url(#neon)">로봇 대결</text>
+    <text x="204" y="177" text-anchor="end" font-size="10" font-weight="500" fill="rgba(0,229,255,0.6)" letter-spacing="3">ROBOT BATTLE</text>
+  </g>
+</svg>

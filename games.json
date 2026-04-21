@@ -126,5 +126,21 @@
     "description": "토끼가 당근을 찾아 미로를 탈출하도록 도와주세요!",
     "thumbnail": "rabbit-maze/thumb.svg",
     "path": "rabbit-maze/index.html"
+  },
+  {
+    "id": "robot-game",
+    "title": "Robot Battle",
+    "title_ko": "🤖 로봇 배틀",
+    "description": "내 로봇으로 적 로봇을 물리쳐라! 공격과 방어 타이밍이 핵심!",
+    "thumbnail": "robot-game/thumb.svg",
+    "path": "robot-game/index.html"
+  },
+  {
+    "id": "space-shooter",
+    "title": "Space Shooter",
+    "title_ko": "🚀 우주 슈팅",
+    "description": "우주선으로 적을 격파하라! 웨이브를 버텨내고 최고 점수에 도전!",
+    "thumbnail": "space-shooter/thumb.svg",
+    "path": "space-shooter/index.html"
   }
 ]

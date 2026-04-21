@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <!-- 배경 그라디언트: 딥 스페이스 퍼플/레드 -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0010"/>
+      <stop offset="60%" stop-color="#12001e"/>
+      <stop offset="100%" stop-color="#1a000a"/>
+    </linearGradient>
+    <!-- 우주선 몸체 그라디언트 -->
+    <linearGradient id="shipGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a1060"/>
+      <stop offset="100%" stop-color="#1e0030"/>
+    </linearGradient>
+    <!-- 레이저/엔진 그라디언트 -->
+    <linearGradient id="laserGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff1744"/>
+      <stop offset="50%" stop-color="#ff6d00"/>
+      <stop offset="100%" stop-color="#ffff00" stop-opacity="0.7"/>
+    </linearGradient>
+    <!-- 엔진 불꽃 그라디언트 -->
+    <linearGradient id="engineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c4dff"/>
+      <stop offset="100%" stop-color="#e040fb"/>
+    </linearGradient>
+    <!-- 배경 성운 글로우: 퍼플 -->
+    <radialGradient id="nebulaPurple" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7c4dff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#7c4dff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 배경 성운 글로우: 레드 -->
+    <radialGradient id="nebulaRed" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff1744" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ff1744" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 행성 그라디언트 -->
+    <radialGradient id="planetGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#7b1fa2"/>
+      <stop offset="60%" stop-color="#4a148c"/>
+      <stop offset="100%" stop-color="#1a0030"/>
+    </radialGradient>
+    <!-- 폭발 그라디언트 -->
+    <radialGradient id="explodeGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#ff9100"/>
+      <stop offset="60%" stop-color="#ff1744"/>
+      <stop offset="100%" stop-color="#7c4dff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 네온 글로우 (약) -->
+    <filter id="neon" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 네온 글로우 (강) -->
+    <filter id="glowStrong" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 폭발 필터 -->
+    <filter id="explodeFilter" x="-80%" y="-80%" width="360%" height="360%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 레이저 필터 -->
+    <filter id="laserFilter" x="-20%" y="-200%" width="140%" height="500%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 별 깜빡임 필터 -->
+    <filter id="starFilter" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(150,0,200,0.12)"/>
+
+  <!-- 배경 성운 -->
+  <ellipse cx="80" cy="70" rx="90" ry="65" fill="url(#nebulaPurple)"/>
+  <ellipse cx="230" cy="110" rx="80" ry="60" fill="url(#nebulaRed)"/>
+
+  <!-- 별 배경 -->
+  <circle cx="12" cy="14" r="1.2" fill="#ffffff" opacity="0.8" filter="url(#starFilter)"/>
+  <circle cx="35" cy="6" r="0.8" fill="#ffffff" opacity="0.6"/>
+  <circle cx="55" cy="22" r="1" fill="#e1bee7" opacity="0.7"/>
+  <circle cx="80" cy="8" r="1.5" fill="#ffffff" opacity="0.9" filter="url(#starFilter)"/>
+  <circle cx="105" cy="18" r="0.8" fill="#ffffff" opacity="0.5"/>
+  <circle cx="130" cy="5" r="1" fill="#f3e5f5" opacity="0.7"/>
+  <circle cx="160" cy="14" r="1.2" fill="#ffffff" opacity="0.8"/>
+  <circle cx="185" cy="8" r="0.8" fill="#e1bee7" opacity="0.6"/>
+  <circle cx="210" cy="18" r="1" fill="#ffffff" opacity="0.7" filter="url(#starFilter)"/>
+  <circle cx="240" cy="6" r="1.5" fill="#ffffff" opacity="0.9"/>
+  <circle cx="265" cy="20" r="0.8" fill="#f3e5f5" opacity="0.6"/>
+  <circle cx="290" cy="10" r="1" fill="#ffffff" opacity="0.8"/>
+  <circle cx="310" cy="22" r="1.2" fill="#e1bee7" opacity="0.7"/>
+  <circle cx="8" cy="50" r="0.8" fill="#ffffff" opacity="0.5"/>
+  <circle cx="25" cy="38" r="1" fill="#f3e5f5" opacity="0.6"/>
+  <circle cx="300" cy="45" r="0.8" fill="#ffffff" opacity="0.5"/>
+  <circle cx="315" cy="60" r="1" fill="#e1bee7" opacity="0.6"/>
+  <circle cx="14" cy="100" r="0.8" fill="#ffffff" opacity="0.4"/>
+  <circle cx="310" cy="95" r="1" fill="#ffffff" opacity="0.5"/>
+  <circle cx="18" cy="150" r="1.2" fill="#ffffff" opacity="0.7" filter="url(#starFilter)"/>
+  <circle cx="295" cy="160" r="0.8" fill="#e1bee7" opacity="0.6"/>
+
+  <!-- ═══════════════════════════ 행성 ═══════════════════════════ -->
+  <!-- 행성 본체 -->
+  <circle cx="258" cy="52" r="32" fill="url(#planetGrad)"/>
+  <!-- 행성 표면 디테일 -->
+  <ellipse cx="248" cy="42" rx="10" ry="6" fill="rgba(255,255,255,0.05)" transform="rotate(-20,248,42)"/>
+  <ellipse cx="265" cy="58" rx="7" ry="4" fill="rgba(255,255,255,0.03)" transform="rotate(15,265,58)"/>
+  <!-- 행성 테두리 네온 -->
+  <circle cx="258" cy="52" r="32" fill="none" stroke="#ce93d8" stroke-width="1.5" opacity="0.5" filter="url(#neon)"/>
+  <!-- 행성 고리 -->
+  <ellipse cx="258" cy="52" rx="45" ry="10" fill="none" stroke="#9c27b0" stroke-width="2.5" opacity="0.5" filter="url(#neon)"/>
+  <ellipse cx="258" cy="52" rx="45" ry="10" fill="none" stroke="rgba(206,147,216,0.3)" stroke-width="4"/>
+
+  <!-- ═══════════════════════════ 우주선 (주인공) ═══════════════════════════ -->
+  <!-- 엔진 불꽃 (후방) -->
+  <ellipse cx="82" cy="115" rx="6" ry="16" fill="url(#engineGrad)" opacity="0.9" filter="url(#glowStrong)"/>
+  <ellipse cx="82" cy="118" rx="3.5" ry="12" fill="#ffffff" opacity="0.7" filter="url(#neon)"/>
+  <ellipse cx="82" cy="122" rx="2" ry="8" fill="#e040fb" opacity="0.5"/>
+
+  <!-- 우주선 몸체 (좌향 — 오른쪽으로 비행) -->
+  <!-- 날개 하단 -->
+  <polygon points="72,125 95,128 88,145" fill="#2d004a" stroke="#9c27b0" stroke-width="1"/>
+  <polygon points="72,125 95,128 88,145" fill="none" stroke="#e040fb" stroke-width="0.8" opacity="0.5" filter="url(#neon)"/>
+  <!-- 날개 상단 -->
+  <polygon points="72,105 95,102 88,86" fill="#2d004a" stroke="#9c27b0" stroke-width="1"/>
+  <polygon points="72,105 95,102 88,86" fill="none" stroke="#e040fb" stroke-width="0.8" opacity="0.5" filter="url(#neon)"/>
+  <!-- 몸통 메인 -->
+  <ellipse cx="110" cy="115" rx="32" ry="14" fill="url(#shipGrad)" stroke="#7c4dff" stroke-width="1.5"/>
+  <ellipse cx="110" cy="115" rx="32" ry="14" fill="none" stroke="#e040fb" stroke-width="1" opacity="0.5" filter="url(#neon)"/>
+  <!-- 콕핏 (앞부분) -->
+  <ellipse cx="136" cy="113" rx="10" ry="8" fill="#1a0030" stroke="#ce93d8" stroke-width="1"/>
+  <!-- 콕핏 유리창 -->
+  <ellipse cx="137" cy="112" rx="6" ry="5" fill="#4a0080" opacity="0.8"/>
+  <ellipse cx="136" cy="111" rx="3" ry="2.5" fill="#9c27b0" opacity="0.6" filter="url(#neon)"/>
+  <!-- 콕핏 반사광 -->
+  <ellipse cx="134" cy="110" rx="2" ry="1.5" fill="rgba(255,255,255,0.4)"/>
+  <!-- 몸통 디테일 줄 -->
+  <line x1="92" y1="110" x2="130" y2="108" stroke="rgba(206,147,216,0.4)" stroke-width="0.8"/>
+  <line x1="90" y1="115" x2="128" y2="115" stroke="rgba(206,147,216,0.2)" stroke-width="0.8"/>
+  <!-- 볼트/리벳 -->
+  <circle cx="100" cy="112" r="2" fill="#4a0080" stroke="#ce93d8" stroke-width="0.8"/>
+  <circle cx="112" cy="110" r="2" fill="#4a0080" stroke="#9c27b0" stroke-width="0.8"/>
+
+  <!-- ═══════════════════════════ 레이저/미사일 ═══════════════════════════ -->
+  <!-- 레이저 빔 1 (주) -->
+  <rect x="146" y="112" width="90" height="4" rx="2" fill="url(#laserGrad)" filter="url(#laserFilter)"/>
+  <rect x="146" y="113" width="90" height="2" rx="1" fill="#ffffff" opacity="0.6"/>
+  <!-- 레이저 빔 2 (보조, 약간 위) -->
+  <rect x="148" y="105" width="60" height="2.5" rx="1.2" fill="#ff4081" opacity="0.7" filter="url(#laserFilter)"/>
+  <!-- 레이저 팁 섬광 -->
+  <circle cx="238" cy="114" r="5" fill="#ffff00" opacity="0.9" filter="url(#glowStrong)"/>
+
+  <!-- ═══════════════════════════ 적 우주선 ═══════════════════════════ -->
+  <!-- 적 우주선 (오른쪽 상단, 맞아서 폭발 중) -->
+  <!-- 적 본체 -->
+  <polygon points="248,72 268,62 280,75 268,85" fill="#4a0010" stroke="#ff1744" stroke-width="1.5"/>
+  <polygon points="248,72 268,62 280,75 268,85" fill="none" stroke="#ff4081" stroke-width="0.8" opacity="0.6" filter="url(#neon)"/>
+
+  <!-- 폭발 이펙트 (적 우주선 피격) -->
+  <circle cx="262" cy="74" r="18" fill="url(#explodeGrad)" filter="url(#explodeFilter)" opacity="0.85"/>
+  <!-- 폭발 파편 -->
+  <line x1="262" y1="74" x2="275" y2="58" stroke="#ff9100" stroke-width="2" opacity="0.8" filter="url(#neon)"/>
+  <line x1="262" y1="74" x2="280" y2="72" stroke="#ff1744" stroke-width="1.5" opacity="0.7" filter="url(#neon)"/>
+  <line x1="262" y1="74" x2="270" y2="90" stroke="#ffff00" stroke-width="1.5" opacity="0.6" filter="url(#neon)"/>
+  <line x1="262" y1="74" x2="248" y2="62" stroke="#ff9100" stroke-width="1.5" opacity="0.7" filter="url(#neon)"/>
+  <circle cx="278" cy="58" r="3" fill="#ffff00" opacity="0.8" filter="url(#starFilter)"/>
+  <circle cx="282" cy="68" r="2" fill="#ff9100" opacity="0.7" filter="url(#starFilter)"/>
+  <circle cx="272" cy="90" r="2.5" fill="#ff1744" opacity="0.6" filter="url(#starFilter)"/>
+
+  <!-- ═══════════════════════════ UI 요소 ═══════════════════════════ -->
+
+  <!-- 점수 표시 -->
+  <rect x="10" y="16" width="90" height="28" rx="8" fill="rgba(50,0,80,0.7)" stroke="rgba(206,147,216,0.35)" stroke-width="1"/>
+  <text x="18" y="28" font-size="9" font-weight="700" fill="#ce93d8" font-family="sans-serif" letter-spacing="1">SCORE</text>
+  <text x="96" y="39" text-anchor="end" font-size="15" font-weight="900" fill="#ff4081" font-family="sans-serif" filter="url(#neon)">12800</text>
+
+  <!-- 라이프 표시 -->
+  <rect x="10" y="50" width="72" height="22" rx="6" fill="rgba(50,0,80,0.6)" stroke="rgba(255,23,68,0.3)" stroke-width="1"/>
+  <text x="18" y="62" font-size="9" font-weight="700" fill="#ff4081" font-family="sans-serif" letter-spacing="1">LIFE</text>
+  <!-- 하트 아이콘 3개 -->
+  <text x="44" y="63" font-size="11" fill="#ff1744" filter="url(#neon)">♥♥♥</text>
+
+  <!-- 콤보 표시 -->
+  <rect x="10" y="78" width="72" height="22" rx="6" fill="rgba(255,215,0,0.1)" stroke="#ffd700" stroke-width="1"/>
+  <text x="18" y="91" font-size="9" font-weight="700" fill="#ffd700" font-family="sans-serif">COMBO</text>
+  <text x="78" y="93" text-anchor="end" font-size="13" font-weight="900" fill="#ffd700" font-family="sans-serif">x8</text>
+
+  <!-- 미사일 스톡 표시 -->
+  <rect x="10" y="106" width="55" height="20" rx="5" fill="rgba(124,77,255,0.15)" stroke="#7c4dff" stroke-width="1"/>
+  <text x="17" y="119" font-size="9" font-weight="600" fill="#b388ff" font-family="sans-serif">MSL</text>
+  <text x="61" y="120" text-anchor="end" font-size="11" font-weight="900" fill="#b388ff" font-family="sans-serif">x5</text>
+
+  <!-- ═══════════════════════════ 타이틀 텍스트 ═══════════════════════════ -->
+  <g font-family="'Pretendard','Noto Sans KR',Arial Black,sans-serif">
+    <rect x="0" y="150" width="320" height="30" fill="rgba(0,0,0,0.45)"/>
+    <line x1="0" y1="150" x2="320" y2="150" stroke="rgba(206,147,216,0.25)" stroke-width="1"/>
+    <text x="310" y="165" text-anchor="end" font-size="20" font-weight="900" fill="#e040fb" filter="url(#neon)">우주 슈팅</text>
+    <text x="310" y="176" text-anchor="end" font-size="10" font-weight="500" fill="rgba(206,147,216,0.65)" letter-spacing="2.5">SPACE SHOOTER</text>
+  </g>
+</svg>
