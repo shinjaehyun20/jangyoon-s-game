@@ -102,5 +102,37 @@
     "description": "흩어진 숫자를 1부터 순서대로 빠르게 터치! 레벨 클리어 도전",
     "thumbnail": "number-order/thumb.svg",
     "path": "number-order/index.html"
+  },
+  {
+    "id": "animal-coloring",
+    "title": "Animal Coloring",
+    "title_ko": "🐾 동물 색칠 놀이",
+    "description": "귀여운 동물을 원하는 색으로 색칠해봐요!",
+    "thumbnail": "animal-coloring/thumb.svg",
+    "path": "animal-coloring/index.html"
+  },
+  {
+    "id": "star-counting",
+    "title": "Star Counting",
+    "title_ko": "⭐ 별 세기 숫자 놀이",
+    "description": "별을 세며 숫자를 맞추는 재미있는 퍼즐!",
+    "thumbnail": "star-counting/thumb.svg",
+    "path": "star-counting/index.html"
+  },
+  {
+    "id": "princess-dressup",
+    "title": "Princess Dress-Up",
+    "title_ko": "👑 공주 드레스업",
+    "description": "공주님을 예쁘게 꾸며보세요!",
+    "thumbnail": "princess-dressup/thumb.svg",
+    "path": "princess-dressup/index.html"
+  },
+  {
+    "id": "rabbit-maze",
+    "title": "Rabbit Maze",
+    "title_ko": "🐰 토끼 당근 미로",
+    "description": "토끼가 당근을 찾아 미로를 탈출하도록 도와주세요!",
+    "thumbnail": "rabbit-maze/thumb.svg",
+    "path": "rabbit-maze/index.html"
   }
 ]

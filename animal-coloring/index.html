@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐾 동물 색칠 놀이</title>
+  <style>
+    :root {
+      --bg: #fff0f6;
+      --accent: #ff80ab;
+      --accent2: #ea80fc;
+      --text: #4a148c;
+      --btn-bg: #f48fb1;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: var(--bg);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      color: var(--text);
+      font-weight: 900;
+    }
+    /* 동물 선택 영역 */
+    #animalSelect {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+    .animal-btn {
+      flex: 1;
+      max-width: 80px;
+      aspect-ratio: 1;
+      border-radius: 16px;
+      border: 3px solid transparent;
+      background: white;
+      font-size: 32px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .animal-btn.active {
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+    /* 색상 팔레트 */
+    #palette {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .color-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .color-btn.active {
+      border-color: #333;
+      transform: scale(1.2);
+    }
+    /* 캔버스 영역 */
+    #canvasWrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    #gameCanvas {
+      border-radius: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      background: white;
+      touch-action: none;
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    /* 버튼 */
+    #controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .ctrl-btn {
+      flex: 1;
+      max-width: 120px;
+      padding: 10px 0;
+      border-radius: 20px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--btn-bg);
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .ctrl-btn.clear { background: #b0bec5; }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #888;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    /* 축하 오버레이 */
+    #celebrate {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .star-particle {
+      position: absolute;
+      font-size: 24px;
+      animation: flyUp 1.2s ease-out forwards;
+    }
+    @keyframes flyUp {
+      0%   { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-200px) scale(0.3) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐾 동물 색칠 놀이</h1>
+
+  <!-- 동물 선택 -->
+  <div id="animalSelect">
+    <button class="animal-btn active" data-animal="cat">🐱</button>
+    <button class="animal-btn" data-animal="rabbit">🐰</button>
+    <button class="animal-btn" data-animal="bear">🐻</button>
+    <button class="animal-btn" data-animal="fox">🦊</button>
+    <button class="animal-btn" data-animal="duck">🐥</button>
+  </div>
+
+  <!-- 색상 팔레트 -->
+  <div id="palette"></div>
+
+  <!-- 캔버스 -->
+  <div id="canvasWrap">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <!-- 버튼 -->
+  <div id="controls">
+    <button class="ctrl-btn clear" id="clearBtn">🗑 지우기</button>
+    <button class="ctrl-btn" id="celebrateBtn">🎉 완성!</button>
+  </div>
+
+  <footer>
+    <small>색깔을 골라서 칠해봐요!</small>
+    <a href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<div id="celebrate"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── 설정 상수 ─────────────────────────────────────────────────────────────
+  const COLORS = [
+    '#FF6B9D', '#FF9F43', '#FEE500', '#A8E6CF',
+    '#74B9FF', '#A29BFE', '#FD79A8', '#55EFC4',
+    '#FDCB6E', '#E17055', '#00B894', '#6C5CE7'
+  ];
+
+  // ── 각 동물의 색칠 영역 정의 (정규화된 좌표 0~1) ──────────────────────────
+  // 형식: { name, regions: [{id, label, path}] }
+  const ANIMALS = {
+    cat: {
+      emoji: '🐱',
+      regions: [
+        { id: 'body',  label: '몸통', color: '#f8f8f8', shape: 'ellipse', x: 0.5, y: 0.62, rx: 0.28, ry: 0.22 },
+        { id: 'head',  label: '머리', color: '#f8f8f8', shape: 'circle',  x: 0.5, y: 0.30, r: 0.18 },
+        { id: 'earL',  label: '귀L',  color: '#ffb3c1', shape: 'tri',     pts: [[0.32,0.16],[0.27,0.05],[0.40,0.14]] },
+        { id: 'earR',  label: '귀R',  color: '#ffb3c1', shape: 'tri',     pts: [[0.68,0.16],[0.73,0.05],[0.60,0.14]] },
+        { id: 'face',  label: '얼굴', color: '#ffe0ec', shape: 'circle',  x: 0.5, y: 0.28, r: 0.10 },
+        { id: 'tailL', label: '꼬리', color: '#e0e0e0', shape: 'bezier',
+          pts: [[0.70,0.78],[0.88,0.65],[0.92,0.52],[0.82,0.48]] }
+      ]
+    },
+    rabbit: {
+      emoji: '🐰',
+      regions: [
+        { id: 'body',  label: '몸통', color: '#f8f8f8', shape: 'ellipse', x: 0.5, y: 0.65, rx: 0.25, ry: 0.20 },
+        { id: 'head',  label: '머리', color: '#f8f8f8', shape: 'circle',  x: 0.5, y: 0.34, r: 0.17 },
+        { id: 'earL',  label: '귀L',  color: '#f8f8f8', shape: 'earRound', x: 0.38, y: 0.10, w: 0.09, h: 0.18 },
+        { id: 'earR',  label: '귀R',  color: '#f8f8f8', shape: 'earRound', x: 0.62, y: 0.10, w: 0.09, h: 0.18 },
+        { id: 'earLin', label: '귀속L', color: '#ffb3c1', shape: 'earRound', x: 0.38, y: 0.11, w: 0.05, h: 0.14 },
+        { id: 'earRin', label: '귀속R', color: '#ffb3c1', shape: 'earRound', x: 0.62, y: 0.11, w: 0.05, h: 0.14 },
+        { id: 'face',  label: '얼굴', color: '#ffe0ec', shape: 'circle',  x: 0.5, y: 0.32, r: 0.09 },
+        { id: 'tail',  label: '꼬리', color: '#f0f0f0', shape: 'circle',  x: 0.73, y: 0.75, r: 0.05 }
+      ]
+    },
+    bear: {
+      emoji: '🐻',
+      regions: [
+        { id: 'body',  label: '몸통', color: '#d7a87e', shape: 'ellipse', x: 0.5, y: 0.65, rx: 0.27, ry: 0.21 },
+        { id: 'head',  label: '머리', color: '#d7a87e', shape: 'circle',  x: 0.5, y: 0.30, r: 0.20 },
+        { id: 'earL',  label: '귀L',  color: '#d7a87e', shape: 'circle',  x: 0.33, y: 0.13, r: 0.08 },
+        { id: 'earR',  label: '귀R',  color: '#d7a87e', shape: 'circle',  x: 0.67, y: 0.13, r: 0.08 },
+        { id: 'face',  label: '얼굴', color: '#f5dbc1', shape: 'ellipse', x: 0.5, y: 0.34, rx: 0.10, ry: 0.08 },
+        { id: 'belly', label: '배',   color: '#f5dbc1', shape: 'ellipse', x: 0.5, y: 0.65, rx: 0.14, ry: 0.11 }
+      ]
+    },
+    fox: {
+      emoji: '🦊',
+      regions: [
+        { id: 'body',  label: '몸통', color: '#e07b39', shape: 'ellipse', x: 0.5, y: 0.65, rx: 0.26, ry: 0.20 },
+        { id: 'head',  label: '머리', color: '#e07b39', shape: 'circle',  x: 0.5, y: 0.30, r: 0.18 },
+        { id: 'earL',  label: '귀L',  color: '#e07b39', shape: 'tri',     pts: [[0.35,0.17],[0.28,0.04],[0.43,0.13]] },
+        { id: 'earR',  label: '귀R',  color: '#e07b39', shape: 'tri',     pts: [[0.65,0.17],[0.72,0.04],[0.57,0.13]] },
+        { id: 'face',  label: '얼굴', color: '#fce0c8', shape: 'ellipse', x: 0.5, y: 0.30, rx: 0.10, ry: 0.09 },
+        { id: 'tail',  label: '꼬리', color: '#e07b39', shape: 'bezier',
+          pts: [[0.68,0.80],[0.85,0.70],[0.90,0.55],[0.78,0.50]] },
+        { id: 'tailTip', label: '꼬리끝', color: '#f8f8f8', shape: 'circle', x: 0.83, y: 0.49, r: 0.06 }
+      ]
+    },
+    duck: {
+      emoji: '🐥',
+      regions: [
+        { id: 'body',  label: '몸통', color: '#ffe066', shape: 'ellipse', x: 0.5, y: 0.64, rx: 0.27, ry: 0.22 },
+        { id: 'head',  label: '머리', color: '#ffe066', shape: 'circle',  x: 0.5, y: 0.28, r: 0.18 },
+        { id: 'beak',  label: '부리', color: '#ff9f43', shape: 'tri',     pts: [[0.64,0.27],[0.76,0.24],[0.66,0.32]] },
+        { id: 'wing',  label: '날개', color: '#ffd32a', shape: 'ellipse', x: 0.35, y: 0.60, rx: 0.13, ry: 0.09 },
+        { id: 'belly', label: '배',   color: '#fff8e1', shape: 'ellipse', x: 0.55, y: 0.66, rx: 0.13, ry: 0.10 }
+      ]
+    }
+  };
+
+  // ── 상태 ──────────────────────────────────────────────────────────────────
+  let currentAnimal = 'cat';
+  let currentColor = COLORS[0];
+  let regionColors = {};  // regionId → color
+  let W, H;
+
+  // ── DOM ───────────────────────────────────────────────────────────────────
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const canvasWrap = document.getElementById('canvasWrap');
+  const palette = document.getElementById('palette');
+  const celebDiv = document.getElementById('celebrate');
+
+  // ── 팔레트 생성 ─────────────────────────────────────────────────────────
+  COLORS.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'color-btn' + (i === 0 ? ' active' : '');
+    btn.style.background = c;
+    btn.dataset.color = c;
+    btn.addEventListener('pointerdown', () => selectColor(c, btn));
+    palette.appendChild(btn);
+  });
+
+  function selectColor(c, btn) {
+    currentColor = c;
+    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── 동물 버튼 ────────────────────────────────────────────────────────────
+  document.querySelectorAll('.animal-btn').forEach(btn => {
+    btn.addEventListener('pointerdown', () => {
+      document.querySelectorAll('.animal-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentAnimal = btn.dataset.animal;
+      regionColors = {};
+      render();
+    });
+  });
+
+  // ── 캔버스 크기 조정 ────────────────────────────────────────────────────
+  function resize() {
+    const rect = canvasWrap.getBoundingClientRect();
+    const size = Math.min(rect.width, rect.height, 320);
+    canvas.width = size;
+    canvas.height = size;
+    W = size; H = size;
+    render();
+  }
+
+  // ── 그리기 유틸 ─────────────────────────────────────────────────────────
+  function px(v, dim) { return v * (dim === 'w' ? W : H); }
+
+  function drawRegion(region, fillColor) {
+    ctx.beginPath();
+    const color = fillColor || regionColors[region.id] || region.color;
+    ctx.fillStyle = color;
+    ctx.strokeStyle = 'rgba(100,60,0,0.25)';
+    ctx.lineWidth = 1.5;
+
+    if (region.shape === 'circle') {
+      ctx.arc(px(region.x,'w'), px(region.y,'h'), px(region.r,'w'), 0, Math.PI*2);
+    } else if (region.shape === 'ellipse') {
+      ctx.ellipse(px(region.x,'w'), px(region.y,'h'), px(region.rx,'w'), px(region.ry,'h'), 0, 0, Math.PI*2);
+    } else if (region.shape === 'tri') {
+      const pts = region.pts;
+      ctx.moveTo(px(pts[0][0],'w'), px(pts[0][1],'h'));
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(px(pts[i][0],'w'), px(pts[i][1],'h'));
+      ctx.closePath();
+    } else if (region.shape === 'earRound') {
+      const cx = px(region.x,'w'), cy = px(region.y,'h');
+      const rw = px(region.w,'w')/2, rh = px(region.h,'h')/2;
+      ctx.ellipse(cx, cy, rw, rh, 0, 0, Math.PI*2);
+    } else if (region.shape === 'bezier') {
+      const pts = region.pts;
+      ctx.moveTo(px(pts[0][0],'w'), px(pts[0][1],'h'));
+      ctx.bezierCurveTo(
+        px(pts[1][0],'w'), px(pts[1][1],'h'),
+        px(pts[2][0],'w'), px(pts[2][1],'h'),
+        px(pts[3][0],'w'), px(pts[3][1],'h')
+      );
+      ctx.lineWidth = px(0.04,'w');
+      ctx.strokeStyle = color;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      return;
+    }
+
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+
+    // 배경
+    ctx.fillStyle = '#fff9ff';
+    ctx.beginPath();
+    ctx.roundRect(0, 0, W, H, 16);
+    ctx.fill();
+
+    // 동물 영역 그리기
+    const animal = ANIMALS[currentAnimal];
+    if (!animal) return;
+    animal.regions.forEach(r => drawRegion(r));
+
+    // 눈 (공통)
+    drawEyes();
+
+    // 레이블
+    ctx.fillStyle = 'rgba(80,40,0,0.35)';
+    ctx.font = `bold ${Math.max(9, W*0.026)}px sans-serif`;
+    ctx.textAlign = 'center';
+    animal.regions.forEach(r => {
+      if (r.shape === 'circle' || r.shape === 'ellipse' || r.shape === 'earRound') {
+        ctx.fillText(r.label, px(r.x,'w'), px(r.y,'h') + 3);
+      }
+    });
+  }
+
+  function drawEyes() {
+    const eyeData = {
+      cat:    [[0.43, 0.28], [0.57, 0.28]],
+      rabbit: [[0.44, 0.32], [0.56, 0.32]],
+      bear:   [[0.44, 0.26], [0.56, 0.26]],
+      fox:    [[0.43, 0.27], [0.57, 0.27]],
+      duck:   [[0.47, 0.24], [0.57, 0.24]]
+    };
+    const eyes = eyeData[currentAnimal];
+    if (!eyes) return;
+    eyes.forEach(([ex, ey]) => {
+      // 흰자
+      ctx.beginPath();
+      ctx.arc(px(ex,'w'), px(ey,'h'), px(0.028,'w'), 0, Math.PI*2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      // 동공
+      ctx.beginPath();
+      ctx.arc(px(ex,'w')+1, px(ey,'h'), px(0.016,'w'), 0, Math.PI*2);
+      ctx.fillStyle = '#222';
+      ctx.fill();
+      // 하이라이트
+      ctx.beginPath();
+      ctx.arc(px(ex,'w')+2, px(ey,'h')-2, px(0.006,'w'), 0, Math.PI*2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    });
+  }
+
+  // ── 터치 → 색칠 ─────────────────────────────────────────────────────────
+  function getCanvasPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
+
+  function hitTest(pos) {
+    const animal = ANIMALS[currentAnimal];
+    if (!animal) return null;
+    // 역순으로 검사 (위에 그려진 것 우선)
+    const reversed = [...animal.regions].reverse();
+    for (const r of reversed) {
+      ctx.beginPath();
+      if (r.shape === 'circle') {
+        ctx.arc(px(r.x,'w'), px(r.y,'h'), px(r.r,'w'), 0, Math.PI*2);
+      } else if (r.shape === 'ellipse') {
+        ctx.ellipse(px(r.x,'w'), px(r.y,'h'), px(r.rx,'w'), px(r.ry,'h'), 0, 0, Math.PI*2);
+      } else if (r.shape === 'tri') {
+        const pts = r.pts;
+        ctx.moveTo(px(pts[0][0],'w'), px(pts[0][1],'h'));
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(px(pts[i][0],'w'), px(pts[i][1],'h'));
+        ctx.closePath();
+      } else if (r.shape === 'earRound') {
+        const cx = px(r.x,'w'), cy = px(r.y,'h');
+        const rw = px(r.w,'w')/2, rh = px(r.h,'h')/2;
+        ctx.ellipse(cx, cy, rw, rh, 0, 0, Math.PI*2);
+      } else {
+        continue;
+      }
+      if (ctx.isPointInPath(pos.x, pos.y)) return r;
+    }
+    return null;
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    const pos = getCanvasPos(e);
+    const region = hitTest(pos);
+    if (region) {
+      regionColors[region.id] = currentColor;
+      render();
+      spawnMiniStars(e.clientX, e.clientY, 3);
+    }
+  });
+
+  // ── 지우기 ───────────────────────────────────────────────────────────────
+  document.getElementById('clearBtn').addEventListener('pointerdown', () => {
+    regionColors = {};
+    render();
+  });
+
+  // ── 완성 축하 ────────────────────────────────────────────────────────────
+  document.getElementById('celebrateBtn').addEventListener('pointerdown', () => {
+    // 모든 영역이 색칠됐는지 확인
+    const animal = ANIMALS[currentAnimal];
+    const colored = animal.regions.filter(r => regionColors[r.id]).length;
+    if (colored === 0) {
+      alert('먼저 동물을 색칠해봐요! 🎨');
+      return;
+    }
+    spawnStars(40);
+  });
+
+  function spawnMiniStars(cx, cy, count) {
+    const emojis = ['⭐', '✨', '💫'];
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('span');
+      el.className = 'star-particle';
+      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.left = (cx + (Math.random()-0.5)*40) + 'px';
+      el.style.top  = (cy + (Math.random()-0.5)*20) + 'px';
+      el.style.animationDuration = (0.8 + Math.random()*0.6) + 's';
+      celebDiv.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }
+  }
+
+  function spawnStars(count) {
+    const emojis = ['🌟','⭐','✨','💫','🎉','🎊','🌈','💖','🌸'];
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const el = document.createElement('span');
+        el.className = 'star-particle';
+        el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        el.style.left = (Math.random()*window.innerWidth) + 'px';
+        el.style.top  = (window.innerHeight * 0.8 + Math.random()*40) + 'px';
+        el.style.fontSize = (20 + Math.random()*20) + 'px';
+        el.style.animationDuration = (1.0 + Math.random()*0.8) + 's';
+        celebDiv.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+      }, i * 40);
+    }
+  }
+
+  // ── 초기화 ───────────────────────────────────────────────────────────────
+  window.addEventListener('resize', resize);
+  resize();
+})();
+</script>
+</body>
+</html>

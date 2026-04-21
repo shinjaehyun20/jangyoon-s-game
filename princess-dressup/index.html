@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>👑 공주 드레스업</title>
+  <style>
+    :root {
+      --bg: #fff0fb;
+      --accent: #e91e8c;
+      --accent2: #9c27b0;
+      --text: #6a0040;
+      --card: #ffffff;
+      --btn-sel: #f8bbd9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: linear-gradient(160deg, #ffe4f5 0%, #f3e5f5 100%);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      color: var(--text);
+      font-weight: 900;
+    }
+    /* 공주 표시 영역 */
+    #princessArea {
+      flex: 1.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 0;
+    }
+    #princessCanvas {
+      max-height: 100%;
+      max-width: 100%;
+      display: block;
+    }
+    /* 카테고리 탭 */
+    #tabs {
+      display: flex;
+      gap: 4px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 7px 0;
+      border-radius: 12px;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(255,255,255,0.6);
+      color: var(--text);
+      transition: background 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+    /* 아이템 선택 패널 */
+    #itemPanel {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 2px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    #itemPanel::-webkit-scrollbar { display: none; }
+    .item-btn {
+      flex-shrink: 0;
+      width: 60px; height: 60px;
+      border-radius: 16px;
+      border: 3px solid transparent;
+      background: white;
+      font-size: 30px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.1s, border-color 0.1s;
+    }
+    .item-btn.selected {
+      border-color: var(--accent);
+      transform: scale(1.1);
+      background: #fff0fb;
+    }
+    /* 완성 버튼 */
+    #bottomRow {
+      display: flex;
+      gap: 8px;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 20px;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 2px 8px rgba(233,30,140,0.3);
+    }
+    .action-btn.reset { background: #b0bec5; box-shadow: none; }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #aaa;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    /* 파티클 */
+    #celebrate {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .petal {
+      position: absolute;
+      animation: petalFall 1.4s ease-out forwards;
+    }
+    @keyframes petalFall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(120px) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>👑 공주 드레스업</h1>
+
+  <!-- 공주 캔버스 -->
+  <div id="princessArea">
+    <canvas id="princessCanvas"></canvas>
+  </div>
+
+  <!-- 카테고리 탭 -->
+  <div id="tabs">
+    <button class="tab-btn active" data-cat="dress">👗 드레스</button>
+    <button class="tab-btn" data-cat="crown">👑 왕관</button>
+    <button class="tab-btn" data-cat="wand">🪄 지팡이</button>
+    <button class="tab-btn" data-cat="shoes">👠 구두</button>
+    <button class="tab-btn" data-cat="acc">💎 장신구</button>
+  </div>
+
+  <!-- 아이템 패널 -->
+  <div id="itemPanel"></div>
+
+  <!-- 하단 버튼 -->
+  <div id="bottomRow">
+    <button class="action-btn reset" id="resetBtn">🗑 초기화</button>
+    <button class="action-btn" id="completeBtn">✨ 완성!</button>
+  </div>
+
+  <footer>
+    <small>예쁜 공주님으로 꾸며봐요!</small>
+    <a href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<div id="celebrate"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── 아이템 정의 ─────────────────────────────────────────────────────────
+  const ITEMS = {
+    dress: [
+      { id: 'd1', emoji: '🩷', label: '핑크 드레스',  color: '#f48fb1', skirtColor: '#f06292' },
+      { id: 'd2', emoji: '💜', label: '보라 드레스',  color: '#ce93d8', skirtColor: '#ab47bc' },
+      { id: 'd3', emoji: '💙', label: '파랑 드레스',  color: '#81d4fa', skirtColor: '#29b6f6' },
+      { id: 'd4', emoji: '💚', label: '초록 드레스',  color: '#a5d6a7', skirtColor: '#66bb6a' },
+      { id: 'd5', emoji: '🤍', label: '흰 드레스',    color: '#f5f5f5', skirtColor: '#e0e0e0' },
+      { id: 'd6', emoji: '🩵', label: '하늘 드레스',  color: '#b3e5fc', skirtColor: '#4fc3f7' },
+      { id: 'd7', emoji: '🧡', label: '오렌지 드레스',color: '#ffcc80', skirtColor: '#ffa726' },
+    ],
+    crown: [
+      { id: 'c1', emoji: '👑', label: '황금 왕관',  color: '#ffd700', gems: ['#e74c3c','#3498db','#2ecc71'] },
+      { id: 'c2', emoji: '💎', label: '보석 왕관',  color: '#a29bfe', gems: ['#fd79a8','#fdcb6e','#6c5ce7'] },
+      { id: 'c3', emoji: '🌸', label: '꽃 왕관',    color: '#ffb3c1', gems: ['#ff8fab','#ffd6e7','#ffb3c1'] },
+      { id: 'c4', emoji: '⭐', label: '별 왕관',    color: '#ffe066', gems: ['#fff200','#ffd700','#ffb700'] },
+      { id: 'c5', emoji: '🌈', label: '무지개 왕관', color: '#fd79a8', gems: ['#ff6b6b','#ffd93d','#6bcb77'] },
+      { id: 'c0', emoji: '✖', label: '없음', color: null },
+    ],
+    wand: [
+      { id: 'w1', emoji: '🪄', label: '마법 지팡이', tipColor: '#ffe066', stickColor: '#795548' },
+      { id: 'w2', emoji: '⭐', label: '별 지팡이',   tipColor: '#ffd700', stickColor: '#d4a017' },
+      { id: 'w3', emoji: '🌸', label: '꽃 지팡이',   tipColor: '#ff80ab', stickColor: '#c2185b' },
+      { id: 'w4', emoji: '🌙', label: '달 지팡이',   tipColor: '#b0e0e6', stickColor: '#607d8b' },
+      { id: 'w0', emoji: '✖', label: '없음', tipColor: null, stickColor: null },
+    ],
+    shoes: [
+      { id: 's1', emoji: '👠', label: '빨강 구두',  color: '#e53935' },
+      { id: 's2', emoji: '💗', label: '핑크 구두',  color: '#f06292' },
+      { id: 's3', emoji: '🩵', label: '파랑 구두',  color: '#42a5f5' },
+      { id: 's4', emoji: '💜', label: '보라 구두',  color: '#ab47bc' },
+      { id: 's5', emoji: '🌟', label: '황금 구두',  color: '#ffd700' },
+      { id: 's0', emoji: '✖', label: '없음', color: null },
+    ],
+    acc: [
+      { id: 'a1', emoji: '💍', label: '반지', extra: 'ring' },
+      { id: 'a2', emoji: '📿', label: '목걸이', extra: 'necklace' },
+      { id: 'a3', emoji: '🦋', label: '나비 핀', extra: 'butterfly' },
+      { id: 'a4', emoji: '🌸', label: '꽃 핀',  extra: 'flower' },
+      { id: 'a0', emoji: '✖', label: '없음',  extra: null },
+    ]
+  };
+
+  // ── 상태 ──────────────────────────────────────────────────────────────────
+  const selected = {
+    dress: ITEMS.dress[0],
+    crown: ITEMS.crown[0],
+    wand:  ITEMS.wand[0],
+    shoes: ITEMS.shoes[0],
+    acc:   ITEMS.acc[3]
+  };
+  let currentCat = 'dress';
+
+  // ── DOM ───────────────────────────────────────────────────────────────────
+  const canvas    = document.getElementById('princessCanvas');
+  const ctx       = canvas.getContext('2d');
+  const area      = document.getElementById('princessArea');
+  const itemPanel = document.getElementById('itemPanel');
+  const celebDiv  = document.getElementById('celebrate');
+
+  // ── 캔버스 크기 조정 ─────────────────────────────────────────────────────
+  function resize() {
+    const rect = area.getBoundingClientRect();
+    const h = Math.min(rect.height, rect.width * 1.3, 260);
+    const w = h / 1.3;
+    canvas.width  = Math.round(w);
+    canvas.height = Math.round(h);
+    draw();
+  }
+
+  window.addEventListener('resize', resize);
+
+  // ── 공주 그리기 ──────────────────────────────────────────────────────────
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const cx = W / 2;
+    const scale = H / 300;  // 기준 높이 300
+
+    function s(v) { return v * scale; }  // 스케일 변환
+
+    // 배경 (옅은 그라디언트)
+    const bg = ctx.createRadialGradient(cx, H*0.4, s(10), cx, H*0.4, s(160));
+    bg.addColorStop(0, '#fff5fd');
+    bg.addColorStop(1, '#f8e8ff');
+    ctx.fillStyle = bg;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, W, H, s(12));
+    ctx.fill();
+
+    // ── 드레스 ────────────────────────────────────────────────────────────
+    const dress = selected.dress;
+    if (dress) {
+      // 치마 (큰 삼각형 + 곡선)
+      ctx.beginPath();
+      ctx.moveTo(cx - s(14), s(145));
+      ctx.quadraticCurveTo(cx - s(60), s(200), cx - s(70), s(270));
+      ctx.lineTo(cx + s(70), s(270));
+      ctx.quadraticCurveTo(cx + s(60), s(200), cx + s(14), s(145));
+      ctx.closePath();
+      ctx.fillStyle = dress.skirtColor;
+      ctx.fill();
+
+      // 치마 하이라이트 (오버레이)
+      const skirtGrad = ctx.createLinearGradient(cx - s(70), 0, cx + s(70), 0);
+      skirtGrad.addColorStop(0, 'rgba(255,255,255,0.25)');
+      skirtGrad.addColorStop(0.5, 'rgba(255,255,255,0.0)');
+      skirtGrad.addColorStop(1, 'rgba(255,255,255,0.15)');
+      ctx.fillStyle = skirtGrad;
+      ctx.fill();
+
+      // 몸통 (코르셋)
+      ctx.beginPath();
+      ctx.roundRect(cx - s(13), s(108), s(26), s(40), s(4));
+      ctx.fillStyle = dress.color;
+      ctx.fill();
+
+      // 레이스 장식
+      ctx.beginPath();
+      ctx.moveTo(cx - s(14), s(145));
+      for (let i = 0; i <= 8; i++) {
+        const bx = cx - s(14) + (s(28)/8)*i;
+        const by = s(145) + (i % 2 === 0 ? s(4) : s(-4));
+        ctx.lineTo(bx, by);
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      ctx.lineWidth = s(2);
+      ctx.stroke();
+    }
+
+    // ── 팔 ────────────────────────────────────────────────────────────────
+    const armColor = '#fcd5b0';
+    // 왼팔
+    ctx.beginPath();
+    ctx.moveTo(cx - s(13), s(115));
+    ctx.quadraticCurveTo(cx - s(28), s(128), cx - s(32), s(155));
+    ctx.lineTo(cx - s(26), s(157));
+    ctx.quadraticCurveTo(cx - s(22), s(132), cx - s(10), s(120));
+    ctx.closePath();
+    ctx.fillStyle = armColor;
+    ctx.fill();
+
+    // 오른팔 (지팡이 들기)
+    ctx.beginPath();
+    ctx.moveTo(cx + s(13), s(115));
+    ctx.quadraticCurveTo(cx + s(28), s(128), cx + s(36), s(148));
+    ctx.lineTo(cx + s(30), s(152));
+    ctx.quadraticCurveTo(cx + s(24), s(132), cx + s(10), s(120));
+    ctx.closePath();
+    ctx.fillStyle = armColor;
+    ctx.fill();
+
+    // ── 목 ────────────────────────────────────────────────────────────────
+    ctx.beginPath();
+    ctx.roundRect(cx - s(5), s(90), s(10), s(20), s(3));
+    ctx.fillStyle = armColor;
+    ctx.fill();
+
+    // ── 얼굴 ──────────────────────────────────────────────────────────────
+    // 얼굴 바탕
+    ctx.beginPath();
+    ctx.arc(cx, s(68), s(28), 0, Math.PI * 2);
+    ctx.fillStyle = '#fde8d0';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(180,100,80,0.15)';
+    ctx.lineWidth = s(1);
+    ctx.stroke();
+
+    // 볼 홍조
+    [cx - s(14), cx + s(14)].forEach(bx => {
+      ctx.beginPath();
+      ctx.ellipse(bx, s(72), s(7), s(4), 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,160,160,0.35)';
+      ctx.fill();
+    });
+
+    // 눈
+    [cx - s(10), cx + s(10)].forEach(ex => {
+      ctx.beginPath();
+      ctx.arc(ex, s(65), s(4.5), 0, Math.PI * 2);
+      ctx.fillStyle = '#333';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(ex + s(1.5), s(63.5), s(1.5), 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    });
+
+    // 속눈썹
+    [cx - s(10), cx + s(10)].forEach((ex, i) => {
+      for (let e = 0; e < 3; e++) {
+        ctx.beginPath();
+        ctx.moveTo(ex + (i === 0 ? -s(3) : s(0)) + e * s(2), s(60.5));
+        ctx.lineTo(ex + (i === 0 ? -s(5) : s(2)) + e * s(2.5), s(57));
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = s(1.2);
+        ctx.stroke();
+      }
+    });
+
+    // 입 (미소)
+    ctx.beginPath();
+    ctx.arc(cx, s(75), s(6), 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.strokeStyle = '#c0705a';
+    ctx.lineWidth = s(1.8);
+    ctx.stroke();
+
+    // 코
+    ctx.beginPath();
+    ctx.arc(cx, s(71), s(1.5), 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(180,100,80,0.25)';
+    ctx.fill();
+
+    // ── 머리카락 ──────────────────────────────────────────────────────────
+    const hairColor = '#a0522d';
+    ctx.beginPath();
+    ctx.arc(cx, s(62), s(30), Math.PI * 1.05, Math.PI * 2.0);
+    ctx.fillStyle = hairColor;
+    ctx.fill();
+
+    // 양쪽 땋은 머리
+    [cx - s(26), cx + s(26)].forEach((hx, i) => {
+      ctx.beginPath();
+      ctx.moveTo(hx, s(68));
+      ctx.bezierCurveTo(
+        hx + (i === 0 ? -s(12) : s(12)), s(90),
+        hx + (i === 0 ? -s(8)  : s(8)),  s(130),
+        hx + (i === 0 ? -s(4)  : s(4)),  s(145)
+      );
+      ctx.strokeStyle = hairColor;
+      ctx.lineWidth = s(7);
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    });
+
+    // 리본 (머리)
+    ctx.beginPath();
+    ctx.ellipse(cx - s(20), s(42), s(9), s(5), Math.PI * 0.3, 0, Math.PI * 2);
+    ctx.fillStyle = selected.dress ? selected.dress.skirtColor : '#f48fb1';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cx - s(12), s(40), s(9), s(5), -Math.PI * 0.3, 0, Math.PI * 2);
+    ctx.fillStyle = selected.dress ? selected.dress.skirtColor : '#f48fb1';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx - s(16), s(41), s(3), 0, Math.PI * 2);
+    ctx.fillStyle = selected.dress ? selected.dress.color : '#fff';
+    ctx.fill();
+
+    // ── 구두 ──────────────────────────────────────────────────────────────
+    if (selected.shoes && selected.shoes.color) {
+      [[cx - s(22), cx - s(8)], [cx + s(8), cx + s(22)]].forEach(([x1, x2]) => {
+        const scx = (x1 + x2) / 2;
+        ctx.beginPath();
+        ctx.roundRect(x1, s(268), x2 - x1, s(10), s(4));
+        ctx.fillStyle = selected.shoes.color;
+        ctx.fill();
+        // 힐
+        ctx.beginPath();
+        ctx.roundRect(scx - s(2), s(272), s(4), s(6), s(2));
+        ctx.fillStyle = selected.shoes.color;
+        ctx.fill();
+      });
+    }
+
+    // ── 왕관 ──────────────────────────────────────────────────────────────
+    if (selected.crown && selected.crown.color) {
+      const cr = selected.crown;
+      const crownY = s(40);
+      // 왕관 기반
+      ctx.beginPath();
+      ctx.rect(cx - s(24), crownY + s(6), s(48), s(12));
+      ctx.fillStyle = cr.color;
+      ctx.fill();
+      // 왕관 뾰족 3개
+      [[cx - s(18), 0], [cx, -s(10)], [cx + s(18), 0]].forEach(([px, offset]) => {
+        ctx.beginPath();
+        ctx.moveTo(px - s(6), crownY + s(6));
+        ctx.lineTo(px, crownY + offset);
+        ctx.lineTo(px + s(6), crownY + s(6));
+        ctx.closePath();
+        ctx.fillStyle = cr.color;
+        ctx.fill();
+        // 보석
+        ctx.beginPath();
+        ctx.arc(px, crownY + offset + s(4), s(3), 0, Math.PI * 2);
+        ctx.fillStyle = cr.gems ? cr.gems[0] : '#fff';
+        ctx.fill();
+      });
+      // 아랫줄 보석
+      if (cr.gems) {
+        [cx - s(12), cx, cx + s(12)].forEach((gx, gi) => {
+          ctx.beginPath();
+          ctx.arc(gx, crownY + s(12), s(3.5), 0, Math.PI * 2);
+          ctx.fillStyle = cr.gems[gi % cr.gems.length];
+          ctx.fill();
+        });
+      }
+    }
+
+    // ── 지팡이 ────────────────────────────────────────────────────────────
+    if (selected.wand && selected.wand.stickColor) {
+      const wand = selected.wand;
+      const wx = cx + s(36), wy = s(148);
+      // 막대
+      ctx.beginPath();
+      ctx.moveTo(wx, wy);
+      ctx.lineTo(wx - s(20), wy + s(80));
+      ctx.strokeStyle = wand.stickColor;
+      ctx.lineWidth = s(5);
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      // 끝 장식 (별 모양)
+      drawStar(wx, wy, s(12), s(5), wand.tipColor);
+    }
+
+    // ── 장신구 ────────────────────────────────────────────────────────────
+    if (selected.acc && selected.acc.extra) {
+      const acc = selected.acc.extra;
+      if (acc === 'necklace') {
+        ctx.beginPath();
+        ctx.arc(cx, s(100), s(10), Math.PI * 0.2, Math.PI * 0.8);
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = s(2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx, s(110), s(4), 0, Math.PI * 2);
+        ctx.fillStyle = '#3498db';
+        ctx.fill();
+      }
+      if (acc === 'butterfly') {
+        drawButterfly(cx - s(10), s(52), s(8));
+      }
+      if (acc === 'flower') {
+        drawFlower(cx - s(10), s(50), s(6));
+      }
+      if (acc === 'ring') {
+        ctx.beginPath();
+        ctx.arc(cx - s(30), s(148), s(4), 0, Math.PI * 2);
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = s(2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx - s(30), s(144), s(2.5), 0, Math.PI * 2);
+        ctx.fillStyle = '#e74c3c';
+        ctx.fill();
+      }
+    }
+  }
+
+  // ── 별 그리기 헬퍼 ───────────────────────────────────────────────────────
+  function drawStar(cx, cy, outerR, innerR, color) {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 === 0 ? outerR : innerR;
+      const angle = (i * Math.PI / 5) - Math.PI / 2;
+      if (i === 0) ctx.moveTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+      else ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    // 반짝이
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR * 0.3, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fill();
+  }
+
+  // ── 나비 그리기 헬퍼 ─────────────────────────────────────────────────────
+  function drawButterfly(x, y, r) {
+    [[-1, 1], [1, 1], [-1, -1], [1, -1]].forEach(([dx, dy]) => {
+      ctx.beginPath();
+      ctx.ellipse(x + dx * r, y + dy * r * 0.6, r * 0.9, r * 0.55, dx > 0 ? 0.3 : -0.3, 0, Math.PI * 2);
+      ctx.fillStyle = dx * dy > 0 ? '#ff80ab' : '#ea80fc';
+      ctx.globalAlpha = 0.85;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  // ── 꽃 그리기 헬퍼 ───────────────────────────────────────────────────────
+  function drawFlower(x, y, r) {
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.ellipse(x + Math.cos(angle) * r * 0.7, y + Math.sin(angle) * r * 0.7, r * 0.5, r * 0.35, angle, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff80ab';
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffe066';
+    ctx.fill();
+  }
+
+  // ── 탭 전환 ──────────────────────────────────────────────────────────────
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('pointerdown', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCat = btn.dataset.cat;
+      renderItemPanel();
+    });
+  });
+
+  function renderItemPanel() {
+    itemPanel.innerHTML = '';
+    const items = ITEMS[currentCat] || [];
+    items.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'item-btn' + (selected[currentCat]?.id === item.id ? ' selected' : '');
+      btn.textContent = item.emoji;
+      btn.title = item.label;
+      btn.addEventListener('pointerdown', () => {
+        selected[currentCat] = item;
+        renderItemPanel();
+        draw();
+      });
+      itemPanel.appendChild(btn);
+    });
+  }
+
+  // ── 완성 ─────────────────────────────────────────────────────────────────
+  document.getElementById('completeBtn').addEventListener('pointerdown', () => {
+    spawnPetals(50);
+  });
+
+  document.getElementById('resetBtn').addEventListener('pointerdown', () => {
+    selected.dress = ITEMS.dress[0];
+    selected.crown = ITEMS.crown[0];
+    selected.wand  = ITEMS.wand[0];
+    selected.shoes = ITEMS.shoes[0];
+    selected.acc   = ITEMS.acc[3];
+    renderItemPanel();
+    draw();
+  });
+
+  function spawnPetals(count) {
+    const emojis = ['🌸','🌺','💖','✨','🌟','💫','🌈','🎀','🦋','🌷'];
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const el = document.createElement('span');
+        el.className = 'petal';
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = (Math.random() * window.innerWidth) + 'px';
+        el.style.top  = (-20) + 'px';
+        el.style.fontSize = (14 + Math.random() * 18) + 'px';
+        el.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
+        el.style.animationDelay   = (Math.random() * 0.2) + 's';
+        celebDiv.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+      }, i * 30);
+    }
+  }
+
+  // ── 초기화 ───────────────────────────────────────────────────────────────
+  renderItemPanel();
+  resize();
+})();
+</script>
+</body>
+</html>

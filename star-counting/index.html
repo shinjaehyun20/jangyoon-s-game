@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>⭐ 별 세기 숫자 놀이</title>
+  <style>
+    :root {
+      --bg: #1a1a4e;
+      --accent: #ffe066;
+      --text: #ffffff;
+      --card: rgba(255,255,255,0.12);
+      --correct: #a8e6cf;
+      --wrong: #ff8b94;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: radial-gradient(ellipse at 50% 30%, #2e2e7a 0%, #0d0d2b 100%);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 14px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    /* 점수/레벨 HUD */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .hud span { color: var(--accent); }
+    /* 질문 영역 */
+    #question {
+      text-align: center;
+      font-size: clamp(16px, 4.5vw, 22px);
+      font-weight: 700;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 10px;
+      min-height: 42px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* 별 표시 영역 */
+    #starField {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 6px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 12px;
+      justify-content: center;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .star-item {
+      font-size: clamp(22px, 6vw, 34px);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.15s;
+      border-radius: 50%;
+      width: clamp(38px, 10vw, 50px);
+      height: clamp(38px, 10vw, 50px);
+      display: flex; align-items: center; justify-content: center;
+      touch-action: manipulation;
+    }
+    .star-item.tapped {
+      transform: scale(1.4);
+      background: rgba(255,224,102,0.3);
+    }
+    /* 정답 선택 버튼 */
+    #answerGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .ans-btn {
+      padding: 12px 0;
+      border-radius: 16px;
+      border: none;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      cursor: pointer;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .ans-btn:active { transform: scale(0.92); }
+    .ans-btn.correct { background: var(--correct); color: #1a3a2a; }
+    .ans-btn.wrong   { background: var(--wrong);   color: #4a1010; }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    /* 오버레이 공통 */
+    .overlay {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.7);
+      z-index: 50;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #2a2a5e;
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 300px; width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; }
+    .overlay-card p  { font-size: 15px; color: rgba(255,255,255,0.8); margin-bottom: 16px; line-height: 1.5; }
+    .result-score { font-size: 48px; font-weight: 900; color: var(--accent); margin: 8px 0; }
+    .btn-start {
+      background: var(--accent);
+      color: #1a1a4e;
+      border: none;
+      border-radius: 20px;
+      padding: 12px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    /* 별 파티클 */
+    #celebrate {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .star-p {
+      position: absolute;
+      font-size: 22px;
+      animation: flyUp2 1s ease-out forwards;
+    }
+    @keyframes flyUp2 {
+      0%   { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-240px) scale(0.3) rotate(540deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⭐ 별 세기 숫자 놀이</h1>
+
+  <div class="hud">
+    <div>점수 <span id="score">0</span></div>
+    <div>레벨 <span id="level">1</span></div>
+    <div>최고 <span id="best">0</span></div>
+  </div>
+
+  <div id="question">별이 몇 개일까요?</div>
+
+  <div id="starField"></div>
+
+  <div id="answerGrid"></div>
+
+  <footer>
+    <small>별을 손가락으로 세어봐요!</small>
+    <a href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<div id="celebrate"></div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>⭐ 별 세기</h2>
+    <p>하늘에 별이 몇 개 있는지<br>숫자를 눌러서 맞춰봐요!<br>별을 손가락으로 세어봐요 🌙</p>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 종료 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 잘했어요!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── 설정 ──────────────────────────────────────────────────────────────────
+  const LEVELS = [
+    { min: 1, max: 5,  choices: 3 },   // 레벨 1: 1~5
+    { min: 1, max: 8,  choices: 4 },   // 레벨 2: 1~8
+    { min: 1, max: 10, choices: 4 },   // 레벨 3: 1~10
+    { min: 3, max: 10, choices: 5 },   // 레벨 4: 3~10 (보기 5개)
+  ];
+  const ROUND_PER_LEVEL = 3;  // 레벨당 문제 수
+  const MAX_LEVEL = LEVELS.length;
+
+  const STAR_EMOJIS = ['⭐','🌟','💫','✨'];
+  const WRONG_EMOJIS = ['🌙','🌈','🌸','🦋','🌺','🍀','🌻','🍭'];
+  const CELEB_EMOJIS = ['🎉','🌟','⭐','✨','💖','🎊','🌈','🌸'];
+
+  // ── 상태 ──────────────────────────────────────────────────────────────────
+  const state = {
+    score: 0,
+    level: 1,
+    round: 0,
+    correct: 0,
+    answered: false,
+    starCount: 0,
+    best: parseInt(localStorage.getItem('star_count_best') || '0', 10)
+  };
+
+  // ── DOM ───────────────────────────────────────────────────────────────────
+  const scoreEl   = document.getElementById('score');
+  const levelEl   = document.getElementById('level');
+  const bestEl    = document.getElementById('best');
+  const questionEl = document.getElementById('question');
+  const starField = document.getElementById('starField');
+  const answerGrid = document.getElementById('answerGrid');
+  const celebDiv  = document.getElementById('celebrate');
+
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay   = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl  = document.getElementById('resultMsg');
+
+  // ── 버튼 이벤트 ──────────────────────────────────────────────────────────
+  document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+  document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+
+  // ── 게임 시작 ─────────────────────────────────────────────────────────────
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    state.score = 0;
+    state.level = 1;
+    state.round = 0;
+    state.correct = 0;
+    updateHUD();
+    nextQuestion();
+  }
+
+  function updateHUD() {
+    scoreEl.textContent = state.score;
+    levelEl.textContent = state.level;
+    bestEl.textContent  = state.best;
+  }
+
+  // ── 문제 생성 ─────────────────────────────────────────────────────────────
+  function nextQuestion() {
+    state.answered = false;
+    const lvlCfg = LEVELS[Math.min(state.level - 1, MAX_LEVEL - 1)];
+    const count = randInt(lvlCfg.min, lvlCfg.max);
+    state.starCount = count;
+
+    // 별 표시
+    starField.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'star-item';
+      el.textContent = STAR_EMOJIS[Math.floor(Math.random() * STAR_EMOJIS.length)];
+      el.addEventListener('pointerdown', function () {
+        this.classList.toggle('tapped');
+      });
+      starField.appendChild(el);
+    }
+
+    // 질문 표시
+    questionEl.textContent = '별이 몇 개일까요? 손가락으로 세어봐요! ☝';
+
+    // 보기 생성
+    const choices = makeChoices(count, lvlCfg.choices, lvlCfg.min, lvlCfg.max);
+    answerGrid.innerHTML = '';
+    answerGrid.style.gridTemplateColumns = `repeat(${Math.min(choices.length, 3)}, 1fr)`;
+    choices.forEach(ch => {
+      const btn = document.createElement('button');
+      btn.className = 'ans-btn';
+      btn.textContent = ch;
+      btn.addEventListener('pointerdown', () => checkAnswer(ch, btn));
+      answerGrid.appendChild(btn);
+    });
+  }
+
+  function makeChoices(correct, total, min, max) {
+    const set = new Set([correct]);
+    let attempts = 0;
+    while (set.size < total && attempts < 100) {
+      attempts++;
+      let v = correct + randInt(-3, 3);
+      v = Math.max(min, Math.min(max, v));
+      if (v !== correct) set.add(v);
+    }
+    // 부족하면 채우기
+    for (let v = min; v <= max && set.size < total; v++) {
+      set.add(v);
+    }
+    return shuffle([...set]).slice(0, total);
+  }
+
+  // ── 정답 확인 ─────────────────────────────────────────────────────────────
+  function checkAnswer(val, btn) {
+    if (state.answered) return;
+    state.answered = true;
+    state.round++;
+
+    if (val === state.starCount) {
+      btn.classList.add('correct');
+      state.score += 10 * state.level;
+      state.correct++;
+      questionEl.textContent = `맞아요! ${val}개! 🎉`;
+      spawnStars(val * 3);
+    } else {
+      btn.classList.add('wrong');
+      // 정답 버튼 표시
+      document.querySelectorAll('.ans-btn').forEach(b => {
+        if (parseInt(b.textContent) === state.starCount) b.classList.add('correct');
+      });
+      questionEl.textContent = `아쉬워요! 정답은 ${state.starCount}개였어요 😊`;
+    }
+
+    updateHUD();
+
+    // 레벨 업 판정
+    if (state.round % ROUND_PER_LEVEL === 0) {
+      if (state.level < MAX_LEVEL) {
+        setTimeout(() => {
+          state.level++;
+          updateHUD();
+          nextQuestion();
+        }, 1500);
+      } else {
+        // 게임 종료
+        setTimeout(showResult, 1500);
+      }
+    } else {
+      setTimeout(nextQuestion, 1500);
+    }
+  }
+
+  function showResult() {
+    if (state.score > state.best) {
+      state.best = state.score;
+      localStorage.setItem('star_count_best', state.best);
+    }
+    finalScoreEl.textContent = state.score + '점';
+    const rate = Math.round((state.correct / (MAX_LEVEL * ROUND_PER_LEVEL)) * 100);
+    resultMsgEl.textContent = `정답률 ${rate}%! ${rate >= 80 ? '정말 잘했어요! 🌟' : '다시 한번 해봐요! 💪'}`;
+    endOverlay.classList.remove('hidden');
+    spawnStars(30);
+  }
+
+  // ── 파티클 ────────────────────────────────────────────────────────────────
+  function spawnStars(count) {
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const el = document.createElement('span');
+        el.className = 'star-p';
+        el.textContent = CELEB_EMOJIS[Math.floor(Math.random() * CELEB_EMOJIS.length)];
+        el.style.left = (Math.random() * window.innerWidth) + 'px';
+        el.style.top  = (window.innerHeight * 0.7 + Math.random() * 60) + 'px';
+        el.style.fontSize = (16 + Math.random() * 14) + 'px';
+        el.style.animationDuration = (0.8 + Math.random() * 0.6) + 's';
+        celebDiv.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+      }, i * 30);
+    }
+  }
+
+  // ── 유틸 ──────────────────────────────────────────────────────────────────
+  function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  // ── 초기 최고기록 표시 ─────────────────────────────────────────────────────
+  bestEl.textContent = state.best;
+})();
+</script>
+</body>
+</html>

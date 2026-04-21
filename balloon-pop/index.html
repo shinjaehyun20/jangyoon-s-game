@@ -257,22 +257,29 @@
 
     area.appendChild(el);
 
+    // popped 플래그: 터치로 제거된 풍선이 tick()에서 목숨 감소를 추가 트리거하지 않도록 방지
+    let popped = false;
+
     el.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       if (!state.running) return;
-      if (!el.parentNode) return; // 이미 제거된 경우 무시
+      if (popped) return; // 이미 터트린 경우 무시
+      if (!el.parentNode) return; // DOM에서 이미 제거된 경우 무시
+      popped = true;
       const bomb = el.dataset.bomb === '1';
       popBalloon(el, bomb, xPos + 28, yPos + 26);
     });
 
     function tick() {
       if (!state.running) { el.remove(); return; }
+      if (popped) return; // 이미 터트려진 경우 tick 중단 (목숨 감소 방지)
       yPos -= speed;
       el.style.top = yPos + 'px';
       if (yPos < -80) {
+        popped = true; // miss 처리 시에도 플래그 설정 (중복 감소 방지)
         el.remove();
         if (!isBomb) {
-          // 풍선 놓침 — 목숨 감소
+          // 풍선 놓침(miss) — 목숨 감소
           state.lives--;
           livesEl.textContent = state.lives;
           if (state.lives <= 0) endGame();

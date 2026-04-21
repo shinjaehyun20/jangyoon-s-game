@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Javascript Tetris</title>
   <style>
-    body      { margin: 0; padding: 1rem; font-family: Helvetica, sans-serif; background: #ececec; }
-    #tetris   { margin: 1em auto; padding: 1em; border: 4px solid black; border-radius: 10px; background-color: #F8F8F8; }
+    html, body { width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; font-family: Helvetica, sans-serif; background: #ececec; }
+    body      { padding: 0.5rem; box-sizing: border-box; }
+    #tetris   { margin: 0 auto; padding: 0.5em; border: 4px solid black; border-radius: 10px; background-color: #F8F8F8; }
     #stats    { display: inline-block; vertical-align: top; }
-    #canvas   { display: inline-block; vertical-align: top; background: url(texture.jpg); box-shadow: 10px 10px 10px #999; border: 2px solid #333; }
-    #menu     { display: inline-block; vertical-align: top; position: relative; }
-    #menu p   { margin: 0.5em 0; text-align: center; }
+    #canvas   { display: block; margin: 0 auto; background: url(texture.jpg); box-shadow: 10px 10px 10px #999; border: 2px solid #333; }
+    #menu     { display: block; position: relative; text-align: center; margin-bottom: 0.5em; }
+    #menu p   { margin: 0.25em 0; text-align: center; display: inline-block; margin-right: 0.5em; }
     #menu p a { text-decoration: none; color: black; }
-    #upcoming { display: block; margin: 0 auto; background-color: #E0E0E0; }
+    #upcoming { display: inline-block; background-color: #E0E0E0; vertical-align: middle; }
     #score    { color: red; font-weight: bold; vertical-align: middle; }
     #rows     { color: blue; font-weight: bold; vertical-align: middle; }
-    #stats    { position: absolute; bottom: 0em; right: 1em; }
-    #mobile-controls { display: none; margin-top: 1rem; }
+    #stats    { display: none; } /* 모바일에서 FPS 카운터 숨김 */
+    #mobile-controls { display: none; margin-top: 0.75rem; }
     #mobile-controls .touch-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
     #mobile-controls .touch-row + .touch-row { margin-top: 0.6rem; }
     #mobile-controls button {
@@ -40,7 +42,7 @@
     .mobile-home-link {
       display: none;
       width: 100%;
-      margin-top: 1rem;
+      margin-top: 0.75rem;
       padding: 0.95rem 1rem;
       border-radius: 14px;
       background: #1f2937;
@@ -50,19 +52,23 @@
       font-weight: 700;
       box-sizing: border-box;
     }
-    @media screen and (min-width:   0px) and (min-height:   0px)  { #tetris { font-size: 0.75em; width: 250px; } #menu { width: 100px; height: 200px; } #upcoming { width:  50px; height:  50px; } #canvas { width: 100px; height: 200px; } } /* 10px chunks */
-    @media screen and (min-width: 400px) and (min-height: 400px)  { #tetris { font-size: 1.00em; width: 350px; } #menu { width: 150px; height: 300px; } #upcoming { width:  75px; height:  75px; } #canvas { width: 150px; height: 300px; } } /* 15px chunks */
-    @media screen and (min-width: 500px) and (min-height: 500px)  { #tetris { font-size: 1.25em; width: 450px; } #menu { width: 200px; height: 400px; } #upcoming { width: 100px; height: 100px; } #canvas { width: 200px; height: 400px; } } /* 20px chunks */
-    @media screen and (min-width: 600px) and (min-height: 600px)  { #tetris { font-size: 1.50em; width: 550px; } #menu { width: 250px; height: 500px; } #upcoming { width: 125px; height: 125px; } #canvas { width: 250px; height: 500px; } } /* 25px chunks */
-    @media screen and (min-width: 700px) and (min-height: 700px)  { #tetris { font-size: 1.75em; width: 650px; } #menu { width: 300px; height: 600px; } #upcoming { width: 150px; height: 150px; } #canvas { width: 300px; height: 600px; } } /* 30px chunks */
-    @media screen and (min-width: 800px) and (min-height: 800px)  { #tetris { font-size: 2.00em; width: 750px; } #menu { width: 350px; height: 700px; } #upcoming { width: 175px; height: 175px; } #canvas { width: 350px; height: 700px; } } /* 35px chunks */
-    @media screen and (min-width: 900px) and (min-height: 900px)  { #tetris { font-size: 2.25em; width: 850px; } #menu { width: 400px; height: 800px; } #upcoming { width: 200px; height: 200px; } #canvas { width: 400px; height: 800px; } } /* 40px chunks */
-    @media (pointer: coarse), (max-width: 600px) {
-      body { padding: 0.75rem; }
-      #tetris { width: min(100%, 25rem); }
+    /* 데스크탑: 가로 레이아웃 유지 */
+    @media screen and (min-width: 600px) and (min-height: 600px) {
+      #canvas   { display: inline-block; margin: 0; }
+      #menu     { display: inline-block; vertical-align: top; position: relative; }
+      #menu p   { display: block; margin-right: 0; }
+      #stats    { display: inline-block; position: absolute; bottom: 0; right: 1em; }
+    }
+    @media screen and (min-width:   0px) and (min-height:   0px)  { #tetris { font-size: 0.75em; } }
+    @media screen and (min-width: 600px) and (min-height: 600px)  { #tetris { font-size: 1.50em; } #menu { width: 250px; height: 500px; } #upcoming { width: 125px; height: 125px; } }
+    @media screen and (min-width: 700px) and (min-height: 700px)  { #tetris { font-size: 1.75em; } #menu { width: 300px; height: 600px; } #upcoming { width: 150px; height: 150px; } }
+    @media screen and (min-width: 800px) and (min-height: 800px)  { #tetris { font-size: 2.00em; } #menu { width: 350px; height: 700px; } #upcoming { width: 175px; height: 175px; } }
+    @media screen and (min-width: 900px) and (min-height: 900px)  { #tetris { font-size: 2.25em; } #menu { width: 400px; height: 800px; } #upcoming { width: 200px; height: 200px; } }
+    @media (pointer: coarse), (max-width: 599px) {
+      body { padding: 0.5rem; overflow: hidden; }
+      #tetris { width: 100%; box-sizing: border-box; }
       #mobile-controls { display: block; }
       .mobile-home-link { display: block; }
-      body { overflow-x: hidden; }
     }
   </style>
 </head>
@@ -368,12 +374,32 @@
     }
 
     function resize(event) {
-      canvas.width   = canvas.clientWidth;  // set canvas logical size equal to its physical size
-      canvas.height  = canvas.clientHeight; // (ditto)
-      ucanvas.width  = ucanvas.clientWidth;
-      ucanvas.height = ucanvas.clientHeight;
-      dx = canvas.width  / nx; // pixel size of a single tetris block
-      dy = canvas.height / ny; // (ditto)
+      var isMobile = (window.innerWidth < 600 || ('ontouchstart' in window && window.innerWidth <= 600));
+      if (isMobile) {
+        // 모바일: canvas 너비를 window.innerWidth 기준으로 동적 계산
+        // 패딩/보더 여백(약 32px)을 제외하고, 최대 360px로 제한
+        var availW = Math.min(window.innerWidth - 32, 360);
+        var blockSize = Math.floor(availW / nx); // 셀 크기 = 너비 / 10 열
+        var canvasW   = blockSize * nx;
+        var canvasH   = blockSize * ny;
+        canvas.width  = canvasW;
+        canvas.height = canvasH;
+        canvas.style.width  = canvasW + 'px';
+        canvas.style.height = canvasH + 'px';
+        var uBlockSize = Math.floor(blockSize * 0.6);
+        ucanvas.width  = uBlockSize * nu;
+        ucanvas.height = uBlockSize * nu;
+        ucanvas.style.width  = ucanvas.width  + 'px';
+        ucanvas.style.height = ucanvas.height + 'px';
+      } else {
+        // 데스크탑: 기존 clientWidth/Height 방식 유지
+        canvas.width   = canvas.clientWidth;
+        canvas.height  = canvas.clientHeight;
+        ucanvas.width  = ucanvas.clientWidth;
+        ucanvas.height = ucanvas.clientHeight;
+      }
+      dx = canvas.width  / nx; // 블록 1개의 픽셀 너비
+      dy = canvas.height / ny; // 블록 1개의 픽셀 높이
       invalidate();
       invalidateNext();
     }
