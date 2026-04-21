@@ -120,14 +120,6 @@
     "path": "star-counting/index.html"
   },
   {
-    "id": "princess-dressup",
-    "title": "Princess Dress-Up",
-    "title_ko": "👑 공주 드레스업",
-    "description": "공주님을 예쁘게 꾸며보세요!",
-    "thumbnail": "princess-dressup/thumb.svg",
-    "path": "princess-dressup/index.html"
-  },
-  {
     "id": "rabbit-maze",
     "title": "Rabbit Maze",
     "title_ko": "🐰 토끼 당근 미로",

@@ -1,28 +1,95 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0d0d1a"/><stop offset="1" stop-color="#1a1a2e"/>
+      <stop offset="0%" stop-color="#0a0a1a"/>
+      <stop offset="100%" stop-color="#12003a"/>
     </linearGradient>
+    <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff3b3b" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ff3b3b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="neon">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-strong">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
+
+  <!-- 배경 -->
   <rect width="320" height="180" fill="url(#bg)"/>
-  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-  <!-- 큰 컬러 단어 -->
-  <text x="88" y="100" text-anchor="middle" font-size="58" font-weight="900" fill="#3b82f6"
-        font-family="'Pretendard','Noto Sans KR',sans-serif">빨강</text>
-  <!-- 물음표 -->
-  <text x="172" y="75" text-anchor="middle" font-size="28" fill="rgba(255,255,255,0.3)">?</text>
-  <!-- 컬러 버튼 4개 -->
-  <rect x="16" y="120" width="62" height="38" rx="8" fill="#ef4444"/>
-  <text x="47" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="sans-serif">빨강</text>
-  <rect x="86" y="120" width="62" height="38" rx="8" fill="#3b82f6"/>
-  <text x="117" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="sans-serif">파랑</text>
-  <rect x="156" y="120" width="62" height="38" rx="8" fill="#22c55e"/>
-  <text x="187" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="sans-serif">초록</text>
-  <rect x="226" y="120" width="62" height="38" rx="8" fill="#facc15"/>
-  <text x="257" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#111" font-family="sans-serif">노랑</text>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.1)"/>
+
+  <!-- 배경 글로우 효과 -->
+  <ellipse cx="90" cy="85" rx="80" ry="60" fill="url(#glow1)"/>
+  <ellipse cx="200" cy="70" rx="60" ry="50" fill="url(#glow2)"/>
+
+  <!-- 배경 파티클 -->
+  <circle cx="20" cy="20" r="2" fill="#ff3b3b" opacity="0.7"/>
+  <circle cx="45" cy="10" r="1.5" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="300" cy="15" r="2" fill="#22c55e" opacity="0.7"/>
+  <circle cx="280" cy="165" r="1.5" fill="#facc15" opacity="0.6"/>
+  <circle cx="15" cy="160" r="2" fill="#a855f7" opacity="0.6"/>
+  <circle cx="155" cy="8" r="1.5" fill="#ff3b3b" opacity="0.5"/>
+
+  <!-- 중앙 메인 단어 카드 — 강렬한 대비 (Stroop Effect 핵심) -->
+  <!-- 카드 배경 -->
+  <rect x="20" y="18" width="160" height="70" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <!-- 네온 글로우 라인 -->
+  <rect x="20" y="18" width="160" height="70" rx="14" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.5" filter="url(#neon)"/>
+
+  <!-- 핵심: 글자는 "빨강"인데 색은 파란색 — Stroop 효과 -->
+  <text x="100" y="72" text-anchor="middle" font-size="56" font-weight="900" fill="#3b82f6"
+        font-family="'Pretendard','Noto Sans KR',Arial Black,sans-serif" filter="url(#glow-strong)">빨강</text>
+
+  <!-- 물음표 + 화살표 힌트 -->
+  <text x="195" y="50" text-anchor="middle" font-size="22" fill="rgba(255,255,255,0.4)">→</text>
+  <text x="208" y="36" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.3)" font-family="sans-serif">색깔은?</text>
+
+  <!-- 4개 컬러 버튼 — 더 크고 임팩트 있게 -->
+  <!-- 빨강 버튼 — 정답 강조 -->
+  <rect x="20" y="100" width="65" height="48" rx="12" fill="#ef4444"/>
+  <rect x="20" y="100" width="65" height="48" rx="12" fill="none" stroke="#ff6b6b" stroke-width="2" filter="url(#neon)"/>
+  <!-- 정답 표시 -->
+  <circle cx="79" cy="104" r="8" fill="#ffd700"/>
+  <text x="79" y="108" text-anchor="middle" font-size="9" font-weight="900" fill="#1a0000">✓</text>
+  <text x="52" y="131" text-anchor="middle" font-size="16" font-weight="900" fill="#fff" font-family="'Pretendard','Noto Sans KR',sans-serif">빨강</text>
+
+  <!-- 파랑 버튼 -->
+  <rect x="93" y="100" width="65" height="48" rx="12" fill="#3b82f6"/>
+  <text x="125" y="131" text-anchor="middle" font-size="16" font-weight="900" fill="#fff" font-family="'Pretendard','Noto Sans KR',sans-serif">파랑</text>
+
+  <!-- 초록 버튼 -->
+  <rect x="166" y="100" width="65" height="48" rx="12" fill="#22c55e"/>
+  <text x="198" y="131" text-anchor="middle" font-size="16" font-weight="900" fill="#fff" font-family="'Pretendard','Noto Sans KR',sans-serif">초록</text>
+
+  <!-- 노랑 버튼 -->
+  <rect x="239" y="100" width="65" height="48" rx="12" fill="#facc15"/>
+  <text x="271" y="131" text-anchor="middle" font-size="16" font-weight="900" fill="#111" font-family="'Pretendard','Noto Sans KR',sans-serif">노랑</text>
+
+  <!-- 점수/콤보 표시 -->
+  <rect x="220" y="18" width="84" height="30" rx="8" fill="rgba(255,215,0,0.15)" stroke="#ffd700" stroke-width="1.2"/>
+  <text x="228" y="37" font-size="11" font-weight="700" fill="#ffd700" font-family="sans-serif">🔥 COMBO</text>
+  <text x="295" y="37" text-anchor="end" font-size="14" font-weight="900" fill="#ffd700" font-family="sans-serif">x5</text>
+
+  <!-- 시간바 -->
+  <rect x="220" y="56" width="84" height="8" rx="4" fill="rgba(255,255,255,0.1)"/>
+  <rect x="220" y="56" width="52" height="8" rx="4" fill="#ef4444"/>
+  <text x="220" y="78" font-size="9" fill="rgba(255,255,255,0.5)" font-family="sans-serif">TIME</text>
+
+  <!-- 번쩍이 이펙트 -->
+  <text x="14" y="97" font-size="13">⚡</text>
+  <text x="175" y="97" font-size="11">✨</text>
+
   <!-- 타이틀 -->
   <g font-family="'Pretendard','Noto Sans KR',sans-serif">
-    <text x="296" y="168" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">COLOR TAP</text>
+    <text x="298" y="162" text-anchor="end" font-size="19" font-weight="900" fill="#ffd700">색깔 탭 게임</text>
+    <text x="298" y="176" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">COLOR TAP</text>
   </g>
-  <text x="88" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="rgba(255,255,255,0.7)" font-family="sans-serif">글자 색깔을 골라요!</text>
 </svg>
