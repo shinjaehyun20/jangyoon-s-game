@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a2a1a"/>
+      <stop offset="100%" stop-color="#0d2b0d"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 팔레트 -->
+  <ellipse cx="60" cy="95" rx="44" ry="38" fill="#f5deb3"/>
+  <ellipse cx="60" cy="95" rx="44" ry="38" fill="none" stroke="#ccc" stroke-width="1.5"/>
+  <circle cx="42" cy="80" r="9" fill="#ff6b6b"/>
+  <circle cx="62" cy="74" r="9" fill="#ffd700"/>
+  <circle cx="80" cy="82" r="9" fill="#48dbfb"/>
+  <circle cx="84" cy="100" r="9" fill="#26de81"/>
+  <circle cx="70" cy="112" r="9" fill="#a29bfe"/>
+  <circle cx="50" cy="114" r="9" fill="#fd9644"/>
+  <ellipse cx="35" cy="102" rx="7" ry="7" fill="#f5deb3"/>
+
+  <!-- 붓 -->
+  <rect x="85" y="55" width="6" height="38" rx="3" fill="#8B6914" transform="rotate(-35 88 74)"/>
+  <ellipse cx="73" cy="58" rx="7" ry="4" fill="#48dbfb" transform="rotate(-35 73 58)"/>
+
+  <!-- 동물 실루엣 (고양이) -->
+  <ellipse cx="195" cy="90" rx="42" ry="36" fill="rgba(255,200,100,0.15)" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="195" y="100" text-anchor="middle" font-size="48">🐱</text>
+
+  <!-- 색깔 점들 -->
+  <circle cx="155" cy="45" r="6" fill="#ff6b6b" opacity="0.8"/>
+  <circle cx="240" cy="40" r="5" fill="#26de81" opacity="0.8"/>
+  <circle cx="270" cy="70" r="7" fill="#ffd700" opacity="0.8"/>
+  <circle cx="260" cy="130" r="5" fill="#a29bfe" opacity="0.8"/>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd700">동물 색칠 놀이</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">ANIMAL COLORING</text>
+  </g>
+</svg>

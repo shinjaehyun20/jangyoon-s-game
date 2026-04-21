@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a1a0a"/>
+      <stop offset="100%" stop-color="#0d2b1a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 미로 격자 (왼쪽) -->
+  <!-- 외벽 -->
+  <rect x="18" y="18" width="150" height="144" rx="4" fill="none" stroke="#26de81" stroke-width="2"/>
+  <!-- 미로 벽들 -->
+  <line x1="18"  y1="54"  x2="108" y2="54"  stroke="#26de81" stroke-width="2"/>
+  <line x1="18"  y1="90"  x2="78"  y2="90"  stroke="#26de81" stroke-width="2"/>
+  <line x1="108" y1="90"  x2="168" y2="90"  stroke="#26de81" stroke-width="2"/>
+  <line x1="18"  y1="126" x2="58"  y2="126" stroke="#26de81" stroke-width="2"/>
+  <line x1="98"  y1="126" x2="168" y2="126" stroke="#26de81" stroke-width="2"/>
+  <line x1="54"  y1="18"  x2="54"  y2="54"  stroke="#26de81" stroke-width="2"/>
+  <line x1="108" y1="54"  x2="108" y2="126" stroke="#26de81" stroke-width="2"/>
+  <line x1="54"  y1="90"  x2="54"  y2="162" stroke="#26de81" stroke-width="2"/>
+  <line x1="144" y1="18"  x2="144" y2="90"  stroke="#26de81" stroke-width="2"/>
+
+  <!-- 토끼 (시작점) -->
+  <text x="28" y="44" font-size="20">🐰</text>
+
+  <!-- 경로 점선 -->
+  <polyline points="44,36 44,72 80,72 80,108 116,108 116,144 140,144" fill="none" stroke="#ffd700" stroke-width="2" stroke-dasharray="5,3" opacity="0.7"/>
+
+  <!-- 당근 (도착점) -->
+  <text x="144" y="162" font-size="18">🥕</text>
+
+  <!-- 반짝이 -->
+  <text x="148" y="150" font-size="10">✨</text>
+
+  <!-- 오른쪽 난이도 표시 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <rect x="185" y="25" width="100" height="32" rx="8" fill="rgba(38,222,129,0.2)" stroke="#26de81" stroke-width="1.5"/>
+    <text x="235" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#26de81">쉬움</text>
+
+    <rect x="185" y="68" width="100" height="32" rx="8" fill="rgba(255,215,0,0.2)" stroke="#ffd700" stroke-width="1.5"/>
+    <text x="235" y="89" text-anchor="middle" font-size="13" font-weight="700" fill="#ffd700">보통</text>
+
+    <rect x="185" y="111" width="100" height="32" rx="8" fill="rgba(255,107,107,0.2)" stroke="#ff6b6b" stroke-width="1.5"/>
+    <text x="235" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#ff6b6b">어려움</text>
+  </g>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd700">토끼 당근 미로</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">RABBIT MAZE</text>
+  </g>
+</svg>
