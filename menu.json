@@ -3,6 +3,8 @@
     "id": "kids",
     "label": "어린이 추천",
     "items": [
+      { "id": "rhythm-tap",   "label": "🎵 리듬 탭",          "path": "rhythm-tap/index.html" },
+      { "id": "target-hit",   "label": "🎯 과녁 맞추기",       "path": "target-hit/index.html" },
       { "id": "whack-a-mole", "label": "🔨 두더지 잡기",      "path": "whack-a-mole/index.html" },
       { "id": "memory-match", "label": "🧠 기억력 카드",      "path": "memory-match/index.html" },
       { "id": "color-tap",    "label": "🎨 색깔 맞추기",      "path": "color-tap/index.html" },

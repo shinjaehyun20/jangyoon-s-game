@@ -142,5 +142,21 @@
     "description": "우주선으로 적을 격파하라! 웨이브를 버텨내고 최고 점수에 도전!",
     "thumbnail": "space-shooter/thumb.svg",
     "path": "space-shooter/index.html"
+  },
+  {
+    "id": "rhythm-tap",
+    "title": "Rhythm Tap",
+    "title_ko": "🎵 리듬 탭",
+    "description": "내려오는 노트를 박자에 맞춰 탭! 폭탄은 피하고 콤보를 이어가요",
+    "thumbnail": "rhythm-tap/thumb.svg",
+    "path": "rhythm-tap/index.html"
+  },
+  {
+    "id": "target-hit",
+    "title": "Target Hit",
+    "title_ko": "🎯 과녁 맞추기",
+    "description": "이동하는 과녁을 탭! 정중앙을 맞추면 100점, 30초 도전",
+    "thumbnail": "target-hit/thumb.svg",
+    "path": "target-hit/index.html"
   }
 ]

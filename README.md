@@ -17,6 +17,8 @@
 | [우봉고 (ubongo)](./ubongo) | 폴리오미노 조각 배치 속도 퍼즐 (9라운드) | 퍼즐 |
 | [🎈 풍선 터뜨리기 (balloon-pop)](./balloon-pop) | 올라오는 풍선 터치, 폭탄 회피, 30초 타임어택 | 반사 |
 | [🔢 숫자 순서 맞추기 (number-order)](./number-order) | 흩어진 숫자 1→N 순서대로 빠르게 터치, 레벨 클리어 | 인지 |
+| [🎵 리듬 탭 (rhythm-tap)](./rhythm-tap) | 내려오는 노트를 박자에 맞춰 탭, 폭탄 회피, 콤보 보너스 | 리듬 |
+| [🎯 과녁 맞추기 (target-hit)](./target-hit) | 이동하는 과녁 터치, 정중앙=100점, 30초 타임어택 | 반사 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 

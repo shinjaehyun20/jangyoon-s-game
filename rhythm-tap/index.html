@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🎵 리듬 탭</title>
+  <style>
+    :root {
+      --bg: #1a0533;
+      --accent: #ff6bd6;
+      --accent2: #7c3aed;
+      --text: #ffffff;
+      --beat-color: #ff6bd6;
+      --perfect-color: #00f5a0;
+      --good-color: #ffd700;
+      --miss-color: #ff4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      text-align: center;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(255,107,214,0.6);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 6px 14px;
+      flex-shrink: 0;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 10px; color: rgba(255,255,255,0.5); }
+    .hud-val { font-size: 20px; font-weight: 900; }
+    #scoreVal { color: var(--accent); }
+    #comboVal { color: var(--good-color); }
+    #lifeVal { font-size: 18px; letter-spacing: 2px; }
+
+    /* 게임 영역 */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(255,107,214,0.15);
+      overflow: hidden;
+    }
+
+    /* 박자선 — 세로 레인 */
+    .lane {
+      position: absolute;
+      top: 0; bottom: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .lane-0 { left: 5%; width: 20%; }
+    .lane-1 { left: 27%; width: 20%; }
+    .lane-2 { left: 49%; width: 20%; }
+    .lane-3 { left: 71%; width: 20%; }
+
+    .hit-zone {
+      position: absolute;
+      bottom: 18px;
+      left: 50%; transform: translateX(-50%);
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.05);
+      transition: transform 0.08s, background 0.1s;
+    }
+    .hit-zone.flash { background: rgba(255,107,214,0.5); transform: translateX(-50%) scale(1.2); }
+
+    /* 노트 */
+    .note {
+      position: absolute;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ff6bd6 40%, #7c3aed 100%);
+      box-shadow: 0 0 18px rgba(255,107,214,0.7);
+      left: 50%; transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .note.bomb {
+      background: radial-gradient(circle, #ff4444 40%, #880000 100%);
+      box-shadow: 0 0 18px rgba(255,68,68,0.7);
+    }
+
+    /* 판정 텍스트 */
+    .judge-text {
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 900;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .judge-text.show { opacity: 1; }
+
+    /* 파형 시각화 바 */
+    .beat-bar {
+      position: absolute;
+      bottom: 80px;
+      left: 50%; transform: translateX(-50%);
+      width: 90%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .beat-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.05s linear;
+    }
+
+    /* 탭 버튼 (모바일) */
+    .tap-buttons {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .tap-btn {
+      flex: 1;
+      height: 52px;
+      border: none;
+      border-radius: 14px;
+      font-size: 22px;
+      cursor: pointer;
+      transition: transform 0.08s, filter 0.08s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .tap-btn:nth-child(1) { background: linear-gradient(135deg, #ff6bd6, #7c3aed); }
+    .tap-btn:nth-child(2) { background: linear-gradient(135deg, #3be8b0, #1a8cf1); }
+    .tap-btn:nth-child(3) { background: linear-gradient(135deg, #ffd700, #ff8c00); }
+    .tap-btn:nth-child(4) { background: linear-gradient(135deg, #ff4d4d, #c70039); }
+    .tap-btn:active { transform: scale(0.92); filter: brightness(1.3); }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; color: rgba(255,255,255,0.4); }
+    .home-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,0,20,0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      transition: opacity 0.3s;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #2d0b5a, #1a0533);
+      border: 2px solid rgba(255,107,214,0.4);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 320px; width: 90%;
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; color: var(--accent); }
+    .overlay-card p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 20px; line-height: 1.6; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); margin: 12px 0; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 14px;
+      padding: 14px 32px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      min-height: 44px;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .best-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 8px; }
+
+    /* 박자 맞을 때 화면 펄스 */
+    @keyframes screenPulse {
+      0% { box-shadow: inset 0 0 0 0 rgba(255,107,214,0); }
+      30% { box-shadow: inset 0 0 40px 10px rgba(255,107,214,0.3); }
+      100% { box-shadow: inset 0 0 0 0 rgba(255,107,214,0); }
+    }
+    .pulse { animation: screenPulse 0.4s ease-out; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🎵 리듬 탭</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <div class="hud-label">점수</div>
+        <div class="hud-val" id="scoreVal">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">콤보</div>
+        <div class="hud-val" id="comboVal">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">목숨</div>
+        <div class="hud-val" id="lifeVal">❤️❤️❤️</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">최고</div>
+        <div class="hud-val" id="bestVal" style="color:#ffd700">0</div>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <!-- 레인 4개 -->
+      <div class="lane lane-0">
+        <div class="hit-zone" id="hz0"></div>
+      </div>
+      <div class="lane lane-1">
+        <div class="hit-zone" id="hz1"></div>
+      </div>
+      <div class="lane lane-2">
+        <div class="hit-zone" id="hz2"></div>
+      </div>
+      <div class="lane lane-3">
+        <div class="hit-zone" id="hz3"></div>
+      </div>
+
+      <!-- 박자 바 -->
+      <div class="beat-bar"><div class="beat-fill" id="beatFill"></div></div>
+
+      <!-- 판정 텍스트 -->
+      <div class="judge-text" id="judgeText"></div>
+    </div>
+
+    <div class="tap-buttons">
+      <button class="tap-btn" id="tapBtn0" data-lane="0">💜</button>
+      <button class="tap-btn" id="tapBtn1" data-lane="1">💚</button>
+      <button class="tap-btn" id="tapBtn2" data-lane="2">💛</button>
+      <button class="tap-btn" id="tapBtn3" data-lane="3">❤️</button>
+    </div>
+
+    <footer>
+      <small>박자에 맞춰 탭!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🎵 리듬 탭</h2>
+      <p>노트가 내려오면<br>해당 버튼을 탭하세요!<br><br>💜 💚 💛 ❤️<br>폭탄💣은 탭하지 마세요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <div class="best-label" id="bestMsg"></div>
+      <br>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      totalTime: 45,        // 게임 시간(초)
+      lives: 3,
+      noteSpeed: 2.8,       // px/frame (기본 속도)
+      spawnInterval: 900,   // ms (노트 생성 간격)
+      hitZoneBottom: 18,    // px (히트존 하단 위치)
+      hitZoneSize: 52,      // px
+      hitWindow: 55,        // px (판정 범위)
+      bombRatio: 0.18,      // 폭탄 비율
+      maxComboBonus: 5,     // 최대 콤보 보너스 배율
+    };
+
+    const LANE_CENTERS = [12.5, 34.5, 56.5, 78.5]; // % (레인 중앙)
+
+    let state = {
+      score: 0,
+      combo: 0,
+      lives: CONFIG.lives,
+      running: false,
+      notes: [],           // { el, lane, y, isBomb }
+      spawnTimer: 0,
+      gameTimer: CONFIG.totalTime,
+      raf: null,
+      lastTime: 0,
+      judgeTimeout: null,
+    };
+
+    const best = parseInt(localStorage.getItem('rhythm-tap_best') || '0');
+
+    // DOM
+    const gameArea = document.getElementById('gameArea');
+    const scoreVal = document.getElementById('scoreVal');
+    const comboVal = document.getElementById('comboVal');
+    const lifeVal = document.getElementById('lifeVal');
+    const bestVal = document.getElementById('bestVal');
+    const judgeText = document.getElementById('judgeText');
+    const beatFill = document.getElementById('beatFill');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+    const bestMsg = document.getElementById('bestMsg');
+
+    bestVal.textContent = best;
+
+    function updateHUD() {
+      scoreVal.textContent = state.score;
+      comboVal.textContent = state.combo;
+      const hearts = '❤️'.repeat(state.lives) + '🖤'.repeat(CONFIG.lives - state.lives);
+      lifeVal.textContent = hearts || '💀';
+    }
+
+    function showJudge(text, color) {
+      judgeText.textContent = text;
+      judgeText.style.color = color;
+      judgeText.classList.add('show');
+      clearTimeout(state.judgeTimeout);
+      state.judgeTimeout = setTimeout(() => judgeText.classList.remove('show'), 500);
+    }
+
+    function spawnNote() {
+      const lane = Math.floor(Math.random() * 4);
+      const isBomb = Math.random() < CONFIG.bombRatio;
+      const el = document.createElement('div');
+      el.className = 'note' + (isBomb ? ' bomb' : '');
+      el.textContent = isBomb ? '💣' : '';
+      el.style.fontSize = '28px';
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.justifyContent = 'center';
+      el.style.top = '-60px';
+      el.style.left = LANE_CENTERS[lane] + '%';
+      gameArea.appendChild(el);
+      state.notes.push({ el, lane, y: -60, isBomb });
+    }
+
+    function getHitZoneY() {
+      const h = gameArea.getBoundingClientRect().height;
+      return h - CONFIG.hitZoneBottom - CONFIG.hitZoneSize / 2;
+    }
+
+    function hitLane(lane) {
+      if (!state.running) return;
+
+      // 해당 레인에서 히트 존 근처 노트 찾기
+      const hzY = getHitZoneY();
+      let closest = null;
+      let closestDist = Infinity;
+
+      for (const note of state.notes) {
+        if (note.lane !== lane || note.hit) continue;
+        const dist = Math.abs(note.y - hzY);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closest = note;
+        }
+      }
+
+      if (closest && closestDist < CONFIG.hitWindow) {
+        closest.hit = true;
+        if (closest.isBomb) {
+          // 폭탄 탭 — 목숨 감소
+          state.combo = 0;
+          state.lives = Math.max(0, state.lives - 1);
+          showJudge('💣 폭탄!', 'var(--miss-color)');
+          closest.el.style.transform = 'translateX(-50%) scale(2)';
+          closest.el.style.opacity = '0';
+          setTimeout(() => closest.el.remove(), 300);
+        } else {
+          // 정상 노트
+          const bonus = Math.min(state.combo, CONFIG.maxComboBonus);
+          const pts = 10 * (1 + bonus);
+          state.score += pts;
+          state.combo++;
+          if (closestDist < CONFIG.hitWindow * 0.4) {
+            showJudge('✨ PERFECT!', 'var(--perfect-color)');
+          } else {
+            showJudge('👍 GOOD', 'var(--good-color)');
+          }
+          // 히트 애니메이션
+          closest.el.style.transform = 'translateX(-50%) scale(1.6)';
+          closest.el.style.opacity = '0';
+          setTimeout(() => closest.el.remove(), 250);
+          // 레인 플래시
+          const hz = document.getElementById('hz' + lane);
+          hz.classList.add('flash');
+          setTimeout(() => hz.classList.remove('flash'), 200);
+          // 화면 펄스
+          gameArea.classList.remove('pulse');
+          void gameArea.offsetWidth;
+          gameArea.classList.add('pulse');
+        }
+        state.notes = state.notes.filter(n => !n.hit);
+      }
+      updateHUD();
+      if (state.lives <= 0) endGame();
+    }
+
+    function loop(timestamp) {
+      if (!state.running) return;
+      const dt = Math.min(timestamp - state.lastTime, 50);
+      state.lastTime = timestamp;
+
+      // 게임 시간
+      state.gameTimer -= dt / 1000;
+      beatFill.style.width = ((1 - state.gameTimer / CONFIG.totalTime) * 100) + '%';
+      if (state.gameTimer <= 0) { endGame(); return; }
+
+      // 노트 스폰
+      state.spawnTimer -= dt;
+      if (state.spawnTimer <= 0) {
+        spawnNote();
+        state.spawnTimer = CONFIG.spawnInterval - Math.min(state.score / 5, 300);
+      }
+
+      // 노트 이동
+      const areaH = gameArea.getBoundingClientRect().height;
+      const hzY = getHitZoneY();
+      const speed = CONFIG.noteSpeed * (1 + state.score / 800);
+
+      for (let i = state.notes.length - 1; i >= 0; i--) {
+        const note = state.notes[i];
+        if (note.hit) continue;
+        note.y += speed * (dt / 16);
+        note.el.style.top = note.y + 'px';
+
+        // 미스 판정 — 히트존 아래로 벗어남
+        if (note.y > hzY + CONFIG.hitWindow && !note.isBomb) {
+          note.hit = true;
+          note.el.remove();
+          state.notes.splice(i, 1);
+          state.combo = 0;
+          state.lives = Math.max(0, state.lives - 1);
+          showJudge('MISS 😢', 'var(--miss-color)');
+          updateHUD();
+          if (state.lives <= 0) { endGame(); return; }
+        } else if (note.y > areaH + 20) {
+          // 폭탄은 그냥 사라짐 (미스 아님)
+          note.el.remove();
+          state.notes.splice(i, 1);
+        }
+      }
+
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      // 초기화
+      state.score = 0;
+      state.combo = 0;
+      state.lives = CONFIG.lives;
+      state.notes.forEach(n => n.el.remove());
+      state.notes = [];
+      state.spawnTimer = 300;
+      state.gameTimer = CONFIG.totalTime;
+      state.running = true;
+      state.lastTime = performance.now();
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      judgeText.classList.remove('show');
+      beatFill.style.width = '0%';
+      updateHUD();
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(state.raf);
+      state.notes.forEach(n => n.el.remove());
+      state.notes = [];
+
+      const newBest = Math.max(state.score, best);
+      if (state.score > best) {
+        localStorage.setItem('rhythm-tap_best', state.score);
+        bestVal.textContent = state.score;
+        bestMsg.textContent = '🏆 새 최고 기록!';
+      } else {
+        bestMsg.textContent = '최고기록: ' + best + '점';
+      }
+
+      finalScore.textContent = state.score + '점';
+      if (state.score >= 200) resultMsg.textContent = '리듬 마스터! 🎵';
+      else if (state.score >= 100) resultMsg.textContent = '잘했어요! 👍';
+      else resultMsg.textContent = '다시 도전해봐요! 💪';
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 버튼 이벤트
+    for (let i = 0; i < 4; i++) {
+      const btn = document.getElementById('tapBtn' + i);
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        hitLane(i);
+      });
+    }
+
+    // 키보드 지원 (D F J K)
+    const keyMap = { 'd': 0, 'f': 1, 'j': 2, 'k': 3 };
+    document.addEventListener('keydown', (e) => {
+      const lane = keyMap[e.key.toLowerCase()];
+      if (lane !== undefined) hitLane(lane);
+    });
+
+    document.getElementById('startBtn').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      startGame();
+    });
+    document.getElementById('restartBtn').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      startGame();
+    });
+  })();
+  </script>
+</body>
+</html>

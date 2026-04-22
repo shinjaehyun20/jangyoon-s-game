@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1b2a"/>
+      <stop offset="100%" stop-color="#1a3a56"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg2)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 조준선 -->
+  <line x1="0" y1="88" x2="140" y2="88" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <line x1="160" y1="88" x2="320" y2="88" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <line x1="150" y1="0" x2="150" y2="70" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <line x1="150" y1="108" x2="150" y2="180" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+
+  <!-- 과녁 크게 (중앙) -->
+  <circle cx="150" cy="88" r="52" fill="#ff0000"/>
+  <circle cx="150" cy="88" r="41" fill="#ff4400"/>
+  <circle cx="150" cy="88" r="30" fill="#ff8800"/>
+  <circle cx="150" cy="88" r="19" fill="#ffcc00"/>
+  <circle cx="150" cy="88" r="9" fill="#ffffff"/>
+
+  <!-- 과녁 작게 (우측상단) -->
+  <circle cx="248" cy="42" r="26" fill="#0055ff" opacity="0.85"/>
+  <circle cx="248" cy="42" r="19" fill="#0099ff" opacity="0.85"/>
+  <circle cx="248" cy="42" r="12" fill="#00ccff" opacity="0.85"/>
+  <circle cx="248" cy="42" r="5" fill="#ffffff" opacity="0.85"/>
+
+  <!-- 히트 이펙트 -->
+  <circle cx="150" cy="88" r="62" fill="none" stroke="rgba(255,107,53,0.6)" stroke-width="3" opacity="0.6"/>
+  <circle cx="150" cy="88" r="72" fill="none" stroke="rgba(255,107,53,0.3)" stroke-width="2" opacity="0.4"/>
+
+  <!-- 점수 팝업 -->
+  <text x="175" y="42" font-size="18" font-weight="900" fill="#ffd700" font-family="sans-serif">+100</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6b35">과녁 맞추기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">TARGET HIT</text>
+  </g>
+</svg>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a0533"/>
+      <stop offset="100%" stop-color="#2d0b5a"/>
+    </linearGradient>
+    <linearGradient id="noteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6bd6"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 레인 세로선 4개 -->
+  <line x1="60" y1="10" x2="60" y2="140" stroke="rgba(255,107,214,0.15)" stroke-width="1"/>
+  <line x1="110" y1="10" x2="110" y2="140" stroke="rgba(255,107,214,0.15)" stroke-width="1"/>
+  <line x1="160" y1="10" x2="160" y2="140" stroke="rgba(255,107,214,0.15)" stroke-width="1"/>
+  <line x1="210" y1="10" x2="210" y2="140" stroke="rgba(255,107,214,0.15)" stroke-width="1"/>
+
+  <!-- 히트존 -->
+  <circle cx="60" cy="128" r="18" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <circle cx="110" cy="128" r="18" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <circle cx="160" cy="128" r="18" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <circle cx="210" cy="128" r="18" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+
+  <!-- 노트들 -->
+  <circle cx="60" cy="40" r="16" fill="url(#noteGrad)" opacity="0.9"/>
+  <circle cx="60" cy="40" r="16" fill="url(#noteGrad)" filter="drop-shadow(0 0 8px #ff6bd6)"/>
+
+  <circle cx="110" cy="70" r="16" fill="url(#noteGrad)" opacity="0.85"/>
+  <circle cx="160" cy="30" r="16" fill="url(#noteGrad)" opacity="0.9"/>
+  <circle cx="210" cy="55" r="16" fill="url(#noteGrad)" opacity="0.8"/>
+
+  <!-- 폭탄 노트 -->
+  <circle cx="110" cy="105" r="14" fill="#ff4444" opacity="0.8"/>
+  <text x="110" y="110" text-anchor="middle" font-size="14">💣</text>
+
+  <!-- 히트 중인 노트 (레인 1) -->
+  <circle cx="60" cy="128" r="20" fill="rgba(255,107,214,0.3)" stroke="#ff6bd6" stroke-width="2"/>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6bd6">리듬 탭</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">RHYTHM TAP</text>
+  </g>
+
+  <!-- 음표 장식 -->
+  <text x="240" y="50" font-size="28" opacity="0.5">🎵</text>
+  <text x="255" y="90" font-size="20" opacity="0.35">🎶</text>
+</svg>

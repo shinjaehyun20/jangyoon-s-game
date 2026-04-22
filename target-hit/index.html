@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🎯 과녁 맞추기</title>
+  <style>
+    :root {
+      --bg: #0d1b2a;
+      --accent: #ff6b35;
+      --accent2: #f7c59f;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      text-align: center;
+      color: var(--accent);
+      text-shadow: 0 0 16px rgba(255,107,53,0.5);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 6px 14px;
+      flex-shrink: 0;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 10px; color: rgba(255,255,255,0.45); }
+    .hud-val { font-size: 20px; font-weight: 900; }
+    #scoreVal { color: var(--accent); }
+    #timerVal { color: #7fffb2; }
+    #bestVal { color: #ffd700; }
+
+    /* 타이머 바 */
+    .timer-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7fffb2, var(--accent));
+      border-radius: 4px;
+      width: 100%;
+      transition: width 0.1s linear;
+    }
+
+    /* 게임 영역 */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      background: linear-gradient(160deg, #0d2137, #1a3a56);
+      border: 2px solid rgba(255,107,53,0.2);
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    /* 조준선 */
+    #crosshairH, #crosshairV {
+      position: absolute;
+      background: rgba(255,255,255,0.12);
+      pointer-events: none;
+    }
+    #crosshairH { left: 0; right: 0; height: 1px; }
+    #crosshairV { top: 0; bottom: 0; width: 1px; }
+
+    /* 과녁 */
+    .target {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: transform 0.15s ease-out;
+    }
+
+    /* 히트 효과 */
+    .hit-effect {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: hitPop 0.5s ease-out forwards;
+    }
+    @keyframes hitPop {
+      0% { opacity: 1; width: inherit; height: inherit; }
+      100% { opacity: 0; width: calc(inherit * 2); height: calc(inherit * 2); }
+    }
+
+    /* 점수 팝업 */
+    .score-popup {
+      position: absolute;
+      font-size: 20px;
+      font-weight: 900;
+      pointer-events: none;
+      animation: popUp 0.8s ease-out forwards;
+    }
+    @keyframes popUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-50px); }
+    }
+
+    /* 연속 콤보 표시 */
+    #comboDisplay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(255,107,53,0.8);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    #comboDisplay.show { opacity: 1; }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; color: rgba(255,255,255,0.4); }
+    .home-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(5,10,18,0.93);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #0d2137, #1a3a56);
+      border: 2px solid rgba(255,107,53,0.4);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 320px; width: 90%;
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; color: var(--accent); }
+    .overlay-card p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 20px; line-height: 1.6; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); margin: 12px 0; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #c0392b);
+      border: none;
+      border-radius: 14px;
+      padding: 14px 32px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      min-height: 44px;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .best-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🎯 과녁 맞추기</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <div class="hud-label">점수</div>
+        <div class="hud-val" id="scoreVal">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">콤보</div>
+        <div class="hud-val" id="comboVal" style="color:#ff6bd6">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">남은시간</div>
+        <div class="hud-val" id="timerVal">30</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">최고</div>
+        <div class="hud-val" id="bestVal">0</div>
+      </div>
+    </div>
+
+    <div class="timer-bar">
+      <div class="timer-fill" id="timerFill"></div>
+    </div>
+
+    <div id="gameArea">
+      <div id="crosshairH"></div>
+      <div id="crosshairV"></div>
+      <div id="comboDisplay"></div>
+    </div>
+
+    <footer>
+      <small>이동하는 과녁을 탭!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🎯 과녁 맞추기</h2>
+      <p>움직이는 과녁을 터치하세요!<br><br>🎯 정중앙 = 100점<br>⭕ 안쪽 = 50점<br>🔴 바깥쪽 = 20점<br><br>30초 안에 최고 점수에 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 시간 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <div class="best-label" id="bestMsg"></div>
+      <br>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      totalTime: 30,
+      targetCount: 3,    // 동시 표시 과녁 수
+      targetMinR: 22,    // 최소 반지름
+      targetMaxR: 46,    // 최대 반지름
+      moveSpeed: 1.2,    // 기본 이동 속도
+      spawnDelay: 700,   // 제거 후 재생성 딜레이(ms)
+      hitZones: [0.25, 0.55, 1.0], // 반지름 비율 (정중앙/중간/바깥)
+      hitPoints: [100, 50, 20],
+    };
+
+    const COLORS = [
+      { rings: ['#ff0000','#ff4400','#ff8800','#ffcc00','#ffffff'] }, // 빨강 과녁
+      { rings: ['#0055ff','#0099ff','#00ccff','#88eeff','#ffffff'] }, // 파랑 과녁
+      { rings: ['#00aa00','#44cc00','#aaee00','#eeff88','#ffffff'] }, // 초록 과녁
+    ];
+
+    let state = {
+      score: 0,
+      combo: 0,
+      timeLeft: CONFIG.totalTime,
+      running: false,
+      targets: [],
+      raf: null,
+      lastTime: 0,
+      comboTimeout: null,
+    };
+
+    let bestScore = parseInt(localStorage.getItem('target-hit_best') || '0');
+
+    const gameArea = document.getElementById('gameArea');
+    const scoreVal = document.getElementById('scoreVal');
+    const comboVal = document.getElementById('comboVal');
+    const timerVal = document.getElementById('timerVal');
+    const timerFill = document.getElementById('timerFill');
+    const bestVal = document.getElementById('bestVal');
+    const comboDisplay = document.getElementById('comboDisplay');
+    const crosshairH = document.getElementById('crosshairH');
+    const crosshairV = document.getElementById('crosshairV');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+    const bestMsg = document.getElementById('bestMsg');
+
+    bestVal.textContent = bestScore;
+
+    function updateHUD() {
+      scoreVal.textContent = state.score;
+      comboVal.textContent = state.combo > 1 ? state.combo + 'x' : state.combo;
+      timerVal.textContent = Math.ceil(state.timeLeft);
+    }
+
+    function drawTarget(target) {
+      const el = document.createElement('div');
+      el.className = 'target';
+      const size = target.r * 2;
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.left = target.x + 'px';
+      el.style.top = target.y + 'px';
+
+      // SVG 과녁 그리기
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', size);
+      svg.setAttribute('height', size);
+      svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+
+      const cx = target.r, cy = target.r;
+      const colors = COLORS[target.colorIdx].rings;
+      const ringCount = 5;
+      for (let i = ringCount; i >= 1; i--) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', cx);
+        circle.setAttribute('cy', cy);
+        circle.setAttribute('r', target.r * (i / ringCount));
+        circle.setAttribute('fill', colors[i - 1] || '#fff');
+        circle.setAttribute('stroke', 'rgba(0,0,0,0.3)');
+        circle.setAttribute('stroke-width', '1');
+        svg.appendChild(circle);
+      }
+      el.appendChild(svg);
+      gameArea.appendChild(el);
+      target.el = el;
+    }
+
+    function spawnTarget(slot) {
+      const areaW = gameArea.offsetWidth;
+      const areaH = gameArea.offsetHeight;
+      const r = CONFIG.targetMinR + Math.random() * (CONFIG.targetMaxR - CONFIG.targetMinR);
+      const margin = r + 8;
+      const x = margin + Math.random() * (areaW - margin * 2);
+      const y = margin + Math.random() * (areaH - margin * 2);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = CONFIG.moveSpeed * (0.7 + Math.random() * 0.8) * (1 + state.score / 300);
+      const colorIdx = Math.floor(Math.random() * COLORS.length);
+
+      const target = { x, y, r, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, colorIdx, slot };
+      drawTarget(target);
+      return target;
+    }
+
+    function showHitEffect(x, y, r, pts) {
+      // 히트 효과 원
+      const eff = document.createElement('div');
+      eff.className = 'hit-effect';
+      eff.style.cssText = `left:${x}px;top:${y}px;width:${r*2}px;height:${r*2}px;border:3px solid #fff;`;
+      gameArea.appendChild(eff);
+      setTimeout(() => eff.remove(), 500);
+
+      // 점수 팝업
+      const pop = document.createElement('div');
+      pop.className = 'score-popup';
+      pop.textContent = '+' + pts * (state.combo > 1 ? state.combo : 1);
+      pop.style.left = (x - 20) + 'px';
+      pop.style.top = (y - r) + 'px';
+      pop.style.color = pts >= 100 ? '#ffd700' : pts >= 50 ? '#ff6bd6' : '#7fffb2';
+      gameArea.appendChild(pop);
+      setTimeout(() => pop.remove(), 800);
+    }
+
+    function handleHit(evt) {
+      if (!state.running) return;
+      evt.preventDefault();
+
+      const rect = gameArea.getBoundingClientRect();
+      const px = (evt.touches ? evt.touches[0].clientX : evt.clientX) - rect.left;
+      const py = (evt.touches ? evt.touches[0].clientY : evt.clientY) - rect.top;
+
+      // 조준선 이동
+      crosshairH.style.top = py + 'px';
+      crosshairV.style.left = px + 'px';
+
+      // 히트 판정 (가장 작은 과녁 우선)
+      let hit = false;
+      const sorted = [...state.targets].sort((a, b) => a.r - b.r);
+
+      for (const target of sorted) {
+        const dx = px - target.x;
+        const dy = py - target.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist <= target.r) {
+          let pts = CONFIG.hitPoints[2];
+          for (let i = 0; i < CONFIG.hitZones.length; i++) {
+            if (dist <= target.r * CONFIG.hitZones[i]) {
+              pts = CONFIG.hitPoints[i];
+              break;
+            }
+          }
+          const comboMult = Math.min(state.combo + 1, 5);
+          state.score += pts * comboMult;
+          state.combo++;
+
+          showHitEffect(target.x, target.y, target.r, pts);
+
+          // 콤보 표시
+          if (state.combo >= 3) {
+            comboDisplay.textContent = state.combo + 'COMBO! 🔥';
+            comboDisplay.classList.add('show');
+            clearTimeout(state.comboTimeout);
+            state.comboTimeout = setTimeout(() => comboDisplay.classList.remove('show'), 800);
+          }
+
+          // 과녁 제거 후 재생성
+          const slot = target.slot;
+          target.el.style.transform = 'translate(-50%, -50%) scale(1.5)';
+          target.el.style.opacity = '0';
+          target.el.style.transition = 'all 0.2s';
+          const elRef = target.el;
+          state.targets = state.targets.filter(t => t !== target);
+          setTimeout(() => {
+            elRef.remove();
+            if (state.running) {
+              state.targets.push(spawnTarget(slot));
+            }
+          }, CONFIG.spawnDelay);
+
+          hit = true;
+          updateHUD();
+          break;
+        }
+      }
+
+      if (!hit) {
+        state.combo = 0;
+        comboDisplay.classList.remove('show');
+        updateHUD();
+      }
+    }
+
+    function loop(timestamp) {
+      if (!state.running) return;
+      const dt = Math.min(timestamp - state.lastTime, 50);
+      state.lastTime = timestamp;
+
+      state.timeLeft -= dt / 1000;
+      timerFill.style.width = (state.timeLeft / CONFIG.totalTime * 100) + '%';
+
+      if (state.timeLeft <= 0) { endGame(); return; }
+
+      const areaW = gameArea.offsetWidth;
+      const areaH = gameArea.offsetHeight;
+
+      for (const target of state.targets) {
+        target.x += target.vx * (dt / 16);
+        target.y += target.vy * (dt / 16);
+
+        // 벽 튕기기
+        if (target.x - target.r < 0) { target.vx = Math.abs(target.vx); }
+        if (target.x + target.r > areaW) { target.vx = -Math.abs(target.vx); }
+        if (target.y - target.r < 0) { target.vy = Math.abs(target.vy); }
+        if (target.y + target.r > areaH) { target.vy = -Math.abs(target.vy); }
+
+        if (target.el) {
+          target.el.style.left = target.x + 'px';
+          target.el.style.top = target.y + 'px';
+        }
+      }
+
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      state.score = 0;
+      state.combo = 0;
+      state.timeLeft = CONFIG.totalTime;
+      state.running = true;
+      state.lastTime = performance.now();
+
+      // 기존 과녁 제거
+      state.targets.forEach(t => t.el && t.el.remove());
+      state.targets = [];
+      // 기존 이펙트 제거
+      gameArea.querySelectorAll('.hit-effect, .score-popup').forEach(e => e.remove());
+
+      // 과녁 생성
+      for (let i = 0; i < CONFIG.targetCount; i++) {
+        state.targets.push(spawnTarget(i));
+      }
+
+      timerFill.style.width = '100%';
+      comboDisplay.classList.remove('show');
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      updateHUD();
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(state.raf);
+      state.targets.forEach(t => t.el && t.el.remove());
+      state.targets = [];
+
+      if (state.score > bestScore) {
+        bestScore = state.score;
+        localStorage.setItem('target-hit_best', bestScore);
+        bestVal.textContent = bestScore;
+        bestMsg.textContent = '🏆 새 최고 기록!';
+      } else {
+        bestMsg.textContent = '최고기록: ' + bestScore + '점';
+      }
+
+      finalScore.textContent = state.score + '점';
+      if (state.score >= 1500) resultMsg.textContent = '명사수! 🎯🔥';
+      else if (state.score >= 800) resultMsg.textContent = '잘 맞췄어요! 👏';
+      else resultMsg.textContent = '다시 도전! 💪';
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 이벤트
+    gameArea.addEventListener('pointerdown', handleHit);
+
+    document.getElementById('startBtn').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      startGame();
+    });
+    document.getElementById('restartBtn').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      startGame();
+    });
+  })();
+  </script>
+</body>
+</html>
