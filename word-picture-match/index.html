@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🖼️ 그림 단어 맞추기</title>
+  <style>
+    :root {
+      --bg: #1a1a3e;
+      --accent: #a78bfa;
+      --correct: #22c55e;
+      --wrong: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      color: #fff; text-align: center;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 8px 16px;
+      flex-shrink: 0;
+    }
+    .hud-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .hud-label { font-size: 11px; color: rgba(255,255,255,0.6); }
+    .hud-value { font-size: 20px; font-weight: 900; color: #fff; }
+    .progress-wrap {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px; height: 8px; overflow: hidden;
+      flex-shrink: 0;
+    }
+    #progressBar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #a78bfa, #60a5fa);
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+    #gameArea {
+      flex: 1;
+      display: flex; flex-direction: column; gap: 10px;
+      overflow: hidden;
+    }
+    #pictureCard {
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.2));
+      border: 2px solid rgba(167,139,250,0.4);
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 10px;
+      position: relative;
+    }
+    #pictureEmoji {
+      font-size: clamp(70px, 18vw, 100px);
+      line-height: 1;
+    }
+    #pictureEmoji.pop { animation: emojiPop 0.3s ease; }
+    @keyframes emojiPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    #levelBadge {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(167,139,250,0.3);
+      border: 1px solid rgba(167,139,250,0.5);
+      border-radius: 20px; padding: 3px 10px;
+      font-size: 12px; color: #c4b5fd;
+    }
+    #hintText {
+      text-align: center; font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      flex-shrink: 0; min-height: 18px;
+    }
+    #streakRow {
+      display: flex; justify-content: center; gap: 5px;
+      flex-shrink: 0; min-height: 18px;
+    }
+    .streak-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transition: background 0.3s;
+    }
+    .streak-dot.hit { background: #22c55e; }
+    .streak-dot.miss { background: #ef4444; }
+    #choicesGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px; flex: 1;
+    }
+    .choice-btn {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      color: #fff;
+      font-size: clamp(16px, 4.5vw, 22px);
+      font-weight: 700;
+      cursor: pointer; min-height: 56px;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.1s, background 0.2s, border-color 0.2s;
+      padding: 8px; text-align: center; word-break: keep-all;
+    }
+    .choice-btn:active { transform: scale(0.95); }
+    .choice-btn.correct {
+      background: rgba(34,197,94,0.3);
+      border-color: #22c55e;
+      animation: correctPulse 0.4s ease;
+    }
+    .choice-btn.wrong {
+      background: rgba(239,68,68,0.3);
+      border-color: #ef4444;
+      animation: wrongShake 0.4s ease;
+    }
+    .choice-btn.disabled { pointer-events: none; }
+    @keyframes correctPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0; padding: 0 2px;
+    }
+    footer small { font-size: 11px; color: rgba(255,255,255,0.4); }
+    .home-link {
+      font-size: 13px; color: rgba(255,255,255,0.6);
+      text-decoration: none; padding: 4px 8px;
+      background: rgba(255,255,255,0.1); border-radius: 8px;
+    }
+    #feedbackOverlay {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; z-index: 50;
+    }
+    #feedbackIcon {
+      font-size: 80px; opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    #feedbackIcon.show { opacity: 1; transform: scale(1.1); }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      border-radius: 24px; padding: 28px 24px;
+      text-align: center; color: #fff;
+      width: 88%; max-width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; }
+    .result-score { font-size: 50px; font-weight: 900; color: #a78bfa; margin: 8px 0; }
+    .result-detail { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+    .best-tag { font-size: 13px; color: #86efac; margin-bottom: 16px; }
+    .btn-start {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff; border: none; border-radius: 50px;
+      padding: 14px 36px; font-size: 18px; font-weight: 700;
+      cursor: pointer; min-height: 52px;
+      box-shadow: 0 6px 20px rgba(124,58,237,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .rules-list { list-style: none; margin-bottom: 16px; text-align: left; }
+    .rules-list li { font-size: 13px; color: rgba(255,255,255,0.8); margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🖼️ 그림 단어 맞추기</h1>
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">점수</span>
+      <span class="hud-value" id="scoreDisplay">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">문제</span>
+      <span class="hud-value" id="questionDisplay">0/10</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">정답률</span>
+      <span class="hud-value" id="accuracyDisplay">-</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">최고</span>
+      <span class="hud-value" id="bestDisplay">0</span>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div id="progressBar"></div>
+  </div>
+
+  <div id="gameArea">
+    <div id="pictureCard">
+      <div id="pictureEmoji">🍎</div>
+      <div id="levelBadge">Lv.1</div>
+    </div>
+    <div id="hintText"></div>
+    <div id="streakRow"></div>
+    <div id="choicesGrid"></div>
+  </div>
+
+  <footer>
+    <small>그림을 보고 올바른 단어를 골라요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<div id="feedbackOverlay">
+  <div id="feedbackIcon">✅</div>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🖼️ 그림 단어 맞추기</h2>
+    <ul class="rules-list">
+      <li>🖼️ 이모지 그림을 잘 보세요</li>
+      <li>📝 4개 중 올바른 한글 단어를 골라요</li>
+      <li>✅ 맞으면 10점 + 연속 정답 보너스!</li>
+      <li>❌ 틀려도 계속 도전할 수 있어요</li>
+      <li>🎯 10문제 완료 후 결과 확인!</li>
+    </ul>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 완료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="result-detail" id="resultDetail"></div>
+    <div class="best-tag" id="bestTag"></div>
+    <button class="btn-start" id="restartBtn">다시 하기!</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const WORDS = [
+    { emoji: '🍎', answer: '사과',   category: '과일',  distractors: ['바나나','딸기','포도'] },
+    { emoji: '🍌', answer: '바나나', category: '과일',  distractors: ['사과','수박','귤'] },
+    { emoji: '🍓', answer: '딸기',   category: '과일',  distractors: ['포도','망고','키위'] },
+    { emoji: '🍇', answer: '포도',   category: '과일',  distractors: ['사과','복숭아','레몬'] },
+    { emoji: '🍊', answer: '귤',     category: '과일',  distractors: ['레몬','라임','오렌지'] },
+    { emoji: '🐶', answer: '강아지', category: '동물',  distractors: ['고양이','토끼','곰'] },
+    { emoji: '🐱', answer: '고양이', category: '동물',  distractors: ['강아지','소','말'] },
+    { emoji: '🐰', answer: '토끼',   category: '동물',  distractors: ['다람쥐','쥐','고양이'] },
+    { emoji: '🐻', answer: '곰',     category: '동물',  distractors: ['사자','호랑이','늑대'] },
+    { emoji: '🦊', answer: '여우',   category: '동물',  distractors: ['늑대','곰','너구리'] },
+    { emoji: '🐸', answer: '개구리', category: '동물',  distractors: ['뱀','도마뱀','두꺼비'] },
+    { emoji: '🐧', answer: '펭귄',   category: '동물',  distractors: ['새','오리','독수리'] },
+    { emoji: '🦁', answer: '사자',   category: '동물',  distractors: ['호랑이','표범','치타'] },
+    { emoji: '🐘', answer: '코끼리', category: '동물',  distractors: ['기린','코뿔소','하마'] },
+    { emoji: '🦒', answer: '기린',   category: '동물',  distractors: ['코끼리','낙타','말'] },
+    { emoji: '⭐', answer: '별',     category: '자연',  distractors: ['달','해','구름'] },
+    { emoji: '🌙', answer: '달',     category: '자연',  distractors: ['별','해','은하'] },
+    { emoji: '🌈', answer: '무지개', category: '자연',  distractors: ['하늘','바람','비'] },
+    { emoji: '🌊', answer: '파도',   category: '자연',  distractors: ['강','호수','폭포'] },
+    { emoji: '🌸', answer: '꽃',     category: '자연',  distractors: ['나무','잎','풀'] },
+    { emoji: '🌲', answer: '나무',   category: '자연',  distractors: ['풀','꽃','버섯'] },
+    { emoji: '🎈', answer: '풍선',   category: '놀이',  distractors: ['공','연','비행기'] },
+    { emoji: '⚽', answer: '축구공', category: '운동',  distractors: ['야구공','농구공','럭비공'] },
+    { emoji: '🎂', answer: '케이크', category: '음식',  distractors: ['빵','쿠키','마카롱'] },
+    { emoji: '🍕', answer: '피자',   category: '음식',  distractors: ['햄버거','파스타','라면'] },
+    { emoji: '🍦', answer: '아이스크림', category: '음식', distractors: ['케이크','사탕','젤리'] },
+    { emoji: '🚗', answer: '자동차', category: '탈것',  distractors: ['기차','버스','트럭'] },
+    { emoji: '✈️', answer: '비행기', category: '탈것',  distractors: ['로켓','헬기','드론'] },
+    { emoji: '🦋', answer: '나비',   category: '곤충',  distractors: ['벌','잠자리','사마귀'] },
+    { emoji: '🐝', answer: '벌',     category: '곤충',  distractors: ['나비','파리','모기'] },
+    { emoji: '🐳', answer: '고래',   category: '동물',  distractors: ['상어','돌고래','오징어'] },
+    { emoji: '🦈', answer: '상어',   category: '동물',  distractors: ['고래','가오리','바다거북'] },
+    { emoji: '🐙', answer: '문어',   category: '동물',  distractors: ['오징어','게','새우'] },
+    { emoji: '🦜', answer: '앵무새', category: '동물',  distractors: ['독수리','참새','까마귀'] },
+    { emoji: '🌵', answer: '선인장', category: '식물',  distractors: ['대나무','나무','해바라기'] },
+    { emoji: '🍄', answer: '버섯',   category: '식물',  distractors: ['감자','고구마','당근'] },
+  ];
+
+  const CONFIG = {
+    questionsPerRound: 10,
+    baseScore: 10,
+    streakBonus: 5,
+    feedbackDelay: 700,
+    storageKey: 'word_picture_match_best',
+  };
+
+  let state = {
+    score: 0, correct: 0, answered: 0,
+    streak: 0, questionIdx: 0,
+    questions: [], waiting: false, streakDots: [],
+  };
+
+  const scoreEl       = document.getElementById('scoreDisplay');
+  const questionEl    = document.getElementById('questionDisplay');
+  const accuracyEl    = document.getElementById('accuracyDisplay');
+  const bestEl        = document.getElementById('bestDisplay');
+  const progressBar   = document.getElementById('progressBar');
+  const pictureEmoji  = document.getElementById('pictureEmoji');
+  const levelBadge    = document.getElementById('levelBadge');
+  const hintText      = document.getElementById('hintText');
+  const streakRow     = document.getElementById('streakRow');
+  const choicesGrid   = document.getElementById('choicesGrid');
+  const feedbackIcon  = document.getElementById('feedbackIcon');
+  const startOverlay  = document.getElementById('startOverlay');
+  const endOverlay    = document.getElementById('endOverlay');
+  const finalScoreEl  = document.getElementById('finalScore');
+  const resultDetailEl= document.getElementById('resultDetail');
+  const bestTagEl     = document.getElementById('bestTag');
+
+  function getBest() { return parseInt(localStorage.getItem(CONFIG.storageKey) || '0'); }
+  function saveBest(s) { if (s > getBest()) localStorage.setItem(CONFIG.storageKey, s); }
+  bestEl.textContent = getBest();
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function buildQuestions() {
+    const shuffled = shuffle(WORDS).slice(0, CONFIG.questionsPerRound);
+    return shuffled.map(w => {
+      const choices = shuffle([w.answer, ...shuffle(w.distractors).slice(0, 3)]);
+      return { ...w, choices };
+    });
+  }
+
+  function renderQuestion() {
+    const q = state.questions[state.questionIdx];
+    if (!q) return;
+
+    pictureEmoji.classList.remove('pop');
+    void pictureEmoji.offsetWidth;
+    pictureEmoji.textContent = q.emoji;
+    pictureEmoji.classList.add('pop');
+
+    hintText.textContent = '카테고리: ' + q.category;
+    const lv = state.questionIdx < 4 ? 1 : state.questionIdx < 7 ? 2 : 3;
+    levelBadge.textContent = 'Lv.' + lv;
+
+    choicesGrid.innerHTML = '';
+    q.choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => handleChoice(btn, choice, q.answer));
+      choicesGrid.appendChild(btn);
+    });
+
+    questionEl.textContent = (state.questionIdx + 1) + '/' + CONFIG.questionsPerRound;
+    progressBar.style.width = (state.questionIdx / CONFIG.questionsPerRound * 100) + '%';
+    accuracyEl.textContent = state.answered > 0
+      ? Math.round(state.correct / state.answered * 100) + '%' : '-';
+  }
+
+  function handleChoice(btn, choice, answer) {
+    if (state.waiting) return;
+    state.waiting = true;
+    state.answered++;
+
+    choicesGrid.querySelectorAll('.choice-btn').forEach(b => b.classList.add('disabled'));
+
+    if (choice === answer) {
+      state.correct++;
+      state.streak++;
+      const bonus = Math.floor(state.streak / 2) * CONFIG.streakBonus;
+      state.score += CONFIG.baseScore + bonus;
+      btn.classList.add('correct');
+      showFeedback('✅');
+      addStreakDot(true);
+    } else {
+      state.streak = 0;
+      btn.classList.add('wrong');
+      choicesGrid.querySelectorAll('.choice-btn').forEach(b => {
+        if (b.textContent === answer) b.classList.add('correct');
+      });
+      showFeedback('❌');
+      addStreakDot(false);
+    }
+
+    scoreEl.textContent = state.score;
+
+    setTimeout(() => {
+      state.questionIdx++;
+      if (state.questionIdx >= CONFIG.questionsPerRound) {
+        endGame();
+      } else {
+        state.waiting = false;
+        renderQuestion();
+      }
+    }, CONFIG.feedbackDelay);
+  }
+
+  function buildStreakDots() {
+    streakRow.innerHTML = '';
+    for (let i = 0; i < CONFIG.questionsPerRound; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'streak-dot';
+      streakRow.appendChild(dot);
+    }
+    state.streakDots = Array.from(streakRow.querySelectorAll('.streak-dot'));
+  }
+  function addStreakDot(isHit) {
+    const dot = state.streakDots[state.answered - 1];
+    if (dot) dot.classList.add(isHit ? 'hit' : 'miss');
+  }
+
+  function showFeedback(icon) {
+    feedbackIcon.textContent = icon;
+    feedbackIcon.classList.add('show');
+    setTimeout(() => feedbackIcon.classList.remove('show'), 500);
+  }
+
+  function startGame() {
+    state.score = 0; state.correct = 0; state.answered = 0;
+    state.streak = 0; state.questionIdx = 0; state.waiting = false;
+    state.questions = buildQuestions();
+    scoreEl.textContent = '0';
+    questionEl.textContent = '1/' + CONFIG.questionsPerRound;
+    accuracyEl.textContent = '-';
+    progressBar.style.width = '0%';
+    bestEl.textContent = getBest();
+    buildStreakDots();
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    renderQuestion();
+  }
+
+  function endGame() {
+    const prev = getBest();
+    saveBest(state.score);
+    const isNew = state.score > prev;
+    bestEl.textContent = getBest();
+    finalScoreEl.textContent = state.score;
+    progressBar.style.width = '100%';
+    const pct = Math.round(state.correct / CONFIG.questionsPerRound * 100);
+    resultDetailEl.textContent = CONFIG.questionsPerRound + '문제 중 ' + state.correct + '개 정답 (' + pct + '%)';
+    let msg = pct === 100 ? '🏆 완벽해요! 천재!' : pct >= 80 ? '🌟 아주 잘했어요!' : pct >= 60 ? '🎉 잘했어요!' : '😊 다시 도전해봐요!';
+    bestTagEl.textContent = (isNew ? '🎉 새 최고 기록! ' : '최고 기록: ' + getBest() + '점') + ' — ' + msg;
+    endOverlay.classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('restartBtn').addEventListener('click', startGame);
+
+})();
+</script>
+</body>
+</html>

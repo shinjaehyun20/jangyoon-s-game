@@ -11,7 +11,9 @@
       { "id": "balloon-pop",  "label": "🎈 풍선 터뜨리기",    "path": "balloon-pop/index.html" },
       { "id": "number-order", "label": "🔢 숫자 순서 맞추기", "path": "number-order/index.html" },
       { "id": "space-catcher","label": "🌟 우주 장윤이",      "path": "space-catcher/index.html" },
-      { "id": "runner-game",  "label": "🏃 달리는 장윤이",    "path": "runner-game/index.html" }
+      { "id": "runner-game",  "label": "🏃 달리는 장윤이",    "path": "runner-game/index.html" },
+      { "id": "fruit-catch",          "label": "🍎 과일 받기",       "path": "fruit-catch/index.html" },
+      { "id": "word-picture-match",   "label": "🖼️ 그림 단어 맞추기","path": "word-picture-match/index.html" }
     ]
   },
   {

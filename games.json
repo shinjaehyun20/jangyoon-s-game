@@ -158,5 +158,21 @@
     "description": "이동하는 과녁을 탭! 정중앙을 맞추면 100점, 30초 도전",
     "thumbnail": "target-hit/thumb.svg",
     "path": "target-hit/index.html"
+  },
+  {
+    "id": "fruit-catch",
+    "title": "Fruit Catch",
+    "title_ko": "🍎 과일 받기",
+    "description": "떨어지는 과일을 바구니로 받아요! 폭탄 피하고 콤보 연결, 30초 도전",
+    "thumbnail": "fruit-catch/thumb.svg",
+    "path": "fruit-catch/index.html"
+  },
+  {
+    "id": "word-picture-match",
+    "title": "Word Picture Match",
+    "title_ko": "🖼️ 그림 단어 맞추기",
+    "description": "이모지 그림에 맞는 한글 단어를 골라요! 10문제 퀴즈, 연속 정답 보너스",
+    "thumbnail": "word-picture-match/thumb.svg",
+    "path": "word-picture-match/index.html"
   }
 ]
