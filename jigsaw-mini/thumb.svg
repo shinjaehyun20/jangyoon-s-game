@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+
+  <!-- 퍼즐 그리드 (2×2, 좌측) -->
+  <!-- 칸 1 — 채워짐 -->
+  <rect x="24" y="28" width="64" height="64" rx="6" fill="rgba(233,69,96,0.3)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="56" y="68" text-anchor="middle" font-size="36">🐶</text>
+
+  <!-- 칸 2 — 채워짐 -->
+  <rect x="96" y="28" width="64" height="64" rx="6" fill="rgba(233,69,96,0.3)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="128" y="68" text-anchor="middle" font-size="36">🐱</text>
+
+  <!-- 칸 3 — 채워짐 -->
+  <rect x="24" y="100" width="64" height="64" rx="6" fill="rgba(233,69,96,0.3)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="56" y="140" text-anchor="middle" font-size="36">🦊</text>
+
+  <!-- 칸 4 — 빈 칸 (점선) -->
+  <rect x="96" y="100" width="64" height="64" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.4)" stroke-dasharray="6,4" stroke-width="2"/>
+  <text x="128" y="143" text-anchor="middle" font-size="22" fill="rgba(255,255,255,0.2)">?</text>
+
+  <!-- 드래그 중인 조각 -->
+  <rect x="190" y="90" width="54" height="54" rx="8" fill="rgba(245,166,35,0.35)" stroke="#f5a623" stroke-width="2"/>
+  <text x="217" y="126" text-anchor="middle" font-size="30">🐻</text>
+
+  <!-- 화살표 -->
+  <path d="M160 134 L178 128" stroke="rgba(255,255,255,0.5)" stroke-width="2" marker-end="url(#arr)"/>
+  <defs>
+    <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.5)"/>
+    </marker>
+  </defs>
+
+  <!-- 테두리 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#f5a623">퍼즐 조각 맞추기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">JIGSAW MINI</text>
+  </g>
+</svg>

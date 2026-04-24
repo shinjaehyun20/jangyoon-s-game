@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🧩 퍼즐 조각 맞추기</title>
+  <style>
+    :root {
+      --bg-top: #1a1a2e;
+      --bg-bot: #16213e;
+      --accent: #e94560;
+      --accent2: #f5a623;
+      --surface: rgba(255,255,255,0.08);
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+      color: var(--text);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface); border-radius: 12px;
+      padding: 6px 14px; flex-shrink: 0;
+      font-size: clamp(13px, 3.5vw, 16px);
+    }
+    .hud span { font-weight: 700; color: var(--accent2); }
+    #gameArea {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-between;
+      overflow: hidden;
+      padding: 6px 0;
+    }
+    /* 완성 영역(위) */
+    #boardZone {
+      position: relative;
+      flex-shrink: 0;
+    }
+    #board {
+      display: grid;
+      border: 2px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .slot {
+      position: relative;
+      background: rgba(255,255,255,0.05);
+      border: 1px dashed rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: rgba(255,255,255,0.3);
+      overflow: hidden;
+    }
+    .slot.filled { border-color: transparent; background: transparent; }
+    /* 분리된 조각 영역(아래) */
+    #pieceTray {
+      width: 100%;
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
+      flex-shrink: 0;
+    }
+    .piece-wrapper {
+      cursor: grab;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.3);
+      overflow: hidden;
+      touch-action: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .piece-wrapper.dragging {
+      position: fixed;
+      z-index: 200;
+      cursor: grabbing;
+      border-color: var(--accent2);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+      pointer-events: none;
+    }
+    .piece-wrapper canvas { display: block; }
+
+    /* 레벨 완료 팝업 */
+    #levelClear {
+      position: fixed; inset: 0;
+      background: rgba(26,26,46,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 150;
+    }
+    #levelClear.hidden { display: none; }
+    #levelClear .card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px; padding: 28px 24px;
+      text-align: center; max-width: 300px; width: 90%;
+    }
+    #levelClear .big { font-size: 52px; margin-bottom: 8px; }
+    #levelClear h3 { font-size: 22px; margin-bottom: 6px; }
+    #levelClear p { font-size: 14px; opacity: 0.8; margin-bottom: 20px; }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0; font-size: 12px; opacity: 0.7;
+    }
+    .home-link {
+      color: var(--text); text-decoration: none;
+      background: rgba(255,255,255,0.15); border-radius: 8px;
+      padding: 4px 10px; font-size: 12px;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(26,26,46,0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px; padding: 28px 24px;
+      text-align: center; max-width: 320px; width: 90%;
+    }
+    .overlay-card h2 { font-size: clamp(22px,6vw,30px); margin-bottom: 12px; }
+    .overlay-card p { font-size: 14px; line-height: 1.6; opacity: 0.9; margin-bottom: 20px; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent2); margin: 8px 0; }
+    .btn-start {
+      background: var(--accent2); color: #1a1a2e;
+      border: none; border-radius: 14px;
+      padding: 14px 36px; font-size: 18px; font-weight: 900;
+      cursor: pointer; min-height: 52px;
+      box-shadow: 0 4px 16px rgba(245,166,35,0.4);
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .best-label { font-size: 12px; opacity: 0.7; margin-top: 6px; }
+    #difficultyRow { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; }
+    .diff-btn {
+      background: rgba(255,255,255,0.15); color: #fff;
+      border: 2px solid rgba(255,255,255,0.3); border-radius: 10px;
+      padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+      min-height: 40px;
+    }
+    .diff-btn.active { background: var(--accent2); border-color: var(--accent2); color: #1a1a2e; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🧩 퍼즐 조각 맞추기</h1>
+  <div class="hud">
+    <div>단계: <span id="levelDisplay">1</span></div>
+    <div>맞춘 수: <span id="scoreDisplay">0</span></div>
+    <div>최고: <span id="bestDisplay">0</span></div>
+  </div>
+  <div id="gameArea">
+    <div id="boardZone">
+      <div id="board"></div>
+    </div>
+    <div id="pieceTray"></div>
+  </div>
+  <footer>
+    <small>조각을 끌어서 빈 칸에 맞춰 보세요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 레벨 완료 -->
+<div id="levelClear" class="hidden">
+  <div class="card">
+    <div class="big" id="clearEmoji">🎉</div>
+    <h3 id="clearTitle">레벨 클리어!</h3>
+    <p id="clearMsg"></p>
+    <button class="btn-start" id="nextBtn">다음 단계!</button>
+  </div>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🧩 퍼즐 조각 맞추기</h2>
+    <p>흩어진 조각을 끌어다 제자리에 놓으세요!<br>레벨이 올라갈수록 조각이 많아져요.</p>
+    <div id="difficultyRow">
+      <button class="diff-btn active" data-diff="2" id="d2">쉬움 (2×2)</button>
+      <button class="diff-btn" data-diff="3" id="d3">보통 (3×3)</button>
+    </div>
+    <button class="btn-start" id="startBtn">시작!</button>
+    <div class="best-label" id="startBest"></div>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🏆 완주!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">처음부터!</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'jigsaw-mini_best';
+  const MAX_LEVELS  = 8;
+
+  // 8가지 이모지 테마: 각 레벨에 하나씩
+  const THEMES = [
+    { label: '해변', emojis: [['🌊','🐚'],['☀️','🏖️']] },
+    { label: '우주', emojis: [['🚀','⭐'],['🌙','🪐']] },
+    { label: '동물', emojis: [['🐶','🐱'],['🦊','🐻']] },
+    { label: '과일', emojis: [['🍎','🍊'],['🍇','🍓']] },
+    { label: '교통', emojis: [['🚗','✈️'],['🚢','🚂']] },
+    { label: '음식', emojis: [['🍕','🍔'],['🍜','🍣']] },
+    { label: '스포츠', emojis: [['⚽','🏀'],['🎾','⚾']] },
+    { label: '날씨', emojis: [['☀️','🌈'],['❄️','🌩️']] },
+  ];
+
+  // 3×3 테마 (9 emojis)
+  const THEMES3 = [
+    { label: '동물', emojis: [['🐶','🐱','🦊'],['🐻','🐼','🐨'],['🐯','🦁','🐸']] },
+    { label: '과일', emojis: [['🍎','🍊','🍋'],['🍇','🍓','🍑'],['🍉','🍒','🍍']] },
+    { label: '우주', emojis: [['🚀','🛸','⭐'],['🌙','🪐','☄️'],['🌟','🌍','🌌']] },
+  ];
+
+  let grid  = 2;  // 2 or 3
+  let state = {};
+
+  function getBest() { return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10); }
+  function saveBest(v) { localStorage.setItem(STORAGE_KEY, v); }
+
+  const $board    = document.getElementById('board');
+  const $tray     = document.getElementById('pieceTray');
+  const $lvl      = document.getElementById('levelDisplay');
+  const $sc       = document.getElementById('scoreDisplay');
+  const $best     = document.getElementById('bestDisplay');
+  const $startOv  = document.getElementById('startOverlay');
+  const $endOv    = document.getElementById('endOverlay');
+  const $lcOv     = document.getElementById('levelClear');
+  const $startBst = document.getElementById('startBest');
+  const $final    = document.getElementById('finalScore');
+  const $resultMsg= document.getElementById('resultMsg');
+
+  function updateStartBest() {
+    const b = getBest();
+    $startBst.textContent = b > 0 ? `최고 기록: ${b}레벨` : '';
+    $best.textContent = b;
+  }
+  updateStartBest();
+
+  // 난이도 버튼
+  document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      grid = parseInt(btn.dataset.diff, 10);
+    });
+  });
+
+  /* ── 레벨 초기화 ── */
+  function buildLevel(level) {
+    $board.innerHTML = '';
+    $tray.innerHTML  = '';
+    state.slots      = [];
+    state.pieces     = [];
+    state.placedCount= 0;
+
+    const themeList = grid === 2 ? THEMES : THEMES3;
+    const theme = themeList[(level - 1) % themeList.length];
+
+    // 보드 크기 계산
+    const areaEl = document.getElementById('boardZone');
+    const areaW  = Math.min(window.innerWidth, 480) - 24;
+    // boardZone 크기: 전체 높이의 약 50%
+    const maxBoardPx = Math.min(areaW, window.innerHeight * 0.42);
+    const cellPx = Math.floor(maxBoardPx / grid);
+    const boardPx = cellPx * grid;
+
+    $board.style.width  = boardPx + 'px';
+    $board.style.height = boardPx + 'px';
+    $board.style.gridTemplateColumns = `repeat(${grid}, ${cellPx}px)`;
+    $board.style.gridTemplateRows    = `repeat(${grid}, ${cellPx}px)`;
+
+    // 조각 크기
+    const piecePx = Math.floor((Math.min(areaW, window.innerHeight * 0.28) - 10 * (grid - 1)) / grid);
+
+    // 슬롯 및 조각 생성
+    const correctMap = []; // correctMap[row][col] = pieceId
+
+    let id = 0;
+    for (let r = 0; r < grid; r++) {
+      for (let c = 0; c < grid; c++) {
+        const emoji = theme.emojis[r][c];
+        const slotEl = document.createElement('div');
+        slotEl.className = 'slot';
+        slotEl.dataset.id = id;
+        slotEl.style.width  = cellPx + 'px';
+        slotEl.style.height = cellPx + 'px';
+        slotEl.style.fontSize = Math.floor(cellPx * 0.55) + 'px';
+        // 힌트: 연한 이모지
+        slotEl.innerHTML = `<span style="opacity:0.18">${emoji}</span>`;
+        $board.appendChild(slotEl);
+        state.slots.push({ el: slotEl, id, emoji, filled: false });
+
+        // 조각 캔버스
+        const canvas = document.createElement('canvas');
+        canvas.width  = piecePx;
+        canvas.height = piecePx;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, piecePx, piecePx);
+        ctx.font = Math.floor(piecePx * 0.62) + 'px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(emoji, piecePx / 2, piecePx / 2 + 2);
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'piece-wrapper';
+        wrapper.dataset.id = id;
+        wrapper.appendChild(canvas);
+        state.pieces.push({ el: wrapper, id, emoji, placed: false });
+        id++;
+      }
+    }
+
+    // 조각 랜덤 배치 (정답과 다른 순서)
+    const shuffled = [...state.pieces].sort(() => Math.random() - 0.5);
+    shuffled.forEach(p => $tray.appendChild(p.el));
+
+    $lvl.textContent  = level;
+    $sc.textContent   = state.score || 0;
+    $best.textContent = getBest();
+  }
+
+  /* ── 드래그 로직 ── */
+  let dragging  = null;  // { pieceObj, origParent, origStyles, startX, startY }
+  let dragEl    = null;
+
+  document.addEventListener('pointerdown', e => {
+    if (!state.running) return;
+    const wrapper = e.target.closest('.piece-wrapper');
+    if (!wrapper || wrapper.classList.contains('dragging')) return;
+    const piece = state.pieces.find(p => p.el === wrapper);
+    if (!piece || piece.placed) return;
+
+    e.preventDefault();
+
+    const rect = wrapper.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+
+    dragging = { piece, offsetX, offsetY };
+    dragEl   = wrapper;
+
+    // 고정 위치로 이탈
+    const w = rect.width, h = rect.height;
+    wrapper.classList.add('dragging');
+    wrapper.style.width  = w + 'px';
+    wrapper.style.height = h + 'px';
+    wrapper.style.left   = (e.clientX - offsetX) + 'px';
+    wrapper.style.top    = (e.clientY - offsetY) + 'px';
+    document.body.appendChild(wrapper);
+  }, { passive: false });
+
+  document.addEventListener('pointermove', e => {
+    if (!dragging || !dragEl) return;
+    e.preventDefault();
+    dragEl.style.left = (e.clientX - dragging.offsetX) + 'px';
+    dragEl.style.top  = (e.clientY - dragging.offsetY) + 'px';
+  }, { passive: false });
+
+  document.addEventListener('pointerup', e => {
+    if (!dragging || !dragEl) return;
+
+    // 가장 가까운 슬롯 감지
+    const px = e.clientX;
+    const py = e.clientY;
+    let best = null, bestDist = Infinity;
+
+    state.slots.forEach(slot => {
+      if (slot.filled) return;
+      const sr = slot.el.getBoundingClientRect();
+      const cx = sr.left + sr.width / 2;
+      const cy = sr.top  + sr.height / 2;
+      const d  = Math.hypot(px - cx, py - cy);
+      if (d < bestDist) { bestDist = d; best = slot; }
+    });
+
+    const snapThreshold = dragEl.offsetWidth * 1.2;
+
+    if (best && bestDist < snapThreshold) {
+      // 정답 여부
+      const isCorrect = (best.id === dragging.piece.id);
+      if (isCorrect) {
+        placeCorrect(dragging.piece, best);
+      } else {
+        // 오답: 트레이로 복귀
+        returnToTray(dragEl);
+      }
+    } else {
+      returnToTray(dragEl);
+    }
+
+    dragging = null;
+    dragEl   = null;
+  });
+
+  function placeCorrect(piece, slot) {
+    piece.placed = true;
+    slot.filled  = true;
+
+    // 조각을 슬롯 크기에 맞게 확대
+    const slotRect = slot.el.getBoundingClientRect();
+    const pw = slotRect.width, ph = slotRect.height;
+    dragEl.style.width  = pw + 'px';
+    dragEl.style.height = ph + 'px';
+    dragEl.querySelector('canvas').style.width  = pw + 'px';
+    dragEl.querySelector('canvas').style.height = ph + 'px';
+    dragEl.style.border  = 'none';
+    dragEl.style.borderRadius = '0';
+    dragEl.style.boxShadow = 'none';
+    dragEl.classList.remove('dragging');
+    dragEl.style.left = '';
+    dragEl.style.top  = '';
+    dragEl.style.position = '';
+
+    slot.el.innerHTML = '';
+    slot.el.classList.add('filled');
+    slot.el.appendChild(dragEl);
+
+    state.placedCount++;
+    state.score++;
+    $sc.textContent = state.score;
+
+    if (state.placedCount === grid * grid) {
+      setTimeout(() => showLevelClear(), 350);
+    }
+  }
+
+  function returnToTray(el) {
+    el.classList.remove('dragging');
+    el.style.left = '';
+    el.style.top  = '';
+    el.style.position = '';
+    el.style.width  = '';
+    el.style.height = '';
+    $tray.appendChild(el);
+  }
+
+  /* ── 레벨 클리어 ── */
+  function showLevelClear() {
+    const clears = [
+      [6, '🌟', '대단해요! 퍼즐 천재!'],
+      [4, '🎉', '훌륭해요!'],
+      [2, '😊', '잘했어요!'],
+      [0, '👍', '클리어!'],
+    ];
+    const [,emoji, msg] = clears.find(([min]) => state.level >= min) || clears[3];
+    document.getElementById('clearEmoji').textContent = emoji;
+    document.getElementById('clearTitle').textContent = `레벨 ${state.level} 클리어!`;
+    document.getElementById('clearMsg').textContent   = msg;
+
+    if (state.level > getBest()) saveBest(state.level);
+
+    if (state.level >= MAX_LEVELS) {
+      // 전체 완주
+      $lcOv.classList.add('hidden');
+      endGame();
+    } else {
+      $lcOv.classList.remove('hidden');
+    }
+  }
+
+  document.getElementById('nextBtn').addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    $lcOv.classList.add('hidden');
+    state.level++;
+    buildLevel(state.level);
+  });
+
+  /* ── 게임 시작 / 종료 ── */
+  function startGame() {
+    state = { running: true, level: 1, score: 0 };
+    $startOv.classList.add('hidden');
+    $endOv.classList.add('hidden');
+    $lcOv.classList.add('hidden');
+    buildLevel(1);
+  }
+
+  function endGame() {
+    state.running = false;
+    $final.textContent = `${state.level}단계`;
+    const best = getBest();
+    $resultMsg.textContent = `총 ${state.score}조각 완성! (최고: ${best}레벨)`;
+    $endOv.classList.remove('hidden');
+    updateStartBest();
+  }
+
+  document.getElementById('startBtn').addEventListener('pointerdown', e => {
+    e.stopPropagation(); startGame();
+  });
+  document.getElementById('restartBtn').addEventListener('pointerdown', e => {
+    e.stopPropagation(); startGame();
+  });
+
+  updateStartBest();
+})();
+</script>
+</body>
+</html>

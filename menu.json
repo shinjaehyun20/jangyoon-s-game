@@ -15,7 +15,9 @@
       { "id": "fruit-catch",          "label": "🍎 과일 받기",       "path": "fruit-catch/index.html" },
       { "id": "word-picture-match",   "label": "🖼️ 그림 단어 맞추기","path": "word-picture-match/index.html" },
       { "id": "bounce-ball",           "label": "🏀 농구공 드리블",    "path": "bounce-ball/index.html" },
-      { "id": "star-connect",          "label": "⭐ 별자리 잇기",      "path": "star-connect/index.html" }
+      { "id": "star-connect",  "label": "⭐ 별자리 잇기",      "path": "star-connect/index.html" },
+      { "id": "fish-catch",   "label": "🐟 물고기 잡기",      "path": "fish-catch/index.html" },
+      { "id": "jigsaw-mini",  "label": "🧩 퍼즐 조각 맞추기", "path": "jigsaw-mini/index.html" }
     ]
   },
   {

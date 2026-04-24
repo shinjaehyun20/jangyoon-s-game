@@ -190,5 +190,21 @@
     "description": "숫자 순서대로 별을 탭해 별자리를 완성해요! 8가지 별자리 도전",
     "thumbnail": "star-connect/thumb.svg",
     "path": "star-connect/index.html"
+  },
+  {
+    "id": "fish-catch",
+    "title": "Fish Catch",
+    "title_ko": "🐟 물고기 잡기",
+    "description": "잠자리채를 드래그해 물고기를 잡고 폭탄은 피하세요! 30초 도전",
+    "thumbnail": "fish-catch/thumb.svg",
+    "path": "fish-catch/index.html"
+  },
+  {
+    "id": "jigsaw-mini",
+    "title": "Jigsaw Mini",
+    "title_ko": "🧩 퍼즐 조각 맞추기",
+    "description": "흩어진 이모지 조각을 끌어서 제자리에 맞춰요! 2×2·3×3 레벨업",
+    "thumbnail": "jigsaw-mini/thumb.svg",
+    "path": "jigsaw-mini/index.html"
   }
 ]
