@@ -174,5 +174,21 @@
     "description": "이모지 그림에 맞는 한글 단어를 골라요! 10문제 퀴즈, 연속 정답 보너스",
     "thumbnail": "word-picture-match/thumb.svg",
     "path": "word-picture-match/index.html"
+  },
+  {
+    "id": "bounce-ball",
+    "title": "Bounce Ball",
+    "title_ko": "🏀 농구공 드리블",
+    "description": "공이 바닥에 닿기 전에 탭해서 튀겨요! 콤보 연결로 최고 점수 도전",
+    "thumbnail": "bounce-ball/thumb.svg",
+    "path": "bounce-ball/index.html"
+  },
+  {
+    "id": "star-connect",
+    "title": "Star Connect",
+    "title_ko": "⭐ 별자리 잇기",
+    "description": "숫자 순서대로 별을 탭해 별자리를 완성해요! 8가지 별자리 도전",
+    "thumbnail": "star-connect/thumb.svg",
+    "path": "star-connect/index.html"
   }
 ]

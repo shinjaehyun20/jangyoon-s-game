@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>별자리 잇기</title>
+  <style>
+    :root {
+      --bg: #0a0a1a;
+      --accent: #ffd700;
+      --accent2: #c8a2f0;
+      --text: #ffffff;
+      --hud-bg: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      font-weight: 900;
+      text-align: center;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: var(--hud-bg);
+      border-radius: 12px;
+      padding: 8px 16px;
+      flex-shrink: 0;
+    }
+    .hud-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .hud-label { font-size: 11px; opacity: 0.65; }
+    .hud-value { font-size: 22px; font-weight: 900; color: var(--accent); }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: radial-gradient(ellipse at 50% 40%, #1a1060 0%, #0a0a1a 70%);
+    }
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      touch-action: none;
+    }
+    /* 레벨 이름 표시 */
+    #levelName {
+      position: absolute;
+      top: 8px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(255,215,0,0.8);
+      pointer-events: none;
+      text-shadow: 0 0 8px rgba(255,215,0,0.5);
+    }
+    /* 별 라벨 */
+    .star-label {
+      position: absolute;
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+    /* 완성 효과 */
+    .sparkle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 20px;
+      animation: sparkleAnim 0.8s ease-out forwards;
+    }
+    @keyframes sparkleAnim {
+      0% { opacity: 1; transform: translate(-50%,-50%) scale(0) rotate(0deg); }
+      50% { opacity: 1; transform: translate(-50%,-50%) scale(1.5) rotate(180deg); }
+      100% { opacity: 0; transform: translate(-50%,-50%) scale(1) rotate(360deg) translateY(-30px); }
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 12px; opacity: 0.6; }
+    .home-link {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #12102a 0%, #1a1040 100%);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 320px; width: 88%;
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; opacity: 0.85; margin-bottom: 8px; line-height: 1.6; }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--accent);
+      margin: 12px 0 4px;
+    }
+    .result-sub { font-size: 13px; opacity: 0.65; margin-bottom: 16px; }
+    .btn-start {
+      background: linear-gradient(135deg, #c8a2f0, #7b5fa8);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>⭐ 별자리 잇기</h1>
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">레벨</span>
+        <span class="hud-value" id="levelDisplay">1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">점수</span>
+        <span class="hud-value" id="scoreDisplay">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">최고</span>
+        <span class="hud-value" id="bestDisplay">0</span>
+      </div>
+    </div>
+    <div id="gameArea">
+      <canvas id="mainCanvas"></canvas>
+      <div id="levelName"></div>
+    </div>
+    <footer>
+      <small>숫자 순서대로 별을 이어요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>⭐ 별자리 잇기</h2>
+      <p>1번 별부터 순서대로<br>탭해서 별자리를 완성해요!</p>
+      <p style="font-size:13px;opacity:0.6;margin-top:4px;">레벨이 올라갈수록 별이 많아져요</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🌟 훌륭해요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p class="result-sub">점수</p>
+      <p id="resultMsg" style="font-size:14px;margin-bottom:8px;"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const BEST_KEY = 'star-connect_best';
+
+    // 별자리 데이터: 각 레벨마다 이름, 별 목록 (0~1 정규화 좌표, 연결 순서)
+    // 좌표는 (0,0) = 좌상단, (1,1) = 우하단
+    const CONSTELLATIONS = [
+      {
+        name: '큰곰자리 (북두칠성)',
+        emoji: '🐻',
+        color: '#ffd700',
+        stars: [
+          { x: 0.20, y: 0.35 }, // 1
+          { x: 0.30, y: 0.28 }, // 2
+          { x: 0.42, y: 0.25 }, // 3
+          { x: 0.52, y: 0.30 }, // 4
+          { x: 0.62, y: 0.42 }, // 5
+          { x: 0.72, y: 0.35 }, // 6
+          { x: 0.80, y: 0.25 }, // 7
+        ],
+      },
+      {
+        name: '오리온자리',
+        emoji: '🏹',
+        color: '#a8d8f0',
+        stars: [
+          { x: 0.35, y: 0.20 }, // 1 (벨라트릭스)
+          { x: 0.65, y: 0.20 }, // 2 (베텔게우스)
+          { x: 0.70, y: 0.40 }, // 3 (오른어깨)
+          { x: 0.75, y: 0.58 }, // 4 (사이프)
+          { x: 0.60, y: 0.55 }, // 5 (알닐탐)
+          { x: 0.50, y: 0.53 }, // 6 (알닐람)
+          { x: 0.40, y: 0.55 }, // 7 (민타카)
+          { x: 0.25, y: 0.58 }, // 8 (리겔)
+          { x: 0.30, y: 0.40 }, // 9 (사이프2)
+          { x: 0.35, y: 0.20 }, // (닫기 — 1과 같음이므로 실제 연결만)
+        ],
+        connect: [0,1,2,3,4,5,6,7,8,0], // 별 인덱스 연결 순서
+      },
+      {
+        name: '카시오페이아',
+        emoji: '👑',
+        color: '#ffb3d9',
+        stars: [
+          { x: 0.15, y: 0.60 }, // 1
+          { x: 0.30, y: 0.35 }, // 2
+          { x: 0.50, y: 0.55 }, // 3
+          { x: 0.70, y: 0.30 }, // 4
+          { x: 0.85, y: 0.55 }, // 5
+        ],
+      },
+      {
+        name: '백조자리 (북십자)',
+        emoji: '🦢',
+        color: '#b0f0a0',
+        stars: [
+          { x: 0.50, y: 0.15 }, // 1 (데네브 — 위)
+          { x: 0.50, y: 0.38 }, // 2 (중앙)
+          { x: 0.22, y: 0.38 }, // 3 (왼쪽)
+          { x: 0.50, y: 0.38 }, // 4 (중앙 다시, 십자 패턴)
+          { x: 0.78, y: 0.38 }, // 5 (오른쪽)
+          { x: 0.50, y: 0.38 }, // 6
+          { x: 0.50, y: 0.62 }, // 7
+          { x: 0.50, y: 0.82 }, // 8 (알비레오 — 아래)
+        ],
+        connect: [0,1,2,1,4,1,6,7], // 십자 형태
+      },
+      {
+        name: '사자자리',
+        emoji: '🦁',
+        color: '#ffc080',
+        stars: [
+          { x: 0.20, y: 0.50 }, // 1 (꼬리 — 데네볼라)
+          { x: 0.35, y: 0.38 }, // 2
+          { x: 0.50, y: 0.30 }, // 3
+          { x: 0.60, y: 0.25 }, // 4 (레굴루스)
+          { x: 0.70, y: 0.35 }, // 5
+          { x: 0.72, y: 0.50 }, // 6
+          { x: 0.60, y: 0.60 }, // 7
+          { x: 0.50, y: 0.65 }, // 8
+          { x: 0.35, y: 0.60 }, // 9
+          { x: 0.20, y: 0.50 }, // (닫기)
+        ],
+        connect: [0,1,2,3,4,5,6,7,8,0],
+      },
+      {
+        name: '전갈자리',
+        emoji: '🦂',
+        color: '#ff7070',
+        stars: [
+          { x: 0.25, y: 0.25 }, // 1
+          { x: 0.38, y: 0.22 }, // 2
+          { x: 0.50, y: 0.28 }, // 3 (안타레스)
+          { x: 0.60, y: 0.35 }, // 4
+          { x: 0.62, y: 0.48 }, // 5
+          { x: 0.65, y: 0.60 }, // 6
+          { x: 0.70, y: 0.70 }, // 7
+          { x: 0.75, y: 0.78 }, // 8
+          { x: 0.80, y: 0.82 }, // 9 (꼬리)
+          { x: 0.72, y: 0.88 }, // 10 (침)
+        ],
+      },
+      {
+        name: '물병자리',
+        emoji: '💧',
+        color: '#80d0ff',
+        stars: [
+          { x: 0.30, y: 0.20 }, // 1
+          { x: 0.45, y: 0.28 }, // 2
+          { x: 0.50, y: 0.40 }, // 3
+          { x: 0.40, y: 0.55 }, // 4
+          { x: 0.50, y: 0.65 }, // 5
+          { x: 0.60, y: 0.55 }, // 6
+          { x: 0.65, y: 0.42 }, // 7
+          { x: 0.72, y: 0.30 }, // 8
+          { x: 0.60, y: 0.22 }, // 9
+          { x: 0.45, y: 0.28 }, // (합류)
+          { x: 0.50, y: 0.40 }, // (합류)
+          { x: 0.55, y: 0.75 }, // 10
+          { x: 0.45, y: 0.85 }, // 11
+        ],
+        connect: [0,1,2,3,4,5,6,7,8,1,2,10,11,12], // 물 흐름
+      },
+      {
+        name: '쌍둥이자리',
+        emoji: '👯',
+        color: '#e0c060',
+        stars: [
+          { x: 0.25, y: 0.20 }, // 1 (카스토르 머리)
+          { x: 0.40, y: 0.20 }, // 2 (폴룩스 머리)
+          { x: 0.28, y: 0.38 }, // 3 (카스토르 몸)
+          { x: 0.42, y: 0.38 }, // 4 (폴룩스 몸)
+          { x: 0.25, y: 0.58 }, // 5 (카스토르 다리1)
+          { x: 0.32, y: 0.72 }, // 6 (카스토르 다리2)
+          { x: 0.40, y: 0.58 }, // 7 (폴룩스 다리1)
+          { x: 0.48, y: 0.72 }, // 8 (폴룩스 다리2)
+        ],
+        connect: [0,2,4,5,2,3,6,7,3,1,0], // 두 사람 연결
+      },
+    ];
+
+    const state = {
+      running: false,
+      score: 0,
+      best: parseInt(localStorage.getItem(BEST_KEY) || '0', 10),
+      level: 0,
+      currentConstellation: null,
+      nextExpected: 0,   // 다음에 눌러야 할 별 인덱스
+      connectedCount: 0, // 연결된 별 수
+      stars: [],         // 화면 좌표 { x, y, idx, connected, label }
+      drawnLines: [],    // { x1,y1,x2,y2 }
+      bgStars: [],       // 배경 별 반짝임용
+      animFrameId: null,
+      shakeTimer: null,
+    };
+
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const gameArea = document.getElementById('gameArea');
+    const levelNameEl = document.getElementById('levelName');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const levelDisplay = document.getElementById('levelDisplay');
+    const bestDisplay = document.getElementById('bestDisplay');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+
+    document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+    document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+    canvas.addEventListener('pointerdown', onTap);
+
+    function resizeCanvas() {
+      canvas.width = gameArea.clientWidth;
+      canvas.height = gameArea.clientHeight;
+    }
+
+    function generateBgStars(count) {
+      const stars = [];
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random(),
+          y: Math.random(),
+          r: Math.random() * 1.5 + 0.3,
+          phase: Math.random() * Math.PI * 2,
+          speed: Math.random() * 0.03 + 0.01,
+        });
+      }
+      return stars;
+    }
+
+    function startGame() {
+      resizeCanvas();
+      state.running = true;
+      state.score = 0;
+      state.level = 0;
+
+      state.bgStars = generateBgStars(80);
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      updateHUD();
+      loadLevel(state.level);
+
+      if (state.animFrameId) cancelAnimationFrame(state.animFrameId);
+      state.animFrameId = requestAnimationFrame(renderLoop);
+    }
+
+    function loadLevel(idx) {
+      const constData = CONSTELLATIONS[idx % CONSTELLATIONS.length];
+      state.currentConstellation = constData;
+      state.drawnLines = [];
+      state.nextExpected = 0;
+      state.connectedCount = 0;
+
+      const w = canvas.width;
+      const h = canvas.height;
+      const padding = 40;
+
+      // 연결 순서 결정
+      const connectOrder = constData.connect
+        ? constData.connect
+        : constData.stars.map((_, i) => i);
+
+      // 별 좌표 계산 (패딩 적용)
+      state.stars = constData.stars.map((s, i) => ({
+        x: padding + s.x * (w - padding * 2),
+        y: padding + s.y * (h - padding * 2),
+        idx: i,
+        connected: false,
+        labelNum: null, // 나중에 설정
+      }));
+
+      // 연결 순서에서 각 별의 방문 번호 결정 (처음 등장하는 순서)
+      const visitOrder = new Map();
+      let num = 1;
+      for (const si of connectOrder) {
+        if (!visitOrder.has(si)) {
+          visitOrder.set(si, num++);
+        }
+      }
+      state.stars.forEach((s, i) => {
+        s.labelNum = visitOrder.has(i) ? visitOrder.get(i) : null;
+      });
+
+      state.connectOrder = connectOrder;
+      levelNameEl.textContent = constData.emoji + ' ' + constData.name;
+      levelDisplay.textContent = idx + 1;
+    }
+
+    function renderLoop(now) {
+      if (!state.running) return;
+      drawFrame(now);
+      state.animFrameId = requestAnimationFrame(renderLoop);
+    }
+
+    function drawFrame(now) {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // 배경 별 그리기
+      state.bgStars.forEach(bs => {
+        const alpha = 0.3 + 0.3 * Math.sin(now * bs.speed + bs.phase);
+        ctx.beginPath();
+        ctx.arc(bs.x * w, bs.y * h, bs.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        ctx.fill();
+      });
+
+      const color = state.currentConstellation ? state.currentConstellation.color : '#ffd700';
+
+      // 완성된 선 그리기
+      state.drawnLines.forEach((line, i) => {
+        const progress = Math.min(1, (now - line.startTime) / 200);
+        const ex = line.x1 + (line.x2 - line.x1) * progress;
+        const ey = line.y1 + (line.y2 - line.y1) * progress;
+        ctx.beginPath();
+        ctx.moveTo(line.x1, line.y1);
+        ctx.lineTo(ex, ey);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.globalAlpha = 0.85;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // 선 글로우
+        ctx.beginPath();
+        ctx.moveTo(line.x1, line.y1);
+        ctx.lineTo(ex, ey);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 6;
+        ctx.globalAlpha = 0.15;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      });
+
+      // 별 그리기
+      state.stars.forEach(s => {
+        if (s.labelNum === null) return;
+
+        const isNext = (state.connectOrder[state.nextExpected] === s.idx);
+        const isConnected = s.connected;
+
+        // 별 빛
+        if (isConnected) {
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 18, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.2;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        } else if (isNext) {
+          // 다음 별 펄스
+          const pulse = 0.5 + 0.5 * Math.sin(now * 0.006);
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 20 + pulse * 6, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.15 + pulse * 0.15;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // 별 본체
+        const r = isConnected ? 9 : isNext ? 10 : 7;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+        if (isConnected) {
+          ctx.fillStyle = color;
+        } else if (isNext) {
+          ctx.fillStyle = '#ffffff';
+        } else {
+          ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        }
+        ctx.fill();
+
+        // 별 테두리
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = isConnected ? 1 : 0.4;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // 번호 라벨
+        ctx.font = `bold ${isNext ? 14 : 12}px 'Noto Sans KR', sans-serif`;
+        ctx.fillStyle = isConnected ? '#0a0a1a' : '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(s.labelNum, s.x, s.y);
+      });
+    }
+
+    function onTap(e) {
+      if (!state.running) return;
+      e.preventDefault();
+
+      const rect = canvas.getBoundingClientRect();
+      const tapX = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const tapY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+      // 다음 눌러야 할 별 인덱스
+      const expectedStarIdx = state.connectOrder[state.nextExpected];
+      const star = state.stars[expectedStarIdx];
+      if (!star) return;
+
+      const dist = Math.hypot(tapX - star.x, tapY - star.y);
+      const hitRadius = 38; // 넉넉한 히트 범위 (7살 터치)
+
+      if (dist <= hitRadius) {
+        // 정답!
+        const prevStarIdx = state.nextExpected > 0
+          ? state.connectOrder[state.nextExpected - 1]
+          : null;
+
+        if (prevStarIdx !== null) {
+          const prevStar = state.stars[prevStarIdx];
+          state.drawnLines.push({
+            x1: prevStar.x, y1: prevStar.y,
+            x2: star.x, y2: star.y,
+            startTime: performance.now(),
+          });
+        }
+
+        star.connected = true;
+        state.nextExpected++;
+        state.score += 10;
+        if (state.score > state.best) {
+          state.best = state.score;
+          localStorage.setItem(BEST_KEY, state.best);
+        }
+
+        // 반짝 효과
+        showSparkle(star.x, star.y);
+        updateHUD();
+
+        // 레벨 완료 체크
+        if (state.nextExpected >= state.connectOrder.length) {
+          // 완성!
+          state.score += 50; // 완성 보너스
+          if (state.score > state.best) {
+            state.best = state.score;
+            localStorage.setItem(BEST_KEY, state.best);
+          }
+          updateHUD();
+          showCompletionEffect();
+        }
+      } else {
+        // 오답 — 별 깜빡임 없이 살짝 흔들리는 게임 영역 피드백
+        gameArea.style.transform = 'translateX(4px)';
+        setTimeout(() => {
+          gameArea.style.transform = 'translateX(-4px)';
+          setTimeout(() => { gameArea.style.transform = ''; }, 80);
+        }, 80);
+      }
+    }
+
+    function showSparkle(x, y) {
+      const rect = gameArea.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      const el = document.createElement('div');
+      el.className = 'sparkle';
+      el.textContent = '✨';
+      el.style.left = (canvasRect.left - rect.left + x * canvasRect.width / canvas.width) + 'px';
+      el.style.top = (canvasRect.top - rect.top + y * canvasRect.height / canvas.height) + 'px';
+      gameArea.appendChild(el);
+      setTimeout(() => el.remove(), 900);
+    }
+
+    function showCompletionEffect() {
+      // 완성 반짝 — 모든 별에 sparkle
+      state.stars.forEach((s, i) => {
+        if (s.labelNum === null) return;
+        setTimeout(() => showSparkle(s.x, s.y), i * 80);
+      });
+
+      // 다음 레벨로
+      setTimeout(() => {
+        state.level++;
+        if (state.level >= CONSTELLATIONS.length) {
+          // 전체 완료!
+          endGame(true);
+        } else {
+          loadLevel(state.level);
+        }
+      }, 1200);
+    }
+
+    function updateHUD() {
+      scoreDisplay.textContent = state.score;
+      levelDisplay.textContent = state.level + 1;
+      bestDisplay.textContent = state.best;
+    }
+
+    function endGame(allDone) {
+      state.running = false;
+      if (state.animFrameId) cancelAnimationFrame(state.animFrameId);
+
+      finalScore.textContent = state.score;
+      if (allDone) {
+        resultMsg.textContent = '🏆 모든 별자리 완성! 별자리 박사 장윤이!';
+      } else {
+        const msgs = [
+          [0, '별자리 탐험가 시작! 계속 연습해봐요! 🌟'],
+          [50, '별을 잘 이어요! 별자리 학생 장윤이! ⭐'],
+          [150, '훌륭한 별자리 탐험가! 👏'],
+          [300, '별자리 마스터! 우주를 정복했어요! 🚀'],
+        ];
+        let msg = msgs[0][1];
+        for (const [t, m] of msgs) { if (state.score >= t) msg = m; }
+        resultMsg.textContent = msg;
+      }
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 초기
+    bestDisplay.textContent = state.best;
+    resizeCanvas();
+    // 배경 별만 미리 그려 보여줌
+    state.bgStars = generateBgStars(80);
+    drawFrame(0);
+
+  })();
+  </script>
+</body>
+</html>

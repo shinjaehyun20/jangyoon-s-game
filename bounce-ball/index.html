@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>농구공 드리블</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg2: #16213e;
+      --accent: #f5a623;
+      --accent2: #e85d04;
+      --text: #ffffff;
+      --hud-bg: rgba(255,255,255,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: var(--hud-bg);
+      border-radius: 12px;
+      padding: 8px 16px;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .hud-label { font-size: 11px; opacity: 0.7; }
+    .hud-value { font-size: 22px; font-weight: 900; color: var(--accent); }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #0f3460 0%, #16213e 60%, #1a472a 100%);
+      cursor: pointer;
+    }
+    /* 농구 코트 라인 */
+    #court {
+      position: absolute;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    /* 공 */
+    #ball {
+      position: absolute;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #f5a623, #e85d04);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 -3px 8px rgba(0,0,0,0.3);
+      transition: transform 0.05s ease;
+      pointer-events: none;
+    }
+    /* 공 라인 */
+    #ball::before, #ball::after {
+      content: '';
+      position: absolute;
+      border: 2px solid rgba(0,0,0,0.35);
+      border-radius: 50%;
+    }
+    #ball::before {
+      top: 5px; left: 50%; transform: translateX(-50%);
+      width: 40px; height: 40px;
+    }
+    #ball::after {
+      top: 50%; left: 5px; transform: translateY(-50%);
+      width: 40px; height: 40px;
+    }
+    /* 바닥 라인 */
+    #ground {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.15);
+      pointer-events: none;
+    }
+    /* 탭 힌트 링 */
+    #tapRing {
+      position: absolute;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 3px solid rgba(245,166,35,0.6);
+      transform: translate(-50%, -50%) scale(0);
+      pointer-events: none;
+      transition: none;
+    }
+    /* 콤보 텍스트 */
+    .combo-text {
+      position: absolute;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--accent);
+      pointer-events: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      animation: floatUp 0.8s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+    }
+    /* 바닥 충돌 플래시 */
+    .ground-flash {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: rgba(245,166,35,0.4);
+      pointer-events: none;
+      animation: flashFade 0.25s ease-out forwards;
+    }
+    @keyframes flashFade {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 12px; opacity: 0.6; }
+    .home-link {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border: 1px solid rgba(245,166,35,0.3);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 320px; width: 88%;
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; opacity: 0.85; margin-bottom: 8px; line-height: 1.6; }
+    .result-score {
+      font-size: 56px; font-weight: 900;
+      color: var(--accent);
+      margin: 12px 0 4px;
+    }
+    .result-sub {
+      font-size: 14px; opacity: 0.65; margin-bottom: 20px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🏀 농구공 드리블</h1>
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">드리블</span>
+        <span class="hud-value" id="scoreDisplay">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">콤보</span>
+        <span class="hud-value" id="comboDisplay">x1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">최고</span>
+        <span class="hud-value" id="bestDisplay">0</span>
+      </div>
+    </div>
+    <div id="gameArea">
+      <canvas id="court"></canvas>
+      <div id="ball"></div>
+      <div id="ground"></div>
+      <div id="tapRing"></div>
+    </div>
+    <footer>
+      <small>탭해서 공을 튀겨요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🏀 농구공 드리블</h2>
+      <p>공이 바닥에 닿기 전에<br>탭해서 위로 튀겨요!</p>
+      <p style="font-size:13px;opacity:0.6;margin-top:4px;">연속으로 드리블하면 콤보 보너스!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 대단해요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p class="result-sub">드리블 횟수</p>
+      <p id="resultMsg" style="font-size:14px;margin-bottom:8px;"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GRAVITY: 0.45,        // 중력 가속도 (px/frame²)
+      BOUNCE_VY: -14,       // 탭 시 위로 튀기는 속도
+      TAP_BOOST: -11,       // 탭 추가 부스트
+      BALL_RADIUS: 26,      // 공 반지름 px
+      FAIL_COOLDOWN: 800,   // 바닥 닿은 후 실패 판정 대기 ms
+      COMBO_WINDOW: 2.5,    // 콤보 유지 시간(초)
+      BEST_KEY: 'bounce-ball_best',
+      MAX_VY_DOWN: 22,      // 최대 낙하속도
+    };
+
+    const state = {
+      running: false,
+      score: 0,
+      best: parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10),
+      combo: 1,
+      comboTimer: null,
+      ballX: 0,
+      ballY: 0,
+      vy: 0,            // 수직 속도 (px/frame)
+      frameId: null,
+      lastTime: 0,
+      groundHit: false,
+      groundHitTime: 0,
+    };
+
+    // DOM
+    const gameArea = document.getElementById('gameArea');
+    const ballEl = document.getElementById('ball');
+    const tapRing = document.getElementById('tapRing');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const comboDisplay = document.getElementById('comboDisplay');
+    const bestDisplay = document.getElementById('bestDisplay');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+
+    document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+    document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+    gameArea.addEventListener('pointerdown', onTap);
+
+    function getAreaSize() {
+      return { w: gameArea.clientWidth, h: gameArea.clientHeight };
+    }
+
+    function startGame() {
+      const { w, h } = getAreaSize();
+      state.running = true;
+      state.score = 0;
+      state.combo = 1;
+      state.groundHit = false;
+      state.ballX = w / 2;
+      state.ballY = h * 0.3;
+      state.vy = CONFIG.BOUNCE_VY;
+
+      if (state.comboTimer) clearTimeout(state.comboTimer);
+
+      updateHUD();
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      if (state.frameId) cancelAnimationFrame(state.frameId);
+      state.lastTime = performance.now();
+      state.frameId = requestAnimationFrame(loop);
+    }
+
+    function loop(now) {
+      if (!state.running) return;
+
+      const dt = Math.min((now - state.lastTime) / 16.67, 3); // normalize to ~60fps
+      state.lastTime = now;
+
+      const { w, h } = getAreaSize();
+      const groundY = h - CONFIG.BALL_RADIUS - 4; // 4px = ground bar height
+
+      // 물리
+      state.vy += CONFIG.GRAVITY * dt;
+      if (state.vy > CONFIG.MAX_VY_DOWN) state.vy = CONFIG.MAX_VY_DOWN;
+      state.ballY += state.vy * dt;
+
+      // 바닥 충돌
+      if (state.ballY >= groundY) {
+        state.ballY = groundY;
+        if (!state.groundHit) {
+          state.groundHit = true;
+          state.groundHitTime = now;
+          showGroundFlash();
+          // 콤보 리셋
+          state.combo = 1;
+          updateHUD();
+        }
+        // 바닥에서 800ms 넘게 있으면 게임 오버
+        if (now - state.groundHitTime > CONFIG.FAIL_COOLDOWN) {
+          endGame();
+          return;
+        }
+        // 바닥에서 자연 반발 (낮은 바운스)
+        state.vy = -3;
+      } else {
+        state.groundHit = false;
+      }
+
+      // 좌우 벽 (공이 벗어나지 않도록)
+      const halfR = CONFIG.BALL_RADIUS;
+      if (state.ballX < halfR) state.ballX = halfR;
+      if (state.ballX > w - halfR) state.ballX = w - halfR;
+
+      // 상단 천장 (공이 위로 너무 가면 반사)
+      if (state.ballY < halfR) {
+        state.ballY = halfR;
+        state.vy = Math.abs(state.vy) * 0.4;
+      }
+
+      renderBall();
+      state.frameId = requestAnimationFrame(loop);
+    }
+
+    function onTap(e) {
+      if (!state.running) return;
+      e.preventDefault();
+
+      const rect = gameArea.getBoundingClientRect();
+      const tapX = (e.clientX - rect.left);
+
+      // 탭 방향으로 약간의 수평 이동 (시각적 재미)
+      const { w } = getAreaSize();
+      const dx = (tapX - state.ballX) * 0.05;
+      state.ballX += dx;
+
+      // 위로 튀기기
+      state.vy = CONFIG.BOUNCE_VY;
+      state.groundHit = false;
+
+      // 점수
+      state.score++;
+      if (state.score > state.best) {
+        state.best = state.score;
+        localStorage.setItem(CONFIG.BEST_KEY, state.best);
+      }
+
+      // 콤보 (연속 탭)
+      if (state.comboTimer) clearTimeout(state.comboTimer);
+      if (state.combo < 10) state.combo++;
+      state.comboTimer = setTimeout(() => {
+        state.combo = 1;
+        updateHUD();
+      }, CONFIG.COMBO_WINDOW * 1000);
+
+      // 콤보 점수 추가
+      if (state.combo >= 3) {
+        const bonus = state.combo - 2;
+        state.score += bonus;
+      }
+
+      updateHUD();
+      showTapEffect(tapX, e.clientY - rect.top);
+      showComboText();
+    }
+
+    function showTapEffect(x, y) {
+      tapRing.style.left = x + 'px';
+      tapRing.style.top = y + 'px';
+      tapRing.style.transform = 'translate(-50%, -50%) scale(0)';
+      tapRing.offsetWidth; // reflow
+      tapRing.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+      tapRing.style.transform = 'translate(-50%, -50%) scale(1.5)';
+      tapRing.style.opacity = '0';
+      setTimeout(() => {
+        tapRing.style.transition = 'none';
+        tapRing.style.opacity = '1';
+        tapRing.style.transform = 'translate(-50%, -50%) scale(0)';
+      }, 320);
+    }
+
+    function showComboText() {
+      if (state.combo < 3) return;
+      const texts = { 3: 'x3 콤보!', 4: 'x4 멋져!', 5: 'x5 와우!', 6: 'x6 대박!', 8: 'x8 천재!', 10: '🔥 퍼펙트!' };
+      const msg = texts[state.combo] || (state.combo >= 7 ? `x${state.combo} 완벽!` : null);
+      if (!msg) return;
+
+      const el = document.createElement('div');
+      el.className = 'combo-text';
+      el.textContent = msg;
+      el.style.left = (state.ballX - 40) + 'px';
+      el.style.top = (state.ballY - 40) + 'px';
+      gameArea.appendChild(el);
+      setTimeout(() => el.remove(), 900);
+    }
+
+    function showGroundFlash() {
+      const el = document.createElement('div');
+      el.className = 'ground-flash';
+      gameArea.appendChild(el);
+      setTimeout(() => el.remove(), 280);
+    }
+
+    function renderBall() {
+      ballEl.style.left = (state.ballX - CONFIG.BALL_RADIUS) + 'px';
+      ballEl.style.top = (state.ballY - CONFIG.BALL_RADIUS) + 'px';
+
+      // 낙하 시 약간 찌그러지는 효과
+      const squish = state.vy > 5 ? 0.9 : 1;
+      const stretch = state.vy < -8 ? 1.1 : 1;
+      ballEl.style.transform = `scaleX(${stretch}) scaleY(${squish})`;
+    }
+
+    function updateHUD() {
+      scoreDisplay.textContent = state.score;
+      comboDisplay.textContent = 'x' + state.combo;
+      comboDisplay.style.color = state.combo >= 5 ? '#ff4444' : state.combo >= 3 ? '#ff9900' : '#f5a623';
+      bestDisplay.textContent = state.best;
+    }
+
+    function endGame() {
+      state.running = false;
+      if (state.frameId) cancelAnimationFrame(state.frameId);
+      if (state.comboTimer) clearTimeout(state.comboTimer);
+
+      finalScore.textContent = state.score;
+      const msgs = [
+        [0, '다시 도전해봐요! 💪'],
+        [5, '조금만 더 연습하면 돼요! 🏀'],
+        [10, '잘했어요! 드리블 실력이 늘고 있어요! ⭐'],
+        [20, '대단해요! NBA 선수가 될 것 같아요! 🌟'],
+        [30, '완전 프로! 농구 천재 장윤이! 🏆'],
+      ];
+      let msg = msgs[0][1];
+      for (const [threshold, text] of msgs) {
+        if (state.score >= threshold) msg = text;
+      }
+      resultMsg.textContent = msg;
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 초기 화면
+    bestDisplay.textContent = state.best;
+
+    // 초기 공 위치 표시 (게임 전)
+    const { w, h } = getAreaSize();
+    state.ballX = w / 2;
+    state.ballY = h * 0.4;
+    renderBall();
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f3460"/>
+      <stop offset="70%" stop-color="#16213e"/>
+      <stop offset="100%" stop-color="#1a472a"/>
+    </linearGradient>
+    <radialGradient id="ball" cx="38%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#f5a623"/>
+      <stop offset="100%" stop-color="#e85d04"/>
+    </radialGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/>
+    </filter>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+
+  <!-- 코트 바닥 -->
+  <rect x="0" y="158" width="320" height="22" fill="#1a472a" opacity="0.8"/>
+  <line x1="0" y1="158" x2="320" y2="158" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+
+  <!-- 바운스 궤적 -->
+  <path d="M 70 155 Q 90 60 130 45 Q 170 30 200 155" stroke="rgba(245,166,35,0.3)" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+
+  <!-- 공 (공중) -->
+  <circle cx="130" cy="45" r="28" fill="url(#ball)" filter="url(#shadow)"/>
+  <!-- 공 라인 1 -->
+  <ellipse cx="130" cy="45" rx="20" ry="28" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+  <!-- 공 라인 2 -->
+  <ellipse cx="130" cy="45" rx="28" ry="20" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+
+  <!-- 작은 공 (바닥 근처) -->
+  <ellipse cx="70" cy="153" rx="22" ry="10" fill="#e85d04" opacity="0.7"/>
+  <circle cx="70" cy="148" r="14" fill="url(#ball)" opacity="0.6"/>
+
+  <!-- 탭 리플 -->
+  <circle cx="130" cy="45" r="38" fill="none" stroke="rgba(245,166,35,0.4)" stroke-width="2" stroke-dasharray="4,4"/>
+  <circle cx="130" cy="45" r="50" fill="none" stroke="rgba(245,166,35,0.2)" stroke-width="1.5"/>
+
+  <!-- 콤보 텍스트 -->
+  <text x="190" y="50" font-family="'Noto Sans KR',sans-serif" font-size="18" font-weight="900" fill="#ff9900" opacity="0.9">x5 콤보!</text>
+  <text x="200" y="72" font-family="'Noto Sans KR',sans-serif" font-size="13" fill="rgba(255,255,255,0.6)">드리블 42</text>
+
+  <!-- 내부 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#f5a623">농구공 드리블</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">BOUNCE BALL</text>
+  </g>
+</svg>
