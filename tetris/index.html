@@ -4,9 +4,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Javascript Tetris</title>
   <style>
-    html, body { width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; font-family: Helvetica, sans-serif; background: #ececec; }
-    body      { padding: 0.5rem; box-sizing: border-box; }
-    #tetris   { margin: 0 auto; padding: 0.5em; border: 4px solid black; border-radius: 10px; background-color: #F8F8F8; }
+    /* ===== 기본 리셋 ===== */
+    html, body {
+      width: 100%; height: 100%;
+      margin: 0; padding: 0;
+      font-family: Helvetica, sans-serif;
+      background: #ececec;
+      overflow: hidden;
+    }
+
+    /* ===== 데스크탑 레이아웃 (기존 방식 유지) ===== */
+    body { padding: 0.5rem; box-sizing: border-box; }
+    #tetris {
+      margin: 0 auto; padding: 0.5em;
+      border: 4px solid black; border-radius: 10px;
+      background-color: #F8F8F8;
+    }
     #stats    { display: inline-block; vertical-align: top; }
     #canvas   { display: block; margin: 0 auto; background: url(texture.jpg); box-shadow: 10px 10px 10px #999; border: 2px solid #333; }
     #menu     { display: block; position: relative; text-align: center; margin-bottom: 0.5em; }
@@ -15,62 +28,165 @@
     #upcoming { display: inline-block; background-color: #E0E0E0; vertical-align: middle; }
     #score    { color: red; font-weight: bold; vertical-align: middle; }
     #rows     { color: blue; font-weight: bold; vertical-align: middle; }
-    #stats    { display: none; } /* 모바일에서 FPS 카운터 숨김 */
-    #mobile-controls { display: none; margin-top: 0.75rem; }
-    #mobile-controls .touch-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
-    #mobile-controls .touch-row + .touch-row { margin-top: 0.6rem; }
-    #mobile-controls button {
-      appearance: none;
-      min-height: 4.2rem;
-      border: 2px solid #222;
-      border-radius: 14px;
-      background: linear-gradient(180deg, #ffffff, #d9d9d9);
-      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
-      color: #111;
-      font-size: 1.15rem;
-      font-weight: bold;
-      touch-action: manipulation;
-      user-select: none;
-    }
-    #mobile-controls button:active,
-    #mobile-controls button.is-active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.18);
-      background: linear-gradient(180deg, #dff3ff, #a7d6ff);
-    }
-    #mobile-controls .wide { grid-column: span 3; }
-    .mobile-home-link {
-      display: none;
-      width: 100%;
-      margin-top: 0.75rem;
-      padding: 0.95rem 1rem;
-      border-radius: 14px;
-      background: #1f2937;
-      color: #fff;
-      text-align: center;
-      text-decoration: none;
-      font-weight: 700;
-      box-sizing: border-box;
-    }
-    /* 데스크탑: 가로 레이아웃 유지 */
+    #stats    { display: none; }
+
+    /* ===== 모바일 컨트롤: 기본 숨김 ===== */
+    #mobile-controls { display: none; }
+    .mobile-home-link { display: none; }
+
+    /* ===== 데스크탑 미디어쿼리 ===== */
     @media screen and (min-width: 600px) and (min-height: 600px) {
       #canvas   { display: inline-block; margin: 0; }
       #menu     { display: inline-block; vertical-align: top; position: relative; }
       #menu p   { display: block; margin-right: 0; }
       #stats    { display: inline-block; position: absolute; bottom: 0; right: 1em; }
     }
-    @media screen and (min-width:   0px) and (min-height:   0px)  { #tetris { font-size: 0.75em; } }
-    @media screen and (min-width: 600px) and (min-height: 600px)  { #tetris { font-size: 1.50em; } #menu { width: 250px; height: 500px; } #upcoming { width: 125px; height: 125px; } }
-    @media screen and (min-width: 700px) and (min-height: 700px)  { #tetris { font-size: 1.75em; } #menu { width: 300px; height: 600px; } #upcoming { width: 150px; height: 150px; } }
-    @media screen and (min-width: 800px) and (min-height: 800px)  { #tetris { font-size: 2.00em; } #menu { width: 350px; height: 700px; } #upcoming { width: 175px; height: 175px; } }
-    @media screen and (min-width: 900px) and (min-height: 900px)  { #tetris { font-size: 2.25em; } #menu { width: 400px; height: 800px; } #upcoming { width: 200px; height: 200px; } }
+    /* 데스크탑: canvas에 CSS 크기 명시 → clientWidth/Height가 올바르게 반환됨 */
+    @media screen and (min-width:   0px) and (min-height:   0px)  { #tetris { font-size: 0.75em; width: 250px; } #menu { width: 100px; height: 200px; } #upcoming { width:  50px; height:  50px; } #canvas { width: 100px; height: 200px; } }
+    @media screen and (min-width: 600px) and (min-height: 600px)  { #tetris { font-size: 1.50em; width: 550px; } #menu { width: 250px; height: 500px; } #upcoming { width: 125px; height: 125px; } #canvas { width: 250px; height: 500px; } }
+    @media screen and (min-width: 700px) and (min-height: 700px)  { #tetris { font-size: 1.75em; width: 650px; } #menu { width: 300px; height: 600px; } #upcoming { width: 150px; height: 150px; } #canvas { width: 300px; height: 600px; } }
+    @media screen and (min-width: 800px) and (min-height: 800px)  { #tetris { font-size: 2.00em; width: 750px; } #menu { width: 350px; height: 700px; } #upcoming { width: 175px; height: 175px; } #canvas { width: 350px; height: 700px; } }
+    @media screen and (min-width: 900px) and (min-height: 900px)  { #tetris { font-size: 2.25em; width: 850px; } #menu { width: 400px; height: 800px; } #upcoming { width: 200px; height: 200px; } #canvas { width: 400px; height: 800px; } }
+
+    /* ===== 모바일 레이아웃 ===== */
+    /*
+     * 모바일 전체 구조:
+     *   [헤더: 정보바]  ~40px
+     *   [게임보드]      가변 (viewport 세로 - 헤더 - 컨트롤 - 여백)
+     *   [컨트롤]        ~160px (버튼 2행)
+     *   [홈버튼]        ~48px
+     *
+     * 총 비게임 영역: 40 + 160 + 48 + 여백(24) = ~272px
+     * 보드 높이 = 100vh - 272px (최소 320px)
+     * 보드 너비 = 보드높이 * (10/20) = 보드높이 / 2
+     */
     @media (pointer: coarse), (max-width: 599px) {
-      body { padding: 0.3rem; overflow: hidden; }
-      #tetris { width: 100%; box-sizing: border-box; padding: 0.3em; }
-      #mobile-controls { display: block; }
-      .mobile-home-link { display: block; }
-      #menu { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3em; margin-bottom: 0.3em; }
-      #menu p { margin: 0; }
+      html, body {
+        overflow: hidden;
+      }
+
+      body {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        height: 100dvh; /* dynamic viewport height for mobile browsers */
+      }
+
+      #tetris {
+        /* 모바일에서는 전체 화면 flexbox 컨테이너 */
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        border: none;
+        border-radius: 0;
+        padding: 4px 6px 0 6px;
+        margin: 0;
+        /* 스크롤 완전 차단 */
+        overflow: hidden;
+        background-color: #F8F8F8;
+      }
+
+      /* 헤더 정보바: 고정 높이 */
+      #menu {
+        display: flex !important;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-around;
+        gap: 4px;
+        flex-shrink: 0;
+        height: 40px;
+        margin-bottom: 4px;
+        padding: 0 4px;
+        background: #eee;
+        border-radius: 8px;
+        font-size: 0.85em;
+      }
+      #menu p {
+        margin: 0;
+        display: inline-block !important;
+        white-space: nowrap;
+      }
+
+      /* 캔버스: flex-grow로 남은 공간 모두 차지, 비율 유지 */
+      #canvas {
+        display: block !important;
+        flex-shrink: 1;
+        align-self: center;
+        /* JS가 실제 크기를 계산해서 설정함 */
+        background: url(texture.jpg);
+        box-shadow: 4px 4px 8px #999;
+        border: 2px solid #333;
+        margin: 0;
+      }
+
+      /* 모바일 컨트롤: 고정 높이, 하단에 위치 */
+      #mobile-controls {
+        display: block !important;
+        flex-shrink: 0;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 4px 4px 0 4px;
+      }
+
+      #mobile-controls .touch-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 5px;
+        margin-bottom: 5px;
+      }
+
+      #mobile-controls button {
+        appearance: none;
+        height: 56px;           /* 최소 hit area */
+        min-height: 56px;
+        border: 2px solid #222;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #ffffff, #d9d9d9);
+        box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+        color: #111;
+        font-size: 1.1rem;
+        font-weight: bold;
+        touch-action: manipulation;
+        user-select: none;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      #mobile-controls button:active,
+      #mobile-controls button.is-active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 rgba(0,0,0,0.18);
+        background: linear-gradient(180deg, #dff3ff, #a7d6ff);
+      }
+
+      #mobile-controls .wide {
+        grid-column: span 3;
+      }
+
+      /* 홈 버튼 */
+      .mobile-home-link {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 100%;
+        height: 44px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        padding: 0 1rem;
+        border-radius: 12px;
+        background: #1f2937;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        box-sizing: border-box;
+      }
     }
   </style>
 </head>
@@ -89,15 +205,15 @@
     </canvas>
     <div id="mobile-controls" aria-label="터치 컨트롤">
       <div class="touch-row">
-        <button type="button" data-action="left" aria-label="왼쪽 이동">◀</button>
+        <button type="button" data-action="left"   aria-label="왼쪽 이동">◀</button>
         <button type="button" data-action="rotate" aria-label="회전">⟳</button>
-        <button type="button" data-action="right" aria-label="오른쪽 이동">▶</button>
+        <button type="button" data-action="right"  aria-label="오른쪽 이동">▶</button>
       </div>
       <div class="touch-row">
-        <button type="button" class="wide" data-action="down" aria-label="빠르게 내리기">▼ 빠르게 내리기</button>
+        <button type="button" data-action="down"  aria-label="빠르게 내리기" class="wide">▼ 빠르게 내리기</button>
       </div>
       <div class="touch-row">
-        <button type="button" class="wide" data-action="start" aria-label="게임 시작 또는 다시 시작">▶ 게임 시작</button>
+        <button type="button" data-action="start" aria-label="게임 시작 또는 다시 시작" class="wide">▶ 게임 시작</button>
       </div>
     </div>
     <a class="mobile-home-link" href="../index.html">🏠 게임 목록으로</a>
@@ -130,7 +246,7 @@
     function random(min, max)      { return (min + (Math.random() * (max - min)));            }
     function randomChoice(choices) { return choices[Math.round(random(0, choices.length-1))]; }
 
-    if (!window.requestAnimationFrame) { // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    if (!window.requestAnimationFrame) {
       window.requestAnimationFrame = window.webkitRequestAnimationFrame ||
                                      window.mozRequestAnimationFrame    ||
                                      window.oRequestAnimationFrame      ||
@@ -151,42 +267,30 @@
         ctx     = canvas.getContext('2d'),
         ucanvas = get('upcoming'),
         uctx    = ucanvas.getContext('2d'),
-        speed   = { start: 0.6, decrement: 0.005, min: 0.1 }, // how long before piece drops by 1 row (seconds)
-        nx      = 10, // width of tetris court (in blocks)
-        ny      = 20, // height of tetris court (in blocks)
-        nu      = 5;  // width/height of upcoming preview (in blocks)
+        speed   = { start: 0.6, decrement: 0.005, min: 0.1 },
+        nx      = 10, // 가로 칸 수
+        ny      = 20, // 세로 칸 수
+        nu      = 5;  // 넥스트 프리뷰 칸 수
 
     //-------------------------------------------------------------------------
     // game variables (initialized during reset)
     //-------------------------------------------------------------------------
 
-    var dx, dy,        // pixel size of a single tetris block
-        blocks,        // 2 dimensional array (nx*ny) representing tetris court - either empty block or occupied by a 'piece'
-        actions,       // queue of user actions (inputs)
-        playing,       // true|false - game is in progress
-        dt,            // time since starting this game
-        current,       // the current piece
-        next,          // the next piece
-        score,         // the current score
-        vscore,        // the currently displayed score (it catches up to score in small chunks - like a spinning slot machine)
-        rows,          // number of completed rows in the current game
-        step,          // how long before current piece drops by 1 row
-        holdTimers = {}; // active repeat timers for touch controls
+    var dx, dy,
+        blocks,
+        actions,
+        playing,
+        dt,
+        current,
+        next,
+        score,
+        vscore,
+        rows,
+        step,
+        holdTimers = {};
 
     //-------------------------------------------------------------------------
     // tetris pieces
-    //
-    // blocks: each element represents a rotation of the piece (0, 90, 180, 270)
-    //         each element is a 16 bit integer where the 16 bits represent
-    //         a 4x4 set of blocks, e.g. j.blocks[0] = 0x44C0
-    //
-    //             0100 = 0x4 << 3 = 0x4000
-    //             0100 = 0x4 << 2 = 0x0400
-    //             1100 = 0xC << 1 = 0x00C0
-    //             0000 = 0x0 << 0 = 0x0000
-    //                               ------
-    //                               0x44C0
-    //
     //-------------------------------------------------------------------------
 
     var i = { size: 4, blocks: [0x0F00, 0x2222, 0x00F0, 0x4444], color: 'cyan'   };
@@ -197,28 +301,16 @@
     var t = { size: 3, blocks: [0x0E40, 0x4C40, 0x4E00, 0x4640], color: 'purple' };
     var z = { size: 3, blocks: [0x0C60, 0x4C80, 0xC600, 0x2640], color: 'red'    };
 
-    //------------------------------------------------
-    // do the bit manipulation and iterate through each
-    // occupied block (x,y) for a given piece
-    //------------------------------------------------
     function eachblock(type, x, y, dir, fn) {
       var bit, result, row = 0, col = 0, blocks = type.blocks[dir];
       for(bit = 0x8000 ; bit > 0 ; bit = bit >> 1) {
-        if (blocks & bit) {
-          fn(x + col, y + row);
-        }
-        if (++col === 4) {
-          col = 0;
-          ++row;
-        }
+        if (blocks & bit) { fn(x + col, y + row); }
+        if (++col === 4) { col = 0; ++row; }
       }
     }
 
-    //-----------------------------------------------------
-    // check if a piece can fit into a position in the grid
-    //-----------------------------------------------------
     function occupied(type, x, y, dir) {
-      var result = false
+      var result = false;
       eachblock(type, x, y, dir, function(x, y) {
         if ((x < 0) || (x >= nx) || (y < 0) || (y >= ny) || getBlock(x,y))
           result = true;
@@ -226,14 +318,8 @@
       return result;
     }
 
-    function unoccupied(type, x, y, dir) {
-      return !occupied(type, x, y, dir);
-    }
+    function unoccupied(type, x, y, dir) { return !occupied(type, x, y, dir); }
 
-    //-----------------------------------------
-    // start with 4 instances of each piece and
-    // pick randomly until the 'bag is empty'
-    //-----------------------------------------
     var pieces = [];
     function randomPiece() {
       if (pieces.length == 0)
@@ -242,30 +328,27 @@
       return { type: type, dir: DIR.UP, x: Math.round(random(0, nx - type.size)), y: 0 };
     }
 
-
     //-------------------------------------------------------------------------
     // GAME LOOP
     //-------------------------------------------------------------------------
 
     function run() {
-
-      showStats(); // initialize FPS counter
-      addEvents(); // attach keydown and resize events
+      showStats();
+      addEvents();
 
       var last = now = timestamp();
       function frame() {
         now = timestamp();
-        update(Math.min(1, (now - last) / 1000.0)); // using requestAnimationFrame have to be able to handle large delta's caused when it 'hibernates' in a background or non-visible tab
+        update(Math.min(1, (now - last) / 1000.0));
         draw();
         stats.update();
         last = now;
         requestAnimationFrame(frame, canvas);
       }
 
-      resize(); // setup all our sizing information
-      reset();  // reset the per-game variables
-      frame();  // start the first frame
-
+      resize();
+      reset();
+      frame();
     }
 
     function showStats() {
@@ -297,8 +380,7 @@
     }
 
     function bindSwipeControls() {
-      var swipeStartX = 0;
-      var swipeStartY = 0;
+      var swipeStartX = 0, swipeStartY = 0;
       canvas.addEventListener('touchstart', function(ev) {
         swipeStartX = ev.touches[0].clientX;
         swipeStartY = ev.touches[0].clientY;
@@ -309,8 +391,7 @@
         var deltaY = ev.changedTouches[0].clientY - swipeStartY;
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
           actions.push(deltaX > 0 ? DIR.RIGHT : DIR.LEFT);
-        }
-        else {
+        } else {
           actions.push(deltaY > 0 ? DIR.DOWN : DIR.UP);
         }
         ev.preventDefault();
@@ -319,10 +400,7 @@
 
     function bindStartTouch() {
       get('start').addEventListener('click', function(ev) {
-        if (!playing) {
-          play();
-          ev.preventDefault();
-        }
+        if (!playing) { play(); ev.preventDefault(); }
       }, false);
     }
 
@@ -337,24 +415,19 @@
     }
 
     function queueAction(action) {
-      if (!playing)
-        return;
+      if (!playing) return;
       var mapped = mapTouchAction(action);
-      if (mapped !== null)
-        actions.push(mapped);
+      if (mapped !== null) actions.push(mapped);
     }
 
     function handleTouchAction(action, allowRepeat, button) {
       if (action === 'start') {
-        if (!playing)
-          play();
+        if (!playing) play();
         flashTouchButton(button);
         return;
       }
-
       queueAction(action);
       flashTouchButton(button);
-
       if (allowRepeat && (action === 'left' || action === 'right' || action === 'down')) {
         stopTouchAction(action, button);
         holdTimers[action] = {
@@ -373,47 +446,80 @@
         clearInterval(holdTimers[action].interval);
         delete holdTimers[action];
       }
-      if (button)
-        button.classList.remove('is-active');
+      if (button) button.classList.remove('is-active');
     }
 
     function flashTouchButton(button) {
-      if (!button)
-        return;
+      if (!button) return;
       button.classList.add('is-active');
-      setTimeout(function() {
-        button.classList.remove('is-active');
-      }, 120);
+      setTimeout(function() { button.classList.remove('is-active'); }, 120);
     }
 
+    /**
+     * resize(): viewport 실측 기반 캔버스 크기 계산
+     *
+     * 모바일 레이아웃 예산 (실측값):
+     *   메뉴바:       40px + 4px margin = 44px
+     *   컨트롤 3행:   56*3 + gap(5*2) + padding(8) = 186px
+     *   홈버튼:       44px + margin(4+4) = 52px
+     *   tetris padding: 4px top
+     *   여백 버퍼:    16px
+     *   합계:         ~302px
+     *
+     * 보드 가용 세로: vh - 302
+     * 보드 가용 가로: vw - 12 (좌우 padding 6*2)
+     * blockSize = min(가용세로/20, 가용가로/10)
+     */
     function resize(event) {
-      var isMobile = (window.innerWidth < 600 || ('ontouchstart' in window && window.innerWidth <= 600));
+      var isMobile = (window.innerWidth < 600) || ('ontouchstart' in window && window.innerWidth <= 600);
+
       if (isMobile) {
-        // 모바일: canvas 너비를 window.innerWidth 기준으로 동적 계산
-        // 패딩/보더 여백(약 32px)을 제외하고, 최대 360px로 제한
-        // 모바일: 패딩/보더 여백(최소화) 제외. 최대 400px 허용으로 넓게 사용
-        var availW = Math.min(window.innerWidth - 20, 400);
-        var blockSize = Math.floor(availW / nx); // 셀 크기 = 너비 / 10 열
-        var canvasW   = blockSize * nx;
-        var canvasH   = blockSize * ny;
+        // viewport 실측: dvh 지원 여부에 따라 실제 가용 높이 결정
+        var vh = window.innerHeight;
+        var vw = window.innerWidth;
+
+        // 비게임 영역 예산 (px)
+        var MENU_H     = 44;   // 헤더 메뉴바 + 하단 margin
+        var CTRL_H     = 190;  // 컨트롤 3행 (버튼 56px * 3행 + gap + padding)
+        var HOME_H     = 52;   // 홈 버튼 + 여백
+        var PADDING_T  = 4;    // #tetris 상단 padding
+        var BUFFER     = 16;   // 안전 여백
+        var RESERVED   = MENU_H + CTRL_H + HOME_H + PADDING_T + BUFFER;
+
+        // 보드에 쓸 수 있는 최대 픽셀
+        var maxBoardH  = vh - RESERVED;
+        var maxBoardW  = vw - 12; // 좌우 padding 6px * 2
+
+        // blockSize: 세로 기준(ny=20)과 가로 기준(nx=10) 중 작은 쪽
+        var bsByH = Math.floor(maxBoardH / ny);
+        var bsByW = Math.floor(maxBoardW / nx);
+        var blockSize = Math.max(12, Math.min(bsByH, bsByW)); // 최소 12px, 제한 없는 최대
+
+        var canvasW = blockSize * nx;
+        var canvasH = blockSize * ny;
+
         canvas.width  = canvasW;
         canvas.height = canvasH;
         canvas.style.width  = canvasW + 'px';
         canvas.style.height = canvasH + 'px';
+
+        // 넥스트 프리뷰: blockSize의 60%
         var uBlockSize = Math.floor(blockSize * 0.6);
         ucanvas.width  = uBlockSize * nu;
         ucanvas.height = uBlockSize * nu;
         ucanvas.style.width  = ucanvas.width  + 'px';
         ucanvas.style.height = ucanvas.height + 'px';
+
       } else {
-        // 데스크탑: 기존 clientWidth/Height 방식 유지
+        // 데스크탑: 기존 clientWidth/Height 방식
         canvas.width   = canvas.clientWidth;
         canvas.height  = canvas.clientHeight;
         ucanvas.width  = ucanvas.clientWidth;
         ucanvas.height = ucanvas.clientHeight;
       }
-      dx = canvas.width  / nx; // 블록 1개의 픽셀 너비
-      dy = canvas.height / ny; // 블록 1개의 픽셀 높이
+
+      dx = canvas.width  / nx;
+      dy = canvas.height / ny;
       invalidate();
       invalidateNext();
     }
@@ -433,8 +539,7 @@
         play();
         handled = true;
       }
-      if (handled)
-        ev.preventDefault(); // prevent arrow keys from scrolling the page (supported in IE9+ and all other browsers)
+      if (handled) ev.preventDefault();
     }
 
     //-------------------------------------------------------------------------
@@ -443,16 +548,15 @@
 
     function play() {
       hide('start');
-      // 게임 오버 오버레이가 열려있으면 닫기
       get('gameOverOverlay').style.display = 'none';
       reset();
       playing = true;
     }
+
     function lose() {
       show('start');
       setVisualScore();
       playing = false;
-      // 게임 오버 오버레이 표시
       get('goScore').textContent = Math.floor(score);
       var ov = get('gameOverOverlay');
       ov.style.display = 'flex';
@@ -484,14 +588,10 @@
 
     function update(idt) {
       if (playing) {
-        if (vscore < score)
-          setVisualScore(vscore + 1);
+        if (vscore < score) setVisualScore(vscore + 1);
         handle(actions.shift());
         dt = dt + idt;
-        if (dt > step) {
-          dt = dt - step;
-          drop();
-        }
+        if (dt > step) { dt = dt - step; drop(); }
       }
     }
 
@@ -516,8 +616,7 @@
         current.y = y;
         invalidate();
         return true;
-      }
-      else {
+      } else {
         return false;
       }
     }
@@ -555,18 +654,17 @@
       for(y = ny ; y > 0 ; --y) {
         complete = true;
         for(x = 0 ; x < nx ; ++x) {
-          if (!getBlock(x, y))
-            complete = false;
+          if (!getBlock(x, y)) complete = false;
         }
         if (complete) {
           removeLine(y);
-          y = y + 1; // recheck same line
+          y = y + 1;
           n++;
         }
       }
       if (n > 0) {
         addRows(n);
-        addScore(100*Math.pow(2,n-1)); // 1: 100, 2: 200, 3: 400, 4: 800
+        addScore(100*Math.pow(2,n-1));
       }
     }
 
@@ -592,7 +690,7 @@
     function draw() {
       ctx.save();
       ctx.lineWidth = 1;
-      ctx.translate(0.5, 0.5); // for crisp 1px black lines
+      ctx.translate(0.5, 0.5);
       drawCourt();
       drawNext();
       drawScore();
@@ -612,14 +710,14 @@
               drawBlock(ctx, x, y, block.color);
           }
         }
-        ctx.strokeRect(0, 0, nx*dx - 1, ny*dy - 1); // court boundary
+        ctx.strokeRect(0, 0, nx*dx - 1, ny*dy - 1);
         invalid.court = false;
       }
     }
 
     function drawNext() {
       if (invalid.next) {
-        var padding = (nu - next.type.size) / 2; // half-arsed attempt at centering next piece display
+        var padding = (nu - next.type.size) / 2;
         uctx.save();
         uctx.translate(0.5, 0.5);
         uctx.clearRect(0, 0, nu*dx, nu*dy);
@@ -654,14 +752,13 @@
     function drawBlock(ctx, x, y, color) {
       ctx.fillStyle = color;
       ctx.fillRect(x*dx, y*dy, dx, dy);
-      ctx.strokeRect(x*dx, y*dy, dx, dy)
+      ctx.strokeRect(x*dx, y*dy, dx, dy);
     }
 
     //-------------------------------------------------------------------------
     // FINALLY, lets run the game
     //-------------------------------------------------------------------------
 
-    // 게임 오버 오버레이 버튼 바인딩
     document.getElementById('goRetryBtn').addEventListener('click', function() {
       document.getElementById('gameOverOverlay').style.display = 'none';
       play();
