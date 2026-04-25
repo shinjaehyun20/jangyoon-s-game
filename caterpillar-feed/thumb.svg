@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90">
+  <rect width="120" height="90" rx="12" fill="#1a4a2e"/>
+  <!-- 배경 잎 -->
+  <text x="20" y="35" font-size="28">🍃</text>
+  <text x="75" y="55" font-size="24">🌿</text>
+  <text x="48" y="22" font-size="18">🍀</text>
+  <!-- 반짝 효과 -->
+  <circle cx="34" cy="22" r="12" fill="#4dcc66" opacity="0.2"/>
+  <!-- 애벌레 -->
+  <text x="30" y="72" font-size="36">🐛</text>
+  <!-- 제목 -->
+  <text x="76" y="76" text-anchor="middle" font-size="9" fill="#a8f0a0" font-weight="bold">먹이주기</text>
+</svg>

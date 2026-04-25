@@ -206,5 +206,21 @@
     "description": "흩어진 이모지 조각을 끌어서 제자리에 맞춰요! 2×2·3×3 레벨업",
     "thumbnail": "jigsaw-mini/thumb.svg",
     "path": "jigsaw-mini/index.html"
+  },
+  {
+    "id": "bubble-pop-color",
+    "title": "Bubble Pop Color",
+    "title_ko": "🌈 같은 색 버블 팡팡",
+    "description": "같은 색 버블 3개를 순서대로 터치해서 팡팡 터트려요! 콤보로 점수 올리기",
+    "thumbnail": "bubble-pop-color/thumb.svg",
+    "path": "bubble-pop-color/index.html"
+  },
+  {
+    "id": "caterpillar-feed",
+    "title": "Caterpillar Feed",
+    "title_ko": "🐛 애벌레 먹이주기",
+    "description": "애벌레를 끌어서 반짝이는 나뭇잎을 먹여요! 레벨이 오를수록 잎이 많아져요",
+    "thumbnail": "caterpillar-feed/thumb.svg",
+    "path": "caterpillar-feed/index.html"
   }
 ]
