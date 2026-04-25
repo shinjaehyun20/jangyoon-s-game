@@ -174,14 +174,27 @@
       text-shadow: 0 4px 16px rgba(255,200,0,0.5);
     }
     .btn {
-      display: inline-block; padding: 14px 36px;
+      display: block; width: 100%; padding: 16px 36px;
       background: linear-gradient(135deg, #4dcc66, #27a844);
       color: #fff; font-size: clamp(16px, 4.5vw, 20px);
       font-weight: 700; border: none; border-radius: 50px;
       cursor: pointer; margin-top: 16px;
       box-shadow: 0 6px 20px rgba(77,204,102,0.4);
+      min-height: 56px; text-align: center;
+      box-sizing: border-box;
     }
     .btn:active { transform: scale(0.96); }
+    .btn-home {
+      display: block; width: 100%; padding: 16px;
+      background: #374151;
+      color: #fff; font-size: clamp(15px, 4vw, 18px);
+      font-weight: 700; border: none; border-radius: 50px;
+      cursor: pointer; margin-top: 10px;
+      min-height: 56px; text-align: center;
+      text-decoration: none; box-sizing: border-box;
+      line-height: 1.4;
+    }
+    .btn-home:active { transform: scale(0.96); }
 
     /* 시작 화면 */
     #startOverlay { display: flex; }
@@ -233,7 +246,8 @@
     <div class="big-score" id="endLevel">1</div>
     <p>획득한 별</p>
     <div class="big-score" id="endScore">0</div>
-    <button class="btn" id="btnRestart">다시 하기 🔄</button>
+    <button class="btn" id="btnRestart">🔄 다시 하기</button>
+    <a class="btn-home" href="../index.html">🏠 게임 목록으로</a>
   </div>
 </div>
 
@@ -533,8 +547,23 @@
     spawnLeaves();
   }
 
-  btnStart.addEventListener('click', resetGame);
-  btnRestart.addEventListener('click', resetGame);
+  // 모바일에서 click 이벤트가 지연될 수 있어 pointerdown + touchstart 이중 바인딩
+  function bindStart(el, fn) {
+    var fired = false;
+    function handler(e) {
+      e.preventDefault();
+      if (fired) return;
+      fired = true;
+      fn();
+      // 300ms 후 중복 방지 플래그 리셋 (다음 게임 시작을 위해)
+      setTimeout(function() { fired = false; }, 300);
+    }
+    el.addEventListener('pointerdown', handler);
+    el.addEventListener('click', function(e) { e.preventDefault(); }); // click 기본동작 차단
+  }
+
+  bindStart(btnStart, resetGame);
+  bindStart(btnRestart, resetGame);
 })();
 </script>
 </body>

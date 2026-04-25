@@ -21,13 +21,13 @@
     #mobile-controls .touch-row + .touch-row { margin-top: 0.6rem; }
     #mobile-controls button {
       appearance: none;
-      min-height: 3.4rem;
+      min-height: 4.2rem;
       border: 2px solid #222;
       border-radius: 14px;
       background: linear-gradient(180deg, #ffffff, #d9d9d9);
       box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
       color: #111;
-      font-size: 1rem;
+      font-size: 1.15rem;
       font-weight: bold;
       touch-action: manipulation;
       user-select: none;
@@ -65,10 +65,12 @@
     @media screen and (min-width: 800px) and (min-height: 800px)  { #tetris { font-size: 2.00em; } #menu { width: 350px; height: 700px; } #upcoming { width: 175px; height: 175px; } }
     @media screen and (min-width: 900px) and (min-height: 900px)  { #tetris { font-size: 2.25em; } #menu { width: 400px; height: 800px; } #upcoming { width: 200px; height: 200px; } }
     @media (pointer: coarse), (max-width: 599px) {
-      body { padding: 0.5rem; overflow: hidden; }
-      #tetris { width: 100%; box-sizing: border-box; }
+      body { padding: 0.3rem; overflow: hidden; }
+      #tetris { width: 100%; box-sizing: border-box; padding: 0.3em; }
       #mobile-controls { display: block; }
       .mobile-home-link { display: block; }
+      #menu { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3em; margin-bottom: 0.3em; }
+      #menu p { margin: 0; }
     }
   </style>
 </head>
@@ -99,6 +101,17 @@
       </div>
     </div>
     <a class="mobile-home-link" href="../index.html">홈으로</a>
+  </div>
+
+  <!-- 게임 오버 오버레이 -->
+  <div id="gameOverOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:200; align-items:center; justify-content:center; flex-direction:column; backdrop-filter:blur(3px);">
+    <div style="background:linear-gradient(135deg,#1f2937,#111827); border-radius:24px; padding:32px 28px; text-align:center; color:#fff; max-width:300px; width:88%; box-shadow:0 16px 48px rgba(0,0,0,0.6);">
+      <div style="font-size:40px; margin-bottom:8px;">😵</div>
+      <h2 style="font-size:24px; margin-bottom:6px;">게임 오버!</h2>
+      <p style="font-size:15px; color:rgba(255,255,255,0.7); margin-bottom:6px;">점수: <span id="goScore" style="color:#ffd700; font-weight:900;"></span></p>
+      <button id="goRetryBtn" style="display:block; width:100%; margin-top:16px; padding:16px; border:none; border-radius:14px; background:linear-gradient(135deg,#f7971e,#ffd200); color:#111; font-size:18px; font-weight:900; cursor:pointer; min-height:56px; box-sizing:border-box;">🔄 다시 하기</button>
+      <a href="../index.html" style="display:flex; align-items:center; justify-content:center; margin-top:10px; padding:16px; border-radius:14px; background:#374151; color:#fff; text-decoration:none; font-size:17px; font-weight:700; min-height:56px; box-sizing:border-box;">🏠 게임 목록으로</a>
+    </div>
   </div>
 
   <script src="stats.js"></script>
@@ -378,7 +391,8 @@
       if (isMobile) {
         // 모바일: canvas 너비를 window.innerWidth 기준으로 동적 계산
         // 패딩/보더 여백(약 32px)을 제외하고, 최대 360px로 제한
-        var availW = Math.min(window.innerWidth - 32, 360);
+        // 모바일: 패딩/보더 여백(최소화) 제외. 최대 400px 허용으로 넓게 사용
+        var availW = Math.min(window.innerWidth - 20, 400);
         var blockSize = Math.floor(availW / nx); // 셀 크기 = 너비 / 10 열
         var canvasW   = blockSize * nx;
         var canvasH   = blockSize * ny;
@@ -427,8 +441,22 @@
     // GAME LOGIC
     //-------------------------------------------------------------------------
 
-    function play() { hide('start'); reset();          playing = true;  }
-    function lose() { show('start'); setVisualScore(); playing = false; }
+    function play() {
+      hide('start');
+      // 게임 오버 오버레이가 열려있으면 닫기
+      get('gameOverOverlay').style.display = 'none';
+      reset();
+      playing = true;
+    }
+    function lose() {
+      show('start');
+      setVisualScore();
+      playing = false;
+      // 게임 오버 오버레이 표시
+      get('goScore').textContent = Math.floor(score);
+      var ov = get('gameOverOverlay');
+      ov.style.display = 'flex';
+    }
 
     function setVisualScore(n)      { vscore = n || score; invalidateScore(); }
     function setScore(n)            { score = n; setVisualScore(n);  }
@@ -632,6 +660,12 @@
     //-------------------------------------------------------------------------
     // FINALLY, lets run the game
     //-------------------------------------------------------------------------
+
+    // 게임 오버 오버레이 버튼 바인딩
+    document.getElementById('goRetryBtn').addEventListener('click', function() {
+      document.getElementById('gameOverOverlay').style.display = 'none';
+      play();
+    });
 
     run();
 
