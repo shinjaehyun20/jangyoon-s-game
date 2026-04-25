@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🌈 같은 색 버블 팡팡</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(160deg, #1a1a2e 0%, #0f2746 100%);
+      user-select: none; -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex; gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: #fff;
+      font-size: clamp(13px, 3.5vw, 16px);
+      font-weight: 700;
+      align-items: center;
+    }
+    .hud > span { flex: 1; text-align: center; }
+    .hint-bar {
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 6px 14px;
+      color: #ffffffcc;
+      font-size: clamp(12px, 3.2vw, 15px);
+      text-align: center;
+      min-height: 36px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .hint-color-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: inline-block; border: 2px solid rgba(255,255,255,0.6);
+      flex-shrink: 0;
+    }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+    }
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4em;
+      cursor: pointer;
+      transition: transform 0.1s;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.35);
+      animation: floatBubble linear infinite;
+    }
+    .bubble:active { transform: scale(0.9); }
+    .bubble.selected {
+      box-shadow: 0 0 0 4px #fff, 0 0 18px 4px rgba(255,255,255,0.8);
+      transform: scale(1.1);
+    }
+    @keyframes floatBubble {
+      0%   { transform: translateY(0px) translateX(0px); }
+      25%  { transform: translateY(-10px) translateX(6px); }
+      50%  { transform: translateY(-4px) translateX(-6px); }
+      75%  { transform: translateY(-14px) translateX(4px); }
+      100% { transform: translateY(0px) translateX(0px); }
+    }
+    .bubble.selected {
+      animation: floatBubble linear infinite, pulse 0.5s ease infinite alternate;
+    }
+    @keyframes pulse {
+      from { box-shadow: 0 0 0 4px #fff, 0 0 18px 4px rgba(255,255,255,0.7); }
+      to   { box-shadow: 0 0 0 6px #fff, 0 0 28px 8px rgba(255,255,255,1); }
+    }
+    .pop-effect {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      animation: popOut 0.4s ease-out forwards;
+    }
+    @keyframes popOut {
+      0%   { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+    .particle {
+      position: absolute;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: particleFly 0.6s ease-out forwards;
+    }
+    @keyframes particleFly {
+      0%   { transform: translate(0,0) scale(1); opacity: 1; }
+      100% { transform: var(--tx) scale(0); opacity: 0; }
+    }
+    .score-popup {
+      position: absolute;
+      font-size: clamp(22px, 6vw, 34px);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      pointer-events: none;
+      animation: scoreRise 0.8s ease-out forwards;
+      white-space: nowrap;
+    }
+    @keyframes scoreRise {
+      0%   { transform: translateY(0) scale(0.8); opacity: 1; }
+      100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
+    }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .modal {
+      background: linear-gradient(135deg, #1e3a5f, #0d2137);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      color: #fff;
+      max-width: 340px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+    .modal h2 { font-size: clamp(24px, 7vw, 32px); margin-bottom: 12px; }
+    .modal p  { font-size: clamp(14px, 4vw, 18px); margin-bottom: 8px; color: #b0cfe8; }
+    .modal .big-score {
+      font-size: clamp(40px, 12vw, 64px);
+      font-weight: 900; color: #ffe066;
+      margin: 16px 0;
+      text-shadow: 0 4px 16px rgba(255,200,0,0.5);
+    }
+    .btn {
+      display: inline-block; padding: 14px 36px;
+      background: linear-gradient(135deg, #3ea6ff, #1a73e8);
+      color: #fff; font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 700; border: none; border-radius: 50px;
+      cursor: pointer; margin-top: 16px;
+      box-shadow: 0 6px 20px rgba(62,166,255,0.4);
+    }
+    .btn:active { transform: scale(0.96); }
+    .lives { letter-spacing: 2px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌈 같은 색 버블 팡팡</h1>
+  <div class="hud">
+    <span>⭐ <span id="scoreEl">0</span></span>
+    <span>❤️ <span id="livesEl" class="lives">●●●</span></span>
+    <span>✅ <span id="setEl">0</span> 세트</span>
+  </div>
+  <div class="hint-bar" id="hintBar">
+    버블을 3개씩 같은 색으로 터치해요!
+  </div>
+  <div id="gameArea"></div>
+</div>
+
+<!-- Game Over -->
+<div class="overlay hidden" id="overlayEnd">
+  <div class="modal">
+    <h2>🎉 게임 끝!</h2>
+    <p>완성한 세트</p>
+    <div class="big-score" id="endSets">0</div>
+    <p>획득한 별</p>
+    <div class="big-score" id="endScore">0</div>
+    <button class="btn" id="btnRestart">다시 하기 🔄</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── 색상 팔레트 ──
+  const COLORS = [
+    { name: '빨강', hex: '#ff4d4d', light: '#ff9999' },
+    { name: '파랑', hex: '#4d9dff', light: '#99ccff' },
+    { name: '초록', hex: '#4dcc66', light: '#99e6aa' },
+    { name: '노랑', hex: '#ffcc00', light: '#ffe680' },
+    { name: '보라', hex: '#9966ff', light: '#cc99ff' },
+    { name: '주황', hex: '#ff8833', light: '#ffbb88' },
+  ];
+
+  // ── 게임 상태 ──
+  let score = 0;
+  let lives = 3;
+  let setsCleared = 0;
+  let bubbles = [];       // { el, colorIdx, id }
+  let selected = [];      // 현재 선택된 버블 id 배열
+  let isAnimating = false;
+  let nextId = 0;
+
+  const gameArea = document.getElementById('gameArea');
+  const scoreEl  = document.getElementById('scoreEl');
+  const livesEl  = document.getElementById('livesEl');
+  const setEl    = document.getElementById('setEl');
+  const hintBar  = document.getElementById('hintBar');
+  const overlayEnd = document.getElementById('overlayEnd');
+  const endSets  = document.getElementById('endSets');
+  const endScore = document.getElementById('endScore');
+  const btnRestart = document.getElementById('btnRestart');
+
+  // ── 유틸 ──
+  function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+  function rand(a, b)    { return Math.random() * (b - a) + a; }
+
+  function updateHUD() {
+    scoreEl.textContent = score;
+    setEl.textContent   = setsCleared;
+    livesEl.textContent = '●'.repeat(lives) + '○'.repeat(3 - lives);
+  }
+
+  // ── 버블 생성 ──
+  function createBubble(colorIdx) {
+    const areaW = gameArea.offsetWidth;
+    const areaH = gameArea.offsetHeight;
+    const size = randInt(58, 78);
+    const x = randInt(8, areaW - size - 8);
+    const y = randInt(8, areaH - size - 8);
+    const delay = rand(0, 4);
+    const duration = rand(4, 8);
+
+    const el = document.createElement('div');
+    el.className = 'bubble';
+    el.style.width  = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left   = x + 'px';
+    el.style.top    = y + 'px';
+    el.style.background = `radial-gradient(circle at 35% 35%, ${COLORS[colorIdx].light}, ${COLORS[colorIdx].hex})`;
+    el.style.animationDuration = duration + 's';
+    el.style.animationDelay = '-' + delay + 's';
+    el.textContent = '';
+
+    const id = nextId++;
+    el.dataset.id = id;
+    el.dataset.colorIdx = colorIdx;
+
+    el.addEventListener('pointerdown', onBubbleTap);
+
+    gameArea.appendChild(el);
+    bubbles.push({ el, colorIdx, id, x, y, size });
+    return id;
+  }
+
+  // ── 초기 버블 배치 (색상 3개씩 × 2 = 6 세트 섞기) ──
+  function spawnInitialBubbles() {
+    // 색상 2가지 이상으로 각 3개씩 배치
+    const colorCount = randInt(2, 4); // 동시 활성 색상 수
+    const pool = [];
+    const usedColors = [];
+    // 색 섞기
+    const shuffledColors = [...COLORS.keys()].sort(() => Math.random() - 0.5).slice(0, colorCount);
+    shuffledColors.forEach(ci => { pool.push(ci, ci, ci); });
+    pool.sort(() => Math.random() - 0.5);
+    pool.forEach(ci => createBubble(ci));
+  }
+
+  // ── 탭 핸들러 ──
+  function onBubbleTap(e) {
+    e.preventDefault();
+    if (isAnimating) return;
+    const id = Number(e.currentTarget.dataset.id);
+    const colorIdx = Number(e.currentTarget.dataset.colorIdx);
+
+    // 이미 선택된 버블 재탭 → 선택 해제
+    const existIdx = selected.findIndex(s => s.id === id);
+    if (existIdx !== -1) {
+      selected.splice(existIdx, 1);
+      e.currentTarget.classList.remove('selected');
+      updateHint();
+      return;
+    }
+
+    // 선택 중인 것과 색이 다르면 오류 처리
+    if (selected.length > 0 && selected[0].colorIdx !== colorIdx) {
+      wrongTap();
+      return;
+    }
+
+    // 선택 추가
+    selected.push({ id, colorIdx });
+    e.currentTarget.classList.add('selected');
+    updateHint();
+
+    // 3개 모이면 팡팡
+    if (selected.length === 3) {
+      isAnimating = true;
+      setTimeout(popSelected, 200);
+    }
+  }
+
+  function wrongTap() {
+    lives = Math.max(0, lives - 1);
+    updateHUD();
+    // 선택 초기화
+    selected.forEach(s => {
+      const b = bubbles.find(b => b.id === s.id);
+      if (b) b.el.classList.remove('selected');
+    });
+    selected = [];
+    updateHint();
+    // 화면 흔들기
+    gameArea.style.transition = 'transform 0.05s';
+    gameArea.style.transform = 'translateX(-8px)';
+    setTimeout(() => {
+      gameArea.style.transform = 'translateX(8px)';
+      setTimeout(() => { gameArea.style.transform = ''; }, 60);
+    }, 60);
+
+    if (lives === 0) {
+      setTimeout(endGame, 300);
+    }
+  }
+
+  function popSelected() {
+    const toRemove = [...selected];
+    const colorIdx = toRemove[0].colorIdx;
+    selected = [];
+
+    // 팡! 이펙트 + 파티클
+    toRemove.forEach(s => {
+      const b = bubbles.find(b => b.id === s.id);
+      if (!b) return;
+      const cx = b.x + b.size / 2;
+      const cy = b.y + b.size / 2;
+      spawnPopEffect(cx, cy, COLORS[colorIdx].hex);
+      b.el.remove();
+    });
+
+    bubbles = bubbles.filter(b => !toRemove.some(s => s.id === b.id));
+
+    setsCleared++;
+    const bonus = setsCleared >= 5 ? 30 : 10;
+    score += bonus;
+    updateHUD();
+
+    // 점수 팝업
+    const firstB = bubbles.find(b => b.id === toRemove[0]?.id) ||
+                   { x: gameArea.offsetWidth / 2 - 40, y: gameArea.offsetHeight / 2 - 30, size: 0 };
+    spawnScorePopup(
+      randInt(gameArea.offsetWidth * 0.2, gameArea.offsetWidth * 0.7),
+      randInt(gameArea.offsetHeight * 0.2, gameArea.offsetHeight * 0.6),
+      `+${bonus} ⭐`
+    );
+
+    updateHint();
+
+    // 남은 버블이 적으면 보충
+    setTimeout(() => {
+      refillBubbles();
+      isAnimating = false;
+    }, 400);
+  }
+
+  function refillBubbles() {
+    // 버블이 6개 미만이면 새 세트 추가
+    if (bubbles.length < 6) {
+      spawnInitialBubbles();
+    }
+  }
+
+  function spawnPopEffect(cx, cy, color) {
+    const el = document.createElement('div');
+    el.className = 'pop-effect';
+    const size = 60;
+    el.style.width  = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left   = (cx - size / 2) + 'px';
+    el.style.top    = (cy - size / 2) + 'px';
+    el.style.background = color;
+    el.style.opacity = '0.7';
+    gameArea.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+
+    // 파티클
+    for (let i = 0; i < 8; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const angle = (i / 8) * Math.PI * 2;
+      const dist = randInt(40, 90);
+      p.style.left = (cx - 5) + 'px';
+      p.style.top  = (cy - 5) + 'px';
+      p.style.background = color;
+      p.style.setProperty('--tx', `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`);
+      p.style.animationDelay = (i * 0.02) + 's';
+      gameArea.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  }
+
+  function spawnScorePopup(x, y, text) {
+    const el = document.createElement('div');
+    el.className = 'score-popup';
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    gameArea.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+
+  function updateHint() {
+    if (selected.length === 0) {
+      hintBar.innerHTML = '같은 색 버블 3개를 순서대로 터치해요!';
+    } else {
+      const ci = selected[0].colorIdx;
+      const dot = `<span class="hint-color-dot" style="background:${COLORS[ci].hex}"></span>`;
+      hintBar.innerHTML = `${dot} <strong>${COLORS[ci].name}</strong> 버블 ${selected.length}/3 선택됨`;
+    }
+  }
+
+  function endGame() {
+    endSets.textContent  = setsCleared;
+    endScore.textContent = score;
+    overlayEnd.classList.remove('hidden');
+  }
+
+  function resetGame() {
+    score = 0; lives = 3; setsCleared = 0;
+    selected = []; isAnimating = false; nextId = 0;
+    // 버블 제거
+    bubbles.forEach(b => b.el.remove());
+    bubbles = [];
+    overlayEnd.classList.add('hidden');
+    updateHUD();
+    updateHint();
+    spawnInitialBubbles();
+  }
+
+  btnRestart.addEventListener('click', resetGame);
+
+  // ── 시작 ──
+  resetGame();
+})();
+</script>
+</body>
+</html>
