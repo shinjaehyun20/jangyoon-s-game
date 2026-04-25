@@ -1,4 +1,54 @@
-# 변경사항 요약 (2026-04-19)
+# 변경 이력
+
+## 변경사항 (2026-04-25 — 종료버튼 공통화)
+
+### 전 게임 "🏠 게임 목록으로" 종료버튼 일괄 적용
+
+28개 전 게임의 게임오버/클리어/종료 화면에 "🏠 게임 목록으로" 버튼 통일.
+
+#### 목표
+
+- min-height 56px (7살 손가락 기준)
+- 기존 3개(tetris/balloon-pop/caterpillar-feed)와 스타일·문구 통일
+- 헤더/footer 홈 링크 문구도 "← 홈으로" → "🏠 게임 목록으로" 통일
+
+#### 적용 방식별 분류
+
+| 방식 | 게임 |
+| --- | --- |
+| overlay-card + btn-home CSS | bounce-ball, bubble-pop-color, color-tap, fish-catch, fruit-catch, jigsaw-mini, memory-match, number-order, rabbit-maze, rhythm-tap, robot-game, space-shooter, star-connect, star-counting, target-hit, whack-a-mole, word-picture-match |
+| JS endGame() innerHTML (message div) | space-catcher, runner-game |
+| 완성버튼 후 홈버튼 팝업 (celebrate div) | animal-coloring, princess-dressup |
+| game-message div 내 (2048 외부 CSS) | 2048 |
+| mobile-home-link 문구 통일 | sudoku, typing, tetris, runner-game, space-catcher |
+| 이미 완료 (이전 커밋) | tetris, balloon-pop, caterpillar-feed |
+| 종료버튼 있음 (ubongo) | ubongo (btn-ghost로 이미 존재) |
+
+#### princess-dressup thumb.svg 개선
+
+개선된 버전으로 커밋 (더 상세한 A라인 드레스, 별 파티클, 글로우 효과 추가).
+
+---
+
+## 변경사항 (2026-04-25 — 버그 수정 3건, commit 00373c8)
+
+### 테트리스 모바일 개선
+
+- 모바일 보드 크기 확대 (viewport meta 추가)
+- 버튼 확대 (min-height 56px)
+- 게임오버 오버레이 추가
+
+### 풍선 터뜨리기 (balloon-pop) 터치버그 강화
+
+- 폭탄/풍선 터치 판정 개선
+
+### 애벌레 먹이주기 (caterpillar-feed) 시작버튼 무반응 수정
+
+- 시작버튼 pointerdown 이벤트 바인딩 수정
+
+---
+
+## 변경사항 (2026-04-19)
 
 ## 커버 이미지 통일
 7개 게임 썸네일을 **통일된 디자인 시스템**으로 재제작:

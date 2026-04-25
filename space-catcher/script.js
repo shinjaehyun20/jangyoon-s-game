@@ -68,7 +68,9 @@
     state.active = false;
     clearInterval(state.gameTimer);
     clearInterval(state.spawnTimer);
-    message.textContent = `시간 종료! 점수: ${state.score}점 🎉`;
+    message.innerHTML = `
+      <p style="font-size:18px;font-weight:700;margin-bottom:10px;">시간 종료! 점수: ${state.score}점 🎉</p>
+      <a href="../index.html" style="display:flex;align-items:center;justify-content:center;margin-top:10px;padding:16px;border-radius:14px;background:#374151;color:#fff;text-decoration:none;font-size:17px;font-weight:700;min-height:56px;box-sizing:border-box;">🏠 게임 목록으로</a>`;
     message.classList.remove('hidden');
   }
 

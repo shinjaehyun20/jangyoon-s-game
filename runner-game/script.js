@@ -87,12 +87,16 @@
     }
 
     const highScore = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    let resultText;
     if (state.score > highScore) {
       localStorage.setItem(CONFIG.STORAGE_KEY, state.score);
-      message.textContent = `새로운 기록! ${state.score}점 달성! 🎉`;
+      resultText = `새로운 기록! ${state.score}점 달성! 🎉`;
     } else {
-      message.textContent = `게임 종료! ${state.score}점 획득! 🏁`;
+      resultText = `게임 종료! ${state.score}점 획득! 🏁`;
     }
+    message.innerHTML = `
+      <p style="font-size:18px;font-weight:700;margin-bottom:10px;">${resultText}</p>
+      <a href="../index.html" style="display:flex;align-items:center;justify-content:center;margin-top:10px;padding:16px;border-radius:14px;background:#374151;color:#fff;text-decoration:none;font-size:17px;font-weight:700;min-height:56px;box-sizing:border-box;">🏠 게임 목록으로</a>`;
     message.classList.remove('hidden');
     startBtn.textContent = '다시 시작';
   }

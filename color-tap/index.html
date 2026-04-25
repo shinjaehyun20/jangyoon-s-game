@@ -122,6 +122,21 @@
       box-shadow: 0 4px 0 rgba(0,0,0,0.3);
     }
     .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+    .btn-home {
+      display: block; margin-top: 10px;
+      background: #374151;
+      color: #fff;
+      border: none; border-radius: 14px;
+      font-size: 17px; font-weight: 700;
+      padding: 14px 20px;
+      cursor: pointer;
+      min-height: 56px;
+      width: 100%;
+      text-decoration: none;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .btn-home:active { transform: scale(0.97); }
   </style>
 </head>
 <body>
@@ -155,7 +170,7 @@
 
   <footer>
     <small>글자 내용이 아닌 글자 색을 눌러요</small>
-    <a class="home-link" href="../index.html">← 홈으로</a>
+    <a class="home-link" href="../index.html">🏠 게임 목록으로</a>
   </footer>
 </div>
 
@@ -177,6 +192,7 @@
     <div class="result-detail" id="finalDetail"></div>
     <p id="resultMsg"></p>
     <button class="btn-start" id="restartBtn">다시 하기</button>
+    <a class="btn-home" href="../index.html">🏠 게임 목록으로</a>
   </div>
 </div>
 

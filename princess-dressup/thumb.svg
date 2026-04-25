@@ -1,52 +1,108 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2a0a2a"/>
-      <stop offset="100%" stop-color="#1a0533"/>
+      <stop offset="0%" stop-color="#1a0533"/>
+      <stop offset="100%" stop-color="#3d0070"/>
     </linearGradient>
+    <linearGradient id="dress" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e91e8c"/>
+      <stop offset="100%" stop-color="#9c0060"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff69b4" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ff69b4" stop-opacity="0"/>
+    </radialGradient>
   </defs>
+
   <rect width="320" height="180" fill="url(#bg)"/>
   <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
 
-  <!-- 공주 실루엣 -->
-  <!-- 드레스 -->
-  <ellipse cx="110" cy="130" rx="48" ry="42" fill="#e91e8c" opacity="0.9"/>
-  <ellipse cx="110" cy="130" rx="48" ry="42" fill="none" stroke="#ff69b4" stroke-width="1.5"/>
+  <!-- 배경 글로우 -->
+  <ellipse cx="110" cy="100" rx="80" ry="70" fill="url(#glow)"/>
+
+  <!-- 별 파티클 -->
+  <circle cx="30" cy="25" r="2" fill="#ffd700" opacity="0.9"/>
+  <circle cx="55" cy="15" r="1.5" fill="#fff" opacity="0.7"/>
+  <circle cx="170" cy="20" r="2" fill="#ffd700" opacity="0.8"/>
+  <circle cx="200" cy="35" r="1.5" fill="#ff69b4" opacity="0.9"/>
+  <circle cx="45" cy="155" r="2" fill="#ffd700" opacity="0.7"/>
+  <circle cx="160" cy="160" r="1.5" fill="#fff" opacity="0.6"/>
+
+  <!-- 드레스 스커트 (넓은 A라인) -->
+  <ellipse cx="110" cy="148" rx="52" ry="24" fill="url(#dress)" opacity="0.9"/>
+  <polygon points="63,105 157,105 162,160 58,160" fill="url(#dress)"/>
+  <!-- 드레스 레이어 장식 -->
+  <ellipse cx="110" cy="130" rx="46" ry="8" fill="#f06292" opacity="0.6"/>
+  <ellipse cx="110" cy="145" rx="52" ry="8" fill="#f06292" opacity="0.5"/>
+
   <!-- 상체 -->
-  <rect x="96" y="72" width="28" height="36" rx="8" fill="#ffb6c1"/>
+  <rect x="96" y="74" width="28" height="34" rx="6" fill="#f8bbd0"/>
+  <!-- 코르셋 라인 -->
+  <line x1="110" y1="76" x2="110" y2="106" stroke="#e91e8c" stroke-width="1" opacity="0.6"/>
+  <line x1="103" y1="80" x2="117" y2="80" stroke="#e91e8c" stroke-width="0.8" opacity="0.4"/>
+  <line x1="103" y1="87" x2="117" y2="87" stroke="#e91e8c" stroke-width="0.8" opacity="0.4"/>
+  <line x1="103" y1="94" x2="117" y2="94" stroke="#e91e8c" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- 목 -->
+  <rect x="105" y="62" width="10" height="14" rx="4" fill="#ffe0b2"/>
+
   <!-- 얼굴 -->
-  <circle cx="110" cy="60" r="20" fill="#ffe4c4"/>
-  <!-- 왕관 -->
-  <text x="110" y="42" text-anchor="middle" font-size="22">👑</text>
+  <circle cx="110" cy="52" r="18" fill="#ffe0b2"/>
+  <!-- 볼 홍조 -->
+  <ellipse cx="101" cy="56" rx="5" ry="3" fill="#ffb7c5" opacity="0.6"/>
+  <ellipse cx="119" cy="56" rx="5" ry="3" fill="#ffb7c5" opacity="0.6"/>
+  <!-- 눈 -->
+  <ellipse cx="105" cy="50" rx="2.5" ry="3" fill="#4a2c17"/>
+  <ellipse cx="115" cy="50" rx="2.5" ry="3" fill="#4a2c17"/>
+  <circle cx="106" cy="49" r="1" fill="#fff"/>
+  <circle cx="116" cy="49" r="1" fill="#fff"/>
+  <!-- 입 -->
+  <path d="M107 57 Q110 60 113 57" fill="none" stroke="#e91e8c" stroke-width="1.2"/>
+
   <!-- 머리카락 -->
-  <ellipse cx="110" cy="55" rx="22" ry="12" fill="#8B4513"/>
+  <ellipse cx="110" cy="43" rx="20" ry="14" fill="#6d4c41"/>
+  <path d="M91 45 Q85 55 88 68" fill="none" stroke="#6d4c41" stroke-width="8" stroke-linecap="round"/>
+  <path d="M129 45 Q135 55 132 68" fill="none" stroke="#6d4c41" stroke-width="8" stroke-linecap="round"/>
 
-  <!-- 아이템 카드들 -->
-  <rect x="175" y="18" width="36" height="36" rx="8" fill="rgba(255,105,180,0.3)" stroke="#ff69b4" stroke-width="1.5"/>
-  <text x="193" y="43" text-anchor="middle" font-size="20">👒</text>
+  <!-- 왕관 -->
+  <polygon points="96,30 100,22 106,28 110,18 114,28 120,22 124,30" fill="#ffd700" stroke="#ffb300" stroke-width="0.8"/>
+  <!-- 왕관 보석 -->
+  <circle cx="110" cy="24" r="3" fill="#e91e8c"/>
+  <circle cx="101" cy="27" r="2" fill="#3d7ef6"/>
+  <circle cx="119" cy="27" r="2" fill="#26de81"/>
 
-  <rect x="220" y="18" width="36" height="36" rx="8" fill="rgba(255,215,0,0.3)" stroke="#ffd700" stroke-width="1.5"/>
-  <text x="238" y="43" text-anchor="middle" font-size="20">💍</text>
+  <!-- 오른쪽 아이템 패널 -->
+  <!-- 아이템 카드들 — 3x2 그리드 -->
+  <rect x="178" y="14" width="40" height="40" rx="10" fill="rgba(255,105,180,0.15)" stroke="#ff69b4" stroke-width="1.2"/>
+  <text x="198" y="41" text-anchor="middle" font-size="22">👗</text>
 
-  <rect x="265" y="18" width="36" height="36" rx="8" fill="rgba(162,155,254,0.3)" stroke="#a29bfe" stroke-width="1.5"/>
-  <text x="283" y="43" text-anchor="middle" font-size="20">👗</text>
+  <rect x="226" y="14" width="40" height="40" rx="10" fill="rgba(255,215,0,0.15)" stroke="#ffd700" stroke-width="1.2"/>
+  <text x="246" y="41" text-anchor="middle" font-size="22">👑</text>
 
-  <rect x="175" y="64" width="36" height="36" rx="8" fill="rgba(72,219,251,0.3)" stroke="#48dbfb" stroke-width="1.5"/>
-  <text x="193" y="89" text-anchor="middle" font-size="20">👠</text>
+  <rect x="274" y="14" width="40" height="40" rx="10" fill="rgba(162,155,254,0.15)" stroke="#a29bfe" stroke-width="1.2"/>
+  <text x="294" y="41" text-anchor="middle" font-size="22">💎</text>
 
-  <rect x="220" y="64" width="36" height="36" rx="8" fill="rgba(255,107,107,0.3)" stroke="#ff6b6b" stroke-width="1.5"/>
-  <text x="238" y="89" text-anchor="middle" font-size="20">💄</text>
+  <rect x="178" y="62" width="40" height="40" rx="10" fill="rgba(72,219,251,0.15)" stroke="#48dbfb" stroke-width="1.2"/>
+  <text x="198" y="89" text-anchor="middle" font-size="22">👠</text>
 
-  <rect x="265" y="64" width="36" height="36" rx="8" fill="rgba(38,222,129,0.3)" stroke="#26de81" stroke-width="1.5"/>
-  <text x="283" y="89" text-anchor="middle" font-size="20">💎</text>
+  <rect x="226" y="62" width="40" height="40" rx="10" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b" stroke-width="1.2"/>
+  <text x="246" y="89" text-anchor="middle" font-size="22">💄</text>
 
-  <!-- 반짝이 -->
-  <text x="160" y="35" font-size="12">✨</text>
-  <text x="168" y="120" font-size="10">✨</text>
+  <rect x="274" y="62" width="40" height="40" rx="10" fill="rgba(38,222,129,0.15)" stroke="#26de81" stroke-width="1.2"/>
+  <text x="294" y="89" text-anchor="middle" font-size="22">🌸</text>
+
+  <!-- 선택된 아이템 강조 (첫번째) -->
+  <rect x="178" y="14" width="40" height="40" rx="10" fill="none" stroke="#ffd700" stroke-width="2.5"/>
+  <circle cx="214" cy="18" r="6" fill="#ffd700"/>
+  <text x="214" y="22" text-anchor="middle" font-size="8" font-weight="900" fill="#1a0533">✓</text>
+
+  <!-- 반짝이 이펙트 -->
+  <text x="168" y="50" font-size="12">✨</text>
+  <text x="175" y="115" font-size="10">💫</text>
 
   <!-- 타이틀 -->
   <g font-family="'Pretendard','Noto Sans KR',sans-serif">
-    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd700">공주 드레스업</text>
+    <text x="296" y="148" text-anchor="end" font-size="21" font-weight="900" fill="#ffd700">공주 드레스업</text>
     <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">PRINCESS DRESS-UP</text>
   </g>
 </svg>
