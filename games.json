@@ -246,5 +246,21 @@
     "description": "9×9 / 13×13 / 19×19 난이도 선택, 2인 번갈아 두기, 따먹기 규칙만 적용한 입문판",
     "thumbnail": "baby-go/thumb.svg",
     "path": "baby-go/index.html"
+  },
+  {
+    "id": "piano-tiles",
+    "title": "Piano Play",
+    "title_ko": "🎹 피아노 놀이",
+    "description": "건반을 탭해서 음악을 연주해요! 자유 연주 모드와 악보 따라하기 모드(나비야·반짝반짝 등 4곡)",
+    "thumbnail": "piano-tiles/thumb.svg",
+    "path": "piano-tiles/index.html"
+  },
+  {
+    "id": "shape-sort",
+    "title": "Shape Sort",
+    "title_ko": "🔷 모양 분류 놀이",
+    "description": "나타나는 도형을 모양·색깔 바구니에 빠르게 분류! 레벨이 오를수록 제한 시간이 줄어들어요",
+    "thumbnail": "shape-sort/thumb.svg",
+    "path": "shape-sort/index.html"
   }
 ]
