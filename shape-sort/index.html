@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🔷 모양 분류 놀이</title>
+  <style>
+    :root {
+      --bg: #0d1b2a;
+      --panel: #1b2838;
+      --accent: #56cfe1;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px;
+      gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 26px);
+      text-align: center;
+      color: var(--text);
+      text-shadow: 0 2px 8px rgba(86,207,225,0.4);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+    }
+    /* 문제 표시 (떨어지는 도형) */
+    #questionArea {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      flex: 0 0 auto;
+      height: clamp(110px, 28vw, 160px);
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #fallingShape {
+      font-size: clamp(52px, 15vw, 80px);
+      transition: transform 0.12s;
+      user-select: none;
+    }
+    #fallingShape.bounce {
+      animation: bounceIn 0.3s ease-out;
+    }
+    @keyframes bounceIn {
+      0%   { transform: scale(0.4) rotate(-20deg); opacity: 0; }
+      60%  { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    /* 힌트 문구 */
+    #hint {
+      font-size: clamp(16px, 4.5vw, 22px);
+      font-weight: 700;
+      color: var(--accent);
+      text-align: center;
+      min-height: 30px;
+    }
+    /* 분류 바구니 */
+    #basketArea {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .basket {
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      min-height: 56px;
+      transition: transform 0.1s, border-color 0.1s, background 0.1s;
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .basket:active { transform: scale(0.96); }
+    .basket.correct {
+      border-color: #43a047;
+      background: rgba(67,160,71,0.25);
+      animation: correctFlash 0.4s;
+    }
+    .basket.wrong {
+      border-color: #e53935;
+      background: rgba(229,57,53,0.2);
+      animation: wrongFlash 0.4s;
+    }
+    @keyframes correctFlash {
+      0%,100% { filter: brightness(1); }
+      50% { filter: brightness(1.4); }
+    }
+    @keyframes wrongFlash {
+      0%,25%,75%,100% { transform: translateX(0) scale(0.96); }
+      50% { transform: translateX(-6px) scale(0.96); }
+    }
+    .basket-icon {
+      font-size: clamp(28px, 9vw, 46px);
+      line-height: 1;
+    }
+    .basket-label {
+      font-size: clamp(13px, 4vw, 18px);
+      font-weight: 700;
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      padding: 0 8px;
+    }
+    /* 컬러 난이도: 바구니 색상 */
+    .basket[data-cat="red"]    { border-color: rgba(229,57,53,0.4); }
+    .basket[data-cat="blue"]   { border-color: rgba(33,150,243,0.4); }
+    .basket[data-cat="yellow"] { border-color: rgba(255,193,7,0.4); }
+    .basket[data-cat="green"]  { border-color: rgba(67,160,71,0.4); }
+
+    /* 점수 이펙트 */
+    .score-pop {
+      position: absolute;
+      pointer-events: none;
+      font-size: 22px;
+      font-weight: 900;
+      animation: scoreFloat 0.7s ease-out forwards;
+      z-index: 20;
+    }
+    @keyframes scoreFloat {
+      0%   { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-60px); }
+    }
+
+    /* 목숨 */
+    #livesDisplay { font-size: clamp(16px, 4vw, 20px); letter-spacing: 2px; }
+
+    /* 타이머 바 */
+    #timerBarWrap {
+      height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;
+    }
+    #timerBar {
+      height: 100%; background: var(--accent); border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+
+    /* 진행 레벨 */
+    #levelIndicator {
+      text-align: center;
+      font-size: clamp(12px, 3.5vw, 15px);
+      color: rgba(255,255,255,0.5);
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 4px;
+    }
+    footer small { color: rgba(255,255,255,0.4); font-size: 12px; }
+    .home-link {
+      color: rgba(255,255,255,0.45);
+      font-size: 13px;
+      text-decoration: none;
+    }
+    .home-link:hover { color: #fff; }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: var(--panel);
+      border: 2px solid rgba(86,207,225,0.3);
+      border-radius: 24px;
+      padding: 28px 22px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; color: #fff; }
+    .overlay-card p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 18px; line-height: 1.6; }
+    .result-score { font-size: 48px; font-weight: 900; color: var(--accent); margin: 10px 0; }
+    .btn-main {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 56px;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .btn-main:hover { opacity: 0.92; }
+    .diff-select {
+      display: flex; gap: 8px; margin-bottom: 14px;
+    }
+    .diff-btn {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      color: #fff;
+      padding: 10px 4px;
+      font-size: clamp(12px, 3.5vw, 14px);
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 56px;
+    }
+    .diff-btn.selected { border-color: var(--accent); background: rgba(86,207,225,0.15); color: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔷 모양 분류 놀이</h1>
+
+  <div class="hud">
+    <span>점수: <b id="scoreDisplay">0</b></span>
+    <span id="livesDisplay">❤️❤️❤️</span>
+    <span>최고: <b id="bestDisplay">0</b></span>
+  </div>
+
+  <div id="timerBarWrap"><div id="timerBar" style="width:100%"></div></div>
+
+  <!-- 문제 표시 -->
+  <div id="questionArea">
+    <div id="fallingShape">🔷</div>
+  </div>
+
+  <div id="hint">?</div>
+  <div id="levelIndicator">레벨 1</div>
+
+  <!-- 분류 바구니 (2×2 그리드) -->
+  <div id="basketArea">
+    <!-- JS로 동적 생성 -->
+  </div>
+
+  <footer>
+    <small>맞는 바구니에 탭하세요</small>
+    <a class="home-link" href="../index.html">🏠 게임 목록으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🔷 모양 분류 놀이</h2>
+    <p>나타나는 도형을 보고<br>
+       알맞은 바구니에 빠르게 탭해요!<br>
+       3번 틀리면 게임 종료!</p>
+    <div class="diff-select">
+      <button class="diff-btn selected" data-diff="shape">모양 분류</button>
+      <button class="diff-btn" data-diff="color">색깔 분류</button>
+      <button class="diff-btn" data-diff="both">모양+색 분류</button>
+    </div>
+    <button class="btn-main" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2 id="endTitle">게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <button class="btn-main" id="restartBtn">다시 하기</button>
+    <br><br>
+    <a href="../index.html" style="display:block;color:rgba(255,255,255,0.5);font-size:14px;margin-top:10px;text-decoration:none;min-height:44px;line-height:44px;">🏠 게임 목록으로</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── 데이터 정의 ────────────────────────────────────
+  const SHAPES = {
+    circle:   { icon: ['⭕','🔵','🟡','🔴','🟢'], label: '원', color: { blue:'🔵', red:'🔴', yellow:'🟡', green:'🟢' } },
+    square:   { icon: ['🟦','🟥','🟨','🟩','⬛'], label: '사각형', color: { blue:'🟦', red:'🟥', yellow:'🟨', green:'🟩' } },
+    triangle: { icon: ['🔺','🔻'], label: '세모', color: { red:'🔺', green:'🔻' } },
+    star:     { icon: ['⭐','🌟','✨'], label: '별', color: { yellow:'⭐' } },
+    heart:    { icon: ['❤️','💙','💚','💛'], label: '하트', color: { red:'❤️', blue:'💙', green:'💚', yellow:'💛' } },
+    diamond:  { icon: ['🔷','🔶','💠'], label: '다이아', color: { blue:'🔷', orange:'🔶' } },
+  };
+
+  const SHAPE_KEYS  = Object.keys(SHAPES);
+  const COLOR_NAMES = {
+    red:'빨강', blue:'파랑', yellow:'노랑', green:'초록', orange:'주황'
+  };
+
+  const DIFF_CONFIG = {
+    shape: {
+      hintFn: (s,c) => `${SHAPES[s].label} 바구니에!`,
+      catFn:  (s,c) => s,
+      baskets: [
+        { cat:'circle',   icon:'⭕', label:'원' },
+        { cat:'square',   icon:'🟦', label:'사각형' },
+        { cat:'triangle', icon:'🔺', label:'세모' },
+        { cat:'star',     icon:'⭐', label:'별' },
+      ],
+      itemPool: () => {
+        const pool = [];
+        ['circle','square','triangle','star','heart','diamond'].forEach(s => {
+          SHAPES[s].icon.slice(0,3).forEach(ic => pool.push({ shape:s, icon:ic }));
+        });
+        return pool;
+      },
+      lives: 3,
+    },
+    color: {
+      hintFn: (s,c) => `${COLOR_NAMES[c] || c} 바구니에!`,
+      catFn:  (s,c) => c,
+      baskets: [
+        { cat:'red',    icon:'🔴', label:'빨강' },
+        { cat:'blue',   icon:'🔵', label:'파랑' },
+        { cat:'yellow', icon:'🟡', label:'노랑' },
+        { cat:'green',  icon:'🟢', label:'초록' },
+      ],
+      itemPool: () => {
+        const pool = [];
+        const items = [
+          {shape:'circle',  color:'red',    icon:'🔴'},
+          {shape:'circle',  color:'blue',   icon:'🔵'},
+          {shape:'circle',  color:'yellow', icon:'🟡'},
+          {shape:'circle',  color:'green',  icon:'🟢'},
+          {shape:'square',  color:'red',    icon:'🟥'},
+          {shape:'square',  color:'blue',   icon:'🟦'},
+          {shape:'square',  color:'yellow', icon:'🟨'},
+          {shape:'square',  color:'green',  icon:'🟩'},
+          {shape:'heart',   color:'red',    icon:'❤️'},
+          {shape:'heart',   color:'blue',   icon:'💙'},
+          {shape:'heart',   color:'yellow', icon:'💛'},
+          {shape:'heart',   color:'green',  icon:'💚'},
+          {shape:'star',    color:'yellow', icon:'⭐'},
+        ];
+        for (let i = 0; i < 3; i++) pool.push(...items);
+        return pool;
+      },
+      lives: 3,
+    },
+    both: {
+      hintFn: (s,c) => `${COLOR_NAMES[c]||c} ${SHAPES[s].label}!`,
+      catFn:  (s,c) => s + '_' + c,
+      baskets: [
+        { cat:'circle_red',    icon:'🔴', label:'빨간 원' },
+        { cat:'square_blue',   icon:'🟦', label:'파란 사각형' },
+        { cat:'star_yellow',   icon:'⭐', label:'노란 별' },
+        { cat:'heart_red',     icon:'❤️', label:'빨간 하트' },
+      ],
+      itemPool: () => [
+        {shape:'circle',color:'red',icon:'🔴'},
+        {shape:'square',color:'blue',icon:'🟦'},
+        {shape:'star',color:'yellow',icon:'⭐'},
+        {shape:'heart',color:'red',icon:'❤️'},
+        {shape:'circle',color:'red',icon:'⭕'},
+        {shape:'square',color:'blue',icon:'🔷'},
+        {shape:'star',color:'yellow',icon:'🌟'},
+        {shape:'heart',color:'red',icon:'❤️'},
+      ],
+      lives: 3,
+    }
+  };
+
+  // ── 상태 ───────────────────────────────────────────
+  let diff     = 'shape';
+  let score    = 0;
+  let best     = parseInt(localStorage.getItem('shape_sort_best') || '0');
+  let lives    = 3;
+  let level    = 1;
+  let total    = 0;
+  let correct  = 0;
+  let timer    = null;
+  let timeLeft = 0;
+  let timeLimit = 5000; // ms
+  let pool     = [];
+  let current  = null;
+  let running  = false;
+
+  // ── DOM ────────────────────────────────────────────
+  const scoreEl   = document.getElementById('scoreDisplay');
+  const bestEl    = document.getElementById('bestDisplay');
+  const livesEl   = document.getElementById('livesDisplay');
+  const hintEl    = document.getElementById('hint');
+  const shapeEl   = document.getElementById('fallingShape');
+  const timerBar  = document.getElementById('timerBar');
+  const levelEl   = document.getElementById('levelIndicator');
+  const basketArea= document.getElementById('basketArea');
+  const startOvl  = document.getElementById('startOverlay');
+  const endOvl    = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsg    = document.getElementById('resultMsg');
+  const endTitle     = document.getElementById('endTitle');
+
+  bestEl.textContent = best;
+
+  // 난이도 버튼
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.diff-btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      diff = b.dataset.diff;
+    });
+  });
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    startOvl.classList.add('hidden');
+    startGame();
+  });
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    endOvl.classList.add('hidden');
+    startOvl.classList.remove('hidden');
+  });
+
+  // ── 바구니 생성 ────────────────────────────────────
+  function buildBaskets() {
+    basketArea.innerHTML = '';
+    const cfg = DIFF_CONFIG[diff];
+    cfg.baskets.forEach(b => {
+      const div = document.createElement('div');
+      div.className = 'basket';
+      div.dataset.cat = b.cat;
+      div.innerHTML = `<div class="basket-icon">${b.icon}</div><div class="basket-label">${b.label}</div>`;
+      div.addEventListener('pointerdown', () => onBasketTap(b.cat));
+      basketArea.appendChild(div);
+    });
+  }
+
+  // ── 게임 시작 ──────────────────────────────────────
+  function startGame() {
+    score = 0; lives = 3; level = 1; total = 0; correct = 0;
+    timeLimit = 5500;
+    running = true;
+    scoreEl.textContent = 0;
+    buildBaskets();
+    shufflePool();
+    nextQuestion();
+  }
+
+  function shufflePool() {
+    const cfg = DIFF_CONFIG[diff];
+    pool = cfg.itemPool().sort(() => Math.random() - 0.5);
+  }
+
+  // ── 다음 문제 ──────────────────────────────────────
+  function nextQuestion() {
+    if (!running) return;
+    clearTimeout(timer);
+
+    if (pool.length === 0) shufflePool();
+    current = pool.pop();
+    total++;
+
+    const cfg = DIFF_CONFIG[diff];
+    const cat = cfg.catFn(current.shape, current.color || 'none');
+    current._cat = cat;
+
+    shapeEl.textContent = current.icon;
+    shapeEl.classList.remove('bounce');
+    void shapeEl.offsetWidth;
+    shapeEl.classList.add('bounce');
+
+    hintEl.textContent = cfg.hintFn(current.shape, current.color || '');
+    levelEl.textContent = `레벨 ${level} | ${total}번째`;
+    renderLives();
+
+    // 레벨에 따라 타이머 감소
+    timeLeft = timeLimit;
+    tickTimer();
+    timer = setInterval(tickTimer, 80);
+  }
+
+  function tickTimer() {
+    timeLeft -= 80;
+    const pct = Math.max(0, timeLeft / timeLimit * 100);
+    timerBar.style.width = pct + '%';
+    timerBar.style.background = pct > 40 ? 'var(--accent)' : pct > 20 ? '#ffd166' : '#ef233c';
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      // 시간 초과 = 오답
+      lives--;
+      renderLives();
+      hintEl.textContent = '⏰ 시간 초과!';
+      if (lives <= 0) { endGame(); return; }
+      setTimeout(nextQuestion, 700);
+    }
+  }
+
+  // ── 바구니 탭 ──────────────────────────────────────
+  function onBasketTap(cat) {
+    if (!running || !current) return;
+    clearInterval(timer);
+
+    const basketEl = basketArea.querySelector(`.basket[data-cat="${cat}"]`);
+    if (cat === current._cat) {
+      // 정답
+      correct++;
+      const pts = Math.ceil(10 + (timeLeft / timeLimit) * 20); // 빠를수록 보너스
+      score += pts;
+      scoreEl.textContent = score;
+      hintEl.textContent = '🎉 맞아요!';
+      if (basketEl) {
+        basketEl.classList.add('correct');
+        spawnScorePop(basketEl, '+' + pts);
+        setTimeout(() => basketEl.classList.remove('correct'), 400);
+      }
+      // 10문제마다 레벨업
+      if (correct % 8 === 0) {
+        level++;
+        timeLimit = Math.max(2500, timeLimit - 400);
+        hintEl.textContent = `🆙 레벨 ${level}!`;
+      }
+      setTimeout(nextQuestion, 400);
+    } else {
+      // 오답
+      lives--;
+      renderLives();
+      hintEl.textContent = '❌ 다시 봐요!';
+      if (basketEl) {
+        basketEl.classList.add('wrong');
+        setTimeout(() => basketEl.classList.remove('wrong'), 400);
+      }
+      if (lives <= 0) { endGame(); return; }
+      setTimeout(nextQuestion, 600);
+    }
+  }
+
+  // ── 목숨 표시 ──────────────────────────────────────
+  function renderLives() {
+    livesEl.textContent = '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, 3 - lives));
+  }
+
+  // ── 점수 팝업 ──────────────────────────────────────
+  function spawnScorePop(el, text) {
+    const wrap = document.querySelector('.wrap');
+    const r1 = el.getBoundingClientRect();
+    const r2 = wrap.getBoundingClientRect();
+    const div = document.createElement('div');
+    div.className = 'score-pop';
+    div.textContent = text;
+    div.style.color = '#f9c74f';
+    div.style.left = (r1.left - r2.left + r1.width / 2 - 20) + 'px';
+    div.style.top  = (r1.top  - r2.top  + 10) + 'px';
+    wrap.appendChild(div);
+    div.addEventListener('animationend', () => div.remove());
+  }
+
+  // ── 게임 종료 ──────────────────────────────────────
+  function endGame() {
+    running = false;
+    clearInterval(timer);
+    if (score > best) {
+      best = score;
+      localStorage.setItem('shape_sort_best', best);
+      bestEl.textContent = best;
+    }
+    const acc = total > 0 ? Math.round(correct / total * 100) : 0;
+    endTitle.textContent = score >= 150 ? '🏆 훌륭해요!' : '🎮 게임 종료';
+    finalScoreEl.textContent = score;
+    resultMsg.textContent = `${total}문제 중 ${correct}개 정답 (${acc}%) | 최고 ${best}점`;
+    endOvl.classList.remove('hidden');
+  }
+
+})();
+</script>
+</body>
+</html>
