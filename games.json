@@ -222,5 +222,21 @@
     "description": "애벌레를 끌어서 반짝이는 나뭇잎을 먹여요! 레벨이 오를수록 잎이 많아져요",
     "thumbnail": "caterpillar-feed/thumb.svg",
     "path": "caterpillar-feed/index.html"
+  },
+  {
+    "id": "frog-jump",
+    "title": "Frog Jump",
+    "title_ko": "🐸 개구리 점프",
+    "description": "탭하면 개구리가 점프! 수련잎 위에 착지하면 점수, 물에 빠지면 목숨 차감",
+    "thumbnail": "frog-jump/thumb.svg",
+    "path": "frog-jump/index.html"
+  },
+  {
+    "id": "color-memory",
+    "title": "Color Memory",
+    "title_ko": "🔮 색깔 기억 패턴",
+    "description": "버튼이 켜지는 순서를 기억했다가 같은 순서로 탭! 단계가 오를수록 길어져요",
+    "thumbnail": "color-memory/thumb.svg",
+    "path": "color-memory/index.html"
   }
 ]

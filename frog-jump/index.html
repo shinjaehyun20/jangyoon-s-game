@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐸 개구리 점프</title>
+  <style>
+    :root {
+      --bg: #1a6b2e;
+      --water: #1565c0;
+      --accent: #76c442;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      color: var(--text);
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .hud {
+      display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 16px;
+      color: var(--text);
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+    }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(180deg, #87ceeb 0%, #87ceeb 55%, #1565c0 55%, #1a237e 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+    }
+    /* 구름 장식 */
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.7);
+      border-radius: 50px;
+      pointer-events: none;
+    }
+    /* 수련잎 */
+    .lily-pad {
+      position: absolute;
+      background: radial-gradient(ellipse, #4caf50, #2e7d32);
+      border-radius: 50%;
+      border: 3px solid #1b5e20;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(10px, 3vw, 16px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    /* 개구리 */
+    #frog {
+      position: absolute;
+      font-size: clamp(30px, 8vw, 48px);
+      transition: left 0.1s;
+      z-index: 10;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    }
+    /* 물 표면 */
+    .water-surface {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 45%;
+      background: linear-gradient(180deg, rgba(21,101,192,0.6) 0%, rgba(13,71,161,0.9) 100%);
+      pointer-events: none;
+    }
+    /* 물결 */
+    .wave {
+      position: absolute;
+      top: 0; left: -100%;
+      width: 300%; height: 20px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 20'%3E%3Cpath d='M0,10 C200,0 400,20 600,10 C800,0 1000,20 1200,10 L1200,20 L0,20 Z' fill='rgba(255,255,255,0.15)'/%3E%3C/svg%3E") repeat-x;
+      animation: wave-move 3s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes wave-move { to { left: 0%; } }
+    footer {
+      display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+      color: rgba(255,255,255,0.7);
+      font-size: clamp(11px, 3vw, 14px);
+    }
+    .home-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    /* 오버레이 공통 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; color: #555; margin-bottom: 20px; line-height: 1.6; }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--bg);
+      margin: 12px 0;
+    }
+    .btn-start {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 32px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      margin-top: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .lives { font-size: 20px; letter-spacing: 2px; }
+    /* 점프 애니메이션 */
+    @keyframes jump-up {
+      0%   { transform: translateY(0) scaleY(1); }
+      30%  { transform: translateY(-30px) scaleY(1.15); }
+      60%  { transform: translateY(var(--jump-height, -120px)) scaleY(0.9); }
+      80%  { transform: translateY(var(--jump-peak, -80px)) scaleY(1); }
+      100% { transform: translateY(0) scaleY(1); }
+    }
+    #frog.jumping { animation: jump-up 0.6s ease-out; }
+    /* 착지 성공 플래시 */
+    @keyframes flash-green {
+      0%, 100% { background: transparent; }
+      50% { background: rgba(118,196,66,0.3); }
+    }
+    #gameArea.success { animation: flash-green 0.3s; }
+    /* 착지 실패 플래시 */
+    @keyframes flash-red {
+      0%, 100% { background: transparent; }
+      50% { background: rgba(244,67,54,0.4); }
+    }
+    #gameArea.fail { animation: flash-red 0.3s; }
+    /* 점수 팝업 */
+    .score-pop {
+      position: absolute;
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      pointer-events: none;
+      animation: pop-up 0.8s ease-out forwards;
+      z-index: 20;
+    }
+    @keyframes pop-up {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-50px) scale(1.4); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🐸 개구리 점프</h1>
+
+    <div class="hud">
+      <div>점수: <span id="scoreDisplay">0</span></div>
+      <div class="lives" id="livesDisplay">❤️❤️❤️</div>
+      <div>최고: <span id="bestDisplay">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="water-surface">
+        <div class="wave"></div>
+      </div>
+      <div id="frog">🐸</div>
+    </div>
+
+    <footer>
+      <small>수련잎 위에 착지하세요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🐸 개구리 점프</h2>
+      <p>화면을 탭하면 개구리가 위로 점프해요!<br>
+         수련잎 위에 착지하면 점수를 얻어요.<br>
+         물에 빠지면 목숨이 줄어요. 3번 실수하면 끝!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+      <br><br>
+      <a class="home-link" href="../index.html" style="color:#555; font-size:14px;">🏠 게임 목록으로</a>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      LIVES: 3,
+      PAD_WIDTH_RATIO: 0.28,     // 수련잎 너비 = 게임영역 너비 * ratio
+      PAD_HEIGHT_RATIO: 0.07,
+      PAD_SPEED_BASE: 1.8,        // px/frame (60fps 기준)
+      PAD_SPEED_INC: 0.15,        // 성공할수록 속도 증가
+      PAD_SPAWN_INTERVAL: 1600,   // ms
+      JUMP_DURATION: 600,         // ms
+      FROG_SIZE_RATIO: 0.12,
+      LAND_TOLERANCE: 0.45,       // 개구리 중심이 잎 내에 있어야 하는 비율
+      BEST_KEY: 'frog_jump_best',
+    };
+
+    let state = {
+      score: 0,
+      lives: CONFIG.LIVES,
+      running: false,
+      jumping: false,
+      pads: [],
+      padSpeedMultiplier: 1,
+      animId: null,
+      spawnTimer: null,
+      frogY: 0,       // frog bottom from area bottom (%)
+      jumpTarget: 0,  // which pad index is being jumped to (-1 = none)
+    };
+
+    const area    = document.getElementById('gameArea');
+    const frogEl  = document.getElementById('frog');
+    const scoreEl = document.getElementById('scoreDisplay');
+    const bestEl  = document.getElementById('bestDisplay');
+    const livesEl = document.getElementById('livesDisplay');
+    const startOv = document.getElementById('startOverlay');
+    const endOv   = document.getElementById('endOverlay');
+    const finalScoreEl = document.getElementById('finalScore');
+    const resultMsgEl  = document.getElementById('resultMsg');
+
+    // Best score
+    let best = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0');
+    bestEl.textContent = best;
+
+    // ── Utility ──────────────────────────────────────────────
+    function getAreaRect() { return area.getBoundingClientRect(); }
+
+    function areaW() { return area.offsetWidth; }
+    function areaH() { return area.offsetHeight; }
+
+    // ── Frog positioning ─────────────────────────────────────
+    function placeFrogAtBottom() {
+      const fw = areaW() * CONFIG.FROG_SIZE_RATIO;
+      const fh = fw;
+      frogEl.style.width  = fw + 'px';
+      frogEl.style.height = fh + 'px';
+      frogEl.style.fontSize = (fw * 0.85) + 'px';
+      // Center horizontally
+      frogEl.style.left = ((areaW() - fw) / 2) + 'px';
+      // bottom = water surface area (45% of height) - frog size
+      const waterH = areaH() * 0.45;
+      frogEl.style.bottom = (waterH - fh * 0.4) + 'px';
+      frogEl.style.top = 'auto';
+    }
+
+    // ── Lily pad management ───────────────────────────────────
+    function spawnPad() {
+      if (!state.running) return;
+
+      const w = areaW() * CONFIG.PAD_WIDTH_RATIO;
+      const h = areaH() * CONFIG.PAD_HEIGHT_RATIO;
+      const waterTop = areaH() * 0.55; // water surface top y
+      const skyH = waterTop - h;
+
+      // Random y in sky zone (10% ~ 80% of sky height)
+      const yPos = skyH * (0.1 + Math.random() * 0.7);
+
+      const pad = document.createElement('div');
+      pad.className = 'lily-pad';
+      pad.style.width  = w + 'px';
+      pad.style.height = h + 'px';
+      pad.style.top    = yPos + 'px';
+      pad.style.left   = areaW() + 'px'; // start from right edge
+
+      // Add a flower emoji randomly
+      const emojis = ['🌸','🌺','🌼','💐','🌻'];
+      if (Math.random() < 0.5) {
+        pad.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      }
+
+      area.appendChild(pad);
+      state.pads.push({
+        el: pad,
+        x: areaW(),
+        y: yPos,
+        w: w,
+        h: h,
+        passed: false,
+      });
+    }
+
+    function updatePads() {
+      const speed = CONFIG.PAD_SPEED_BASE * state.padSpeedMultiplier;
+      state.pads = state.pads.filter(p => {
+        p.x -= speed;
+        p.el.style.left = p.x + 'px';
+        // Remove if off-screen left
+        if (p.x + p.w < -10) {
+          p.el.remove();
+          return false;
+        }
+        return true;
+      });
+    }
+
+    // ── Jump logic ────────────────────────────────────────────
+    function doJump() {
+      if (!state.running || state.jumping) return;
+      if (state.pads.length === 0) return;
+
+      state.jumping = true;
+
+      // Find nearest pad (closest to frog X center)
+      const frogCX = parseFloat(frogEl.style.left) + frogEl.offsetWidth / 2;
+      const frogBottom = areaH() - parseFloat(frogEl.style.bottom || 0) - frogEl.offsetHeight;
+
+      // Pick closest pad by horizontal distance
+      let target = null;
+      let minDist = Infinity;
+      state.pads.forEach(p => {
+        const padCX = p.x + p.w / 2;
+        const dist = Math.abs(padCX - frogCX);
+        if (dist < minDist) {
+          minDist = dist;
+          target = p;
+        }
+      });
+
+      if (!target) {
+        state.jumping = false;
+        return;
+      }
+
+      // Animate frog jump via CSS keyframe (visual only)
+      frogEl.classList.remove('jumping');
+      // Force reflow
+      void frogEl.offsetWidth;
+      frogEl.classList.add('jumping');
+
+      setTimeout(() => {
+        frogEl.classList.remove('jumping');
+        state.jumping = false;
+        checkLanding(target, frogCX);
+      }, CONFIG.JUMP_DURATION);
+    }
+
+    function checkLanding(target, frogCX) {
+      if (!state.running) return;
+
+      const padCX = target.x + target.w / 2;
+      const tolerance = target.w * CONFIG.LAND_TOLERANCE;
+
+      if (Math.abs(padCX - frogCX) <= tolerance) {
+        // Success
+        state.score++;
+        state.padSpeedMultiplier += CONFIG.PAD_SPEED_INC;
+        scoreEl.textContent = state.score;
+        showScorePop('+1', target.x + target.w / 2, target.y);
+        area.classList.add('success');
+        setTimeout(() => area.classList.remove('success'), 300);
+      } else {
+        // Miss
+        loseLife();
+      }
+    }
+
+    function loseLife() {
+      state.lives--;
+      updateLivesUI();
+      area.classList.add('fail');
+      setTimeout(() => area.classList.remove('fail'), 300);
+      // Frog shake
+      frogEl.style.transform = 'rotate(-15deg)';
+      setTimeout(() => { frogEl.style.transform = ''; }, 300);
+
+      if (state.lives <= 0) {
+        endGame();
+      }
+    }
+
+    function updateLivesUI() {
+      livesEl.textContent = '❤️'.repeat(state.lives) + '🖤'.repeat(CONFIG.LIVES - state.lives);
+    }
+
+    function showScorePop(text, x, y) {
+      const pop = document.createElement('div');
+      pop.className = 'score-pop';
+      pop.textContent = text;
+      pop.style.left = x + 'px';
+      pop.style.top  = y + 'px';
+      area.appendChild(pop);
+      setTimeout(() => pop.remove(), 800);
+    }
+
+    // ── Game loop ─────────────────────────────────────────────
+    function loop() {
+      if (!state.running) return;
+      updatePads();
+      state.animId = requestAnimationFrame(loop);
+    }
+
+    function startSpawner() {
+      const tick = () => {
+        if (!state.running) return;
+        spawnPad();
+        const interval = Math.max(700, CONFIG.PAD_SPAWN_INTERVAL / state.padSpeedMultiplier);
+        state.spawnTimer = setTimeout(tick, interval);
+      };
+      state.spawnTimer = setTimeout(tick, 500);
+    }
+
+    // ── Game control ──────────────────────────────────────────
+    function startGame() {
+      // Clean up pads
+      state.pads.forEach(p => p.el.remove());
+      state.pads = [];
+
+      state.score = 0;
+      state.lives = CONFIG.LIVES;
+      state.running = true;
+      state.jumping = false;
+      state.padSpeedMultiplier = 1;
+
+      scoreEl.textContent = 0;
+      updateLivesUI();
+      placeFrogAtBottom();
+
+      startOv.classList.add('hidden');
+      endOv.classList.add('hidden');
+
+      startSpawner();
+      state.animId = requestAnimationFrame(loop);
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(state.animId);
+      clearTimeout(state.spawnTimer);
+
+      if (state.score > best) {
+        best = state.score;
+        localStorage.setItem(CONFIG.BEST_KEY, best);
+        bestEl.textContent = best;
+      }
+
+      finalScoreEl.textContent = state.score + '점';
+      const msgs = [
+        '잘 했어요! 다시 도전해봐요!',
+        '굿 점프! 더 높이 날아봐요!',
+        '연습하면 더 잘할 수 있어요!',
+        '개구리가 수련잎을 좋아해요!',
+      ];
+      resultMsgEl.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      endOv.classList.remove('hidden');
+    }
+
+    // ── Event listeners ───────────────────────────────────────
+    document.getElementById('startBtn').addEventListener('pointerdown', e => {
+      e.preventDefault();
+      startGame();
+    });
+    document.getElementById('restartBtn').addEventListener('pointerdown', e => {
+      e.preventDefault();
+      startGame();
+    });
+
+    // Tap game area = jump
+    area.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      doJump();
+    });
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+      if (state.running) placeFrogAtBottom();
+    });
+
+    // Add decorative clouds on init
+    function addClouds() {
+      const positions = [{top:'8%',left:'5%',w:'80px',h:'30px'},
+                         {top:'18%',left:'55%',w:'100px',h:'35px'},
+                         {top:'5%',left:'70%',w:'70px',h:'25px'}];
+      positions.forEach(p => {
+        const c = document.createElement('div');
+        c.className = 'cloud';
+        c.style.top = p.top; c.style.left = p.left;
+        c.style.width = p.w; c.style.height = p.h;
+        area.appendChild(c);
+      });
+    }
+    addClouds();
+  })();
+  </script>
+</body>
+</html>

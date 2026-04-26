@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🔮 색깔 기억 패턴</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --panel: #16213e;
+      --accent: #e94560;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      color: var(--text);
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(233,69,96,0.5);
+    }
+    .hud {
+      display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 8px 16px;
+      color: var(--text);
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+    }
+    #gameArea {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px;
+      position: relative;
+    }
+    /* 상태 메시지 */
+    #statusMsg {
+      color: rgba(255,255,255,0.85);
+      font-size: clamp(15px, 4.5vw, 20px);
+      font-weight: 700;
+      text-align: center;
+      min-height: 28px;
+      letter-spacing: 0.5px;
+    }
+    /* 4색 그리드 */
+    .color-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: min(72vw, 300px);
+      height: min(72vw, 300px);
+    }
+    .color-btn {
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.08s, filter 0.08s;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(28px, 8vw, 48px);
+      touch-action: manipulation;
+      min-height: 44px;
+    }
+    .color-btn:active { transform: scale(0.93); }
+    .color-btn.dimmed { filter: brightness(0.3) saturate(0.4); }
+    .color-btn.lit    { filter: brightness(1.6) saturate(1.5); transform: scale(1.06); box-shadow: 0 0 30px currentColor; }
+
+    #btn-red    { background: #e53935; color: #ff8a80; }
+    #btn-green  { background: #43a047; color: #b9f6ca; }
+    #btn-blue   { background: #1e88e5; color: #bbdefb; }
+    #btn-yellow { background: #f9a825; color: #fff9c4; }
+
+    /* 시퀀스 진행 도트 */
+    .dots-row {
+      display: flex; gap: 6px; align-items: center;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transition: background 0.2s;
+    }
+    .dot.done { background: var(--accent); }
+
+    footer {
+      display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+      color: rgba(255,255,255,0.5);
+      font-size: clamp(11px, 3vw, 14px);
+    }
+    .home-link { color: rgba(255,255,255,0.5); text-decoration: none; font-weight: 600; }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #16213e;
+      border: 2px solid rgba(233,69,96,0.3);
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 12px; color: #fff; }
+    .overlay-card p { font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 20px; line-height: 1.6; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); margin: 12px 0; }
+    .btn-start {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 32px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      margin-top: 4px;
+    }
+    #startOverlay .level-select {
+      display: flex; gap: 10px; margin-bottom: 16px; justify-content: center;
+    }
+    .level-btn {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .level-btn.selected { background: var(--accent); border-color: var(--accent); }
+
+    /* 정답/오답 플래시 */
+    @keyframes correct-flash { 0%,100%{background:var(--bg)} 50%{background:rgba(67,160,71,0.25)} }
+    @keyframes wrong-flash   { 0%,100%{background:var(--bg)} 25%{background:rgba(229,57,53,0.3)} 75%{background:rgba(229,57,53,0.15)} }
+    body.correct { animation: correct-flash 0.4s; }
+    body.wrong   { animation: wrong-flash 0.5s; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🔮 색깔 기억 패턴</h1>
+
+    <div class="hud">
+      <div>단계: <span id="roundDisplay">0</span></div>
+      <div id="statusHud">준비</div>
+      <div>최고: <span id="bestDisplay">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div id="statusMsg">버튼을 보고 기억하세요!</div>
+      <div class="color-grid">
+        <button class="color-btn dimmed" id="btn-red"    data-id="red">🔴</button>
+        <button class="color-btn dimmed" id="btn-green"  data-id="green">🟢</button>
+        <button class="color-btn dimmed" id="btn-blue"   data-id="blue">🔵</button>
+        <button class="color-btn dimmed" id="btn-yellow" data-id="yellow">🟡</button>
+      </div>
+      <div class="dots-row" id="dotsRow"></div>
+    </div>
+
+    <footer>
+      <small>순서대로 탭하세요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🔮 색깔 기억 패턴</h2>
+      <p>버튼이 순서대로 빛나요.<br>
+         기억했다가 같은 순서로 탭하세요!<br>
+         단계가 올라갈수록 패턴이 길어져요.</p>
+      <div class="level-select">
+        <button class="level-btn selected" data-level="easy">쉬움 😊</button>
+        <button class="level-btn" data-level="hard">어려움 😤</button>
+      </div>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+      <br><br>
+      <a class="home-link" href="../index.html" style="color:rgba(255,255,255,0.5); font-size:14px;">🏠 게임 목록으로</a>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const COLORS = ['red', 'green', 'blue', 'yellow'];
+    const EMOJI  = { red:'🔴', green:'🟢', blue:'🔵', yellow:'🟡' };
+
+    const CONFIG = {
+      SHOW_DURATION: { easy: 700, hard: 450 },  // ms each color lit
+      PAUSE_DURATION:{ easy: 250, hard: 150 },  // ms between colors
+      BEST_KEY: 'color_memory_best',
+    };
+
+    let state = {
+      sequence: [],
+      playerSeq: [],
+      round: 0,
+      mode: 'idle',   // idle | showing | input
+      level: 'easy',
+      running: false,
+    };
+
+    const roundEl  = document.getElementById('roundDisplay');
+    const bestEl   = document.getElementById('bestDisplay');
+    const statusEl = document.getElementById('statusMsg');
+    const statusHudEl = document.getElementById('statusHud');
+    const dotsRow  = document.getElementById('dotsRow');
+    const startOv  = document.getElementById('startOverlay');
+    const endOv    = document.getElementById('endOverlay');
+    const finalScoreEl = document.getElementById('finalScore');
+    const resultMsgEl  = document.getElementById('resultMsg');
+    const endTitleEl   = document.getElementById('endTitle');
+
+    const btns = {};
+    COLORS.forEach(c => { btns[c] = document.getElementById('btn-' + c); });
+
+    let best = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0');
+    bestEl.textContent = best;
+
+    // ── Level selection ───────────────────────────────────────
+    document.querySelectorAll('.level-btn').forEach(b => {
+      b.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        document.querySelectorAll('.level-btn').forEach(x => x.classList.remove('selected'));
+        b.classList.add('selected');
+        state.level = b.dataset.level;
+      });
+    });
+
+    // ── Dots UI ───────────────────────────────────────────────
+    function buildDots(count) {
+      dotsRow.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const d = document.createElement('div');
+        d.className = 'dot';
+        dotsRow.appendChild(d);
+      }
+    }
+    function updateDots(filled) {
+      const dots = dotsRow.querySelectorAll('.dot');
+      dots.forEach((d, i) => {
+        d.classList.toggle('done', i < filled);
+      });
+    }
+
+    // ── Button effects ────────────────────────────────────────
+    function dimAll() {
+      COLORS.forEach(c => { btns[c].classList.add('dimmed'); btns[c].classList.remove('lit'); });
+    }
+    function lightUp(color) {
+      dimAll();
+      btns[color].classList.remove('dimmed');
+      btns[color].classList.add('lit');
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // ── Show sequence ─────────────────────────────────────────
+    async function showSequence() {
+      state.mode = 'showing';
+      setInputEnabled(false);
+      statusEl.textContent = '잘 봐요! 👀';
+      statusHudEl.textContent = '기억 중...';
+      dimAll();
+
+      await sleep(600);
+
+      const d = CONFIG.SHOW_DURATION[state.level];
+      const p = CONFIG.PAUSE_DURATION[state.level];
+
+      for (let i = 0; i < state.sequence.length; i++) {
+        lightUp(state.sequence[i]);
+        await sleep(d);
+        dimAll();
+        await sleep(p);
+      }
+
+      await sleep(200);
+
+      // Player's turn
+      state.playerSeq = [];
+      state.mode = 'input';
+      statusEl.textContent = '이제 같은 순서로 탭하세요! 🖐️';
+      statusHudEl.textContent = '입력 중';
+      setInputEnabled(true);
+      buildDots(state.sequence.length);
+      updateDots(0);
+    }
+
+    // ── Input handling ────────────────────────────────────────
+    function setInputEnabled(enabled) {
+      COLORS.forEach(c => {
+        btns[c].disabled = !enabled;
+        if (!enabled) btns[c].classList.add('dimmed');
+        else btns[c].classList.remove('dimmed');
+      });
+    }
+
+    async function handleColorPress(color) {
+      if (state.mode !== 'input' || !state.running) return;
+
+      const idx = state.playerSeq.length;
+      state.playerSeq.push(color);
+
+      // Visual feedback
+      lightUp(color);
+      setTimeout(() => dimAll(), 200);
+
+      updateDots(state.playerSeq.length);
+
+      if (color !== state.sequence[idx]) {
+        // Wrong!
+        await sleep(300);
+        gameOver();
+        return;
+      }
+
+      if (state.playerSeq.length === state.sequence.length) {
+        // Correct! Next round
+        state.mode = 'wait';
+        setInputEnabled(false);
+        statusEl.textContent = '정답! 🎉 다음 단계로!';
+        body_flash('correct');
+
+        if (state.round > best) {
+          best = state.round;
+          localStorage.setItem(CONFIG.BEST_KEY, best);
+          bestEl.textContent = best;
+        }
+
+        await sleep(900);
+        nextRound();
+      }
+    }
+
+    function body_flash(cls) {
+      document.body.classList.add(cls);
+      setTimeout(() => document.body.classList.remove(cls), 500);
+    }
+
+    // ── Round management ──────────────────────────────────────
+    function nextRound() {
+      state.round++;
+      roundEl.textContent = state.round;
+      // Add one random color to sequence
+      const next = COLORS[Math.floor(Math.random() * COLORS.length)];
+      state.sequence.push(next);
+      showSequence();
+    }
+
+    function gameOver() {
+      state.running = false;
+      state.mode = 'idle';
+      setInputEnabled(false);
+      dimAll();
+      body_flash('wrong');
+
+      // Update best
+      if (state.round > best) {
+        best = state.round;
+        localStorage.setItem(CONFIG.BEST_KEY, best);
+        bestEl.textContent = best;
+      }
+
+      endTitleEl.textContent = '😢 틀렸어요!';
+      finalScoreEl.textContent = state.round + '단계';
+      const msgs = [
+        `${state.round}단계까지 기억했어요! 대단해요!`,
+        '다시 도전하면 더 잘할 수 있어요!',
+        '집중해서 다시 해봐요!',
+      ];
+      resultMsgEl.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      endOv.classList.remove('hidden');
+    }
+
+    // ── Game control ──────────────────────────────────────────
+    function startGame() {
+      state.sequence = [];
+      state.playerSeq = [];
+      state.round = 0;
+      state.running = true;
+      state.mode = 'idle';
+
+      roundEl.textContent = 0;
+      dimAll();
+      startOv.classList.add('hidden');
+      endOv.classList.add('hidden');
+
+      nextRound();
+    }
+
+    // ── Button listeners ──────────────────────────────────────
+    COLORS.forEach(c => {
+      btns[c].addEventListener('pointerdown', e => {
+        e.preventDefault();
+        handleColorPress(c);
+      });
+    });
+
+    document.getElementById('startBtn').addEventListener('pointerdown', e => {
+      e.preventDefault();
+      startGame();
+    });
+    document.getElementById('restartBtn').addEventListener('pointerdown', e => {
+      e.preventDefault();
+      startGame();
+    });
+  })();
+  </script>
+</body>
+</html>
