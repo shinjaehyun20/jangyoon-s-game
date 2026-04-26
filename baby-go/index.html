@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>⚫⚪ 아기 바둑</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(160deg, #2d2416 0%, #3d3220 50%, #2a1f10 100%);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex; gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: clamp(12px, 3.3vw, 15px);
+      font-weight: 700;
+      align-items: center;
+    }
+    .hud > div {
+      flex: 1; text-align: center;
+      display: flex; flex-direction: column; gap: 2px;
+      align-items: center;
+    }
+    .hud .label { font-size: 11px; opacity: 0.7; font-weight: 500; }
+    .stone-icon {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .stone-icon.b { background: radial-gradient(circle at 35% 30%, #555, #000); }
+    .stone-icon.w { background: radial-gradient(circle at 35% 30%, #fff, #b8b8b8); border: 1px solid #888; }
+    .turn-indicator {
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      font-size: clamp(13px, 3.5vw, 16px);
+      color: #fff;
+      text-align: center;
+      font-weight: 700;
+    }
+    .turn-indicator.black { background: rgba(0,0,0,0.45); }
+    .turn-indicator.white { background: rgba(255,255,255,0.85); color: #222; }
+
+    #boardWrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+    }
+    #board {
+      display: block;
+      background: #d9b375;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      max-width: 100%;
+      max-height: 100%;
+      touch-action: none;
+    }
+
+    .controls {
+      display: flex; gap: 8px;
+    }
+    .controls button {
+      flex: 1;
+      min-height: 44px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      font-size: clamp(13px, 3.5vw, 15px);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+    }
+    .controls button:active { transform: scale(0.96); }
+    .controls .btn-undo { background: rgba(255,200,80,0.25); }
+    .controls .btn-pass { background: rgba(120,180,255,0.22); }
+    .controls .btn-reset { background: rgba(255,120,120,0.28); }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      color: rgba(255,255,255,0.65);
+      font-size: clamp(11px, 3vw, 13px);
+    }
+    .home-link {
+      color: #ffd966;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      min-height: 32px;
+      display: inline-flex; align-items: center;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.78);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, #4a3a20, #2d2416);
+      border: 2px solid rgba(255,200,100,0.3);
+      border-radius: 18px;
+      padding: 24px 22px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+    }
+    .overlay-card h2 {
+      font-size: clamp(20px, 5vw, 26px);
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 15px);
+      line-height: 1.5;
+      margin-bottom: 16px;
+      color: rgba(255,255,255,0.85);
+    }
+    .rules {
+      text-align: left;
+      background: rgba(0,0,0,0.25);
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: clamp(12px, 3.3vw, 14px);
+      line-height: 1.7;
+    }
+    .btn-start {
+      min-height: 48px;
+      padding: 12px 32px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffd966, #f0a020);
+      color: #2d2416;
+      font-size: clamp(15px, 4vw, 18px);
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .btn-start:active { transform: scale(0.96); }
+    .btn-secondary {
+      margin-top: 8px;
+      min-height: 40px;
+      padding: 8px 20px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      background: transparent;
+      color: rgba(255,255,255,0.85);
+      font-size: clamp(13px, 3.4vw, 14px);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-secondary:active { transform: scale(0.96); }
+    .size-pick {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .size-btn {
+      min-height: 52px;
+      padding: 10px 14px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.25);
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .size-btn:active { transform: scale(0.98); }
+    .size-btn.selected {
+      border-color: #ffd966;
+      background: rgba(255,217,102,0.18);
+      box-shadow: 0 0 0 2px rgba(255,217,102,0.2) inset;
+    }
+    .size-num {
+      font-size: clamp(15px, 4vw, 17px);
+      font-weight: 800;
+      color: #ffd966;
+    }
+    .size-desc {
+      font-size: clamp(11px, 3vw, 13px);
+      color: rgba(255,255,255,0.75);
+      font-weight: 500;
+    }
+    .result-score {
+      font-size: clamp(28px, 8vw, 40px);
+      font-weight: 900;
+      margin: 12px 0;
+      color: #ffd966;
+    }
+    .toast {
+      position: absolute;
+      top: 80px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 5;
+      animation: toastIn 0.2s ease-out, toastOut 0.3s ease-in 1.4s forwards;
+      pointer-events: none;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    @keyframes toastOut { to { opacity: 0; transform: translate(-50%, -10px); } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>⚫⚪ 아기 바둑</h1>
+
+    <div class="hud">
+      <div>
+        <span class="label">⚫ 흑 점수</span>
+        <span id="capBlack">0</span>
+      </div>
+      <div>
+        <span class="label">⚪ 백 점수</span>
+        <span id="capWhite">0</span>
+      </div>
+      <div>
+        <span class="label">수</span>
+        <span id="moveNum">0</span>
+      </div>
+    </div>
+
+    <div class="turn-indicator black" id="turnBox">⚫ 흑돌 차례</div>
+
+    <div id="boardWrap">
+      <canvas id="board" width="450" height="450"></canvas>
+    </div>
+
+    <div class="controls">
+      <button class="btn-undo" id="undoBtn">↩ 무르기</button>
+      <button class="btn-pass" id="passBtn">⏭ 한 번 쉬기</button>
+      <button class="btn-reset" id="resetBtn">🔄 새 판</button>
+    </div>
+
+    <footer>
+      <small>두 번 연속 쉬면 끝나요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>⚫⚪ 아기 바둑</h2>
+      <p>먼저 바둑판 크기를 골라요!</p>
+
+      <div class="size-pick" id="sizePick">
+        <button class="size-btn selected" data-size="9">
+          <div class="size-num">9 × 9</div>
+          <div class="size-desc">🌱 입문 (빠른 한 판)</div>
+        </button>
+        <button class="size-btn" data-size="13">
+          <div class="size-num">13 × 13</div>
+          <div class="size-desc">🌿 중간</div>
+        </button>
+        <button class="size-btn" data-size="19">
+          <div class="size-num">19 × 19</div>
+          <div class="size-desc">🌳 정식 바둑판</div>
+        </button>
+      </div>
+
+      <div class="rules">
+        🎯 <b>규칙</b><br>
+        • 빈 자리를 톡! 누르면 돌이 놓여요<br>
+        • 상대 돌을 빙 둘러싸면 잡아요<br>
+        • 잡은 돌이 많은 사람이 이겨요<br>
+        • 두기 싫으면 "쉬기" 버튼!
+      </div>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="winnerTitle">🎉 게임 끝!</h2>
+      <div class="result-score" id="finalScore">0 : 0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+      <button class="btn-secondary" id="changeSizeBtn">↺ 크기 바꾸기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ─── CONFIG ───────────────────────────────────
+    const CONFIG = {
+      SIZE: 9,                 // 시작 시 난이도 선택으로 덮어씀
+      MARGIN: 26,              // 보드 가장자리 여백 (px, 450 기준)
+      BASE: 450,               // 캔버스 기준 크기
+      BEST_KEY: 'baby-go_best',
+      SIZE_KEY: 'baby-go_size',
+    };
+    function cellSize() {
+      return (CONFIG.BASE - CONFIG.MARGIN * 2) / (CONFIG.SIZE - 1);
+    }
+    // 보드 크기별 화점 좌표
+    const STAR_POINTS = {
+      9:  [[2,2],[2,6],[6,2],[6,6],[4,4]],
+      13: [[3,3],[3,9],[9,3],[9,9],[6,6],[6,3],[6,9],[3,6],[9,6]],
+      19: [[3,3],[3,9],[3,15],[9,3],[9,9],[9,15],[15,3],[15,9],[15,15]],
+    };
+
+    // ─── DOM ──────────────────────────────────────
+    const canvas    = document.getElementById('board');
+    const ctx       = canvas.getContext('2d');
+    const turnBox   = document.getElementById('turnBox');
+    const capBlackEl = document.getElementById('capBlack'); // 흑이 잡은 백돌 수
+    const capWhiteEl = document.getElementById('capWhite'); // 백이 잡은 흑돌 수
+    const moveNumEl = document.getElementById('moveNum');
+    const startOv   = document.getElementById('startOverlay');
+    const endOv     = document.getElementById('endOverlay');
+    const winnerEl  = document.getElementById('winnerTitle');
+    const finalEl   = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+    const wrapEl    = document.querySelector('.wrap');
+
+    // ─── STATE ────────────────────────────────────
+    // board[y][x] = 0(빈) / 1(흑) / 2(백)
+    const state = {
+      board: [],
+      turn: 1,                 // 1=흑, 2=백
+      captured: { 1: 0, 2: 0 },// captured[1] = 흑이 잡은 백돌 수
+      moveNum: 0,
+      lastMove: null,          // {x, y}
+      history: [],             // 무르기용 스냅샷 스택
+      passes: 0,
+      ended: false,
+    };
+
+    function emptyBoard() {
+      const b = [];
+      for (let y = 0; y < CONFIG.SIZE; y++) {
+        b.push(new Array(CONFIG.SIZE).fill(0));
+      }
+      return b;
+    }
+
+    function snapshot() {
+      return {
+        board: state.board.map(row => row.slice()),
+        turn: state.turn,
+        captured: { 1: state.captured[1], 2: state.captured[2] },
+        moveNum: state.moveNum,
+        lastMove: state.lastMove ? { x: state.lastMove.x, y: state.lastMove.y } : null,
+        passes: state.passes,
+      };
+    }
+    function restore(snap) {
+      state.board = snap.board.map(row => row.slice());
+      state.turn = snap.turn;
+      state.captured = { 1: snap.captured[1], 2: snap.captured[2] };
+      state.moveNum = snap.moveNum;
+      state.lastMove = snap.lastMove ? { x: snap.lastMove.x, y: snap.lastMove.y } : null;
+      state.passes = snap.passes;
+    }
+
+    // ─── 그리기 ────────────────────────────────────
+    function drawBoard() {
+      const W = CONFIG.BASE;
+      ctx.clearRect(0, 0, W, W);
+
+      // 보드 배경 (이미 CSS로 처리되지만 캔버스 내 보장)
+      ctx.fillStyle = '#d9b375';
+      ctx.fillRect(0, 0, W, W);
+
+      // 격자선
+      const CELL = cellSize();
+      ctx.strokeStyle = '#3a2810';
+      ctx.lineWidth = 1.2;
+      for (let i = 0; i < CONFIG.SIZE; i++) {
+        const p = CONFIG.MARGIN + i * CELL;
+        // 가로
+        ctx.beginPath();
+        ctx.moveTo(CONFIG.MARGIN, p);
+        ctx.lineTo(W - CONFIG.MARGIN, p);
+        ctx.stroke();
+        // 세로
+        ctx.beginPath();
+        ctx.moveTo(p, CONFIG.MARGIN);
+        ctx.lineTo(p, W - CONFIG.MARGIN);
+        ctx.stroke();
+      }
+
+      // 화점 (보드 크기별)
+      const dots = STAR_POINTS[CONFIG.SIZE] || [];
+      const dotR = CONFIG.SIZE >= 19 ? 2.5 : (CONFIG.SIZE >= 13 ? 3 : 3.5);
+      ctx.fillStyle = '#3a2810';
+      dots.forEach(([dx, dy]) => {
+        const px = CONFIG.MARGIN + dx * CELL;
+        const py = CONFIG.MARGIN + dy * CELL;
+        ctx.beginPath();
+        ctx.arc(px, py, dotR, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 돌
+      for (let y = 0; y < CONFIG.SIZE; y++) {
+        for (let x = 0; x < CONFIG.SIZE; x++) {
+          const v = state.board[y][x];
+          if (v === 0) continue;
+          const px = CONFIG.MARGIN + x * CELL;
+          const py = CONFIG.MARGIN + y * CELL;
+          drawStone(px, py, v, CELL);
+        }
+      }
+
+      // 마지막 수 표시
+      if (state.lastMove) {
+        const { x, y } = state.lastMove;
+        const px = CONFIG.MARGIN + x * CELL;
+        const py = CONFIG.MARGIN + y * CELL;
+        ctx.fillStyle = '#ff3030';
+        ctx.beginPath();
+        ctx.arc(px, py, Math.max(2.5, CELL * 0.12), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawStone(px, py, color, CELL) {
+      const r = CELL * 0.46;
+      // 그림자
+      ctx.beginPath();
+      ctx.arc(px + 1.5, py + 2, r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.fill();
+
+      // 본체
+      const grad = ctx.createRadialGradient(
+        px - r * 0.35, py - r * 0.35, r * 0.1,
+        px, py, r
+      );
+      if (color === 1) {
+        grad.addColorStop(0, '#777');
+        grad.addColorStop(0.6, '#1a1a1a');
+        grad.addColorStop(1, '#000');
+      } else {
+        grad.addColorStop(0, '#fff');
+        grad.addColorStop(0.7, '#e8e8e8');
+        grad.addColorStop(1, '#bdbdbd');
+      }
+      ctx.beginPath();
+      ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+      if (color === 2) {
+        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = 'rgba(120,120,120,0.5)';
+        ctx.stroke();
+      }
+    }
+
+    // ─── 좌표 변환 ─────────────────────────────────
+    function pixelToGrid(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const scale = CONFIG.BASE / rect.width;
+      const cx = (clientX - rect.left) * scale;
+      const cy = (clientY - rect.top)  * scale;
+      const CELL = cellSize();
+      const gx = Math.round((cx - CONFIG.MARGIN) / CELL);
+      const gy = Math.round((cy - CONFIG.MARGIN) / CELL);
+      if (gx < 0 || gx >= CONFIG.SIZE || gy < 0 || gy >= CONFIG.SIZE) return null;
+      // 너무 멀리 클릭한 건 무시 (가장 가까운 점에서 셀 절반 이내일 때만)
+      const px = CONFIG.MARGIN + gx * CELL;
+      const py = CONFIG.MARGIN + gy * CELL;
+      const dist = Math.hypot(cx - px, cy - py);
+      if (dist > CELL * 0.55) return null;
+      return { x: gx, y: gy };
+    }
+
+    // ─── 바둑 규칙: 활로 계산 + 따먹기 ──────────────
+    const DIRS = [[1,0],[-1,0],[0,1],[0,-1]];
+
+    function getGroup(board, x, y) {
+      // 같은 색 돌이 연결된 그룹과 활로(빈 칸 인접 수)를 반환
+      const color = board[y][x];
+      if (color === 0) return null;
+      const visited = new Set();
+      const stack = [[x, y]];
+      const stones = [];
+      const liberties = new Set();
+      while (stack.length) {
+        const [cx, cy] = stack.pop();
+        const key = cy * CONFIG.SIZE + cx;
+        if (visited.has(key)) continue;
+        visited.add(key);
+        stones.push([cx, cy]);
+        for (const [dx, dy] of DIRS) {
+          const nx = cx + dx, ny = cy + dy;
+          if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
+          const v = board[ny][nx];
+          if (v === 0) {
+            liberties.add(ny * CONFIG.SIZE + nx);
+          } else if (v === color) {
+            stack.push([nx, ny]);
+          }
+        }
+      }
+      return { stones, liberties: liberties.size };
+    }
+
+    function tryMove(x, y) {
+      // 빈 자리?
+      if (state.board[y][x] !== 0) return { ok: false, reason: '이미 돌이 있어요' };
+
+      const me = state.turn;
+      const opp = me === 1 ? 2 : 1;
+
+      // 가상으로 두기
+      const trial = state.board.map(r => r.slice());
+      trial[y][x] = me;
+
+      // 인접한 상대 그룹 중 활로 0인 것 따먹기
+      let captured = 0;
+      for (const [dx, dy] of DIRS) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
+        if (trial[ny][nx] !== opp) continue;
+        const grp = getGroup(trial, nx, ny);
+        if (grp.liberties === 0) {
+          for (const [sx, sy] of grp.stones) {
+            trial[sy][sx] = 0;
+            captured++;
+          }
+        }
+      }
+
+      // 자살수 검사: 내 돌의 활로가 0이면 무효 (단 따먹은 게 있으면 OK)
+      const myGroup = getGroup(trial, x, y);
+      if (myGroup.liberties === 0) {
+        return { ok: false, reason: '거기는 둘 수 없어요 😅' };
+      }
+
+      return { ok: true, board: trial, captured };
+    }
+
+    // ─── 액션 ──────────────────────────────────────
+    function place(x, y) {
+      if (state.ended) return;
+      const res = tryMove(x, y);
+      if (!res.ok) {
+        showToast(res.reason);
+        return;
+      }
+      // 스냅샷 저장 (둘기 직전)
+      state.history.push(snapshot());
+      if (state.history.length > 30) state.history.shift();
+
+      state.board = res.board;
+      state.captured[state.turn] += res.captured;
+      state.moveNum++;
+      state.lastMove = { x, y };
+      state.passes = 0;
+      state.turn = state.turn === 1 ? 2 : 1;
+
+      updateHud();
+      drawBoard();
+    }
+
+    function pass() {
+      if (state.ended) return;
+      state.history.push(snapshot());
+      if (state.history.length > 30) state.history.shift();
+      state.passes++;
+      state.lastMove = null;
+      showToast(state.turn === 1 ? '⚫ 흑 한 번 쉼' : '⚪ 백 한 번 쉼');
+      state.turn = state.turn === 1 ? 2 : 1;
+      state.moveNum++;
+
+      if (state.passes >= 2) {
+        endGame();
+        return;
+      }
+      updateHud();
+      drawBoard();
+    }
+
+    function undo() {
+      if (state.history.length === 0) {
+        showToast('무를 수 없어요');
+        return;
+      }
+      const snap = state.history.pop();
+      restore(snap);
+      state.ended = false;
+      endOv.classList.add('hidden');
+      updateHud();
+      drawBoard();
+    }
+
+    function reset() {
+      state.board = emptyBoard();
+      state.turn = 1;
+      state.captured = { 1: 0, 2: 0 };
+      state.moveNum = 0;
+      state.lastMove = null;
+      state.history = [];
+      state.passes = 0;
+      state.ended = false;
+      endOv.classList.add('hidden');
+      updateHud();
+      drawBoard();
+    }
+
+    function endGame() {
+      state.ended = true;
+      const black = state.captured[1]; // 흑이 잡은 백돌
+      const white = state.captured[2]; // 백이 잡은 흑돌
+      finalEl.textContent = `⚫ ${black} : ${white} ⚪`;
+
+      let title, msg;
+      if (black > white) {
+        title = '🎉 흑돌 승리!';
+        msg = `흑이 백돌을 ${black - white}개 더 잡았어요!`;
+      } else if (white > black) {
+        title = '🎉 백돌 승리!';
+        msg = `백이 흑돌을 ${white - black}개 더 잡았어요!`;
+      } else {
+        title = '🤝 무승부!';
+        msg = '둘 다 똑같이 잘했어요!';
+      }
+      winnerEl.textContent = title;
+      resultMsg.textContent = msg;
+      endOv.classList.remove('hidden');
+    }
+
+    // ─── HUD ───────────────────────────────────────
+    function updateHud() {
+      capBlackEl.textContent = state.captured[1]; // 흑이 잡은 백돌 수
+      capWhiteEl.textContent = state.captured[2]; // 백이 잡은 흑돌 수
+      moveNumEl.textContent = state.moveNum;
+      if (state.turn === 1) {
+        turnBox.textContent = '⚫ 흑돌 차례';
+        turnBox.className = 'turn-indicator black';
+      } else {
+        turnBox.textContent = '⚪ 백돌 차례';
+        turnBox.className = 'turn-indicator white';
+      }
+    }
+
+    // ─── 토스트 ────────────────────────────────────
+    let toastTimer = null;
+    function showToast(text) {
+      const old = wrapEl.querySelector('.toast');
+      if (old) old.remove();
+      if (toastTimer) clearTimeout(toastTimer);
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = text;
+      wrapEl.appendChild(t);
+      toastTimer = setTimeout(() => { t.remove(); }, 1800);
+    }
+
+    // ─── 입력 ──────────────────────────────────────
+    canvas.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      const g = pixelToGrid(e.clientX, e.clientY);
+      if (g) place(g.x, g.y);
+    });
+
+    document.getElementById('undoBtn').addEventListener('click', undo);
+    document.getElementById('passBtn').addEventListener('click', pass);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (state.moveNum === 0 || confirm('새 판 시작할까요?')) reset();
+    });
+
+    // ─── 난이도 선택 ───────────────────────────────
+    const sizePick = document.getElementById('sizePick');
+    let pickedSize = parseInt(localStorage.getItem(CONFIG.SIZE_KEY) || '9', 10);
+    if (![9, 13, 19].includes(pickedSize)) pickedSize = 9;
+
+    function applyPickedHighlight() {
+      sizePick.querySelectorAll('.size-btn').forEach(b => {
+        const sz = parseInt(b.dataset.size, 10);
+        b.classList.toggle('selected', sz === pickedSize);
+      });
+    }
+    applyPickedHighlight();
+
+    sizePick.addEventListener('click', (e) => {
+      const btn = e.target.closest('.size-btn');
+      if (!btn) return;
+      pickedSize = parseInt(btn.dataset.size, 10);
+      applyPickedHighlight();
+    });
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      CONFIG.SIZE = pickedSize;
+      localStorage.setItem(CONFIG.SIZE_KEY, String(pickedSize));
+      reset();                          // 새 크기로 보드 재초기화
+      startOv.classList.add('hidden');
+    });
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      reset();
+      endOv.classList.add('hidden');
+    });
+    document.getElementById('changeSizeBtn').addEventListener('click', () => {
+      endOv.classList.add('hidden');
+      startOv.classList.remove('hidden');
+    });
+
+    // ─── 초기화 ────────────────────────────────────
+    function init() {
+      // 시작 화면이 떠 있는 동안엔 기본 9x9 보드를 미리 그려둠 (배경 미리보기)
+      CONFIG.SIZE = pickedSize;
+      state.board = emptyBoard();
+      updateHud();
+      drawBoard();
+    }
+    init();
+  })();
+  </script>
+</body>
+</html>

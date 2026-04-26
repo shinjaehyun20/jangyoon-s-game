@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2d2416"/>
+      <stop offset="0.5" stop-color="#3d3220"/>
+      <stop offset="1" stop-color="#1f1810"/>
+    </linearGradient>
+    <radialGradient id="black" cx="0.35" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#777"/>
+      <stop offset="0.6" stop-color="#1a1a1a"/>
+      <stop offset="1" stop-color="#000"/>
+    </radialGradient>
+    <radialGradient id="white" cx="0.35" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0.7" stop-color="#e8e8e8"/>
+      <stop offset="1" stop-color="#bdbdbd"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 바둑판 -->
+  <g transform="translate(20,18)">
+    <rect width="140" height="140" rx="6" fill="#d9b375"/>
+    <!-- 5x5 격자 (썸네일용 단순화) -->
+    <g stroke="#3a2810" stroke-width="1" fill="none">
+      <line x1="20" y1="20" x2="20" y2="120"/>
+      <line x1="45" y1="20" x2="45" y2="120"/>
+      <line x1="70" y1="20" x2="70" y2="120"/>
+      <line x1="95" y1="20" x2="95" y2="120"/>
+      <line x1="120" y1="20" x2="120" y2="120"/>
+      <line x1="20" y1="20" x2="120" y2="20"/>
+      <line x1="20" y1="45" x2="120" y2="45"/>
+      <line x1="20" y1="70" x2="120" y2="70"/>
+      <line x1="20" y1="95" x2="120" y2="95"/>
+      <line x1="20" y1="120" x2="120" y2="120"/>
+    </g>
+    <!-- 화점 -->
+    <circle cx="70" cy="70" r="2.5" fill="#3a2810"/>
+    <!-- 돌 배치 -->
+    <circle cx="45" cy="45" r="11" fill="#000" opacity="0.25"/>
+    <circle cx="44" cy="44" r="11" fill="url(#black)"/>
+    <circle cx="70" cy="70" r="11" fill="#000" opacity="0.25"/>
+    <circle cx="69" cy="69" r="11" fill="url(#white)" stroke="rgba(120,120,120,0.5)" stroke-width="0.5"/>
+    <circle cx="95" cy="45" r="11" fill="#000" opacity="0.25"/>
+    <circle cx="94" cy="44" r="11" fill="url(#black)"/>
+    <circle cx="45" cy="95" r="11" fill="#000" opacity="0.25"/>
+    <circle cx="44" cy="94" r="11" fill="url(#white)" stroke="rgba(120,120,120,0.5)" stroke-width="0.5"/>
+    <circle cx="95" cy="95" r="11" fill="#000" opacity="0.25"/>
+    <circle cx="94" cy="94" r="11" fill="url(#black)"/>
+    <!-- 마지막 수 -->
+    <circle cx="94" cy="94" r="2.5" fill="#ff3030"/>
+  </g>
+
+  <!-- 우측 정보 -->
+  <g transform="translate(180,40)">
+    <text x="0" y="0" font-family="'Pretendard','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#ffd966">9 × 9</text>
+    <text x="0" y="22" font-family="'Pretendard','Noto Sans KR',sans-serif" font-size="11" font-weight="500" fill="rgba(255,255,255,0.7)">2인 대전</text>
+    <text x="0" y="44" font-family="'Pretendard','Noto Sans KR',sans-serif" font-size="10" font-weight="500" fill="rgba(255,255,255,0.55)">⚫ vs ⚪</text>
+  </g>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd966">아기 바둑</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">BABY GO</text>
+  </g>
+</svg>

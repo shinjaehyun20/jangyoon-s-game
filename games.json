@@ -238,5 +238,13 @@
     "description": "버튼이 켜지는 순서를 기억했다가 같은 순서로 탭! 단계가 오를수록 길어져요",
     "thumbnail": "color-memory/thumb.svg",
     "path": "color-memory/index.html"
+  },
+  {
+    "id": "baby-go",
+    "title": "Baby Go",
+    "title_ko": "⚫⚪ 아기 바둑",
+    "description": "9×9 / 13×13 / 19×19 난이도 선택, 2인 번갈아 두기, 따먹기 규칙만 적용한 입문판",
+    "thumbnail": "baby-go/thumb.svg",
+    "path": "baby-go/index.html"
   }
 ]
