@@ -84,6 +84,17 @@
       touch-action: none;
     }
 
+    /* 보드 흔들기 애니메이션 (잘못된 클릭) */
+    @keyframes boardShake {
+      0%   { transform: translateX(0); }
+      20%  { transform: translateX(-6px); }
+      40%  { transform: translateX(6px); }
+      60%  { transform: translateX(-4px); }
+      80%  { transform: translateX(4px); }
+      100% { transform: translateX(0); }
+    }
+    #board.shake { animation: boardShake 0.35s ease-out; }
+
     .controls {
       display: flex; gap: 8px;
     }
@@ -275,11 +286,148 @@
     /* 시작 화면 스크롤 대응 */
     .overlay { overflow-y: auto; }
     .overlay-card { overflow-y: auto; }
+
+    /* ── 튜토리얼 UI ─────────────────────────────── */
+
+    /* 진행 인디케이터 (상단, 게임 중 표시) */
+    #tutProgress {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 10px;
+      background: rgba(255,220,80,0.18);
+      border-radius: 8px;
+      color: #ffd966;
+      font-size: clamp(11px, 3vw, 13px);
+      font-weight: 700;
+    }
+    #tutProgress.visible { display: flex; }
+    #tutSkipBtn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.45);
+      font-size: clamp(10px, 2.6vw, 11px);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    #tutSkipBtn:active { opacity: 0.6; }
+
+    /* 말풍선 코치 */
+    #coachBubble {
+      display: none;
+      background: #fff9c2;
+      border: 2px solid #f5c800;
+      border-radius: 16px;
+      padding: 12px 14px;
+      color: #2d2416;
+      font-size: clamp(14px, 3.8vw, 17px);
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+    #coachBubble.visible { display: block; }
+    /* 꼬리 삼각형 — 말풍선 아래쪽 */
+    #coachBubble::after {
+      content: '';
+      position: absolute;
+      bottom: -12px; left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #f5c800;
+    }
+    #coachBubble::before {
+      content: '';
+      position: absolute;
+      bottom: -9px; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #fff9c2;
+      z-index: 1;
+    }
+
+    /* 코치 다음 버튼 */
+    #coachNextBtn {
+      display: none;
+      margin-top: 8px;
+      min-height: 40px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ffd966, #f0a020);
+      color: #2d2416;
+      font-size: clamp(13px, 3.5vw, 15px);
+      font-weight: 800;
+      cursor: pointer;
+    }
+    #coachNextBtn.visible { display: block; }
+    #coachNextBtn:active { transform: scale(0.97); }
+
+    /* 튜토리얼 step 5 "시작" 버튼 */
+    #tutFinalBtn {
+      display: none;
+      margin-top: 8px;
+      min-height: 48px;
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffd966, #f0a020);
+      color: #2d2416;
+      font-size: clamp(14px, 4vw, 17px);
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    #tutFinalBtn.visible { display: block; }
+    #tutFinalBtn:active { transform: scale(0.96); }
+
+    /* 폭죽 축하 오버레이 */
+    #celebrateOverlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      pointer-events: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #celebrateOverlay.visible { display: flex; }
+    #celebrateOverlay .big-text {
+      font-size: clamp(32px, 10vw, 48px);
+      font-weight: 900;
+      color: #ffd966;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #celebrateOverlay .confetti {
+      font-size: clamp(24px, 7vw, 36px);
+      animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    /* 깜박이는 점선 (canvas 위 오버레이 — SVG 아님, canvas에서 직접 그림) */
+    @keyframes dashedBlink {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.3; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>⚫⚪ 아기 바둑</h1>
+
+    <!-- 튜토리얼 진행 인디케이터 -->
+    <div id="tutProgress">
+      <span id="tutProgressText">📚 배우기 1/5</span>
+      <button id="tutSkipBtn">건너뛰기</button>
+    </div>
 
     <div class="hud">
       <div>
@@ -298,8 +446,19 @@
 
     <div class="turn-indicator black" id="turnBox">⚫ 흑돌 차례</div>
 
+    <!-- 말풍선 코치 -->
+    <div id="coachBubble"></div>
+    <button id="coachNextBtn">다음 →</button>
+    <button id="tutFinalBtn">혼자 두기 시작! 🎮</button>
+
     <div id="boardWrap">
       <canvas id="board" width="450" height="450"></canvas>
+    </div>
+
+    <!-- 폭죽 축하 -->
+    <div id="celebrateOverlay">
+      <div class="confetti">🎉🎊✨</div>
+      <div class="big-text">잡았다!</div>
     </div>
 
     <div class="controls">
@@ -355,6 +514,13 @@
       </div>
 
       <button class="btn-start" id="startBtn">시작!</button>
+      <!-- 튜토리얼 다시 하기 (작게, 하단) -->
+      <div style="margin-top:14px;">
+        <button id="replayTutBtn"
+          style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:clamp(11px,2.8vw,12px);cursor:pointer;text-decoration:underline;">
+          📚 배우기 다시 하기
+        </button>
+      </div>
     </div>
   </div>
 
@@ -380,6 +546,7 @@
       BASE: 450,
       SIZE_KEY: 'baby-go_size',
       MODE_KEY: 'baby-go_mode',
+      TUT_DONE_KEY: 'babygo_tutorial_done',
     };
     function cellSize() {
       return (CONFIG.BASE - CONFIG.MARGIN * 2) / (CONFIG.SIZE - 1);
@@ -405,8 +572,17 @@
     const wrapEl      = document.querySelector('.wrap');
     const hintBtn     = document.getElementById('hintBtn');
 
+    // 튜토리얼 UI DOM
+    const tutProgress     = document.getElementById('tutProgress');
+    const tutProgressText = document.getElementById('tutProgressText');
+    const tutSkipBtn      = document.getElementById('tutSkipBtn');
+    const coachBubble     = document.getElementById('coachBubble');
+    const coachNextBtn    = document.getElementById('coachNextBtn');
+    const tutFinalBtn     = document.getElementById('tutFinalBtn');
+    const celebrateOv     = document.getElementById('celebrateOverlay');
+    const replayTutBtn    = document.getElementById('replayTutBtn');
+
     // ─── MODE STATE ───────────────────────────────
-    // mode: 'pvp' | 'ai'    difficulty: 'easy' (확장용)
     const gameMode = { mode: 'pvp', difficulty: 'easy', hintOn: false };
 
     // ─── GAME STATE ───────────────────────────────
@@ -473,7 +649,7 @@
       return { stones, liberties: liberties.size };
     }
 
-    // 그룹의 활로 좌표 목록 반환 (힌트용)
+    // 그룹의 활로 좌표 목록 반환 (힌트·튜토리얼용)
     function getGroupLibertyCoords(board, x, y) {
       const color = board[y][x];
       if (color === 0) return [];
@@ -500,7 +676,6 @@
     }
 
     function tryMove(x, y, boardSrc, turnColor) {
-      // boardSrc, turnColor 인자 없으면 현재 state 사용
       const board = boardSrc || state.board;
       const me = turnColor || state.turn;
       const opp = me === 1 ? 2 : 1;
@@ -532,7 +707,6 @@
     }
 
     // ─── AI 평가 함수들 ───────────────────────────
-    // 상대 돌 잡을 수 있는 자리 탐색 (활로 1개 막기)
     function findCaptureMoves(board, aiColor) {
       const opp = aiColor === 1 ? 2 : 1;
       const visited = new Set();
@@ -546,7 +720,6 @@
           if (!grp) continue;
           grp.stones.forEach(([sx, sy]) => visited.add(sy * CONFIG.SIZE + sx));
           if (grp.liberties === 1) {
-            // 활로 1개인 상대 그룹 — 그 활로를 찾아 추가
             const libCoords = getGroupLibertyCoords(board, x, y);
             libCoords.forEach(([lx, ly]) => {
               const res = tryMove(lx, ly, board, aiColor);
@@ -558,7 +731,6 @@
       return result;
     }
 
-    // 자기 돌 살리기 (활로 1개 아타리 상태)
     function findRescueMoves(board, aiColor) {
       const visited = new Set();
       const result = [];
@@ -582,7 +754,6 @@
       return result;
     }
 
-    // 자기 돌 인접 확장 자리 (연결)
     function findConnectMoves(board, aiColor) {
       const result = [];
       for (let y = 0; y < CONFIG.SIZE; y++) {
@@ -601,15 +772,12 @@
       return result;
     }
 
-    // 화점·중앙 선호 후보
     function getPreferredMoves(board, aiColor) {
       const stars = STAR_POINTS[CONFIG.SIZE] || [];
       const candidates = [];
-      // 화점 우선
       for (const [sx, sy] of stars) {
         if (board[sy][sx] === 0 && tryMove(sx, sy, board, aiColor).ok) candidates.push([sx, sy]);
       }
-      // 중앙 근처 (크기 기준 중앙 ±2)
       const c = Math.floor(CONFIG.SIZE / 2);
       for (let dy = -2; dy <= 2; dy++) {
         for (let dx = -2; dx <= 2; dx++) {
@@ -626,58 +794,48 @@
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    // AI 최적 수 선택 (difficulty 매개변수: 추후 확장용)
     function evaluateMove(x, y, board, aiColor) {
-      // 점수가 높을수록 우선
       const res = tryMove(x, y, board, aiColor);
       if (!res.ok) return -1;
       let score = 0;
-      // 잡기 여부 확인
       if (res.captured > 0) score += 100 + res.captured * 10;
       return score;
     }
 
     function aiMove(difficulty = 'easy') {
-      const aiColor = 2; // AI = 백
+      const aiColor = 2;
       const board = state.board;
 
-      // 1순위: 상대 돌 잡기
       const captures = findCaptureMoves(board, aiColor);
       if (captures.length) return pickRandom(captures);
 
-      // 2순위: 자기 돌 살리기
       const rescues = findRescueMoves(board, aiColor);
       if (rescues.length) return pickRandom(rescues);
 
-      // 3순위: 연결 (인접 확장)
       const connects = findConnectMoves(board, aiColor);
       if (connects.length && Math.random() < 0.65) return pickRandom(connects);
 
-      // 4순위: 화점·중앙 선호 + 나머지 합법수 중 랜덤
       const preferred = getPreferredMoves(board, aiColor);
       if (preferred.length) return pickRandom(preferred);
 
       const legal = getLegalMoves(board, aiColor);
       if (legal.length) return pickRandom(legal);
 
-      return null; // 둘 자리 없음 → 패스
+      return null;
     }
 
     // ─── 힌트 계산 ────────────────────────────────
-    // 합법수 표시용, 위험 흑 그룹, 잡을 수 있는 백 그룹 활로
     function computeHints() {
       if (!gameMode.hintOn || state.ended || state.aiThinking) return null;
-      if (gameMode.mode === 'ai' && state.turn !== 1) return null; // 흑 차례일 때만
+      if (gameMode.mode === 'ai' && state.turn !== 1) return null;
 
       const board = state.board;
-      const myColor = 1; // 흑
-      const oppColor = 2; // 백
+      const myColor = 1;
+      const oppColor = 2;
 
-      // 합법수 좌표
       const legal = getLegalMoves(board, myColor);
 
-      // 위험한 흑 그룹 (활로 <= 2)
-      const dangerGroups = []; // [[x,y], ...]  — 그룹 내 돌들
+      const dangerGroups = [];
       const dangerMessages = [];
       const visitedDanger = new Set();
       for (let y = 0; y < CONFIG.SIZE; y++) {
@@ -695,8 +853,7 @@
         }
       }
 
-      // 잡을 수 있는 백돌 활로 (활로 1개)
-      const captureTargets = []; // 막을 수 있는 좌표
+      const captureTargets = [];
       const captureMessages = [];
       const visitedCapture = new Set();
       for (let y = 0; y < CONFIG.SIZE; y++) {
@@ -716,6 +873,250 @@
       }
 
       return { legal, dangerGroups, dangerMessages, captureTargets, captureMessages };
+    }
+
+    // ══════════════════════════════════════════════
+    // ─── 튜토리얼 시스템 ───────────────────────────
+    // ══════════════════════════════════════════════
+
+    // 튜토리얼 상태
+    const tut = {
+      active: false,       // 튜토리얼 진행 중 여부
+      step: 0,             // 현재 단계 (1~5)
+      enforcePos: null,    // {x, y} — 이 자리만 클릭 허용 (null이면 자유)
+      blinkTimer: null,    // 점선 깜박이기 타이머
+      blinkPhase: 0,       // 깜박이기 위상 (0~1)
+      libertyTargets: [],  // Step 2: 활로 좌표 목록
+      dangerStones: [],    // Step 4: 위험 흑돌 좌표
+    };
+
+    // 9x9 튜토리얼 전용 시나리오 좌표 (모두 9×9 기준)
+    //  Step 1: 흑 (4,4) — 중앙 천원
+    //  Step 3: 백 (4,4) / 흑 (3,4), (4,3), (4,5) → 정답 (5,4)
+    //  Step 4: 흑 (4,4) / 백 (3,4), (4,3), (4,5) → 정답 (5,4)
+    const TUT = {
+      STEP1_TARGET: { x: 4, y: 4 },
+      // Step 3 배치: 백 (4,4) 잡기 시나리오
+      // 백 활로 1개만 남도록: 흑이 (3,4),(4,3),(4,5) 배치 → 백 (4,4) 활로=(5,4)
+      STEP3_SETUP: [
+        { x: 3, y: 4, c: 1 },  // 흑
+        { x: 4, y: 3, c: 1 },  // 흑
+        { x: 4, y: 5, c: 1 },  // 흑
+        { x: 4, y: 4, c: 2 },  // 백 (활로: (5,4) 하나만)
+      ],
+      STEP3_TARGET: { x: 5, y: 4 },
+      // Step 4 배치: 흑 (4,4) 위험 시나리오
+      // 흑 (4,4) 활로 1개: 백이 (3,4),(4,3),(4,5) → 활로=(5,4)
+      STEP4_SETUP: [
+        { x: 4, y: 4, c: 1 },  // 흑
+        { x: 3, y: 4, c: 2 },  // 백
+        { x: 4, y: 3, c: 2 },  // 백
+        { x: 4, y: 5, c: 2 },  // 백
+      ],
+      STEP4_TARGET: { x: 5, y: 4 },
+    };
+
+    // 튜토리얼 전용 setupBoard: 빈 보드 + 사전 배치 stones
+    function setupBoard(stones) {
+      CONFIG.SIZE = 9;
+      state.board = emptyBoard();
+      state.turn = 1;
+      state.captured = { 1: 0, 2: 0 };
+      state.moveNum = 0;
+      state.lastMove = null;
+      state.history = [];
+      state.passes = 0;
+      state.ended = false;
+      state.aiThinking = false;
+      if (stones) {
+        stones.forEach(({ x, y, c }) => { state.board[y][x] = c; });
+      }
+    }
+
+    // enforceMove: 특정 자리만 허용하는 가드 설정
+    function enforceMove(x, y) {
+      tut.enforcePos = { x, y };
+    }
+    function clearEnforce() {
+      tut.enforcePos = null;
+    }
+
+    // 말풍선 표시
+    function showCoach(text, showNext = false, showFinal = false) {
+      coachBubble.textContent = text;
+      coachBubble.classList.add('visible');
+      coachNextBtn.classList.toggle('visible', showNext);
+      tutFinalBtn.classList.toggle('visible', showFinal);
+    }
+    function hideCoach() {
+      coachBubble.classList.remove('visible');
+      coachNextBtn.classList.remove('visible');
+      tutFinalBtn.classList.remove('visible');
+    }
+
+    // 진행 인디케이터 갱신
+    function updateTutProgress(step) {
+      tutProgressText.textContent = `📚 배우기 ${step}/5`;
+      tutProgress.classList.add('visible');
+    }
+
+    // 폭죽 축하 효과 (1.2초)
+    function celebrate(onDone) {
+      celebrateOv.classList.add('visible');
+      setTimeout(() => {
+        celebrateOv.classList.remove('visible');
+        if (onDone) onDone();
+      }, 1200);
+    }
+
+    // 보드 흔들기
+    function shakeBoard() {
+      canvas.classList.remove('shake');
+      // reflow trick
+      void canvas.offsetWidth;
+      canvas.classList.add('shake');
+      canvas.addEventListener('animationend', () => canvas.classList.remove('shake'), { once: true });
+    }
+
+    // 튜토리얼 단계별 깜박임 타이머 (canvas 재그리기)
+    function startBlink() {
+      stopBlink();
+      tut.blinkPhase = 0;
+      tut.blinkTimer = setInterval(() => {
+        tut.blinkPhase = (tut.blinkPhase + 1) % 2;
+        drawBoard();
+      }, 500);
+    }
+    function stopBlink() {
+      if (tut.blinkTimer) { clearInterval(tut.blinkTimer); tut.blinkTimer = null; }
+    }
+
+    // 튜토리얼 시작
+    function startTutorial() {
+      tut.active = true;
+      tut.step = 0;
+
+      // 게임 컨트롤 비활성화 (hidden)
+      document.getElementById('undoBtn').classList.add('hidden');
+      document.getElementById('passBtn').classList.add('hidden');
+      document.getElementById('resetBtn').classList.add('hidden');
+      hintBtn.classList.add('hidden');
+
+      // 시작 오버레이 닫기
+      startOv.classList.add('hidden');
+
+      // 9×9 강제 설정
+      CONFIG.SIZE = 9;
+      gameMode.mode = 'ai';
+      gameMode.hintOn = false;
+
+      tutorialStep(1);
+    }
+
+    // 단계 진입
+    function tutorialStep(n) {
+      tut.step = n;
+      updateTutProgress(n);
+      stopBlink();
+      clearEnforce();
+      tut.libertyTargets = [];
+      tut.dangerStones = [];
+
+      if (n === 1) {
+        // ── Step 1: 돌 놓기 ──────────────────────
+        setupBoard(null);
+        drawBoard();
+        enforceMove(TUT.STEP1_TARGET.x, TUT.STEP1_TARGET.y);
+        startBlink();
+        showCoach('장윤아! ✨ 점선 자리에\n흑돌(⚫)을 놔봐!', false, false);
+
+      } else if (n === 2) {
+        // ── Step 2: 활로 개념 ─────────────────────
+        // 이미 Step1에서 둔 돌이 보드에 있음
+        const tx = TUT.STEP1_TARGET.x, ty = TUT.STEP1_TARGET.y;
+        tut.libertyTargets = getGroupLibertyCoords(state.board, tx, ty);
+        stopBlink();
+        clearEnforce();
+        drawBoard();
+        showCoach('흑돌 옆에 빈 자리(활로) 4개로\n살아있어! ✨\n활로가 다 막히면 잡혀!', true, false);
+
+      } else if (n === 3) {
+        // ── Step 3: 잡기 시범 ─────────────────────
+        setupBoard(TUT.STEP3_SETUP);
+        enforceMove(TUT.STEP3_TARGET.x, TUT.STEP3_TARGET.y);
+        startBlink();
+        drawBoard();
+        showCoach('🎯 여기 두면 백돌(⚪) 잡혀!\n두자!', false, false);
+
+      } else if (n === 4) {
+        // ── Step 4: 위험 회피 ─────────────────────
+        setupBoard(TUT.STEP4_SETUP);
+        tut.dangerStones = [[4, 4]];  // 흑돌 위험
+        enforceMove(TUT.STEP4_TARGET.x, TUT.STEP4_TARGET.y);
+        startBlink();
+        drawBoard();
+        showCoach('어이쿠! ⚠️ 흑돌이 위험해!\n활로(살길)에 두면 살릴 수 있어!\n어디일까?', false, false);
+
+      } else if (n === 5) {
+        // ── Step 5: 자유 모드 안내 ────────────────
+        setupBoard(null);
+        clearEnforce();
+        stopBlink();
+        drawBoard();
+        showCoach('이제 혼자 둬볼까? 💡 도움말이\n도와줄거야! 🤖 백돌은 컴퓨터가 둬!',
+          false, true);
+      }
+    }
+
+    // 튜토리얼 완료 → 정상 모드 진입
+    function finishTutorial() {
+      tut.active = false;
+      stopBlink();
+      clearEnforce();
+      hideCoach();
+      tutProgress.classList.remove('visible');
+
+      // 컨트롤 복원
+      document.getElementById('undoBtn').classList.remove('hidden');
+      document.getElementById('passBtn').classList.remove('hidden');
+      document.getElementById('resetBtn').classList.remove('hidden');
+
+      // AI 모드 + 도움말 ON으로 자동 진입
+      CONFIG.SIZE = 9;
+      gameMode.mode = 'ai';
+      gameMode.hintOn = true;
+      hintBtn.textContent = '💡 도움말 ON';
+      hintBtn.classList.add('on');
+      hintBtn.classList.remove('hidden');
+
+      // localStorage 완료 기록
+      localStorage.setItem(CONFIG.TUT_DONE_KEY, 'true');
+
+      // 새 판 시작
+      setupBoard(null);
+      updateHud();
+      drawBoard();
+
+      showToast('🎉 잘했어! 이제 자유롭게 둬봐!');
+    }
+
+    // 튜토리얼 건너뛰기
+    function skipTutorial() {
+      tut.active = false;
+      stopBlink();
+      clearEnforce();
+      hideCoach();
+      tutProgress.classList.remove('visible');
+
+      // 컨트롤 복원
+      document.getElementById('undoBtn').classList.remove('hidden');
+      document.getElementById('passBtn').classList.remove('hidden');
+      document.getElementById('resetBtn').classList.remove('hidden');
+
+      localStorage.setItem(CONFIG.TUT_DONE_KEY, 'true');
+
+      // 시작 오버레이로 돌아가기
+      startOv.classList.remove('hidden');
     }
 
     // ─── 그리기 ────────────────────────────────────
@@ -742,9 +1143,11 @@
         ctx.beginPath(); ctx.arc(px, py, dotR, 0, Math.PI * 2); ctx.fill();
       });
 
-      // 힌트 레이어 (돌 아래에 그려야 덜 가림 — 합법수 점선)
-      const hints = computeHints();
-      if (hints) drawHints(hints, CELL);
+      // 힌트 레이어 (일반 모드)
+      if (!tut.active) {
+        const hints = computeHints();
+        if (hints) drawHints(hints, CELL);
+      }
 
       // 돌
       for (let y = 0; y < CONFIG.SIZE; y++) {
@@ -756,8 +1159,16 @@
         }
       }
 
-      // 힌트 심볼 (돌 위에)
-      if (hints) drawHintSymbols(hints, CELL);
+      // 일반 모드 힌트 심볼 (돌 위)
+      if (!tut.active) {
+        const hints = computeHints();
+        if (hints) drawHintSymbols(hints, CELL);
+      }
+
+      // ── 튜토리얼 오버레이 그리기 ──────────────────
+      if (tut.active) {
+        drawTutorialOverlay(CELL);
+      }
 
       // 마지막 수 표시
       if (state.lastMove) {
@@ -770,8 +1181,97 @@
       }
     }
 
+    // 튜토리얼 전용 canvas 오버레이
+    function drawTutorialOverlay(CELL) {
+      const step = tut.step;
+      const blink = tut.blinkPhase === 0;  // true=보임, false=어두움
+
+      // Step 1, 3, 4: 두어야 할 자리 강조 (깜박이는 점선 원 + ✨ 또는 🎯)
+      if ((step === 1 || step === 3 || step === 4) && tut.enforcePos) {
+        const { x, y } = tut.enforcePos;
+        const px = CONFIG.MARGIN + x * CELL;
+        const py = CONFIG.MARGIN + y * CELL;
+
+        // 깜박이는 점선 원
+        ctx.save();
+        ctx.setLineDash([6, 4]);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = blink
+          ? (step === 4 ? 'rgba(255,80,80,0.95)' : 'rgba(255,200,0,0.95)')
+          : 'rgba(200,200,200,0.3)';
+        ctx.beginPath();
+        ctx.arc(px, py, CELL * 0.48, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 반짝이는 배경 글로우
+        if (blink) {
+          ctx.save();
+          ctx.globalAlpha = 0.25;
+          ctx.fillStyle = step === 4 ? '#ff4444' : '#ffdd00';
+          ctx.beginPath();
+          ctx.arc(px, py, CELL * 0.55, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 이모지 표시 (점선 원 바로 위)
+        const emoji = step === 3 ? '🎯' : (step === 4 ? '⚠️' : '✨');
+        ctx.font = `${Math.round(CELL * 0.5)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(emoji, px, py - CELL * 0.5);
+      }
+
+      // Step 2: 활로 4방향 강조
+      if (step === 2 && tut.libertyTargets.length > 0) {
+        tut.libertyTargets.forEach(([lx, ly]) => {
+          const px = CONFIG.MARGIN + lx * CELL;
+          const py = CONFIG.MARGIN + ly * CELL;
+          ctx.save();
+          ctx.setLineDash([4, 3]);
+          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = 'rgba(80,200,255,0.9)';
+          ctx.beginPath();
+          ctx.arc(px, py, CELL * 0.38, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+
+          ctx.save();
+          ctx.globalAlpha = 0.2;
+          ctx.fillStyle = '#40c8ff';
+          ctx.beginPath();
+          ctx.arc(px, py, CELL * 0.38, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          // ✨ 이모지
+          ctx.font = `${Math.round(CELL * 0.38)}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('✨', px, py);
+        });
+      }
+
+      // Step 4: 위험한 흑돌에 빨간 펄스 링
+      if (step === 4 && tut.dangerStones.length > 0) {
+        tut.dangerStones.forEach(([dx, dy]) => {
+          const px = CONFIG.MARGIN + dx * CELL;
+          const py = CONFIG.MARGIN + dy * CELL;
+          ctx.save();
+          ctx.lineWidth = 3.5;
+          ctx.strokeStyle = blink
+            ? 'rgba(255,40,40,0.95)'
+            : 'rgba(255,120,120,0.4)';
+          ctx.beginPath();
+          ctx.arc(px, py, CELL * 0.52, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        });
+      }
+    }
+
     function drawHints(hints, CELL) {
-      // 합법수 — 옅은 회색 점 (자살수·금수 제외된 빈 자리)
       const { legal, captureTargets } = hints;
       const captureSet = new Set(captureTargets.map(([cx, cy]) => cy * CONFIG.SIZE + cx));
 
@@ -788,7 +1288,6 @@
     function drawHintSymbols(hints, CELL) {
       const { dangerGroups, captureTargets } = hints;
 
-      // 위험 흑 그룹 — 빨간 테두리 + 작은 ⚠ (텍스트 대신 빨간 링)
       dangerGroups.forEach(([x, y]) => {
         const px = CONFIG.MARGIN + x * CELL, py = CONFIG.MARGIN + y * CELL;
         ctx.beginPath();
@@ -798,7 +1297,6 @@
         ctx.stroke();
       });
 
-      // 잡을 수 있는 자리 — 초록 타겟 원
       captureTargets.forEach(([x, y]) => {
         const px = CONFIG.MARGIN + x * CELL, py = CONFIG.MARGIN + y * CELL;
         ctx.beginPath();
@@ -855,9 +1353,86 @@
       return { x: gx, y: gy };
     }
 
+    // ─── 튜토리얼 클릭 처리 ───────────────────────
+    // 튜토리얼 중 캔버스 클릭 — enforce 가드 + 단계별 진행
+    function handleTutClick(gx, gy) {
+      const step = tut.step;
+
+      // ── Step 1: 지정 자리에 흑돌 놓기 ──
+      if (step === 1) {
+        const { x, y } = TUT.STEP1_TARGET;
+        if (gx !== x || gy !== y) {
+          shakeBoard();
+          showToast('여기 말고 점선 자리에! 👆');
+          return;
+        }
+        // 놓기
+        state.board[y][x] = 1;
+        state.lastMove = { x, y };
+        stopBlink();
+        clearEnforce();
+        drawBoard();
+        // 짧은 딜레이 후 Step 2
+        setTimeout(() => tutorialStep(2), 600);
+        return;
+      }
+
+      // ── Step 3: 백돌 잡기 ──
+      if (step === 3) {
+        const { x, y } = TUT.STEP3_TARGET;
+        if (gx !== x || gy !== y) {
+          shakeBoard();
+          showToast('거기 말고! 🎯 표시 자리에 둬봐!');
+          return;
+        }
+        // 흑돌 놓기 → 백돌 자동 제거
+        const res = tryMove(x, y, state.board, 1);
+        if (!res.ok) return;
+        state.board = res.board;
+        state.captured[1] += res.captured;
+        state.lastMove = { x, y };
+        stopBlink();
+        clearEnforce();
+        drawBoard();
+        // 포인트 업데이트
+        capBlackEl.textContent = state.captured[1];
+        // 폭죽 후 Step 4
+        celebrate(() => {
+          setTimeout(() => tutorialStep(4), 400);
+        });
+        return;
+      }
+
+      // ── Step 4: 흑돌 살리기 ──
+      if (step === 4) {
+        const { x, y } = TUT.STEP4_TARGET;
+        if (gx !== x || gy !== y) {
+          shakeBoard();
+          showToast('거기 말고! 활로(빈 칸 옆 자리)에 둬봐');
+          return;
+        }
+        state.board[y][x] = 1;
+        state.lastMove = { x, y };
+        stopBlink();
+        clearEnforce();
+        tut.dangerStones = [];
+        drawBoard();
+        showToast('잘했어! 흑돌 살렸다! 💪');
+        setTimeout(() => tutorialStep(5), 1000);
+        return;
+      }
+    }
+
     // ─── 액션 ──────────────────────────────────────
     function place(x, y) {
       if (state.ended || state.aiThinking) return;
+
+      // 튜토리얼 중이면 튜토리얼 핸들러로 위임
+      if (tut.active) {
+        handleTutClick(x, y);
+        return;
+      }
+
       // AI 모드: 흑 차례만 허용
       if (gameMode.mode === 'ai' && state.turn !== 1) return;
 
@@ -874,16 +1449,12 @@
       state.passes = 0;
       state.turn = state.turn === 1 ? 2 : 1;
 
-      // 잡은 수 토스트
       if (res.captured > 0) showToast(`⚫ 흑이 백돌 ${res.captured}개 잡았어요!`);
 
       updateHud();
       drawBoard();
-
-      // 힌트 이벤트 알림 (흑 차례 기준)
       checkHintAlerts();
 
-      // AI 모드: 백 응수 예약
       if (gameMode.mode === 'ai' && state.turn === 2 && !state.ended) {
         scheduleAiMove();
       }
@@ -891,7 +1462,7 @@
 
     function checkHintAlerts() {
       if (!gameMode.hintOn || gameMode.mode !== 'ai') return;
-      if (state.turn !== 1) return; // 흑 차례일 때만 알림
+      if (state.turn !== 1) return;
       const hints = computeHints();
       if (!hints) return;
       if (hints.captureMessages.length > 0) showToast(hints.captureMessages[0]);
@@ -901,7 +1472,7 @@
     function scheduleAiMove() {
       state.aiThinking = true;
       updateHud();
-      const delay = 500 + Math.random() * 500; // 0.5~1초
+      const delay = 500 + Math.random() * 500;
       setTimeout(executeAiMove, delay);
     }
 
@@ -909,9 +1480,8 @@
       if (state.ended) { state.aiThinking = false; return; }
       const move = aiMove(gameMode.difficulty);
       if (!move) {
-        // AI 패스
         state.aiThinking = false;
-        pass(true); // silent AI pass
+        pass(true);
         return;
       }
       const [ax, ay] = move;
@@ -940,6 +1510,7 @@
       if (state.ended) return;
       if (!isAi && state.aiThinking) return;
       if (!isAi && gameMode.mode === 'ai' && state.turn !== 1) return;
+      if (tut.active) return;  // 튜토리얼 중 패스 금지
 
       state.history.push(snapshot());
       if (state.history.length > 60) state.history.shift();
@@ -961,26 +1532,17 @@
     }
 
     function undo() {
+      if (tut.active) return;  // 튜토리얼 중 무르기 금지
       if (state.aiThinking) return;
       if (state.history.length === 0) { showToast('무를 수 없어요'); return; }
 
-      // AI 모드: 흑+백 한 쌍 무르기 (AI 응수까지 함께 무름)
       if (gameMode.mode === 'ai') {
-        // 최소 2개 팝 시도 (흑 + 백 쌍), 없으면 1개
-        if (state.history.length >= 2) {
-          state.history.pop();
-          const snap = state.history.pop();
-          restore(snap);
-          state.history.push(snap); // 복원 기준 스냅샷은 다시 넣어야 다음 무르기 가능
-          // 실은 pop 후 restore하면 됨 — 아래 재정리
-        }
-        // 단순하게: turn이 흑이 될 때까지 pop
         let popped = 0;
         while (state.history.length > 0 && popped < 2) {
           const snap = state.history.pop();
           restore(snap);
           popped++;
-          if (snap.turn === 1) break; // 흑 차례 상태로 복원됐으면 멈춤
+          if (snap.turn === 1) break;
         }
       } else {
         const snap = state.history.pop();
@@ -1040,17 +1602,17 @@
         turnBox.textContent = '🤖 AI가 생각 중...';
         turnBox.className = 'turn-indicator ai-thinking';
       } else if (state.turn === 1) {
-        const label = gameMode.mode === 'ai' ? '⚫ 내 차례!' : '⚫ 흑돌 차례';
+        const label = (gameMode.mode === 'ai' && !tut.active) ? '⚫ 내 차례!' : '⚫ 흑돌 차례';
         turnBox.textContent = label;
         turnBox.className = 'turn-indicator black';
       } else {
-        const label = gameMode.mode === 'ai' ? '⚪ 백돌 (AI)' : '⚪ 백돌 차례';
+        const label = (gameMode.mode === 'ai' && !tut.active) ? '⚪ 백돌 (AI)' : '⚪ 백돌 차례';
         turnBox.textContent = label;
         turnBox.className = 'turn-indicator white';
       }
 
-      // 힌트 버튼 표시 (AI 모드만)
-      hintBtn.classList.toggle('hidden', gameMode.mode !== 'ai');
+      // 힌트 버튼 표시 (AI 모드 + 튜토리얼 아닐 때)
+      hintBtn.classList.toggle('hidden', gameMode.mode !== 'ai' || tut.active);
     }
 
     // ─── 토스트 ────────────────────────────────────
@@ -1076,6 +1638,7 @@
     document.getElementById('undoBtn').addEventListener('click', undo);
     document.getElementById('passBtn').addEventListener('click', () => pass(false));
     document.getElementById('resetBtn').addEventListener('click', () => {
+      if (tut.active) return;
       if (state.moveNum === 0 || confirm('새 판 시작할까요?')) reset();
     });
     hintBtn.addEventListener('click', () => {
@@ -1084,6 +1647,28 @@
       hintBtn.classList.toggle('on', gameMode.hintOn);
       drawBoard();
       if (gameMode.hintOn) showToast('도움말 켜짐 — 합법수·위험·기회를 알려줘요!');
+    });
+
+    // 코치 다음 버튼 (Step 2 → Step 3)
+    coachNextBtn.addEventListener('click', () => {
+      if (tut.step === 2) tutorialStep(3);
+    });
+
+    // Step 5 완료 버튼
+    tutFinalBtn.addEventListener('click', () => {
+      finishTutorial();
+    });
+
+    // 건너뛰기
+    tutSkipBtn.addEventListener('click', () => {
+      skipTutorial();
+    });
+
+    // 배우기 다시 하기 (모드 선택 화면에서)
+    replayTutBtn.addEventListener('click', () => {
+      localStorage.removeItem(CONFIG.TUT_DONE_KEY);
+      startOv.classList.add('hidden');
+      startTutorial();
     });
 
     // ─── 시작 오버레이 ────────────────────────────
@@ -1145,6 +1730,15 @@
       state.board = emptyBoard();
       updateHud();
       drawBoard();
+
+      // 첫 진입 판정: localStorage에 완료 기록 없으면 튜토리얼 자동 시작
+      const tutDone = localStorage.getItem(CONFIG.TUT_DONE_KEY);
+      if (!tutDone) {
+        // 시작 오버레이를 닫고 튜토리얼 시작
+        startOv.classList.add('hidden');
+        startTutorial();
+      }
+      // tutDone이 있으면 시작 오버레이 그대로 표시 (기존 동작)
     }
     init();
   })();
