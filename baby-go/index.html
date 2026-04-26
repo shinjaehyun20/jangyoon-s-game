@@ -6,6 +6,7 @@
   <title>⚫⚪ 아기 바둑</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    .hidden { display: none !important; }
     html, body {
       height: 100vh; height: 100dvh;
       overflow: hidden;
@@ -64,6 +65,7 @@
     }
     .turn-indicator.black { background: rgba(0,0,0,0.45); }
     .turn-indicator.white { background: rgba(255,255,255,0.85); color: #222; }
+    .turn-indicator.ai-thinking { background: rgba(100,180,255,0.35); color: #cef; }
 
     #boardWrap {
       flex: 1;
@@ -92,7 +94,7 @@
       border-radius: 10px;
       background: rgba(255,255,255,0.12);
       color: #fff;
-      font-size: clamp(13px, 3.5vw, 15px);
+      font-size: clamp(12px, 3.2vw, 14px);
       font-weight: 700;
       cursor: pointer;
       transition: transform 0.1s, background 0.2s;
@@ -101,6 +103,8 @@
     .controls .btn-undo { background: rgba(255,200,80,0.25); }
     .controls .btn-pass { background: rgba(120,180,255,0.22); }
     .controls .btn-reset { background: rgba(255,120,120,0.28); }
+    .controls .btn-hint { background: rgba(100,255,180,0.22); }
+    .controls .btn-hint.on { background: rgba(100,255,180,0.55); color: #0a2e1a; }
 
     footer {
       display: flex; justify-content: space-between; align-items: center;
@@ -166,6 +170,7 @@
       font-weight: 800;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      width: 100%;
     }
     .btn-start:active { transform: scale(0.96); }
     .btn-secondary {
@@ -179,14 +184,44 @@
       font-size: clamp(13px, 3.4vw, 14px);
       font-weight: 600;
       cursor: pointer;
+      width: 100%;
     }
     .btn-secondary:active { transform: scale(0.96); }
+
+    /* 모드 선택 버튼 */
+    .mode-pick {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 14px;
+    }
+    .mode-btn {
+      min-height: 52px;
+      padding: 10px 14px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.25);
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .mode-btn:active { transform: scale(0.98); }
+    .mode-btn.selected {
+      border-color: #ffd966;
+      background: rgba(255,217,102,0.18);
+      box-shadow: 0 0 0 2px rgba(255,217,102,0.2) inset;
+    }
+    .mode-icon { font-size: 26px; flex-shrink: 0; }
+    .mode-text { display: flex; flex-direction: column; gap: 2px; }
+    .mode-name { font-size: clamp(14px, 3.8vw, 16px); font-weight: 800; color: #ffd966; }
+    .mode-desc { font-size: clamp(11px, 3vw, 12px); color: rgba(255,255,255,0.7); font-weight: 500; }
+
     .size-pick {
       display: flex; flex-direction: column; gap: 8px;
       margin-bottom: 16px;
     }
     .size-btn {
-      min-height: 52px;
+      min-height: 48px;
       padding: 10px 14px;
       border: 2px solid rgba(255,255,255,0.15);
       border-radius: 12px;
@@ -232,9 +267,14 @@
       z-index: 5;
       animation: toastIn 0.2s ease-out, toastOut 0.3s ease-in 1.4s forwards;
       pointer-events: none;
+      white-space: nowrap;
     }
     @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
     @keyframes toastOut { to { opacity: 0; transform: translate(-50%, -10px); } }
+
+    /* 시작 화면 스크롤 대응 */
+    .overlay { overflow-y: auto; }
+    .overlay-card { overflow-y: auto; }
   </style>
 </head>
 <body>
@@ -264,7 +304,8 @@
 
     <div class="controls">
       <button class="btn-undo" id="undoBtn">↩ 무르기</button>
-      <button class="btn-pass" id="passBtn">⏭ 한 번 쉬기</button>
+      <button class="btn-pass" id="passBtn">⏭ 쉬기</button>
+      <button class="btn-hint hidden" id="hintBtn">💡 도움말</button>
       <button class="btn-reset" id="resetBtn">🔄 새 판</button>
     </div>
 
@@ -274,12 +315,30 @@
     </footer>
   </div>
 
-  <!-- 시작 오버레이 -->
+  <!-- 시작 오버레이 (단계 1: 모드 선택) -->
   <div class="overlay" id="startOverlay">
     <div class="overlay-card">
       <h2>⚫⚪ 아기 바둑</h2>
-      <p>먼저 바둑판 크기를 골라요!</p>
+      <p>어떻게 둘까요?</p>
 
+      <div class="mode-pick" id="modePick">
+        <button class="mode-btn selected" data-mode="pvp">
+          <span class="mode-icon">🤝</span>
+          <div class="mode-text">
+            <div class="mode-name">둘이 두기</div>
+            <div class="mode-desc">친구나 가족이랑 같이 해요</div>
+          </div>
+        </button>
+        <button class="mode-btn" data-mode="ai">
+          <span class="mode-icon">🤖</span>
+          <div class="mode-text">
+            <div class="mode-name">혼자 두기 (쉬움)</div>
+            <div class="mode-desc">내가 흑돌, 컴퓨터가 백돌이에요</div>
+          </div>
+        </button>
+      </div>
+
+      <p style="margin-bottom:8px; font-size:clamp(12px,3.3vw,13px); color:rgba(255,255,255,0.6);">바둑판 크기를 골라요!</p>
       <div class="size-pick" id="sizePick">
         <button class="size-btn selected" data-size="9">
           <div class="size-num">9 × 9</div>
@@ -295,13 +354,6 @@
         </button>
       </div>
 
-      <div class="rules">
-        🎯 <b>규칙</b><br>
-        • 빈 자리를 톡! 누르면 돌이 놓여요<br>
-        • 상대 돌을 빙 둘러싸면 잡아요<br>
-        • 잡은 돌이 많은 사람이 이겨요<br>
-        • 두기 싫으면 "쉬기" 버튼!
-      </div>
       <button class="btn-start" id="startBtn">시작!</button>
     </div>
   </div>
@@ -313,7 +365,7 @@
       <div class="result-score" id="finalScore">0 : 0</div>
       <p id="resultMsg"></p>
       <button class="btn-start" id="restartBtn">다시 하기</button>
-      <button class="btn-secondary" id="changeSizeBtn">↺ 크기 바꾸기</button>
+      <button class="btn-secondary" id="changeSizeBtn">↺ 크기·모드 바꾸기</button>
     </div>
   </div>
 
@@ -323,16 +375,15 @@
 
     // ─── CONFIG ───────────────────────────────────
     const CONFIG = {
-      SIZE: 9,                 // 시작 시 난이도 선택으로 덮어씀
-      MARGIN: 26,              // 보드 가장자리 여백 (px, 450 기준)
-      BASE: 450,               // 캔버스 기준 크기
-      BEST_KEY: 'baby-go_best',
+      SIZE: 9,
+      MARGIN: 26,
+      BASE: 450,
       SIZE_KEY: 'baby-go_size',
+      MODE_KEY: 'baby-go_mode',
     };
     function cellSize() {
       return (CONFIG.BASE - CONFIG.MARGIN * 2) / (CONFIG.SIZE - 1);
     }
-    // 보드 크기별 화점 좌표
     const STAR_POINTS = {
       9:  [[2,2],[2,6],[6,2],[6,6],[4,4]],
       13: [[3,3],[3,9],[9,3],[9,9],[6,6],[6,3],[6,9],[3,6],[9,6]],
@@ -340,114 +391,378 @@
     };
 
     // ─── DOM ──────────────────────────────────────
-    const canvas    = document.getElementById('board');
-    const ctx       = canvas.getContext('2d');
-    const turnBox   = document.getElementById('turnBox');
-    const capBlackEl = document.getElementById('capBlack'); // 흑이 잡은 백돌 수
-    const capWhiteEl = document.getElementById('capWhite'); // 백이 잡은 흑돌 수
-    const moveNumEl = document.getElementById('moveNum');
-    const startOv   = document.getElementById('startOverlay');
-    const endOv     = document.getElementById('endOverlay');
-    const winnerEl  = document.getElementById('winnerTitle');
-    const finalEl   = document.getElementById('finalScore');
-    const resultMsg = document.getElementById('resultMsg');
-    const wrapEl    = document.querySelector('.wrap');
+    const canvas      = document.getElementById('board');
+    const ctx         = canvas.getContext('2d');
+    const turnBox     = document.getElementById('turnBox');
+    const capBlackEl  = document.getElementById('capBlack');
+    const capWhiteEl  = document.getElementById('capWhite');
+    const moveNumEl   = document.getElementById('moveNum');
+    const startOv     = document.getElementById('startOverlay');
+    const endOv       = document.getElementById('endOverlay');
+    const winnerEl    = document.getElementById('winnerTitle');
+    const finalEl     = document.getElementById('finalScore');
+    const resultMsg   = document.getElementById('resultMsg');
+    const wrapEl      = document.querySelector('.wrap');
+    const hintBtn     = document.getElementById('hintBtn');
 
-    // ─── STATE ────────────────────────────────────
-    // board[y][x] = 0(빈) / 1(흑) / 2(백)
+    // ─── MODE STATE ───────────────────────────────
+    // mode: 'pvp' | 'ai'    difficulty: 'easy' (확장용)
+    const gameMode = { mode: 'pvp', difficulty: 'easy', hintOn: false };
+
+    // ─── GAME STATE ───────────────────────────────
     const state = {
       board: [],
-      turn: 1,                 // 1=흑, 2=백
-      captured: { 1: 0, 2: 0 },// captured[1] = 흑이 잡은 백돌 수
+      turn: 1,               // 1=흑, 2=백
+      captured: { 1: 0, 2: 0 },
       moveNum: 0,
-      lastMove: null,          // {x, y}
-      history: [],             // 무르기용 스냅샷 스택
+      lastMove: null,
+      history: [],
       passes: 0,
       ended: false,
+      aiThinking: false,
     };
 
     function emptyBoard() {
       const b = [];
-      for (let y = 0; y < CONFIG.SIZE; y++) {
-        b.push(new Array(CONFIG.SIZE).fill(0));
-      }
+      for (let y = 0; y < CONFIG.SIZE; y++) b.push(new Array(CONFIG.SIZE).fill(0));
       return b;
     }
-
     function snapshot() {
       return {
-        board: state.board.map(row => row.slice()),
+        board: state.board.map(r => r.slice()),
         turn: state.turn,
         captured: { 1: state.captured[1], 2: state.captured[2] },
         moveNum: state.moveNum,
-        lastMove: state.lastMove ? { x: state.lastMove.x, y: state.lastMove.y } : null,
+        lastMove: state.lastMove ? { ...state.lastMove } : null,
         passes: state.passes,
       };
     }
     function restore(snap) {
-      state.board = snap.board.map(row => row.slice());
+      state.board = snap.board.map(r => r.slice());
       state.turn = snap.turn;
       state.captured = { 1: snap.captured[1], 2: snap.captured[2] };
       state.moveNum = snap.moveNum;
-      state.lastMove = snap.lastMove ? { x: snap.lastMove.x, y: snap.lastMove.y } : null;
+      state.lastMove = snap.lastMove ? { ...snap.lastMove } : null;
       state.passes = snap.passes;
+    }
+
+    // ─── 바둑 규칙 ─────────────────────────────────
+    const DIRS = [[1,0],[-1,0],[0,1],[0,-1]];
+
+    function getGroup(board, x, y) {
+      const color = board[y][x];
+      if (color === 0) return null;
+      const visited = new Set();
+      const stack = [[x, y]];
+      const stones = [];
+      const liberties = new Set();
+      while (stack.length) {
+        const [cx, cy] = stack.pop();
+        const key = cy * CONFIG.SIZE + cx;
+        if (visited.has(key)) continue;
+        visited.add(key);
+        stones.push([cx, cy]);
+        for (const [dx, dy] of DIRS) {
+          const nx = cx + dx, ny = cy + dy;
+          if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
+          const v = board[ny][nx];
+          if (v === 0) liberties.add(ny * CONFIG.SIZE + nx);
+          else if (v === color) stack.push([nx, ny]);
+        }
+      }
+      return { stones, liberties: liberties.size };
+    }
+
+    // 그룹의 활로 좌표 목록 반환 (힌트용)
+    function getGroupLibertyCoords(board, x, y) {
+      const color = board[y][x];
+      if (color === 0) return [];
+      const visited = new Set();
+      const stack = [[x, y]];
+      const libSet = new Set();
+      const libCoords = [];
+      while (stack.length) {
+        const [cx, cy] = stack.pop();
+        const key = cy * CONFIG.SIZE + cx;
+        if (visited.has(key)) continue;
+        visited.add(key);
+        for (const [dx, dy] of DIRS) {
+          const nx = cx + dx, ny = cy + dy;
+          if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
+          const v = board[ny][nx];
+          if (v === 0) {
+            const lk = ny * CONFIG.SIZE + nx;
+            if (!libSet.has(lk)) { libSet.add(lk); libCoords.push([nx, ny]); }
+          } else if (v === color) stack.push([nx, ny]);
+        }
+      }
+      return libCoords;
+    }
+
+    function tryMove(x, y, boardSrc, turnColor) {
+      // boardSrc, turnColor 인자 없으면 현재 state 사용
+      const board = boardSrc || state.board;
+      const me = turnColor || state.turn;
+      const opp = me === 1 ? 2 : 1;
+      if (board[y][x] !== 0) return { ok: false, reason: '이미 돌이 있어요' };
+      const trial = board.map(r => r.slice());
+      trial[y][x] = me;
+      let captured = 0;
+      for (const [dx, dy] of DIRS) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
+        if (trial[ny][nx] !== opp) continue;
+        const grp = getGroup(trial, nx, ny);
+        if (grp.liberties === 0) {
+          for (const [sx, sy] of grp.stones) { trial[sy][sx] = 0; captured++; }
+        }
+      }
+      const myGroup = getGroup(trial, x, y);
+      if (myGroup.liberties === 0) return { ok: false, reason: '거기는 둘 수 없어요 😅' };
+      return { ok: true, board: trial, captured };
+    }
+
+    // 합법수 목록 (자살수 제외)
+    function getLegalMoves(board, color) {
+      const moves = [];
+      for (let y = 0; y < CONFIG.SIZE; y++)
+        for (let x = 0; x < CONFIG.SIZE; x++)
+          if (tryMove(x, y, board, color).ok) moves.push([x, y]);
+      return moves;
+    }
+
+    // ─── AI 평가 함수들 ───────────────────────────
+    // 상대 돌 잡을 수 있는 자리 탐색 (활로 1개 막기)
+    function findCaptureMoves(board, aiColor) {
+      const opp = aiColor === 1 ? 2 : 1;
+      const visited = new Set();
+      const result = [];
+      for (let y = 0; y < CONFIG.SIZE; y++) {
+        for (let x = 0; x < CONFIG.SIZE; x++) {
+          if (board[y][x] !== opp) continue;
+          const key = y * CONFIG.SIZE + x;
+          if (visited.has(key)) continue;
+          const grp = getGroup(board, x, y);
+          if (!grp) continue;
+          grp.stones.forEach(([sx, sy]) => visited.add(sy * CONFIG.SIZE + sx));
+          if (grp.liberties === 1) {
+            // 활로 1개인 상대 그룹 — 그 활로를 찾아 추가
+            const libCoords = getGroupLibertyCoords(board, x, y);
+            libCoords.forEach(([lx, ly]) => {
+              const res = tryMove(lx, ly, board, aiColor);
+              if (res.ok) result.push([lx, ly]);
+            });
+          }
+        }
+      }
+      return result;
+    }
+
+    // 자기 돌 살리기 (활로 1개 아타리 상태)
+    function findRescueMoves(board, aiColor) {
+      const visited = new Set();
+      const result = [];
+      for (let y = 0; y < CONFIG.SIZE; y++) {
+        for (let x = 0; x < CONFIG.SIZE; x++) {
+          if (board[y][x] !== aiColor) continue;
+          const key = y * CONFIG.SIZE + x;
+          if (visited.has(key)) continue;
+          const grp = getGroup(board, x, y);
+          if (!grp) continue;
+          grp.stones.forEach(([sx, sy]) => visited.add(sy * CONFIG.SIZE + sx));
+          if (grp.liberties === 1) {
+            const libCoords = getGroupLibertyCoords(board, x, y);
+            libCoords.forEach(([lx, ly]) => {
+              const res = tryMove(lx, ly, board, aiColor);
+              if (res.ok) result.push([lx, ly]);
+            });
+          }
+        }
+      }
+      return result;
+    }
+
+    // 자기 돌 인접 확장 자리 (연결)
+    function findConnectMoves(board, aiColor) {
+      const result = [];
+      for (let y = 0; y < CONFIG.SIZE; y++) {
+        for (let x = 0; x < CONFIG.SIZE; x++) {
+          if (board[y][x] !== 0) continue;
+          for (const [dx, dy] of DIRS) {
+            const nx = x + dx, ny = y + dy;
+            if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
+            if (board[ny][nx] === aiColor) {
+              const res = tryMove(x, y, board, aiColor);
+              if (res.ok) { result.push([x, y]); break; }
+            }
+          }
+        }
+      }
+      return result;
+    }
+
+    // 화점·중앙 선호 후보
+    function getPreferredMoves(board, aiColor) {
+      const stars = STAR_POINTS[CONFIG.SIZE] || [];
+      const candidates = [];
+      // 화점 우선
+      for (const [sx, sy] of stars) {
+        if (board[sy][sx] === 0 && tryMove(sx, sy, board, aiColor).ok) candidates.push([sx, sy]);
+      }
+      // 중앙 근처 (크기 기준 중앙 ±2)
+      const c = Math.floor(CONFIG.SIZE / 2);
+      for (let dy = -2; dy <= 2; dy++) {
+        for (let dx = -2; dx <= 2; dx++) {
+          const nx = c + dx, ny = c + dy;
+          if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
+          if (board[ny][nx] === 0 && tryMove(nx, ny, board, aiColor).ok) candidates.push([nx, ny]);
+        }
+      }
+      return candidates;
+    }
+
+    function pickRandom(arr) {
+      if (!arr.length) return null;
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // AI 최적 수 선택 (difficulty 매개변수: 추후 확장용)
+    function evaluateMove(x, y, board, aiColor) {
+      // 점수가 높을수록 우선
+      const res = tryMove(x, y, board, aiColor);
+      if (!res.ok) return -1;
+      let score = 0;
+      // 잡기 여부 확인
+      if (res.captured > 0) score += 100 + res.captured * 10;
+      return score;
+    }
+
+    function aiMove(difficulty = 'easy') {
+      const aiColor = 2; // AI = 백
+      const board = state.board;
+
+      // 1순위: 상대 돌 잡기
+      const captures = findCaptureMoves(board, aiColor);
+      if (captures.length) return pickRandom(captures);
+
+      // 2순위: 자기 돌 살리기
+      const rescues = findRescueMoves(board, aiColor);
+      if (rescues.length) return pickRandom(rescues);
+
+      // 3순위: 연결 (인접 확장)
+      const connects = findConnectMoves(board, aiColor);
+      if (connects.length && Math.random() < 0.65) return pickRandom(connects);
+
+      // 4순위: 화점·중앙 선호 + 나머지 합법수 중 랜덤
+      const preferred = getPreferredMoves(board, aiColor);
+      if (preferred.length) return pickRandom(preferred);
+
+      const legal = getLegalMoves(board, aiColor);
+      if (legal.length) return pickRandom(legal);
+
+      return null; // 둘 자리 없음 → 패스
+    }
+
+    // ─── 힌트 계산 ────────────────────────────────
+    // 합법수 표시용, 위험 흑 그룹, 잡을 수 있는 백 그룹 활로
+    function computeHints() {
+      if (!gameMode.hintOn || state.ended || state.aiThinking) return null;
+      if (gameMode.mode === 'ai' && state.turn !== 1) return null; // 흑 차례일 때만
+
+      const board = state.board;
+      const myColor = 1; // 흑
+      const oppColor = 2; // 백
+
+      // 합법수 좌표
+      const legal = getLegalMoves(board, myColor);
+
+      // 위험한 흑 그룹 (활로 <= 2)
+      const dangerGroups = []; // [[x,y], ...]  — 그룹 내 돌들
+      const dangerMessages = [];
+      const visitedDanger = new Set();
+      for (let y = 0; y < CONFIG.SIZE; y++) {
+        for (let x = 0; x < CONFIG.SIZE; x++) {
+          if (board[y][x] !== myColor) continue;
+          const key = y * CONFIG.SIZE + x;
+          if (visitedDanger.has(key)) continue;
+          const grp = getGroup(board, x, y);
+          if (!grp) continue;
+          grp.stones.forEach(([sx, sy]) => visitedDanger.add(sy * CONFIG.SIZE + sx));
+          if (grp.liberties <= 2) {
+            dangerGroups.push(...grp.stones);
+            dangerMessages.push(`⚠️ 흑돌 위험! 활로 ${grp.liberties}개 남아요`);
+          }
+        }
+      }
+
+      // 잡을 수 있는 백돌 활로 (활로 1개)
+      const captureTargets = []; // 막을 수 있는 좌표
+      const captureMessages = [];
+      const visitedCapture = new Set();
+      for (let y = 0; y < CONFIG.SIZE; y++) {
+        for (let x = 0; x < CONFIG.SIZE; x++) {
+          if (board[y][x] !== oppColor) continue;
+          const key = y * CONFIG.SIZE + x;
+          if (visitedCapture.has(key)) continue;
+          const grp = getGroup(board, x, y);
+          if (!grp) continue;
+          grp.stones.forEach(([sx, sy]) => visitedCapture.add(sy * CONFIG.SIZE + sx));
+          if (grp.liberties === 1) {
+            const libCoords = getGroupLibertyCoords(board, x, y);
+            captureTargets.push(...libCoords);
+            captureMessages.push('🎯 여기 두면 백돌 잡아요!');
+          }
+        }
+      }
+
+      return { legal, dangerGroups, dangerMessages, captureTargets, captureMessages };
     }
 
     // ─── 그리기 ────────────────────────────────────
     function drawBoard() {
       const W = CONFIG.BASE;
       ctx.clearRect(0, 0, W, W);
-
-      // 보드 배경 (이미 CSS로 처리되지만 캔버스 내 보장)
       ctx.fillStyle = '#d9b375';
       ctx.fillRect(0, 0, W, W);
 
-      // 격자선
       const CELL = cellSize();
       ctx.strokeStyle = '#3a2810';
       ctx.lineWidth = 1.2;
       for (let i = 0; i < CONFIG.SIZE; i++) {
         const p = CONFIG.MARGIN + i * CELL;
-        // 가로
-        ctx.beginPath();
-        ctx.moveTo(CONFIG.MARGIN, p);
-        ctx.lineTo(W - CONFIG.MARGIN, p);
-        ctx.stroke();
-        // 세로
-        ctx.beginPath();
-        ctx.moveTo(p, CONFIG.MARGIN);
-        ctx.lineTo(p, W - CONFIG.MARGIN);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(CONFIG.MARGIN, p); ctx.lineTo(W - CONFIG.MARGIN, p); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(p, CONFIG.MARGIN); ctx.lineTo(p, W - CONFIG.MARGIN); ctx.stroke();
       }
 
-      // 화점 (보드 크기별)
       const dots = STAR_POINTS[CONFIG.SIZE] || [];
       const dotR = CONFIG.SIZE >= 19 ? 2.5 : (CONFIG.SIZE >= 13 ? 3 : 3.5);
       ctx.fillStyle = '#3a2810';
       dots.forEach(([dx, dy]) => {
-        const px = CONFIG.MARGIN + dx * CELL;
-        const py = CONFIG.MARGIN + dy * CELL;
-        ctx.beginPath();
-        ctx.arc(px, py, dotR, 0, Math.PI * 2);
-        ctx.fill();
+        const px = CONFIG.MARGIN + dx * CELL, py = CONFIG.MARGIN + dy * CELL;
+        ctx.beginPath(); ctx.arc(px, py, dotR, 0, Math.PI * 2); ctx.fill();
       });
+
+      // 힌트 레이어 (돌 아래에 그려야 덜 가림 — 합법수 점선)
+      const hints = computeHints();
+      if (hints) drawHints(hints, CELL);
 
       // 돌
       for (let y = 0; y < CONFIG.SIZE; y++) {
         for (let x = 0; x < CONFIG.SIZE; x++) {
           const v = state.board[y][x];
           if (v === 0) continue;
-          const px = CONFIG.MARGIN + x * CELL;
-          const py = CONFIG.MARGIN + y * CELL;
+          const px = CONFIG.MARGIN + x * CELL, py = CONFIG.MARGIN + y * CELL;
           drawStone(px, py, v, CELL);
         }
       }
 
+      // 힌트 심볼 (돌 위에)
+      if (hints) drawHintSymbols(hints, CELL);
+
       // 마지막 수 표시
       if (state.lastMove) {
         const { x, y } = state.lastMove;
-        const px = CONFIG.MARGIN + x * CELL;
-        const py = CONFIG.MARGIN + y * CELL;
+        const px = CONFIG.MARGIN + x * CELL, py = CONFIG.MARGIN + y * CELL;
         ctx.fillStyle = '#ff3030';
         ctx.beginPath();
         ctx.arc(px, py, Math.max(2.5, CELL * 0.12), 0, Math.PI * 2);
@@ -455,19 +770,56 @@
       }
     }
 
+    function drawHints(hints, CELL) {
+      // 합법수 — 옅은 회색 점 (자살수·금수 제외된 빈 자리)
+      const { legal, captureTargets } = hints;
+      const captureSet = new Set(captureTargets.map(([cx, cy]) => cy * CONFIG.SIZE + cx));
+
+      legal.forEach(([x, y]) => {
+        const isCap = captureSet.has(y * CONFIG.SIZE + x);
+        const px = CONFIG.MARGIN + x * CELL, py = CONFIG.MARGIN + y * CELL;
+        ctx.beginPath();
+        ctx.arc(px, py, CELL * 0.18, 0, Math.PI * 2);
+        ctx.fillStyle = isCap ? 'rgba(80,220,80,0.55)' : 'rgba(180,180,180,0.38)';
+        ctx.fill();
+      });
+    }
+
+    function drawHintSymbols(hints, CELL) {
+      const { dangerGroups, captureTargets } = hints;
+
+      // 위험 흑 그룹 — 빨간 테두리 + 작은 ⚠ (텍스트 대신 빨간 링)
+      dangerGroups.forEach(([x, y]) => {
+        const px = CONFIG.MARGIN + x * CELL, py = CONFIG.MARGIN + y * CELL;
+        ctx.beginPath();
+        ctx.arc(px, py, CELL * 0.47, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,60,60,0.85)';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+      });
+
+      // 잡을 수 있는 자리 — 초록 타겟 원
+      captureTargets.forEach(([x, y]) => {
+        const px = CONFIG.MARGIN + x * CELL, py = CONFIG.MARGIN + y * CELL;
+        ctx.beginPath();
+        ctx.arc(px, py, CELL * 0.28, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(50,255,120,0.9)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(px, py, CELL * 0.1, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(50,255,120,0.8)';
+        ctx.fill();
+      });
+    }
+
     function drawStone(px, py, color, CELL) {
       const r = CELL * 0.46;
-      // 그림자
       ctx.beginPath();
       ctx.arc(px + 1.5, py + 2, r, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(0,0,0,0.25)';
       ctx.fill();
-
-      // 본체
-      const grad = ctx.createRadialGradient(
-        px - r * 0.35, py - r * 0.35, r * 0.1,
-        px, py, r
-      );
+      const grad = ctx.createRadialGradient(px - r*0.35, py - r*0.35, r*0.1, px, py, r);
       if (color === 1) {
         grad.addColorStop(0, '#777');
         grad.addColorStop(0.6, '#1a1a1a');
@@ -498,91 +850,22 @@
       const gx = Math.round((cx - CONFIG.MARGIN) / CELL);
       const gy = Math.round((cy - CONFIG.MARGIN) / CELL);
       if (gx < 0 || gx >= CONFIG.SIZE || gy < 0 || gy >= CONFIG.SIZE) return null;
-      // 너무 멀리 클릭한 건 무시 (가장 가까운 점에서 셀 절반 이내일 때만)
-      const px = CONFIG.MARGIN + gx * CELL;
-      const py = CONFIG.MARGIN + gy * CELL;
-      const dist = Math.hypot(cx - px, cy - py);
-      if (dist > CELL * 0.55) return null;
+      const px = CONFIG.MARGIN + gx * CELL, py = CONFIG.MARGIN + gy * CELL;
+      if (Math.hypot(cx - px, cy - py) > CELL * 0.55) return null;
       return { x: gx, y: gy };
-    }
-
-    // ─── 바둑 규칙: 활로 계산 + 따먹기 ──────────────
-    const DIRS = [[1,0],[-1,0],[0,1],[0,-1]];
-
-    function getGroup(board, x, y) {
-      // 같은 색 돌이 연결된 그룹과 활로(빈 칸 인접 수)를 반환
-      const color = board[y][x];
-      if (color === 0) return null;
-      const visited = new Set();
-      const stack = [[x, y]];
-      const stones = [];
-      const liberties = new Set();
-      while (stack.length) {
-        const [cx, cy] = stack.pop();
-        const key = cy * CONFIG.SIZE + cx;
-        if (visited.has(key)) continue;
-        visited.add(key);
-        stones.push([cx, cy]);
-        for (const [dx, dy] of DIRS) {
-          const nx = cx + dx, ny = cy + dy;
-          if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
-          const v = board[ny][nx];
-          if (v === 0) {
-            liberties.add(ny * CONFIG.SIZE + nx);
-          } else if (v === color) {
-            stack.push([nx, ny]);
-          }
-        }
-      }
-      return { stones, liberties: liberties.size };
-    }
-
-    function tryMove(x, y) {
-      // 빈 자리?
-      if (state.board[y][x] !== 0) return { ok: false, reason: '이미 돌이 있어요' };
-
-      const me = state.turn;
-      const opp = me === 1 ? 2 : 1;
-
-      // 가상으로 두기
-      const trial = state.board.map(r => r.slice());
-      trial[y][x] = me;
-
-      // 인접한 상대 그룹 중 활로 0인 것 따먹기
-      let captured = 0;
-      for (const [dx, dy] of DIRS) {
-        const nx = x + dx, ny = y + dy;
-        if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
-        if (trial[ny][nx] !== opp) continue;
-        const grp = getGroup(trial, nx, ny);
-        if (grp.liberties === 0) {
-          for (const [sx, sy] of grp.stones) {
-            trial[sy][sx] = 0;
-            captured++;
-          }
-        }
-      }
-
-      // 자살수 검사: 내 돌의 활로가 0이면 무효 (단 따먹은 게 있으면 OK)
-      const myGroup = getGroup(trial, x, y);
-      if (myGroup.liberties === 0) {
-        return { ok: false, reason: '거기는 둘 수 없어요 😅' };
-      }
-
-      return { ok: true, board: trial, captured };
     }
 
     // ─── 액션 ──────────────────────────────────────
     function place(x, y) {
-      if (state.ended) return;
+      if (state.ended || state.aiThinking) return;
+      // AI 모드: 흑 차례만 허용
+      if (gameMode.mode === 'ai' && state.turn !== 1) return;
+
       const res = tryMove(x, y);
-      if (!res.ok) {
-        showToast(res.reason);
-        return;
-      }
-      // 스냅샷 저장 (둘기 직전)
+      if (!res.ok) { showToast(res.reason); return; }
+
       state.history.push(snapshot());
-      if (state.history.length > 30) state.history.shift();
+      if (state.history.length > 60) state.history.shift();
 
       state.board = res.board;
       state.captured[state.turn] += res.captured;
@@ -591,36 +874,121 @@
       state.passes = 0;
       state.turn = state.turn === 1 ? 2 : 1;
 
+      // 잡은 수 토스트
+      if (res.captured > 0) showToast(`⚫ 흑이 백돌 ${res.captured}개 잡았어요!`);
+
       updateHud();
       drawBoard();
+
+      // 힌트 이벤트 알림 (흑 차례 기준)
+      checkHintAlerts();
+
+      // AI 모드: 백 응수 예약
+      if (gameMode.mode === 'ai' && state.turn === 2 && !state.ended) {
+        scheduleAiMove();
+      }
     }
 
-    function pass() {
-      if (state.ended) return;
+    function checkHintAlerts() {
+      if (!gameMode.hintOn || gameMode.mode !== 'ai') return;
+      if (state.turn !== 1) return; // 흑 차례일 때만 알림
+      const hints = computeHints();
+      if (!hints) return;
+      if (hints.captureMessages.length > 0) showToast(hints.captureMessages[0]);
+      else if (hints.dangerMessages.length > 0) showToast(hints.dangerMessages[0]);
+    }
+
+    function scheduleAiMove() {
+      state.aiThinking = true;
+      updateHud();
+      const delay = 500 + Math.random() * 500; // 0.5~1초
+      setTimeout(executeAiMove, delay);
+    }
+
+    function executeAiMove() {
+      if (state.ended) { state.aiThinking = false; return; }
+      const move = aiMove(gameMode.difficulty);
+      if (!move) {
+        // AI 패스
+        state.aiThinking = false;
+        pass(true); // silent AI pass
+        return;
+      }
+      const [ax, ay] = move;
+      const res = tryMove(ax, ay, state.board, 2);
+      if (!res.ok) { state.aiThinking = false; return; }
+
       state.history.push(snapshot());
-      if (state.history.length > 30) state.history.shift();
+      if (state.history.length > 60) state.history.shift();
+
+      state.board = res.board;
+      state.captured[2] += res.captured;
+      state.moveNum++;
+      state.lastMove = { x: ax, y: ay };
+      state.passes = 0;
+      state.turn = 1;
+      state.aiThinking = false;
+
+      if (res.captured > 0) showToast(`🤖 AI가 흑돌 ${res.captured}개 잡았어요!`);
+
+      updateHud();
+      drawBoard();
+      checkHintAlerts();
+    }
+
+    function pass(isAi = false) {
+      if (state.ended) return;
+      if (!isAi && state.aiThinking) return;
+      if (!isAi && gameMode.mode === 'ai' && state.turn !== 1) return;
+
+      state.history.push(snapshot());
+      if (state.history.length > 60) state.history.shift();
       state.passes++;
+      const passer = state.turn === 1 ? '⚫ 흑' : '⚪ 백';
+      if (!isAi) showToast(`${passer} 한 번 쉼`);
       state.lastMove = null;
-      showToast(state.turn === 1 ? '⚫ 흑 한 번 쉼' : '⚪ 백 한 번 쉼');
       state.turn = state.turn === 1 ? 2 : 1;
       state.moveNum++;
 
-      if (state.passes >= 2) {
-        endGame();
-        return;
-      }
+      if (state.passes >= 2) { endGame(); return; }
+
       updateHud();
       drawBoard();
+
+      if (!isAi && gameMode.mode === 'ai' && state.turn === 2 && !state.ended) {
+        scheduleAiMove();
+      }
     }
 
     function undo() {
-      if (state.history.length === 0) {
-        showToast('무를 수 없어요');
-        return;
+      if (state.aiThinking) return;
+      if (state.history.length === 0) { showToast('무를 수 없어요'); return; }
+
+      // AI 모드: 흑+백 한 쌍 무르기 (AI 응수까지 함께 무름)
+      if (gameMode.mode === 'ai') {
+        // 최소 2개 팝 시도 (흑 + 백 쌍), 없으면 1개
+        if (state.history.length >= 2) {
+          state.history.pop();
+          const snap = state.history.pop();
+          restore(snap);
+          state.history.push(snap); // 복원 기준 스냅샷은 다시 넣어야 다음 무르기 가능
+          // 실은 pop 후 restore하면 됨 — 아래 재정리
+        }
+        // 단순하게: turn이 흑이 될 때까지 pop
+        let popped = 0;
+        while (state.history.length > 0 && popped < 2) {
+          const snap = state.history.pop();
+          restore(snap);
+          popped++;
+          if (snap.turn === 1) break; // 흑 차례 상태로 복원됐으면 멈춤
+        }
+      } else {
+        const snap = state.history.pop();
+        restore(snap);
       }
-      const snap = state.history.pop();
-      restore(snap);
+
       state.ended = false;
+      state.aiThinking = false;
       endOv.classList.add('hidden');
       updateHud();
       drawBoard();
@@ -635,6 +1003,7 @@
       state.history = [];
       state.passes = 0;
       state.ended = false;
+      state.aiThinking = false;
       endOv.classList.add('hidden');
       updateHud();
       drawBoard();
@@ -642,20 +1011,19 @@
 
     function endGame() {
       state.ended = true;
-      const black = state.captured[1]; // 흑이 잡은 백돌
-      const white = state.captured[2]; // 백이 잡은 흑돌
+      state.aiThinking = false;
+      const black = state.captured[1];
+      const white = state.captured[2];
       finalEl.textContent = `⚫ ${black} : ${white} ⚪`;
-
       let title, msg;
-      if (black > white) {
-        title = '🎉 흑돌 승리!';
-        msg = `흑이 백돌을 ${black - white}개 더 잡았어요!`;
-      } else if (white > black) {
-        title = '🎉 백돌 승리!';
-        msg = `백이 흑돌을 ${white - black}개 더 잡았어요!`;
+      if (gameMode.mode === 'ai') {
+        if (black > white) { title = '🎉 장윤이 이겼어요!'; msg = `흑이 백돌을 ${black - white}개 더 잡았어요! 대단해요!`; }
+        else if (white > black) { title = '🤖 AI가 이겼어요'; msg = `백이 흑돌을 ${white - black}개 더 잡았어요. 다시 도전!`; }
+        else { title = '🤝 비겼어요!'; msg = '아주 잘했어요!'; }
       } else {
-        title = '🤝 무승부!';
-        msg = '둘 다 똑같이 잘했어요!';
+        if (black > white) { title = '🎉 흑돌 승리!'; msg = `흑이 백돌을 ${black - white}개 더 잡았어요!`; }
+        else if (white > black) { title = '🎉 백돌 승리!'; msg = `백이 흑돌을 ${white - black}개 더 잡았어요!`; }
+        else { title = '🤝 무승부!'; msg = '둘 다 똑같이 잘했어요!'; }
       }
       winnerEl.textContent = title;
       resultMsg.textContent = msg;
@@ -664,16 +1032,25 @@
 
     // ─── HUD ───────────────────────────────────────
     function updateHud() {
-      capBlackEl.textContent = state.captured[1]; // 흑이 잡은 백돌 수
-      capWhiteEl.textContent = state.captured[2]; // 백이 잡은 흑돌 수
+      capBlackEl.textContent = state.captured[1];
+      capWhiteEl.textContent = state.captured[2];
       moveNumEl.textContent = state.moveNum;
-      if (state.turn === 1) {
-        turnBox.textContent = '⚫ 흑돌 차례';
+
+      if (state.aiThinking) {
+        turnBox.textContent = '🤖 AI가 생각 중...';
+        turnBox.className = 'turn-indicator ai-thinking';
+      } else if (state.turn === 1) {
+        const label = gameMode.mode === 'ai' ? '⚫ 내 차례!' : '⚫ 흑돌 차례';
+        turnBox.textContent = label;
         turnBox.className = 'turn-indicator black';
       } else {
-        turnBox.textContent = '⚪ 백돌 차례';
+        const label = gameMode.mode === 'ai' ? '⚪ 백돌 (AI)' : '⚪ 백돌 차례';
+        turnBox.textContent = label;
         turnBox.className = 'turn-indicator white';
       }
+
+      // 힌트 버튼 표시 (AI 모드만)
+      hintBtn.classList.toggle('hidden', gameMode.mode !== 'ai');
     }
 
     // ─── 토스트 ────────────────────────────────────
@@ -697,35 +1074,59 @@
     });
 
     document.getElementById('undoBtn').addEventListener('click', undo);
-    document.getElementById('passBtn').addEventListener('click', pass);
+    document.getElementById('passBtn').addEventListener('click', () => pass(false));
     document.getElementById('resetBtn').addEventListener('click', () => {
       if (state.moveNum === 0 || confirm('새 판 시작할까요?')) reset();
     });
+    hintBtn.addEventListener('click', () => {
+      gameMode.hintOn = !gameMode.hintOn;
+      hintBtn.textContent = gameMode.hintOn ? '💡 도움말 ON' : '💡 도움말';
+      hintBtn.classList.toggle('on', gameMode.hintOn);
+      drawBoard();
+      if (gameMode.hintOn) showToast('도움말 켜짐 — 합법수·위험·기회를 알려줘요!');
+    });
 
-    // ─── 난이도 선택 ───────────────────────────────
+    // ─── 시작 오버레이 ────────────────────────────
+    const modePick = document.getElementById('modePick');
     const sizePick = document.getElementById('sizePick');
+    let pickedMode = localStorage.getItem(CONFIG.MODE_KEY) || 'pvp';
     let pickedSize = parseInt(localStorage.getItem(CONFIG.SIZE_KEY) || '9', 10);
+    if (!['pvp', 'ai'].includes(pickedMode)) pickedMode = 'pvp';
     if (![9, 13, 19].includes(pickedSize)) pickedSize = 9;
 
-    function applyPickedHighlight() {
-      sizePick.querySelectorAll('.size-btn').forEach(b => {
-        const sz = parseInt(b.dataset.size, 10);
-        b.classList.toggle('selected', sz === pickedSize);
-      });
+    function applyModeHighlight() {
+      modePick.querySelectorAll('.mode-btn').forEach(b =>
+        b.classList.toggle('selected', b.dataset.mode === pickedMode));
     }
-    applyPickedHighlight();
+    function applySizeHighlight() {
+      sizePick.querySelectorAll('.size-btn').forEach(b =>
+        b.classList.toggle('selected', parseInt(b.dataset.size, 10) === pickedSize));
+    }
+    applyModeHighlight();
+    applySizeHighlight();
 
+    modePick.addEventListener('click', (e) => {
+      const btn = e.target.closest('.mode-btn');
+      if (!btn) return;
+      pickedMode = btn.dataset.mode;
+      applyModeHighlight();
+    });
     sizePick.addEventListener('click', (e) => {
       const btn = e.target.closest('.size-btn');
       if (!btn) return;
       pickedSize = parseInt(btn.dataset.size, 10);
-      applyPickedHighlight();
+      applySizeHighlight();
     });
 
     document.getElementById('startBtn').addEventListener('click', () => {
       CONFIG.SIZE = pickedSize;
+      gameMode.mode = pickedMode;
+      gameMode.hintOn = false;
+      hintBtn.textContent = '💡 도움말';
+      hintBtn.classList.remove('on');
       localStorage.setItem(CONFIG.SIZE_KEY, String(pickedSize));
-      reset();                          // 새 크기로 보드 재초기화
+      localStorage.setItem(CONFIG.MODE_KEY, pickedMode);
+      reset();
       startOv.classList.add('hidden');
     });
     document.getElementById('restartBtn').addEventListener('click', () => {
@@ -739,8 +1140,8 @@
 
     // ─── 초기화 ────────────────────────────────────
     function init() {
-      // 시작 화면이 떠 있는 동안엔 기본 9x9 보드를 미리 그려둠 (배경 미리보기)
       CONFIG.SIZE = pickedSize;
+      gameMode.mode = pickedMode;
       state.board = emptyBoard();
       updateHud();
       drawBoard();
