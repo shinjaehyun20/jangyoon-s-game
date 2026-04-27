@@ -262,5 +262,21 @@
     "description": "나타나는 도형을 모양·색깔 바구니에 빠르게 분류! 레벨이 오를수록 제한 시간이 줄어들어요",
     "thumbnail": "shape-sort/thumb.svg",
     "path": "shape-sort/index.html"
+  },
+  {
+    "id": "math-quiz",
+    "title": "Math Quiz",
+    "title_ko": "🔢 숫자 퀴즈",
+    "description": "더하기·빼기 문제를 풀어봐요! 3가지 난이도, 10문제 퀴즈",
+    "thumbnail": "math-quiz/thumb.svg",
+    "path": "math-quiz/index.html"
+  },
+  {
+    "id": "shadow-match",
+    "title": "Shadow Match",
+    "title_ko": "🌑 그림자 맞추기",
+    "description": "그림자를 보고 어떤 그림인지 맞혀요! 동물·탈것·음식 40가지",
+    "thumbnail": "shadow-match/thumb.svg",
+    "path": "shadow-match/index.html"
   }
 ]

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#16213e"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 카드 -->
+  <rect x="24" y="28" width="180" height="100" rx="18" fill="url(#card)" opacity="0.9"/>
+
+  <!-- 문제 텍스트 -->
+  <text x="114" y="72" text-anchor="middle" font-family="'Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="28" font-weight="900" fill="white">3 + 4 = ?</text>
+  <text x="50" y="102" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,0.5)" font-weight="600">쉬움</text>
+
+  <!-- 보기 버튼들 -->
+  <!-- 버튼 1 (정답 7 - 초록) -->
+  <rect x="36" y="110" width="60" height="32" rx="10" fill="#2e7d32"/>
+  <text x="66" y="132" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="900" fill="white">7</text>
+
+  <!-- 버튼 2 -->
+  <rect x="104" y="110" width="60" height="32" rx="10" fill="#0f3460" opacity="0.9"/>
+  <text x="134" y="132" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="900" fill="white">5</text>
+
+  <!-- 버튼 3 -->
+  <rect x="36" y="148" width="60" height="28" rx="10" fill="#0f3460" opacity="0.9"/>
+  <text x="66" y="167" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="white">6</text>
+
+  <!-- 버튼 4 -->
+  <rect x="104" y="148" width="60" height="28" rx="10" fill="#0f3460" opacity="0.9"/>
+  <text x="134" y="167" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="white">9</text>
+
+  <!-- 체크 아이콘 -->
+  <text x="230" y="90" font-size="44" text-anchor="middle">✅</text>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#e94560">숫자 퀴즈</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">MATH QUIZ</text>
+  </g>
+</svg>
