@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b2dfdb"/>
+      <stop offset="100%" stop-color="#f1f8e9"/>
+    </linearGradient>
+    <linearGradient id="soil2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a1887f"/>
+      <stop offset="100%" stop-color="#6d4c41"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#sky2)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <!-- 해 -->
+  <circle cx="280" cy="30" r="20" fill="#ffca28" opacity="0.9"/>
+  <text x="280" y="38" font-size="24" text-anchor="middle">☀️</text>
+  <!-- 구름 -->
+  <text x="40" y="35" font-size="22" opacity="0.7">☁️</text>
+  <!-- 밭 그리드 -->
+  <rect x="20" y="70" width="64" height="56" rx="8" fill="url(#soil2)"/>
+  <rect x="92" y="70" width="64" height="56" rx="8" fill="url(#soil2)"/>
+  <rect x="164" y="70" width="64" height="56" rx="8" fill="url(#soil2)"/>
+  <!-- 채소들 -->
+  <text x="52" y="108" font-size="34" text-anchor="middle">🥕</text>
+  <text x="124" y="104" font-size="28" text-anchor="middle">🌿</text>
+  <text x="196" y="108" font-size="34" text-anchor="middle">🌽</text>
+  <!-- 물주기 이모지 -->
+  <text x="240" y="98" font-size="28" opacity="0.85">💧</text>
+  <!-- 별 이펙트 -->
+  <text x="56" y="68" font-size="18">✨</text>
+  <text x="200" y="65" font-size="14">⭐</text>
+  <!-- 하단 잔디 -->
+  <rect x="0" y="140" width="320" height="40" fill="#66bb6a"/>
+  <text x="30" y="162" font-size="16">🌱</text>
+  <text x="80" y="162" font-size="16">🌱</text>
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#2e7d32">채소 텃밭</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.6)" letter-spacing="2">VEGGIE GARDEN</text>
+  </g>
+</svg>

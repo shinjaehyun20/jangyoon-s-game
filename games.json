@@ -278,5 +278,21 @@
     "description": "그림자를 보고 어떤 그림인지 맞혀요! 동물·탈것·음식 40가지",
     "thumbnail": "shadow-match/thumb.svg",
     "path": "shadow-match/index.html"
+  },
+  {
+    "id": "dino-run",
+    "title": "Dino Run",
+    "title_ko": "🦕 공룡 달리기",
+    "description": "탭해서 점프! 선인장과 새를 피해 멀리멀리 달려요. 목숨 3개 도전",
+    "thumbnail": "dino-run/thumb.svg",
+    "path": "dino-run/index.html"
+  },
+  {
+    "id": "vegetable-garden",
+    "title": "Vegetable Garden",
+    "title_ko": "🥕 채소 텃밭",
+    "description": "씨앗을 심고 물을 줘서 채소를 키워요! 5레벨 수확 목표 달성 도전",
+    "thumbnail": "vegetable-garden/thumb.svg",
+    "path": "vegetable-garden/index.html"
   }
 ]

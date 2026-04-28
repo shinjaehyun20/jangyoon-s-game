@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🥕 채소 텃밭</title>
+  <style>
+    :root {
+      --bg: #f1f8e9;
+      --soil: #8d6e63;
+      --soil-dark: #6d4c41;
+      --accent: #66bb6a;
+      --accent2: #ffca28;
+      --text: #2e7d32;
+      --danger: #ef5350;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px;
+      gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      text-align: center;
+      color: var(--text);
+      font-weight: 900;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: rgba(255,255,255,0.7);
+      border-radius: 16px;
+      padding: 6px 10px;
+      font-size: clamp(12px, 3.2vw, 15px);
+      color: var(--text);
+      font-weight: 700;
+    }
+    /* 레벨 표시 */
+    #levelBar {
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    #levelFill {
+      height: 100%;
+      background: linear-gradient(to right, #66bb6a, #ffca28);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    /* 게임 그리드 */
+    #gameArea {
+      flex: 1;
+      display: grid;
+      gap: 8px;
+      padding: 8px;
+    }
+    .plot {
+      background: var(--soil);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      border: 3px solid var(--soil-dark);
+      transition: transform 0.1s;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .plot:active { transform: scale(0.95); }
+    .plot .veggie { font-size: clamp(28px, 8vw, 42px); line-height: 1; }
+    .plot .stage-label {
+      font-size: 10px; color: rgba(255,255,255,0.8);
+      font-weight: 700; margin-top: 2px;
+    }
+    /* 물 게이지 바 */
+    .water-bar {
+      position: absolute;
+      bottom: 4px; left: 6px; right: 6px;
+      height: 5px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+    }
+    .water-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.2s;
+    }
+    /* 준비 상태: 씨앗 심기 버튼 */
+    .plot.empty { background: #a1887f; }
+    .plot.ready { background: #6d9e50; border-color: #4caf50; }
+    .plot.ready .veggie { animation: bounce 0.4s ease; }
+    @keyframes bounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+    .plot.wilting { border-color: #ef9a9a; }
+    .plot.wilting .veggie { filter: grayscale(0.6); }
+    /* 수확 이펙트 */
+    .harvest-fx {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      animation: harvestPop 0.5s ease forwards;
+      pointer-events: none;
+    }
+    @keyframes harvestPop {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    /* 별점 표시 */
+    #stars { font-size: clamp(14px, 3.5vw, 18px); }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text);
+      padding: 0 4px 2px;
+    }
+    .home-link {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      background: rgba(255,255,255,0.6);
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px; width: 88%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .overlay-card h2 { font-size: 24px; margin-bottom: 8px; }
+    .overlay-card p { font-size: 14px; color: #555; margin-bottom: 14px; line-height: 1.6; }
+    .result-score { font-size: 44px; font-weight: 900; color: var(--accent); margin: 6px 0; }
+    .btn-start {
+      display: block; width: 100%;
+      background: var(--accent);
+      color: #fff; border: none; border-radius: 16px;
+      padding: 14px; font-size: 18px; font-weight: 800;
+      cursor: pointer; min-height: 52px; margin-top: 6px;
+    }
+    .btn-start:active { transform: scale(0.97); }
+    .level-info { font-size: 12px; color: #888; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🥕 채소 텃밭</h1>
+    <div class="hud">
+      <span>🌾 수확: <b id="harvestDisplay">0</b></span>
+      <span>⭐ 레벨 <b id="levelDisplay">1</b></span>
+      <span>🏆 <b id="bestDisplay">0</b></span>
+    </div>
+    <div id="levelBar"><div id="levelFill" style="width:0%"></div></div>
+    <div id="gameArea"></div>
+    <footer>
+      <small>탭해서 씨앗 심고, 물 주고, 수확!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🥕 채소 텃밭</h2>
+      <p>빈 땅을 탭해서 씨앗을 심어요!<br>
+         싹이 나면 빠르게 물을 줘요 💧<br>
+         노랗게 빛나면 수확하세요! 🌟<br>
+         물을 안 주면 시들어요 🥀</p>
+      <button class="btn-start" id="startBtn">농사 시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="levelOverlay">
+    <div class="overlay-card">
+      <h2 id="levelTitle">🎉 레벨 업!</h2>
+      <div class="result-score" id="levelScore"></div>
+      <p id="levelMsg"></p>
+      <button class="btn-start" id="nextLevelBtn">다음 레벨!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🌻 오늘 농사 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const VEGGIES = [
+      { emoji: '🥕', name: '당근' },
+      { emoji: '🌽', name: '옥수수' },
+      { emoji: '🍓', name: '딸기' },
+      { emoji: '🥦', name: '브로콜리' },
+      { emoji: '🍅', name: '토마토' },
+      { emoji: '🥔', name: '감자' },
+    ];
+
+    // 성장 단계 이모지
+    const STAGES = ['🌱','🌿','🌾','✨'];
+    // 단계별 라벨
+    const STAGE_LABELS = ['싹남!', '자라는중', '수확직전', '수확!'];
+
+    const CONFIG = {
+      plotCounts: [4, 6, 6, 9, 9], // 레벨별 밭 수
+      growthTime:   [6000, 5000, 4500, 3500, 3000], // 단계 성장 시간 (ms)
+      wiltTime:     [8000, 6000, 5000, 4000, 3500],  // 물 없으면 시드는 시간
+      targetHarvest:[4, 6, 8, 10, 12],               // 레벨 클리어 수확량
+      totalLevels: 5,
+      storageKey: 'vegetable-garden_best',
+    };
+
+    let level = 1;
+    let totalHarvest = 0;
+    let levelHarvest = 0;
+    let plots = [];
+    let timers = [];
+    let running = false;
+    let best = parseInt(localStorage.getItem(CONFIG.storageKey) || '0');
+
+    const gameArea    = document.getElementById('gameArea');
+    const harvestDisp = document.getElementById('harvestDisplay');
+    const levelDisp   = document.getElementById('levelDisplay');
+    const bestDisp    = document.getElementById('bestDisplay');
+    const levelFill   = document.getElementById('levelFill');
+    const startOverlay  = document.getElementById('startOverlay');
+    const levelOverlay  = document.getElementById('levelOverlay');
+    const endOverlay    = document.getElementById('endOverlay');
+    const finalScore    = document.getElementById('finalScore');
+    const resultMsg     = document.getElementById('resultMsg');
+    const startBtn      = document.getElementById('startBtn');
+    const nextLevelBtn  = document.getElementById('nextLevelBtn');
+    const restartBtn    = document.getElementById('restartBtn');
+    const levelTitle    = document.getElementById('levelTitle');
+    const levelScore    = document.getElementById('levelScore');
+    const levelMsg      = document.getElementById('levelMsg');
+
+    bestDisp.textContent = best;
+
+    function getPlotCount() {
+      return CONFIG.plotCounts[Math.min(level - 1, CONFIG.plotCounts.length - 1)];
+    }
+    function getGrowthTime() {
+      return CONFIG.growthTime[Math.min(level - 1, CONFIG.growthTime.length - 1)];
+    }
+    function getWiltTime() {
+      return CONFIG.wiltTime[Math.min(level - 1, CONFIG.wiltTime.length - 1)];
+    }
+    function getTarget() {
+      return CONFIG.targetHarvest[Math.min(level - 1, CONFIG.targetHarvest.length - 1)];
+    }
+
+    function updateHUD() {
+      harvestDisp.textContent = totalHarvest;
+      levelDisp.textContent = level;
+      bestDisp.textContent = best;
+      const pct = Math.min(100, Math.floor(levelHarvest / getTarget() * 100));
+      levelFill.style.width = pct + '%';
+    }
+
+    function setupGrid() {
+      const n = getPlotCount();
+      let cols = n <= 4 ? 2 : 3;
+      gameArea.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    }
+
+    function clearTimers() {
+      timers.forEach(t => clearTimeout(t));
+      timers = [];
+    }
+
+    function addTimer(fn, ms) {
+      const t = setTimeout(fn, ms);
+      timers.push(t);
+      return t;
+    }
+
+    // 밭 초기화
+    function initPlots() {
+      clearTimers();
+      gameArea.innerHTML = '';
+      plots = [];
+      const n = getPlotCount();
+      for (let i = 0; i < n; i++) {
+        const el = document.createElement('div');
+        el.classList.add('plot', 'empty');
+        el.innerHTML = `<div class="veggie">🌱</div><div class="stage-label">탭해서 심기</div>`;
+        el.addEventListener('pointerdown', () => onPlotTap(i));
+        gameArea.appendChild(el);
+        plots.push({ el, state: 'empty', stage: 0, veggie: null, growTimer: null, wiltTimer: null, wiltStart: 0, wiltFill: null });
+      }
+      setupGrid();
+    }
+
+    function onPlotTap(i) {
+      if (!running) return;
+      const p = plots[i];
+      if (p.state === 'empty') {
+        plant(i);
+      } else if (p.state === 'growing' || p.state === 'watering') {
+        water(i);
+      } else if (p.state === 'ready') {
+        harvest(i);
+      }
+    }
+
+    function plant(i) {
+      const p = plots[i];
+      const v = VEGGIES[Math.floor(Math.random() * VEGGIES.length)];
+      p.veggie = v;
+      p.state = 'growing';
+      p.stage = 0;
+      p.el.className = 'plot';
+      renderPlot(i);
+      scheduleGrowth(i);
+      scheduleWilt(i);
+    }
+
+    function renderPlot(i) {
+      const p = plots[i];
+      const el = p.el;
+      let emoji = '';
+      let label = '';
+      if (p.state === 'empty') {
+        emoji = '🌱'; label = '탭해서 심기';
+        el.className = 'plot empty';
+      } else if (p.state === 'growing' || p.state === 'watering') {
+        emoji = STAGES[Math.min(p.stage, STAGES.length - 2)];
+        label = STAGE_LABELS[Math.min(p.stage, STAGE_LABELS.length - 2)] + ' 💧';
+        el.className = 'plot' + (p.state === 'watering' ? '' : '');
+      } else if (p.state === 'wilting') {
+        emoji = STAGES[Math.min(p.stage, STAGES.length - 2)] + '🥀';
+        label = '물 빨리!';
+        el.className = 'plot wilting';
+      } else if (p.state === 'ready') {
+        emoji = p.veggie.emoji;
+        label = '수확! 🌟';
+        el.className = 'plot ready';
+      } else if (p.state === 'dead') {
+        emoji = '🥀'; label = '시들었어요';
+        el.className = 'plot empty';
+      }
+      el.innerHTML = `<div class="veggie">${emoji}</div><div class="stage-label">${label}</div><div class="water-bar"><div class="water-fill" id="wf${i}" style="background:#64b5f6;width:100%"></div></div>`;
+    }
+
+    function scheduleGrowth(i) {
+      const p = plots[i];
+      if (p.growTimer) clearTimeout(p.growTimer);
+      p.growTimer = addTimer(() => {
+        if (!running) return;
+        if (p.state !== 'growing' && p.state !== 'watering') return;
+        p.stage++;
+        if (p.stage >= 3) {
+          // 수확 가능
+          p.state = 'ready';
+          renderPlot(i);
+          // 수확 안 하면 일정 시간 후 사라짐
+          p.wiltTimer = addTimer(() => {
+            if (p.state === 'ready') {
+              p.state = 'empty'; p.stage = 0;
+              renderPlot(i);
+            }
+          }, getWiltTime() * 1.5);
+        } else {
+          renderPlot(i);
+          scheduleGrowth(i);
+          startWiltBar(i);
+        }
+      }, getGrowthTime());
+    }
+
+    function startWiltBar(i) {
+      const p = plots[i];
+      if (p.wiltTimer) clearTimeout(p.wiltTimer);
+      p.wiltStart = Date.now();
+      // 물 게이지 애니메이션
+      const wf = document.getElementById('wf' + i);
+      if (wf) {
+        wf.style.transition = `width ${getWiltTime()}ms linear`;
+        wf.style.width = '0%';
+        wf.style.background = '#ef9a9a';
+      }
+      p.state = 'growing';
+      p.wiltTimer = addTimer(() => {
+        if (p.state === 'growing' || p.state === 'wilting') {
+          p.state = 'dead';
+          renderPlot(i);
+          addTimer(() => {
+            if (p.state === 'dead') { p.state = 'empty'; renderPlot(i); }
+          }, 1500);
+        }
+      }, getWiltTime());
+    }
+
+    function scheduleWilt(i) {
+      startWiltBar(i);
+    }
+
+    function water(i) {
+      const p = plots[i];
+      if (p.state !== 'growing' && p.state !== 'wilting' && p.state !== 'watering') return;
+      p.state = 'watering';
+      if (p.wiltTimer) clearTimeout(p.wiltTimer);
+      // 물 게이지 리셋
+      const wf = document.getElementById('wf' + i);
+      if (wf) {
+        wf.style.transition = 'width 0.2s';
+        wf.style.width = '100%';
+        wf.style.background = '#64b5f6';
+        setTimeout(() => {
+          if (wf) {
+            wf.style.transition = `width ${getWiltTime()}ms linear`;
+            wf.style.width = '0%';
+            wf.style.background = '#ef9a9a';
+          }
+        }, 300);
+      }
+      // 물 주면 성장 가속 (현재 단계 시간 절반 단축)
+      if (p.growTimer) clearTimeout(p.growTimer);
+      p.growTimer = addTimer(() => {
+        if (!running) return;
+        p.stage++;
+        if (p.stage >= 3) {
+          p.state = 'ready';
+          renderPlot(i);
+          p.wiltTimer = addTimer(() => {
+            if (p.state === 'ready') { p.state = 'empty'; p.stage = 0; renderPlot(i); }
+          }, getWiltTime() * 1.5);
+        } else {
+          p.state = 'growing';
+          renderPlot(i);
+          scheduleGrowth(i);
+          startWiltBar(i);
+        }
+      }, getGrowthTime() * 0.6);
+
+      // 시들기 타이머 재설정
+      p.wiltTimer = addTimer(() => {
+        if (p.state === 'growing' || p.state === 'watering') {
+          p.state = 'dead'; renderPlot(i);
+          addTimer(() => { if (p.state === 'dead') { p.state = 'empty'; renderPlot(i); } }, 1500);
+        }
+      }, getWiltTime());
+      renderPlot(i);
+    }
+
+    function harvest(i) {
+      const p = plots[i];
+      if (p.state !== 'ready') return;
+      // 이펙트
+      const fx = document.createElement('div');
+      fx.classList.add('harvest-fx');
+      fx.textContent = p.veggie.emoji;
+      p.el.appendChild(fx);
+      setTimeout(() => fx.remove(), 600);
+      // 초기화
+      if (p.growTimer) clearTimeout(p.growTimer);
+      if (p.wiltTimer) clearTimeout(p.wiltTimer);
+      p.state = 'empty'; p.stage = 0; p.veggie = null;
+      renderPlot(i);
+      // 점수
+      totalHarvest++;
+      levelHarvest++;
+      updateHUD();
+      // 레벨 클리어 체크
+      if (levelHarvest >= getTarget()) {
+        checkLevelClear();
+      }
+    }
+
+    function checkLevelClear() {
+      if (level >= CONFIG.totalLevels) {
+        endGame();
+        return;
+      }
+      clearTimers();
+      running = false;
+      levelTitle.textContent = `🎉 레벨 ${level} 클리어!`;
+      levelScore.textContent = `🥕 ${levelHarvest}개`;
+      levelMsg.textContent = `대단해요! ${level + 1}레벨에서는 더 빠르게 자라요!`;
+      levelOverlay.classList.remove('hidden');
+    }
+
+    function nextLevel() {
+      level++;
+      levelHarvest = 0;
+      levelOverlay.classList.add('hidden');
+      running = true;
+      levelDisp.textContent = level;
+      initPlots();
+      updateHUD();
+    }
+
+    function endGame() {
+      clearTimers();
+      running = false;
+      if (totalHarvest > best) {
+        best = totalHarvest;
+        localStorage.setItem(CONFIG.storageKey, best);
+      }
+      finalScore.textContent = `🥕 ${totalHarvest}개`;
+      const msgs = ['채소 농부가 됐어요! 🌻','정말 잘 키웠어요! ⭐','맛있는 채소 완성! 🎉'];
+      resultMsg.textContent = totalHarvest > parseInt(localStorage.getItem(CONFIG.storageKey) || '0') - 1
+        ? `🏆 최고 기록! ${totalHarvest}개 수확!`
+        : msgs[Math.floor(Math.random() * msgs.length)];
+      bestDisp.textContent = best;
+      endOverlay.classList.remove('hidden');
+    }
+
+    function startGame() {
+      level = 1; totalHarvest = 0; levelHarvest = 0;
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      levelOverlay.classList.add('hidden');
+      running = true;
+      initPlots();
+      updateHUD();
+    }
+
+    startBtn.addEventListener('pointerdown', startGame);
+    nextLevelBtn.addEventListener('pointerdown', nextLevel);
+    restartBtn.addEventListener('pointerdown', startGame);
+
+    bestDisp.textContent = best;
+  })();
+  </script>
+</body>
+</html>
