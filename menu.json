@@ -24,7 +24,9 @@
       { "id": "piano-tiles",  "label": "🎹 피아노 놀이",       "path": "piano-tiles/index.html" },
       { "id": "shape-sort",        "label": "🔷 모양 분류 놀이",    "path": "shape-sort/index.html" },
       { "id": "dino-run",          "label": "🦕 공룡 달리기",        "path": "dino-run/index.html" },
-      { "id": "vegetable-garden",  "label": "🥕 채소 텃밭",          "path": "vegetable-garden/index.html" }
+      { "id": "vegetable-garden",  "label": "🥕 채소 텃밭",          "path": "vegetable-garden/index.html" },
+      { "id": "color-fill",        "label": "🎨 색칠 놀이",           "path": "color-fill/index.html" },
+      { "id": "wave-surf",         "label": "🌊 파도 서핑",           "path": "wave-surf/index.html" }
     ]
   },
   {

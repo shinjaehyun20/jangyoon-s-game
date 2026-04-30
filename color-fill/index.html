@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🎨 색칠 놀이</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --panel-bg: rgba(255,255,255,0.08);
+      --accent: #f7b731;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: var(--bg);
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 10px 6px;
+      gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .hud {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--panel-bg); border-radius: 12px;
+      padding: 6px 12px;
+      font-size: clamp(13px, 3.5vw, 16px);
+    }
+    .hud-score { font-weight: 700; color: var(--accent); }
+
+    /* 팔레트 */
+    .palette {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 6px;
+      padding: 4px 0;
+    }
+    .color-btn {
+      width: clamp(36px, 9vw, 46px);
+      height: clamp(36px, 9vw, 46px);
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      touch-action: manipulation;
+    }
+    .color-btn.active {
+      border-color: #fff;
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+
+    /* 캔버스 영역 */
+    #canvasWrap {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #gameCanvas {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: rgba(255,255,255,0.5);
+      padding: 0 4px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .home-link:hover { color: #fff; }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .overlay-card h2 { font-size: clamp(22px, 6vw, 30px); margin-bottom: 10px; }
+    .overlay-card p { font-size: clamp(13px, 3.5vw, 16px); color: rgba(255,255,255,0.8); margin-bottom: 18px; line-height: 1.5; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent) 0%, #f97f51 100%);
+      color: #1a1a2e;
+      border: none; border-radius: 50px;
+      padding: 12px 32px;
+      font-size: clamp(16px, 4vw, 20px); font-weight: 700;
+      cursor: pointer; min-height: 48px;
+      box-shadow: 0 4px 16px rgba(247,183,49,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); }
+    .progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #f97f51);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎨 색칠 놀이</h1>
+
+  <div class="hud">
+    <span>📝 그림: <span id="picLabel">?</span></span>
+    <span class="hud-score">채운 칸: <span id="fillCount">0</span>/<span id="totalCount">0</span></span>
+  </div>
+
+  <div class="palette" id="palette"></div>
+
+  <div id="canvasWrap">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <footer>
+    <small>색을 골라서 탭해요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🎨 색칠 놀이</h2>
+    <p>색을 고르고<br>그림을 탭해서 색칠해요!<br>모두 채우면 완성!</p>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 완성 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2 id="endEmoji">🎉</h2>
+    <div style="font-size:clamp(18px,5vw,24px);font-weight:700;margin-bottom:8px;" id="endTitle">완성!</div>
+    <div class="progress-bar"><div class="progress-fill" id="endProgress" style="width:100%"></div></div>
+    <p id="endMsg">멋지게 색칠했어요!</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-start" id="nextBtn">다음 그림 →</button>
+      <button class="btn-start" id="restartBtn" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;">다시 칠하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── 팔레트 정의 ── */
+  const COLORS = [
+    '#f7b731','#f97f51','#e74c3c','#e91e8c',
+    '#9b59b6','#3498db','#1abc9c','#2ecc71',
+    '#ffffff','#b2bec3','#636e72','#2d3436',
+  ];
+
+  /* ── 그림 데이터 (픽셀 아트, 20×20 격자) ── */
+  const PICTURES = [
+    {
+      label: '🌻 해바라기', rows: 20, cols: 20,
+      // 0=배경, 1=줄기/잎(초록), 2=꽃잎(노랑), 3=씨앗(갈색), 4=잎(연초록)
+      palette: { 1:'#27ae60', 2:'#f1c40f', 3:'#7f4f24', 4:'#2ecc71' },
+      grid: [
+        [0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0],
+        [0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0,0],
+        [0,0,0,0,0,2,2,2,3,3,3,3,2,2,2,2,0,0,0,0],
+        [0,0,0,0,2,2,2,3,3,3,3,3,3,2,2,2,2,0,0,0],
+        [0,0,0,2,2,2,3,3,3,3,3,3,3,3,2,2,2,2,0,0],
+        [0,0,2,2,2,3,3,3,3,3,3,3,3,3,3,2,2,2,2,0],
+        [0,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2,2],
+        [2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2],
+        [2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2],
+        [2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2],
+        [2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2],
+        [2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2],
+        [2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2],
+        [0,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2,0],
+        [0,0,2,2,2,2,3,3,3,3,3,3,3,3,2,2,2,2,0,0],
+        [0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0],
+        [0,0,0,0,4,4,1,1,1,1,1,1,1,0,0,0,0,0,0,0],
+        [0,0,0,4,4,4,4,1,1,1,1,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,4,4,4,1,1,1,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0],
+      ]
+    },
+    {
+      label: '🐟 물고기', rows: 20, cols: 20,
+      palette: { 1:'#3498db', 2:'#e74c3c', 3:'#f39c12', 4:'#ecf0f1', 5:'#2c3e50' },
+      grid: [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,2,2,1,1,2,2,0,0,0,0,0,0,0],
+        [0,0,0,3,3,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0],
+        [0,0,3,3,3,3,1,1,1,4,1,1,1,1,1,1,0,0,0,0],
+        [0,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,5,0,0],
+        [3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,0],
+        [3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,0],
+        [3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,5,0,0],
+        [0,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,5,0,0,0],
+        [0,0,3,3,3,3,3,1,1,1,1,1,1,1,1,5,0,0,0,0],
+        [0,0,0,3,3,3,3,3,3,3,3,3,3,3,5,0,0,0,0,0],
+        [0,0,0,0,3,3,3,3,3,3,3,3,3,5,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      ]
+    },
+    {
+      label: '🏡 집', rows: 20, cols: 20,
+      palette: { 1:'#e74c3c', 2:'#e67e22', 3:'#3498db', 4:'#27ae60', 5:'#ecf0f1', 6:'#95a5a6' },
+      grid: [
+        [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0],
+        [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0],
+        [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+        [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+        [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+        [0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0],
+        [0,0,2,2,2,5,5,5,5,5,5,5,5,5,5,2,2,2,0,0],
+        [0,0,2,2,5,5,3,3,3,5,5,3,3,3,5,5,2,2,0,0],
+        [0,0,2,2,5,5,3,3,3,5,5,3,3,3,5,5,2,2,0,0],
+        [0,0,2,2,5,5,3,3,3,5,5,3,3,3,5,5,2,2,0,0],
+        [0,0,2,2,2,5,5,5,5,5,5,5,5,5,5,2,2,2,0,0],
+        [0,0,2,2,2,2,2,6,6,6,6,6,2,2,2,2,2,2,0,0],
+        [0,0,2,2,2,2,2,6,6,6,6,6,2,2,2,2,2,2,0,0],
+        [0,0,2,2,2,2,2,6,6,6,6,6,2,2,2,2,2,2,0,0],
+        [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+        [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+      ]
+    },
+    {
+      label: '⭐ 별', rows: 20, cols: 20,
+      palette: { 1:'#f7b731', 2:'#f97f51', 3:'#fdcb6e' },
+      grid: [
+        [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0],
+        [2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,2,2,2,2,2],
+        [0,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,0],
+        [0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0],
+        [0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0],
+        [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+        [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+        [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+        [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+        [0,0,0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0,0,0],
+        [0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0],
+        [0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0],
+        [0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0],
+        [0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0],
+        [0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0],
+        [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+      ]
+    },
+    {
+      label: '🦋 나비', rows: 20, cols: 20,
+      palette: { 1:'#9b59b6', 2:'#e74c3c', 3:'#f39c12', 4:'#2c3e50' },
+      grid: [
+        [0,0,0,1,1,1,1,0,0,0,0,0,0,2,2,2,2,0,0,0],
+        [0,0,1,1,1,1,1,1,0,0,0,0,2,2,2,2,2,2,0,0],
+        [0,1,1,1,3,3,1,1,1,0,0,2,2,2,3,3,2,2,2,0],
+        [1,1,1,3,3,3,3,1,1,1,2,2,2,3,3,3,3,2,2,2],
+        [1,1,1,3,3,3,3,1,1,4,4,2,2,3,3,3,3,2,2,2],
+        [1,1,1,3,3,3,3,1,4,4,4,4,2,3,3,3,3,2,2,2],
+        [0,1,1,1,3,3,1,4,4,4,4,4,4,2,3,3,2,2,2,0],
+        [0,0,1,1,1,1,4,4,4,4,4,4,4,4,2,2,2,2,0,0],
+        [0,0,0,1,1,4,4,4,4,4,4,4,4,4,4,2,2,0,0,0],
+        [0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0],
+        [0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0],
+        [0,0,0,1,1,4,4,4,4,4,4,4,4,4,4,2,2,0,0,0],
+        [0,0,1,1,1,1,4,4,4,4,4,4,4,4,2,2,2,2,0,0],
+        [0,1,1,1,3,3,1,4,4,4,4,4,4,2,2,3,3,2,2,0],
+        [1,1,1,3,3,3,3,1,4,4,4,4,2,3,3,3,3,2,2,2],
+        [1,1,1,3,3,3,3,1,1,4,4,2,2,3,3,3,3,2,2,2],
+        [0,1,1,1,3,3,1,1,1,0,0,2,2,2,3,3,2,2,2,0],
+        [0,0,1,1,1,1,1,1,0,0,0,0,2,2,2,2,2,2,0,0],
+        [0,0,0,1,1,1,1,0,0,0,0,0,0,2,2,2,2,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      ]
+    }
+  ];
+
+  /* ── 상태 ── */
+  const state = {
+    running: false,
+    picIdx: 0,
+    selectedColor: COLORS[0],
+    filled: [],       // 각 셀의 현재 채워진 색 (null = 미채움)
+    totalCells: 0,
+    filledCount: 0,
+    cellSize: 0,
+    offsetX: 0,
+    offsetY: 0,
+  };
+
+  /* ── DOM ── */
+  const canvas   = document.getElementById('gameCanvas');
+  const ctx      = canvas.getContext('2d');
+  const palette  = document.getElementById('palette');
+  const picLabel = document.getElementById('picLabel');
+  const fillCountEl = document.getElementById('fillCount');
+  const totalCountEl= document.getElementById('totalCount');
+  const startOverlay= document.getElementById('startOverlay');
+  const endOverlay  = document.getElementById('endOverlay');
+  const endEmoji    = document.getElementById('endEmoji');
+  const endTitle    = document.getElementById('endTitle');
+  const endMsg      = document.getElementById('endMsg');
+  const startBtn    = document.getElementById('startBtn');
+  const nextBtn     = document.getElementById('nextBtn');
+  const restartBtn  = document.getElementById('restartBtn');
+
+  /* ── 팔레트 렌더 ── */
+  function buildPalette() {
+    palette.innerHTML = '';
+    COLORS.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'color-btn';
+      btn.style.background = c;
+      btn.setAttribute('aria-label', c);
+      if (c === state.selectedColor) btn.classList.add('active');
+      btn.addEventListener('pointerdown', () => {
+        state.selectedColor = c;
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+      palette.appendChild(btn);
+    });
+  }
+
+  /* ── 캔버스 크기 계산 ── */
+  function resizeCanvas() {
+    const wrap = document.getElementById('canvasWrap');
+    const maxW = Math.min(wrap.clientWidth  - 8, 420);
+    const maxH = Math.min(wrap.clientHeight - 8, 420);
+    const pic  = PICTURES[state.picIdx];
+    const cell = Math.floor(Math.min(maxW / pic.cols, maxH / pic.rows));
+    state.cellSize = Math.max(cell, 10);
+    canvas.width  = state.cellSize * pic.cols;
+    canvas.height = state.cellSize * pic.rows;
+    drawPicture();
+  }
+
+  /* ── 그림 그리기 ── */
+  function drawPicture() {
+    const pic  = PICTURES[state.picIdx];
+    const cs   = state.cellSize;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 배경
+    ctx.fillStyle = '#f5f5f5';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let r = 0; r < pic.rows; r++) {
+      for (let c = 0; c < pic.cols; c++) {
+        const val = pic.grid[r][c];
+        const x = c * cs, y = r * cs;
+        const filled = state.filled[r * pic.cols + c];
+
+        if (val === 0) {
+          // 배경 셀
+          ctx.fillStyle = '#e8e8e8';
+          ctx.fillRect(x, y, cs, cs);
+        } else {
+          // 색칠 가능 셀
+          if (filled) {
+            ctx.fillStyle = filled;
+          } else {
+            // 흰색 외곽선 포함 미채움
+            ctx.fillStyle = '#fff';
+          }
+          ctx.fillRect(x, y, cs, cs);
+          // 외곽선
+          ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+          ctx.lineWidth = 0.5;
+          ctx.strokeRect(x + 0.25, y + 0.25, cs - 0.5, cs - 0.5);
+          // 영역 색상 힌트 (미채움 시 반투명)
+          if (!filled) {
+            ctx.fillStyle = pic.palette[val] + '22'; // 10% 투명도
+            ctx.fillRect(x, y, cs, cs);
+          }
+        }
+      }
+    }
+
+    // 격자선
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.lineWidth = 0.5;
+    for (let r = 0; r <= pic.rows; r++) {
+      ctx.beginPath(); ctx.moveTo(0, r*cs); ctx.lineTo(canvas.width, r*cs); ctx.stroke();
+    }
+    for (let c = 0; c <= pic.cols; c++) {
+      ctx.beginPath(); ctx.moveTo(c*cs, 0); ctx.lineTo(c*cs, canvas.height); ctx.stroke();
+    }
+  }
+
+  /* ── 셀 채우기 ── */
+  function fillCell(px, py) {
+    const pic = PICTURES[state.picIdx];
+    const cs  = state.cellSize;
+    const c = Math.floor(px / cs);
+    const r = Math.floor(py / cs);
+    if (r < 0 || r >= pic.rows || c < 0 || c >= pic.cols) return;
+
+    const val = pic.grid[r][c];
+    if (val === 0) return; // 배경 셀은 색칠 불가
+
+    const idx = r * pic.cols + c;
+    const wasEmpty = !state.filled[idx];
+    state.filled[idx] = state.selectedColor;
+
+    if (wasEmpty) {
+      state.filledCount++;
+      fillCountEl.textContent = state.filledCount;
+    }
+
+    drawPicture();
+    checkComplete();
+  }
+
+  /* ── 완성 체크 ── */
+  function checkComplete() {
+    if (state.filledCount >= state.totalCells) {
+      setTimeout(() => {
+        const pic = PICTURES[state.picIdx];
+        endEmoji.textContent = '🎉';
+        endTitle.textContent = pic.label + ' 완성!';
+        endMsg.textContent = '정말 멋지게 색칠했어요! 👏';
+        endOverlay.classList.remove('hidden');
+      }, 300);
+    }
+  }
+
+  /* ── 그림 초기화 ── */
+  function initPicture(idx) {
+    state.picIdx = idx % PICTURES.length;
+    const pic = PICTURES[state.picIdx];
+    picLabel.textContent = pic.label;
+
+    // 채울 수 있는 셀 수 계산
+    let total = 0;
+    for (let r = 0; r < pic.rows; r++)
+      for (let c = 0; c < pic.cols; c++)
+        if (pic.grid[r][c] !== 0) total++;
+    state.totalCells  = total;
+    state.filledCount = 0;
+    state.filled      = new Array(pic.rows * pic.cols).fill(null);
+    totalCountEl.textContent = total;
+    fillCountEl.textContent  = 0;
+
+    resizeCanvas();
+  }
+
+  /* ── 입력 처리 ── */
+  function handlePointer(e) {
+    if (!state.running) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const px = (e.clientX - rect.left) * scaleX;
+    const py = (e.clientY - rect.top)  * scaleY;
+    fillCell(px, py);
+  }
+
+  canvas.addEventListener('pointerdown', handlePointer);
+  canvas.addEventListener('pointermove', e => {
+    if (e.buttons > 0) handlePointer(e);
+  });
+
+  /* ── 버튼 ── */
+  startBtn.addEventListener('pointerdown', () => {
+    startOverlay.classList.add('hidden');
+    state.running = true;
+    initPicture(0);
+  });
+  nextBtn.addEventListener('pointerdown', () => {
+    endOverlay.classList.add('hidden');
+    initPicture(state.picIdx + 1);
+  });
+  restartBtn.addEventListener('pointerdown', () => {
+    endOverlay.classList.add('hidden');
+    initPicture(state.picIdx);
+  });
+
+  /* ── 리사이즈 ── */
+  window.addEventListener('resize', () => {
+    if (state.running) resizeCanvas();
+  });
+
+  /* ── 초기화 ── */
+  buildPalette();
+
+})();
+</script>
+</body>
+</html>

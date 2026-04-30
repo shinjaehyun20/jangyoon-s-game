@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 미니 격자 색칠 예시 -->
+  <g transform="translate(24,28)">
+    <!-- 격자 배경 -->
+    <rect width="120" height="120" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <!-- 색칠된 셀들 (5x5 미니 그림) -->
+    <rect x="12" y="12" width="20" height="20" rx="3" fill="#f7b731"/>
+    <rect x="36" y="12" width="20" height="20" rx="3" fill="#f7b731"/>
+    <rect x="60" y="12" width="20" height="20" rx="3" fill="#f7b731"/>
+    <rect x="84" y="12" width="20" height="20" rx="3" fill="#f7b731"/>
+    <rect x="12" y="36" width="20" height="20" rx="3" fill="#f97f51"/>
+    <rect x="36" y="36" width="20" height="20" rx="3" fill="#f7b731"/>
+    <rect x="60" y="36" width="20" height="20" rx="3" fill="#f7b731"/>
+    <rect x="84" y="36" width="20" height="20" rx="3" fill="#f97f51"/>
+    <rect x="12" y="60" width="20" height="20" rx="3" fill="#2ecc71"/>
+    <rect x="36" y="60" width="20" height="20" rx="3" fill="#2ecc71"/>
+    <rect x="60" y="60" width="20" height="20" rx="3" fill="#3498db"/>
+    <rect x="84" y="60" width="20" height="20" rx="3" fill="#3498db"/>
+    <rect x="12" y="84" width="20" height="20" rx="3" fill="#2ecc71"/>
+    <rect x="36" y="84" width="20" height="20" rx="3" fill="#fff" opacity="0.3"/>
+    <rect x="60" y="84" width="20" height="20" rx="3" fill="#fff" opacity="0.3"/>
+    <rect x="84" y="84" width="20" height="20" rx="3" fill="#3498db"/>
+  </g>
+
+  <!-- 팔레트 점 -->
+  <circle cx="185" cy="50" r="14" fill="#e74c3c"/>
+  <circle cx="215" cy="50" r="14" fill="#f7b731"/>
+  <circle cx="245" cy="50" r="14" fill="#2ecc71"/>
+  <circle cx="275" cy="50" r="14" fill="#3498db"/>
+  <circle cx="185" cy="84" r="14" fill="#9b59b6"/>
+  <circle cx="215" cy="84" r="14" fill="#f97f51"/>
+  <circle cx="245" cy="84" r="14" fill="#1abc9c"/>
+  <circle cx="275" cy="84" r="14" fill="#e91e8c"/>
+
+  <!-- 선택된 색 강조 -->
+  <circle cx="215" cy="50" r="14" fill="none" stroke="#fff" stroke-width="3"/>
+
+  <!-- 붓 이모지 대체 텍스트 -->
+  <text x="200" y="135" text-anchor="middle" font-size="36" fill="rgba(255,255,255,0.25)">🎨</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#f7b731">색칠 놀이</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">COLOR FILL</text>
+  </g>
+</svg>

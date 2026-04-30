@@ -294,5 +294,21 @@
     "description": "씨앗을 심고 물을 줘서 채소를 키워요! 5레벨 수확 목표 달성 도전",
     "thumbnail": "vegetable-garden/thumb.svg",
     "path": "vegetable-garden/index.html"
+  },
+  {
+    "id": "color-fill",
+    "title": "Color Fill",
+    "title_ko": "🎨 색칠 놀이",
+    "description": "색을 골라서 그림을 탭으로 색칠해요! 5가지 그림 완성 도전",
+    "thumbnail": "color-fill/thumb.svg",
+    "path": "color-fill/index.html"
+  },
+  {
+    "id": "wave-surf",
+    "title": "Wave Surf",
+    "title_ko": "🌊 파도 서핑",
+    "description": "서퍼를 드래그해서 바위·해파리를 피해요! 별을 먹으면 보너스, 멀리 달려라",
+    "thumbnail": "wave-surf/thumb.svg",
+    "path": "wave-surf/index.html"
   }
 ]
