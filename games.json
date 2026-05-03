@@ -203,7 +203,7 @@
     "id": "jigsaw-mini",
     "title": "Jigsaw Mini",
     "title_ko": "🧩 퍼즐 조각 맞추기",
-    "description": "흩어진 이모지 조각을 끌어서 제자리에 맞춰요! 2×2·3×3 레벨업",
+    "description": "흩어진 이모지 조각을 끌어서 제자리에 맞춰요! 2x2·3x3 레벨업",
     "thumbnail": "jigsaw-mini/thumb.svg",
     "path": "jigsaw-mini/index.html"
   },
@@ -243,7 +243,7 @@
     "id": "baby-go",
     "title": "Baby Go",
     "title_ko": "⚫⚪ 아기 바둑",
-    "description": "9×9 / 13×13 / 19×19 난이도 선택, 2인 번갈아 두기, 따먹기 규칙만 적용한 입문판",
+    "description": "9x9 / 13x13 / 19x19 난이도 선택, 2인 번갈아 두기, 따먹기 규칙만 적용한 입문판",
     "thumbnail": "baby-go/thumb.svg",
     "path": "baby-go/index.html"
   },
@@ -310,5 +310,21 @@
     "description": "서퍼를 드래그해서 바위·해파리를 피해요! 별을 먹으면 보너스, 멀리 달려라",
     "thumbnail": "wave-surf/thumb.svg",
     "path": "wave-surf/index.html"
+  },
+  {
+    "id": "animal-sound",
+    "title": "Animal Sound",
+    "title_ko": "🐾 동물 소리 맞추기",
+    "description": "이모지 동물을 보고 울음소리를 맞혀요! 20종 동물, 10문제 퀴즈, 연속 정답 보너스",
+    "thumbnail": "animal-sound/thumb.svg",
+    "path": "animal-sound/index.html"
+  },
+  {
+    "id": "cloud-jump",
+    "title": "Cloud Jump",
+    "title_ko": "☁️ 구름 점프",
+    "description": "탭해서 점프! 구름을 밟아 하늘 높이 올라가요. 목숨 3개 도전",
+    "thumbnail": "cloud-jump/thumb.svg",
+    "path": "cloud-jump/index.html"
   }
 ]

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>☁️ 구름 점프</title>
+  <style>
+    :root {
+      --bg-top: #1a3a6a;
+      --bg-bot: #0d1f42;
+      --accent: #88ccff;
+      --cloud-color: rgba(255,255,255,0.88);
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      text-align: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 6px 14px;
+      flex-shrink: 0;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 10px; opacity: 0.65; }
+    .hud-value { font-size: 20px; font-weight: 700; color: var(--accent); }
+    .game-canvas-wrap {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #1a4a8a 0%, #0a1f42 100%);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    footer {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; opacity: 0.5; }
+    .home-link {
+      font-size: 13px; color: var(--accent);
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(136,204,255,0.12);
+    }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1a3a6a;
+      border-radius: 24px;
+      padding: 28px 22px;
+      max-width: 320px; width: 90%;
+      text-align: center;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .overlay-card h2 { font-size: 26px; }
+    .overlay-card p { font-size: 14px; opacity: 0.8; line-height: 1.6; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); }
+    .result-sub { font-size: 13px; opacity: 0.7; }
+    .btn-start {
+      background: #2277cc;
+      color: #fff;
+      border: none; border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 18px; font-weight: 700;
+      cursor: pointer;
+      min-height: 52px;
+      transition: opacity 0.15s;
+    }
+    .btn-start:active { opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>☁️ 구름 점프</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <div class="hud-label">높이</div>
+        <div class="hud-value" id="scoreVal">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">최고</div>
+        <div class="hud-value" id="bestVal">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">목숨</div>
+        <div class="hud-value" id="livesVal">❤️❤️❤️</div>
+      </div>
+    </div>
+
+    <div class="game-canvas-wrap" id="canvasWrap">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <footer>
+      <small>탭해서 점프! 구름 밟아 올라가요!</small>
+      <a class="home-link" href="../index.html">&#8592; 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>☁️ 구름 점프</h2>
+      <p>화면을 탭하면 점프!<br>구름 위에 착지하면 더 높이 올라가요.<br>떨어지면 목숨이 줄어요. 목숨 3개!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <p class="result-sub" id="bestMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+      <a class="home-link" href="../index.html" style="display:block;margin-top:4px;">🏠 게임 목록으로</a>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    var canvas = document.getElementById('gameCanvas');
+    var ctx = canvas.getContext('2d');
+    var wrap = document.getElementById('canvasWrap');
+
+    var W, H;
+    function resize() {
+      W = wrap.clientWidth;
+      H = wrap.clientHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    resize();
+    window.addEventListener('resize', function() { resize(); if (!running) drawStatic(); });
+
+    var CLOUD_H = 18;
+    var CLOUD_SPEED_BASE = 1.2;
+    var GRAVITY = 0.45;
+    var JUMP_VEL = -10.5;
+    var PLAYER_SIZE = 38;
+
+    var state = {};
+    var running = false;
+    var animId = null;
+    var best = parseInt(localStorage.getItem('cloud_jump_best') || '0', 10);
+
+    document.getElementById('bestVal').textContent = best;
+
+    function initState() {
+      var clouds = [];
+      // 초기 구름 배치 (바닥부터 위로)
+      var step = H / 6;
+      for (var i = 0; i < 7; i++) {
+        clouds.push({
+          x: Math.random() * (W - 90) + 10,
+          y: H - 60 - i * step,
+          w: 70 + Math.random() * 50,
+          moving: i > 3 && Math.random() > 0.5,
+          dir: Math.random() > 0.5 ? 1 : -1,
+          speed: 0.8 + Math.random() * 0.6
+        });
+      }
+      state = {
+        px: W / 2,
+        py: H - 120,
+        vx: 0,
+        vy: 0,
+        score: 0,
+        lives: 3,
+        clouds: clouds,
+        camY: 0,        // 카메라 오프셋 (아래로 내려간 총 픽셀)
+        onGround: false,
+        stars: generateStars(),
+        deadCooldown: 0
+      };
+    }
+
+    function generateStars() {
+      var stars = [];
+      for (var i = 0; i < 40; i++) {
+        stars.push({
+          x: Math.random() * 1000,
+          y: Math.random() * 2000,
+          r: Math.random() * 1.5 + 0.5,
+          a: Math.random()
+        });
+      }
+      return stars;
+    }
+
+    function spawnCloud() {
+      var level = Math.floor(state.score / 50);
+      var moving = level > 2 && Math.random() > 0.6;
+      state.clouds.push({
+        x: Math.random() * (W - 90) + 10,
+        y: state.clouds[state.clouds.length - 1].y - (55 + Math.random() * 50),
+        w: Math.max(55, 80 - level * 3 + Math.random() * 30),
+        moving: moving,
+        dir: Math.random() > 0.5 ? 1 : -1,
+        speed: (0.8 + Math.random() * 0.8) * (1 + level * 0.1)
+      });
+    }
+
+    function drawCloud(x, y, w) {
+      var h = CLOUD_H;
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      // 구름 모양: 둥근 사각형 + 위에 두 개 원
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 8);
+      ctx.fill();
+      // 위에 둥근 부분
+      ctx.beginPath();
+      ctx.arc(x + w * 0.3, y - 6, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + w * 0.65, y - 4, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawPlayer(px, py) {
+      ctx.font = PLAYER_SIZE + 'px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('🐣', px, py);
+    }
+
+    function drawStars(camY) {
+      state.stars.forEach(function(s) {
+        var sy = ((s.y - camY * 0.3) % (H + 200) + H + 200) % (H + 200);
+        ctx.globalAlpha = s.a * 0.7;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(s.x % W, sy, s.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+    }
+
+    function gameLoop() {
+      if (!running) return;
+      update();
+      draw();
+      animId = requestAnimationFrame(gameLoop);
+    }
+
+    function update() {
+      if (state.deadCooldown > 0) {
+        state.deadCooldown--;
+        return;
+      }
+
+      // 물리
+      state.vy += GRAVITY;
+      state.py += state.vy;
+      state.px += state.vx;
+      state.vx *= 0.92;
+
+      // 화면 경계 wrap
+      if (state.px < -20) state.px = W + 20;
+      if (state.px > W + 20) state.px = -20;
+
+      // 구름 충돌 (아래로 떨어지는 중에만)
+      if (state.vy > 0) {
+        state.onGround = false;
+        state.clouds.forEach(function(c) {
+          var playerBottom = state.py;
+          var playerLeft = state.px - PLAYER_SIZE / 2 + 6;
+          var playerRight = state.px + PLAYER_SIZE / 2 - 6;
+          var cloudTop = c.screenY;
+          if (
+            playerBottom >= cloudTop &&
+            playerBottom <= cloudTop + CLOUD_H + 8 &&
+            playerRight > c.x + 4 &&
+            playerLeft < c.x + c.w - 4
+          ) {
+            state.py = cloudTop;
+            state.vy = JUMP_VEL;
+            state.onGround = true;
+          }
+        });
+      }
+
+      // 카메라 스크롤: 캐릭터가 화면 40% 위로 가면 카메라 올림
+      var targetCamY = state.py - H * 0.4;
+      if (targetCamY < state.camY) {
+        var diff = state.camY - targetCamY;
+        state.camY = targetCamY;
+        // 점수 계산: 올라간 픽셀 -> 미터
+        var meters = Math.floor(diff / 5);
+        state.score += meters;
+        document.getElementById('scoreVal').textContent = state.score;
+      }
+
+      // 구름 화면 좌표 업데이트 + 이동
+      state.clouds.forEach(function(c) {
+        c.screenY = c.y - state.camY;
+        if (c.moving) {
+          c.x += c.dir * c.speed;
+          if (c.x < 0 || c.x + c.w > W) c.dir *= -1;
+        }
+      });
+
+      // 화면 위로 사라진 구름 제거 + 새 구름 생성
+      state.clouds = state.clouds.filter(function(c) { return c.screenY < H + 50; });
+      while (state.clouds.length < 8) {
+        spawnCloud();
+      }
+
+      // 낙사 판정: 캐릭터가 화면 아래로 벗어나면
+      if (state.py - state.camY > H + 60) {
+        state.lives--;
+        updateLivesUI();
+        if (state.lives <= 0) {
+          endGame();
+          return;
+        }
+        // 부활: 가장 높은 구름 근처에 재배치
+        state.clouds.sort(function(a, b) { return a.y - b.y; });
+        var topCloud = state.clouds[0];
+        state.py = topCloud.y - PLAYER_SIZE;
+        state.px = topCloud.x + topCloud.w / 2;
+        state.vy = JUMP_VEL * 0.7;
+        state.deadCooldown = 40;
+      }
+    }
+
+    function updateLivesUI() {
+      var hearts = ['', '❤️', '❤️❤️', '❤️❤️❤️'];
+      document.getElementById('livesVal').textContent = hearts[Math.max(0, state.lives)] || '';
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // 배경 그라디언트
+      var grd = ctx.createLinearGradient(0, 0, 0, H);
+      grd.addColorStop(0, '#0a1428');
+      grd.addColorStop(1, '#1a3a6a');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      drawStars(state.camY);
+
+      // 구름
+      state.clouds.forEach(function(c) {
+        if (c.screenY > -30 && c.screenY < H + 30) {
+          drawCloud(c.x, c.screenY, c.w);
+        }
+      });
+
+      // 캐릭터
+      drawPlayer(state.px, state.py - state.camY);
+    }
+
+    function drawStatic() {
+      ctx.clearRect(0, 0, W, H);
+      var grd = ctx.createLinearGradient(0, 0, 0, H);
+      grd.addColorStop(0, '#0a1428');
+      grd.addColorStop(1, '#1a3a6a');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function endGame() {
+      running = false;
+      if (animId) { cancelAnimationFrame(animId); animId = null; }
+
+      var sc = state.score;
+      document.getElementById('finalScore').textContent = sc + 'm';
+      if (sc >= 200) document.getElementById('resultMsg').textContent = '하늘까지 올라갔어요!';
+      else if (sc >= 100) document.getElementById('resultMsg').textContent = '잘했어요!';
+      else if (sc >= 50) document.getElementById('resultMsg').textContent = '조금 더 높이!';
+      else document.getElementById('resultMsg').textContent = '💪 다시 도전!';
+
+      if (sc > best) {
+        best = sc;
+        localStorage.setItem('cloud_jump_best', best);
+        document.getElementById('bestMsg').textContent = '최고 기록 갱신! ' + best + 'm';
+        document.getElementById('bestVal').textContent = best;
+      } else {
+        document.getElementById('bestMsg').textContent = '최고 기록: ' + best + 'm';
+      }
+      document.getElementById('endOverlay').classList.remove('hidden');
+    }
+
+    function startGame() {
+      document.getElementById('startOverlay').classList.add('hidden');
+      document.getElementById('endOverlay').classList.add('hidden');
+      resize();
+      initState();
+      updateLivesUI();
+      document.getElementById('scoreVal').textContent = '0';
+      running = true;
+      if (animId) cancelAnimationFrame(animId);
+      gameLoop();
+    }
+
+    // 탭/클릭 -> 점프 (게임 중에만)
+    wrap.addEventListener('pointerdown', function(e) {
+      if (!running) return;
+      e.preventDefault();
+      // 수평 방향도 살짝 추가
+      var rx = e.clientX / W;
+      state.vx = (rx - 0.5) * 6;
+      state.vy = JUMP_VEL;
+    });
+
+    document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+    document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+
+    drawStatic();
+  })();
+  </script>
+</body>
+</html>

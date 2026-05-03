@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a2a1a"/>
+      <stop offset="100%" stop-color="#2d4a2d"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- 동물 이모지 배치 -->
+  <text x="32" y="80" font-size="44" text-anchor="middle">🐶</text>
+  <text x="90" y="58" font-size="36" text-anchor="middle">🐱</text>
+  <text x="145" y="82" font-size="38" text-anchor="middle">🐮</text>
+  <text x="58" y="130" font-size="32" text-anchor="middle">🐸</text>
+  <text x="112" y="140" font-size="34" text-anchor="middle">🦁</text>
+
+  <!-- 말풍선: 멍멍! -->
+  <ellipse cx="75" cy="28" rx="28" ry="14" fill="rgba(102,221,102,0.25)" stroke="#66dd66" stroke-width="1.5"/>
+  <text x="75" y="33" font-size="11" font-weight="700" fill="#66dd66" text-anchor="middle" font-family="'Noto Sans KR',sans-serif">멍멍!</text>
+
+  <!-- 타이틀 우하단 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#66dd66">동물 소리 맞추기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">ANIMAL SOUND</text>
+  </g>
+</svg>
