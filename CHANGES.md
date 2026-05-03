@@ -1,5 +1,33 @@
 # 변경 이력
 
+## 핫픽스 (2026-05-03 — 애벌레 먹이주기 시작하기 버튼 무동작)
+
+### 버그 원인
+
+`caterpillar-feed/index.html`의 `bindStart()` 헬퍼 함수에서
+`pointerdown` 이벤트 핸들러가 `e.preventDefault()`를 호출하여
+iOS Safari를 포함한 일부 모바일 브라우저에서 터치 이벤트 자체가 취소됨.
+동시에 `click` 이벤트에는 `e.preventDefault()`만 달아두고 `fn()`을 호출하지 않아
+어떤 경로로도 `resetGame()`이 실행되지 않는 상태.
+
+### 수정 내용
+
+- `bindStart()` 함수 전체 제거
+- `btnStart`/`btnRestart` 모두 단순 `click` 이벤트 리스너로 교체
+
+```js
+// Before (버그)
+function bindStart(el, fn) { ... pointerdown + e.preventDefault() ... }
+bindStart(btnStart, resetGame);
+bindStart(btnRestart, resetGame);
+
+// After (수정)
+btnStart.addEventListener('click', resetGame);
+btnRestart.addEventListener('click', resetGame);
+```
+
+---
+
 ## 변경사항 (2026-04-27 — 신규 게임 2종 추가)
 
 ### 🎹 피아노 놀이 (piano-tiles) 추가

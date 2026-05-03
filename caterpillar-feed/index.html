@@ -547,23 +547,8 @@
     spawnLeaves();
   }
 
-  // 모바일에서 click 이벤트가 지연될 수 있어 pointerdown + touchstart 이중 바인딩
-  function bindStart(el, fn) {
-    var fired = false;
-    function handler(e) {
-      e.preventDefault();
-      if (fired) return;
-      fired = true;
-      fn();
-      // 300ms 후 중복 방지 플래그 리셋 (다음 게임 시작을 위해)
-      setTimeout(function() { fired = false; }, 300);
-    }
-    el.addEventListener('pointerdown', handler);
-    el.addEventListener('click', function(e) { e.preventDefault(); }); // click 기본동작 차단
-  }
-
-  bindStart(btnStart, resetGame);
-  bindStart(btnRestart, resetGame);
+  btnStart.addEventListener('click', resetGame);
+  btnRestart.addEventListener('click', resetGame);
 })();
 </script>
 </body>
