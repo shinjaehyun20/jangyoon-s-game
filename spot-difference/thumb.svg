@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1b2a"/>
+      <stop offset="100%" stop-color="#1b2838"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg2)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- 그림 A 패널 -->
+  <rect x="12" y="30" width="128" height="110" rx="10" fill="rgba(255,255,255,0.05)" stroke="rgba(78,205,196,0.3)" stroke-width="1.5"/>
+  <text x="20" y="44" font-size="9" fill="rgba(78,205,196,0.7)" font-family="sans-serif" font-weight="700">그림 A</text>
+
+  <!-- A 그리드 이모지 -->
+  <text x="32" y="76" font-size="22" text-anchor="middle">🐶</text>
+  <text x="65" y="76" font-size="22" text-anchor="middle">🐱</text>
+  <text x="98" y="76" font-size="22" text-anchor="middle">🐭</text>
+  <text x="32" y="108" font-size="22" text-anchor="middle">🐰</text>
+  <text x="65" y="108" font-size="22" text-anchor="middle">🦊</text>
+  <text x="98" y="108" font-size="22" text-anchor="middle">🐻</text>
+  <text x="32" y="130" font-size="22" text-anchor="middle">🐼</text>
+  <text x="65" y="130" font-size="22" text-anchor="middle">🐨</text>
+  <text x="98" y="130" font-size="22" text-anchor="middle">🐯</text>
+
+  <!-- 그림 B 패널 -->
+  <rect x="148" y="30" width="128" height="110" rx="10" fill="rgba(255,255,255,0.05)" stroke="rgba(78,205,196,0.3)" stroke-width="1.5"/>
+  <text x="156" y="44" font-size="9" fill="rgba(78,205,196,0.7)" font-family="sans-serif" font-weight="700">그림 B</text>
+
+  <!-- B 그리드 이모지 (일부 다름) -->
+  <text x="168" y="76" font-size="22" text-anchor="middle">🐶</text>
+  <text x="201" y="76" font-size="22" text-anchor="middle">🐱</text>
+  <text x="234" y="76" font-size="22" text-anchor="middle">🐭</text>
+  <text x="168" y="108" font-size="22" text-anchor="middle">🐰</text>
+  <!-- 다른 칸 강조 표시 (🦊→🐷로 변경된 것처럼) -->
+  <rect x="184" y="90" width="32" height="30" rx="6" fill="rgba(78,205,196,0.25)" stroke="#4ecdc4" stroke-width="1.5"/>
+  <text x="201" y="108" font-size="22" text-anchor="middle">🐷</text>
+  <text x="234" y="108" font-size="22" text-anchor="middle">🐻</text>
+  <text x="168" y="130" font-size="22" text-anchor="middle">🐼</text>
+  <text x="201" y="130" font-size="22" text-anchor="middle">🐨</text>
+  <text x="234" y="130" font-size="22" text-anchor="middle">🐯</text>
+
+  <!-- 돋보기 -->
+  <text x="290" y="72" font-size="36" text-anchor="middle" dominant-baseline="central" opacity="0.9">🔍</text>
+
+  <!-- 정답 표시 원 -->
+  <circle cx="201" cy="108" r="18" fill="none" stroke="#4ecdc4" stroke-width="2.5" opacity="0.9"/>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#4ecdc4">다른 그림 찾기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">SPOT DIFFERENCE</text>
+  </g>
+</svg>

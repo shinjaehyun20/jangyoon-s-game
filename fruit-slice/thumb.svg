@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+    <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#f7c948" stop-opacity="0.7"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- 과일들 -->
+  <text x="30" y="90" font-size="48" text-anchor="middle" dominant-baseline="central">🍉</text>
+  <text x="95" y="65" font-size="38" text-anchor="middle" dominant-baseline="central">🍊</text>
+  <text x="150" y="95" font-size="42" text-anchor="middle" dominant-baseline="central">🍎</text>
+  <text x="205" y="60" font-size="36" text-anchor="middle" dominant-baseline="central">🍋</text>
+
+  <!-- 반으로 잘린 과일 효과 (반쪽) -->
+  <text x="80" y="130" font-size="30" text-anchor="middle" dominant-baseline="central" opacity="0.6">🍓</text>
+  <text x="130" y="140" font-size="28" text-anchor="middle" dominant-baseline="central" opacity="0.5">🫐</text>
+
+  <!-- 칼날 슬라이스 궤적 -->
+  <path d="M 20 40 Q 130 110 270 30" stroke="url(#blade)" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <!-- 광채 효과 -->
+  <path d="M 20 40 Q 130 110 270 30" stroke="rgba(255,255,200,0.4)" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+  <!-- 주스 파티클 -->
+  <circle cx="95" cy="68" r="5" fill="#ff6b35" opacity="0.7"/>
+  <circle cx="110" cy="55" r="3" fill="#ff6b35" opacity="0.5"/>
+  <circle cx="150" cy="98" r="4" fill="#e94560" opacity="0.7"/>
+  <circle cx="165" cy="82" r="3" fill="#e94560" opacity="0.5"/>
+  <circle cx="205" cy="63" r="4" fill="#f7c948" opacity="0.7"/>
+  <circle cx="220" cy="48" r="3" fill="#f7c948" opacity="0.5"/>
+
+  <!-- 폭탄 -->
+  <text x="240" y="130" font-size="30" text-anchor="middle" dominant-baseline="central" opacity="0.9">💣</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#e94560">과일 자르기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">FRUIT SLICE</text>
+  </g>
+</svg>

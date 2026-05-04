@@ -326,5 +326,21 @@
     "description": "탭해서 점프! 구름을 밟아 하늘 높이 올라가요. 목숨 3개 도전",
     "thumbnail": "cloud-jump/thumb.svg",
     "path": "cloud-jump/index.html"
+  },
+  {
+    "id": "fruit-slice",
+    "title": "Fruit Slice",
+    "title_ko": "🍉 과일 자르기",
+    "description": "날아오는 과일을 손가락으로 슬라이드해서 잘라요! 폭탄 피하고 콤보 연결, 60초 도전",
+    "thumbnail": "fruit-slice/thumb.svg",
+    "path": "fruit-slice/index.html"
+  },
+  {
+    "id": "spot-difference",
+    "title": "Spot Difference",
+    "title_ko": "🔍 다른 그림 찾기",
+    "description": "두 이모지 그림을 비교해서 다른 곳을 찾아 탭! 레벨마다 다른 칸 수가 늘어나요",
+    "thumbnail": "spot-difference/thumb.svg",
+    "path": "spot-difference/index.html"
   }
 ]

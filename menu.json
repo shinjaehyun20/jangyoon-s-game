@@ -3,6 +3,8 @@
     "id": "kids",
     "label": "어린이 추천",
     "items": [
+      { "id": "fruit-slice",    "label": "🍉 과일 자르기",         "path": "fruit-slice/index.html" },
+      { "id": "spot-difference","label": "🔍 다른 그림 찾기",     "path": "spot-difference/index.html" },
       { "id": "animal-sound",  "label": "🐾 동물 소리 맞추기",  "path": "animal-sound/index.html" },
       { "id": "cloud-jump",    "label": "☁️ 구름 점프",          "path": "cloud-jump/index.html" },
       { "id": "rhythm-tap",   "label": "🎵 리듬 탭",          "path": "rhythm-tap/index.html" },

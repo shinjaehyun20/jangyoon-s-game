@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🍉 과일 자르기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #1a1a2e;
+      --accent: #e94560;
+      --text: #ffffff;
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: none;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      text-align: center;
+      font-weight: 900;
+      text-shadow: 0 2px 8px rgba(233,69,96,0.5);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 8px 16px;
+      flex-shrink: 0;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 11px; opacity: 0.7; }
+    .hud-val { font-size: 22px; font-weight: 900; }
+    .hud-val.timer { color: #f7c948; }
+    .lives { font-size: 20px; letter-spacing: 2px; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(160deg, #16213e 0%, #0f3460 100%);
+      cursor: crosshair;
+    }
+    /* fruit */
+    .fruit {
+      position: absolute;
+      font-size: 44px;
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+      transition: transform 0.05s;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    }
+    .fruit.sliced {
+      animation: sliceAnim 0.4s ease-out forwards;
+    }
+    @keyframes sliceAnim {
+      0%   { opacity: 1; transform: scale(1.2); }
+      100% { opacity: 0; transform: scale(1.6) translateY(-20px); }
+    }
+    .fruit.bomb { filter: drop-shadow(0 4px 12px rgba(255,50,50,0.6)); }
+    /* slice trail */
+    #sliceCanvas {
+      position: absolute; inset: 0;
+      pointer-events: none;
+    }
+    /* juice splat */
+    .splat {
+      position: absolute;
+      font-size: 28px;
+      pointer-events: none;
+      animation: splatAnim 0.6s ease-out forwards;
+    }
+    @keyframes splatAnim {
+      0%   { opacity: 1; transform: scale(0.5); }
+      60%  { opacity: 1; transform: scale(1.4); }
+      100% { opacity: 0; transform: scale(1.8); }
+    }
+    /* score pop */
+    .score-pop {
+      position: absolute;
+      font-size: 26px; font-weight: 900;
+      color: #f7c948;
+      pointer-events: none;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      animation: scorePop 0.7s ease-out forwards;
+    }
+    @keyframes scorePop {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-50px) scale(1.3); }
+    }
+    .combo-msg {
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      top: 30%;
+      font-size: 28px; font-weight: 900;
+      color: #ff6b6b;
+      text-shadow: 0 2px 10px rgba(255,107,107,0.8);
+      pointer-events: none;
+      animation: comboAnim 0.8s ease-out forwards;
+      white-space: nowrap;
+    }
+    @keyframes comboAnim {
+      0%   { opacity: 1; transform: translateX(-50%) scale(1); }
+      50%  { transform: translateX(-50%) scale(1.3); }
+      100% { opacity: 0; transform: translateX(-50%) scale(0.8); }
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 12px; opacity: 0.6; }
+    .home-link {
+      font-size: 13px; color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      background: rgba(255,255,255,0.1);
+      padding: 6px 12px; border-radius: 8px;
+      min-height: 44px; display: flex; align-items: center;
+    }
+    /* overlays */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 2px solid rgba(233,69,96,0.4);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 340px; width: 90%;
+      box-shadow: 0 8px 32px rgba(233,69,96,0.2);
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 12px; }
+    .overlay-card p  { font-size: 15px; opacity: 0.85; line-height: 1.6; margin-bottom: 20px; }
+    .result-score { font-size: 52px; font-weight: 900; color: #f7c948; margin: 12px 0; }
+    .result-best  { font-size: 14px; opacity: 0.7; margin-bottom: 16px; }
+    .btn-start {
+      background: linear-gradient(135deg, #e94560, #c72e48);
+      border: none; color: #fff;
+      font-size: 20px; font-weight: 900;
+      padding: 14px 40px; border-radius: 14px;
+      min-height: 52px; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+      width: 100%;
+    }
+    .btn-start:active { transform: scale(0.96); }
+    .difficulty-row { display: flex; gap: 10px; margin-bottom: 18px; justify-content: center; }
+    .diff-btn {
+      border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.08);
+      color: #fff; font-size: 14px; font-weight: 700;
+      padding: 8px 16px; border-radius: 10px; cursor: pointer; min-height: 44px;
+    }
+    .diff-btn.active { border-color: #e94560; background: rgba(233,69,96,0.2); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍉 과일 자르기</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <div class="hud-label">점수</div>
+        <div class="hud-val" id="scoreVal">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">남은 목숨</div>
+        <div class="hud-val lives" id="livesVal">❤️❤️❤️</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">시간</div>
+        <div class="hud-val timer" id="timerVal">60</div>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <canvas id="sliceCanvas"></canvas>
+    </div>
+
+    <footer>
+      <small>손가락으로 과일을 긁어 잘라요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍉 과일 자르기</h2>
+      <p>화면에 날아오는 과일을<br>손가락으로 <strong>슬라이드해서</strong> 잘라요!<br>💣 폭탄은 피하세요!</p>
+      <div class="difficulty-row">
+        <button class="diff-btn active" data-diff="easy">쉬움</button>
+        <button class="diff-btn" data-diff="normal">보통</button>
+        <button class="diff-btn" data-diff="hard">어려움</button>
+      </div>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 종료 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-best" id="bestMsg"></div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      easy:   { spawnInterval: 1400, speed: 1.8, bombRate: 0.08, time: 60 },
+      normal: { spawnInterval: 1100, speed: 2.4, bombRate: 0.14, time: 60 },
+      hard:   { spawnInterval: 800,  speed: 3.2, bombRate: 0.20, time: 60 },
+      maxLives: 3,
+      trailLength: 12,
+      trailFade: 0.15,
+    };
+
+    const FRUITS = ['🍎','🍊','🍋','🍇','🍓','🍑','🍒','🥭','🍍','🫐','🍈','🍏'];
+    const BOMB = '💣';
+
+    const state = {
+      running: false,
+      score: 0,
+      lives: CONFIG.maxLives,
+      timeLeft: 60,
+      difficulty: 'easy',
+      fruits: [],
+      combo: 0,
+      animId: null,
+      timerInterval: null,
+      spawnTimeout: null,
+      trailPoints: [],
+      pointerDown: false,
+      lastPointer: null,
+    };
+
+    // DOM
+    const gameArea = document.getElementById('gameArea');
+    const canvas   = document.getElementById('sliceCanvas');
+    const ctx      = canvas.getContext('2d');
+    const scoreEl  = document.getElementById('scoreVal');
+    const livesEl  = document.getElementById('livesVal');
+    const timerEl  = document.getElementById('timerVal');
+    const startOv  = document.getElementById('startOverlay');
+    const endOv    = document.getElementById('endOverlay');
+    const finalScoreEl = document.getElementById('finalScore');
+    const bestMsgEl    = document.getElementById('bestMsg');
+    const resultMsgEl  = document.getElementById('resultMsg');
+
+    // difficulty buttons
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.difficulty = btn.dataset.diff;
+      });
+    });
+
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      endOv.classList.add('hidden');
+      startOv.classList.remove('hidden');
+    });
+
+    function resizeCanvas() {
+      canvas.width  = gameArea.offsetWidth;
+      canvas.height = gameArea.offsetHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function startGame() {
+      startOv.classList.add('hidden');
+      endOv.classList.add('hidden');
+      const cfg = CONFIG[state.difficulty];
+      Object.assign(state, {
+        running: true, score: 0,
+        lives: CONFIG.maxLives,
+        timeLeft: cfg.time,
+        fruits: [], combo: 0,
+        trailPoints: [], pointerDown: false,
+      });
+      updateHUD();
+      scheduleSpawn();
+      state.timerInterval = setInterval(tick, 1000);
+      requestAnimationFrame(loop);
+    }
+
+    function tick() {
+      if (!state.running) return;
+      state.timeLeft--;
+      timerEl.textContent = state.timeLeft;
+      if (state.timeLeft <= 0) endGame();
+    }
+
+    function scheduleSpawn() {
+      if (!state.running) return;
+      const cfg = CONFIG[state.difficulty];
+      state.spawnTimeout = setTimeout(() => {
+        spawnFruit();
+        scheduleSpawn();
+      }, cfg.spawnInterval + Math.random() * 400);
+    }
+
+    function spawnFruit() {
+      const area = gameArea;
+      const w = area.offsetWidth;
+      const h = area.offsetHeight;
+      const cfg = CONFIG[state.difficulty];
+      const isBomb = Math.random() < cfg.bombRate;
+      const emoji  = isBomb ? BOMB : FRUITS[Math.floor(Math.random() * FRUITS.length)];
+
+      // 아래에서 위로 포물선 궤도
+      const x = 40 + Math.random() * (w - 80);
+      const vx = (Math.random() - 0.5) * 2.5;
+      const vy = -(cfg.speed * 6 + Math.random() * 3);
+
+      const el = document.createElement('div');
+      el.className = 'fruit' + (isBomb ? ' bomb' : '');
+      el.textContent = emoji;
+      el.style.left = x + 'px';
+      el.style.top  = h + 'px';
+      area.appendChild(el);
+
+      state.fruits.push({ el, x, y: h, vx, vy, w: 48, isBomb, sliced: false });
+    }
+
+    function loop(ts) {
+      if (!state.running) return;
+      updateFruits();
+      drawTrail();
+      state.animId = requestAnimationFrame(loop);
+    }
+
+    function updateFruits() {
+      const h = gameArea.offsetHeight;
+      const gravity = 0.12;
+
+      for (let i = state.fruits.length - 1; i >= 0; i--) {
+        const f = state.fruits[i];
+        if (f.sliced) continue;
+        f.vy += gravity;
+        f.x  += f.vx;
+        f.y  += f.vy;
+        f.el.style.left = (f.x - 24) + 'px';
+        f.el.style.top  = (f.y - 24) + 'px';
+
+        // 화면 밖으로 나가면 제거
+        if (f.y > h + 80) {
+          if (!f.isBomb) {
+            // 과일 놓침 → 목숨 감소
+            loseLife();
+          }
+          f.el.remove();
+          state.fruits.splice(i, 1);
+        }
+      }
+    }
+
+    function drawTrail() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (state.trailPoints.length < 2 || !state.pointerDown) return;
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      const pts = state.trailPoints;
+      for (let i = 1; i < pts.length; i++) {
+        const alpha = i / pts.length;
+        const width = alpha * 6 + 1;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(255, 255, 180, ${alpha * 0.9})`;
+        ctx.lineWidth = width;
+        ctx.moveTo(pts[i-1].x, pts[i-1].y);
+        ctx.lineTo(pts[i].x, pts[i].y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // pointer events on gameArea
+    gameArea.addEventListener('pointerdown', e => {
+      state.pointerDown = true;
+      state.trailPoints = [];
+      const {x, y} = getPos(e);
+      state.trailPoints.push({x, y});
+      state.lastPointer = {x, y};
+    });
+
+    window.addEventListener('pointermove', e => {
+      if (!state.pointerDown || !state.running) return;
+      const {x, y} = getPos(e);
+      state.trailPoints.push({x, y});
+      if (state.trailPoints.length > 18) state.trailPoints.shift();
+      checkSlice(x, y);
+      state.lastPointer = {x, y};
+    });
+
+    window.addEventListener('pointerup', () => {
+      state.pointerDown = false;
+      state.trailPoints = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    function getPos(e) {
+      const rect = gameArea.getBoundingClientRect();
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    }
+
+    function checkSlice(px, py) {
+      for (let i = 0; i < state.fruits.length; i++) {
+        const f = state.fruits[i];
+        if (f.sliced) continue;
+        const dx = px - f.x;
+        const dy = py - f.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 34) {
+          sliceFruit(f, i);
+        }
+      }
+    }
+
+    function sliceFruit(f, idx) {
+      f.sliced = true;
+      f.el.classList.add('sliced');
+      setTimeout(() => { f.el.remove(); state.fruits.splice(state.fruits.indexOf(f), 1); }, 400);
+
+      if (f.isBomb) {
+        // 폭탄 터치
+        state.combo = 0;
+        showSplat(f.x, f.y, '💥');
+        loseLife();
+        return;
+      }
+
+      // 과일 자르기 성공
+      state.combo++;
+      let pts = 10;
+      if (state.combo >= 3) pts = 20;
+      if (state.combo >= 5) pts = 30;
+      state.score += pts;
+      scoreEl.textContent = state.score;
+
+      showSplat(f.x, f.y, getJuice(f.el.textContent));
+      showScorePop(f.x, f.y, '+' + pts);
+
+      if (state.combo >= 3) {
+        showCombo(state.combo + ' 콤보! 🔥');
+      }
+    }
+
+    function getJuice(emoji) {
+      const map = {
+        '🍎':'🔴','🍊':'🟠','🍋':'🟡','🍇':'🟣','🍓':'🔴','🍑':'🟠',
+        '🍒':'🔴','🥭':'🟠','🍍':'🟡','🫐':'🔵','🍈':'🟢','🍏':'🟢',
+      };
+      return map[emoji] || '✨';
+    }
+
+    function showSplat(x, y, emoji) {
+      const el = document.createElement('div');
+      el.className = 'splat';
+      el.textContent = emoji;
+      el.style.left = (x - 14) + 'px';
+      el.style.top  = (y - 14) + 'px';
+      gameArea.appendChild(el);
+      setTimeout(() => el.remove(), 600);
+    }
+
+    function showScorePop(x, y, text) {
+      const el = document.createElement('div');
+      el.className = 'score-pop';
+      el.textContent = text;
+      el.style.left = (x - 20) + 'px';
+      el.style.top  = (y - 40) + 'px';
+      gameArea.appendChild(el);
+      setTimeout(() => el.remove(), 700);
+    }
+
+    function showCombo(text) {
+      const old = gameArea.querySelector('.combo-msg');
+      if (old) old.remove();
+      const el = document.createElement('div');
+      el.className = 'combo-msg';
+      el.textContent = text;
+      gameArea.appendChild(el);
+      setTimeout(() => el.remove(), 800);
+    }
+
+    function loseLife() {
+      if (!state.running) return;
+      state.lives--;
+      if (state.lives < 0) state.lives = 0;
+      updateHUD();
+      // 화면 흔들림
+      gameArea.style.transform = 'translateX(8px)';
+      setTimeout(() => { gameArea.style.transform = 'translateX(-8px)'; }, 80);
+      setTimeout(() => { gameArea.style.transform = ''; }, 160);
+      if (state.lives <= 0) {
+        setTimeout(endGame, 200);
+      }
+    }
+
+    function updateHUD() {
+      scoreEl.textContent = state.score;
+      timerEl.textContent = state.timeLeft;
+      const hearts = '❤️'.repeat(state.lives) + '🖤'.repeat(CONFIG.maxLives - state.lives);
+      livesEl.textContent = hearts || '💔';
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(state.timerInterval);
+      clearTimeout(state.spawnTimeout);
+      cancelAnimationFrame(state.animId);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // remove remaining fruits
+      state.fruits.forEach(f => f.el.remove());
+      state.fruits = [];
+
+      const best = parseInt(localStorage.getItem('fruit-slice_best') || '0');
+      const newBest = state.score > best;
+      if (newBest) localStorage.setItem('fruit-slice_best', state.score);
+      const curBest = newBest ? state.score : best;
+
+      finalScoreEl.textContent = state.score;
+      bestMsgEl.textContent = newBest ? '🏆 최고 기록 갱신!' : `최고 기록: ${curBest}점`;
+      resultMsgEl.textContent = state.score >= 150 ? '🍉 과일 슬라이서 마스터!' :
+                                state.score >= 80  ? '🍊 잘 자랐어요!' : '🍋 더 연습해봐요!';
+      endOv.classList.remove('hidden');
+    }
+
+  })();
+  </script>
+</body>
+</html>
