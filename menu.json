@@ -30,7 +30,9 @@
       { "id": "dino-run",          "label": "🦕 공룡 달리기",        "path": "dino-run/index.html" },
       { "id": "vegetable-garden",  "label": "🥕 채소 텃밭",          "path": "vegetable-garden/index.html" },
       { "id": "color-fill",        "label": "🎨 색칠 놀이",           "path": "color-fill/index.html" },
-      { "id": "wave-surf",         "label": "🌊 파도 서핑",           "path": "wave-surf/index.html" }
+      { "id": "wave-surf",         "label": "🌊 파도 서핑",           "path": "wave-surf/index.html" },
+      { "id": "color-bubble-catch","label": "🌈 색깔 거품 잡기",     "path": "color-bubble-catch/index.html" },
+      { "id": "face-match",        "label": "🎭 표정 맞추기",         "path": "face-match/index.html" }
     ]
   },
   {

@@ -342,5 +342,21 @@
     "description": "두 이모지 그림을 비교해서 다른 곳을 찾아 탭! 레벨마다 다른 칸 수가 늘어나요",
     "thumbnail": "spot-difference/thumb.svg",
     "path": "spot-difference/index.html"
+  },
+  {
+    "id": "color-bubble-catch",
+    "title": "Color Bubble Catch",
+    "title_ko": "🌈 색깔 거품 잡기",
+    "description": "목표 색 거품만 터치! 다른 색은 피해요. 난이도 3단계",
+    "thumbnail": "color-bubble-catch/thumb.svg",
+    "path": "color-bubble-catch/index.html"
+  },
+  {
+    "id": "face-match",
+    "title": "Face Match",
+    "title_ko": "🎭 표정 맞추기",
+    "description": "제시된 표정과 같은 얼굴을 골라요! 10문제 빠른 터치 퀴즈",
+    "thumbnail": "face-match/thumb.svg",
+    "path": "face-match/index.html"
   }
 ]

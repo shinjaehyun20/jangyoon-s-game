@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🎭 표정 맞추기</title>
+  <style>
+    :root {
+      --bg: #0f2027;
+      --accent: #f9c74f;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(160deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(19px, 5.2vw, 27px);
+      text-align: center;
+      text-shadow: 0 0 10px rgba(249,199,79,0.6);
+    }
+    .hud {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 7px 14px;
+      font-size: clamp(13px, 3.5vw, 16px);
+    }
+    .hud span { font-weight: 700; }
+    #gameArea {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-evenly;
+      gap: 10px;
+      min-height: 0;
+    }
+    .question-area {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+      width: 100%;
+    }
+    .question-label {
+      font-size: clamp(12px, 3.2vw, 14px);
+      opacity: 0.75;
+    }
+    .question-face {
+      font-size: clamp(64px, 18vw, 100px);
+      line-height: 1;
+      filter: drop-shadow(0 0 16px rgba(249,199,79,0.5));
+      transition: transform 0.15s;
+    }
+    .question-face.bounce {
+      animation: facebounce 0.35s ease;
+    }
+    @keyframes facebounce {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+    .question-name {
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+    .choice-btn {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px;
+      min-height: clamp(72px, 18vw, 96px);
+      background: rgba(255,255,255,0.07);
+      border: 2px solid rgba(255,255,255,0.18);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.15s;
+    }
+    .choice-btn:active { transform: scale(0.94); }
+    .choice-btn .face-icon { font-size: clamp(32px, 9vw, 48px); line-height: 1; }
+    .choice-btn .face-name { font-size: clamp(11px, 3vw, 13px); opacity: 0.8; }
+    .choice-btn.correct {
+      border-color: #3BCB6E;
+      background: rgba(59, 203, 110, 0.22);
+    }
+    .choice-btn.wrong {
+      border-color: #FF4B4B;
+      background: rgba(255, 75, 75, 0.22);
+    }
+    .progress-bar-wrap {
+      width: 100%; height: 8px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 4px; overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #f9c74f, #f3722c);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    footer {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      font-size: clamp(11px, 2.8vw, 13px); opacity: 0.7;
+      padding: 0 4px;
+    }
+    .home-link {
+      color: #fff; text-decoration: none;
+      background: rgba(255,255,255,0.12);
+      padding: 4px 10px; border-radius: 8px;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10, 20, 30, 0.9);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 24px;
+      padding: 28px 24px 24px;
+      text-align: center;
+      width: min(320px, 88vw);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .overlay-card h2 { font-size: clamp(20px, 6vw, 28px); }
+    .overlay-card p { font-size: clamp(13px, 3.5vw, 15px); opacity: 0.85; line-height: 1.6; }
+    .result-score {
+      font-size: clamp(40px, 12vw, 56px);
+      font-weight: 900; color: var(--accent);
+    }
+    .result-emoji { font-size: 40px; }
+    .btn-start {
+      min-height: 52px;
+      font-size: clamp(15px, 4.5vw, 18px);
+      font-weight: 700;
+      background: linear-gradient(135deg, #f9c74f, #f3722c);
+      color: #fff; border: none; border-radius: 16px;
+      cursor: pointer; padding: 0 24px;
+      box-shadow: 0 4px 18px rgba(243,114,44,0.45);
+    }
+    .feedback-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 80px; pointer-events: none;
+      animation: fadeout 0.6s ease forwards;
+      z-index: 50;
+    }
+    @keyframes fadeout {
+      0%   { opacity: 1; transform: scale(0.7); }
+      50%  { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0; transform: scale(1.3); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🎭 표정 맞추기</h1>
+
+    <div class="hud">
+      <div>
+        <div style="font-size:11px;opacity:0.7">점수</div>
+        <span id="scoreDisp">0</span>
+      </div>
+      <div>
+        <div style="font-size:11px;opacity:0.7">문제</div>
+        <span id="questionNum">1 / 10</span>
+      </div>
+      <div>
+        <div style="font-size:11px;opacity:0.7">연속 정답</div>
+        <span id="comboDisp">🔥 0</span>
+      </div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar" style="width:10%"></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="question-area">
+        <div class="question-label">이 표정을 찾아봐요!</div>
+        <div class="question-face" id="questionFace">😊</div>
+        <div class="question-name" id="questionName">행복해요</div>
+      </div>
+      <div class="choices-grid" id="choicesGrid"></div>
+    </div>
+
+    <footer>
+      <small>같은 표정을 탭!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🎭 표정 맞추기</h2>
+      <p>위에 나오는 표정과<br>똑같은 표정을 찾아서 탭해요!<br>빨리 맞출수록 더 많은 점수! ⭐</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 퀴즈 종료!</h2>
+      <div class="result-emoji" id="resultEmoji">🏆</div>
+      <div class="result-score" id="finalScore">0점</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ─── 표정 데이터 ─── */
+    const FACES = [
+      { emoji: '😊', name: '행복해요' },
+      { emoji: '😢', name: '슬퍼요' },
+      { emoji: '😡', name: '화났어요' },
+      { emoji: '😱', name: '깜짝 놀랐어요' },
+      { emoji: '😴', name: '졸려요' },
+      { emoji: '😋', name: '맛있어요' },
+      { emoji: '🤔', name: '생각해요' },
+      { emoji: '😂', name: '너무 웃겨요' },
+      { emoji: '🥳', name: '신나요' },
+      { emoji: '😍', name: '사랑해요' },
+      { emoji: '😎', name: '멋있어요' },
+      { emoji: '🤗', name: '안아줄게요' },
+      { emoji: '😬', name: '긴장해요' },
+      { emoji: '🥺', name: '간절해요' },
+      { emoji: '🤩', name: '짱이에요' },
+      { emoji: '😏', name: '의심해요' },
+      { emoji: '🙄', name: '어이없어요' },
+      { emoji: '🤣', name: '배꼽 빠져요' },
+      { emoji: '😤', name: '흥!' },
+      { emoji: '🥹', name: '감동이에요' },
+    ];
+
+    const TOTAL_Q = 10;
+
+    let state = {
+      score: 0,
+      qIndex: 0,
+      combo: 0,
+      questionList: [],
+      questionFace: null,
+      currentChoices: [],
+      canTap: true,
+      startTime: 0,
+    };
+
+    /* ─── 요소 ─── */
+    const scoreDisp   = document.getElementById('scoreDisp');
+    const questionNum = document.getElementById('questionNum');
+    const comboDisp   = document.getElementById('comboDisp');
+    const progressBar = document.getElementById('progressBar');
+    const questionFaceEl = document.getElementById('questionFace');
+    const questionNameEl = document.getElementById('questionName');
+    const choicesGrid = document.getElementById('choicesGrid');
+    const gameArea    = document.getElementById('gameArea');
+    const startOverlay= document.getElementById('startOverlay');
+    const endOverlay  = document.getElementById('endOverlay');
+    const finalScore  = document.getElementById('finalScore');
+    const resultMsg   = document.getElementById('resultMsg');
+    const resultEmoji = document.getElementById('resultEmoji');
+
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      endOverlay.classList.add('hidden');
+      startGame();
+    });
+
+    function shuffle(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
+    }
+
+    function startGame() {
+      state.score = 0;
+      state.qIndex = 0;
+      state.combo = 0;
+      state.canTap = true;
+      state.questionList = shuffle(FACES).slice(0, TOTAL_Q);
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      updateHUD();
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (state.qIndex >= TOTAL_Q) { endGame(); return; }
+      state.canTap = true;
+      state.startTime = performance.now();
+
+      const target = state.questionList[state.qIndex];
+      state.questionFace = target;
+
+      // 오답 3개 선정 (target 제외)
+      const pool = shuffle(FACES.filter(f => f.emoji !== target.emoji));
+      const wrong = pool.slice(0, 3);
+      const choices = shuffle([target, ...wrong]);
+      state.currentChoices = choices;
+
+      questionFaceEl.textContent = target.emoji;
+      questionFaceEl.classList.remove('bounce');
+      void questionFaceEl.offsetWidth;
+      questionFaceEl.classList.add('bounce');
+      questionNameEl.textContent = target.name;
+
+      // 보기 카드 생성
+      choicesGrid.innerHTML = '';
+      choices.forEach(face => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = `<span class="face-icon">${face.emoji}</span><span class="face-name">${face.name}</span>`;
+        btn.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          handleChoice(btn, face);
+        });
+        choicesGrid.appendChild(btn);
+      });
+
+      updateHUD();
+    }
+
+    function handleChoice(btn, face) {
+      if (!state.canTap) return;
+      state.canTap = false;
+
+      const elapsed = (performance.now() - state.startTime) / 1000;
+      const isCorrect = face.emoji === state.questionFace.emoji;
+
+      if (isCorrect) {
+        btn.classList.add('correct');
+        state.combo += 1;
+        // 빠를수록 보너스 (최대 5초 기준)
+        const timeBonus = Math.max(0, Math.floor((5 - elapsed) * 4));
+        const comboBonus = state.combo >= 3 ? 20 : (state.combo >= 2 ? 10 : 0);
+        const pts = 100 + timeBonus + comboBonus;
+        state.score += pts;
+        showFeedback('✅');
+      } else {
+        btn.classList.add('wrong');
+        // 정답 하이라이트
+        choicesGrid.querySelectorAll('.choice-btn').forEach((b, i) => {
+          if (state.currentChoices[i].emoji === state.questionFace.emoji) {
+            b.classList.add('correct');
+          }
+        });
+        state.combo = 0;
+        showFeedback('❌');
+      }
+
+      updateHUD();
+      state.qIndex += 1;
+      setTimeout(showQuestion, 900);
+    }
+
+    function showFeedback(emoji) {
+      const f = document.createElement('div');
+      f.className = 'feedback-overlay';
+      f.textContent = emoji;
+      gameArea.style.position = 'relative';
+      gameArea.appendChild(f);
+      setTimeout(() => f.remove(), 640);
+    }
+
+    function updateHUD() {
+      scoreDisp.textContent = state.score;
+      questionNum.textContent = `${Math.min(state.qIndex + 1, TOTAL_Q)} / ${TOTAL_Q}`;
+      comboDisp.textContent = state.combo >= 2 ? `🔥 ${state.combo}` : `${state.combo}`;
+      const pct = ((state.qIndex) / TOTAL_Q * 100);
+      progressBar.style.width = pct + '%';
+    }
+
+    function endGame() {
+      progressBar.style.width = '100%';
+      const best = parseInt(localStorage.getItem('face-match_best') || '0');
+      const isNew = state.score > best;
+      if (isNew) localStorage.setItem('face-match_best', state.score);
+
+      // 결과 등급
+      const pct = state.score / (TOTAL_Q * 100) * 100;
+      let grade, gradeEmoji;
+      if (pct >= 90)      { grade = '천재 표정 박사! 🎓'; gradeEmoji = '🏆'; }
+      else if (pct >= 70) { grade = '잘했어요! 👍';       gradeEmoji = '🥈'; }
+      else if (pct >= 50) { grade = '조금 더 연습해요!';  gradeEmoji = '🥉'; }
+      else                { grade = '괜찮아요, 다시 도전!'; gradeEmoji = '😊'; }
+
+      resultEmoji.textContent = gradeEmoji;
+      finalScore.textContent = state.score + '점';
+      resultMsg.textContent = grade + (isNew ? `\n🏆 최고기록 달성!` : `\n최고기록: ${best}점`);
+      endOverlay.classList.remove('hidden');
+    }
+  })();
+  </script>
+</body>
+</html>
