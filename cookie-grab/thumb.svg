@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3d1a0a"/>
+      <stop offset="100%" stop-color="#8b4513"/>
+    </linearGradient>
+    <radialGradient id="plate" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.12)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.03)"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 배경 원형 접시 느낌 -->
+  <ellipse cx="130" cy="95" rx="100" ry="80" fill="url(#plate)"/>
+
+  <!-- 쿠키들 -->
+  <text x="60"  y="75"  font-size="44" text-anchor="middle">🍪</text>
+  <text x="145" y="60"  font-size="36" text-anchor="middle">🍩</text>
+  <text x="200" y="90"  font-size="38" text-anchor="middle">🧁</text>
+  <text x="80"  y="130" font-size="32" text-anchor="middle">🍫</text>
+  <text x="155" y="135" font-size="30" text-anchor="middle">🍬</text>
+
+  <!-- 나쁜 아이템 (빨간 동그라미 테두리) -->
+  <circle cx="250" cy="58" r="20" fill="rgba(220,50,50,0.22)" stroke="#ff4757" stroke-width="2"/>
+  <text x="250" y="67" font-size="24" text-anchor="middle">🌶️</text>
+
+  <!-- 콤보 표시 -->
+  <rect x="186" y="108" width="70" height="22" rx="11" fill="rgba(255,215,0,0.18)"/>
+  <text x="221" y="124" text-anchor="middle" font-size="13" font-weight="900" fill="#ffd700">🔥 콤보!</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd700">쿠키 낚아채기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">COOKIE GRAB</text>
+  </g>
+</svg>

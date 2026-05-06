@@ -358,5 +358,21 @@
     "description": "제시된 표정과 같은 얼굴을 골라요! 10문제 빠른 터치 퀴즈",
     "thumbnail": "face-match/thumb.svg",
     "path": "face-match/index.html"
+  },
+  {
+    "id": "spin-color",
+    "title": "Spin Color",
+    "title_ko": "🎠 빙글빙글 색 맞추기",
+    "description": "빙글빙글 돌아가는 원판! 화살표가 가리키는 색깔 버튼을 빠르게 탭, 콤보 보너스",
+    "thumbnail": "spin-color/thumb.svg",
+    "path": "spin-color/index.html"
+  },
+  {
+    "id": "cookie-grab",
+    "title": "Cookie Grab",
+    "title_ko": "🍪 쿠키 낚아채기",
+    "description": "화면에 나타나는 쿠키를 빠르게 탭해서 모아요! 🌶️ 고추는 피하고, 콤보 연결, 30초 도전",
+    "thumbnail": "cookie-grab/thumb.svg",
+    "path": "cookie-grab/index.html"
   }
 ]

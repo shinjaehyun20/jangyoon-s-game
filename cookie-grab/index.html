@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🍪 쿠키 낚아채기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(160deg, #3d1a0a 0%, #6b3515 50%, #8b4513 100%);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.35);
+    }
+    .hud {
+      display: flex; gap: 8px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: #fff;
+      font-size: clamp(13px, 3.5vw, 16px);
+      font-weight: 700;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .hud > span { flex: 1; text-align: center; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    /* 쿠키/아이템 */
+    .item {
+      position: absolute;
+      width: 56px; height: 56px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 42px;
+      cursor: pointer;
+      touch-action: none;
+      border-radius: 50%;
+      transition: background 0.08s;
+      will-change: transform;
+      line-height: 1;
+    }
+    .item:active { transform: scale(1.2); }
+    .item.bad { animation: badWobble 0.5s ease infinite alternate; }
+    @keyframes badWobble {
+      from { transform: rotate(-8deg); }
+      to   { transform: rotate(8deg); }
+    }
+
+    /* 터치 이펙트 */
+    .hit-fx {
+      position: absolute;
+      font-size: 22px;
+      font-weight: 900;
+      pointer-events: none;
+      color: #ffd700;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      animation: fxRise 0.55s ease-out forwards;
+      transform: translateX(-50%);
+    }
+    @keyframes fxRise {
+      0%   { opacity: 1; transform: translateX(-50%) translateY(0) scale(0.7); }
+      60%  { opacity: 1; transform: translateX(-50%) translateY(-30px) scale(1.2); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-52px) scale(1.0); }
+    }
+
+    /* 콤보 배너 */
+    #comboBanner {
+      position: absolute;
+      top: 12px; left: 50%;
+      transform: translateX(-50%);
+      color: #ffd700;
+      font-size: clamp(16px, 4vw, 22px);
+      font-weight: 900;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    #comboBanner.show { opacity: 1; }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: rgba(255,255,255,0.55);
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.68);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #6b3515, #3d1a0a);
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      color: #fff;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: 24px; margin-bottom: 8px; }
+    .overlay-card p { font-size: 13px; color: rgba(255,255,255,0.78); margin-bottom: 18px; line-height: 1.65; }
+    .result-score { font-size: 54px; font-weight: 900; color: #ffd700; margin: 8px 0; }
+    .best-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+    .btn-start {
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      color: #1a1200;
+      border: none; border-radius: 14px;
+      font-size: 18px; font-weight: 900;
+      padding: 14px 32px;
+      cursor: pointer;
+      min-height: 56px;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(247,151,30,0.4);
+    }
+    .btn-start:active { transform: scale(0.97); }
+    .btn-home {
+      display: block; margin-top: 10px;
+      background: #374151;
+      color: #fff;
+      border: none; border-radius: 14px;
+      font-size: 17px; font-weight: 700;
+      padding: 14px 20px;
+      cursor: pointer;
+      min-height: 56px;
+      width: 100%;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn-home:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🍪 쿠키 낚아채기</h1>
+  <div class="hud">
+    <span>🍪 <span id="score">0</span></span>
+    <span>🔥 <span id="combo">0</span>콤보</span>
+    <span>⏱ <span id="timer">30</span>s</span>
+    <span>🏆 <span id="best">0</span></span>
+  </div>
+  <div id="gameArea">
+    <div id="comboBanner"></div>
+  </div>
+  <footer>
+    <small>💡 🍪쿠키를 탭! 🌶️고추는 피하세요!</small>
+    <a class="home-link" href="../index.html">🏠 게임 목록으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🍪 쿠키 낚아채기</h2>
+    <p>화면에 나타나는 🍪 쿠키를 빠르게 탭해요!<br>
+    🌶️ 고추는 누르면 점수가 줄어요!<br>
+    ⭐ 연속으로 잡으면 콤보 보너스!<br>
+    30초 안에 최대한 많이 모아요!</p>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <div class="best-label" id="bestLabel"></div>
+    <button class="btn-start" id="restartBtn">🔄 다시 하기</button>
+    <a class="btn-home" href="../index.html">🏠 게임 목록으로</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── 설정 ── */
+  const CONFIG = {
+    duration: 30,
+    spawnInterval: 800,       // 첫 스폰 간격(ms)
+    minSpawnInterval: 400,
+    itemLifetime: 1800,       // 아이템이 사라지기까지 시간(ms)
+    minLifetime: 900,
+    badChance: 0.22,          // 나쁜 아이템 확률
+    goodItems: ['🍪','🍩','🧁','🍫','🍬','🍭'],
+    badItems: ['🌶️','💣','🧅'],
+    bestKey: 'cookie_grab_best',
+    maxOnScreen: 7,           // 최대 동시 아이템 수
+  };
+
+  /* ── 요소 ── */
+  const area         = document.getElementById('gameArea');
+  const scoreEl      = document.getElementById('score');
+  const comboEl      = document.getElementById('combo');
+  const timerEl      = document.getElementById('timer');
+  const bestEl       = document.getElementById('best');
+  const comboBanner  = document.getElementById('comboBanner');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay   = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl  = document.getElementById('resultMsg');
+  const bestLabelEl  = document.getElementById('bestLabel');
+
+  /* ── 상태 ── */
+  let state = {};
+  let spawnTimerId = null;
+  let gameRafId    = null;
+  let comboBannerTimer = null;
+
+  /* ── localStorage ── */
+  function getBest() { return parseInt(localStorage.getItem(CONFIG.bestKey) || '0', 10); }
+  function saveBest(v) { localStorage.setItem(CONFIG.bestKey, String(v)); }
+  bestEl.textContent = getBest();
+
+  /* ── 난수 ── */
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  /* ── 아이템 스폰 ── */
+  function spawnItem() {
+    if (!state.running) return;
+    // 최대 동시 아이템 수 제한
+    if (area.querySelectorAll('.item').length >= CONFIG.maxOnScreen) {
+      scheduleNextSpawn();
+      return;
+    }
+
+    const areaW = area.clientWidth;
+    const areaH = area.clientHeight;
+    const isBad = Math.random() < CONFIG.badChance;
+    const emoji = isBad ? pick(CONFIG.badItems) : pick(CONFIG.goodItems);
+    const ITEM_SIZE = 56;
+
+    const el = document.createElement('div');
+    el.className = 'item' + (isBad ? ' bad' : '');
+    el.textContent = emoji;
+    el.dataset.bad = isBad ? '1' : '0';
+
+    // 랜덤 위치
+    const x = rand(4, areaW - ITEM_SIZE - 4);
+    const y = rand(4, areaH - ITEM_SIZE - 4);
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+
+    // 들어오는 애니메이션 (팝인)
+    el.style.animation = 'none';
+    el.style.transform = 'scale(0)';
+    el.style.transition = 'transform 0.15s cubic-bezier(0.34,1.56,0.64,1)';
+
+    area.appendChild(el);
+    // 리플로우 강제
+    void el.offsetWidth;
+    el.style.transform = '';
+
+    let grabbed = false;
+
+    el.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!state.running || grabbed) return;
+      grabbed = true;
+      el.style.pointerEvents = 'none';
+      onItemGrab(isBad, x + ITEM_SIZE / 2, y);
+      el.remove();
+    });
+
+    // 자동 사라짐
+    const lifetime = Math.max(
+      CONFIG.minLifetime,
+      CONFIG.itemLifetime - state.elapsed * 12
+    );
+    const autoRemove = setTimeout(() => {
+      if (!grabbed && el.isConnected) {
+        grabbed = true;
+        // 좋은 아이템 놓치면 콤보 리셋
+        if (!isBad) {
+          state.combo = 0;
+          comboEl.textContent = '0';
+        }
+        el.style.transition = 'transform 0.2s, opacity 0.2s';
+        el.style.transform = 'scale(0)';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 200);
+      }
+    }, lifetime);
+
+    // 게임 종료 시 제거용
+    el.dataset.removeTimer = autoRemove;
+
+    scheduleNextSpawn();
+  }
+
+  /* ── 아이템 잡기 처리 ── */
+  function onItemGrab(isBad, cx, cy) {
+    if (isBad) {
+      // 나쁜 아이템
+      state.score = Math.max(0, state.score - 2);
+      state.combo = 0;
+      scoreEl.textContent = state.score;
+      comboEl.textContent = '0';
+      showFx('−2 😱', cx, cy);
+    } else {
+      // 좋은 아이템
+      state.combo++;
+      const bonus = Math.floor((state.combo - 1) / 4); // 4연속마다 +1
+      const pts = 1 + bonus;
+      state.score += pts;
+      scoreEl.textContent = state.score;
+      comboEl.textContent = state.combo;
+      showFx(pts > 1 ? `+${pts} 🔥` : `+1`, cx, cy);
+      if (state.combo >= 4) {
+        showComboBanner(`🔥 ${state.combo}콤보!`);
+      }
+    }
+  }
+
+  /* ── FX ── */
+  function showFx(text, cx, cy) {
+    const fx = document.createElement('div');
+    fx.className = 'hit-fx';
+    fx.textContent = text;
+    fx.style.left = cx + 'px';
+    fx.style.top  = (cy - 10) + 'px';
+    area.appendChild(fx);
+    fx.addEventListener('animationend', () => fx.remove());
+  }
+
+  function showComboBanner(text) {
+    comboBanner.textContent = text;
+    comboBanner.classList.add('show');
+    clearTimeout(comboBannerTimer);
+    comboBannerTimer = setTimeout(() => comboBanner.classList.remove('show'), 900);
+  }
+
+  /* ── 스폰 스케줄 ── */
+  function scheduleNextSpawn() {
+    if (!state.running) return;
+    const delay = Math.max(
+      CONFIG.minSpawnInterval,
+      CONFIG.spawnInterval - state.elapsed * 7
+    );
+    spawnTimerId = setTimeout(spawnItem, delay);
+  }
+
+  /* ── 게임 시작 ── */
+  function startGame() {
+    state = { running: true, score: 0, combo: 0, elapsed: 0 };
+    scoreEl.textContent = '0';
+    comboEl.textContent = '0';
+    timerEl.textContent = CONFIG.duration;
+
+    // 이전 아이템 제거
+    area.querySelectorAll('.item').forEach(el => el.remove());
+    comboBanner.classList.remove('show');
+
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+
+    const startTime = Date.now();
+    function tick() {
+      if (!state.running) return;
+      state.elapsed = (Date.now() - startTime) / 1000;
+      const left = Math.max(0, CONFIG.duration - Math.floor(state.elapsed));
+      timerEl.textContent = left;
+      if (left <= 0) { endGame(); return; }
+      gameRafId = requestAnimationFrame(tick);
+    }
+    gameRafId = requestAnimationFrame(tick);
+    spawnItem();
+  }
+
+  /* ── 게임 종료 ── */
+  function endGame() {
+    state.running = false;
+    cancelAnimationFrame(gameRafId);
+    clearTimeout(spawnTimerId);
+    area.querySelectorAll('.item').forEach(el => el.remove());
+
+    const score = state.score;
+    const prev  = getBest();
+    const isNew = score > prev;
+    if (isNew) saveBest(score);
+    bestEl.textContent = isNew ? score : prev;
+
+    finalScoreEl.textContent = score;
+    resultMsgEl.textContent =
+      score >= 30 ? '🍪 쿠키 달인! 엄청 빠르네요!' :
+      score >= 15 ? '👍 잘했어요! 한 번 더 도전해봐요!' :
+      '😊 쿠키가 빠르죠? 다시 해봐요!';
+    bestLabelEl.textContent = isNew ? '🎉 새 최고 기록!' : `🏆 최고 기록: ${prev}개`;
+
+    endOverlay.classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').addEventListener('pointerdown', (e) => { e.preventDefault(); startGame(); });
+  document.getElementById('restartBtn').addEventListener('pointerdown', (e) => { e.preventDefault(); startGame(); });
+})();
+</script>
+</body>
+</html>

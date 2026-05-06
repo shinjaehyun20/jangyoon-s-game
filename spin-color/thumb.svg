@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0c29"/>
+      <stop offset="100%" stop-color="#302b63"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 회전 원판 (6구역) -->
+  <g transform="translate(110,90)">
+    <!-- 빨강 -->
+    <path d="M0,0 L0,-65 A65,65 0 0,1 56.3,-32.5 Z" fill="#ff4757"/>
+    <!-- 주황 -->
+    <path d="M0,0 L56.3,-32.5 A65,65 0 0,1 56.3,32.5 Z" fill="#ff6348"/>
+    <!-- 노랑 -->
+    <path d="M0,0 L56.3,32.5 A65,65 0 0,1 0,65 Z" fill="#ffd700"/>
+    <!-- 초록 -->
+    <path d="M0,0 L0,65 A65,65 0 0,1 -56.3,32.5 Z" fill="#2ed573"/>
+    <!-- 파랑 -->
+    <path d="M0,0 L-56.3,32.5 A65,65 0 0,1 -56.3,-32.5 Z" fill="#1e90ff"/>
+    <!-- 보라 -->
+    <path d="M0,0 L-56.3,-32.5 A65,65 0 0,1 0,-65 Z" fill="#a55eea"/>
+    <!-- 경계선 -->
+    <circle cx="0" cy="0" r="65" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+    <!-- 중앙 원 -->
+    <circle cx="0" cy="0" r="18" fill="#1a1a3e" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <text x="0" y="6" text-anchor="middle" font-size="16">?</text>
+    <!-- 화살표 (위) -->
+    <polygon points="0,-72 -9,-88 9,-88" fill="#ffffff" opacity="0.9"/>
+  </g>
+
+  <!-- 색깔 버튼 2개 표시 -->
+  <rect x="190" y="55" width="55" height="28" rx="8" fill="#ff4757"/>
+  <text x="217" y="74" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">빨강</text>
+  <rect x="255" y="55" width="55" height="28" rx="8" fill="#1e90ff"/>
+  <text x="282" y="74" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">파랑</text>
+  <rect x="190" y="92" width="55" height="28" rx="8" fill="#ffd700"/>
+  <text x="217" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#222">노랑</text>
+  <rect x="255" y="92" width="55" height="28" rx="8" fill="#2ed573"/>
+  <text x="282" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">초록</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#ffd700">빙글빙글 색 맞추기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">SPIN COLOR</text>
+  </g>
+</svg>
