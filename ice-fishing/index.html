@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🎣 얼음 낚시</title>
+  <style>
+    :root {
+      --bg-top: #a8d8f0;
+      --bg-ice: #cceeff;
+      --bg-water: #1a6fa0;
+      --accent: #ff6b35;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg-top);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      color: #1a3a5c;
+      text-align: center;
+      font-weight: 900;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.35);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-weight: 700;
+      font-size: clamp(13px, 3.5vw, 16px);
+      color: #1a3a5c;
+    }
+    .hud span { display: flex; align-items: center; gap: 4px; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #1a3a5c;
+      opacity: 0.75;
+    }
+    .home-link {
+      color: #1a3a5c;
+      text-decoration: none;
+      font-weight: 700;
+      opacity: 0.85;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(10, 40, 80, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, #cceeff 0%, #9ed8f5 100%);
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+    .overlay-card h2 {
+      font-size: clamp(20px, 6vw, 28px);
+      color: #1a3a5c;
+      margin-bottom: 10px;
+    }
+    .overlay-card p {
+      font-size: 14px;
+      color: #2a4a6c;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+    .result-score {
+      font-size: clamp(36px, 12vw, 52px);
+      font-weight: 900;
+      color: var(--accent);
+      margin: 10px 0;
+    }
+    .result-label {
+      font-size: 14px;
+      color: #2a4a6c;
+      margin-bottom: 6px;
+    }
+    .best-score {
+      font-size: 13px;
+      color: #1a6fa0;
+      margin-bottom: 18px;
+      font-weight: 700;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #e84e1b);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 0 28px;
+      min-height: 52px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(255,107,53,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); }
+    #resultMsg {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a3a5c;
+      margin-bottom: 4px;
+    }
+    /* 잡기 피드백 */
+    #catchFeedback {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 32px;
+      font-weight: 900;
+      pointer-events: none;
+      z-index: 200;
+      opacity: 0;
+      transition: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🎣 얼음 낚시</h1>
+    <div class="hud">
+      <span>🐟 잡은 물고기: <b id="scoreDisp">0</b></span>
+      <span>⏱️ <b id="timeDisp">30</b>초</span>
+      <span>⭐ 최고: <b id="bestDisp">0</b></span>
+    </div>
+    <div id="gameArea">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+    <footer>
+      <small>물고기가 낚싯줄 아래 올 때 탭!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div id="catchFeedback"></div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🎣 얼음 낚시</h2>
+      <p>낚싯줄이 물속으로 내려가요!<br>물고기가 낚싯바늘 근처에 오면<br><b>화면을 탭해서 잡아요!</b><br>🐡 = 1점 &nbsp;🐙 폭탄 = 목숨↓</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 낚시 끝!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-label">마리</div>
+      <div id="resultMsg"></div>
+      <div class="best-score" id="bestScoreMsg"></div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ── CONFIG ──
+    const CONFIG = {
+      GAME_DURATION: 30,          // 초
+      LINE_SPEED_INIT: 1.2,       // 낚싯줄 하강 속도
+      LINE_SPEED_MAX: 2.5,
+      FISH_COUNT_INIT: 2,         // 동시 물고기 수
+      FISH_COUNT_MAX: 5,
+      FISH_TYPES: [
+        { emoji: '🐟', points: 1, w: 48, speed: 1.2 },
+        { emoji: '🐠', points: 2, w: 44, speed: 1.8 },
+        { emoji: '🐡', points: 3, w: 42, speed: 2.2 },
+        { emoji: '🦐', points: 2, w: 38, speed: 2.5 },
+        { emoji: '🦑', points: 5, w: 40, speed: 1.0 },
+      ],
+      BOMB_EMOJI: '💣',
+      BOMB_SPEED: 1.6,
+      BOMB_W: 40,
+      CATCH_WINDOW: 60,           // 픽셀 — 바늘과 물고기 y 차이 허용치
+      HOOK_WOBBLE_AMP: 18,        // 낚싯바늘 좌우 흔들림
+      ICE_RATIO: 0.28,            // 화면 상단 얼음 비율
+      STORAGE_KEY: 'ice-fishing_best',
+    };
+
+    // ── DOM ──
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisp = document.getElementById('scoreDisp');
+    const timeDisp = document.getElementById('timeDisp');
+    const bestDisp = document.getElementById('bestDisp');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+    const bestScoreMsg = document.getElementById('bestScoreMsg');
+    const catchFeedback = document.getElementById('catchFeedback');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    // ── STATE ──
+    let state = {
+      score: 0,
+      lives: 3,
+      timeLeft: CONFIG.GAME_DURATION,
+      running: false,
+      lineY: 0,         // 낚싯바늘 Y (water 기준)
+      lineDir: 1,       // 1=내려가기 -1=올라가기
+      hookX: 0,         // 바늘 X
+      wobbleT: 0,       // 흔들림 시간
+      fishes: [],
+      bombs: [],
+      lastTime: 0,
+      raf: null,
+      timerInterval: null,
+      spawnInterval: null,
+    };
+
+    let bestScore = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    bestDisp.textContent = bestScore;
+
+    // ── CANVAS 크기 ──
+    function resize() {
+      const area = document.getElementById('gameArea');
+      canvas.width = area.clientWidth;
+      canvas.height = area.clientHeight;
+      state.hookX = canvas.width / 2;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // ── DERIVED ──
+    function iceH() { return Math.round(canvas.height * CONFIG.ICE_RATIO); }
+    function waterH() { return canvas.height - iceH(); }
+    function holeX() { return canvas.width / 2; }
+    const HOLE_R = 22;
+
+    // ── DRAWING ──
+    function drawBg() {
+      // 하늘 (얼음 영역)
+      const grad = ctx.createLinearGradient(0, 0, 0, iceH());
+      grad.addColorStop(0, '#b8e4f8');
+      grad.addColorStop(1, '#d4eef8');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, iceH());
+
+      // 물 영역
+      const wGrad = ctx.createLinearGradient(0, iceH(), 0, canvas.height);
+      wGrad.addColorStop(0, '#1a6fa0');
+      wGrad.addColorStop(1, '#0d3d5c');
+      ctx.fillStyle = wGrad;
+      ctx.fillRect(0, iceH(), canvas.width, waterH());
+
+      // 얼음 판 — 상단
+      ctx.fillStyle = '#daf1fc';
+      ctx.fillRect(0, iceH() - 18, canvas.width, 22);
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillRect(0, iceH() - 18, canvas.width, 7);
+
+      // 얼음 구멍
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(holeX(), iceH() - 6, HOLE_R, 10, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#1a6fa0';
+      ctx.fill();
+      ctx.restore();
+
+      // 얼음 균열 장식
+      ctx.strokeStyle = 'rgba(180,230,252,0.6)';
+      ctx.lineWidth = 1;
+      const cracks = [
+        [holeX()-30, iceH()-20, holeX()-55, iceH()-12],
+        [holeX()+25, iceH()-22, holeX()+50, iceH()-10],
+        [holeX()-20, iceH()-10, holeX()-40, iceH()-2],
+      ];
+      cracks.forEach(([x1,y1,x2,y2]) => {
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      });
+
+      // 물속 빛 반짝임
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      for (let i = 0; i < 5; i++) {
+        const bx = (canvas.width * (i + 0.5)) / 5;
+        const by = iceH() + waterH() * 0.25 + Math.sin(state.wobbleT * 0.02 + i) * 20;
+        ctx.beginPath();
+        ctx.ellipse(bx, by, 40, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawLine() {
+      const x = holeX();
+      const topY = iceH() - 6;
+      const hookY = iceH() + state.lineY;
+      const hookXc = state.hookX;
+
+      // 줄
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, topY);
+      ctx.quadraticCurveTo(x, topY + (hookY - topY) * 0.5, hookXc, hookY);
+      ctx.stroke();
+
+      // 낚싯바늘
+      ctx.font = '22px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🪝', hookXc, hookY);
+    }
+
+    function drawFish(f) {
+      ctx.save();
+      if (f.dir < 0) {
+        ctx.scale(-1, 1);
+        ctx.font = `${f.type.w}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(f.type.emoji, -f.x, f.y);
+      } else {
+        ctx.font = `${f.type.w}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(f.type.emoji, f.x, f.y);
+      }
+      ctx.restore();
+    }
+
+    function drawBomb(b) {
+      ctx.font = `${CONFIG.BOMB_W}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(CONFIG.BOMB_EMOJI, b.x, b.y);
+    }
+
+    function drawLives() {
+      ctx.font = '18px serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      let hearts = '';
+      for (let i = 0; i < state.lives; i++) hearts += '❤️';
+      for (let i = state.lives; i < 3; i++) hearts += '🖤';
+      ctx.fillText(hearts, 8, iceH() + 6);
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBg();
+      state.fishes.forEach(drawFish);
+      state.bombs.forEach(drawBomb);
+      drawLine();
+      drawLives();
+    }
+
+    // ── SPAWN ──
+    function spawnFish() {
+      const type = CONFIG.FISH_TYPES[Math.floor(Math.random() * CONFIG.FISH_TYPES.length)];
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      const yMin = iceH() + 40;
+      const yMax = canvas.height - 40;
+      state.fishes.push({
+        type,
+        x: dir === 1 ? -30 : canvas.width + 30,
+        y: yMin + Math.random() * (yMax - yMin),
+        dir,
+        speed: type.speed * (0.8 + Math.random() * 0.4),
+        caught: false,
+      });
+    }
+
+    function spawnBomb() {
+      if (Math.random() < 0.35) {
+        const dir = Math.random() < 0.5 ? 1 : -1;
+        const yMin = iceH() + 40;
+        const yMax = canvas.height - 40;
+        state.bombs.push({
+          x: dir === 1 ? -30 : canvas.width + 30,
+          y: yMin + Math.random() * (yMax - yMin),
+          dir,
+          speed: CONFIG.BOMB_SPEED * (0.8 + Math.random() * 0.5),
+        });
+      }
+    }
+
+    // ── UPDATE ──
+    function update(dt) {
+      state.wobbleT += dt;
+
+      // 낚싯바늘 좌우 흔들림
+      state.hookX = holeX() + Math.sin(state.wobbleT * 0.002) * CONFIG.HOOK_WOBBLE_AMP;
+
+      // 낚싯줄 자동 상하
+      const speed = CONFIG.LINE_SPEED_INIT + (CONFIG.GAME_DURATION - state.timeLeft) * 0.04;
+      state.lineY += state.dir * Math.min(speed, CONFIG.LINE_SPEED_MAX);
+
+      const maxY = waterH() - 30;
+      if (state.lineY >= maxY) { state.dir = -1; }
+      if (state.lineY <= 10)   { state.dir = 1; }
+
+      // 물고기 이동
+      state.fishes = state.fishes.filter(f => {
+        f.x += f.dir * f.speed;
+        return f.x > -80 && f.x < canvas.width + 80;
+      });
+
+      // 폭탄 이동
+      state.bombs = state.bombs.filter(b => {
+        b.x += b.dir * b.speed;
+        return b.x > -80 && b.x < canvas.width + 80;
+      });
+    }
+
+    // ── CATCH CHECK ──
+    function checkCatch() {
+      if (!state.running) return;
+
+      const hookY = iceH() + state.lineY;
+      const hookX = state.hookX;
+      let caught = false;
+
+      // 물고기 체크
+      state.fishes = state.fishes.filter(f => {
+        const dx = Math.abs(f.x - hookX);
+        const dy = Math.abs(f.y - hookY);
+        if (dx < CONFIG.FISH_TYPES[0].w / 2 + 12 && dy < CONFIG.CATCH_WINDOW) {
+          // 잡힘!
+          state.score++;
+          scoreDisp.textContent = state.score;
+          showFeedback(f.type.emoji + ' +' + f.type.points + '점!', '#ffdd44');
+          caught = true;
+          return false;
+        }
+        return true;
+      });
+
+      // 폭탄 체크
+      state.bombs = state.bombs.filter(b => {
+        const dx = Math.abs(b.x - hookX);
+        const dy = Math.abs(b.y - hookY);
+        if (dx < CONFIG.BOMB_W / 2 + 12 && dy < CONFIG.CATCH_WINDOW) {
+          state.lives = Math.max(0, state.lives - 1);
+          showFeedback('💣 앗!', '#ff4444');
+          caught = true;
+          if (state.lives <= 0) endGame();
+          return false;
+        }
+        return true;
+      });
+
+      // 허탕
+      if (!caught) {
+        showFeedback('🌊 허탕~', 'rgba(255,255,255,0.7)');
+      }
+    }
+
+    function showFeedback(text, color) {
+      catchFeedback.textContent = text;
+      catchFeedback.style.color = color;
+      catchFeedback.style.opacity = '1';
+      catchFeedback.style.fontSize = '28px';
+      clearTimeout(catchFeedback._timer);
+      catchFeedback._timer = setTimeout(() => {
+        catchFeedback.style.opacity = '0';
+      }, 900);
+    }
+
+    // ── GAME LOOP ──
+    function loop(ts) {
+      if (!state.running) return;
+      const dt = ts - (state.lastTime || ts);
+      state.lastTime = ts;
+      update(dt);
+      render();
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    // ── START / END ──
+    function startGame() {
+      // 초기화
+      state.score = 0;
+      state.lives = 3;
+      state.timeLeft = CONFIG.GAME_DURATION;
+      state.lineY = 10;
+      state.dir = 1;
+      state.wobbleT = 0;
+      state.fishes = [];
+      state.bombs = [];
+      state.lastTime = 0;
+      state.running = true;
+
+      scoreDisp.textContent = '0';
+      timeDisp.textContent = CONFIG.GAME_DURATION;
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      // 타이머
+      state.timerInterval = setInterval(() => {
+        state.timeLeft--;
+        timeDisp.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+
+      // 스폰
+      state.spawnInterval = setInterval(() => {
+        const count = Math.min(
+          CONFIG.FISH_COUNT_INIT + Math.floor((CONFIG.GAME_DURATION - state.timeLeft) / 8),
+          CONFIG.FISH_COUNT_MAX
+        );
+        if (state.fishes.length < count) spawnFish();
+        spawnBomb();
+      }, 1200);
+
+      // 첫 물고기 2마리
+      spawnFish(); spawnFish();
+
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(state.timerInterval);
+      clearInterval(state.spawnInterval);
+      cancelAnimationFrame(state.raf);
+
+      finalScore.textContent = state.score;
+      let msg = '';
+      if (state.score >= 15) msg = '🏆 낚시 천재!';
+      else if (state.score >= 10) msg = '🥇 훌륭한 어부!';
+      else if (state.score >= 5) msg = '👍 잘했어요!';
+      else msg = '🎣 다시 도전!';
+      resultMsg.textContent = msg;
+
+      if (state.score > bestScore) {
+        bestScore = state.score;
+        localStorage.setItem(CONFIG.STORAGE_KEY, bestScore);
+        bestScoreMsg.textContent = '🌟 새 최고 기록!';
+      } else {
+        bestScoreMsg.textContent = `최고 기록: ${bestScore}마리`;
+      }
+      bestDisp.textContent = bestScore;
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    // ── 이벤트 ──
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    // 탭 (잡기)
+    canvas.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      checkCatch();
+    });
+
+    // 최초 렌더
+    resize();
+    render();
+  })();
+  </script>
+</body>
+</html>

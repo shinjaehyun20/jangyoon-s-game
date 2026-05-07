@@ -34,7 +34,9 @@
       { "id": "color-bubble-catch","label": "🌈 색깔 거품 잡기",     "path": "color-bubble-catch/index.html" },
       { "id": "face-match",        "label": "🎭 표정 맞추기",         "path": "face-match/index.html" },
       { "id": "spin-color",        "label": "🎠 빙글빙글 색 맞추기",  "path": "spin-color/index.html" },
-      { "id": "cookie-grab",       "label": "🍪 쿠키 낚아채기",       "path": "cookie-grab/index.html" }
+      { "id": "cookie-grab",       "label": "🍪 쿠키 낚아채기",       "path": "cookie-grab/index.html" },
+      { "id": "ice-fishing",        "label": "🎣 얼음 낚시",            "path": "ice-fishing/index.html" },
+      { "id": "emoji-chef",         "label": "👨‍🍳 이모지 요리사",       "path": "emoji-chef/index.html" }
     ]
   },
   {

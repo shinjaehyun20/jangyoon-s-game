@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="chefBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff8e1"/>
+      <stop offset="100%" stop-color="#ffe0b2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 내부 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#chefBg)"/>
+
+  <!-- 장식 원 -->
+  <circle cx="30" cy="30" r="50" fill="rgba(255,152,0,0.08)"/>
+  <circle cx="290" cy="150" r="60" fill="rgba(230,81,0,0.08)"/>
+
+  <!-- 레시피 박스 (좌상단) -->
+  <rect x="10" y="10" width="130" height="80" rx="10" fill="rgba(255,255,255,0.6)" stroke="#ffcc02" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="20" y="28" font-size="9" fill="#e65100" font-weight="700" font-family="sans-serif">📋 레시피</text>
+  <text x="20" y="50" font-size="22">🍜</text>
+  <text x="54" y="50" font-size="22">🥚</text>
+  <text x="88" y="50" font-size="22">🧅</text>
+  <text x="20" y="80" font-size="22">🌶️</text>
+  <!-- 체크 -->
+  <text x="44" y="76" font-size="12" fill="#4caf50" font-weight="900">✓</text>
+
+  <!-- 냄비 (중앙 우측) -->
+  <text x="175" y="108" font-size="72" text-anchor="middle" dominant-baseline="middle">🍲</text>
+
+  <!-- 재료 그리드 일부 -->
+  <rect x="10" y="100" width="45" height="45" rx="8" fill="white" stroke="#ffe0b2" stroke-width="1.5"/>
+  <text x="32" y="122" font-size="24" text-anchor="middle" dominant-baseline="middle">🍚</text>
+
+  <rect x="60" y="100" width="45" height="45" rx="8" fill="white" stroke="#ffe0b2" stroke-width="1.5"/>
+  <text x="82" y="122" font-size="24" text-anchor="middle" dominant-baseline="middle">🐟</text>
+
+  <rect x="10" y="150" width="45" height="24" rx="7" fill="#4caf50" stroke="none"/>
+  <text x="32" y="162" font-size="11" text-anchor="middle" dominant-baseline="middle" fill="white" font-weight="700" font-family="sans-serif">정답!</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#e65100">이모지 요리사</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(100,50,0,0.45)" letter-spacing="2">EMOJI CHEF</text>
+  </g>
+</svg>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>👨‍🍳 이모지 요리사</title>
+  <style>
+    :root {
+      --bg: #fff3e0;
+      --pot: #e65100;
+      --accent: #ff9800;
+      --text-dark: #4e2900;
+      --success: #2e7d32;
+      --fail: #c62828;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 10px 6px;
+      gap: 5px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(17px, 4.8vw, 24px);
+      color: var(--text-dark);
+      text-align: center;
+      font-weight: 900;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,152,0,0.15);
+      border-radius: 12px;
+      padding: 5px 12px;
+      font-weight: 700;
+      font-size: clamp(12px, 3.2vw, 15px);
+      color: var(--text-dark);
+    }
+    /* 레시피 표시 */
+    .recipe-box {
+      background: #fff8e1;
+      border: 2.5px dashed var(--accent);
+      border-radius: 14px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+    .recipe-label {
+      font-size: 11px;
+      color: var(--text-dark);
+      font-weight: 700;
+      margin-bottom: 4px;
+      opacity: 0.75;
+    }
+    .recipe-items {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .recipe-item {
+      font-size: clamp(26px, 7vw, 38px);
+      width: clamp(42px, 11vw, 54px);
+      height: clamp(42px, 11vw, 54px);
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      background: rgba(255,152,0,0.1);
+      border: 2px solid transparent;
+      transition: background 0.2s, border-color 0.2s;
+      position: relative;
+    }
+    .recipe-item.done {
+      background: rgba(76,175,80,0.2);
+      border-color: #4caf50;
+    }
+    .recipe-item.done::after {
+      content: '✓';
+      position: absolute;
+      bottom: 1px; right: 3px;
+      font-size: 11px;
+      color: #2e7d32;
+      font-weight: 900;
+    }
+    /* 냄비 영역 */
+    .pot-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .pot-emoji {
+      font-size: clamp(54px, 15vw, 80px);
+      text-align: center;
+      filter: drop-shadow(0 4px 8px rgba(230,81,0,0.25));
+      transition: transform 0.1s;
+      user-select: none;
+    }
+    .pot-emoji.pop { transform: scale(1.15); }
+    /* 재료 그리드 */
+    .ingredients-label {
+      font-size: 11px;
+      color: var(--text-dark);
+      font-weight: 700;
+      text-align: center;
+      opacity: 0.7;
+    }
+    .ingredients-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      flex: 1;
+    }
+    .ingredient-btn {
+      background: #fff;
+      border: 2.5px solid #ffe0b2;
+      border-radius: 14px;
+      font-size: clamp(24px, 6.5vw, 36px);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: transform 0.1s, border-color 0.15s, box-shadow 0.15s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-height: 56px;
+      user-select: none;
+    }
+    .ingredient-btn:active { transform: scale(0.92); }
+    .ingredient-btn.correct {
+      border-color: #4caf50;
+      background: #e8f5e9;
+      box-shadow: 0 0 0 3px rgba(76,175,80,0.3);
+    }
+    .ingredient-btn.wrong {
+      border-color: #f44336;
+      background: #ffebee;
+      box-shadow: 0 0 0 3px rgba(244,67,54,0.3);
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-dark);
+      opacity: 0.65;
+    }
+    .home-link {
+      color: var(--text-dark);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(80,40,0,0.72);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, #fff8e1 0%, #ffe0b2 100%);
+      border-radius: 24px;
+      padding: 26px 22px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .overlay-card h2 { font-size: clamp(20px, 6vw, 28px); color: var(--text-dark); margin-bottom: 10px; }
+    .overlay-card p { font-size: 14px; color: #5d3a00; margin-bottom: 16px; line-height: 1.6; }
+    .result-score { font-size: clamp(36px, 12vw, 52px); font-weight: 900; color: var(--pot); margin: 8px 0 2px; }
+    .result-label { font-size: 14px; color: #5d3a00; margin-bottom: 6px; }
+    .best-score { font-size: 13px; color: var(--pot); margin-bottom: 16px; font-weight: 700; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #e65100);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 0 28px;
+      min-height: 52px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(230,81,0,0.35);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); }
+    /* 피드백 메시지 */
+    #feedback {
+      position: fixed;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 22px;
+      font-weight: 900;
+      pointer-events: none;
+      z-index: 200;
+      opacity: 0;
+      text-align: center;
+      white-space: nowrap;
+    }
+    /* 요리 완성 폭죽 이펙트 */
+    #celebration {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 52px;
+      pointer-events: none;
+      z-index: 300;
+      opacity: 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>👨‍🍳 이모지 요리사</h1>
+    <div class="hud">
+      <span>🍽️ 완성: <b id="scoreDisp">0</b></span>
+      <span>⏱️ <b id="timeDisp">60</b>초</span>
+      <span>🏆 최고: <b id="bestDisp">0</b></span>
+    </div>
+
+    <!-- 레시피 -->
+    <div class="recipe-box">
+      <div class="recipe-label">📋 레시피 — 순서대로 넣어요!</div>
+      <div class="recipe-items" id="recipeItems"></div>
+    </div>
+
+    <!-- 냄비 -->
+    <div class="pot-area">
+      <div class="pot-emoji" id="potEmoji">🍲</div>
+    </div>
+
+    <!-- 재료 -->
+    <div class="ingredients-label">재료를 순서대로 탭하세요</div>
+    <div class="ingredients-grid" id="ingredientsGrid"></div>
+
+    <footer>
+      <small>레시피 순서에 맞는 재료를 탭!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div id="feedback"></div>
+  <div id="celebration"></div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>👨‍🍳 이모지 요리사</h2>
+      <p>레시피를 보고<br><b>순서대로</b> 재료를 탭해요!<br>냄비에 재료가 모이면 요리 완성 🍽️<br>틀리면 목숨이 줄어요!</p>
+      <button class="btn-start" id="startBtn">요리 시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🍽️ 요리 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-label">가지 요리 완성</div>
+      <div id="resultMsg" style="font-size:15px;font-weight:700;color:#5d3a00;margin-bottom:4px;"></div>
+      <div class="best-score" id="bestScoreMsg"></div>
+      <button class="btn-start" id="restartBtn">다시 요리!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_DURATION: 60,
+      STORAGE_KEY: 'emoji-chef_best',
+      // 레시피 정의: [완성 이모지, 재료 순서배열, 요리이름]
+      RECIPES: [
+        { dish: '🍜', name: '라면', steps: ['🍜', '🥚', '🧅', '🌶️'] },
+        { dish: '🍕', name: '피자', steps: ['🫓', '🍅', '🧀', '🍄'] },
+        { dish: '🍣', name: '초밥', steps: ['🍚', '🐟', '🥒', '🫙'] },
+        { dish: '🥗', name: '샐러드', steps: ['🥬', '🍅', '🥕', '🫒'] },
+        { dish: '🍲', name: '찌개', steps: ['🥩', '🧅', '🥦', '🌶️'] },
+        { dish: '🌮', name: '타코', steps: ['🫓', '🥩', '🧅', '🥑'] },
+        { dish: '🍱', name: '도시락', steps: ['🍚', '🥚', '🥕', '🥦'] },
+        { dish: '🍛', name: '카레', steps: ['🥔', '🧅', '🥕', '🍛'] },
+        { dish: '🥘', name: '스튜', steps: ['🥩', '🥔', '🧅', '🫑'] },
+        { dish: '🍝', name: '파스타', steps: ['🍝', '🧅', '🍅', '🧄'] },
+      ],
+      // 전체 재료 풀 (그리드에 표시할 후보)
+      ALL_INGREDIENTS: [
+        '🍜','🥚','🧅','🌶️','🫓','🍅','🧀','🍄',
+        '🍚','🐟','🥒','🫙','🥬','🥕','🫒','🥩',
+        '🥦','🥑','🫑','🧄','🥔','🍛','🍝','🌽',
+        '🫐','🍋','🧆','🫛',
+      ],
+      GRID_SIZE: 8,   // 그리드에 보일 재료 수 (2행×4열)
+    };
+
+    // DOM
+    const scoreDisp = document.getElementById('scoreDisp');
+    const timeDisp = document.getElementById('timeDisp');
+    const bestDisp = document.getElementById('bestDisp');
+    const recipeItems = document.getElementById('recipeItems');
+    const potEmoji = document.getElementById('potEmoji');
+    const ingredientsGrid = document.getElementById('ingredientsGrid');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+    const bestScoreMsg = document.getElementById('bestScoreMsg');
+    const feedback = document.getElementById('feedback');
+    const celebration = document.getElementById('celebration');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let bestScore = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    bestDisp.textContent = bestScore;
+
+    // STATE
+    let state = {
+      score: 0,
+      lives: 3,
+      timeLeft: CONFIG.GAME_DURATION,
+      running: false,
+      currentRecipe: null,
+      stepIndex: 0,       // 다음에 넣어야 할 재료 인덱스
+      timerInterval: null,
+      usedRecipes: [],
+    };
+
+    // 유틸
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function showFeedback(text, color) {
+      feedback.textContent = text;
+      feedback.style.color = color;
+      feedback.style.opacity = '1';
+      clearTimeout(feedback._t);
+      feedback._t = setTimeout(() => { feedback.style.opacity = '0'; }, 900);
+    }
+
+    function showCelebration(emoji) {
+      celebration.textContent = emoji;
+      celebration.style.opacity = '1';
+      clearTimeout(celebration._t);
+      celebration._t = setTimeout(() => { celebration.style.opacity = '0'; }, 1000);
+    }
+
+    // 레시피 선택
+    function pickRecipe() {
+      const avail = CONFIG.RECIPES.filter(r => !state.usedRecipes.includes(r.dish));
+      if (avail.length === 0) state.usedRecipes = [];
+      const pool = state.usedRecipes.length === 0 ? CONFIG.RECIPES : avail;
+      const r = pool[Math.floor(Math.random() * pool.length)];
+      state.usedRecipes.push(r.dish);
+      return r;
+    }
+
+    // 재료 그리드 생성
+    function buildGrid(recipe) {
+      ingredientsGrid.innerHTML = '';
+      // 필요 재료 + 나머지 랜덤
+      const needed = recipe.steps;
+      const others = shuffle(
+        CONFIG.ALL_INGREDIENTS.filter(i => !needed.includes(i))
+      ).slice(0, CONFIG.GRID_SIZE - needed.length);
+      const gridItems = shuffle([...needed, ...others]);
+
+      gridItems.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.className = 'ingredient-btn';
+        btn.textContent = emoji;
+        btn.dataset.emoji = emoji;
+        btn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          if (!state.running) return;
+          handleIngredient(emoji, btn);
+        });
+        ingredientsGrid.appendChild(btn);
+      });
+    }
+
+    // 레시피 UI 갱신
+    function renderRecipe(recipe, stepIndex) {
+      recipeItems.innerHTML = '';
+      recipe.steps.forEach((step, i) => {
+        const div = document.createElement('div');
+        div.className = 'recipe-item' + (i < stepIndex ? ' done' : '');
+        div.textContent = step;
+        recipeItems.appendChild(div);
+      });
+    }
+
+    // 새 레시피 로드
+    function loadNewRecipe() {
+      state.currentRecipe = pickRecipe();
+      state.stepIndex = 0;
+      potEmoji.textContent = state.currentRecipe.dish;
+      renderRecipe(state.currentRecipe, 0);
+      buildGrid(state.currentRecipe);
+    }
+
+    // 재료 탭 처리
+    function handleIngredient(emoji, btn) {
+      const recipe = state.currentRecipe;
+      const expected = recipe.steps[state.stepIndex];
+
+      if (emoji === expected) {
+        // 정답
+        btn.classList.add('correct');
+        state.stepIndex++;
+        renderRecipe(recipe, state.stepIndex);
+
+        // 냄비 팡
+        potEmoji.classList.add('pop');
+        setTimeout(() => potEmoji.classList.remove('pop'), 120);
+
+        if (state.stepIndex >= recipe.steps.length) {
+          // 요리 완성!
+          state.score++;
+          scoreDisp.textContent = state.score;
+          showFeedback(`🍽️ ${recipe.name} 완성!`, '#ff6f00');
+          showCelebration('🎉🎊🎉');
+          setTimeout(() => {
+            if (state.running) loadNewRecipe();
+          }, 900);
+        } else {
+          showFeedback('👍 맞아요!', '#2e7d32');
+        }
+      } else {
+        // 오답
+        btn.classList.add('wrong');
+        setTimeout(() => btn.classList.remove('wrong'), 500);
+        state.lives = Math.max(0, state.lives - 1);
+        showFeedback('❌ 순서를 확인하세요!', '#c62828');
+        if (state.lives <= 0) endGame();
+      }
+    }
+
+    // 시작
+    function startGame() {
+      state.score = 0;
+      state.lives = 3;
+      state.timeLeft = CONFIG.GAME_DURATION;
+      state.running = true;
+      state.usedRecipes = [];
+
+      scoreDisp.textContent = '0';
+      timeDisp.textContent = CONFIG.GAME_DURATION;
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      loadNewRecipe();
+
+      state.timerInterval = setInterval(() => {
+        state.timeLeft--;
+        timeDisp.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(state.timerInterval);
+
+      finalScore.textContent = state.score;
+      let msg = '';
+      if (state.score >= 8) msg = '🏆 요리 천재 셰프!';
+      else if (state.score >= 5) msg = '🥇 훌륭한 요리사!';
+      else if (state.score >= 3) msg = '👍 잘했어요!';
+      else msg = '🍳 다시 도전!';
+      resultMsg.textContent = msg;
+
+      if (state.score > bestScore) {
+        bestScore = state.score;
+        localStorage.setItem(CONFIG.STORAGE_KEY, bestScore);
+        bestScoreMsg.textContent = '🌟 새 최고 기록!';
+      } else {
+        bestScoreMsg.textContent = `최고 기록: ${bestScore}가지`;
+      }
+      bestDisp.textContent = bestScore;
+      endOverlay.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+  })();
+  </script>
+</body>
+</html>

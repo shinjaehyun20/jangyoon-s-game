@@ -374,5 +374,21 @@
     "description": "화면에 나타나는 쿠키를 빠르게 탭해서 모아요! 🌶️ 고추는 피하고, 콤보 연결, 30초 도전",
     "thumbnail": "cookie-grab/thumb.svg",
     "path": "cookie-grab/index.html"
+  },
+  {
+    "id": "ice-fishing",
+    "title": "Ice Fishing",
+    "title_ko": "🎣 얼음 낚시",
+    "description": "낚싯줄이 얼음 구멍 아래로 자동 하강! 물고기가 바늘 근처에 오면 탭해서 잡아요. 💣 폭탄은 피하고 목숨 3개 도전, 30초 타임어택",
+    "thumbnail": "ice-fishing/thumb.svg",
+    "path": "ice-fishing/index.html"
+  },
+  {
+    "id": "emoji-chef",
+    "title": "Emoji Chef",
+    "title_ko": "👨‍🍳 이모지 요리사",
+    "description": "레시피를 보고 재료를 순서대로 냄비에 넣어 요리를 완성! 10가지 레시피, 순서 기억+인지 복합 게임, 60초 도전",
+    "thumbnail": "emoji-chef/thumb.svg",
+    "path": "emoji-chef/index.html"
   }
 ]

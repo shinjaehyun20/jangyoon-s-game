@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b8e4f8"/>
+      <stop offset="100%" stop-color="#d4eef8"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a6fa0"/>
+      <stop offset="100%" stop-color="#0d3d5c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 내부 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 하늘 -->
+  <rect width="320" height="70" fill="url(#sky)"/>
+
+  <!-- 얼음 판 -->
+  <rect x="0" y="52" width="320" height="22" fill="#daf1fc"/>
+  <rect x="0" y="52" width="320" height="7" fill="rgba(255,255,255,0.5)"/>
+
+  <!-- 균열 -->
+  <line x1="80" y1="55" x2="55" y2="65" stroke="rgba(180,230,252,0.6)" stroke-width="1"/>
+  <line x1="230" y1="57" x2="255" y2="67" stroke="rgba(180,230,252,0.6)" stroke-width="1"/>
+
+  <!-- 얼음 구멍 -->
+  <ellipse cx="160" cy="67" rx="22" ry="9" fill="#1a6fa0"/>
+
+  <!-- 물 -->
+  <rect x="0" y="74" width="320" height="106" fill="url(#water)"/>
+
+  <!-- 물속 빛 반짝임 -->
+  <ellipse cx="80" cy="100" rx="35" ry="8" fill="rgba(255,255,255,0.05)"/>
+  <ellipse cx="240" cy="115" rx="28" ry="6" fill="rgba(255,255,255,0.05)"/>
+
+  <!-- 낚싯줄 -->
+  <path d="M160,67 Q160,100 168,128" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" fill="none"/>
+
+  <!-- 물고기들 -->
+  <text x="90" y="110" font-size="32" text-anchor="middle" dominant-baseline="middle">🐟</text>
+  <text x="220" y="135" font-size="28" text-anchor="middle" dominant-baseline="middle">🐠</text>
+  <text x="145" y="155" font-size="24" text-anchor="middle" dominant-baseline="middle">🐡</text>
+
+  <!-- 낚싯바늘 -->
+  <text x="168" y="128" font-size="20" text-anchor="middle" dominant-baseline="middle">🪝</text>
+
+  <!-- 낚싯대 (얼음 위) -->
+  <rect x="148" y="32" width="26" height="6" rx="3" fill="#8B5E3C"/>
+  <rect x="148" y="32" width="6" height="24" rx="3" fill="#8B5E3C"/>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6b35">얼음 낚시</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">ICE FISHING</text>
+  </g>
+</svg>
