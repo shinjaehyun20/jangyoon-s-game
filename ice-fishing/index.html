@@ -262,12 +262,15 @@
     // ── CANVAS 크기 ──
     function resize() {
       const area = document.getElementById('gameArea');
-      canvas.width = area.clientWidth;
-      canvas.height = area.clientHeight;
-      state.hookX = canvas.width / 2;
+      const w = area.clientWidth  || area.offsetWidth  || 360;
+      const h = area.clientHeight || area.offsetHeight || 480;
+      canvas.width  = w;
+      canvas.height = h;
+      state.hookX = w / 2;
     }
-    resize();
-    window.addEventListener('resize', resize);
+    // DOM 완전 렌더 후 resize
+    requestAnimationFrame(() => { resize(); render(); });
+    window.addEventListener('resize', () => { resize(); if (!state.running) render(); });
 
     // ── DERIVED ──
     function iceH() { return Math.round(canvas.height * CONFIG.ICE_RATIO); }
@@ -516,6 +519,7 @@
 
     // ── START / END ──
     function startGame() {
+      resize(); // canvas 크기 보장
       // 초기화
       state.score = 0;
       state.lives = 3;
@@ -583,8 +587,8 @@
     }
 
     // ── 이벤트 ──
-    startBtn.addEventListener('click', startGame);
-    restartBtn.addEventListener('click', startGame);
+    startBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); startGame(); });
+    restartBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); startGame(); });
 
     // 탭 (잡기)
     canvas.addEventListener('pointerdown', (e) => {
