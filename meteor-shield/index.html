@@ -255,13 +255,13 @@
   <div id="shieldRing"></div>
 
   <!-- 힌트 -->
-  <div id="hint">화면 어디나 드래그해서 방패를 돌려요!</div>
+  <div id="hint">드래그로 방패 4개를 돌려서 운석을 막아요!</div>
 
   <!-- 시작 오버레이 -->
   <div id="overlay">
     <div class="overlay-emoji">🛡️</div>
     <div class="overlay-title">운석 막기!</div>
-    <div class="overlay-sub">날아오는 운석에서<br>행성을 지켜요!<br>화면을 드래그해서 방패를 돌려요 🪐</div>
+    <div class="overlay-sub">날아오는 운석에서<br>행성을 지켜요!<br>방패 4개를 드래그로 돌려서 막아요 🪐</div>
     <button id="startBtn">시작!</button>
   </div>
 
@@ -294,10 +294,10 @@ for (let i = 0; i < 40; i++) {
   wrap.appendChild(s);
 }
 
-// ── 방패 구성 (8방향)
-const SEGS = 8;
+// ── 방패 구성 (4방향)
+const SEGS = 4;
 const RADIUS = 100; // 행성 중심에서 방패까지 거리
-const SHIELD_EMOJIS = ['🛡️','🛡️','🛡️','🛡️','🛡️','🛡️','🛡️','🛡️'];
+const SHIELD_EMOJIS = ['🛡️','🛡️','🛡️','🛡️'];
 const shieldRing = document.getElementById('shieldRing');
 let shieldAngle = 0; // 전체 방패 링 회전 각도 (deg)
 
@@ -423,7 +423,7 @@ function spawnMeteor(ts) {
 // 운석이 방패 링 반경(~100px) 안에 들어왔을 때, 가장 가까운 방패 조각이 해당 각도에 있으면 막음
 function shieldBlocks(meteorAngle) {
   // 방패 조각들의 각도 목록
-  const HALF_SEG = (360 / SEGS) / 2 + 8; // 허용 오차(deg)
+  const HALF_SEG = (360 / SEGS) / 2 - 8; // 허용 오차(deg) — 방패 4개, 틈새 확보
   for (let i = 0; i < SEGS; i++) {
     const segAng = ((shieldAngle + (360 / SEGS) * i) % 360 + 360) % 360;
     let diff = Math.abs(segAng - meteorAngle);

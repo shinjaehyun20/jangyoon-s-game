@@ -324,15 +324,17 @@ function doJump() {
   }, 500);
 }
 
-// ── 기차 생성
+// ── 기차 생성 (x = wrap 기준 left 픽셀)
 function spawnTrain(ts) {
   if (ts - lastTrainTime < trainInterval) return;
   lastTrainTime = ts;
   const t = document.createElement('div');
   t.className = 'train';
+  t.style.right = 'auto';
+  t.style.left = (wrap.offsetWidth + 60) + 'px';
   t.textContent = ['🚂','🚃','🚄'][Math.floor(Math.random()*3)];
   wrap.appendChild(t);
-  trainList.push({ el: t, x: parseInt(wrap.offsetWidth) + 60 });
+  trainList.push({ el: t, x: wrap.offsetWidth + 60 });
 }
 
 // ── 잔디 장식
@@ -348,11 +350,12 @@ function spawnGrass(ts) {
 }
 
 // ── 충돌 체크 (간단 AABB)
+// tr.x = wrap 왼쪽에서의 실제 left 픽셀 위치
 function checkCollision(trainX) {
   if (isJumping) return false;
-  const px = 60, pw = 40;
-  const tx = trainX, tw = 52;
-  return px + pw > tx && px < tx + tw;
+  const px = 60, pw = 36;   // 플레이어 left, 너비
+  const tx = trainX, tw = 44; // 기차 left, 너비 (약간 작게)
+  return px + pw > tx + 6 && px + 6 < tx + tw;
 }
 
 // ── 히트
@@ -396,7 +399,7 @@ function gameLoop(ts) {
   for (let i = trainList.length - 1; i >= 0; i--) {
     const tr = trainList[i];
     tr.x -= trainSpeed;
-    tr.el.style.right = (wrap.offsetWidth - tr.x) + 'px';
+    tr.el.style.left = tr.x + 'px';
 
     if (checkCollision(tr.x)) {
       tr.el.remove();
