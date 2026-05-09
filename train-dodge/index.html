@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🚂 기차 피하기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
+  html, body {
+    width: 100%; height: 100dvh;
+    background: #87ceeb;
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    user-select: none;
+  }
+  #gameWrap {
+    position: relative;
+    width: min(420px, 100vw);
+    height: min(640px, 100dvh);
+    background: linear-gradient(180deg, #87ceeb 0%, #b0e0ff 60%, #a8d5a2 60%, #7cba6e 100%);
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+
+  /* 하늘 구름 */
+  .cloud {
+    position: absolute;
+    font-size: 36px;
+    top: 24px;
+    animation: cloudMove 10s linear infinite;
+  }
+  .cloud:nth-child(2) { top: 50px; font-size: 24px; animation-duration: 14s; animation-delay: -5s; }
+  @keyframes cloudMove { from { left: 110%; } to { left: -20%; } }
+
+  /* 선로 */
+  #tracks {
+    position: absolute;
+    bottom: 120px;
+    width: 100%;
+    height: 24px;
+  }
+  .rail {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: #888;
+    border-radius: 2px;
+  }
+  .rail.top { top: 4px; }
+  .rail.bot { bottom: 4px; }
+  .sleeper-wrap {
+    position: absolute;
+    top: 0; left: 0;
+    width: 200%;
+    height: 100%;
+    display: flex;
+    gap: 24px;
+    animation: sleeperScroll 0.6s linear infinite;
+  }
+  @keyframes sleeperScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .sleeper {
+    flex-shrink: 0;
+    width: 14px;
+    height: 24px;
+    background: #8B5E3C;
+    border-radius: 2px;
+  }
+
+  /* 플레이어 캐릭터 */
+  #player {
+    position: absolute;
+    left: 60px;
+    font-size: 48px;
+    bottom: 144px;
+    transition: bottom 0.05s;
+    filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
+    z-index: 10;
+  }
+  #player.jumping { animation: jump 0.5s ease-out; }
+  @keyframes jump {
+    0%   { bottom: 144px; }
+    40%  { bottom: 244px; }
+    70%  { bottom: 244px; }
+    100% { bottom: 144px; }
+  }
+
+  /* 기차 */
+  .train {
+    position: absolute;
+    bottom: 138px;
+    right: -120px;
+    font-size: 52px;
+    z-index: 8;
+    filter: drop-shadow(2px 3px 3px rgba(0,0,0,0.25));
+  }
+
+  /* 지면 장식 */
+  .grass-deco {
+    position: absolute;
+    bottom: 90px;
+    font-size: 20px;
+    animation: grassMove 4s linear infinite;
+  }
+  @keyframes grassMove { from { right: -40px; } to { right: 110%; } }
+
+  /* UI */
+  #ui {
+    position: absolute;
+    top: 12px; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 20;
+  }
+  #scoreBox {
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a5276;
+  }
+  #livesBox {
+    font-size: 22px;
+    letter-spacing: 2px;
+  }
+  #timerBox {
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #922b21;
+  }
+
+  /* 오버레이 */
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    gap: 16px;
+  }
+  #overlay.hidden { display: none; }
+  .overlay-emoji { font-size: 80px; }
+  .overlay-title {
+    font-size: 36px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .overlay-sub {
+    font-size: 18px;
+    color: rgba(255,255,255,0.9);
+    text-align: center;
+    line-height: 1.6;
+  }
+  #startBtn {
+    margin-top: 8px;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    border: none;
+    border-radius: 32px;
+    padding: 16px 48px;
+    font-size: 22px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+  }
+  #startBtn:active { transform: scale(0.96); }
+
+  /* 결과 패널 */
+  #resultPanel {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    gap: 12px;
+  }
+  #resultPanel.show { display: flex; }
+  .result-card {
+    background: white;
+    border-radius: 24px;
+    padding: 28px 36px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    min-width: 260px;
+  }
+  .result-emoji { font-size: 64px; margin-bottom: 8px; }
+  .result-title { font-size: 28px; font-weight: 900; color: #1a5276; }
+  .result-score { font-size: 48px; font-weight: 900; color: #e67e22; margin: 4px 0; }
+  .result-label { font-size: 14px; color: #888; margin-bottom: 8px; }
+  #retryBtn {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    border: none;
+    border-radius: 28px;
+    padding: 14px 40px;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+  #retryBtn:active { transform: scale(0.96); }
+
+  /* 히트 이펙트 */
+  .hit-flash {
+    position: absolute;
+    inset: 0;
+    background: rgba(231,76,60,0.4);
+    z-index: 25;
+    pointer-events: none;
+    animation: flashFade 0.35s forwards;
+  }
+  @keyframes flashFade { to { opacity: 0; } }
+
+  /* 별 파티클 */
+  .star-burst {
+    position: absolute;
+    font-size: 24px;
+    pointer-events: none;
+    animation: burstAnim 0.6s forwards;
+    z-index: 22;
+  }
+  @keyframes burstAnim {
+    0%   { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(1.5) translateY(-40px); }
+  }
+</style>
+</head>
+<body>
+<div id="gameWrap">
+  <!-- 구름 -->
+  <div class="cloud">☁️</div>
+  <div class="cloud">☁️</div>
+
+  <!-- UI -->
+  <div id="ui">
+    <div id="scoreBox">🌟 0</div>
+    <div id="livesBox">❤️❤️❤️</div>
+    <div id="timerBox">⏱ 30</div>
+  </div>
+
+  <!-- 선로 -->
+  <div id="tracks">
+    <div class="rail top"></div>
+    <div class="sleeper-wrap" id="sleeperWrap"></div>
+    <div class="rail bot"></div>
+  </div>
+
+  <!-- 플레이어 -->
+  <div id="player">🧒</div>
+
+  <!-- 오버레이 (시작) -->
+  <div id="overlay">
+    <div class="overlay-emoji">🚂</div>
+    <div class="overlay-title">기차 피하기!</div>
+    <div class="overlay-sub">달려오는 기차를<br>탭해서 점프해 피하세요!<br>30초 동안 버텨봐요 🎉</div>
+    <button id="startBtn">시작!</button>
+  </div>
+
+  <!-- 결과 -->
+  <div id="resultPanel">
+    <div class="result-card">
+      <div class="result-emoji" id="resultEmoji">🏆</div>
+      <div class="result-title">기차 피하기!</div>
+      <div class="result-score" id="resultScore">0</div>
+      <div class="result-label">피한 횟수</div>
+    </div>
+    <button id="retryBtn">🔄 다시!</button>
+  </div>
+</div>
+
+<script>
+// ── 침목 생성
+const sw = document.getElementById('sleeperWrap');
+for (let i = 0; i < 30; i++) {
+  const s = document.createElement('div');
+  s.className = 'sleeper';
+  sw.appendChild(s);
+}
+
+// ── 상태
+const GAME_TIME = 30;
+let lives = 3, score = 0, time = GAME_TIME;
+let isJumping = false, isAlive = true, running = false;
+let trainList = [], grassList = [];
+let animId, timerInt;
+let trainSpeed = 4.5;     // px/frame (60fps 기준)
+let trainInterval = 2400; // ms
+let lastTrainTime = 0;
+let lastGrassTime = 0;
+let frameTime = 0;
+
+const wrap      = document.getElementById('gameWrap');
+const player    = document.getElementById('player');
+const scoreBox  = document.getElementById('scoreBox');
+const livesBox  = document.getElementById('livesBox');
+const timerBox  = document.getElementById('timerBox');
+const overlay   = document.getElementById('overlay');
+const resultPanel = document.getElementById('resultPanel');
+
+// ── 점프
+function doJump() {
+  if (!running || isJumping || !isAlive) return;
+  isJumping = true;
+  player.style.bottom = '244px';
+  setTimeout(() => {
+    if (!isAlive) return;
+    player.style.bottom = '144px';
+    isJumping = false;
+  }, 500);
+}
+
+// ── 기차 생성
+function spawnTrain(ts) {
+  if (ts - lastTrainTime < trainInterval) return;
+  lastTrainTime = ts;
+  const t = document.createElement('div');
+  t.className = 'train';
+  t.textContent = ['🚂','🚃','🚄'][Math.floor(Math.random()*3)];
+  wrap.appendChild(t);
+  trainList.push({ el: t, x: parseInt(wrap.offsetWidth) + 60 });
+}
+
+// ── 잔디 장식
+function spawnGrass(ts) {
+  if (ts - lastGrassTime < 1800) return;
+  lastGrassTime = ts;
+  const g = document.createElement('div');
+  g.className = 'grass-deco';
+  g.textContent = ['🌸','🌷','🌿','🌼','🍀'][Math.floor(Math.random()*5)];
+  g.style.right = '-40px';
+  wrap.appendChild(g);
+  grassList.push(g);
+}
+
+// ── 충돌 체크 (간단 AABB)
+function checkCollision(trainX) {
+  if (isJumping) return false;
+  const px = 60, pw = 40;
+  const tx = trainX, tw = 52;
+  return px + pw > tx && px < tx + tw;
+}
+
+// ── 히트
+function onHit() {
+  lives--;
+  updateLives();
+  const flash = document.createElement('div');
+  flash.className = 'hit-flash';
+  wrap.appendChild(flash);
+  setTimeout(() => flash.remove(), 350);
+  if (lives <= 0) endGame(false);
+}
+
+// ── 점수 파티클
+function burstStar(x) {
+  const el = document.createElement('div');
+  el.className = 'star-burst';
+  el.textContent = '⭐';
+  el.style.left = x + 'px';
+  el.style.bottom = '190px';
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 650);
+}
+
+// ── UI 갱신
+function updateLives() {
+  livesBox.textContent = '❤️'.repeat(Math.max(0, lives));
+}
+function updateScore() {
+  scoreBox.textContent = '🌟 ' + score;
+}
+
+// ── 게임 루프
+function gameLoop(ts) {
+  if (!running) return;
+
+  spawnTrain(ts);
+  spawnGrass(ts);
+
+  // 기차 이동
+  for (let i = trainList.length - 1; i >= 0; i--) {
+    const tr = trainList[i];
+    tr.x -= trainSpeed;
+    tr.el.style.right = (wrap.offsetWidth - tr.x) + 'px';
+
+    if (checkCollision(tr.x)) {
+      tr.el.remove();
+      trainList.splice(i, 1);
+      onHit();
+      continue;
+    }
+    if (tr.x + 80 < 0) {
+      // 피했다!
+      score++;
+      updateScore();
+      burstStar(70);
+      tr.el.remove();
+      trainList.splice(i, 1);
+    }
+  }
+
+  // 잔디 제거
+  grassList = grassList.filter(g => {
+    if (parseFloat(g.style.right) > wrap.offsetWidth + 40) {
+      g.remove(); return false;
+    }
+    return true;
+  });
+
+  // 속도 증가
+  if (ts - frameTime > 5000) {
+    frameTime = ts;
+    trainSpeed = Math.min(10, trainSpeed + 0.4);
+    trainInterval = Math.max(1000, trainInterval - 80);
+  }
+
+  animId = requestAnimationFrame(gameLoop);
+}
+
+// ── 타이머
+function startTimer() {
+  timerInt = setInterval(() => {
+    if (!running) return;
+    time--;
+    timerBox.textContent = '⏱ ' + time;
+    if (time <= 0) endGame(true);
+  }, 1000);
+}
+
+// ── 시작
+function startGame() {
+  lives = 3; score = 0; time = GAME_TIME;
+  isJumping = false; isAlive = true; running = true;
+  trainSpeed = 4.5; trainInterval = 2400;
+  lastTrainTime = 0; lastGrassTime = 0; frameTime = 0;
+  trainList.forEach(t => t.el.remove()); trainList = [];
+  grassList.forEach(g => g.remove()); grassList = [];
+  updateLives(); updateScore();
+  timerBox.textContent = '⏱ ' + GAME_TIME;
+  overlay.classList.add('hidden');
+  resultPanel.classList.remove('show');
+  player.style.bottom = '144px';
+  cancelAnimationFrame(animId);
+  clearInterval(timerInt);
+  startTimer();
+  animId = requestAnimationFrame(gameLoop);
+}
+
+// ── 종료
+function endGame(cleared) {
+  running = false; isAlive = false;
+  cancelAnimationFrame(animId);
+  clearInterval(timerInt);
+  trainList.forEach(t => t.el.remove()); trainList = [];
+  grassList.forEach(g => g.remove()); grassList = [];
+  document.getElementById('resultEmoji').textContent = cleared ? '🏆' : '😢';
+  document.getElementById('resultScore').textContent = score;
+  resultPanel.classList.add('show');
+}
+
+// ── 이벤트
+document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+document.getElementById('retryBtn').addEventListener('pointerdown', startGame);
+
+wrap.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  doJump();
+});
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'ArrowUp') doJump();
+});
+</script>
+</body>
+</html>

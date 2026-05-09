@@ -390,5 +390,21 @@
     "description": "레시피를 보고 재료를 순서대로 냄비에 넣어 요리를 완성! 10가지 레시피, 순서 기억+인지 복합 게임, 60초 도전",
     "thumbnail": "emoji-chef/thumb.svg",
     "path": "emoji-chef/index.html"
+  },
+  {
+    "id": "train-dodge",
+    "title": "Train Dodge",
+    "title_ko": "🚂 기차 피하기",
+    "description": "달려오는 기차를 탭해서 점프로 피해요! 30초 동안 최대한 많이 피하기 도전",
+    "thumbnail": "train-dodge/thumb.svg",
+    "path": "train-dodge/index.html"
+  },
+  {
+    "id": "meteor-shield",
+    "title": "Meteor Shield",
+    "title_ko": "🛡️ 운석 막기",
+    "description": "화면을 드래그해서 방패를 돌려 운석에서 행성을 지켜요! 40초 타임어택",
+    "thumbnail": "meteor-shield/thumb.svg",
+    "path": "meteor-shield/index.html"
   }
 ]

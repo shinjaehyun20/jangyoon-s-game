@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🛡️ 운석 막기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
+  html, body {
+    width: 100%; height: 100dvh;
+    background: #0a0a1a;
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    user-select: none;
+  }
+  #gameWrap {
+    position: relative;
+    width: min(420px, 100vw);
+    height: min(640px, 100dvh);
+    background: radial-gradient(ellipse at 50% 30%, #1a1a4a 0%, #0a0a1a 70%);
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(100,100,255,0.3);
+  }
+
+  /* 별 배경 */
+  .bg-star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    opacity: 0;
+    animation: twinkle 2s infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50%       { opacity: 0.9; transform: scale(1.4); }
+  }
+
+  /* 행성 (중심) */
+  #planet {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 72px;
+    z-index: 10;
+    filter: drop-shadow(0 0 18px rgba(100,200,255,0.6));
+  }
+
+  /* 방패 컨테이너 */
+  #shieldRing {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 220px;
+    height: 220px;
+    transform: translate(-50%, -50%);
+    z-index: 15;
+  }
+
+  /* 방패 조각 */
+  .shield-seg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 56px;
+    height: 56px;
+    margin-left: -28px;
+    margin-top: -28px;
+    font-size: 44px;
+    text-align: center;
+    line-height: 56px;
+    transform-origin: center center;
+    cursor: pointer;
+    transition: filter 0.1s;
+    z-index: 16;
+  }
+  .shield-seg.active { filter: drop-shadow(0 0 10px gold); }
+  .shield-seg.hit { animation: shieldHit 0.3s; }
+  @keyframes shieldHit {
+    0%   { filter: drop-shadow(0 0 16px #ff4444) brightness(2); }
+    100% { filter: none; }
+  }
+
+  /* 운석 */
+  .meteor {
+    position: absolute;
+    font-size: 30px;
+    z-index: 12;
+    pointer-events: none;
+    transition: none;
+  }
+
+  /* UI */
+  #ui {
+    position: absolute;
+    top: 12px; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 20;
+  }
+  #scoreBox {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+  #hpBox {
+    font-size: 22px;
+    letter-spacing: 2px;
+  }
+  #timerBox {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ff9999;
+  }
+
+  /* 힌트 (회전 안내) */
+  #hint {
+    position: absolute;
+    bottom: 24px;
+    left: 0; right: 0;
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  /* 오버레이 */
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    gap: 16px;
+  }
+  #overlay.hidden { display: none; }
+  .overlay-emoji { font-size: 80px; }
+  .overlay-title {
+    font-size: 36px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 2px 16px rgba(100,180,255,0.7);
+  }
+  .overlay-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,0.85);
+    text-align: center;
+    line-height: 1.8;
+  }
+  #startBtn {
+    margin-top: 8px;
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    border: none;
+    border-radius: 32px;
+    padding: 16px 48px;
+    font-size: 22px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(108,92,231,0.5);
+    letter-spacing: 1px;
+  }
+  #startBtn:active { transform: scale(0.96); }
+
+  /* 결과 */
+  #resultPanel {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    gap: 12px;
+  }
+  #resultPanel.show { display: flex; }
+  .result-card {
+    background: linear-gradient(135deg, #1a1a4a, #2d2d6e);
+    border: 2px solid rgba(162,155,254,0.5);
+    border-radius: 24px;
+    padding: 28px 36px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(108,92,231,0.4);
+    min-width: 260px;
+  }
+  .result-emoji { font-size: 64px; margin-bottom: 8px; }
+  .result-title { font-size: 26px; font-weight: 900; color: #a29bfe; }
+  .result-score { font-size: 52px; font-weight: 900; color: #fdcb6e; margin: 4px 0; }
+  .result-label { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+  #retryBtn {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    color: white;
+    border: none;
+    border-radius: 28px;
+    padding: 14px 40px;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,184,148,0.4);
+  }
+  #retryBtn:active { transform: scale(0.96); }
+
+  /* 폭발 */
+  .explosion {
+    position: absolute;
+    font-size: 36px;
+    pointer-events: none;
+    animation: explode 0.5s forwards;
+    z-index: 18;
+  }
+  @keyframes explode {
+    0%   { opacity: 1; transform: scale(0.5); }
+    50%  { opacity: 1; transform: scale(1.8); }
+    100% { opacity: 0; transform: scale(2.5); }
+  }
+
+  /* 행성 피격 */
+  #planet.hurt { animation: hurtPulse 0.4s; }
+  @keyframes hurtPulse {
+    0%,100% { filter: drop-shadow(0 0 18px rgba(100,200,255,0.6)); }
+    50%     { filter: drop-shadow(0 0 30px rgba(255,80,80,0.9)) brightness(0.6); }
+  }
+</style>
+</head>
+<body>
+<div id="gameWrap">
+  <!-- UI -->
+  <div id="ui">
+    <div id="scoreBox">⭐ 0</div>
+    <div id="hpBox">💙💙💙</div>
+    <div id="timerBox">⏱ 40</div>
+  </div>
+
+  <!-- 행성 -->
+  <div id="planet">🪐</div>
+
+  <!-- 방패 링 -->
+  <div id="shieldRing"></div>
+
+  <!-- 힌트 -->
+  <div id="hint">화면 어디나 드래그해서 방패를 돌려요!</div>
+
+  <!-- 시작 오버레이 -->
+  <div id="overlay">
+    <div class="overlay-emoji">🛡️</div>
+    <div class="overlay-title">운석 막기!</div>
+    <div class="overlay-sub">날아오는 운석에서<br>행성을 지켜요!<br>화면을 드래그해서 방패를 돌려요 🪐</div>
+    <button id="startBtn">시작!</button>
+  </div>
+
+  <!-- 결과 -->
+  <div id="resultPanel">
+    <div class="result-card">
+      <div class="result-emoji" id="resultEmoji">🏆</div>
+      <div class="result-title">운석 막기!</div>
+      <div class="result-score" id="resultScore">0</div>
+      <div class="result-label">막은 운석 수</div>
+    </div>
+    <button id="retryBtn">🔄 다시!</button>
+  </div>
+</div>
+
+<script>
+// ── 별 배경 생성
+const wrap = document.getElementById('gameWrap');
+for (let i = 0; i < 40; i++) {
+  const s = document.createElement('div');
+  s.className = 'bg-star';
+  const size = Math.random() * 3 + 1;
+  s.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    animation-delay:${Math.random()*2}s;
+    animation-duration:${1.5+Math.random()*2}s;
+  `;
+  wrap.appendChild(s);
+}
+
+// ── 방패 구성 (8방향)
+const SEGS = 8;
+const RADIUS = 100; // 행성 중심에서 방패까지 거리
+const SHIELD_EMOJIS = ['🛡️','🛡️','🛡️','🛡️','🛡️','🛡️','🛡️','🛡️'];
+const shieldRing = document.getElementById('shieldRing');
+let shieldAngle = 0; // 전체 방패 링 회전 각도 (deg)
+
+// 방패 조각 DOM 생성
+const segs = [];
+for (let i = 0; i < SEGS; i++) {
+  const el = document.createElement('div');
+  el.className = 'shield-seg';
+  el.textContent = '🛡️';
+  shieldRing.appendChild(el);
+  segs.push(el);
+}
+
+function renderShield() {
+  const cx = parseInt(wrap.offsetWidth / 2);
+  const cy = parseInt(wrap.offsetHeight / 2);
+  for (let i = 0; i < SEGS; i++) {
+    const ang = (shieldAngle + (360 / SEGS) * i) * (Math.PI / 180);
+    const x = Math.cos(ang) * RADIUS;
+    const y = Math.sin(ang) * RADIUS;
+    // transform: 행성 중심 기준 상대 좌표 → shieldRing 내부 좌표
+    segs[i].style.transform = `translate(${x}px, ${y}px)`;
+  }
+}
+
+// ── 드래그로 방패 회전
+let isDragging = false;
+let lastAngle = 0;
+let centerX, centerY;
+
+function getCenter() {
+  const r = wrap.getBoundingClientRect();
+  centerX = r.left + r.width / 2;
+  centerY = r.top + r.height / 2;
+}
+
+function pointerToAngle(px, py) {
+  return Math.atan2(py - centerY, px - centerX) * (180 / Math.PI);
+}
+
+wrap.addEventListener('pointerdown', e => {
+  if (!running) return;
+  e.preventDefault();
+  isDragging = true;
+  getCenter();
+  lastAngle = pointerToAngle(e.clientX, e.clientY);
+  wrap.setPointerCapture(e.pointerId);
+});
+
+wrap.addEventListener('pointermove', e => {
+  if (!isDragging || !running) return;
+  e.preventDefault();
+  const cur = pointerToAngle(e.clientX, e.clientY);
+  let delta = cur - lastAngle;
+  // 각도 급변 방지 (-180~+180 범위로)
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+  shieldAngle += delta;
+  lastAngle = cur;
+  renderShield();
+});
+
+wrap.addEventListener('pointerup', () => { isDragging = false; });
+wrap.addEventListener('pointercancel', () => { isDragging = false; });
+
+// ── 상태
+const GAME_TIME = 40;
+let hp = 3, score = 0, timeLeft = GAME_TIME;
+let running = false;
+let meteors = [];
+let animId, timerInt;
+let spawnInterval = 1600; // ms
+let lastSpawnTime = 0;
+let meteorSpeed = 1.8; // 초당 진행 비율
+
+const planet  = document.getElementById('planet');
+const scoreBox = document.getElementById('scoreBox');
+const hpBox   = document.getElementById('hpBox');
+const timerBox = document.getElementById('timerBox');
+const overlay  = document.getElementById('overlay');
+const resultPanel = document.getElementById('resultPanel');
+
+function updateHP() {
+  hpBox.textContent = '💙'.repeat(Math.max(0, hp));
+}
+function updateScore() {
+  scoreBox.textContent = '⭐ ' + score;
+}
+
+// ── 운석 생성
+// 운석은 행성 중심 밖에서 중심으로 날아옴
+const METEOR_EMOJIS = ['☄️','🪨','💥','🌑'];
+function spawnMeteor(ts) {
+  if (ts - lastSpawnTime < spawnInterval) return;
+  lastSpawnTime = ts;
+
+  // 랜덤 각도에서 출발
+  const ang = Math.random() * 360;
+  const angRad = ang * (Math.PI / 180);
+  const spawnDist = 280; // 중심에서 시작 거리
+  const cx = wrap.offsetWidth / 2;
+  const cy = wrap.offsetHeight / 2;
+
+  const startX = cx + Math.cos(angRad) * spawnDist;
+  const startY = cy + Math.sin(angRad) * spawnDist;
+
+  const el = document.createElement('div');
+  el.className = 'meteor';
+  el.textContent = METEOR_EMOJIS[Math.floor(Math.random() * METEOR_EMOJIS.length)];
+  el.style.left = startX + 'px';
+  el.style.top  = startY + 'px';
+  wrap.appendChild(el);
+
+  meteors.push({
+    el,
+    angle: ang,          // 진행 각도 (반대 방향)
+    dist: spawnDist,     // 현재 중심까지 거리
+    startDist: spawnDist
+  });
+}
+
+// ── 방패와 충돌 체크
+// 운석이 방패 링 반경(~100px) 안에 들어왔을 때, 가장 가까운 방패 조각이 해당 각도에 있으면 막음
+function shieldBlocks(meteorAngle) {
+  // 방패 조각들의 각도 목록
+  const HALF_SEG = (360 / SEGS) / 2 + 8; // 허용 오차(deg)
+  for (let i = 0; i < SEGS; i++) {
+    const segAng = ((shieldAngle + (360 / SEGS) * i) % 360 + 360) % 360;
+    let diff = Math.abs(segAng - meteorAngle);
+    if (diff > 180) diff = 360 - diff;
+    if (diff < HALF_SEG) return i;
+  }
+  return -1;
+}
+
+// ── 폭발 이펙트
+function spawnExplosion(x, y, emoji) {
+  const el = document.createElement('div');
+  el.className = 'explosion';
+  el.textContent = emoji || '💥';
+  el.style.left = (x - 18) + 'px';
+  el.style.top  = (y - 18) + 'px';
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 520);
+}
+
+// ── 게임 루프
+let prevTs = 0;
+function gameLoop(ts) {
+  if (!running) return;
+  const dt = Math.min((ts - prevTs) / 1000, 0.1); // 초 단위
+  prevTs = ts;
+
+  spawnMeteor(ts);
+
+  const cx = wrap.offsetWidth / 2;
+  const cy = wrap.offsetHeight / 2;
+
+  for (let i = meteors.length - 1; i >= 0; i--) {
+    const m = meteors[i];
+    m.dist -= meteorSpeed * 60 * dt; // 프레임 독립 이동
+    const angRad = m.angle * (Math.PI / 180);
+    const mx = cx + Math.cos(angRad) * m.dist;
+    const my = cy + Math.sin(angRad) * m.dist;
+    m.el.style.left = mx + 'px';
+    m.el.style.top  = my + 'px';
+
+    // 방패 링 반경에 닿았는지
+    if (m.dist <= RADIUS + 16) {
+      // 운석 각도 (중심으로 날아오는 방향 = 반대쪽에서)
+      const meteorAng = ((m.angle + 180) % 360 + 360) % 360;
+      const segIdx = shieldBlocks(meteorAng);
+      if (segIdx >= 0) {
+        // 막음!
+        score++;
+        updateScore();
+        spawnExplosion(mx, my, '✨');
+        segs[segIdx].classList.add('hit');
+        setTimeout(() => segs[segIdx].classList.remove('hit'), 300);
+        m.el.remove();
+        meteors.splice(i, 1);
+      } else if (m.dist <= 46) {
+        // 행성 피격
+        hp--;
+        updateHP();
+        spawnExplosion(cx - 20, cy - 20, '💥');
+        planet.classList.add('hurt');
+        setTimeout(() => planet.classList.remove('hurt'), 420);
+        m.el.remove();
+        meteors.splice(i, 1);
+        if (hp <= 0) { endGame(false); return; }
+      }
+    }
+
+    // 화면 벗어남 (이미 중심 통과)
+    if (m.dist < -60) {
+      m.el.remove();
+      meteors.splice(i, 1);
+    }
+  }
+
+  animId = requestAnimationFrame(gameLoop);
+}
+
+// ── 타이머
+function startTimer() {
+  timerInt = setInterval(() => {
+    if (!running) return;
+    timeLeft--;
+    timerBox.textContent = '⏱ ' + timeLeft;
+    // 난이도 상승
+    if (timeLeft % 8 === 0 && timeLeft > 0) {
+      spawnInterval = Math.max(700, spawnInterval - 120);
+      meteorSpeed = Math.min(4.5, meteorSpeed + 0.25);
+    }
+    if (timeLeft <= 0) endGame(true);
+  }, 1000);
+}
+
+function startGame() {
+  hp = 3; score = 0; timeLeft = GAME_TIME;
+  running = true;
+  shieldAngle = 0;
+  spawnInterval = 1600;
+  meteorSpeed = 1.8;
+  lastSpawnTime = 0;
+  meteors.forEach(m => m.el.remove()); meteors = [];
+  updateHP(); updateScore();
+  timerBox.textContent = '⏱ ' + GAME_TIME;
+  overlay.classList.add('hidden');
+  resultPanel.classList.remove('show');
+  renderShield();
+  cancelAnimationFrame(animId);
+  clearInterval(timerInt);
+  prevTs = performance.now();
+  startTimer();
+  animId = requestAnimationFrame(gameLoop);
+}
+
+function endGame(cleared) {
+  running = false;
+  cancelAnimationFrame(animId);
+  clearInterval(timerInt);
+  meteors.forEach(m => m.el.remove()); meteors = [];
+  document.getElementById('resultEmoji').textContent = cleared ? '🏆' : '😢';
+  document.getElementById('resultScore').textContent = score;
+  resultPanel.classList.add('show');
+}
+
+document.getElementById('startBtn').addEventListener('pointerdown', e => {
+  e.stopPropagation();
+  startGame();
+});
+document.getElementById('retryBtn').addEventListener('pointerdown', e => {
+  e.stopPropagation();
+  startGame();
+});
+
+// 초기 방패 렌더
+renderShield();
+</script>
+</body>
+</html>

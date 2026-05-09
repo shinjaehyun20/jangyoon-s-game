@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#87ceeb"/>
+      <stop offset="60%" stop-color="#b0e0ff"/>
+      <stop offset="60%" stop-color="#a8d5a2"/>
+      <stop offset="100%" stop-color="#7cba6e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 내부 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#skyGrad)"/>
+
+  <!-- 구름 -->
+  <text x="40" y="36" font-size="28">☁️</text>
+  <text x="210" y="28" font-size="20">☁️</text>
+
+  <!-- 선로 침목 -->
+  <rect x="0" y="122" width="320" height="4" rx="2" fill="#888"/>
+  <rect x="0" y="136" width="320" height="4" rx="2" fill="#888"/>
+  <rect x="16"  y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+  <rect x="48"  y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+  <rect x="80"  y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+  <rect x="112" y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+  <rect x="144" y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+  <rect x="176" y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+  <rect x="208" y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+  <rect x="240" y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+  <rect x="272" y="122" width="12" height="18" rx="2" fill="#8B5E3C"/>
+
+  <!-- 플레이어 (점프 중) -->
+  <text x="60" y="108" font-size="44" text-anchor="middle" dominant-baseline="middle">🧒</text>
+
+  <!-- 화살표 (점프 표시) -->
+  <text x="72" y="88" font-size="16" text-anchor="middle">⬆️</text>
+
+  <!-- 기차 -->
+  <text x="240" y="130" font-size="52" text-anchor="middle" dominant-baseline="middle">🚂</text>
+
+  <!-- 장식 꽃 -->
+  <text x="150" y="160" font-size="18">🌸</text>
+  <text x="20"  y="164" font-size="16">🌿</text>
+
+  <!-- 하트(목숨) -->
+  <text x="10" y="22" font-size="18">❤️❤️❤️</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#1a5276">기차 피하기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(26,82,118,0.5)" letter-spacing="2">TRAIN DODGE</text>
+  </g>
+</svg>
