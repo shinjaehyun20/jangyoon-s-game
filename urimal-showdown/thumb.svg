@@ -1,0 +1,14 @@
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="180" rx="24" fill="#FFF7E6"/>
+  <rect x="1" y="1" width="318" height="178" rx="23" stroke="rgba(44,83,122,0.12)"/>
+  <circle cx="58" cy="48" r="30" fill="#FFD25E"/>
+  <circle cx="262" cy="38" r="24" fill="#BFE6FF"/>
+  <circle cx="279" cy="126" r="28" fill="#FFD8C7"/>
+  <rect x="26" y="42" width="268" height="96" rx="24" fill="#FFFFFF"/>
+  <rect x="26" y="42" width="268" height="96" rx="24" stroke="#D8E7F5"/>
+  <text x="42" y="82" fill="#17324B" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="26" font-weight="700">우리말 쇼다운</text>
+  <text x="42" y="111" fill="#4F6E87" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="600">말뜻 · 맞춤법 · 속담 퀴즈</text>
+  <rect x="42" y="121" width="78" height="24" rx="12" fill="#FFF1BE"/>
+  <text x="56" y="137" fill="#8B5A00" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="700">KIDS QUIZ</text>
+  <text x="194" y="156" fill="#4F6E87" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="10" font-weight="700" letter-spacing="1.2">URIMAL SHOWDOWN</text>
+</svg>

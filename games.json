@@ -392,6 +392,14 @@
     "path": "emoji-chef/index.html"
   },
   {
+    "id": "urimal-showdown",
+    "title": "Urimal Showdown",
+    "title_ko": "📝 우리말 쇼다운",
+    "description": "말뜻, 순화어, 맞춤법, 속담을 밝은 카드 화면에서 차근차근 풀어보는 어린이용 우리말 퀴즈",
+    "thumbnail": "urimal-showdown/thumb.svg",
+    "path": "urimal-showdown/index.html"
+  },
+  {
     "id": "train-dodge",
     "title": "Train Dodge",
     "title_ko": "🚂 기차 피하기",
