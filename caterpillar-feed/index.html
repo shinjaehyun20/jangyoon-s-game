@@ -547,8 +547,8 @@
     spawnLeaves();
   }
 
-  btnStart.addEventListener('click', resetGame);
-  btnRestart.addEventListener('click', resetGame);
+  btnStart.addEventListener('pointerdown', (e) => { e.preventDefault(); resetGame(); });
+  btnRestart.addEventListener('pointerdown', (e) => { e.preventDefault(); resetGame(); });
 })();
 </script>
 </body>
