@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#87CEEB"/>
+      <stop offset="60%" stop-color="#B0E2FF"/>
+      <stop offset="100%" stop-color="#90EE90"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#sky)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <!-- ground strip -->
+  <rect x="0" y="148" width="320" height="32" fill="#5CB85C" opacity="0.5"/>
+  <!-- flowers -->
+  <text x="40"  y="128" font-size="44" text-anchor="middle">🌸</text>
+  <text x="110" y="118" font-size="44" text-anchor="middle">🌼</text>
+  <text x="180" y="128" font-size="44" text-anchor="middle">🌺</text>
+  <text x="250" y="115" font-size="44" text-anchor="middle">🌻</text>
+  <!-- butterfly -->
+  <text x="155" y="72" font-size="48" text-anchor="middle">🦋</text>
+  <!-- wilt bars -->
+  <rect x="22"  y="130" width="36" height="4" rx="2" fill="rgba(255,255,255,0.4)"/>
+  <rect x="22"  y="130" width="28" height="4" rx="2" fill="#5CB85C"/>
+  <rect x="92"  y="120" width="36" height="4" rx="2" fill="rgba(255,255,255,0.4)"/>
+  <rect x="92"  y="120" width="36" height="4" rx="2" fill="#f39c12"/>
+  <!-- title -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="152" text-anchor="end" font-size="22" font-weight="900" fill="#2d5a27">나비 꽃밭</text>
+    <text x="296" y="168" text-anchor="end" font-size="10" font-weight="500" fill="rgba(0,80,0,0.55)" letter-spacing="2">BUTTERFLY GARDEN</text>
+  </g>
+</svg>
