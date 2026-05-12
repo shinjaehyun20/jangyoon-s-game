@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#4a2c8a"/>
+      <stop offset="100%" stop-color="#1a0d40"/>
+    </radialGradient>
+    <radialGradient id="egg-grad" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fff8e7"/>
+      <stop offset="40%" stop-color="#fdedc1"/>
+      <stop offset="100%" stop-color="#f5c842"/>
+    </radialGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg2)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 별 파티클 -->
+  <text x="45" y="45" font-size="16">✨</text>
+  <text x="250" y="35" font-size="14">⭐</text>
+  <text x="270" y="90" font-size="18">💫</text>
+  <text x="30" y="120" font-size="14">🌟</text>
+
+  <!-- 큰 달걀 (중앙 좌측) -->
+  <ellipse cx="115" cy="100" rx="55" ry="66" fill="url(#egg-grad)" opacity="0.95"/>
+  <!-- 균열 -->
+  <path d="M115,45 L110,72 L117,90 L105,115" stroke="rgba(160,110,0,0.7)" stroke-width="3" fill="none"/>
+  <path d="M125,58 L133,78 L120,100" stroke="rgba(160,110,0,0.5)" stroke-width="2" fill="none"/>
+
+  <!-- 부화된 동물들 -->
+  <text x="198" y="75" font-size="36" text-anchor="middle">🐥</text>
+  <text x="248" y="130" font-size="28" text-anchor="middle">🦕</text>
+  <text x="155" y="148" font-size="26" text-anchor="middle">🦎</text>
+
+  <!-- 탭 효과 -->
+  <circle cx="115" cy="100" r="70" fill="none" stroke="rgba(255,215,0,0.25)" stroke-width="3"/>
+
+  <!-- 제목 우하단 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#ffd700">달걀 부화시키기</text>
+    <text x="296" y="164" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">HATCH EGG</text>
+  </g>
+</svg>

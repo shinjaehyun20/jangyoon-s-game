@@ -430,5 +430,21 @@
     "description": "화면을 탭해서 광대를 움직여 공을 튕겨요! 목숨 3개, 콤보로 점수 올리기",
     "thumbnail": "juggle-circus/thumb.svg",
     "path": "juggle-circus/index.html"
+  },
+  {
+    "id": "rain-dodge",
+    "title": "Rain Dodge",
+    "title_ko": "🌧️ 빗방울 피하기",
+    "description": "우산을 드래그해서 빗방울을 피하고 햇살을 잡아요! 목숨 3개, 40초 도전",
+    "thumbnail": "rain-dodge/thumb.svg",
+    "path": "rain-dodge/index.html"
+  },
+  {
+    "id": "hatch-egg",
+    "title": "Hatch Egg",
+    "title_ko": "🐣 달걀 부화시키기",
+    "description": "달걀을 탭탭탭 눌러서 부화시키고 나온 동물을 맞혀요! 5마리 부화 60초 도전",
+    "thumbnail": "hatch-egg/thumb.svg",
+    "path": "hatch-egg/index.html"
   }
 ]

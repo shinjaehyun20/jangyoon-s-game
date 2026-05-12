@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐣 달걀 부화시키기</title>
+  <style>
+    :root {
+      --bg: #2d1b69;
+      --accent: #ffd700;
+      --text: #ffffff;
+      --egg-base: #fff8e7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5.5vw, 26px);
+      color: var(--text); text-align: center;
+      font-weight: 900;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .hud {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 6px 14px; gap: 8px;
+    }
+    .hud-item {
+      display: flex; flex-direction: column; align-items: center;
+      font-size: 12px; color: rgba(255,255,255,0.7);
+    }
+    .hud-val {
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900; color: var(--text); line-height: 1.1;
+    }
+    .hud-val.gold { color: var(--accent); }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: radial-gradient(ellipse at 50% 30%, #4a2c8a 0%, #2d1b69 60%, #1a0d40 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      touch-action: none;
+    }
+
+    /* 달걀 */
+    #eggContainer {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      width: 160px; height: 192px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #eggBase {
+      position: absolute;
+      width: 140px; height: 168px;
+      background: radial-gradient(ellipse at 40% 35%, #fff8e7 0%, #fdedc1 40%, #f5c842 100%);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4), inset 0 -6px 20px rgba(200,150,0,0.2);
+      transition: transform 0.08s ease;
+      z-index: 1;
+    }
+    #eggBase.shake { animation: shake 0.25s ease; }
+    @keyframes shake {
+      0%   { transform: rotate(0deg); }
+      20%  { transform: rotate(-8deg) scale(1.05); }
+      40%  { transform: rotate(8deg) scale(1.08); }
+      60%  { transform: rotate(-5deg) scale(1.04); }
+      80%  { transform: rotate(5deg) scale(1.06); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    /* 균열 레이어들 */
+    #crack1, #crack2, #crack3 {
+      position: absolute; width: 140px; height: 168px;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    /* 균열 SVG는 JS에서 동적 생성 */
+    #eggEmoji {
+      position: absolute;
+      font-size: 52px;
+      z-index: 3;
+      opacity: 0;
+      transform: scale(0.3);
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+      pointer-events: none;
+    }
+    #eggEmoji.show {
+      opacity: 1; transform: scale(1);
+    }
+    /* 파티클 */
+    .particle {
+      position: absolute;
+      font-size: 20px;
+      pointer-events: none;
+      animation: flyOut 0.8s ease-out forwards;
+      z-index: 20;
+    }
+    @keyframes flyOut {
+      0% { transform: translate(0,0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
+    }
+
+    /* 진행 바 */
+    #progressWrap {
+      width: 80%; max-width: 300px;
+      height: 18px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    #progressBar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #ffd700, #ff9500);
+      border-radius: 12px;
+      transition: width 0.15s ease;
+    }
+    #tapHint {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    /* 동물 이름 표시 */
+    #animalName {
+      font-size: 22px; font-weight: 900;
+      color: var(--accent);
+      margin-top: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-shadow: 0 0 14px rgba(255,215,0,0.5);
+    }
+    #animalName.show { opacity: 1; }
+
+    /* 퀴즈 영역 */
+    #quizArea {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 0 12px;
+    }
+    #quizArea.show { display: flex; }
+    #quizQuestion {
+      font-size: 16px; color: rgba(255,255,255,0.85);
+      text-align: center; line-height: 1.5;
+    }
+    .quiz-options {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; width: 100%; max-width: 340px;
+    }
+    .quiz-btn {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 14px 6px;
+      font-size: 22px;
+      color: var(--text); cursor: pointer;
+      min-height: 62px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .quiz-btn:active { transform: scale(0.95); }
+    .quiz-btn.correct {
+      background: rgba(72, 199, 142, 0.4);
+      border-color: #48c78e;
+    }
+    .quiz-btn.wrong {
+      background: rgba(255, 90, 90, 0.3);
+      border-color: #ff5a5a;
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    footer small { color: rgba(255,255,255,0.5); font-size: 11px; }
+    .home-link {
+      color: rgba(255,255,255,0.6); font-size: 12px; text-decoration: none;
+      padding: 4px 8px; border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+    .home-link:hover { background: rgba(255,255,255,0.15); }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #2d1b69, #4a2c8a);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 24px;
+      padding: 28px 24px; text-align: center;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { color: var(--text); font-size: 26px; margin-bottom: 10px; }
+    .overlay-card p { color: rgba(255,255,255,0.75); font-size: 14px; line-height: 1.6; margin-bottom: 8px; }
+    .overlay-card .sub { color: rgba(255,255,255,0.5); font-size: 12px; margin-bottom: 18px; }
+    .btn-start {
+      background: linear-gradient(135deg, #f6c90e, #f39c12);
+      border: none; border-radius: 16px;
+      padding: 14px 40px;
+      font-size: 20px; font-weight: 900;
+      color: #1a1a1a; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(246,201,14,0.4);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--accent); margin: 12px 0 4px;
+      text-shadow: 0 0 20px rgba(255,215,0,0.5);
+    }
+    #resultMsg { color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 6px; }
+    #hatched-list { font-size: 28px; letter-spacing: 4px; margin: 8px 0; }
+    #bestDisplay { color: rgba(255,215,0,0.7); font-size: 13px; margin-bottom: 18px; }
+
+    /* 파티클 생성 */
+    #confetti { position: absolute; inset: 0; pointer-events: none; z-index: 15; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🐣 달걀 부화시키기</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-val gold" id="hatchedVal">0</span>
+        <span>부화🐣</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-val" id="scoreVal">0</span>
+        <span>점수</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-val" id="timerVal">60</span>
+        <span>초</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-val" id="roundVal">1/5</span>
+        <span>라운드</span>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <div id="confetti"></div>
+      <div id="eggContainer" role="button" aria-label="달걀 탭하기">
+        <div id="eggBase"></div>
+        <svg id="crack1" style="position:absolute;width:140px;height:168px;z-index:2;opacity:0;">
+          <path d="M70,30 L65,60 L72,85 L60,110" stroke="rgba(180,120,0,0.7)" stroke-width="2.5" fill="none"/>
+        </svg>
+        <svg id="crack2" style="position:absolute;width:140px;height:168px;z-index:2;opacity:0;">
+          <path d="M70,30 L65,60 L72,85 L60,110" stroke="rgba(180,120,0,0.8)" stroke-width="2.5" fill="none"/>
+          <path d="M80,50 L88,70 L78,95" stroke="rgba(180,120,0,0.6)" stroke-width="2" fill="none"/>
+          <path d="M55,70 L48,90" stroke="rgba(180,120,0,0.5)" stroke-width="1.5" fill="none"/>
+        </svg>
+        <svg id="crack3" style="position:absolute;width:140px;height:168px;z-index:2;opacity:0;">
+          <path d="M70,20 L65,50 L72,75 L58,105 L70,130" stroke="rgba(150,100,0,0.9)" stroke-width="3" fill="none"/>
+          <path d="M80,40 L92,65 L78,90 L85,115" stroke="rgba(150,100,0,0.7)" stroke-width="2" fill="none"/>
+          <path d="M55,60 L44,85 L55,108" stroke="rgba(150,100,0,0.6)" stroke-width="2" fill="none"/>
+          <path d="M65,100 L58,118" stroke="rgba(150,100,0,0.5)" stroke-width="1.5" fill="none"/>
+          <path d="M78,95 L85,112" stroke="rgba(150,100,0,0.5)" stroke-width="1.5" fill="none"/>
+        </svg>
+        <div id="eggEmoji"></div>
+      </div>
+      <div id="progressWrap">
+        <div id="progressBar"></div>
+      </div>
+      <div id="tapHint">탭탭탭! 🥚</div>
+      <div id="animalName"></div>
+      <div id="quizArea">
+        <div id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+      </div>
+    </div>
+
+    <footer>
+      <small>달걀을 탭해서 부화시켜요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🐣 달걀 부화시키기</h2>
+      <p>달걀을 탭탭탭 눌러서<br>부화시켜요!</p>
+      <p>나온 동물이 뭔지 맞추면<br><strong style="color:#ffd700">보너스 점수!</strong></p>
+      <p class="sub">60초 안에 5마리 부화 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div id="hatched-list"></div>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="bestDisplay">최고 기록: 0점</p>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const CONFIG = {
+      GAME_TIME: 60,
+      TOTAL_EGGS: 5,
+      TAPS_PER_EGG: 20,
+      BASE_HATCH_SCORE: 10,
+      QUIZ_BONUS: 5,
+      BEST_KEY: 'hatch-egg_best',
+    };
+
+    // 동물 데이터 (이모지 + 이름 + 퀴즈 옵션)
+    const ANIMALS = [
+      { emoji: '🐥', name: '병아리', options: ['🐥 병아리', '🐧 펭귄', '🦆 오리', '🦅 독수리'] },
+      { emoji: '🐢', name: '거북이', options: ['🐢 거북이', '🦎 도마뱀', '🐊 악어', '🦕 공룡'] },
+      { emoji: '🦎', name: '도마뱀', options: ['🦎 도마뱀', '🐢 거북이', '🐍 뱀', '🦖 티라노'] },
+      { emoji: '🐍', name: '뱀', options: ['🐍 뱀', '🪱 지렁이', '🦎 도마뱀', '🐛 애벌레'] },
+      { emoji: '🦕', name: '공룡', options: ['🦕 공룡', '🦖 티라노', '🐢 거북이', '🦎 도마뱀'] },
+      { emoji: '🦖', name: '티라노', options: ['🦖 티라노', '🦕 공룡', '🐊 악어', '🦁 사자'] },
+      { emoji: '🦆', name: '오리', options: ['🦆 오리', '🐥 병아리', '🦩 홍학', '🐦 새'] },
+      { emoji: '🐊', name: '악어', options: ['🐊 악어', '🦎 도마뱀', '🐢 거북이', '🦕 공룡'] },
+      { emoji: '🦩', name: '홍학', options: ['🦩 홍학', '🦆 오리', '🐦 새', '🐥 병아리'] },
+      { emoji: '🦋', name: '나비', options: ['🦋 나비', '🐛 애벌레', '🐝 벌', '🪲 딱정벌레'] },
+    ];
+
+    const eggBase = document.getElementById('eggBase');
+    const crack1 = document.getElementById('crack1');
+    const crack2 = document.getElementById('crack2');
+    const crack3 = document.getElementById('crack3');
+    const eggEmoji = document.getElementById('eggEmoji');
+    const progressBar = document.getElementById('progressBar');
+    const tapHint = document.getElementById('tapHint');
+    const animalName = document.getElementById('animalName');
+    const quizArea = document.getElementById('quizArea');
+    const quizQuestion = document.getElementById('quizQuestion');
+    const quizOptions = document.getElementById('quizOptions');
+    const scoreEl = document.getElementById('scoreVal');
+    const hatchedEl = document.getElementById('hatchedVal');
+    const timerEl = document.getElementById('timerVal');
+    const roundEl = document.getElementById('roundVal');
+    const confettiEl = document.getElementById('confetti');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScoreEl = document.getElementById('finalScore');
+    const resultMsgEl = document.getElementById('resultMsg');
+    const bestDisplayEl = document.getElementById('bestDisplay');
+    const hatchedListEl = document.getElementById('hatched-list');
+    const eggContainer = document.getElementById('eggContainer');
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('restartBtn').addEventListener('click', startGame);
+
+    let state = {};
+    let countdownTimer = null;
+    let hatchedAnimals = [];
+
+    function getBest() { return parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10); }
+    function saveBest(v) { if (v > getBest()) localStorage.setItem(CONFIG.BEST_KEY, String(v)); }
+
+    function getRandomAnimals(count) {
+      const shuffled = [...ANIMALS].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, count);
+    }
+
+    function initState() {
+      state = {
+        score: 0,
+        hatched: 0,
+        timeLeft: CONFIG.GAME_TIME,
+        round: 1,
+        tapCount: 0,
+        phase: 'tapping', // 'tapping' | 'quiz' | 'hatched'
+        running: false,
+        currentAnimal: null,
+        animals: getRandomAnimals(CONFIG.TOTAL_EGGS),
+        quizAnswered: false,
+      };
+      hatchedAnimals = [];
+    }
+
+    function resetEgg() {
+      eggBase.style.background = 'radial-gradient(ellipse at 40% 35%, #fff8e7 0%, #fdedc1 40%, #f5c842 100%)';
+      crack1.style.opacity = '0';
+      crack2.style.opacity = '0';
+      crack3.style.opacity = '0';
+      eggEmoji.style.opacity = '0';
+      eggEmoji.style.transform = 'scale(0.3)';
+      eggEmoji.classList.remove('show');
+      progressBar.style.width = '0%';
+      tapHint.style.opacity = '1';
+      tapHint.textContent = '탭탭탭! 🥚';
+      animalName.classList.remove('show');
+      animalName.textContent = '';
+      quizArea.classList.remove('show');
+      quizArea.style.display = 'none';
+      eggContainer.style.display = 'flex';
+    }
+
+    function startGame() {
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      initState();
+      resetEgg();
+      state.currentAnimal = state.animals[0];
+      state.running = true;
+      roundEl.textContent = `1/${CONFIG.TOTAL_EGGS}`;
+      updateHUD();
+      startCountdown();
+    }
+
+    function startCountdown() {
+      if (countdownTimer) clearInterval(countdownTimer);
+      countdownTimer = setInterval(() => {
+        if (!state.running) { clearInterval(countdownTimer); return; }
+        state.timeLeft--;
+        timerEl.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function updateHUD() {
+      scoreEl.textContent = state.score;
+      hatchedEl.textContent = state.hatched;
+      timerEl.textContent = state.timeLeft;
+      roundEl.textContent = `${state.round}/${CONFIG.TOTAL_EGGS}`;
+    }
+
+    function onTap(e) {
+      e.preventDefault();
+      if (!state.running || state.phase !== 'tapping') return;
+      state.tapCount++;
+      const pct = state.tapCount / CONFIG.TAPS_PER_EGG;
+
+      // 달걀 흔들림
+      eggBase.classList.remove('shake');
+      void eggBase.offsetWidth; // reflow
+      eggBase.classList.add('shake');
+
+      // 균열 단계
+      if (pct > 0.3) crack1.style.opacity = String(Math.min(1, (pct - 0.3) / 0.2));
+      if (pct > 0.55) crack2.style.opacity = String(Math.min(1, (pct - 0.55) / 0.2));
+      if (pct > 0.75) crack3.style.opacity = String(Math.min(1, (pct - 0.75) / 0.2));
+
+      // 배경색 변화 (더 따뜻하게)
+      if (pct > 0.5) {
+        const warm = Math.floor((pct - 0.5) * 100);
+        eggBase.style.background = `radial-gradient(ellipse at 40% 35%, #fff8e7 0%, #fde68a ${30 + warm}%, #f59e0b 100%)`;
+      }
+
+      // 진행 바
+      progressBar.style.width = (pct * 100) + '%';
+
+      // 탭 힌트
+      if (pct < 0.5) tapHint.textContent = '탭탭탭! 🥚';
+      else if (pct < 0.8) tapHint.textContent = '조금만 더! 💥';
+      else tapHint.textContent = '거의 부화해요! 🌟';
+
+      // 파티클 (랜덤)
+      if (Math.random() < 0.4) spawnTapParticle(e);
+
+      // 부화!
+      if (state.tapCount >= CONFIG.TAPS_PER_EGG) {
+        hatchEgg();
+      }
+    }
+
+    function spawnTapParticle(e) {
+      const rect = eggContainer.getBoundingClientRect();
+      const gameRect = document.getElementById('gameArea').getBoundingClientRect();
+      const x = rect.left + rect.width / 2 - gameRect.left;
+      const y = rect.top + rect.height / 2 - gameRect.top;
+      const parts = ['✨', '💫', '⭐', '🌟'];
+      const el = document.createElement('div');
+      el.className = 'particle';
+      el.textContent = parts[Math.floor(Math.random() * parts.length)];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 50;
+      el.style.left = (x - 10) + 'px';
+      el.style.top = (y - 10) + 'px';
+      el.style.setProperty('--dx', (Math.cos(angle) * dist) + 'px');
+      el.style.setProperty('--dy', (Math.sin(angle) * dist) + 'px');
+      confettiEl.appendChild(el);
+      setTimeout(() => el.remove(), 800);
+    }
+
+    function hatchEgg() {
+      state.phase = 'hatched';
+      const animal = state.currentAnimal;
+      hatchedAnimals.push(animal.emoji);
+
+      // 달걀 숨기고 동물 표시
+      crack1.style.opacity = '0';
+      crack2.style.opacity = '0';
+      crack3.style.opacity = '0';
+      eggBase.style.opacity = '0';
+      eggBase.style.transition = 'opacity 0.25s';
+      eggEmoji.textContent = animal.emoji;
+      eggEmoji.classList.add('show');
+      tapHint.textContent = '부화 성공! 🎊';
+
+      animalName.textContent = animal.name + '(이)가 나왔어요!';
+      animalName.classList.add('show');
+
+      // 폭죽 파티클
+      launchConfetti();
+
+      state.score += CONFIG.BASE_HATCH_SCORE;
+      state.hatched++;
+      updateHUD();
+
+      // 퀴즈로 전환
+      setTimeout(() => showQuiz(animal), 900);
+    }
+
+    function launchConfetti() {
+      const gameRect = document.getElementById('gameArea').getBoundingClientRect();
+      const cx = gameRect.width / 2;
+      const cy = gameRect.height / 2;
+      const parts = ['🎉', '✨', '🌟', '💛', '💫', '🎊'];
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          const el = document.createElement('div');
+          el.className = 'particle';
+          el.textContent = parts[Math.floor(Math.random() * parts.length)];
+          const angle = (i / 10) * Math.PI * 2;
+          const dist = 60 + Math.random() * 60;
+          el.style.left = (cx - 10) + 'px';
+          el.style.top = (cy - 10) + 'px';
+          el.style.setProperty('--dx', (Math.cos(angle) * dist) + 'px');
+          el.style.setProperty('--dy', (Math.sin(angle) * dist) + 'px');
+          confettiEl.appendChild(el);
+          setTimeout(() => el.remove(), 800);
+        }, i * 50);
+      }
+    }
+
+    function showQuiz(animal) {
+      eggContainer.style.display = 'none';
+      animalName.classList.remove('show');
+      quizArea.style.display = 'flex';
+      quizArea.classList.add('show');
+      state.phase = 'quiz';
+      state.quizAnswered = false;
+      quizQuestion.innerHTML = `<span style="font-size:40px">${animal.emoji}</span><br>이 동물은 무엇일까요?`;
+
+      // 보기 섞기 (정답 포함 4개)
+      const shuffled = [...animal.options].sort(() => Math.random() - 0.5);
+      quizOptions.innerHTML = '';
+      shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-btn';
+        btn.textContent = opt;
+        btn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          if (state.quizAnswered) return;
+          onQuizAnswer(btn, opt, animal);
+        });
+        quizOptions.appendChild(btn);
+      });
+    }
+
+    function onQuizAnswer(btn, chosen, animal) {
+      state.quizAnswered = true;
+      const correct = chosen.includes(animal.name);
+      if (correct) {
+        btn.classList.add('correct');
+        state.score += CONFIG.QUIZ_BONUS;
+        scoreEl.textContent = state.score;
+        quizQuestion.innerHTML = `<span style="font-size:40px">${animal.emoji}</span><br>정답! <strong style="color:#ffd700">+${CONFIG.QUIZ_BONUS}점</strong> 🎉`;
+      } else {
+        btn.classList.add('wrong');
+        // 정답 표시
+        const allBtns = quizOptions.querySelectorAll('.quiz-btn');
+        allBtns.forEach(b => {
+          if (b.textContent.includes(animal.name)) b.classList.add('correct');
+        });
+        quizQuestion.innerHTML = `<span style="font-size:40px">${animal.emoji}</span><br>아쉽지만 <strong style="color:#ff9999">${animal.name}</strong>이었어요!`;
+      }
+      setTimeout(goNextRound, 1200);
+    }
+
+    function goNextRound() {
+      if (!state.running) return;
+      quizArea.classList.remove('show');
+      quizArea.style.display = 'none';
+
+      if (state.hatched >= CONFIG.TOTAL_EGGS || state.round >= CONFIG.TOTAL_EGGS) {
+        endGame();
+        return;
+      }
+      state.round++;
+      state.tapCount = 0;
+      state.currentAnimal = state.animals[state.round - 1];
+      state.phase = 'tapping';
+      eggBase.style.opacity = '1';
+      eggBase.style.transition = 'opacity 0.3s';
+      resetEgg();
+      roundEl.textContent = `${state.round}/${CONFIG.TOTAL_EGGS}`;
+    }
+
+    function endGame() {
+      state.running = false;
+      if (countdownTimer) clearInterval(countdownTimer);
+      const best = getBest();
+      saveBest(state.score);
+      finalScoreEl.textContent = state.score + '점';
+      bestDisplayEl.textContent = '최고 기록: ' + Math.max(best, state.score) + '점';
+      hatchedListEl.textContent = hatchedAnimals.join(' ');
+      const msgs = [
+        state.hatched >= 5 ? '🏆 완벽해요! 모든 달걀을 부화시켰어요!' :
+        state.hatched >= 3 ? '🌟 훌륭해요! 열심히 탭탭탭 했어요!' :
+        state.hatched >= 1 ? '⭐ 잘했어요! 다음엔 더 많이 부화시켜 봐요!' :
+        '🥚 괜찮아요! 다시 도전해봐요!'
+      ];
+      resultMsgEl.textContent = msgs[0];
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 포인터 이벤트
+    eggContainer.addEventListener('pointerdown', onTap);
+  })();
+  </script>
+</body>
+</html>
