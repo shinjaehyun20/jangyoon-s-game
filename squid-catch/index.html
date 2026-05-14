@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>오징어 잡기</title>
+  <style>
+    :root {
+      --bg-top: #0b3d91;
+      --bg-bot: #0a1a40;
+      --accent: #ff6b35;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg-top);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--text);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: clamp(13px, 3.5vw, 17px);
+      font-weight: 700;
+      color: var(--text);
+    }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(to bottom, #0b3d91 0%, #0a1a40 100%);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    /* 배경 물결 */
+    .wave-line {
+      position: absolute;
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    /* 그물 (세로 레인 고정) */
+    #net {
+      position: absolute;
+      right: 10px;
+      font-size: clamp(30px, 8vw, 44px);
+      transition: top 0.12s ease-out;
+      line-height: 1;
+      pointer-events: none;
+      z-index: 5;
+    }
+    /* 오징어 */
+    .squid {
+      position: absolute;
+      font-size: clamp(22px, 6vw, 32px);
+      pointer-events: none;
+      animation: squidSwim linear infinite;
+      line-height: 1;
+    }
+    @keyframes squidSwim {
+      0%   { transform: scaleX(1); }
+      50%  { transform: scaleX(-1); }
+      100% { transform: scaleX(1); }
+    }
+    /* 거품 파티클 */
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      pointer-events: none;
+      animation: bubbleRise linear forwards;
+    }
+    @keyframes bubbleRise {
+      0%   { transform: translateY(0) scale(1); opacity: 0.7; }
+      100% { transform: translateY(-120px) scale(1.4); opacity: 0; }
+    }
+    /* 잡기 이펙트 */
+    .catch-effect {
+      position: absolute;
+      font-size: clamp(20px, 5.5vw, 30px);
+      pointer-events: none;
+      animation: catchPop 0.7s forwards;
+      z-index: 10;
+    }
+    @keyframes catchPop {
+      0%   { opacity: 1; transform: scale(1); }
+      60%  { opacity: 1; transform: scale(1.6); }
+      100% { opacity: 0; transform: scale(0.5) translateY(-40px); }
+    }
+    /* 놓침 이펙트 */
+    .miss-effect {
+      position: absolute;
+      font-size: clamp(18px, 5vw, 26px);
+      pointer-events: none;
+      animation: missFade 0.7s forwards;
+      z-index: 10;
+    }
+    @keyframes missFade {
+      0%   { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(-50px); }
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      padding: 2px 4px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 12px;
+    }
+    /* 오버레이 공통 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 88%;
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900;
+      margin-bottom: 10px;
+      color: #0b3d91;
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 16px);
+      color: #444;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+    .result-score {
+      font-size: clamp(38px, 10vw, 56px);
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .btn-start {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 36px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 800;
+      cursor: pointer;
+      min-height: 48px;
+      touch-action: manipulation;
+    }
+    .btn-start:active { opacity: 0.8; transform: scale(0.97); }
+    .best-label {
+      font-size: 13px;
+      color: #888;
+      margin-top: 6px;
+    }
+    /* 터치 버튼 (위/아래) */
+    .ctrl-btn {
+      position: absolute;
+      right: 10px;
+      width: clamp(44px, 12vw, 58px);
+      height: clamp(44px, 12vw, 58px);
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(18px, 5vw, 26px);
+      cursor: pointer;
+      touch-action: manipulation;
+      z-index: 6;
+      user-select: none;
+    }
+    #btnUp   { top: 10px; }
+    #btnDown { bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🦑 오징어 잡기</h1>
+    <div class="hud">
+      <span>🐙 <span id="scoreDisplay">0</span>마리</span>
+      <span>⏱️ <span id="timerDisplay">45</span>초</span>
+      <span>❌ <span id="missDisplay">0</span>/5</span>
+    </div>
+    <div id="gameArea">
+      <!-- 그물 -->
+      <div id="net">🪤</div>
+      <!-- 조작 버튼 -->
+      <div class="ctrl-btn" id="btnUp">⬆️</div>
+      <div class="ctrl-btn" id="btnDown">⬇️</div>
+    </div>
+    <footer>
+      <small>위아래 버튼 또는 화면 위/아래 터치로 그물 이동!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🦑 오징어 잡기</h2>
+      <p>오징어가 오른쪽에서 헤엄쳐 와요!<br>그물을 위아래로 움직여서<br>오징어를 잡으세요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+      <div class="best-label">최고기록: <span id="startBest">0</span>마리</div>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0마리</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_TIME: 45,
+      MAX_MISS: 5,
+      SQUID_INTERVAL_INIT: 1600,
+      SQUID_INTERVAL_MIN: 700,
+      SQUID_SPEED_INIT: 2.2,
+      SQUID_SPEED_MAX: 6,
+      NET_MOVE_STEP: 18,       // 버튼 1회 이동 픽셀
+      NET_MOVE_HOLD_STEP: 9,   // 버튼 홀드 시 이동 픽셀
+      STORAGE_KEY: 'squid-catch_best',
+      SQUID_TYPES: ['🦑', '🐙', '🐟', '🦐', '🐠'],
+      SQUID_SCORES: [1, 2, 1, 1, 2],  // 오징어 종류별 점수
+    };
+
+    // DOM
+    const gameArea     = document.getElementById('gameArea');
+    const netEl        = document.getElementById('net');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const missDisplay  = document.getElementById('missDisplay');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay   = document.getElementById('endOverlay');
+    const finalScore   = document.getElementById('finalScore');
+    const resultMsg    = document.getElementById('resultMsg');
+    const startBtn     = document.getElementById('startBtn');
+    const restartBtn   = document.getElementById('restartBtn');
+    const startBest    = document.getElementById('startBest');
+    const btnUp        = document.getElementById('btnUp');
+    const btnDown      = document.getElementById('btnDown');
+
+    let state = {};
+    let rafId = null;
+    let timerInterval = null;
+    let spawnTimeout = null;
+    let holdInterval = null;
+
+    function loadBest() {
+      return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    }
+    function saveBest(score) {
+      if (score > loadBest()) localStorage.setItem(CONFIG.STORAGE_KEY, score);
+    }
+
+    function getAreaHeight() {
+      return gameArea.getBoundingClientRect().height;
+    }
+    function getNetRadius() {
+      return parseFloat(getComputedStyle(netEl).fontSize) * 0.5;
+    }
+
+    function initState() {
+      const areaH = getAreaHeight();
+      state = {
+        score: 0,
+        missCount: 0,
+        timeLeft: CONFIG.GAME_TIME,
+        running: false,
+        squids: [],
+        netY: areaH / 2,         // 그물 중심 Y
+        speed: CONFIG.SQUID_SPEED_INIT,
+        spawnInterval: CONFIG.SQUID_INTERVAL_INIT,
+      };
+    }
+
+    function updateNetPos() {
+      const areaH = getAreaHeight();
+      const netH = parseFloat(getComputedStyle(netEl).fontSize) || 36;
+      state.netY = Math.max(netH / 2, Math.min(areaH - netH / 2, state.netY));
+      netEl.style.top = (state.netY - netH / 2) + 'px';
+    }
+
+    // 물결 배경 생성
+    function createWaves() {
+      const areaH = getAreaHeight();
+      for (let i = 0; i < 6; i++) {
+        const w = document.createElement('div');
+        w.className = 'wave-line';
+        w.style.top = (areaH * (i + 1) / 7) + 'px';
+        gameArea.appendChild(w);
+      }
+    }
+
+    function spawnBubble(x, y) {
+      const b = document.createElement('div');
+      b.className = 'bubble';
+      const sz = Math.random() * 6 + 4;
+      b.style.cssText = `width:${sz}px;height:${sz}px;left:${x}px;top:${y}px;animation-duration:${Math.random()*1+0.8}s;`;
+      gameArea.appendChild(b);
+      setTimeout(() => b.remove(), 1200);
+    }
+
+    function spawnSquid() {
+      if (!state.running) return;
+      const areaH = getAreaHeight();
+      const areaW = gameArea.getBoundingClientRect().width;
+      const typeIdx = Math.floor(Math.random() * CONFIG.SQUID_TYPES.length);
+      const emoji = CONFIG.SQUID_TYPES[typeIdx];
+      const score = CONFIG.SQUID_SCORES[typeIdx];
+      const minY = 30;
+      const maxY = areaH - 30;
+      const startY = minY + Math.random() * (maxY - minY);
+
+      const el = document.createElement('div');
+      el.className = 'squid';
+      el.textContent = emoji;
+      el.style.left  = areaW + 'px';
+      el.style.top   = startY + 'px';
+      gameArea.appendChild(el);
+
+      state.squids.push({ el, x: areaW, y: startY, score, typeIdx, radius: 16 });
+
+      // 난이도 상승
+      state.spawnInterval = Math.max(CONFIG.SQUID_INTERVAL_MIN, state.spawnInterval - 25);
+      state.speed = Math.min(CONFIG.SQUID_SPEED_MAX, state.speed + 0.07);
+
+      spawnTimeout = setTimeout(spawnSquid, state.spawnInterval);
+    }
+
+    function showCatch(x, y, emoji) {
+      const ef = document.createElement('div');
+      ef.className = 'catch-effect';
+      ef.textContent = '✨' + emoji;
+      ef.style.left = (x - 20) + 'px';
+      ef.style.top  = (y - 20) + 'px';
+      gameArea.appendChild(ef);
+      spawnBubble(x, y);
+      spawnBubble(x + 10, y - 10);
+      setTimeout(() => ef.remove(), 700);
+    }
+
+    function showMiss(x, y) {
+      const ef = document.createElement('div');
+      ef.className = 'miss-effect';
+      ef.textContent = '💨';
+      ef.style.left = (x - 15) + 'px';
+      ef.style.top  = (y - 15) + 'px';
+      gameArea.appendChild(ef);
+      setTimeout(() => ef.remove(), 700);
+    }
+
+    function gameLoop() {
+      if (!state.running) return;
+      const netFontSize = parseFloat(getComputedStyle(netEl).fontSize) || 36;
+      const netRadius = netFontSize * 0.5;
+
+      // 그물 위치(netEl 기준 중심 Y)
+      const netCenterY = state.netY;
+      // 그물 X: 오른쪽 고정(gameArea.width - 여백)
+      const areaW = gameArea.getBoundingClientRect().width;
+      const netX = areaW - parseFloat(getComputedStyle(netEl).right || '10') - netFontSize * 0.5;
+
+      const toRemove = [];
+      for (let i = 0; i < state.squids.length; i++) {
+        const sq = state.squids[i];
+        sq.x -= state.speed;
+        sq.el.style.left = sq.x + 'px';
+
+        // 충돌 감지
+        const dx = sq.x - netX;
+        const dy = sq.y - netCenterY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < netRadius + sq.radius) {
+          sq.el.remove();
+          toRemove.push(i);
+          state.score += sq.score;
+          scoreDisplay.textContent = state.score;
+          showCatch(sq.x, sq.y, CONFIG.SQUID_TYPES[sq.typeIdx]);
+          continue;
+        }
+
+        // 화면 왼쪽으로 벗어남 → 놓침
+        if (sq.x < -40) {
+          sq.el.remove();
+          toRemove.push(i);
+          state.missCount++;
+          missDisplay.textContent = state.missCount;
+          showMiss(10, sq.y);
+          if (state.missCount >= CONFIG.MAX_MISS) {
+            endGame();
+            return;
+          }
+        }
+      }
+      for (let i = toRemove.length - 1; i >= 0; i--) {
+        state.squids.splice(toRemove[i], 1);
+      }
+
+      rafId = requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      document.querySelectorAll('.squid').forEach(el => el.remove());
+      document.querySelectorAll('.catch-effect,.miss-effect,.bubble').forEach(el => el.remove());
+
+      initState();
+      state.running = true;
+
+      updateNetPos();
+      scoreDisplay.textContent = '0';
+      timerDisplay.textContent = CONFIG.GAME_TIME;
+      missDisplay.textContent = '0';
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      timerInterval = setInterval(() => {
+        state.timeLeft--;
+        timerDisplay.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+
+      spawnTimeout = setTimeout(spawnSquid, 500);
+      rafId = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(timerInterval);
+      clearTimeout(spawnTimeout);
+      cancelAnimationFrame(rafId);
+
+      saveBest(state.score);
+      const best = loadBest();
+
+      finalScore.textContent = state.score + '마리';
+      if (state.score >= best && state.score > 0) {
+        resultMsg.textContent = `🏆 최고기록 달성! (${best}마리)`;
+      } else {
+        resultMsg.textContent = `최고기록: ${best}마리`;
+      }
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 버튼 홀드 이동
+    function startHold(dir) {
+      if (!state.running) return;
+      state.netY += dir * CONFIG.NET_MOVE_STEP;
+      updateNetPos();
+      holdInterval = setInterval(() => {
+        if (!state.running) { clearInterval(holdInterval); return; }
+        state.netY += dir * CONFIG.NET_MOVE_HOLD_STEP;
+        updateNetPos();
+      }, 80);
+    }
+    function stopHold() { clearInterval(holdInterval); }
+
+    btnUp.addEventListener('pointerdown', (e) => { e.stopPropagation(); startHold(-1); });
+    btnUp.addEventListener('pointerup', stopHold);
+    btnUp.addEventListener('pointerleave', stopHold);
+
+    btnDown.addEventListener('pointerdown', (e) => { e.stopPropagation(); startHold(1); });
+    btnDown.addEventListener('pointerup', stopHold);
+    btnDown.addEventListener('pointerleave', stopHold);
+
+    // 화면 위/아래 터치로도 이동
+    gameArea.addEventListener('pointerdown', (e) => {
+      if (!state.running) return;
+      if (e.target === btnUp || e.target === btnDown) return;
+      const rect = gameArea.getBoundingClientRect();
+      const relY = e.clientY - rect.top;
+      state.netY = relY;
+      updateNetPos();
+    });
+    gameArea.addEventListener('pointermove', (e) => {
+      if (!state.running) return;
+      if (e.buttons === 0 && e.pointerType === 'mouse') return;
+      if (e.target === btnUp || e.target === btnDown) return;
+      const rect = gameArea.getBoundingClientRect();
+      state.netY = e.clientY - rect.top;
+      updateNetPos();
+    });
+
+    startBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); startGame(); });
+    restartBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); startGame(); });
+
+    // 초기화
+    createWaves();
+    startBest.textContent = loadBest();
+
+    // 초기 그물 위치
+    setTimeout(() => {
+      const areaH = getAreaHeight();
+      state.netY = areaH / 2;
+      updateNetPos();
+    }, 50);
+  })();
+  </script>
+</body>
+</html>

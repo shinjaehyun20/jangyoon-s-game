@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>⛄ 눈사람 만들기</title>
+  <style>
+    :root {
+      --bg: #c8e6f5;
+      --sky: #87ceeb;
+      --accent: #4fc3f7;
+      --text: #1a237e;
+      --snow: #ffffff;
+      --shadow: rgba(0,0,0,0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(180deg, var(--sky) 0%, var(--bg) 60%, #d4edff 100%);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      margin: 0 auto;
+      padding: 8px 12px 6px;
+      gap: 6px;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--text);
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.5);
+      border-radius: 12px;
+      padding: 6px 12px;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      font-size: clamp(13px, 3.5vw, 17px);
+      font-weight: 700;
+      color: var(--text);
+    }
+    /* 게임 영역 — 눈사람 + 파츠 팔레트 */
+    .game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+    }
+    /* 눈사람 캔버스 영역 */
+    .snowman-stage {
+      flex: 1;
+      position: relative;
+      background: rgba(255,255,255,0.35);
+      border-radius: 16px;
+      border: 2px dashed rgba(100,180,230,0.5);
+      overflow: hidden;
+    }
+    /* 눈 배경 언덕 */
+    .snow-ground {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 28%;
+      background: #fff;
+      border-radius: 80% 80% 0 0 / 40% 40% 0 0;
+    }
+    /* 눈사람 파츠 — 미리 배치된 고정 위치 */
+    .snowman-body {
+      position: absolute;
+      left: 50%;
+      bottom: 22%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .snowball-head {
+      width: clamp(60px, 18vw, 88px);
+      height: clamp(60px, 18vw, 88px);
+      background: #fff;
+      border-radius: 50%;
+      border: 3px solid rgba(180,220,240,0.8);
+      box-shadow: 2px 3px 8px var(--shadow);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .snowball-body {
+      width: clamp(80px, 24vw, 116px);
+      height: clamp(80px, 24vw, 116px);
+      background: #fff;
+      border-radius: 50%;
+      border: 3px solid rgba(180,220,240,0.8);
+      box-shadow: 2px 3px 8px var(--shadow);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: -8px;
+    }
+    /* 눈사람에 붙여진 파츠 표시 영역 */
+    .placed-eyes {
+      position: absolute;
+      top: 28%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(16px, 5vw, 24px);
+      letter-spacing: 10px;
+      pointer-events: none;
+    }
+    .placed-nose {
+      position: absolute;
+      top: 46%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(14px, 4.5vw, 20px);
+      pointer-events: none;
+    }
+    .placed-mouth {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(16px, 5vw, 24px);
+      pointer-events: none;
+    }
+    .placed-hat {
+      position: absolute;
+      top: -36%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(26px, 8vw, 44px);
+      pointer-events: none;
+    }
+    .placed-scarf {
+      position: absolute;
+      bottom: -12%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(18px, 5.5vw, 28px);
+      pointer-events: none;
+    }
+    .placed-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .placed-button span {
+      font-size: clamp(10px, 3vw, 14px);
+    }
+    /* 파츠 팔레트 */
+    .palette {
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.6);
+      border-radius: 14px;
+      padding: 8px;
+    }
+    .palette-title {
+      font-size: clamp(11px, 3vw, 14px);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .palette-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .palette-row::-webkit-scrollbar { display: none; }
+    .part-btn {
+      flex-shrink: 0;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 10px;
+      border: 2.5px solid transparent;
+      background: rgba(255,255,255,0.8);
+      font-size: clamp(18px, 5.5vw, 26px);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.15s, border-color 0.15s;
+      box-shadow: 1px 2px 5px var(--shadow);
+    }
+    .part-btn:active { transform: scale(0.9); }
+    .part-btn.selected {
+      border-color: #4fc3f7;
+      background: rgba(79, 195, 247, 0.2);
+    }
+    .part-btn.placed {
+      opacity: 0.45;
+      border-color: #a5d6a7;
+      background: rgba(165,214,167,0.2);
+    }
+    /* 버튼 영역 */
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn {
+      flex: 1;
+      min-height: 44px;
+      border: none;
+      border-radius: 12px;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn-place {
+      background: linear-gradient(135deg, #4fc3f7, #0288d1);
+      color: #fff;
+    }
+    .btn-reset {
+      background: linear-gradient(135deg, #ef9a9a, #e53935);
+      color: #fff;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    footer small {
+      font-size: 11px;
+      color: rgba(26,35,126,0.6);
+    }
+    .home-link {
+      font-size: 13px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.5);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,60,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 8px 30px rgba(0,0,80,0.3);
+    }
+    .overlay-card h2 {
+      font-size: clamp(20px, 6vw, 28px);
+      font-weight: 900;
+      margin-bottom: 10px;
+      color: #1a237e;
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 16px);
+      color: #555;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #4fc3f7, #0288d1);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 32px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900;
+      cursor: pointer;
+      width: 100%;
+      min-height: 48px;
+    }
+    .big-emoji {
+      font-size: 60px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    /* 파츠 배치 애니메이션 */
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      70% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .pop { animation: popIn 0.3s ease-out forwards; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>⛄ 눈사람 만들기</h1>
+
+    <div class="hud">
+      <span class="hud-item">🎨 꾸민 파츠: <span id="placedCount">0</span>/5</span>
+      <span class="hud-item">⭐ 최고기록: <span id="bestScore">-</span></span>
+    </div>
+
+    <div class="game-area">
+      <!-- 눈사람 스테이지 -->
+      <div class="snowman-stage" id="snowmanStage">
+        <div class="snow-ground"></div>
+        <div class="snowman-body" id="snowmanBody">
+          <!-- 머리 -->
+          <div class="snowball-head" id="snowHead">
+            <span class="placed-hat" id="placedHat"></span>
+            <span class="placed-eyes" id="placedEyes"></span>
+            <span class="placed-nose" id="placedNose"></span>
+            <span class="placed-mouth" id="placedMouth"></span>
+          </div>
+          <!-- 몸통 -->
+          <div class="snowball-body" id="snowBody">
+            <span class="placed-scarf" id="placedScarf"></span>
+            <div class="placed-button" id="placedButton"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 파츠 팔레트 -->
+      <div class="palette">
+        <div class="palette-title">👇 파츠를 골라서 눈사람을 꾸며요!</div>
+
+        <div class="palette-row" id="paletteRow"></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-place" id="btnPlace">✅ 붙이기</button>
+      <button class="btn btn-reset" id="btnReset">🔄 다시 만들기</button>
+    </div>
+
+    <footer>
+      <small>파츠 선택 → 붙이기 버튼!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <span class="big-emoji">⛄</span>
+      <h2>눈사람 만들기</h2>
+      <p>파츠를 골라서 나만의 귀여운 눈사람을 꾸며봐요!<br>눈, 코, 입, 모자, 목도리를 모두 붙이면 완성!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 완성 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <span class="big-emoji">🎉</span>
+      <h2>눈사람 완성!</h2>
+      <p id="resultMsg">나만의 멋진 눈사람이 완성됐어요!<br>다시 만들어볼까요?</p>
+      <button class="btn-start" id="restartBtn">다시 만들기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      TOTAL_PARTS: 5,   // 눈, 코, 입, 모자, 목도리/단추
+      BEST_KEY: 'build-snowman_best',
+    };
+
+    /* 파츠 카탈로그 */
+    const PARTS_CATALOG = [
+      {
+        category: 'eyes',
+        label: '👀 눈',
+        items: [
+          { emoji: '●●', display: '⚫⚫', label: '동그란 눈' },
+          { emoji: '❄️❄️', display: '❄️❄️', label: '눈송이 눈' },
+          { emoji: '⭐⭐', display: '⭐⭐', label: '반짝이는 눈' },
+          { emoji: '🔵🔵', display: '🔵🔵', label: '파란 눈' },
+          { emoji: '🌟🌟', display: '🌟🌟', label: '별 눈' },
+        ]
+      },
+      {
+        category: 'nose',
+        label: '👃 코',
+        items: [
+          { emoji: '🥕', display: '🥕', label: '당근 코' },
+          { emoji: '🔴', display: '🔴', label: '빨간 코' },
+          { emoji: '🟠', display: '🟠', label: '주황 코' },
+          { emoji: '⬛', display: '⬛', label: '네모 코' },
+        ]
+      },
+      {
+        category: 'mouth',
+        label: '😊 입',
+        items: [
+          { emoji: '😊', display: '😊', label: '웃는 입' },
+          { emoji: '😁', display: '😁', label: '활짝 웃음' },
+          { emoji: '😄', display: '😄', label: '즐거운 입' },
+          { emoji: '😛', display: '😛', label: '혀 내밀기' },
+          { emoji: '🙂', display: '🙂', label: '수줍은 미소' },
+        ]
+      },
+      {
+        category: 'hat',
+        label: '🎩 모자',
+        items: [
+          { emoji: '🎩', display: '🎩', label: '신사 모자' },
+          { emoji: '🧢', display: '🧢', label: '야구 모자' },
+          { emoji: '🎓', display: '🎓', label: '졸업 모자' },
+          { emoji: '👒', display: '👒', label: '밀짚 모자' },
+          { emoji: '🪖', display: '🪖', label: '헬멧' },
+          { emoji: '👑', display: '👑', label: '왕관' },
+        ]
+      },
+      {
+        category: 'scarf',
+        label: '🧣 목도리',
+        items: [
+          { emoji: '🧣', display: '🧣', label: '목도리' },
+          { emoji: '❤️', display: '❤️', label: '하트 목도리' },
+          { emoji: '🌸', display: '🌸', label: '꽃 목도리' },
+          { emoji: '🌈', display: '🌈', label: '무지개 목도리' },
+        ]
+      },
+    ];
+
+    const state = {
+      selectedPart: null,    // { category, item }
+      placed: {
+        eyes: null,
+        nose: null,
+        mouth: null,
+        hat: null,
+        scarf: null,
+      },
+      placedCount: 0,
+      currentCategoryIndex: 0,
+    };
+
+    /* DOM */
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay   = document.getElementById('endOverlay');
+    const startBtn     = document.getElementById('startBtn');
+    const restartBtn   = document.getElementById('restartBtn');
+    const btnPlace     = document.getElementById('btnPlace');
+    const btnReset     = document.getElementById('btnReset');
+    const placedCount  = document.getElementById('placedCount');
+    const bestScoreEl  = document.getElementById('bestScore');
+    const paletteRow   = document.getElementById('paletteRow');
+
+    const placedEls = {
+      eyes:  document.getElementById('placedEyes'),
+      nose:  document.getElementById('placedNose'),
+      mouth: document.getElementById('placedMouth'),
+      hat:   document.getElementById('placedHat'),
+      scarf: document.getElementById('placedScarf'),
+    };
+
+    /* 최고기록 */
+    function loadBest() {
+      const b = localStorage.getItem(CONFIG.BEST_KEY);
+      bestScoreEl.textContent = b ? `${b}개` : '-';
+    }
+    function saveBest(count) {
+      const prev = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0');
+      if (count > prev) {
+        localStorage.setItem(CONFIG.BEST_KEY, count);
+        bestScoreEl.textContent = `${count}개`;
+      }
+    }
+
+    /* 팔레트 렌더 */
+    function renderPalette(categoryIndex) {
+      paletteRow.innerHTML = '';
+      state.currentCategoryIndex = categoryIndex;
+      const cat = PARTS_CATALOG[categoryIndex];
+      cat.items.forEach((item, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'part-btn';
+        btn.textContent = item.display;
+        btn.title = item.label;
+        btn.dataset.category = cat.category;
+        btn.dataset.index = i;
+
+        if (state.placed[cat.category] === item) {
+          btn.classList.add('placed');
+        }
+        if (state.selectedPart && state.selectedPart.item === item) {
+          btn.classList.add('selected');
+        }
+
+        btn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          selectPart(cat.category, item);
+        });
+        paletteRow.appendChild(btn);
+      });
+
+      /* 카테고리 탭 */
+      updateCategoryTabs(categoryIndex);
+    }
+
+    /* 카테고리 탭 영역 (팔레트 제목 클릭) */
+    function updateCategoryTabs(activeIdx) {
+      // 팔레트 제목 동적 생성
+      let titleEl = document.querySelector('.palette-title');
+      titleEl.innerHTML = '';
+      PARTS_CATALOG.forEach((cat, i) => {
+        const span = document.createElement('button');
+        span.style.cssText = `
+          background: ${i === activeIdx ? 'rgba(79,195,247,0.25)' : 'rgba(255,255,255,0.5)'};
+          border: ${i === activeIdx ? '2px solid #4fc3f7' : '2px solid transparent'};
+          border-radius: 8px;
+          padding: 3px 8px;
+          font-size: clamp(11px, 3vw, 14px);
+          font-weight: 700;
+          cursor: pointer;
+          margin: 2px;
+          color: #1a237e;
+        `;
+        span.textContent = cat.label;
+        span.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          state.selectedPart = null;
+          renderPalette(i);
+        });
+        titleEl.appendChild(span);
+      });
+    }
+
+    /* 파츠 선택 */
+    function selectPart(category, item) {
+      state.selectedPart = { category, item };
+      renderPalette(state.currentCategoryIndex);
+    }
+
+    /* 파츠 붙이기 */
+    function placePart() {
+      if (!state.selectedPart) {
+        showHint('파츠를 먼저 선택해주세요! 👆');
+        return;
+      }
+      const { category, item } = state.selectedPart;
+      const wasEmpty = !state.placed[category];
+
+      state.placed[category] = item;
+      state.selectedPart = null;
+
+      // 개수 업데이트
+      state.placedCount = Object.values(state.placed).filter(v => v !== null).length;
+      placedCount.textContent = state.placedCount;
+
+      // 시각 반영
+      updateSnowman();
+      renderPalette(state.currentCategoryIndex);
+
+      // 다음 카테고리로 자동 이동
+      if (wasEmpty) {
+        const nextIdx = PARTS_CATALOG.findIndex((c, i) => i > state.currentCategoryIndex && !state.placed[c.category]);
+        if (nextIdx !== -1) {
+          renderPalette(nextIdx);
+        }
+      }
+
+      // 완성 체크
+      if (state.placedCount === CONFIG.TOTAL_PARTS) {
+        setTimeout(() => showEnd(), 600);
+      }
+    }
+
+    /* 눈사람 시각 반영 */
+    function updateSnowman() {
+      const p = state.placed;
+
+      if (p.eyes)  { placedEls.eyes.textContent = p.eyes.display; placedEls.eyes.classList.add('pop'); }
+      if (p.nose)  { placedEls.nose.textContent = p.nose.display; placedEls.nose.classList.add('pop'); }
+      if (p.mouth) { placedEls.mouth.textContent = p.mouth.display; placedEls.mouth.classList.add('pop'); }
+      if (p.hat)   { placedEls.hat.textContent = p.hat.display; placedEls.hat.classList.add('pop'); }
+      if (p.scarf) { placedEls.scarf.textContent = p.scarf.display; placedEls.scarf.classList.add('pop'); }
+    }
+
+    /* 힌트 표시 */
+    function showHint(msg) {
+      const hint = document.createElement('div');
+      hint.style.cssText = `
+        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+        background: rgba(0,0,0,0.7); color: #fff;
+        padding: 8px 20px; border-radius: 20px;
+        font-size: 14px; font-weight: 700;
+        z-index: 200; pointer-events: none;
+      `;
+      hint.textContent = msg;
+      document.body.appendChild(hint);
+      setTimeout(() => hint.remove(), 1800);
+    }
+
+    /* 리셋 */
+    function resetGame() {
+      state.placed = { eyes: null, nose: null, mouth: null, hat: null, scarf: null };
+      state.selectedPart = null;
+      state.placedCount = 0;
+      placedCount.textContent = '0';
+
+      Object.values(placedEls).forEach(el => {
+        el.textContent = '';
+        el.classList.remove('pop');
+      });
+      renderPalette(0);
+      endOverlay.classList.add('hidden');
+    }
+
+    /* 종료 화면 */
+    function showEnd() {
+      saveBest(CONFIG.TOTAL_PARTS);
+      document.getElementById('resultMsg').textContent = '나만의 멋진 눈사람이 완성됐어요! 다시 꾸며볼까요?';
+      endOverlay.classList.remove('hidden');
+    }
+
+    /* 이벤트 */
+    startBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      startOverlay.classList.add('hidden');
+      renderPalette(0);
+      loadBest();
+    });
+    restartBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      resetGame();
+    });
+    btnPlace.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      placePart();
+    });
+    btnReset.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      resetGame();
+    });
+
+    /* 초기화 */
+    loadBest();
+  })();
+  </script>
+</body>
+</html>

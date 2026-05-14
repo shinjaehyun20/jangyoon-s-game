@@ -39,7 +39,11 @@
       { "id": "emoji-chef",         "label": "👨‍🍳 이모지 요리사",       "path": "emoji-chef/index.html" },
       { "id": "urimal-showdown",    "label": "📝 우리말 쇼다운",         "path": "urimal-showdown/index.html" },
       { "id": "rain-dodge",         "label": "🌧️ 빗방울 피하기",        "path": "rain-dodge/index.html" },
-      { "id": "hatch-egg",          "label": "🐣 달걀 부화시키기",       "path": "hatch-egg/index.html" }
+      { "id": "hatch-egg",          "label": "🐣 달걀 부화시키기",       "path": "hatch-egg/index.html" },
+      { "id": "snowball-fight",     "label": "☃️ 눈싸움",                "path": "snowball-fight/index.html" },
+      { "id": "squid-catch",        "label": "🦑 오징어 잡기",            "path": "squid-catch/index.html" },
+      { "id": "build-snowman",      "label": "⛄ 눈사람 만들기",          "path": "build-snowman/index.html" },
+      { "id": "water-gun",          "label": "🔫 물총 싸움",              "path": "water-gun/index.html" }
     ]
   },
   {

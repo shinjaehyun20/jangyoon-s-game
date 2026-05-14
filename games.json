@@ -446,5 +446,37 @@
     "description": "달걀을 탭탭탭 눌러서 부화시키고 나온 동물을 맞혀요! 5마리 부화 60초 도전",
     "thumbnail": "hatch-egg/thumb.svg",
     "path": "hatch-egg/index.html"
+  },
+  {
+    "id": "snowball-fight",
+    "title": "Snowball Fight",
+    "title_ko": "☃️ 눈싸움",
+    "description": "터치로 눈사람을 움직여 날아오는 눈덩이를 피하세요! 40초 생존 도전",
+    "thumbnail": "snowball-fight/thumb.svg",
+    "path": "snowball-fight/index.html"
+  },
+  {
+    "id": "squid-catch",
+    "title": "Squid Catch",
+    "title_ko": "🦑 오징어 잡기",
+    "description": "그물을 위아래로 움직여 헤엄치는 오징어를 잡아요! 5번 놓치면 끝",
+    "thumbnail": "squid-catch/thumb.svg",
+    "path": "squid-catch/index.html"
+  },
+  {
+    "id": "build-snowman",
+    "title": "Build Snowman",
+    "title_ko": "⛄ 눈사람 만들기",
+    "description": "눈, 코, 입, 모자, 목도리를 골라 나만의 귀여운 눈사람을 완성해요!",
+    "thumbnail": "build-snowman/thumb.svg",
+    "path": "build-snowman/index.html"
+  },
+  {
+    "id": "water-gun",
+    "title": "Water Gun Fight",
+    "title_ko": "🔫 물총 싸움",
+    "description": "화면에 나타나는 귀여운 적 캐릭터를 탭해서 물총을 쏴요! 30초 타임어택",
+    "thumbnail": "water-gun/thumb.svg",
+    "path": "water-gun/index.html"
   }
 ]

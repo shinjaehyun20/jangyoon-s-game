@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0097a7"/>
+      <stop offset="100%" stop-color="#00bcd4"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 물결 배경 -->
+  <path d="M0 100 Q40 92 80 100 Q120 108 160 100 Q200 92 240 100 Q280 108 320 100" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+  <path d="M0 120 Q40 112 80 120 Q120 128 160 120 Q200 112 240 120 Q280 128 320 120" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+
+  <!-- 물총 캐릭터 (왼쪽) -->
+  <text x="65" y="115" font-size="52" text-anchor="middle">🔫</text>
+
+  <!-- 물방울들 -->
+  <circle cx="110" cy="88" r="5" fill="#b3e5fc" opacity="0.9"/>
+  <circle cx="125" cy="78" r="4" fill="#80deea" opacity="0.8"/>
+  <circle cx="138" cy="70" r="3" fill="#b3e5fc" opacity="0.7"/>
+  <circle cx="149" cy="64" r="3" fill="#80deea" opacity="0.6"/>
+
+  <!-- 적 캐릭터들 -->
+  <text x="175" y="85" font-size="38" text-anchor="middle">🐸</text>
+  <text x="235" y="115" font-size="32" text-anchor="middle">🐼</text>
+  <text x="195" y="140" font-size="28" text-anchor="middle">🐹</text>
+
+  <!-- 조준 링 -->
+  <circle cx="175" cy="68" r="26" fill="none" stroke="#fff176" stroke-width="2.5" opacity="0.7"/>
+  <circle cx="175" cy="68" r="4" fill="#fff176" opacity="0.8"/>
+
+  <!-- 점수 표시 -->
+  <rect x="88" y="28" width="60" height="24" rx="12" fill="rgba(0,0,0,0.3)"/>
+  <text x="118" y="44" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="#fff176">+10점!</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#fff176">물총 싸움</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">WATER GUN FIGHT</text>
+  </g>
+</svg>

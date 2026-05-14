@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>눈싸움</title>
+  <style>
+    :root {
+      --bg: #b3d9f7;
+      --accent: #e63946;
+      --text: #1a1a2e;
+      --snow: #ffffff;
+      --ground: #dff0ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--text);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.5);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: clamp(13px, 3.5vw, 17px);
+      font-weight: 700;
+      color: var(--text);
+    }
+    .hud .lives { font-size: clamp(16px, 4vw, 20px); }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(to bottom, #b3d9f7 60%, #dff0ff 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    /* 눈사람 */
+    #snowman {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(36px, 10vw, 52px);
+      transition: left 0.1s;
+      pointer-events: none;
+      line-height: 1;
+    }
+    /* 눈덩이 */
+    .snowball {
+      position: absolute;
+      width: clamp(20px, 5vw, 28px);
+      height: clamp(20px, 5vw, 28px);
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+      pointer-events: none;
+    }
+    /* 방어막 */
+    #shield {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(28px, 7vw, 38px);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    /* 히트 이펙트 */
+    .hit-effect {
+      position: absolute;
+      font-size: clamp(22px, 6vw, 32px);
+      pointer-events: none;
+      animation: floatUp 0.8s forwards;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-60px) scale(1.4); }
+    }
+    /* 눈 파티클 */
+    .snow-particle {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: snowfall linear infinite;
+    }
+    @keyframes snowfall {
+      0%   { transform: translateY(-10px) translateX(0); opacity: 0.8; }
+      100% { transform: translateY(110%) translateX(20px); opacity: 0; }
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #555;
+      padding: 2px 4px;
+    }
+    .home-link {
+      color: #555;
+      text-decoration: none;
+      font-size: 12px;
+    }
+    /* 오버레이 공통 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 88%;
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 16px);
+      color: #444;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+    .result-score {
+      font-size: clamp(38px, 10vw, 56px);
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .btn-start {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 36px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 800;
+      cursor: pointer;
+      min-height: 48px;
+      touch-action: manipulation;
+    }
+    .btn-start:active { opacity: 0.8; transform: scale(0.97); }
+    .best-label {
+      font-size: 13px;
+      color: #888;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>☃️ 눈싸움</h1>
+    <div class="hud">
+      <span>⭐ <span id="scoreDisplay">0</span></span>
+      <span>⏱️ <span id="timerDisplay">40</span>초</span>
+      <span class="lives" id="livesDisplay">❤️❤️❤️</span>
+    </div>
+    <div id="gameArea">
+      <div id="snowman">☃️</div>
+      <div id="shield">🛡️</div>
+    </div>
+    <footer>
+      <small>터치해서 눈사람 이동! 눈덩이를 피하세요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>☃️ 눈싸움</h2>
+      <p>날아오는 눈덩이를 피하세요!<br>화면을 터치하면 눈사람이 그쪽으로 이동해요.<br>❤️ 3개를 잃으면 끝!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+      <div class="best-label">최고기록: <span id="startBest">0</span>점</div>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_TIME: 40,         // 게임 시간(초)
+      LIVES: 3,              // 목숨 수
+      SNOWBALL_INTERVAL_INIT: 1200, // 눈덩이 생성 간격(ms) 초기값
+      SNOWBALL_INTERVAL_MIN: 500,   // 최소 간격
+      SNOWBALL_SPEED_INIT: 3.5,     // 낙하 속도(px/frame) 초기값
+      SNOWBALL_SPEED_MAX: 8,        // 최대 속도
+      SHIELD_DURATION: 800,         // 방어막 표시 시간(ms)
+      SNOWMAN_SIZE: 52,      // 눈사람 충돌 반경(px)
+      STORAGE_KEY: 'snowball-fight_best',
+      SCORE_PER_DODGE: 10,
+    };
+
+    // DOM
+    const gameArea     = document.getElementById('gameArea');
+    const snowmanEl    = document.getElementById('snowman');
+    const shieldEl     = document.getElementById('shield');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const livesDisplay = document.getElementById('livesDisplay');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay   = document.getElementById('endOverlay');
+    const finalScore   = document.getElementById('finalScore');
+    const resultMsg    = document.getElementById('resultMsg');
+    const startBtn     = document.getElementById('startBtn');
+    const restartBtn   = document.getElementById('restartBtn');
+    const startBest    = document.getElementById('startBest');
+
+    // 상태
+    let state = {};
+    let rafId = null;
+    let timerInterval = null;
+    let spawnTimeout = null;
+    let shieldTimeout = null;
+
+    function loadBest() {
+      return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    }
+    function saveBest(score) {
+      if (score > loadBest()) localStorage.setItem(CONFIG.STORAGE_KEY, score);
+    }
+
+    function initState() {
+      state = {
+        score: 0,
+        lives: CONFIG.LIVES,
+        timeLeft: CONFIG.GAME_TIME,
+        running: false,
+        snowballs: [],          // { el, x, y, speed, radius }
+        snowmanX: 0,            // 눈사람 중심 X (gameArea 기준)
+        snowmanY: 0,            // 눈사람 중심 Y
+        targetX: null,          // 이동 목표 X
+        speed: CONFIG.SNOWBALL_SPEED_INIT,
+        spawnInterval: CONFIG.SNOWBALL_INTERVAL_INIT,
+        dodgeCount: 0,
+      };
+    }
+
+    function getSnowmanPos() {
+      const rect = gameArea.getBoundingClientRect();
+      const smRect = snowmanEl.getBoundingClientRect();
+      return {
+        x: smRect.left - rect.left + smRect.width / 2,
+        y: smRect.top  - rect.top  + smRect.height / 2,
+        w: smRect.width,
+        h: smRect.height,
+      };
+    }
+
+    function updateLivesDisplay() {
+      const hearts = ['', '❤️', '❤️❤️', '❤️❤️❤️'];
+      livesDisplay.textContent = hearts[Math.max(0, state.lives)] || '';
+    }
+
+    // 눈 파티클 (배경 장식)
+    function createSnowParticles() {
+      for (let i = 0; i < 14; i++) {
+        const p = document.createElement('div');
+        p.className = 'snow-particle';
+        const sz = Math.random() * 5 + 3;
+        p.style.cssText = `
+          width:${sz}px; height:${sz}px;
+          left:${Math.random()*100}%;
+          top:${Math.random()*100}%;
+          animation-duration:${Math.random()*3+2}s;
+          animation-delay:${Math.random()*3}s;
+          opacity:${Math.random()*0.5+0.3};
+        `;
+        gameArea.appendChild(p);
+      }
+    }
+
+    function spawnSnowball() {
+      if (!state.running) return;
+      const rect = gameArea.getBoundingClientRect();
+      const radius = parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue('--sb-radius') || '14');
+      const sbRadius = window.innerWidth > 400 ? 14 : 10;
+      const x = sbRadius + Math.random() * (rect.width - sbRadius * 2);
+      const el = document.createElement('div');
+      el.className = 'snowball';
+      el.style.left = x + 'px';
+      el.style.top  = '-30px';
+      gameArea.appendChild(el);
+      state.snowballs.push({ el, x, y: -30, speed: state.speed, radius: sbRadius });
+
+      // 난이도 상승
+      state.spawnInterval = Math.max(
+        CONFIG.SNOWBALL_INTERVAL_MIN,
+        state.spawnInterval - 20
+      );
+      state.speed = Math.min(CONFIG.SNOWBALL_SPEED_MAX, state.speed + 0.08);
+
+      spawnTimeout = setTimeout(spawnSnowball, state.spawnInterval);
+    }
+
+    function showHit(x, y) {
+      const ef = document.createElement('div');
+      ef.className = 'hit-effect';
+      ef.textContent = '💥';
+      ef.style.left = (x - 20) + 'px';
+      ef.style.top  = (y - 20) + 'px';
+      gameArea.appendChild(ef);
+      setTimeout(() => ef.remove(), 800);
+    }
+
+    function loseLife(snowball) {
+      // 방어막 표시
+      shieldEl.style.opacity = '1';
+      clearTimeout(shieldTimeout);
+      shieldTimeout = setTimeout(() => { shieldEl.style.opacity = '0'; }, CONFIG.SHIELD_DURATION);
+
+      showHit(snowball.x, snowball.y);
+      state.lives--;
+      updateLivesDisplay();
+      if (state.lives <= 0) endGame();
+    }
+
+    function gameLoop() {
+      if (!state.running) return;
+      const rect = gameArea.getBoundingClientRect();
+
+      // 눈사람 이동 (부드럽게)
+      if (state.targetX !== null) {
+        const smPos = getSnowmanPos();
+        const diff = state.targetX - smPos.x;
+        if (Math.abs(diff) > 3) {
+          const newLeft = parseFloat(snowmanEl.style.left || '50%');
+          const pct = (state.targetX / rect.width) * 100;
+          const curPct = smPos.x / rect.width * 100;
+          const step = (pct - curPct) * 0.18;
+          snowmanEl.style.left = Math.min(95, Math.max(5, curPct + step)) + '%';
+        }
+      }
+
+      // 눈사람 방어막 위치 동기화
+      shieldEl.style.left = snowmanEl.style.left;
+
+      // 눈덩이 업데이트
+      const smPos = getSnowmanPos();
+      const toRemove = [];
+      for (let i = 0; i < state.snowballs.length; i++) {
+        const sb = state.snowballs[i];
+        sb.y += sb.speed;
+        sb.el.style.top = sb.y + 'px';
+
+        // 충돌 감지 (눈사람과 원형 충돌)
+        const dx = sb.x - smPos.x;
+        const dy = (sb.y + sb.radius) - smPos.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const hitRadius = smPos.w * 0.38 + sb.radius;
+
+        if (dist < hitRadius) {
+          sb.el.remove();
+          toRemove.push(i);
+          loseLife(sb);
+          if (!state.running) return;
+          continue;
+        }
+
+        // 화면 아래로 벗어남 → 점수 획득
+        if (sb.y > rect.height + 20) {
+          sb.el.remove();
+          toRemove.push(i);
+          state.score += CONFIG.SCORE_PER_DODGE;
+          state.dodgeCount++;
+          scoreDisplay.textContent = state.score;
+        }
+      }
+      // 역순 제거
+      for (let i = toRemove.length - 1; i >= 0; i--) {
+        state.snowballs.splice(toRemove[i], 1);
+      }
+
+      rafId = requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      // 기존 눈덩이 제거
+      document.querySelectorAll('.snowball').forEach(el => el.remove());
+      document.querySelectorAll('.hit-effect').forEach(el => el.remove());
+
+      initState();
+      state.running = true;
+
+      // 눈사람 초기 위치
+      snowmanEl.style.left = '50%';
+      snowmanEl.style.transform = 'translateX(-50%)';
+      shieldEl.style.left = '50%';
+      shieldEl.style.transform = 'translateX(-50%)';
+
+      updateLivesDisplay();
+      scoreDisplay.textContent = '0';
+      timerDisplay.textContent = CONFIG.GAME_TIME;
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      // 타이머
+      timerInterval = setInterval(() => {
+        state.timeLeft--;
+        timerDisplay.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+
+      spawnTimeout = setTimeout(spawnSnowball, 600);
+      rafId = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(timerInterval);
+      clearTimeout(spawnTimeout);
+      cancelAnimationFrame(rafId);
+
+      saveBest(state.score);
+      const best = loadBest();
+
+      finalScore.textContent = state.score + '점';
+      if (state.score >= best && state.score > 0) {
+        resultMsg.textContent = `🏆 최고기록 달성! (${best}점)`;
+      } else {
+        resultMsg.textContent = `최고기록: ${best}점`;
+      }
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 터치/클릭으로 눈사람 이동
+    gameArea.addEventListener('pointerdown', (e) => {
+      if (!state.running) return;
+      e.preventDefault();
+      const rect = gameArea.getBoundingClientRect();
+      state.targetX = e.clientX - rect.left;
+    });
+    gameArea.addEventListener('pointermove', (e) => {
+      if (!state.running) return;
+      if (e.buttons === 0 && e.pointerType === 'mouse') return;
+      e.preventDefault();
+      const rect = gameArea.getBoundingClientRect();
+      state.targetX = e.clientX - rect.left;
+    });
+
+    startBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); startGame(); });
+    restartBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); startGame(); });
+
+    // 초기화
+    createSnowParticles();
+    startBest.textContent = loadBest();
+  })();
+  </script>
+</body>
+</html>
