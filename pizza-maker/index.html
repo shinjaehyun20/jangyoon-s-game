@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>피자 만들기</title>
+  <style>
+    :root {
+      --bg: #1a0a00;
+      --accent: #ff6b35;
+      --gold: #ffd700;
+      --text: #fff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      text-align: center;
+      color: var(--accent);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 6px 14px;
+      font-size: clamp(13px, 3.5vw, 17px);
+      font-weight: 700;
+    }
+    .hud-val { color: var(--gold); }
+    #gameArea {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: space-between;
+      position: relative; overflow: hidden;
+      gap: 6px;
+    }
+    #recipeBar {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 6px 10px;
+      display: flex; align-items: center; gap: 6px;
+      flex-wrap: wrap; min-height: 52px;
+    }
+    .recipe-label {
+      font-size: 11px; color: rgba(255,255,255,0.5);
+      margin-right: 4px; white-space: nowrap;
+    }
+    .recipe-slot {
+      font-size: clamp(20px, 5vw, 28px);
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.15);
+    }
+    .recipe-slot.done { border-color: var(--gold); background: rgba(255,215,0,0.15); }
+
+    #pizzaZone {
+      position: relative;
+      width: min(220px, 55vw); height: min(220px, 55vw);
+      flex-shrink: 0;
+    }
+    #pizzaBase {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 38%, #f4d03f 0%, #d4a017 60%, #a0720a 100%);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+      position: relative; overflow: hidden;
+    }
+    #toppingLayer {
+      position: absolute; inset: 0;
+      border-radius: 50%; overflow: hidden;
+    }
+    .placed-topping {
+      position: absolute; font-size: clamp(16px, 4vw, 24px);
+      transform: translate(-50%, -50%);
+      pointer-events: none; user-select: none;
+    }
+    #dropIndicator {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 3px dashed rgba(255,215,0,0.6);
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.15s;
+    }
+    #dropIndicator.active { opacity: 1; }
+
+    #palette {
+      width: 100%;
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 8px;
+    }
+    .ingredient-btn {
+      width: clamp(52px, 12vw, 68px); height: clamp(52px, 12vw, 68px);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: clamp(24px, 6vw, 32px);
+      cursor: pointer; touch-action: none;
+      -webkit-user-select: none; user-select: none;
+    }
+    .ingredient-btn .ing-name {
+      font-size: 9px; color: rgba(255,255,255,0.6); margin-top: 2px;
+    }
+    #dragGhost {
+      position: fixed; pointer-events: none; z-index: 999;
+      font-size: 40px;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: rgba(255,255,255,0.4); padding: 0 2px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.5); text-decoration: none;
+      font-size: 12px; padding: 4px 8px;
+    }
+
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #2a1500;
+      border: 2px solid var(--accent);
+      border-radius: 20px; padding: 28px 24px;
+      max-width: 320px; width: 90%;
+      text-align: center; display: flex;
+      flex-direction: column; gap: 14px;
+    }
+    .overlay-card h2 { font-size: clamp(22px, 6vw, 30px); }
+    .overlay-card p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--gold); }
+    .result-sub { font-size: 13px; color: rgba(255,255,255,0.6); }
+    .best-tag { font-size: 18px; color: var(--gold); font-weight: 700; }
+    .btn-start {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 14px;
+      padding: 14px 32px; font-size: 18px;
+      font-weight: 700; cursor: pointer;
+      min-height: 52px; width: 100%;
+      touch-action: manipulation;
+    }
+
+    @keyframes pizzaUp {
+      0%   { transform: scale(1) translateY(0); }
+      50%  { transform: scale(1.15) translateY(-10px); }
+      100% { transform: scale(1) translateY(0); }
+    }
+    .pizza-celebrate { animation: pizzaUp 0.4s ease-out; }
+
+    @keyframes starBurst {
+      0%   { opacity: 1; transform: translate(-50%,-50%) scale(0.3); }
+      100% { opacity: 0; transform: translate(-50%,-50%) scale(2.2); }
+    }
+    .star-burst {
+      position: fixed; pointer-events: none; z-index: 200;
+      font-size: 36px; animation: starBurst 0.6s ease-out forwards;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>&#127829; 피자 만들기</h1>
+    <div class="hud">
+      <div>점수 <span class="hud-val" id="scoreEl">0</span></div>
+      <div>피자 <span class="hud-val" id="pizzaCountEl">0</span> / <span class="hud-val" id="goalEl">5</span></div>
+      <div>&#9201; <span class="hud-val" id="timerEl">60</span>초</div>
+    </div>
+
+    <div id="gameArea">
+      <div id="recipeBar"></div>
+      <div id="pizzaZone">
+        <div id="pizzaBase">
+          <div id="toppingLayer"></div>
+          <div id="dropIndicator"></div>
+        </div>
+      </div>
+      <div id="palette"></div>
+    </div>
+
+    <footer>
+      <small>레시피 재료를 피자에 올려요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div id="dragGhost"></div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>&#127829; 피자 만들기</h2>
+      <p>레시피를 보고 재료를 피자 위에 드래그해요!<br>모든 재료를 올리면 완성!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>&#127829; 완성!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-sub">점</div>
+      <div id="bestTag"></div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var CONFIG = {
+      GAME_SEC: 60,
+      GOAL: 5,
+      SCORE_PER_PIZZA: 100,
+    };
+
+    var INGREDIENTS = [
+      { id: 'tomato',   emoji: '🍅', name: '토마토' },
+      { id: 'cheese',   emoji: '🧀', name: '치즈' },
+      { id: 'mushroom', emoji: '🍄', name: '버섯' },
+      { id: 'pepper',   emoji: '🪱', name: '피망' },
+      { id: 'olive',    emoji: '🪲', name: '올리브' },
+      { id: 'corn',     emoji: '🌽', name: '옥수수' },
+      { id: 'egg',      emoji: '🥚', name: '달걀' },
+      { id: 'shrimp',   emoji: '🍤', name: '새우' },
+    ];
+
+    var RECIPES = [
+      ['tomato','cheese','mushroom'],
+      ['tomato','cheese','pepper'],
+      ['tomato','cheese','olive'],
+      ['tomato','cheese','corn'],
+      ['tomato','cheese','egg'],
+      ['tomato','cheese','shrimp'],
+      ['tomato','cheese','mushroom','pepper'],
+      ['tomato','cheese','corn','olive'],
+    ];
+
+    var state = {
+      running: false,
+      score: 0,
+      pizzaCount: 0,
+      timeLeft: CONFIG.GAME_SEC,
+      recipe: [],
+      placed: [],
+      timer: null,
+      dragId: null,
+    };
+
+    function el(id) { return document.getElementById(id); }
+
+    var scoreEl      = el('scoreEl');
+    var timerEl      = el('timerEl');
+    var pizzaCountEl = el('pizzaCountEl');
+    var goalEl       = el('goalEl');
+    var recipeBar    = el('recipeBar');
+    var toppingLayer = el('toppingLayer');
+    var dropIndicator= el('dropIndicator');
+    var pizzaZone    = el('pizzaZone');
+    var palette      = el('palette');
+    var dragGhost    = el('dragGhost');
+    var startOverlay = el('startOverlay');
+    var endOverlay   = el('endOverlay');
+    var finalScore   = el('finalScore');
+    var resultMsg    = el('resultMsg');
+    var bestTag      = el('bestTag');
+
+    goalEl.textContent = CONFIG.GOAL;
+
+    // 재료 팔레트 생성 (DOM 직접 조작)
+    INGREDIENTS.forEach(function(ing) {
+      var btn = document.createElement('div');
+      btn.className = 'ingredient-btn';
+      btn.dataset.id = ing.id;
+
+      var emojiSpan = document.createElement('span');
+      emojiSpan.textContent = ing.emoji;
+
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'ing-name';
+      nameSpan.textContent = ing.name;
+
+      btn.appendChild(emojiSpan);
+      btn.appendChild(nameSpan);
+      palette.appendChild(btn);
+    });
+
+    function pickRecipe() {
+      state.recipe = RECIPES[Math.floor(Math.random() * RECIPES.length)].slice();
+      state.placed = [];
+      renderRecipe();
+      renderToppings();
+    }
+
+    function renderRecipe() {
+      while (recipeBar.firstChild) { recipeBar.removeChild(recipeBar.firstChild); }
+
+      var lbl = document.createElement('span');
+      lbl.className = 'recipe-label';
+      lbl.textContent = '레시피:';
+      recipeBar.appendChild(lbl);
+
+      state.recipe.forEach(function(id) {
+        var ing = INGREDIENTS.find(function(x){ return x.id === id; });
+        var slot = document.createElement('div');
+        slot.className = 'recipe-slot' + (state.placed.indexOf(id) !== -1 ? ' done' : '');
+        slot.textContent = ing.emoji;
+        slot.title = ing.name;
+        recipeBar.appendChild(slot);
+      });
+    }
+
+    function renderToppings() {
+      while (toppingLayer.firstChild) { toppingLayer.removeChild(toppingLayer.firstChild); }
+
+      state.placed.forEach(function(id) {
+        var ing = INGREDIENTS.find(function(x){ return x.id === id; });
+        var t = document.createElement('div');
+        t.className = 'placed-topping';
+        t.textContent = ing.emoji;
+        var r = 28 + Math.random() * 36;
+        var angle = Math.random() * Math.PI * 2;
+        t.style.left = (50 + r * Math.cos(angle)) + '%';
+        t.style.top  = (50 + r * Math.sin(angle)) + '%';
+        toppingLayer.appendChild(t);
+      });
+    }
+
+    // 드래그
+    var dragActive = false;
+
+    palette.addEventListener('pointerdown', function(e) {
+      if (!state.running) return;
+      var btn = e.target.closest('.ingredient-btn');
+      if (!btn) return;
+      e.preventDefault();
+      state.dragId = btn.dataset.id;
+      dragActive = true;
+      var ing = INGREDIENTS.find(function(x){ return x.id === state.dragId; });
+      dragGhost.textContent = ing.emoji;
+      dragGhost.style.display = 'block';
+      moveDragGhost(e.clientX, e.clientY);
+      palette.setPointerCapture(e.pointerId);
+    });
+
+    palette.addEventListener('pointermove', function(e) {
+      if (!dragActive) return;
+      e.preventDefault();
+      moveDragGhost(e.clientX, e.clientY);
+      checkOverPizza(e.clientX, e.clientY);
+    });
+
+    palette.addEventListener('pointerup', function(e) {
+      if (!dragActive) return;
+      dragActive = false;
+      dragGhost.style.display = 'none';
+      dropIndicator.classList.remove('active');
+      dropTopping(e.clientX, e.clientY);
+      state.dragId = null;
+    });
+
+    function moveDragGhost(x, y) {
+      dragGhost.style.left = x + 'px';
+      dragGhost.style.top  = y + 'px';
+    }
+
+    function checkOverPizza(x, y) {
+      var rect = pizzaZone.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top  + rect.height / 2;
+      var dx = x - cx, dy = y - cy;
+      var inside = Math.sqrt(dx*dx + dy*dy) < rect.width / 2;
+      if (inside) { dropIndicator.classList.add('active'); }
+      else { dropIndicator.classList.remove('active'); }
+    }
+
+    function dropTopping(x, y) {
+      if (!state.dragId) return;
+      var rect = pizzaZone.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top  + rect.height / 2;
+      var dx = x - cx, dy = y - cy;
+      var inside = Math.sqrt(dx*dx + dy*dy) < rect.width / 2;
+      if (!inside) return;
+
+      var id = state.dragId;
+      if (state.recipe.indexOf(id) === -1) return;
+      if (state.placed.indexOf(id) !== -1) return;
+
+      state.placed.push(id);
+      renderRecipe();
+      renderToppings();
+      spawnStar(x, y);
+
+      var done = state.recipe.every(function(r){ return state.placed.indexOf(r) !== -1; });
+      if (done) { completePizza(); }
+    }
+
+    function completePizza() {
+      state.pizzaCount++;
+      state.score += CONFIG.SCORE_PER_PIZZA;
+      pizzaCountEl.textContent = state.pizzaCount;
+      scoreEl.textContent = state.score;
+
+      var base = el('pizzaBase');
+      base.classList.remove('pizza-celebrate');
+      void base.offsetWidth;
+      base.classList.add('pizza-celebrate');
+
+      if (state.pizzaCount >= CONFIG.GOAL) { endGame(); return; }
+      setTimeout(function(){ pickRecipe(); }, 500);
+    }
+
+    function spawnStar(x, y) {
+      var s = document.createElement('div');
+      s.className = 'star-burst';
+      s.textContent = '⭐';
+      s.style.left = x + 'px';
+      s.style.top  = y + 'px';
+      document.body.appendChild(s);
+      setTimeout(function(){ if (s.parentNode) s.parentNode.removeChild(s); }, 700);
+    }
+
+    function startTimer() {
+      state.timer = setInterval(function() {
+        state.timeLeft--;
+        timerEl.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) { endGame(); }
+      }, 1000);
+    }
+
+    function startGame() {
+      state.running = true;
+      state.score = 0;
+      state.pizzaCount = 0;
+      state.timeLeft = CONFIG.GAME_SEC;
+      scoreEl.textContent = '0';
+      pizzaCountEl.textContent = '0';
+      timerEl.textContent = CONFIG.GAME_SEC;
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      pickRecipe();
+      startTimer();
+    }
+
+    function endGame() {
+      clearInterval(state.timer);
+      state.running = false;
+      dragActive = false;
+      dragGhost.style.display = 'none';
+      dropIndicator.classList.remove('active');
+
+      var best = parseInt(localStorage.getItem('pizza-maker_best') || '0', 10);
+      var isNew = state.score > best;
+      if (isNew) { localStorage.setItem('pizza-maker_best', String(state.score)); }
+
+      finalScore.textContent = state.score;
+
+      while (bestTag.firstChild) { bestTag.removeChild(bestTag.firstChild); }
+      if (isNew) {
+        var b = document.createElement('span');
+        b.className = 'best-tag';
+        b.textContent = '🏆 최고 기록!';
+        bestTag.appendChild(b);
+      } else {
+        bestTag.textContent = '최고 기록: ' + best + '점';
+      }
+
+      resultMsg.textContent = state.pizzaCount >= CONFIG.GOAL
+        ? '피자 ' + CONFIG.GOAL + '개 완성! 대단해요!'
+        : '피자 ' + state.pizzaCount + '개 완성! 다음엔 더 잘 할 수 있어요!';
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    el('startBtn').addEventListener('click', startGame);
+    el('restartBtn').addEventListener('click', startGame);
+
+  })();
+  </script>
+</body>
+</html>

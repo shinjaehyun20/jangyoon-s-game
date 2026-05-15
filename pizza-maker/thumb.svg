@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#3d1200"/>
+      <stop offset="100%" stop-color="#1a0800"/>
+    </radialGradient>
+    <radialGradient id="pizza" cx="42%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#f4d03f"/>
+      <stop offset="55%" stop-color="#d4a017"/>
+      <stop offset="100%" stop-color="#a0720a"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 피자 원 -->
+  <circle cx="108" cy="90" r="72" fill="url(#pizza)"/>
+  <!-- 치즈 얼룩 -->
+  <circle cx="90"  cy="78" r="16" fill="rgba(240,220,60,0.55)"/>
+  <circle cx="122" cy="100" r="12" fill="rgba(240,220,60,0.45)"/>
+  <circle cx="100" cy="112" r="10" fill="rgba(240,220,60,0.4)"/>
+
+  <!-- 토핑 이모지 -->
+  <text x="88"  y="82"  font-size="22" text-anchor="middle" dominant-baseline="middle">🍅</text>
+  <text x="122" y="72"  font-size="18" text-anchor="middle" dominant-baseline="middle">🧀</text>
+  <text x="105" y="106" font-size="18" text-anchor="middle" dominant-baseline="middle">🍄</text>
+  <text x="130" y="104" font-size="16" text-anchor="middle" dominant-baseline="middle">🌽</text>
+  <text x="76"  y="104" font-size="16" text-anchor="middle" dominant-baseline="middle">🥚</text>
+
+  <!-- 재료 팔레트 힌트 -->
+  <rect x="18" y="154" width="180" height="20" rx="5" fill="rgba(255,107,53,0.18)"/>
+  <text x="28"  y="167" font-size="13">🍅</text>
+  <text x="52"  y="167" font-size="13">🧀</text>
+  <text x="76"  y="167" font-size="13">🍄</text>
+  <text x="100" y="167" font-size="13">🌽</text>
+  <text x="124" y="167" font-size="13">🤿</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6b35">피자 만들기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.45)" letter-spacing="2">PIZZA MAKER</text>
+  </g>
+</svg>

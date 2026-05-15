@@ -43,7 +43,9 @@
       { "id": "snowball-fight",     "label": "☃️ 눈싸움",                "path": "snowball-fight/index.html" },
       { "id": "squid-catch",        "label": "🦑 오징어 잡기",            "path": "squid-catch/index.html" },
       { "id": "build-snowman",      "label": "⛄ 눈사람 만들기",          "path": "build-snowman/index.html" },
-      { "id": "water-gun",          "label": "🔫 물총 싸움",              "path": "water-gun/index.html" }
+      { "id": "water-gun",          "label": "🔫 물총 싸움",              "path": "water-gun/index.html" },
+      { "id": "pizza-maker",        "label": "🍕 피자 만들기",             "path": "pizza-maker/index.html" },
+      { "id": "kangaroo-jump",      "label": "🦘 캥거루 점프",             "path": "kangaroo-jump/index.html" }
     ]
   },
   {

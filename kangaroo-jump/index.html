@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>캥거루 점프</title>
+  <style>
+    :root {
+      --bg1: #1a0d2e;
+      --bg2: #0d1f3c;
+      --accent: #ff9f43;
+      --gold: #ffd700;
+      --green: #2ecc71;
+      --text: #fff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      text-align: center; color: var(--accent);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 6px 14px;
+      font-size: clamp(13px, 3.5vw, 17px); font-weight: 700;
+    }
+    .hud-val { color: var(--gold); }
+
+    /* 캔버스 영역 */
+    #gameArea {
+      flex: 1; position: relative; overflow: hidden;
+      border-radius: 16px;
+      background: linear-gradient(180deg,#090618 0%,#0a1628 60%,#1a3a1a 100%);
+    }
+    #gameCanvas { display: block; width: 100%; height: 100%; }
+
+    /* 점프 파워 게이지 */
+    #powerWrap {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 6px 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    #powerLabel { font-size: 12px; color: rgba(255,255,255,0.6); white-space: nowrap; }
+    #powerBar {
+      flex: 1; height: 14px; border-radius: 7px;
+      background: rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+    #powerFill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #2ecc71, #f39c12, #e74c3c);
+      border-radius: 7px;
+      transition: width 0.05s linear;
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: rgba(255,255,255,0.4); padding: 0 2px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.5); text-decoration: none;
+      font-size: 12px; padding: 4px 8px;
+    }
+
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1a0d2e;
+      border: 2px solid var(--accent);
+      border-radius: 20px; padding: 28px 24px;
+      max-width: 320px; width: 90%;
+      text-align: center; display: flex;
+      flex-direction: column; gap: 14px;
+    }
+    .overlay-card h2 { font-size: clamp(22px, 6vw, 30px); }
+    .overlay-card p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--gold); }
+    .result-sub { font-size: 13px; color: rgba(255,255,255,0.6); }
+    .best-tag { font-size: 18px; color: var(--gold); font-weight: 700; }
+    .btn-start {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 14px;
+      padding: 14px 32px; font-size: 18px;
+      font-weight: 700; cursor: pointer;
+      min-height: 52px; width: 100%;
+      touch-action: manipulation;
+    }
+
+    #holdHint {
+      position: absolute; bottom: 8px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px; color: rgba(255,255,255,0.4);
+      pointer-events: none; white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🦘 캥거루 점프</h1>
+    <div class="hud">
+      <div>점수 <span class="hud-val" id="scoreEl">0</span></div>
+      <div>별 <span class="hud-val" id="starsEl">0</span></div>
+      <div>목숨 <span class="hud-val" id="livesEl">3</span></div>
+    </div>
+
+    <div id="gameArea">
+      <canvas id="gameCanvas"></canvas>
+      <div id="holdHint">꾹 누를수록 높이 점프!</div>
+    </div>
+
+    <div id="powerWrap">
+      <span id="powerLabel">점프력</span>
+      <div id="powerBar"><div id="powerFill"></div></div>
+    </div>
+
+    <footer>
+      <small>화면 꾹 누르면 높이 점프!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🦘 캥거루 점프</h2>
+      <p>화면을 꾹 눌렀다 떼면 캥거루가 점프해요!<br>오래 누를수록 높이 올라가요.<br>별을 먹고 가시를 피하세요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🦘 끝!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-sub">점</div>
+      <div id="bestTag"></div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var CONFIG = {
+      GRAVITY: 0.45,
+      JUMP_MAX: 14,
+      HOLD_RATE: 0.18,
+      GROUND_Y_RATIO: 0.78,
+      PLATFORM_COUNT: 5,
+      PLATFORM_W: 80,
+      PLATFORM_H: 12,
+      SCROLL_SPEED: 2.0,
+      STAR_SCORE: 10,
+      LIVES: 3,
+    };
+
+    var canvas = document.getElementById('gameCanvas');
+    var ctx    = canvas.getContext('2d');
+    var gameArea = document.getElementById('gameArea');
+
+    function el(id) { return document.getElementById(id); }
+    var scoreEl     = el('scoreEl');
+    var starsEl     = el('starsEl');
+    var livesEl     = el('livesEl');
+    var powerFill   = el('powerFill');
+    var startOverlay= el('startOverlay');
+    var endOverlay  = el('endOverlay');
+    var finalScore  = el('finalScore');
+    var resultMsg   = el('resultMsg');
+    var bestTag     = el('bestTag');
+
+    var W, H, groundY;
+
+    function resize() {
+      var rect = gameArea.getBoundingClientRect();
+      W = rect.width;
+      H = rect.height;
+      canvas.width  = W;
+      canvas.height = H;
+      groundY = H * CONFIG.GROUND_Y_RATIO;
+    }
+    resize();
+    window.addEventListener('resize', function() { resize(); if (state.running) { groundY = H * CONFIG.GROUND_Y_RATIO; } });
+
+    var PLATFORM_COLORS = ['#27ae60','#2980b9','#8e44ad','#e67e22','#c0392b'];
+
+    var state = {
+      running: false,
+      score: 0,
+      stars: 0,
+      lives: CONFIG.LIVES,
+      kang: null,
+      platforms: [],
+      starObjs: [],
+      spikes: [],
+      scrollX: 0,
+      holding: false,
+      holdTime: 0,
+      jumpPower: 0,
+      raf: null,
+      lastTime: 0,
+      spawnTimer: 0,
+      starTimer: 0,
+      spikeTimer: 0,
+      invincible: 0,
+    };
+
+    function makeKangaroo() {
+      return {
+        x: W * 0.22,
+        y: groundY,
+        vy: 0,
+        w: 44, h: 44,
+        onGround: true,
+        onPlatform: false,
+      };
+    }
+
+    function makePlatform(x, y, colorIdx) {
+      return {
+        x: x, y: y,
+        w: CONFIG.PLATFORM_W + Math.random() * 40,
+        h: CONFIG.PLATFORM_H,
+        color: PLATFORM_COLORS[colorIdx % PLATFORM_COLORS.length],
+        hasStar: Math.random() < 0.6,
+        starCollected: false,
+      };
+    }
+
+    function initPlatforms() {
+      state.platforms = [];
+      var spacing = W / (CONFIG.PLATFORM_COUNT - 1);
+      for (var i = 0; i < CONFIG.PLATFORM_COUNT; i++) {
+        var px = W * 0.3 + i * (spacing + 20);
+        var py = groundY - (80 + Math.random() * (H * 0.32));
+        state.platforms.push(makePlatform(px, py, i));
+      }
+    }
+
+    function spawnPlatform() {
+      var py = groundY - (80 + Math.random() * (H * 0.35));
+      state.platforms.push(makePlatform(W + 20, py, Math.floor(Math.random() * 5)));
+    }
+
+    function spawnSpike() {
+      state.spikes.push({
+        x: W + 10,
+        y: groundY - 28,
+        w: 20, h: 28,
+      });
+    }
+
+    // 별 스폰 (허공)
+    function spawnAirStar() {
+      state.starObjs.push({
+        x: W + 20,
+        y: groundY - 100 - Math.random() * (H * 0.38),
+        r: 14,
+        collected: false,
+        angle: 0,
+      });
+    }
+
+    // 그리기 함수들
+    function drawBackground() {
+      // 별빛 배경
+      ctx.fillStyle = '#090618';
+      ctx.fillRect(0, 0, W, H);
+
+      // 작은 별
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      var seed = 1;
+      for (var i = 0; i < 40; i++) {
+        seed = (seed * 1664525 + 1013904223) & 0xffffffff;
+        var sx = ((seed >>> 0) % W);
+        seed = (seed * 1664525 + 1013904223) & 0xffffffff;
+        var sy = ((seed >>> 0) % (groundY * 0.85));
+        ctx.beginPath();
+        ctx.arc(sx, sy, 1 + (i % 2) * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 지면
+      ctx.fillStyle = '#1a3a1a';
+      ctx.fillRect(0, groundY, W, H - groundY);
+      ctx.fillStyle = '#27ae60';
+      ctx.fillRect(0, groundY, W, 8);
+    }
+
+    function drawPlatforms() {
+      state.platforms.forEach(function(p) {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.roundRect(p.x, p.y, p.w, p.h, 6);
+        ctx.fill();
+
+        // 플랫폼 위 별
+        if (p.hasStar && !p.starCollected) {
+          drawStar(p.x + p.w / 2, p.y - 18, 12, Date.now());
+        }
+      });
+    }
+
+    function drawStar(x, y, r, t) {
+      var angle = (t / 600) % (Math.PI * 2);
+      ctx.save();
+      ctx.translate(x, y + Math.sin(angle) * 3);
+      ctx.fillStyle = '#ffd700';
+      ctx.font = (r * 2) + 'px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('⭐', 0, 0);
+      ctx.restore();
+    }
+
+    function drawStarObjs(t) {
+      state.starObjs.forEach(function(s) {
+        if (!s.collected) {
+          drawStar(s.x, s.y, s.r, t);
+        }
+      });
+    }
+
+    function drawSpikes() {
+      state.spikes.forEach(function(sp) {
+        ctx.fillStyle = '#e74c3c';
+        ctx.beginPath();
+        ctx.moveTo(sp.x, sp.y + sp.h);
+        ctx.lineTo(sp.x + sp.w / 2, sp.y);
+        ctx.lineTo(sp.x + sp.w, sp.y + sp.h);
+        ctx.closePath();
+        ctx.fill();
+      });
+    }
+
+    function drawKangaroo() {
+      var k = state.kang;
+      var alpha = (state.invincible > 0 && Math.floor(Date.now() / 120) % 2 === 0) ? 0.3 : 1;
+      ctx.globalAlpha = alpha;
+
+      // 몸
+      ctx.fillStyle = '#d4890a';
+      ctx.beginPath();
+      ctx.ellipse(k.x + k.w/2, k.y + k.h * 0.55, k.w * 0.42, k.h * 0.38, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 머리
+      ctx.fillStyle = '#e8a020';
+      ctx.beginPath();
+      ctx.ellipse(k.x + k.w/2 + 2, k.y + k.h * 0.2, k.w * 0.26, k.h * 0.22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 귀
+      ctx.fillStyle = '#d4890a';
+      ctx.beginPath();
+      ctx.ellipse(k.x + k.w/2 + 10, k.y + k.h * 0.06, 5, 9, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(k.x + k.w/2 - 2, k.y + k.h * 0.04, 4, 8, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 눈
+      ctx.fillStyle = '#222';
+      ctx.beginPath();
+      ctx.arc(k.x + k.w/2 + 7, k.y + k.h * 0.17, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 뒷다리/꼬리 (점프 중 자세)
+      if (!k.onGround && !k.onPlatform) {
+        ctx.fillStyle = '#d4890a';
+        ctx.beginPath();
+        ctx.ellipse(k.x + k.w/2 - 10, k.y + k.h * 0.85, 6, 12, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    // 충돌 체크
+    function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+      return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+    }
+
+    function update(dt) {
+      var k = state.kang;
+      var t = Date.now();
+
+      // 점프력 게이지
+      if (state.holding) {
+        state.holdTime = Math.min(state.holdTime + dt * CONFIG.HOLD_RATE, 1);
+        powerFill.style.width = (state.holdTime * 100) + '%';
+      }
+
+      // 중력
+      k.vy += CONFIG.GRAVITY;
+      k.y += k.vy;
+
+      // 지면 착지
+      if (k.y >= groundY) {
+        k.y = groundY;
+        k.vy = 0;
+        k.onGround = true;
+        k.onPlatform = false;
+      }
+
+      // 플랫폼 착지
+      k.onPlatform = false;
+      state.platforms.forEach(function(p) {
+        var prevY = k.y - k.vy;
+        var kBottom = k.y + k.h;
+        var pTop = p.y;
+        if (k.vy > 0 &&
+            prevY + k.h <= pTop + 4 &&
+            kBottom >= pTop &&
+            k.x + k.w > p.x + 6 &&
+            k.x < p.x + p.w - 6) {
+          k.y = pTop - k.h;
+          k.vy = 0;
+          k.onGround = false;
+          k.onPlatform = true;
+
+          // 플랫폼 별 수집
+          if (p.hasStar && !p.starCollected) {
+            p.starCollected = true;
+            state.score += CONFIG.STAR_SCORE;
+            state.stars++;
+            scoreEl.textContent = state.score;
+            starsEl.textContent = state.stars;
+          }
+        }
+      });
+
+      // 화면 아래 추락
+      if (k.y > H + 60 && !k.onGround) {
+        loseLife();
+        return;
+      }
+
+      // 스크롤 (플랫폼·스파이크·별 이동)
+      var speed = CONFIG.SCROLL_SPEED + state.score * 0.003;
+      state.platforms.forEach(function(p) { p.x -= speed; });
+      state.spikes.forEach(function(sp) { sp.x -= speed; });
+      state.starObjs.forEach(function(s) { s.x -= speed; });
+
+      // 허공 별 수집
+      state.starObjs.forEach(function(s) {
+        if (!s.collected && rectsOverlap(k.x, k.y, k.w, k.h, s.x - s.r, s.y - s.r, s.r*2, s.r*2)) {
+          s.collected = true;
+          state.score += CONFIG.STAR_SCORE;
+          state.stars++;
+          scoreEl.textContent = state.score;
+          starsEl.textContent = state.stars;
+        }
+      });
+
+      // 가시 충돌
+      if (state.invincible <= 0) {
+        state.spikes.forEach(function(sp) {
+          if (rectsOverlap(k.x + 6, k.y + k.h * 0.5, k.w - 12, k.h * 0.4, sp.x, sp.y, sp.w, sp.h)) {
+            loseLife();
+          }
+        });
+      } else {
+        state.invincible -= dt;
+      }
+
+      // 오브젝트 정리
+      state.platforms = state.platforms.filter(function(p){ return p.x + p.w > -10; });
+      state.spikes    = state.spikes.filter(function(sp){ return sp.x + sp.w > -10; });
+      state.starObjs  = state.starObjs.filter(function(s){ return s.x + s.r > -10; });
+
+      // 스폰
+      state.spawnTimer += dt;
+      if (state.spawnTimer > 1.8) {
+        spawnPlatform();
+        state.spawnTimer = 0;
+      }
+      state.starTimer += dt;
+      if (state.starTimer > 2.5) {
+        spawnAirStar();
+        state.starTimer = 0;
+      }
+      state.spikeTimer += dt;
+      if (state.spikeTimer > 3.0 + Math.random() * 2) {
+        spawnSpike();
+        state.spikeTimer = 0;
+      }
+
+      // 점수 (시간)
+      state.score++;
+      scoreEl.textContent = state.score;
+    }
+
+    function loseLife() {
+      state.lives--;
+      livesEl.textContent = state.lives;
+      // 캥거루 리셋
+      state.kang.x = W * 0.22;
+      state.kang.y = groundY;
+      state.kang.vy = 0;
+      state.kang.onGround = true;
+      state.kang.onPlatform = false;
+      state.invincible = 2.5;
+
+      if (state.lives <= 0) { endGame(); }
+    }
+
+    function draw(t) {
+      ctx.clearRect(0, 0, W, H);
+      drawBackground();
+      drawPlatforms();
+      drawStarObjs(t);
+      drawSpikes();
+      drawKangaroo();
+    }
+
+    function loop(ts) {
+      if (!state.running) return;
+      var dt = Math.min((ts - state.lastTime) / 1000, 0.05);
+      state.lastTime = ts;
+      update(dt);
+      draw(ts);
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    // 입력 처리
+    function doJump() {
+      if (!state.running) return;
+      var k = state.kang;
+      if (k.onGround || k.onPlatform) {
+        var power = CONFIG.JUMP_MAX * (0.4 + state.holdTime * 0.6);
+        k.vy = -power;
+        k.onGround = false;
+        k.onPlatform = false;
+        state.holdTime = 0;
+        powerFill.style.width = '0%';
+      }
+    }
+
+    gameArea.addEventListener('pointerdown', function(e) {
+      e.preventDefault();
+      state.holding = true;
+      state.holdTime = 0;
+    });
+
+    gameArea.addEventListener('pointerup', function(e) {
+      e.preventDefault();
+      state.holding = false;
+      doJump();
+    });
+
+    gameArea.addEventListener('pointercancel', function(e) {
+      state.holding = false;
+      powerFill.style.width = '0%';
+    });
+
+    function startGame() {
+      state.running = true;
+      state.score = 0;
+      state.stars = 0;
+      state.lives = CONFIG.LIVES;
+      state.holding = false;
+      state.holdTime = 0;
+      state.spawnTimer = 0;
+      state.starTimer  = 0;
+      state.spikeTimer = 0;
+      state.invincible = 0;
+      state.platforms = [];
+      state.starObjs  = [];
+      state.spikes    = [];
+
+      scoreEl.textContent = '0';
+      starsEl.textContent = '0';
+      livesEl.textContent = CONFIG.LIVES;
+      powerFill.style.width = '0%';
+
+      resize();
+      state.kang = makeKangaroo();
+      initPlatforms();
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      state.lastTime = performance.now();
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function endGame() {
+      state.running = false;
+      if (state.raf) { cancelAnimationFrame(state.raf); }
+
+      var best = parseInt(localStorage.getItem('kangaroo-jump_best') || '0', 10);
+      var isNew = state.score > best;
+      if (isNew) { localStorage.setItem('kangaroo-jump_best', String(state.score)); }
+
+      finalScore.textContent = state.score;
+
+      while (bestTag.firstChild) { bestTag.removeChild(bestTag.firstChild); }
+      if (isNew) {
+        var b = document.createElement('span');
+        b.className = 'best-tag';
+        b.textContent = '🏆 최고 기록!';
+        bestTag.appendChild(b);
+      } else {
+        bestTag.textContent = '최고 기록: ' + best + '점';
+      }
+
+      resultMsg.textContent = '별을 ' + state.stars + '개 먹었어요!';
+      endOverlay.classList.remove('hidden');
+    }
+
+    el('startBtn').addEventListener('click', startGame);
+    el('restartBtn').addEventListener('click', startGame);
+
+  })();
+  </script>
+</body>
+</html>

@@ -478,5 +478,21 @@
     "description": "화면에 나타나는 귀여운 적 캐릭터를 탭해서 물총을 쏴요! 30초 타임어택",
     "thumbnail": "water-gun/thumb.svg",
     "path": "water-gun/index.html"
+  },
+  {
+    "id": "pizza-maker",
+    "title": "Pizza Maker",
+    "title_ko": "🍕 피자 만들기",
+    "description": "레시피를 보고 재료를 피자에 드래그! 60초 동안 피자 5판 완성 도전",
+    "thumbnail": "pizza-maker/thumb.svg",
+    "path": "pizza-maker/index.html"
+  },
+  {
+    "id": "kangaroo-jump",
+    "title": "Kangaroo Jump",
+    "title_ko": "🦘 캥거루 점프",
+    "description": "꾹 누를수록 높이 점프! 별을 먹고 가시를 피해 플랫폼을 뛰어다녀요",
+    "thumbnail": "kangaroo-jump/thumb.svg",
+    "path": "kangaroo-jump/index.html"
   }
 ]
