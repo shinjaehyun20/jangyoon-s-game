@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#2d1b69"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 미로 격자 미니어처 -->
+  <g opacity="0.7">
+    <!-- 셀 배경 -->
+    <rect x="20" y="30" width="160" height="120" rx="6" fill="#1e1035"/>
+    <!-- 수평 벽 -->
+    <line x1="20" y1="30"  x2="180" y2="30"  stroke="#4c1d95" stroke-width="3"/>
+    <line x1="20" y1="180" x2="180" y2="180" stroke="#4c1d95" stroke-width="3"/>
+    <line x1="20" y1="30"  x2="20"  y2="150" stroke="#4c1d95" stroke-width="3"/>
+    <line x1="180" y1="30" x2="180" y2="150" stroke="#4c1d95" stroke-width="3"/>
+
+    <!-- 내부 벽 패턴 -->
+    <line x1="60"  y1="30"  x2="60"  y2="70"  stroke="#4c1d95" stroke-width="2"/>
+    <line x1="100" y1="70"  x2="100" y2="110" stroke="#4c1d95" stroke-width="2"/>
+    <line x1="140" y1="30"  x2="140" y2="90"  stroke="#4c1d95" stroke-width="2"/>
+    <line x1="20"  y1="70"  x2="80"  y2="70"  stroke="#4c1d95" stroke-width="2"/>
+    <line x1="120" y1="70"  x2="180" y2="70"  stroke="#4c1d95" stroke-width="2"/>
+    <line x1="60"  y1="110" x2="140" y2="110" stroke="#4c1d95" stroke-width="2"/>
+    <line x1="20"  y1="110" x2="40"  y2="110" stroke="#4c1d95" stroke-width="2"/>
+    <line x1="160" y1="110" x2="180" y2="110" stroke="#4c1d95" stroke-width="2"/>
+  </g>
+
+  <!-- 플레이어 공 -->
+  <circle cx="40" cy="50" r="10" fill="#a78bfa">
+    <animate attributeName="opacity" values="1;0.6;1" dur="1.2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 경로 점선 -->
+  <path d="M40,50 L40,90 L80,90 L80,130 L160,130" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" fill="none" opacity="0.6"/>
+
+  <!-- 목표 별 -->
+  <polygon points="160,118 163,128 174,128 165,135 168,145 160,138 152,145 155,135 146,128 157,128"
+    fill="#fbbf24">
+    <animate attributeName="opacity" values="1;0.7;1" dur="0.9s" repeatCount="indefinite"/>
+  </polygon>
+
+  <!-- 제목 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#a78bfa">미로 탈출</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">MAZE ESCAPE</text>
+  </g>
+</svg>

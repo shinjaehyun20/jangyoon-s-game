@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg2)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 피아노 건반 7개 -->
+  <g>
+    <rect x="18" y="60" width="30" height="90" rx="5" fill="#ef4444" opacity="0.9"/>
+    <rect x="52" y="60" width="30" height="90" rx="5" fill="#f97316" opacity="0.9"/>
+    <rect x="86" y="60" width="30" height="90" rx="5" fill="#eab308" opacity="0.9"/>
+    <rect x="120" y="60" width="30" height="90" rx="5" fill="#22c55e" opacity="0.9"/>
+    <rect x="154" y="60" width="30" height="90" rx="5" fill="#3b82f6" opacity="0.9">
+      <animate attributeName="y" values="60;64;60" dur="0.5s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="188" y="60" width="30" height="90" rx="5" fill="#a855f7" opacity="0.9"/>
+    <rect x="222" y="60" width="30" height="90" rx="5" fill="#ec4899" opacity="0.9"/>
+  </g>
+
+  <!-- 이모지 건반 위 -->
+  <text x="33"  y="55" text-anchor="middle" font-size="16">🔴</text>
+  <text x="67"  y="55" text-anchor="middle" font-size="16">🟠</text>
+  <text x="101" y="55" text-anchor="middle" font-size="16">🟡</text>
+  <text x="135" y="55" text-anchor="middle" font-size="16">🟢</text>
+  <text x="169" y="55" text-anchor="middle" font-size="16">🔵</text>
+  <text x="203" y="55" text-anchor="middle" font-size="16">🟣</text>
+  <text x="237" y="55" text-anchor="middle" font-size="16">🩷</text>
+
+  <!-- 파티클 이펙트 -->
+  <circle cx="169" cy="45" r="5" fill="#3b82f6" opacity="0.8">
+    <animate attributeName="cy" values="45;20;5" dur="0.8s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0.3;0" dur="0.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="155" cy="38" r="4" fill="#818cf8" opacity="0.7">
+    <animate attributeName="cy" values="38;15;2" dur="0.7s" begin="0.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.2;0" dur="0.7s" begin="0.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="183" cy="42" r="3" fill="#60a5fa" opacity="0.6">
+    <animate attributeName="cy" values="42;18;3" dur="0.9s" begin="0.1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0.2;0" dur="0.9s" begin="0.1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 제목 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#818cf8">색깔 피아노</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">COLOR PIANO</text>
+  </g>
+</svg>

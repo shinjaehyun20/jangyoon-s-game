@@ -56,6 +56,8 @@
 | [🦘 캥거루 점프 (kangaroo-jump)](./kangaroo-jump) | 꾹 누를수록 높이 점프! 플랫폼 위 별을 먹고 가시를 피해 달려요 | 액션 |
 | [🫧 뽁뽁이 터뜨리기 (bubble-wrap)](./bubble-wrap) | 뽁뽁이를 전부 탭해서 터뜨려요! 레벨이 오를수록 크기 증가, 30초 도전 | 반사 |
 | [🧲 자석 낚시 (magnet-fish)](./magnet-fish) | 자석을 드래그해서 물고기를 끌어당겨 잡아요! 폭탄 피하고 목숨 3개, 40초 도전 | 반사 |
+| [🔵 미로 탈출 (maze-escape)](./maze-escape) | DFS 미로에서 보라 공을 드래그해 탈출! 4레벨 난이도, 60초 타임어택 | 퍼즐 |
+| [🎹 색깔 피아노 (color-piano)](./color-piano) | 7색 건반을 탭해서 음계 연주! 자유 연주·따라치기 2가지 모드, Web Audio API | 음악 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>미로 탈출</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: #1a0a2e;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      color: #fff;
+      text-align: center;
+      text-shadow: 0 0 12px #a78bfa;
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 6px 14px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    #gameArea {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    canvas {
+      border-radius: 12px;
+      display: block;
+      touch-action: none;
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: rgba(255,255,255,0.5);
+    }
+    .home-link {
+      color: #a78bfa; text-decoration: none; font-weight: 700;
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #2d1b69, #1a0a2e);
+      border: 2px solid #a78bfa;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      color: #fff;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 0 30px rgba(167,139,250,0.4);
+    }
+    .overlay-card h2 { font-size: 24px; margin-bottom: 10px; }
+    .overlay-card p  { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.8); margin-bottom: 18px; }
+    .result-score { font-size: 48px; font-weight: 900; color: #fbbf24; margin-bottom: 8px; }
+    .btn-start {
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      color: #fff; border: none; border-radius: 14px;
+      padding: 14px 32px; font-size: 18px; font-weight: 700;
+      cursor: pointer; min-height: 44px; width: 100%;
+    }
+    .btn-start:active { opacity: 0.85; transform: scale(0.97); }
+
+    /* 레벨 뱃지 */
+    .level-badge {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-size: 48px; font-weight: 900; color: #fbbf24;
+      text-shadow: 0 0 20px #f59e0b;
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 5;
+    }
+    .level-badge.show { opacity: 1; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌀 미로 탈출</h1>
+  <div class="hud">
+    <span>⏱️ <span id="timeDisplay">60</span>초</span>
+    <span>🏆 최고: <span id="bestDisplay">0</span>판</span>
+    <span>🔑 레벨 <span id="levelDisplay">1</span></span>
+  </div>
+  <div id="gameArea">
+    <canvas id="maze"></canvas>
+    <div class="level-badge" id="levelBadge">🎉</div>
+  </div>
+  <footer>
+    <small>손가락으로 캐릭터를 드래그하세요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🌀 미로 탈출</h2>
+    <p>🟣 보라 공을 드래그해서<br>⭐ 별까지 이동하세요!<br><br>벽에 닿으면 처음으로 돌아가요.<br>60초 안에 최대한 많이 탈출!</p>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CONFIG = {
+    TIME_LIMIT: 60,
+    CELL: 40,          // 기본 셀 크기 (px)
+    PLAYER_R: 10,      // 플레이어 반지름
+    GOAL_R: 12,        // 골 반지름
+    LEVELS: [
+      { cols: 7,  rows: 7  },
+      { cols: 9,  rows: 9  },
+      { cols: 11, rows: 11 },
+      { cols: 13, rows: 11 },
+    ],
+    WALL_COLOR: '#4c1d95',
+    BG_COLOR:   '#1e1035',
+    PATH_COLOR: '#2d1b69',
+    PLAYER_COLOR: '#a78bfa',
+    GOAL_COLOR:   '#fbbf24',
+  };
+
+  /* ── DOM ── */
+  const canvas      = document.getElementById('maze');
+  const ctx         = canvas.getContext('2d');
+  const timeDisplay = document.getElementById('timeDisplay');
+  const bestDisplay = document.getElementById('bestDisplay');
+  const levelDisplay= document.getElementById('levelDisplay');
+  const startBtn    = document.getElementById('startBtn');
+  const restartBtn  = document.getElementById('restartBtn');
+  const startOverlay= document.getElementById('startOverlay');
+  const endOverlay  = document.getElementById('endOverlay');
+  const finalScore  = document.getElementById('finalScore');
+  const resultMsg   = document.getElementById('resultMsg');
+  const levelBadge  = document.getElementById('levelBadge');
+
+  /* ── STATE ── */
+  let state = {
+    running: false,
+    timeLeft: CONFIG.TIME_LIMIT,
+    cleared: 0,
+    levelIdx: 0,
+    maze: [],
+    cols: 0, rows: 0,
+    cellW: 0, cellH: 0,
+    player: { x: 0, y: 0 },
+    goal: { x: 0, y: 0 },
+    dragging: false,
+    timer: null,
+    best: parseInt(localStorage.getItem('maze-escape_best') || '0', 10),
+  };
+
+  bestDisplay.textContent = state.best;
+
+  /* ── RESIZE ── */
+  function resizeCanvas() {
+    const area = document.getElementById('gameArea');
+    const aw = area.clientWidth;
+    const ah = area.clientHeight;
+    const lv = CONFIG.LEVELS[Math.min(state.levelIdx, CONFIG.LEVELS.length - 1)];
+    const cw = Math.floor((aw - 4) / lv.cols);
+    const ch = Math.floor((ah - 4) / lv.rows);
+    const cell = Math.max(20, Math.min(cw, ch));
+    canvas.width  = cell * lv.cols;
+    canvas.height = cell * lv.rows;
+    state.cellW = cell;
+    state.cellH = cell;
+    state.cols  = lv.cols;
+    state.rows  = lv.rows;
+  }
+
+  /* ── MAZE GENERATION (Recursive Backtracker DFS) ── */
+  function generateMaze(cols, rows) {
+    // walls[r][c] = { right: bool, bottom: bool }
+    const walls = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => ({ right: true, bottom: true }))
+    );
+    const visited = Array.from({ length: rows }, () => new Array(cols).fill(false));
+
+    function carve(r, c) {
+      visited[r][c] = true;
+      const dirs = [[0,1],[0,-1],[1,0],[-1,0]].sort(() => Math.random() - 0.5);
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr, nc = c + dc;
+        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || visited[nr][nc]) continue;
+        // 벽 제거
+        if (dr === 0 && dc === 1)  walls[r][c].right  = false;
+        if (dr === 0 && dc === -1) walls[r][nc].right = false;
+        if (dr === 1 && dc === 0)  walls[r][c].bottom  = false;
+        if (dr === -1 && dc === 0) walls[nr][c].bottom = false;
+        carve(nr, nc);
+      }
+    }
+    carve(0, 0);
+    return walls;
+  }
+
+  /* ── DRAW ── */
+  function draw() {
+    const { maze, cols, rows, cellW, cellH, player, goal } = state;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 배경
+    ctx.fillStyle = CONFIG.PATH_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 벽
+    ctx.strokeStyle = CONFIG.WALL_COLOR;
+    ctx.lineWidth = 3;
+
+    // 외곽 테두리
+    ctx.beginPath();
+    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.stroke();
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = c * cellW, y = r * cellH;
+        if (maze[r][c].right && c < cols - 1) {
+          ctx.beginPath();
+          ctx.moveTo(x + cellW, y);
+          ctx.lineTo(x + cellW, y + cellH);
+          ctx.stroke();
+        }
+        if (maze[r][c].bottom && r < rows - 1) {
+          ctx.beginPath();
+          ctx.moveTo(x, y + cellH);
+          ctx.lineTo(x + cellW, y + cellH);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // 목표 (별)
+    drawStar(goal.x, goal.y, CONFIG.GOAL_R, 5);
+
+    // 플레이어
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, CONFIG.PLAYER_R, 0, Math.PI * 2);
+    ctx.fillStyle = CONFIG.PLAYER_COLOR;
+    ctx.shadowColor = '#a78bfa';
+    ctx.shadowBlur = 14;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  function drawStar(cx, cy, r, points) {
+    ctx.beginPath();
+    for (let i = 0; i < points * 2; i++) {
+      const angle = (i * Math.PI) / points - Math.PI / 2;
+      const radius = i % 2 === 0 ? r : r * 0.45;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = CONFIG.GOAL_COLOR;
+    ctx.shadowColor = '#fbbf24';
+    ctx.shadowBlur = 16;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  /* ── PLAYER PIXEL POSITION ── */
+  function cellToPixel(r, c) {
+    return {
+      x: c * state.cellW + state.cellW / 2,
+      y: r * state.cellH + state.cellH / 2,
+    };
+  }
+
+  function pixelToCell(px, py) {
+    return {
+      r: Math.floor(py / state.cellH),
+      c: Math.floor(px / state.cellW),
+    };
+  }
+
+  /* ── WALL CHECK ── */
+  function canMove(fromR, fromC, toR, toC) {
+    const { maze, rows, cols } = state;
+    if (toR < 0 || toR >= rows || toC < 0 || toC >= cols) return false;
+    const dr = toR - fromR, dc = toC - fromC;
+    if (Math.abs(dr) + Math.abs(dc) !== 1) return false;
+    if (dr === 0 && dc === 1)  return !maze[fromR][fromC].right;
+    if (dr === 0 && dc === -1) return !maze[fromR][toC].right;
+    if (dr === 1 && dc === 0)  return !maze[fromR][fromC].bottom;
+    if (dr === -1 && dc === 0) return !maze[toR][fromC].bottom;
+    return false;
+  }
+
+  /* ── POINTER DRAG MOVEMENT ── */
+  let lastCell = { r: 0, c: 0 };
+
+  function getCanvasPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const cli = e.touches ? e.touches[0] : e;
+    return {
+      px: cli.clientX - rect.left,
+      py: cli.clientY - rect.top,
+    };
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    if (!state.running) return;
+    e.preventDefault();
+    state.dragging = true;
+    const { px, py } = getCanvasPos(e);
+    const cell = pixelToCell(px, py);
+    const cur = pixelToCell(state.player.x, state.player.y);
+    if (cell.r === cur.r && cell.c === cur.c) {
+      lastCell = cur;
+    }
+    canvas.setPointerCapture(e.pointerId);
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (!state.dragging || !state.running) return;
+    e.preventDefault();
+    const { px, py } = getCanvasPos(e);
+    const cell = pixelToCell(px, py);
+    // clamp
+    cell.r = Math.max(0, Math.min(state.rows - 1, cell.r));
+    cell.c = Math.max(0, Math.min(state.cols - 1, cell.c));
+    const cur = pixelToCell(state.player.x, state.player.y);
+    const curCell = { r: cur.r, c: cur.c };
+
+    if (cell.r !== curCell.r || cell.c !== curCell.c) {
+      // 한 칸씩 이동
+      const dr = Math.sign(cell.r - curCell.r);
+      const dc = Math.sign(cell.c - curCell.c);
+      // 수직 우선, 수평 다음
+      let moved = false;
+      if (dr !== 0 && canMove(curCell.r, curCell.c, curCell.r + dr, curCell.c)) {
+        const np = cellToPixel(curCell.r + dr, curCell.c);
+        state.player = np;
+        moved = true;
+      } else if (dc !== 0 && canMove(curCell.r, curCell.c, curCell.r, curCell.c + dc)) {
+        const np = cellToPixel(curCell.r, curCell.c + dc);
+        state.player = np;
+        moved = true;
+      }
+      if (!moved) {
+        // 벽에 막힘 — 시작 위치로
+        resetPlayer();
+      }
+      draw();
+      checkGoal();
+    }
+  });
+
+  canvas.addEventListener('pointerup', (e) => {
+    state.dragging = false;
+  });
+
+  /* ── GAME LOGIC ── */
+  function resetPlayer() {
+    const p = cellToPixel(0, 0);
+    state.player = { x: p.x, y: p.y };
+  }
+
+  function checkGoal() {
+    const dx = state.player.x - state.goal.x;
+    const dy = state.player.y - state.goal.y;
+    if (Math.sqrt(dx * dx + dy * dy) < CONFIG.PLAYER_R + CONFIG.GOAL_R) {
+      state.cleared++;
+      showLevelBadge();
+      nextLevel();
+    }
+  }
+
+  function showLevelBadge() {
+    levelBadge.textContent = `🎉 +1`;
+    levelBadge.classList.add('show');
+    setTimeout(() => levelBadge.classList.remove('show'), 800);
+  }
+
+  function nextLevel() {
+    if (state.levelIdx < CONFIG.LEVELS.length - 1) state.levelIdx++;
+    levelDisplay.textContent = state.levelIdx + 1;
+    startLevel();
+  }
+
+  function startLevel() {
+    resizeCanvas();
+    state.maze = generateMaze(state.cols, state.rows);
+    resetPlayer();
+    // 목표 = 우하단
+    const gp = cellToPixel(state.rows - 1, state.cols - 1);
+    state.goal = { x: gp.x, y: gp.y };
+    draw();
+  }
+
+  function startGame() {
+    state.running = true;
+    state.timeLeft = CONFIG.TIME_LIMIT;
+    state.cleared = 0;
+    state.levelIdx = 0;
+    levelDisplay.textContent = 1;
+    startLevel();
+
+    clearInterval(state.timer);
+    state.timer = setInterval(() => {
+      state.timeLeft--;
+      timeDisplay.textContent = state.timeLeft;
+      if (state.timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+  }
+
+  function endGame() {
+    state.running = false;
+    clearInterval(state.timer);
+    if (state.cleared > state.best) {
+      state.best = state.cleared;
+      localStorage.setItem('maze-escape_best', state.best);
+      bestDisplay.textContent = state.best;
+    }
+    finalScore.textContent = `${state.cleared}판`;
+    resultMsg.textContent = state.cleared >= 5
+      ? '대단해요! 미로 천재! 🧠'
+      : state.cleared >= 2
+      ? '잘했어요! 한 번 더 도전! 💪'
+      : '미로는 어렵지? 다시 해봐! 🌀';
+    endOverlay.classList.remove('hidden');
+  }
+
+  /* ── EVENTS ── */
+  startBtn.addEventListener('click', () => {
+    startOverlay.classList.add('hidden');
+    startGame();
+  });
+  restartBtn.addEventListener('click', () => {
+    endOverlay.classList.add('hidden');
+    startGame();
+  });
+
+  /* ── INIT ── */
+  resizeCanvas();
+  draw();
+})();
+</script>
+</body>
+</html>

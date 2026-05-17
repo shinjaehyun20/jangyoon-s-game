@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>색깔 피아노</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: #0f172a;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 26px);
+      color: #fff; text-align: center;
+      text-shadow: 0 0 12px rgba(255,255,255,0.4);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 5px 14px;
+      color: #fff; font-size: 14px; font-weight: 700;
+    }
+    #gameArea {
+      flex: 1; display: flex; flex-direction: column;
+      position: relative; overflow: hidden;
+    }
+    #particleCanvas {
+      position: absolute; inset: 0;
+      pointer-events: none; z-index: 1;
+    }
+    .score-display {
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 8px 10px;
+      min-height: 48px; display: flex;
+      align-items: center; gap: 6px; flex-wrap: wrap;
+      position: relative; z-index: 2;
+    }
+    .note-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; border: 2px solid rgba(255,255,255,0.2);
+      transition: border-color 0.15s; flex-shrink: 0;
+    }
+    .note-dot.played { border-color: #fff; }
+    .note-dot.wrong  { border-color: #ef4444; animation: shake 0.3s; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-4px); }
+      75%      { transform: translateX(4px); }
+    }
+    .piano-wrap {
+      flex: 1; display: flex; align-items: flex-end;
+      padding-bottom: 4px; position: relative; z-index: 2;
+    }
+    .piano { display: flex; width: 100%; height: 100%; gap: 3px; align-items: flex-end; }
+    .key {
+      flex: 1; border-radius: 10px 10px 14px 14px;
+      cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 8px; font-size: 18px;
+      border: none; outline: none;
+      transition: transform 0.08s, filter 0.08s;
+      min-height: 44px; touch-action: none;
+      user-select: none; -webkit-user-select: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 -4px 0 rgba(0,0,0,0.3);
+    }
+    .key.pressed {
+      transform: scaleY(0.93) translateY(3px);
+      filter: brightness(1.35);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4), inset 0 -1px 0 rgba(0,0,0,0.3);
+    }
+    .key-emoji { font-size: 20px; }
+    .key-label { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 700; margin-top: 4px; }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: rgba(255,255,255,0.4); position: relative; z-index: 2;
+    }
+    .home-link { color: #818cf8; text-decoration: none; font-weight: 700; }
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      display: flex; align-items: center; justify-content: center; z-index: 20;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1e1b4b, #0f172a);
+      border: 2px solid #818cf8; border-radius: 20px;
+      padding: 28px 24px; text-align: center; color: #fff;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 0 30px rgba(129,140,248,0.4);
+    }
+    .overlay-card h2 { font-size: 24px; margin-bottom: 10px; }
+    .overlay-card p  { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.8); margin-bottom: 14px; }
+    .result-score { font-size: 48px; font-weight: 900; color: #fbbf24; margin-bottom: 8px; }
+    .btn-start {
+      background: linear-gradient(135deg, #4338ca, #818cf8);
+      color: #fff; border: none; border-radius: 14px;
+      padding: 14px 32px; font-size: 18px; font-weight: 700;
+      cursor: pointer; min-height: 44px; width: 100%;
+    }
+    .btn-start:active { opacity: 0.85; transform: scale(0.97); }
+    .mode-btns { display: flex; gap: 8px; margin-bottom: 14px; }
+    .mode-btn {
+      flex: 1; padding: 10px; border-radius: 10px;
+      border: 2px solid #818cf8; background: transparent;
+      color: #fff; font-size: 13px; font-weight: 700;
+      cursor: pointer; min-height: 44px;
+    }
+    .mode-btn.active { background: #4338ca; }
+    .combo-display { font-size: 13px; color: #fbbf24; font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>&#127929; 색깔 피아노</h1>
+  <div class="hud">
+    <span>&#11088; <span id="scoreDisplay">0</span></span>
+    <span class="combo-display">&#128293; <span id="comboDisplay">0</span>연속</span>
+    <span>&#127942; 최고: <span id="bestDisplay">0</span></span>
+  </div>
+  <div id="gameArea">
+    <canvas id="particleCanvas"></canvas>
+    <div class="score-display" id="patternArea"></div>
+    <div class="piano-wrap"><div class="piano" id="piano"></div></div>
+  </div>
+  <footer>
+    <small>건반을 눌러 연주하세요!</small>
+    <a class="home-link" href="../index.html">&larr; 홈으로</a>
+  </footer>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>&#127929; 색깔 피아노</h2>
+    <p>건반을 눌러 연주해요!<br>색깔 파티클이 터져요 &#127878;<br><br>모드를 선택하세요:</p>
+    <div class="mode-btns">
+      <button class="mode-btn active" id="modeFreeBtn">&#127925; 자유 연주</button>
+      <button class="mode-btn" id="modeFollowBtn">&#127919; 따라치기</button>
+    </div>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>&#127881; 연주 완료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var KEYS = [
+    { emoji: '🔴', color: '#ef4444', label: '도', freq: 261.63 },
+    { emoji: '🟠', color: '#f97316', label: '레', freq: 293.66 },
+    { emoji: '🟡', color: '#eab308', label: '미', freq: 329.63 },
+    { emoji: '🟢', color: '#22c55e', label: '파', freq: 349.23 },
+    { emoji: '🔵', color: '#3b82f6', label: '솔', freq: 392.00 },
+    { emoji: '🟣', color: '#a855f7', label: '라', freq: 440.00 },
+    { emoji: '🩷', color: '#ec4899', label: '시', freq: 493.88 },
+  ];
+
+  var PATTERNS = [
+    { name: '도레미', seq: [0,1,2,0,1,2,3,2,1,0] },
+    { name: '반짝반짝', seq: [0,0,4,4,5,5,4,3,3,2,2,1,1,0] },
+    { name: '나비야', seq: [0,2,4,4,3,1,0,2,4,4,2,0] },
+    { name: '곰세마리', seq: [0,1,2,0,0,1,2,0,2,3,4,2,3,4] },
+  ];
+
+  var mode = 'free';
+  var score = 0;
+  var combo = 0;
+  var best = parseInt(localStorage.getItem('color-piano_best') || '0', 10);
+  var currentPattern = null;
+  var patternIdx = 0;
+  var running = false;
+  var gameTimer = null;
+
+  var scoreEl    = document.getElementById('scoreDisplay');
+  var comboEl    = document.getElementById('comboDisplay');
+  var bestEl     = document.getElementById('bestDisplay');
+  var patternArea= document.getElementById('patternArea');
+  var piano      = document.getElementById('piano');
+  var startOverlay = document.getElementById('startOverlay');
+  var endOverlay   = document.getElementById('endOverlay');
+  var startBtn   = document.getElementById('startBtn');
+  var restartBtn = document.getElementById('restartBtn');
+  var finalScore = document.getElementById('finalScore');
+  var resultMsg  = document.getElementById('resultMsg');
+  var modeFreeBtn   = document.getElementById('modeFreeBtn');
+  var modeFollowBtn = document.getElementById('modeFollowBtn');
+  var particleCanvas = document.getElementById('particleCanvas');
+  var pCtx = particleCanvas.getContext('2d');
+
+  bestEl.textContent = best;
+
+  function resizeCanvas() {
+    var area = document.getElementById('gameArea');
+    particleCanvas.width  = area.clientWidth;
+    particleCanvas.height = area.clientHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  modeFreeBtn.addEventListener('click', function() {
+    mode = 'free';
+    modeFreeBtn.classList.add('active');
+    modeFollowBtn.classList.remove('active');
+  });
+  modeFollowBtn.addEventListener('click', function() {
+    mode = 'follow';
+    modeFollowBtn.classList.add('active');
+    modeFreeBtn.classList.remove('active');
+  });
+
+  var audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+  function playTone(freq) {
+    var ctx = getAudioCtx();
+    var osc  = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.32, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.55);
+  }
+
+  var particles = [];
+  function spawnParticles(keyEl, color) {
+    var rect  = keyEl.getBoundingClientRect();
+    var aRect = document.getElementById('gameArea').getBoundingClientRect();
+    var cx = rect.left - aRect.left + rect.width / 2;
+    var cy = rect.top  - aRect.top;
+    for (var i = 0; i < 18; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var spd   = 2 + Math.random() * 5;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd - 3,
+        r: 4 + Math.random() * 6,
+        color: color,
+        alpha: 1,
+      });
+    }
+  }
+  function animParticles() {
+    pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.18; p.vx *= 0.97; p.alpha -= 0.022;
+      if (p.alpha <= 0) { particles.splice(i, 1); continue; }
+      pCtx.globalAlpha = p.alpha;
+      pCtx.beginPath();
+      pCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      pCtx.fillStyle = p.color;
+      pCtx.fill();
+    }
+    pCtx.globalAlpha = 1;
+    requestAnimationFrame(animParticles);
+  }
+  animParticles();
+
+  function buildPiano() {
+    while (piano.firstChild) piano.removeChild(piano.firstChild);
+    KEYS.forEach(function(k, idx) {
+      var btn = document.createElement('div');
+      btn.className = 'key';
+      btn.style.background = 'linear-gradient(180deg,' + k.color + 'cc,' + k.color + ')';
+
+      var emojiSpan = document.createElement('span');
+      emojiSpan.className = 'key-emoji';
+      emojiSpan.textContent = k.emoji;
+
+      var labelSpan = document.createElement('span');
+      labelSpan.className = 'key-label';
+      labelSpan.textContent = k.label;
+
+      btn.appendChild(emojiSpan);
+      btn.appendChild(labelSpan);
+      btn.dataset.idx = idx;
+
+      function pressKey() {
+        if (!running) return;
+        btn.classList.add('pressed');
+        setTimeout(function() { btn.classList.remove('pressed'); }, 150);
+        playTone(k.freq);
+        spawnParticles(btn, k.color);
+        handleKeyPress(idx);
+      }
+
+      btn.addEventListener('pointerdown', function(e) {
+        e.preventDefault();
+        pressKey();
+      });
+      btn.addEventListener('pointerenter', function(e) {
+        if (e.buttons > 0) pressKey();
+      });
+
+      piano.appendChild(btn);
+    });
+  }
+
+  function renderPatternArea() {
+    while (patternArea.firstChild) patternArea.removeChild(patternArea.firstChild);
+
+    if (mode === 'free') {
+      var freeMsg = document.createElement('span');
+      freeMsg.style.cssText = 'font-size:12px;color:rgba(255,255,255,0.5)';
+      freeMsg.textContent = '자유 연주 모드 🎵';
+      patternArea.appendChild(freeMsg);
+      return;
+    }
+
+    if (!currentPattern) return;
+
+    var label = document.createElement('span');
+    label.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.5);margin-right:auto';
+    label.textContent = '🎵 ' + currentPattern.name;
+    patternArea.appendChild(label);
+
+    currentPattern.seq.forEach(function(noteIdx, i) {
+      var dot = document.createElement('div');
+      dot.className = 'note-dot';
+      dot.id = 'dot-' + i;
+      dot.style.background = KEYS[noteIdx].color + '44';
+      dot.style.color = KEYS[noteIdx].color;
+      dot.textContent = KEYS[noteIdx].emoji;
+      if (i < patternIdx) dot.classList.add('played');
+      patternArea.appendChild(dot);
+    });
+  }
+
+  function handleKeyPress(idx) {
+    if (mode === 'free') return;
+    if (!currentPattern) return;
+
+    var expected = currentPattern.seq[patternIdx];
+    if (idx === expected) {
+      var dot = document.getElementById('dot-' + patternIdx);
+      if (dot) dot.classList.add('played');
+      patternIdx++;
+      combo++;
+      score += 10 + combo * 2;
+      scoreEl.textContent = score;
+      comboEl.textContent = combo;
+
+      if (patternIdx >= currentPattern.seq.length) {
+        setTimeout(function() {
+          initPattern();
+        }, 400);
+      }
+    } else {
+      combo = 0;
+      comboEl.textContent = 0;
+      var wrongDot = document.getElementById('dot-' + patternIdx);
+      if (wrongDot) {
+        wrongDot.classList.add('wrong');
+        setTimeout(function() { wrongDot.classList.remove('wrong'); }, 400);
+      }
+    }
+  }
+
+  function initPattern() {
+    currentPattern = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
+    patternIdx = 0;
+    renderPatternArea();
+  }
+
+  function startGame() {
+    running = true;
+    score = 0; combo = 0; patternIdx = 0;
+    scoreEl.textContent = 0; comboEl.textContent = 0;
+    buildPiano();
+    if (mode === 'follow') {
+      initPattern();
+      clearTimeout(gameTimer);
+      gameTimer = setTimeout(function() { endGame(); }, 60000);
+    } else {
+      renderPatternArea();
+    }
+  }
+
+  function endGame() {
+    if (!running) return;
+    running = false;
+    clearTimeout(gameTimer);
+    if (score > best) {
+      best = score;
+      localStorage.setItem('color-piano_best', best);
+      bestEl.textContent = best;
+    }
+    finalScore.textContent = score + '점';
+    if (score >= 200) {
+      resultMsg.textContent = '피아노 천재! 대박이야! 🎹🌟';
+    } else if (score >= 80) {
+      resultMsg.textContent = '잘했어요! 박자 감각이 있어요! 🎵';
+    } else {
+      resultMsg.textContent = '음악은 즐거운 거야! 다시 도전! 🎶';
+    }
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', function() {
+    startOverlay.classList.add('hidden');
+    startGame();
+  });
+  restartBtn.addEventListener('click', function() {
+    endOverlay.classList.add('hidden');
+    startOverlay.classList.remove('hidden');
+  });
+
+  buildPiano();
+  renderPatternArea();
+})();
+</script>
+</body>
+</html>

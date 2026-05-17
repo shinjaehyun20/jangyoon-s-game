@@ -510,5 +510,21 @@
     "description": "자석을 드래그해서 물고기를 끌어당겨 잡아요! 폭탄은 피하고 목숨 3개, 40초 도전",
     "thumbnail": "magnet-fish/thumb.svg",
     "path": "magnet-fish/index.html"
+  },
+  {
+    "id": "maze-escape",
+    "title": "Maze Escape",
+    "title_ko": "🔵 미로 탈출",
+    "description": "DFS로 생성된 미로에서 보라 공을 드래그해 탈출! 4레벨 난이도, 60초 타임어택",
+    "thumbnail": "maze-escape/thumb.svg",
+    "path": "maze-escape/index.html"
+  },
+  {
+    "id": "color-piano",
+    "title": "Color Piano",
+    "title_ko": "🎹 색깔 피아노",
+    "description": "7색 건반을 탭해서 음계를 연주해요! 자유 연주·따라치기 2가지 모드, Web Audio API",
+    "thumbnail": "color-piano/thumb.svg",
+    "path": "color-piano/index.html"
   }
 ]
