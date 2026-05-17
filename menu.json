@@ -45,7 +45,9 @@
       { "id": "build-snowman",      "label": "⛄ 눈사람 만들기",          "path": "build-snowman/index.html" },
       { "id": "water-gun",          "label": "🔫 물총 싸움",              "path": "water-gun/index.html" },
       { "id": "pizza-maker",        "label": "🍕 피자 만들기",             "path": "pizza-maker/index.html" },
-      { "id": "kangaroo-jump",      "label": "🦘 캥거루 점프",             "path": "kangaroo-jump/index.html" }
+      { "id": "kangaroo-jump",      "label": "🦘 캥거루 점프",             "path": "kangaroo-jump/index.html" },
+      { "id": "bubble-wrap",        "label": "🫧 뽁뽁이 터뜨리기",          "path": "bubble-wrap/index.html" },
+      { "id": "magnet-fish",        "label": "🧲 자석 낚시",                 "path": "magnet-fish/index.html" }
     ]
   },
   {

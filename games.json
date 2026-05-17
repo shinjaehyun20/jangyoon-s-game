@@ -494,5 +494,21 @@
     "description": "꾹 누를수록 높이 점프! 별을 먹고 가시를 피해 플랫폼을 뛰어다녀요",
     "thumbnail": "kangaroo-jump/thumb.svg",
     "path": "kangaroo-jump/index.html"
+  },
+  {
+    "id": "bubble-wrap",
+    "title": "Bubble Wrap",
+    "title_ko": "🫧 뽁뽁이 터뜨리기",
+    "description": "뽁뽁이를 전부 탭해서 터뜨려요! 레벨이 오를수록 크기 증가, 30초 도전",
+    "thumbnail": "bubble-wrap/thumb.svg",
+    "path": "bubble-wrap/index.html"
+  },
+  {
+    "id": "magnet-fish",
+    "title": "Magnet Fish",
+    "title_ko": "🧲 자석 낚시",
+    "description": "자석을 드래그해서 물고기를 끌어당겨 잡아요! 폭탄은 피하고 목숨 3개, 40초 도전",
+    "thumbnail": "magnet-fish/thumb.svg",
+    "path": "magnet-fish/index.html"
   }
 ]

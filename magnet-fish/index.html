@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>자석 낚시</title>
+  <style>
+    :root {
+      --bg: #0a1628;
+      --water: #0e3460;
+      --accent: #38bdf8;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 { font-size: clamp(18px, 5vw, 26px); font-weight: 900; text-align: center; }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 6px 14px;
+    }
+    .hud-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .hud-label { font-size: 10px; opacity: 0.65; }
+    .hud-val   { font-size: clamp(16px, 4.5vw, 22px); font-weight: 900; }
+    #timerVal  { color: #fde68a; }
+    #scoreVal  { color: #6ee7b7; }
+    #livesVal  { color: #f87171; }
+
+    #gameArea {
+      flex: 1; position: relative; overflow: hidden;
+      border-radius: 12px;
+    }
+    canvas { display: block; width: 100%; height: 100%; }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; opacity: 0.6;
+    }
+    .home-link {
+      color: #fff; text-decoration: none; font-size: 13px;
+      padding: 6px 10px; background: rgba(255,255,255,0.1); border-radius: 8px;
+    }
+
+    .overlay {
+      position: fixed; inset: 0; background: rgba(5,15,35,0.9);
+      display: flex; align-items: center; justify-content: center; z-index: 10;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #0e3460; border-radius: 20px; padding: 28px 24px;
+      text-align: center; max-width: 320px; width: 88%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      border: 1px solid rgba(56,189,248,0.25);
+    }
+    .overlay-card h2 { font-size: 24px; margin-bottom: 10px; }
+    .overlay-card p  { font-size: 14px; opacity: 0.85; margin-bottom: 18px; line-height: 1.55; }
+    .result-score { font-size: 42px; font-weight: 900; color: var(--accent); margin: 10px 0; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #0284c7);
+      color: #fff; border: none; border-radius: 14px;
+      font-size: 18px; font-weight: 800;
+      padding: 13px 32px; cursor: pointer;
+      min-height: 48px; width: 100%;
+      box-shadow: 0 4px 16px rgba(56,189,248,0.3);
+    }
+    .btn-start:active { transform: scale(0.96); }
+    .best-txt { font-size: 12px; opacity: 0.55; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🧲 자석 낚시</h1>
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">점수</span>
+      <span class="hud-val" id="scoreVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">남은 시간</span>
+      <span class="hud-val" id="timerVal">40</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">목숨</span>
+      <span class="hud-val" id="livesVal">❤️❤️❤️</span>
+    </div>
+  </div>
+  <div id="gameArea">
+    <canvas id="c"></canvas>
+  </div>
+  <footer>
+    <small>자석을 끌어서 물고기를 잡아요!</small>
+    <a class="home-link" href="../index.html">&#8592; 홈으로</a>
+  </footer>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🧲 자석 낚시</h2>
+    <p>화면을 드래그해서 자석을 움직여요!<br>자석에 가까이 온 물고기를 끌어당겨 잡아요.<br>💣 폭탄은 피하세요! 목숨 3개, 40초 도전!</p>
+    <button class="btn-start" id="startBtn">시작!</button>
+    <div class="best-txt" id="startBest"></div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+    <div class="best-txt" id="endBest"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CONFIG = {
+    TOTAL_TIME:    40,
+    LIVES:         3,
+    FISH_INTERVAL: 1400,   // ms
+    BOMB_CHANCE:   0.22,   // 폭탄 생성 확률
+    MAGNET_RADIUS: 80,     // 자석 흡인 범위
+    CATCH_RADIUS:  36,     // 실제 잡히는 반경
+    STORAGE_KEY:   'magnet-fish_best',
+    FISH_EMOJI:    ['🐟','🐠','🐡','🦈','🐬','🐳','🦑'],
+    BOMB_EMOJI:    '💣',
+  };
+
+  function el(id) { return document.getElementById(id); }
+
+  var canvas    = el('c');
+  var ctx       = canvas.getContext('2d');
+  var scoreEl   = el('scoreVal');
+  var timerEl   = el('timerVal');
+  var livesEl   = el('livesVal');
+  var startOvl  = el('startOverlay');
+  var endOvl    = el('endOverlay');
+  var finalScEl = el('finalScore');
+  var resultMsg = el('resultMsg');
+  var startBest = el('startBest');
+  var endBest   = el('endBest');
+
+  var W, H;
+  var state = {};
+  var raf;
+
+  function resize() {
+    var area = el('gameArea');
+    W = canvas.width  = area.clientWidth;
+    H = canvas.height = area.clientHeight;
+  }
+  window.addEventListener('resize', resize);
+
+  function getBest() {
+    return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+  }
+  function saveBest(s) {
+    if (s > getBest()) localStorage.setItem(CONFIG.STORAGE_KEY, String(s));
+  }
+  function heartsStr(n) {
+    var s = '';
+    for (var i = 0; i < n; i++) s += '❤️';
+    return s || '💔';
+  }
+
+  // ── 물고기/폭탄 객체 ──
+  function spawnItem() {
+    var isBomb = Math.random() < CONFIG.BOMB_CHANCE;
+    var item = {
+      x: Math.random() * (W - 60) + 30,
+      y: -30,
+      vx: (Math.random() - 0.5) * 1.8,
+      vy: 0.8 + Math.random() * 1.2,
+      emoji: isBomb ? CONFIG.BOMB_EMOJI
+             : CONFIG.FISH_EMOJI[Math.floor(Math.random() * CONFIG.FISH_EMOJI.length)],
+      isBomb: isBomb,
+      caught: false,
+      miss: false,
+      size: isBomb ? 28 : 26,
+    };
+    state.items.push(item);
+  }
+
+  function startGame() {
+    resize();
+    clearInterval(state.timerId);
+    clearInterval(state.spawnId);
+    cancelAnimationFrame(raf);
+
+    state = {
+      score:    0,
+      lives:    CONFIG.LIVES,
+      timeLeft: CONFIG.TOTAL_TIME,
+      running:  true,
+      items:    [],
+      magnet:   { x: W / 2, y: H * 0.25 },
+      timerId:  null,
+      spawnId:  null,
+      effects:  [],
+    };
+
+    scoreEl.textContent = '0';
+    timerEl.textContent = String(CONFIG.TOTAL_TIME);
+    timerEl.style.color = '#fde68a';
+    livesEl.textContent = heartsStr(CONFIG.LIVES);
+    startOvl.classList.add('hidden');
+    endOvl.classList.add('hidden');
+
+    state.timerId = setInterval(tick, 1000);
+    state.spawnId = setInterval(spawnItem, CONFIG.FISH_INTERVAL);
+    spawnItem();
+    loop();
+  }
+
+  function tick() {
+    if (!state.running) return;
+    state.timeLeft--;
+    timerEl.textContent = String(state.timeLeft);
+    if (state.timeLeft <= 8) timerEl.style.color = '#f87171';
+    if (state.timeLeft <= 0) endGame();
+  }
+
+  function endGame() {
+    clearInterval(state.timerId);
+    clearInterval(state.spawnId);
+    state.running = false;
+    saveBest(state.score);
+    var best = getBest();
+    finalScEl.textContent = state.score + '점';
+    resultMsg.textContent  = '물고기를 ' + state.score + '마리 잡았어요!';
+    endBest.textContent    = '최고 기록: ' + best + '점';
+    endOvl.classList.remove('hidden');
+  }
+
+  function loop() {
+    if (!state.running) return;
+    raf = requestAnimationFrame(loop);
+    update();
+    draw();
+  }
+
+  function update() {
+    var mx = state.magnet.x;
+    var my = state.magnet.y;
+
+    for (var i = state.items.length - 1; i >= 0; i--) {
+      var item = state.items[i];
+      if (item.caught || item.miss) { continue; }
+
+      // 자석 인력 (범위 내 물고기만)
+      var dx = mx - item.x;
+      var dy = my - item.y;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (!item.isBomb && dist < CONFIG.MAGNET_RADIUS) {
+        // 인력: 거리에 반비례
+        var force = (CONFIG.MAGNET_RADIUS - dist) / CONFIG.MAGNET_RADIUS * 3.5;
+        item.vx += (dx / dist) * force;
+        item.vy += (dy / dist) * force;
+      }
+
+      // 속도 제한
+      var speed = Math.sqrt(item.vx * item.vx + item.vy * item.vy);
+      if (speed > 8) { item.vx = item.vx / speed * 8; item.vy = item.vy / speed * 8; }
+
+      item.x += item.vx;
+      item.y += item.vy;
+
+      // 좌우 벽 반사
+      if (item.x < 20) { item.x = 20; item.vx *= -0.6; }
+      if (item.x > W - 20) { item.x = W - 20; item.vx *= -0.6; }
+
+      // 잡힘 판정
+      if (dist < CONFIG.CATCH_RADIUS) {
+        item.caught = true;
+        if (item.isBomb) {
+          // 폭탄 터치
+          state.lives--;
+          livesEl.textContent = heartsStr(state.lives);
+          addEffect(item.x, item.y, '💥 -1', '#f87171');
+          if (state.lives <= 0) { endGame(); return; }
+        } else {
+          state.score++;
+          scoreEl.textContent = String(state.score);
+          addEffect(item.x, item.y, '+1 ' + item.emoji, '#6ee7b7');
+        }
+        state.items.splice(i, 1);
+        continue;
+      }
+
+      // 화면 밖으로 사라짐
+      if (item.y > H + 40) {
+        if (!item.isBomb) {
+          // 물고기 놓침 — 점수 차감 없이 그냥 제거
+        }
+        state.items.splice(i, 1);
+      }
+    }
+
+    // 효과 업데이트
+    for (var j = state.effects.length - 1; j >= 0; j--) {
+      state.effects[j].life--;
+      if (state.effects[j].life <= 0) state.effects.splice(j, 1);
+    }
+  }
+
+  function addEffect(x, y, text, color) {
+    state.effects.push({ x: x, y: y, text: text, color: color, life: 40 });
+  }
+
+  function draw() {
+    // 배경
+    ctx.fillStyle = '#0a1628';
+    ctx.fillRect(0, 0, W, H);
+
+    // 물 영역 그라디언트
+    var grad = ctx.createLinearGradient(0, H * 0.15, 0, H);
+    grad.addColorStop(0, 'rgba(14,52,96,0.5)');
+    grad.addColorStop(1, 'rgba(14,52,96,0.85)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, H * 0.15, W, H * 0.85);
+
+    // 물 표면 선
+    ctx.strokeStyle = 'rgba(56,189,248,0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, H * 0.15);
+    ctx.lineTo(W, H * 0.15);
+    ctx.stroke();
+
+    // 자석 렌더
+    var mx = state.magnet.x;
+    var my = state.magnet.y;
+
+    // 자기장 원 (희미)
+    ctx.beginPath();
+    ctx.arc(mx, my, CONFIG.MAGNET_RADIUS, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(56,189,248,0.18)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 자석 본체
+    ctx.font = '36px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🧲', mx, my);
+
+    // 물고기/폭탄 렌더
+    for (var i = 0; i < state.items.length; i++) {
+      var item = state.items[i];
+      ctx.save();
+      ctx.font = item.size + 'px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // 물고기는 이동 방향으로 뒤집기
+      if (!item.isBomb && item.vx < 0) {
+        ctx.scale(-1, 1);
+        ctx.fillText(item.emoji, -item.x, item.y);
+      } else {
+        ctx.fillText(item.emoji, item.x, item.y);
+      }
+      ctx.restore();
+    }
+
+    // 효과 텍스트
+    for (var j = 0; j < state.effects.length; j++) {
+      var eff = state.effects[j];
+      var alpha = eff.life / 40;
+      ctx.globalAlpha = alpha;
+      ctx.font = 'bold 16px "Apple SD Gothic Neo", sans-serif';
+      ctx.fillStyle = eff.color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(eff.text, eff.x, eff.y - (40 - eff.life) * 1.2);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // ── 포인터 입력 ──
+  var dragging = false;
+
+  el('gameArea').addEventListener('pointerdown', function (e) {
+    if (!state.running) return;
+    dragging = true;
+    moveMagnet(e);
+    e.preventDefault();
+  }, { passive: false });
+
+  window.addEventListener('pointermove', function (e) {
+    if (!dragging || !state.running) return;
+    moveMagnet(e);
+  });
+
+  window.addEventListener('pointerup', function () { dragging = false; });
+  window.addEventListener('pointercancel', function () { dragging = false; });
+
+  function moveMagnet(e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width  / rect.width;
+    var scaleY = canvas.height / rect.height;
+    var px = e.clientX;
+    var py = e.clientY;
+    if (e.touches && e.touches[0]) { px = e.touches[0].clientX; py = e.touches[0].clientY; }
+    state.magnet.x = (px - rect.left) * scaleX;
+    state.magnet.y = (py - rect.top)  * scaleY;
+  }
+
+  el('startBtn').addEventListener('pointerdown', startGame);
+  el('restartBtn').addEventListener('pointerdown', startGame);
+
+  var b = getBest();
+  if (b > 0) startBest.textContent = '최고 기록: ' + b + '점';
+
+  resize();
+})();
+</script>
+</body>
+</html>
