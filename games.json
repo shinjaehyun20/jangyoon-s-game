@@ -526,5 +526,21 @@
     "description": "7색 건반을 탭해서 음계를 연주해요! 자유 연주·따라치기 2가지 모드, Web Audio API",
     "thumbnail": "color-piano/thumb.svg",
     "path": "color-piano/index.html"
+  },
+  {
+    "id": "pretend-play",
+    "title": "Pretend Play Kitchen",
+    "title_ko": "🍳 소꿉놀이 요리사",
+    "description": "레시피 보고 재료를 순서대로 접시에 올려요!",
+    "thumbnail": "pretend-play/thumb.svg",
+    "path": "pretend-play/index.html"
+  },
+  {
+    "id": "ball-throw",
+    "title": "Ball Throw",
+    "title_ko": "🎯 공 던지기",
+    "description": "드래그로 방향 조준, 움직이는 과녁에 공을 던져요!",
+    "thumbnail": "ball-throw/thumb.svg",
+    "path": "ball-throw/index.html"
   }
 ]

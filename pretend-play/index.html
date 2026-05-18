@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>소꿉놀이 요리사</title>
+  <style>
+    :root {
+      --bg: #FFF3E0;
+      --accent: #FF6F00;
+      --plate: #FFFDE7;
+      --text: #4E342E;
+      --btn: #FF8F00;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: var(--bg);
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px;
+      gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; gap: 8px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 12px;
+      padding: 6px 12px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      flex: 1; text-align: center;
+      font-size: clamp(12px, 3.5vw, 16px);
+      font-weight: 700;
+    }
+    .hud-item span {
+      display: block;
+      font-size: clamp(16px, 4.5vw, 22px);
+      color: var(--accent);
+    }
+    .recipe-area {
+      background: white;
+      border-radius: 14px;
+      padding: 8px 10px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .recipe-title {
+      font-size: clamp(11px, 3vw, 14px);
+      font-weight: 700;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .recipe-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .recipe-slot {
+      width: clamp(36px, 10vw, 48px);
+      height: clamp(36px, 10vw, 48px);
+      border-radius: 10px;
+      background: #F5F5F5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(20px, 5.5vw, 28px);
+      border: 2px dashed #DDD;
+      position: relative;
+    }
+    .recipe-slot.filled { background: #E8F5E9; border-color: #66BB6A; border-style: solid; }
+    .recipe-slot.current { border-color: #FF8F00; border-style: solid; background: #FFF8E1; }
+    .slot-check {
+      position: absolute; top: -6px; right: -6px;
+      width: 16px; height: 16px;
+      background: #4CAF50; border-radius: 50%;
+      font-size: 10px; color: white;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .plate-area {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+    }
+    .plate {
+      width: clamp(150px, 42vw, 190px);
+      height: clamp(150px, 42vw, 190px);
+      border-radius: 50%;
+      background: var(--plate);
+      border: 4px solid #E0E0E0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      display: flex; flex-wrap: wrap;
+      align-items: center; justify-content: center;
+      gap: 2px; padding: 16px;
+    }
+    .plate-item {
+      font-size: clamp(22px, 6.5vw, 32px);
+      animation: popIn 0.3s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .plate-label {
+      font-size: clamp(11px, 3vw, 14px);
+      color: #888;
+    }
+    .shelf {
+      background: white; border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+    .shelf-label {
+      font-size: clamp(11px, 3vw, 13px);
+      font-weight: 700; color: #888;
+      margin-bottom: 6px; text-align: center;
+    }
+    .ingredient-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+    .ingredient-btn {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      background: #FFF8E1;
+      border: 2px solid #FFE082;
+      cursor: pointer;
+      font-size: clamp(22px, 6vw, 30px);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 44px;
+    }
+    .ingredient-btn:active { transform: scale(0.88); background: #FFF176; }
+    .ingredient-btn.used { opacity: 0.3; pointer-events: none; }
+    .ingredient-btn.wrong { animation: shake 0.3s ease; border-color: #EF5350; background: #FFEBEE; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+    footer {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-shrink: 0;
+    }
+    footer small { font-size: clamp(11px, 3vw, 13px); color: #888; }
+    .home-link {
+      font-size: clamp(12px, 3.5vw, 14px);
+      color: var(--accent); text-decoration: none; font-weight: 700;
+    }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: white; border-radius: 24px;
+      padding: 28px 24px; max-width: 320px;
+      width: 90%; text-align: center;
+    }
+    .overlay-card h2 {
+      font-size: clamp(20px, 6vw, 28px);
+      margin-bottom: 10px;
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 16px);
+      color: #666; margin-bottom: 18px; line-height: 1.6;
+    }
+    .btn-start {
+      background: var(--btn); color: white;
+      border: none; border-radius: 50px;
+      padding: 14px 36px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.94); }
+    .result-score {
+      font-size: clamp(40px, 12vw, 60px);
+      font-weight: 900; color: var(--accent); margin: 8px 0;
+    }
+    .sparkle {
+      position: fixed; pointer-events: none;
+      font-size: 26px;
+      animation: sparkleAnim 0.8s ease-out forwards;
+      z-index: 200;
+    }
+    @keyframes sparkleAnim {
+      0% { transform: scale(0.5) translateY(0); opacity: 1; }
+      100% { transform: scale(1.4) translateY(-70px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍳 소꿉놀이 요리사</h1>
+
+    <div class="hud">
+      <div class="hud-item">요리 완성<span id="scoreVal">0</span></div>
+      <div class="hud-item">단계<span id="levelVal">1</span></div>
+      <div class="hud-item">시간<span id="timerVal">60</span></div>
+    </div>
+
+    <div class="recipe-area">
+      <div class="recipe-title">📋 레시피 (순서대로 넣어요!)</div>
+      <div class="recipe-row" id="recipeRow"></div>
+    </div>
+
+    <div class="plate-area">
+      <div class="plate" id="plate"></div>
+      <div class="plate-label" id="plateLabel">접시에 재료를 올려요</div>
+    </div>
+
+    <div class="shelf">
+      <div class="shelf-label">🧺 재료 선반</div>
+      <div class="ingredient-grid" id="ingredientGrid"></div>
+    </div>
+
+    <footer>
+      <small>레시피 순서대로 탭!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍳 소꿉놀이 요리사</h2>
+      <p>레시피를 보고<br>재료를 순서대로 접시에 올려요!<br>빨리빨리 요리를 완성해요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 요리 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_TIME: 60,
+      STORAGE_KEY: 'pretend-play_best',
+    };
+
+    const RECIPES = [
+      { name: '🍳 계란 후라이',    items: ['🥚','🧈','🧂'] },
+      { name: '🥗 과일 샐러드',    items: ['🍓','🍇','🍋','🍯'] },
+      { name: '🍱 도시락',          items: ['🍚','🥕','🥩','🥦'] },
+      { name: '🥪 샌드위치',        items: ['🍞','🥬','🧀','🍅'] },
+      { name: '🍲 야채 국',         items: ['🥔','🌽','🧅','💧'] },
+      { name: '🍜 라면',            items: ['🍜','🥚','🌶️','🧅'] },
+      { name: '🍰 딸기 케이크',     items: ['🎂','🍓','🍒','🌸'] },
+      { name: '🧁 컵케이크',        items: ['🫙','🥛','🍫','🎀'] },
+      { name: '🍣 초밥',            items: ['🍚','🐟','🌿','🥢'] },
+      { name: '🥘 볶음밥',          items: ['🍚','🥕','🥚','🫒'] },
+    ];
+
+    const ALL_ITEMS = [
+      '🥚','🧈','🧂','🍓','🍇','🍋','🍯','🍚','🥕','🥩',
+      '🥦','🍞','🥬','🧀','🍅','🥔','🌽','🧅','💧','🍜',
+      '🌶️','🎂','🍒','🌸','🫙','🥛','🍫','🎀','🐟','🌿',
+      '🥢','🫒','🍱','🥗','🧆',
+    ];
+
+    let state = {
+      score: 0,
+      level: 1,
+      timeLeft: CONFIG.GAME_TIME,
+      timer: null,
+      currentRecipe: null,
+      stepIndex: 0,
+      running: false,
+      displayItems: [],
+    };
+
+    function $(id) { return document.getElementById(id); }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function pickRecipe() {
+      return RECIPES[Math.floor(Math.random() * RECIPES.length)];
+    }
+
+    function buildDisplayItems(recipe) {
+      const needed = recipe.items;
+      const pool = ALL_ITEMS.filter(i => !needed.includes(i));
+      const extra = shuffle(pool).slice(0, 10 - needed.length);
+      return shuffle([...needed, ...extra]);
+    }
+
+    function renderRecipe() {
+      const row = $('recipeRow');
+      // DOM 초기화 (안전하게 자식 제거)
+      while (row.firstChild) row.removeChild(row.firstChild);
+      state.currentRecipe.items.forEach((item, idx) => {
+        const slot = document.createElement('div');
+        if (idx < state.stepIndex) {
+          slot.className = 'recipe-slot filled';
+          slot.textContent = item;
+          const check = document.createElement('div');
+          check.className = 'slot-check';
+          check.textContent = '✓';
+          slot.appendChild(check);
+        } else if (idx === state.stepIndex) {
+          slot.className = 'recipe-slot current';
+          slot.textContent = '?';
+        } else {
+          slot.className = 'recipe-slot';
+          slot.textContent = '?';
+        }
+        row.appendChild(slot);
+      });
+    }
+
+    function renderIngredients() {
+      const grid = $('ingredientGrid');
+      while (grid.firstChild) grid.removeChild(grid.firstChild);
+      state.displayItems.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'ingredient-btn';
+        btn.textContent = item;
+        btn.addEventListener('pointerdown', () => handleIngredient(btn, item));
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderPlate() {
+      const plate = $('plate');
+      while (plate.firstChild) plate.removeChild(plate.firstChild);
+      const placed = state.currentRecipe.items.slice(0, state.stepIndex);
+      placed.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'plate-item';
+        el.textContent = item;
+        plate.appendChild(el);
+      });
+    }
+
+    function handleIngredient(btn, item) {
+      if (!state.running) return;
+      const needed = state.currentRecipe.items[state.stepIndex];
+      if (item === needed) {
+        btn.classList.add('used');
+        state.stepIndex++;
+        renderRecipe();
+        renderPlate();
+        spawnSparkle(btn);
+        if (state.stepIndex >= state.currentRecipe.items.length) {
+          state.score++;
+          $('scoreVal').textContent = state.score;
+          $('plateLabel').textContent = '🎉 ' + state.currentRecipe.name + ' 완성!';
+          const best = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0');
+          if (state.score > best) localStorage.setItem(CONFIG.STORAGE_KEY, String(state.score));
+          setTimeout(nextRecipe, 900);
+        }
+      } else {
+        btn.classList.add('wrong');
+        setTimeout(() => btn.classList.remove('wrong'), 400);
+      }
+    }
+
+    function nextRecipe() {
+      if (!state.running) return;
+      state.level = state.score + 1;
+      $('levelVal').textContent = state.level;
+      state.currentRecipe = pickRecipe();
+      state.stepIndex = 0;
+      state.displayItems = buildDisplayItems(state.currentRecipe);
+      $('plateLabel').textContent = '접시에 재료를 올려요';
+      renderRecipe();
+      renderPlate();
+      renderIngredients();
+    }
+
+    function spawnSparkle(btn) {
+      const rect = btn.getBoundingClientRect();
+      const emojis = ['✨','⭐','💫','🌟'];
+      for (let i = 0; i < 3; i++) {
+        const el = document.createElement('div');
+        el.className = 'sparkle';
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = (rect.left + rect.width / 2 + (Math.random() - 0.5) * 40) + 'px';
+        el.style.top = rect.top + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        }, 900);
+      }
+    }
+
+    function startTimer() {
+      state.timer = setInterval(() => {
+        state.timeLeft--;
+        $('timerVal').textContent = state.timeLeft;
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      clearInterval(state.timer);
+      state.running = false;
+      const best = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0');
+      $('finalScore').textContent = state.score + '개';
+      const msg = state.score >= 5 ? '👨‍🍳 요리사 천재!' :
+                  state.score >= 3 ? '😊 잘 했어요!' : '🍳 다시 도전해봐요!';
+      $('resultMsg').textContent = msg + ' 최고기록: ' + best + '개';
+      $('endOverlay').classList.remove('hidden');
+    }
+
+    function startGame() {
+      clearInterval(state.timer);
+      state.score = 0;
+      state.level = 1;
+      state.timeLeft = CONFIG.GAME_TIME;
+      state.running = true;
+      state.stepIndex = 0;
+      $('scoreVal').textContent = '0';
+      $('levelVal').textContent = '1';
+      $('timerVal').textContent = String(CONFIG.GAME_TIME);
+      $('plateLabel').textContent = '접시에 재료를 올려요';
+      state.currentRecipe = pickRecipe();
+      state.displayItems = buildDisplayItems(state.currentRecipe);
+      renderRecipe();
+      renderPlate();
+      renderIngredients();
+      startTimer();
+    }
+
+    $('startBtn').addEventListener('pointerdown', () => {
+      $('startOverlay').classList.add('hidden');
+      startGame();
+    });
+
+    $('restartBtn').addEventListener('pointerdown', () => {
+      $('endOverlay').classList.add('hidden');
+      startGame();
+    });
+  })();
+  </script>
+</body>
+</html>
