@@ -542,5 +542,21 @@
     "description": "드래그로 방향 조준, 움직이는 과녁에 공을 던져요!",
     "thumbnail": "ball-throw/thumb.svg",
     "path": "ball-throw/index.html"
+  },
+  {
+    "id": "constellation-draw",
+    "title": "Constellation Draw",
+    "title_ko": "⭐ 별자리 잇기",
+    "description": "밤하늘의 별을 번호 순서대로 이어 별자리를 완성해요!",
+    "thumbnail": "constellation-draw/thumb.svg",
+    "path": "constellation-draw/index.html"
+  },
+  {
+    "id": "pet-feed",
+    "title": "Pet Feed",
+    "title_ko": "🐾 동물 친구 밥주기",
+    "description": "동물 친구가 좋아하는 음식을 끌어다 줘봐요!",
+    "thumbnail": "pet-feed/thumb.svg",
+    "path": "pet-feed/index.html"
   }
 ]

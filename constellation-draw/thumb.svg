@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0d1b3d"/>
+      <stop offset="100%" stop-color="#02050f"/>
+    </radialGradient>
+  </defs>
+  <rect width="200" height="200" rx="20" fill="url(#bg2)"/>
+  <!-- 작은 별 배경 -->
+  <circle cx="30" cy="40" r="1.5" fill="#fff" opacity="0.6"/>
+  <circle cx="160" cy="60" r="1" fill="#fff" opacity="0.7"/>
+  <circle cx="50" cy="160" r="1.2" fill="#fff" opacity="0.5"/>
+  <circle cx="180" cy="170" r="1.5" fill="#fff" opacity="0.6"/>
+  <!-- 별자리 라인 -->
+  <polyline points="50,80 90,60 130,90 170,70" stroke="#feca57" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- 별 -->
+  <circle cx="50" cy="80" r="10" fill="#feca57"/>
+  <circle cx="90" cy="60" r="10" fill="#feca57"/>
+  <circle cx="130" cy="90" r="10" fill="#feca57"/>
+  <circle cx="170" cy="70" r="10" fill="#feca57"/>
+  <text x="100" y="190" text-anchor="middle" font-size="14" font-family="sans-serif" fill="#fff" font-weight="700">별자리 잇기</text>
+</svg>

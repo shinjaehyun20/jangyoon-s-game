@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>별자리 잇기</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:radial-gradient(ellipse at center,#0d1b3d 0%, #02050f 100%);color:#fff;user-select:none;touch-action:none;}
+  #app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);}
+  header{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:700;}
+  #title{font-size:16px;opacity:0.95;}
+  #level{font-size:14px;opacity:0.85;}
+  #stage{flex:1 1 auto;position:relative;overflow:hidden;}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  #message{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:14px;opacity:0.92;text-shadow:0 1px 3px rgba(0,0,0,0.7);pointer-events:none;}
+  footer{padding:10px 14px;display:flex;gap:8px;justify-content:center;}
+  button.btn{background:#fff;color:#0d1b3d;border:0;border-radius:24px;padding:8px 18px;font-weight:700;font-size:14px;cursor:pointer;}
+  button.btn.alt{background:#feca57;}
+  /* 별 펄스 */
+  @keyframes twinkle{0%,100%{opacity:0.6;}50%{opacity:1;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div id="title">⭐ 별자리 잇기</div>
+    <div id="level">1단계</div>
+  </header>
+  <div id="stage">
+    <canvas id="bgCanvas"></canvas>
+    <canvas id="fgCanvas"></canvas>
+    <div id="message">번호 순서대로 별을 이어요!</div>
+  </div>
+  <footer>
+    <button class="btn" id="hintBtn">힌트</button>
+    <button class="btn alt" id="nextBtn">다음 별자리</button>
+  </footer>
+</div>
+<script>
+const PATTERNS = [
+  {name:'북두칠성',pts:[[0.18,0.55],[0.30,0.50],[0.42,0.48],[0.54,0.50],[0.62,0.62],[0.74,0.70],[0.84,0.62]]},
+  {name:'세모별',pts:[[0.50,0.20],[0.20,0.75],[0.80,0.75]]},
+  {name:'네모별',pts:[[0.25,0.30],[0.75,0.30],[0.75,0.75],[0.25,0.75]]},
+  {name:'다이아',pts:[[0.50,0.18],[0.85,0.50],[0.50,0.82],[0.15,0.50]]},
+  {name:'별모양',pts:[[0.50,0.15],[0.62,0.42],[0.90,0.42],[0.68,0.60],[0.78,0.88],[0.50,0.72],[0.22,0.88],[0.32,0.60],[0.10,0.42],[0.38,0.42]]},
+  {name:'곰돌이',pts:[[0.30,0.30],[0.70,0.30],[0.50,0.40],[0.30,0.55],[0.70,0.55],[0.40,0.72],[0.60,0.72]]},
+  {name:'배',pts:[[0.20,0.45],[0.80,0.45],[0.70,0.70],[0.30,0.70],[0.50,0.20],[0.50,0.45]]},
+];
+
+const bg=document.getElementById('bgCanvas'), fg=document.getElementById('fgCanvas');
+const bctx=bg.getContext('2d'), fctx=fg.getContext('2d');
+const stage=document.getElementById('stage'), msg=document.getElementById('message'), levelEl=document.getElementById('level');
+let W=0,H=0,DPR=window.devicePixelRatio||1;
+let stars=[], next=0, patternIdx=0, completed=0;
+let bgStars=[];
+
+function resize(){
+  const r=stage.getBoundingClientRect();
+  W=r.width; H=r.height;
+  [bg,fg].forEach(c=>{c.width=W*DPR;c.height=H*DPR;c.style.width=W+'px';c.style.height=H+'px';});
+  bctx.setTransform(DPR,0,0,DPR,0,0);
+  fctx.setTransform(DPR,0,0,DPR,0,0);
+  initBgStars();
+  layoutPattern();
+  draw();
+}
+
+function initBgStars(){
+  bgStars=[];
+  const n = Math.floor((W*H)/4000);
+  for(let i=0;i<n;i++){
+    bgStars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+0.3,a:Math.random()*0.6+0.2});
+  }
+}
+
+function layoutPattern(){
+  const p = PATTERNS[patternIdx % PATTERNS.length];
+  const padX = W*0.08, padY = H*0.08;
+  const innerW = W - padX*2, innerH = H - padY*2;
+  stars = p.pts.map((pt,i)=>({x:padX+pt[0]*innerW, y:padY+pt[1]*innerH, n:i+1, done:false}));
+  next = 0;
+  msg.textContent = `「${p.name}」 1번부터 차례대로 이어요!`;
+}
+
+function drawBg(){
+  bctx.clearRect(0,0,W,H);
+  bgStars.forEach(s=>{
+    bctx.fillStyle=`rgba(255,255,255,${s.a})`;
+    bctx.beginPath();
+    bctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    bctx.fill();
+  });
+}
+
+function draw(){
+  drawBg();
+  fctx.clearRect(0,0,W,H);
+  // lines
+  fctx.strokeStyle='rgba(254,202,87,0.9)';
+  fctx.lineWidth=3;
+  fctx.lineCap='round';
+  fctx.beginPath();
+  let started=false;
+  for(let i=0;i<stars.length;i++){
+    if(stars[i].done){
+      if(!started){fctx.moveTo(stars[i].x,stars[i].y);started=true;}
+      else fctx.lineTo(stars[i].x,stars[i].y);
+    }
+  }
+  fctx.stroke();
+  // stars
+  stars.forEach((s,i)=>{
+    const r = s.done?16:13;
+    fctx.fillStyle = s.done?'#feca57':(i===next?'#48dbfb':'#fff');
+    // glow
+    const grd = fctx.createRadialGradient(s.x,s.y,2,s.x,s.y,r*2.4);
+    grd.addColorStop(0,s.done?'rgba(254,202,87,0.9)':'rgba(255,255,255,0.85)');
+    grd.addColorStop(1,'rgba(255,255,255,0)');
+    fctx.fillStyle=grd;
+    fctx.beginPath();fctx.arc(s.x,s.y,r*2.4,0,Math.PI*2);fctx.fill();
+    // core
+    fctx.fillStyle = s.done?'#feca57':(i===next?'#48dbfb':'#fff');
+    fctx.beginPath();fctx.arc(s.x,s.y,r,0,Math.PI*2);fctx.fill();
+    // number
+    fctx.fillStyle='#0d1b3d';
+    fctx.font='bold 13px sans-serif';
+    fctx.textAlign='center';
+    fctx.textBaseline='middle';
+    fctx.fillText(s.n,s.x,s.y);
+  });
+}
+
+function hitTest(x,y){
+  for(let i=0;i<stars.length;i++){
+    const s=stars[i];
+    const d=Math.hypot(s.x-x,s.y-y);
+    if(d<24)return i;
+  }
+  return -1;
+}
+
+function handle(x,y){
+  const i = hitTest(x,y);
+  if(i<0)return;
+  if(i===next){
+    stars[i].done=true;
+    next++;
+    if(next>=stars.length){
+      completed++;
+      msg.textContent=`🎉 완성! 「${PATTERNS[patternIdx%PATTERNS.length].name}」 별자리!`;
+      if(completed%3===0){const cur=parseInt(levelEl.textContent)+1;levelEl.textContent=cur+'단계';}
+      setTimeout(()=>{patternIdx++;layoutPattern();draw();},1400);
+    }else{
+      msg.textContent=`좋아요! 다음은 ${next+1}번 별이에요!`;
+    }
+    draw();
+  }else{
+    msg.textContent=`${next+1}번 별을 먼저 찾아요!`;
+  }
+}
+
+fg.addEventListener('pointerdown',e=>{
+  const r=fg.getBoundingClientRect();
+  handle(e.clientX-r.left, e.clientY-r.top);
+});
+
+document.getElementById('hintBtn').addEventListener('click',()=>{
+  if(next<stars.length){
+    msg.textContent=`힌트: ${next+1}번 별이 파란색으로 빛나고 있어요 💡`;
+    const s=stars[next];
+    fctx.strokeStyle='rgba(72,219,251,0.9)';
+    fctx.lineWidth=4;
+    fctx.beginPath();
+    fctx.arc(s.x,s.y,28,0,Math.PI*2);
+    fctx.stroke();
+    setTimeout(draw,800);
+  }
+});
+document.getElementById('nextBtn').addEventListener('click',()=>{patternIdx++;layoutPattern();draw();});
+
+window.addEventListener('resize',resize);
+resize();
+</script>
+</body>
+</html>

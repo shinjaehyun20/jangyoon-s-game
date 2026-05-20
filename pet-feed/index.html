@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>동물 친구 밥주기</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:linear-gradient(180deg,#87ceeb 0%, #a8e6a3 60%, #6bbf59 100%);user-select:none;touch-action:none;}
+  #app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);}
+  header{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,0.3);}
+  #score{font-size:18px;}
+  #pet-info{font-size:14px;}
+  #stage{flex:1 1 auto;position:relative;overflow:hidden;}
+  .pet{position:absolute;font-size:64px;transition:transform 0.2s;}
+  .food{position:absolute;font-size:34px;cursor:grab;touch-action:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.25));}
+  .food.dragging{z-index:10;}
+  .pet.happy{animation:bounce 0.5s;}
+  .pet.full{animation:wobble 0.6s;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px) scale(1.1);}}
+  @keyframes wobble{0%,100%{transform:rotate(0);}25%{transform:rotate(-10deg);}75%{transform:rotate(10deg);}}
+  #message{position:absolute;left:0;right:0;top:10px;text-align:center;color:#fff;font-size:14px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.4);pointer-events:none;}
+  #pet-tag{position:absolute;background:rgba(255,255,255,0.95);border-radius:16px;padding:4px 10px;font-size:12px;font-weight:700;color:#333;pointer-events:none;white-space:nowrap;}
+  footer{padding:10px 14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  button.btn{background:#fff;color:#2d7a3a;border:0;border-radius:24px;padding:8px 16px;font-weight:700;font-size:14px;cursor:pointer;}
+  button.btn.alt{background:#feca57;color:#2d3436;}
+  /* 풀잎 */
+  .grass{position:absolute;bottom:0;font-size:22px;pointer-events:none;}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div id="score">⭐ 0</div>
+    <div id="pet-info">행복도 ❤️ 0</div>
+  </header>
+  <div id="stage">
+    <div id="message">동물 친구가 좋아하는 음식을 끌어다 주세요! 🐾</div>
+    <div class="pet" id="pet">🐶</div>
+    <div id="pet-tag">강아지 🐶</div>
+  </div>
+  <footer>
+    <button class="btn" id="nextPet">다른 친구</button>
+    <button class="btn alt" id="moreFood">음식 더 ➕</button>
+    <button class="btn" id="resetBtn">처음부터</button>
+  </footer>
+</div>
+<script>
+const PETS = [
+  {emoji:'🐶',name:'강아지',love:['🦴','🍖','🍗'],ok:['🍞','🥩'],bad:['🍫','🍇']},
+  {emoji:'🐱',name:'고양이',love:['🐟','🐠','🥛'],ok:['🍗','🍤'],bad:['🍫','🍪']},
+  {emoji:'🐰',name:'토끼',love:['🥕','🥬','🌿'],ok:['🍎','🍓'],bad:['🍖','🍕']},
+  {emoji:'🐹',name:'햄스터',love:['🌰','🥜','🌻'],ok:['🍎','🥕'],bad:['🍫','🧀']},
+  {emoji:'🐵',name:'원숭이',love:['🍌','🍑','🥥'],ok:['🍎','🍓'],bad:['🍖','🥩']},
+  {emoji:'🐼',name:'판다',love:['🎋','🌿','🥬'],ok:['🍎','🍓'],bad:['🍖','🍕']},
+  {emoji:'🐻',name:'곰돌이',love:['🍯','🐟','🍓'],ok:['🍎','🍞'],bad:['🌶️','🧅']},
+  {emoji:'🐯',name:'호랑이',love:['🥩','🍖','🍗'],ok:['🐟','🍤'],bad:['🥬','🥕']},
+];
+const ALL_FOODS = ['🦴','🍖','🍗','🍞','🥩','🐟','🐠','🥛','🍤','🥕','🥬','🌿','🍎','🍓','🌰','🥜','🌻','🧀','🍌','🍑','🥥','🎋','🍯','🍫','🍇','🍪','🍕','🌶️','🧅'];
+
+const stage=document.getElementById('stage'), petEl=document.getElementById('pet'), tagEl=document.getElementById('pet-tag'), msgEl=document.getElementById('message'), scoreEl=document.getElementById('score'), infoEl=document.getElementById('pet-info');
+let score=0, love=0, petIdx=0, currentPet=PETS[0], foods=[];
+
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function placePet(){
+  currentPet = PETS[petIdx % PETS.length];
+  petEl.textContent = currentPet.emoji;
+  const r = stage.getBoundingClientRect();
+  const px = r.width/2 - 32, py = r.height*0.30;
+  petEl.style.left = px+'px';
+  petEl.style.top = py+'px';
+  tagEl.textContent = currentPet.name+' '+currentPet.emoji;
+  tagEl.style.left = (px-10)+'px';
+  tagEl.style.top = (py+72)+'px';
+}
+
+function spawnFoods(n=6){
+  clearFoods();
+  const r = stage.getBoundingClientRect();
+  // 음식 풀: love 1~2개 + 다른 음식 섞어서
+  const pool = shuffle([...currentPet.love.slice(0,2), ...currentPet.ok.slice(0,1), ...currentPet.bad.slice(0,1), ...shuffle(ALL_FOODS).slice(0,n)]);
+  const picks = shuffle(pool).slice(0,n);
+  picks.forEach((emoji,i)=>{
+    const el = document.createElement('div');
+    el.className='food';
+    el.textContent=emoji;
+    el.dataset.emoji=emoji;
+    // 하단에 배치
+    const cols = Math.ceil(Math.sqrt(n));
+    const cw = r.width/(cols+1);
+    const col = i % cols;
+    const row = Math.floor(i/cols);
+    el.style.left = (cw*(col+1)-22)+'px';
+    el.style.top = (r.height*0.65 + row*52)+'px';
+    stage.appendChild(el);
+    foods.push(el);
+    enableDrag(el);
+  });
+}
+
+function clearFoods(){foods.forEach(f=>f.remove());foods=[];}
+
+function enableDrag(el){
+  let ox=0, oy=0, dragging=false, sx=0, sy=0;
+  el.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    dragging=true;
+    el.classList.add('dragging');
+    el.setPointerCapture(e.pointerId);
+    const r = el.getBoundingClientRect();
+    sx=r.left; sy=r.top;
+    ox = e.clientX - sx;
+    oy = e.clientY - sy;
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const sr = stage.getBoundingClientRect();
+    el.style.left = (e.clientX - sr.left - ox)+'px';
+    el.style.top = (e.clientY - sr.top - oy)+'px';
+  });
+  const finish = e=>{
+    if(!dragging)return;
+    dragging=false;
+    el.classList.remove('dragging');
+    // 펫과 충돌?
+    const er = el.getBoundingClientRect();
+    const pr = petEl.getBoundingClientRect();
+    const ex = er.left+er.width/2, ey = er.top+er.height/2;
+    if(ex > pr.left && ex < pr.right && ey > pr.top && ey < pr.bottom){
+      feed(el.dataset.emoji, el);
+    }
+  };
+  el.addEventListener('pointerup',finish);
+  el.addEventListener('pointercancel',finish);
+}
+
+function feed(emoji, el){
+  const p = currentPet;
+  if(p.love.includes(emoji)){
+    score+=20;love+=2;
+    msgEl.textContent='🎉 우와! 정말 좋아해요!';
+    petEl.classList.add('happy');
+    setTimeout(()=>petEl.classList.remove('happy'),500);
+    el.remove();foods=foods.filter(f=>f!==el);
+  }else if(p.ok.includes(emoji)){
+    score+=10;love+=1;
+    msgEl.textContent='😊 음... 맛있어요!';
+    petEl.classList.add('happy');
+    setTimeout(()=>petEl.classList.remove('happy'),500);
+    el.remove();foods=foods.filter(f=>f!==el);
+  }else{
+    msgEl.textContent=`😖 ${p.name}는 ${emoji} 안 먹어요!`;
+    petEl.classList.add('full');
+    setTimeout(()=>petEl.classList.remove('full'),600);
+    // 음식 원위치
+    const r = stage.getBoundingClientRect();
+    el.style.left = (Math.random()*(r.width-44))+'px';
+    el.style.top = (r.height*0.75)+'px';
+  }
+  scoreEl.textContent='⭐ '+score;
+  infoEl.textContent='행복도 ❤️ '+love;
+  if(foods.length===0){
+    msgEl.textContent='🌟 다 먹였어요! 새 음식 가져올게요!';
+    setTimeout(spawnFoods,800);
+  }
+}
+
+document.getElementById('nextPet').addEventListener('click',()=>{
+  petIdx++;
+  msgEl.textContent='새 친구가 왔어요! 🎈';
+  placePet();
+  spawnFoods();
+});
+document.getElementById('moreFood').addEventListener('click',()=>{spawnFoods();});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  score=0;love=0;petIdx=0;
+  scoreEl.textContent='⭐ 0';infoEl.textContent='행복도 ❤️ 0';
+  placePet();spawnFoods();
+});
+
+window.addEventListener('resize',()=>{placePet();spawnFoods();});
+placePet();
+spawnFoods();
+</script>
+</body>
+</html>
