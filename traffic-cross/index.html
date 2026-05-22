@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#1e3a2a" />
+  <title>🚦 동물 길 건너기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #1e3a2a;
+      --grass: #4ade80;
+      --grass-dark: #166534;
+      --road: #3a3f50;
+      --road-line: #facc15;
+      --safe: #fbbf24;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.7);
+      --accent: #fbbf24;
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      user-select: none; -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      margin: 0 auto;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex; gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    .hud > div { flex: 1; text-align: center; }
+    .hud .label { color: var(--muted); font-size: 11px; display: block; }
+    .hud .val { font-size: 18px; font-weight: 800; color: var(--accent); }
+    .hud .lives { color: #f87171; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      background: var(--bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.4);
+    }
+    /* 행(차선) */
+    .lane {
+      position: absolute;
+      left: 0; right: 0;
+      display: flex;
+      align-items: center;
+    }
+    .lane.grass {
+      background: linear-gradient(180deg, var(--grass) 0%, #65d97c 100%);
+    }
+    .lane.grass.dark {
+      background: linear-gradient(180deg, #65a672 0%, var(--grass-dark) 100%);
+    }
+    .lane.road {
+      background: var(--road);
+    }
+    .lane.road::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 4px;
+      transform: translateY(-50%);
+      background-image: linear-gradient(90deg, var(--road-line) 0 16px, transparent 16px 32px);
+      background-size: 32px 4px;
+      background-repeat: repeat-x;
+      opacity: 0.85;
+    }
+    .lane.safe {
+      background: linear-gradient(180deg, var(--safe) 0%, #f59e0b 100%);
+      border-top: 3px dashed rgba(255,255,255,0.5);
+      border-bottom: 3px dashed rgba(255,255,255,0.5);
+    }
+    .lane.safe .safe-text {
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #78350f;
+      letter-spacing: 4px;
+    }
+    /* 차량 */
+    .car {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 30px;
+      line-height: 1;
+      will-change: left;
+    }
+    .car.flip {
+      transform: translate(-50%, -50%) scaleX(-1);
+    }
+    /* 플레이어 (동물) */
+    .player {
+      position: absolute;
+      width: 40px; height: 40px;
+      transform: translate(-50%, -50%);
+      font-size: 30px;
+      line-height: 40px;
+      text-align: center;
+      transition: top 0.2s ease-out, left 0.2s ease-out;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .player.hit {
+      animation: hitShake 0.4s;
+    }
+    @keyframes hitShake {
+      0%,100% { transform: translate(-50%, -50%) rotate(0); }
+      25%     { transform: translate(-50%, -50%) rotate(-20deg) scale(0.9); }
+      75%     { transform: translate(-50%, -50%) rotate(20deg) scale(0.9); }
+    }
+    .player.cheer {
+      animation: cheer 0.6s;
+    }
+    @keyframes cheer {
+      0%,100% { transform: translate(-50%, -50%) scale(1); }
+      50%     { transform: translate(-50%, -50%) scale(1.3); }
+    }
+    /* 컨트롤 */
+    .controls {
+      position: absolute;
+      bottom: 12px; left: 12px; right: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      z-index: 8;
+    }
+    .ctrl-btn {
+      min-height: 52px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.18);
+      color: var(--text);
+      font-size: 28px;
+      font-weight: 900;
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .ctrl-btn:active { background: rgba(255,255,255,0.32); transform: scale(0.96); }
+    .ctrl-up    { grid-column: 2; grid-row: 1; background: rgba(74,222,128,0.4); }
+    .ctrl-left  { grid-column: 1; grid-row: 2; }
+    .ctrl-down  { grid-column: 2; grid-row: 2; }
+    .ctrl-right { grid-column: 3; grid-row: 2; }
+    /* footer */
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(30,58,42,0.94);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1f4a3a, #0e2a1d);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 24px 20px;
+      text-align: center;
+      max-width: 320px; width: 100%;
+    }
+    .overlay-card h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    .overlay-card p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .btn-start {
+      min-height: 50px;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 28px;
+      background: var(--accent);
+      color: #78350f;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(251,191,36,0.5);
+    }
+    .btn-start:active { transform: scale(0.96); }
+    .animal-pick {
+      display: flex; gap: 8px; justify-content: center;
+      margin-bottom: 14px;
+    }
+    .animal-btn {
+      width: 56px; height: 56px;
+      font-size: 32px;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
+      cursor: pointer;
+    }
+    .animal-btn.active {
+      border-color: var(--accent);
+      background: rgba(251,191,36,0.25);
+      box-shadow: 0 0 12px rgba(251,191,36,0.5);
+    }
+    .result-score {
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🚦 동물 길 건너기</h1>
+
+    <div class="hud">
+      <div><span class="label">점수</span><span class="val" id="scoreVal">0</span></div>
+      <div><span class="label">통과</span><span class="val" id="crossVal">0</span></div>
+      <div><span class="label">목숨</span><span class="val lives" id="livesVal">❤️❤️❤️</span></div>
+      <div><span class="label">최고</span><span class="val" id="bestVal">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="player" id="player">🐢</div>
+
+      <div class="controls">
+        <button class="ctrl-btn ctrl-up"    id="btnUp"    aria-label="위로">▲</button>
+        <button class="ctrl-btn ctrl-left"  id="btnLeft"  aria-label="왼쪽">◀</button>
+        <button class="ctrl-btn ctrl-down"  id="btnDown"  aria-label="아래로">▼</button>
+        <button class="ctrl-btn ctrl-right" id="btnRight" aria-label="오른쪽">▶</button>
+      </div>
+    </div>
+
+    <footer>
+      <small>위 버튼으로 한 칸씩 이동! 차에 부딪히지 마요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🚦 동물 길 건너기</h2>
+      <p>동물을 고르고 ▲ 버튼으로 한 칸씩 위로!<br>
+      자동차를 피해 노란 안전지대까지 건너면 +1통과!</p>
+      <div class="animal-pick" id="animalPick">
+        <button class="animal-btn active" data-emoji="🐢">🐢</button>
+        <button class="animal-btn" data-emoji="🦆">🦆</button>
+        <button class="animal-btn" data-emoji="🐹">🐹</button>
+        <button class="animal-btn" data-emoji="🐰">🐰</button>
+      </div>
+      <button class="btn-start" id="startBtn">출발!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="resultTitle">🏁 게임 끝!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 도전!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      ROWS: 9,                       // 전체 행 (안전지대 위/아래 포함)
+      ROAD_ROWS: [2, 3, 4, 5, 6],    // 도로 행 인덱스 (위에서부터 0)
+      TOP_SAFE_ROW: 0,               // 도착 안전지대
+      BOTTOM_SAFE_ROW: 8,            // 출발 안전지대
+      MID_GRASS_ROW: 1,              // 중간 풀
+      MID_GRASS_ROW2: 7,             // 중간 풀 2
+      ROAD_SPEEDS: [0.04, 0.06, 0.05, 0.07, 0.055], // 차선별 속도 (px/ms)
+      ROAD_DIRECTIONS: [1, -1, 1, -1, 1],            // 방향 (1=오른쪽, -1=왼쪽)
+      CAR_EMOJIS: ['🚗', '🚙', '🚕', '🚌', '🚓'],
+      CAR_GAP_PX: 110,               // 차 간격
+      START_LIVES: 3,
+      POINTS_PER_CROSS: 100,
+      SPEED_RAMP: 0.08,              // 통과 1회당 속도 증가율
+      BEST_KEY: 'traffic-cross_best',
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const elArea     = $('gameArea');
+    const elPlayer   = $('player');
+    const elScore    = $('scoreVal');
+    const elCross    = $('crossVal');
+    const elLives    = $('livesVal');
+    const elBest     = $('bestVal');
+    const elStartOv  = $('startOverlay');
+    const elEndOv    = $('endOverlay');
+    const elStart    = $('startBtn');
+    const elRestart  = $('restartBtn');
+    const elFinal    = $('finalScore');
+    const elResTitle = $('resultTitle');
+    const elResMsg   = $('resultMsg');
+    const elAnimPick = $('animalPick');
+
+    const state = {
+      areaW: 0, areaH: 0,
+      rowH: 0,
+      playerRow: CONFIG.BOTTOM_SAFE_ROW,
+      playerCol: 4, // 0..8 가상 격자
+      cols: 9,
+      cars: [],     // [{el, lane, dir, speed, x}]
+      lanes: [],    // 도로 행 DOM
+      running: false,
+      score: 0,
+      crosses: 0,
+      lives: CONFIG.START_LIVES,
+      lastTs: 0,
+      rafId: null,
+      animal: '🐢',
+      speedMul: 1,
+    };
+
+    function readBest() {
+      const v = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+      return isNaN(v) ? 0 : v;
+    }
+    function writeBest(v) {
+      try { localStorage.setItem(CONFIG.BEST_KEY, String(v)); } catch(e){}
+    }
+
+    function buildLanes() {
+      // 기존 차선 제거 (player·controls 제외)
+      [...elArea.children].forEach(c => {
+        if (!c.classList.contains('player') && !c.classList.contains('controls')) c.remove();
+      });
+      state.lanes = [];
+      state.cars = [];
+
+      const rect = elArea.getBoundingClientRect();
+      // 컨트롤 영역(약 130px) 확보 후 그 위로 게임 그리드
+      state.areaW = rect.width;
+      state.areaH = rect.height - 130; // 컨트롤 영역 제외
+      state.rowH = state.areaH / CONFIG.ROWS;
+
+      for (let i = 0; i < CONFIG.ROWS; i++) {
+        const lane = document.createElement('div');
+        lane.className = 'lane';
+        if (i === CONFIG.TOP_SAFE_ROW) {
+          lane.classList.add('safe');
+          const txt = document.createElement('div');
+          txt.className = 'safe-text';
+          txt.textContent = '★ 도착 ★';
+          lane.appendChild(txt);
+        } else if (i === CONFIG.BOTTOM_SAFE_ROW) {
+          lane.classList.add('safe');
+          const txt = document.createElement('div');
+          txt.className = 'safe-text';
+          txt.textContent = '▶ 출발 ◀';
+          lane.appendChild(txt);
+        } else if (CONFIG.ROAD_ROWS.includes(i)) {
+          lane.classList.add('road');
+        } else {
+          lane.classList.add('grass');
+          if (i === CONFIG.MID_GRASS_ROW2) lane.classList.add('dark');
+        }
+        lane.style.top    = (i * state.rowH) + 'px';
+        lane.style.height = state.rowH + 'px';
+        elArea.appendChild(lane);
+        state.lanes[i] = lane;
+
+        if (CONFIG.ROAD_ROWS.includes(i)) {
+          const laneIdx = CONFIG.ROAD_ROWS.indexOf(i);
+          const dir = CONFIG.ROAD_DIRECTIONS[laneIdx];
+          const speed = CONFIG.ROAD_SPEEDS[laneIdx];
+          // 차량 여러 대 배치
+          const carCount = Math.ceil(state.areaW / CONFIG.CAR_GAP_PX) + 1;
+          for (let c = 0; c < carCount; c++) {
+            const car = document.createElement('div');
+            car.className = 'car';
+            if (dir === -1) car.classList.add('flip');
+            car.textContent = CONFIG.CAR_EMOJIS[Math.floor(Math.random() * CONFIG.CAR_EMOJIS.length)];
+            car.style.top = (i * state.rowH + state.rowH / 2) + 'px';
+            const startX = dir === 1
+              ? (c * CONFIG.CAR_GAP_PX - 60)
+              : (state.areaW - c * CONFIG.CAR_GAP_PX + 60);
+            car.style.left = startX + 'px';
+            elArea.appendChild(car);
+            state.cars.push({ el: car, dir, speed, x: startX, row: i });
+          }
+        }
+      }
+    }
+
+    function placePlayer() {
+      const cellW = state.areaW / state.cols;
+      const x = state.playerCol * cellW + cellW / 2;
+      const y = state.playerRow * state.rowH + state.rowH / 2;
+      elPlayer.style.left = x + 'px';
+      elPlayer.style.top  = y + 'px';
+    }
+
+    function updateHud() {
+      elScore.textContent = state.score;
+      elCross.textContent = state.crosses;
+      elLives.textContent = '❤️'.repeat(Math.max(0, state.lives));
+      elBest.textContent = readBest();
+    }
+
+    function tick(ts) {
+      if (!state.running) return;
+      if (!state.lastTs) state.lastTs = ts;
+      const dt = ts - state.lastTs;
+      state.lastTs = ts;
+
+      // 차량 이동
+      for (const car of state.cars) {
+        car.x += car.dir * car.speed * dt * state.speedMul;
+        // 화면 밖 wrap
+        if (car.dir === 1 && car.x > state.areaW + 40) {
+          car.x = -40;
+          car.el.textContent = CONFIG.CAR_EMOJIS[Math.floor(Math.random() * CONFIG.CAR_EMOJIS.length)];
+        } else if (car.dir === -1 && car.x < -40) {
+          car.x = state.areaW + 40;
+          car.el.textContent = CONFIG.CAR_EMOJIS[Math.floor(Math.random() * CONFIG.CAR_EMOJIS.length)];
+        }
+        car.el.style.left = car.x + 'px';
+      }
+
+      // 충돌 체크 (플레이어가 도로 행에 있을 때)
+      if (CONFIG.ROAD_ROWS.includes(state.playerRow)) {
+        const cellW = state.areaW / state.cols;
+        const px = state.playerCol * cellW + cellW / 2;
+        const HIT_R = 24;
+        for (const car of state.cars) {
+          if (car.row !== state.playerRow) continue;
+          if (Math.abs(car.x - px) < HIT_R) {
+            onHit();
+            break;
+          }
+        }
+      }
+
+      state.rafId = requestAnimationFrame(tick);
+    }
+
+    function onHit() {
+      state.lives -= 1;
+      elPlayer.classList.add('hit');
+      setTimeout(() => elPlayer.classList.remove('hit'), 400);
+      // 출발 위치로 복귀
+      state.playerRow = CONFIG.BOTTOM_SAFE_ROW;
+      state.playerCol = 4;
+      placePlayer();
+      updateHud();
+      if (state.lives <= 0) endGame();
+    }
+
+    function onArrive() {
+      state.crosses += 1;
+      state.score += CONFIG.POINTS_PER_CROSS;
+      state.speedMul = 1 + state.crosses * CONFIG.SPEED_RAMP;
+      elPlayer.classList.add('cheer');
+      setTimeout(() => elPlayer.classList.remove('cheer'), 600);
+      updateHud();
+      // 다음 라운드 — 출발 위치로 복귀
+      setTimeout(() => {
+        state.playerRow = CONFIG.BOTTOM_SAFE_ROW;
+        state.playerCol = 4;
+        placePlayer();
+      }, 500);
+    }
+
+    function move(dr, dc) {
+      if (!state.running) return;
+      const nr = state.playerRow + dr;
+      const nc = state.playerCol + dc;
+      if (nr < 0 || nr >= CONFIG.ROWS) return;
+      if (nc < 0 || nc >= state.cols) return;
+      state.playerRow = nr;
+      state.playerCol = nc;
+      placePlayer();
+      // 위로 한 칸 이동 = 약간 점수
+      if (dr < 0) {
+        state.score += 5;
+        updateHud();
+      }
+      // 도착 안전지대
+      if (state.playerRow === CONFIG.TOP_SAFE_ROW) {
+        onArrive();
+      }
+    }
+
+    function startGame() {
+      state.score = 0;
+      state.crosses = 0;
+      state.lives = CONFIG.START_LIVES;
+      state.speedMul = 1;
+      state.playerRow = CONFIG.BOTTOM_SAFE_ROW;
+      state.playerCol = 4;
+      state.lastTs = 0;
+      state.running = true;
+      elPlayer.textContent = state.animal;
+      elStartOv.classList.add('hidden');
+      elEndOv.classList.add('hidden');
+      buildLanes();
+      placePlayer();
+      updateHud();
+      cancelAnimationFrame(state.rafId);
+      state.rafId = requestAnimationFrame(tick);
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(state.rafId);
+      const best = readBest();
+      const newBest = state.score > best;
+      if (newBest) writeBest(state.score);
+      elFinal.textContent = state.score;
+      elResTitle.textContent = state.crosses > 0 ? `🏁 ${state.crosses}번 건넜어요!` : '🚧 다시 도전!';
+      elResMsg.textContent = newBest ? '🏆 새로운 최고 기록!' : `최고 기록: ${best}`;
+      elEndOv.classList.remove('hidden');
+    }
+
+    // 컨트롤 이벤트
+    $('btnUp').addEventListener('pointerdown',    (e) => { e.preventDefault(); move(-1, 0); });
+    $('btnDown').addEventListener('pointerdown',  (e) => { e.preventDefault(); move(1, 0);  });
+    $('btnLeft').addEventListener('pointerdown',  (e) => { e.preventDefault(); move(0, -1); });
+    $('btnRight').addEventListener('pointerdown', (e) => { e.preventDefault(); move(0, 1);  });
+
+    // 동물 선택
+    elAnimPick.addEventListener('click', (e) => {
+      const btn = e.target.closest('.animal-btn');
+      if (!btn) return;
+      elAnimPick.querySelectorAll('.animal-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.animal = btn.dataset.emoji;
+    });
+
+    elStart.addEventListener('pointerdown', startGame);
+    elRestart.addEventListener('pointerdown', startGame);
+
+    // resize 대응 (단순 재구성)
+    window.addEventListener('resize', () => {
+      if (state.running) buildLanes(), placePlayer();
+    });
+
+    // 초기 HUD
+    updateHud();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1f4a"/>
+      <stop offset="1" stop-color="#06091e"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffcd3c"/>
+      <stop offset="1" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 별들 -->
+  <g fill="#ffffff">
+    <circle cx="40" cy="32" r="1.2"/>
+    <circle cx="80" cy="60" r="1"/>
+    <circle cx="120" cy="24" r="1.5"/>
+    <circle cx="200" cy="40" r="1"/>
+    <circle cx="245" cy="22" r="1.3"/>
+    <circle cx="60" cy="100" r="1"/>
+    <circle cx="150" cy="80" r="1.2"/>
+    <circle cx="230" cy="100" r="1"/>
+    <circle cx="280" cy="60" r="1.4"/>
+  </g>
+
+  <!-- 행성 (목표) -->
+  <g transform="translate(70,52)">
+    <circle r="22" fill="#ffcd3c" opacity="0.95"/>
+    <circle r="22" fill="none" stroke="#ffcd3c" stroke-opacity="0.3" stroke-width="6"/>
+    <ellipse rx="34" ry="8" fill="none" stroke="#ffcd3c" stroke-opacity="0.5" stroke-width="2" transform="rotate(-18)"/>
+  </g>
+
+  <!-- 로켓 (날아오르는) -->
+  <g transform="translate(155,110) rotate(-12)">
+    <!-- 불꽃 -->
+    <path d="M -8 14 Q -14 28 -6 36 Q 0 30 0 22 Q 0 30 6 36 Q 14 28 8 14 Z" fill="url(#flame)"/>
+    <!-- 본체 -->
+    <path d="M 0 -28 L 10 -8 L 10 14 L -10 14 L -10 -8 Z" fill="#e2e8f0"/>
+    <!-- 노즈콘 -->
+    <path d="M 0 -28 L 10 -8 L -10 -8 Z" fill="#ef4444"/>
+    <!-- 창문 -->
+    <circle cx="0" cy="-4" r="4" fill="#3ea6ff" stroke="#1e40af" stroke-width="1"/>
+    <!-- 핀 -->
+    <path d="M -10 8 L -16 18 L -10 14 Z" fill="#ef4444"/>
+    <path d="M 10 8 L 16 18 L 10 14 Z" fill="#ef4444"/>
+  </g>
+
+  <!-- 게이지 미니어처 (좌하단) -->
+  <g transform="translate(20,150)">
+    <rect width="170" height="14" rx="7" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+    <rect x="0" y="0" width="51" height="14" rx="7" fill="#ef4444" opacity="0.7"/>
+    <rect x="51" y="0" width="20" height="14" fill="#f59e0b" opacity="0.7"/>
+    <rect x="71" y="0" width="28" height="14" fill="#4ade80" opacity="0.95"/>
+    <rect x="99" y="0" width="20" height="14" fill="#f59e0b" opacity="0.7"/>
+    <rect x="119" y="0" width="51" height="14" rx="7" fill="#ef4444" opacity="0.7"/>
+    <rect x="84" y="-3" width="3" height="20" fill="#ffffff"/>
+  </g>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffcd3c">로켓 발사</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">ROCKET LAUNCH</text>
+  </g>
+</svg>

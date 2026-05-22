@@ -558,5 +558,21 @@
     "description": "동물 친구가 좋아하는 음식을 끌어다 줘봐요!",
     "thumbnail": "pet-feed/thumb.svg",
     "path": "pet-feed/index.html"
+  },
+  {
+    "id": "rocket-launch",
+    "title": "Rocket Launch",
+    "title_ko": "🚀 로켓 발사",
+    "description": "좌우 게이지가 초록존에 올 때 탭! 3단계 누적 정확도로 행성에 도달",
+    "thumbnail": "rocket-launch/thumb.svg",
+    "path": "rocket-launch/index.html"
+  },
+  {
+    "id": "traffic-cross",
+    "title": "Traffic Cross",
+    "title_ko": "🚦 동물 길 건너기",
+    "description": "동물을 골라 한 칸씩 위로! 자동차 5차선을 피해 안전지대까지",
+    "thumbnail": "traffic-cross/thumb.svg",
+    "path": "traffic-cross/index.html"
   }
 ]

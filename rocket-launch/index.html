@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#0a0e2a" />
+  <title>🚀 로켓 발사</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0e2a;
+      --bg2: #1a1f4a;
+      --accent: #ffcd3c;
+      --green: #4ade80;
+      --red: #ef4444;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.65);
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      color: var(--text);
+      background: radial-gradient(ellipse at center top, var(--bg2) 0%, var(--bg) 70%);
+      user-select: none; -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      margin: 0 auto;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex; gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    .hud > div { flex: 1; text-align: center; }
+    .hud .label { color: var(--muted); font-size: 11px; display: block; }
+    .hud .val { font-size: 18px; font-weight: 800; color: var(--accent); }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(180deg, #060a20 0%, #14193f 60%, #1f2659 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: inset 0 0 60px rgba(0,0,0,0.5);
+    }
+    /* 별 배경 */
+    .stars {
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, #fff 50%, transparent 50%),
+        radial-gradient(1px 1px at 70% 70%, #fff 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 40% 80%, #fff 50%, transparent 50%),
+        radial-gradient(1px 1px at 90% 20%, #fff 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 10% 60%, #fff 50%, transparent 50%),
+        radial-gradient(1px 1px at 55% 15%, #fff 50%, transparent 50%),
+        radial-gradient(1px 1px at 30% 50%, #fff 50%, transparent 50%);
+      animation: starsTwinkle 3s ease-in-out infinite alternate;
+    }
+    @keyframes starsTwinkle {
+      from { opacity: 0.7; }
+      to { opacity: 1; }
+    }
+    /* 행성 위치 (목표) */
+    .planet {
+      position: absolute;
+      top: 16px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 42px;
+      filter: drop-shadow(0 0 12px rgba(255,205,60,0.5));
+    }
+    /* 로켓 */
+    .rocket {
+      position: absolute;
+      bottom: 140px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 48px;
+      transition: bottom 0.6s cubic-bezier(.4,1.5,.5,1), transform 0.6s;
+      filter: drop-shadow(0 4px 8px rgba(255,205,60,0.5));
+    }
+    .rocket.launching {
+      bottom: 60%;
+      transform: translateX(-50%) scale(1.1);
+    }
+    .rocket.success-fly {
+      transition: bottom 1.2s ease-out, transform 1.2s ease-out, opacity 0.4s;
+      bottom: 88%;
+      transform: translateX(-50%) scale(0.7);
+    }
+    .rocket.fail-fall {
+      transition: bottom 0.8s ease-in, transform 0.8s ease-in, opacity 0.6s;
+      bottom: 8%;
+      transform: translateX(-50%) rotate(-25deg) scale(0.85);
+      opacity: 0.4;
+    }
+    /* 불꽃 */
+    .flames {
+      position: absolute;
+      bottom: 80px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 28px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .flames.on { opacity: 1; animation: flameFlicker 0.15s infinite alternate; }
+    @keyframes flameFlicker {
+      from { transform: translateX(-50%) scale(1); }
+      to   { transform: translateX(-50%) scale(1.2); }
+    }
+    /* 타이밍 게이지 */
+    .gauge-wrap {
+      position: absolute;
+      bottom: 18px; left: 12px; right: 12px;
+    }
+    .gauge-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .gauge {
+      position: relative;
+      height: 36px;
+      background: linear-gradient(90deg, var(--red) 0%, var(--red) 30%, #f59e0b 30%, #f59e0b 42%, var(--green) 42%, var(--green) 58%, #f59e0b 58%, #f59e0b 70%, var(--red) 70%, var(--red) 100%);
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      overflow: hidden;
+    }
+    .gauge-marker {
+      position: absolute;
+      top: -2px; bottom: -2px;
+      width: 4px;
+      background: #ffffff;
+      box-shadow: 0 0 8px #fff, 0 0 14px var(--accent);
+      border-radius: 2px;
+      left: 0%;
+    }
+    .gauge-tip {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .tap-btn {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 96px; height: 96px;
+      border: none;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent) 0%, #d97706 100%);
+      color: #1a1f4a;
+      font-size: 18px;
+      font-weight: 900;
+      box-shadow: 0 6px 20px rgba(255,205,60,0.6);
+      cursor: pointer;
+      transition: transform 0.1s;
+      z-index: 10;
+    }
+    .tap-btn:active { transform: translate(-50%, -50%) scale(0.92); }
+    .tap-btn.hidden { display: none; }
+    /* 진행도 표시 (스테이지별) */
+    .stages {
+      position: absolute;
+      top: 12px; left: 12px;
+      display: flex; flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .stage-row {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,0,0,0.4);
+      padding: 4px 8px;
+      border-radius: 8px;
+      min-width: 84px;
+    }
+    .stage-row .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+    }
+    .stage-row.done .dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .stage-row.fail .dot { background: var(--red); }
+    /* footer */
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(10,14,42,0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1a1f4a, #0e1230);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 24px 20px;
+      text-align: center;
+      max-width: 320px; width: 100%;
+    }
+    .overlay-card h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    .overlay-card p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .btn-start {
+      min-height: 50px;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 28px;
+      background: var(--accent);
+      color: #1a1f4a;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255,205,60,0.5);
+    }
+    .btn-start:active { transform: scale(0.96); }
+    .result-score {
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0 4px;
+    }
+    .result-medal {
+      font-size: 56px;
+      margin: 6px 0;
+    }
+    /* 별 펑 이펙트 */
+    .pop {
+      position: absolute;
+      font-size: 28px;
+      pointer-events: none;
+      animation: popFly 0.8s ease-out forwards;
+    }
+    @keyframes popFly {
+      from { opacity: 1; transform: scale(0.6); }
+      to   { opacity: 0; transform: scale(1.8) translateY(-30px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🚀 로켓 발사</h1>
+
+    <div class="hud">
+      <div><span class="label">단계</span><span class="val" id="stageVal">1/3</span></div>
+      <div><span class="label">정확도</span><span class="val" id="accVal">0%</span></div>
+      <div><span class="label">최고</span><span class="val" id="bestVal">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="stars"></div>
+      <div class="planet" id="planet">🌙</div>
+
+      <div class="stages" id="stagesList">
+        <div class="stage-row" data-i="0"><div class="dot"></div><span>1단 부스터</span></div>
+        <div class="stage-row" data-i="1"><div class="dot"></div><span>2단 점화</span></div>
+        <div class="stage-row" data-i="2"><div class="dot"></div><span>3단 추진</span></div>
+      </div>
+
+      <div class="flames" id="flames">🔥</div>
+      <div class="rocket" id="rocket">🚀</div>
+
+      <button class="tap-btn" id="tapBtn">탭!</button>
+
+      <div class="gauge-wrap">
+        <div class="gauge-label">초록존에서 탭!</div>
+        <div class="gauge" id="gauge">
+          <div class="gauge-marker" id="marker"></div>
+        </div>
+        <div class="gauge-tip">초록=정확  /  주황=조금부족  /  빨강=실패</div>
+      </div>
+    </div>
+
+    <footer>
+      <small>3단계 타이밍을 모두 맞춰서 행성에 도달하자!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🚀 로켓 발사</h2>
+      <p>좌우로 움직이는 표시가 <b style="color:var(--green)">초록존</b>에 올 때 큰 버튼을 탭!<br>
+      3단계 모두 맞추면 멀리 있는 행성까지 도착해요.</p>
+      <button class="btn-start" id="startBtn">발사 준비!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <div class="result-medal" id="resultMedal">🌙</div>
+      <h2 id="resultTitle">도착!</h2>
+      <div class="result-score" id="finalScore">0%</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 발사!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      TOTAL_STAGES: 3,
+      MARKER_PERIOD_MS: [1400, 1100, 850], // 단계별 속도 — 점점 빨라짐
+      GREEN_MIN: 42, GREEN_MAX: 58,        // 초록존 (%)
+      ORANGE_MIN: 30, ORANGE_MAX: 70,      // 주황존 포함 범위
+      SCORE_GREEN: 100,
+      SCORE_ORANGE: 50,
+      SCORE_RED: 0,
+      DEST_BY_AVG: [
+        { min: 90, planet: '🪐', label: '토성 도착!', msg: '완벽한 발사! 토성까지 도달했어요.' },
+        { min: 70, planet: '🌍', label: '지구 궤도', msg: '잘했어요! 지구 궤도에 진입했어요.' },
+        { min: 40, planet: '🌙', label: '달 도착', msg: '괜찮아요. 달까지 도달했어요!' },
+        { min: 0,  planet: '☁️', label: '아쉬워요', msg: '구름 위까지 갔어요. 다시 도전!' },
+      ],
+      BEST_KEY: 'rocket-launch_best',
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const elTapBtn    = $('tapBtn');
+    const elMarker    = $('marker');
+    const elGauge     = $('gauge');
+    const elRocket    = $('rocket');
+    const elFlames    = $('flames');
+    const elPlanet    = $('planet');
+    const elStageVal  = $('stageVal');
+    const elAccVal    = $('accVal');
+    const elBestVal   = $('bestVal');
+    const elStartOv   = $('startOverlay');
+    const elEndOv     = $('endOverlay');
+    const elStartBtn  = $('startBtn');
+    const elRestart   = $('restartBtn');
+    const elFinalSc   = $('finalScore');
+    const elResultMed = $('resultMedal');
+    const elResultTit = $('resultTitle');
+    const elResultMsg = $('resultMsg');
+    const elStages    = $('stagesList');
+    const elArea      = $('gameArea');
+
+    const state = {
+      stage: 0,
+      scores: [],
+      running: false,
+      animStart: 0,
+      rafId: null,
+    };
+
+    function readBest() {
+      const v = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+      return isNaN(v) ? 0 : v;
+    }
+    function writeBest(v) {
+      try { localStorage.setItem(CONFIG.BEST_KEY, String(v)); } catch(e){}
+    }
+
+    function resetStagesUI() {
+      [...elStages.children].forEach(r => {
+        r.classList.remove('done', 'fail');
+      });
+    }
+
+    function updateHud() {
+      elStageVal.textContent = `${Math.min(state.stage+1, CONFIG.TOTAL_STAGES)}/${CONFIG.TOTAL_STAGES}`;
+      const total = state.scores.reduce((a,b)=>a+b, 0);
+      const avg = state.scores.length ? Math.round(total / state.scores.length) : 0;
+      elAccVal.textContent = `${avg}%`;
+      elBestVal.textContent = readBest();
+    }
+
+    function animateMarker(ts) {
+      if (!state.running) return;
+      if (!state.animStart) state.animStart = ts;
+      const period = CONFIG.MARKER_PERIOD_MS[state.stage] || 1000;
+      const t = (ts - state.animStart) % (period * 2);
+      // 0 ~ period: 0%→100%, period ~ 2*period: 100%→0%
+      let pct;
+      if (t < period) pct = (t / period) * 100;
+      else pct = 100 - ((t - period) / period) * 100;
+      elMarker.style.left = pct + '%';
+      state.rafId = requestAnimationFrame(animateMarker);
+    }
+
+    function startAnim() {
+      cancelAnimationFrame(state.rafId);
+      state.animStart = 0;
+      state.rafId = requestAnimationFrame(animateMarker);
+    }
+
+    function getMarkerPct() {
+      const left = elMarker.style.left;
+      return parseFloat(left) || 0;
+    }
+
+    function spawnPop(text, x, y) {
+      const pop = document.createElement('div');
+      pop.className = 'pop';
+      pop.textContent = text;
+      pop.style.left = x + 'px';
+      pop.style.top  = y + 'px';
+      elArea.appendChild(pop);
+      setTimeout(() => pop.remove(), 800);
+    }
+
+    function tapNow() {
+      if (!state.running) return;
+      const pct = getMarkerPct();
+      let score = CONFIG.SCORE_RED;
+      let kind = 'red';
+      if (pct >= CONFIG.GREEN_MIN && pct <= CONFIG.GREEN_MAX) { score = CONFIG.SCORE_GREEN; kind = 'green'; }
+      else if (pct >= CONFIG.ORANGE_MIN && pct <= CONFIG.ORANGE_MAX) { score = CONFIG.SCORE_ORANGE; kind = 'orange'; }
+
+      state.scores.push(score);
+      const row = elStages.querySelector(`[data-i="${state.stage}"]`);
+      if (row) row.classList.add(kind === 'red' ? 'fail' : 'done');
+
+      // 시각 피드백
+      const rect = elArea.getBoundingClientRect();
+      const cx = (pct / 100) * rect.width;
+      const popMap = { green: '⭐', orange: '✨', red: '💨' };
+      spawnPop(popMap[kind], cx, rect.height - 80);
+
+      // 로켓 살짝 위로
+      elFlames.classList.add('on');
+      elRocket.classList.add('launching');
+      setTimeout(() => {
+        elRocket.classList.remove('launching');
+        elFlames.classList.remove('on');
+      }, 400);
+
+      state.stage += 1;
+      updateHud();
+
+      if (state.stage >= CONFIG.TOTAL_STAGES) {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(state.rafId);
+      elTapBtn.classList.add('hidden');
+
+      const total = state.scores.reduce((a,b)=>a+b, 0);
+      const avg = Math.round(total / state.scores.length);
+      const dest = CONFIG.DEST_BY_AVG.find(d => avg >= d.min);
+
+      // 로켓 연출
+      if (avg >= 40) {
+        elRocket.classList.add('success-fly');
+        elPlanet.textContent = dest.planet;
+        elFlames.classList.add('on');
+      } else {
+        elRocket.classList.add('fail-fall');
+        elFlames.classList.remove('on');
+      }
+
+      // 최고 기록
+      const best = readBest();
+      if (avg > best) writeBest(avg);
+
+      setTimeout(() => {
+        elFinalSc.textContent = avg + '%';
+        elResultMed.textContent = dest.planet;
+        elResultTit.textContent = dest.label;
+        elResultMsg.textContent = dest.msg + (avg > best ? ' 🏆 새 기록!' : '');
+        elEndOv.classList.remove('hidden');
+      }, 1300);
+    }
+
+    function startGame() {
+      state.stage = 0;
+      state.scores = [];
+      state.running = true;
+      elPlanet.textContent = '🌙';
+      elRocket.className = 'rocket';
+      elFlames.classList.remove('on');
+      elTapBtn.classList.remove('hidden');
+      resetStagesUI();
+      updateHud();
+      elStartOv.classList.add('hidden');
+      elEndOv.classList.add('hidden');
+      startAnim();
+    }
+
+    // 이벤트
+    elTapBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      tapNow();
+    });
+    elStartBtn.addEventListener('pointerdown', startGame);
+    elRestart.addEventListener('pointerdown', startGame);
+
+    // 초기 UI
+    updateHud();
+  })();
+  </script>
+</body>
+</html>
