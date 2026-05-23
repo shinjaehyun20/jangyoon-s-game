@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a2c1a"/>
+      <stop offset="100%" stop-color="#2d1b0e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <g transform="translate(40, 25)">
+    <ellipse cx="55" cy="125" rx="62" ry="9" fill="#e0e0e0" opacity="0.85"/>
+    <rect x="0" y="105" width="110" height="14" rx="6" fill="#cd6b3d"/>
+    <rect x="2" y="92" width="106" height="13" rx="5" fill="#7dd87d"/>
+    <rect x="0" y="78" width="110" height="14" rx="5" fill="#ffd966"/>
+    <rect x="2" y="65" width="106" height="13" rx="5" fill="#ff8a8a"/>
+    <rect x="0" y="51" width="110" height="14" rx="5" fill="#cd6b3d"/>
+    <path d="M 0 51 Q 55 30 110 51 Z" fill="#e3a86e"/>
+    <circle cx="30" cy="42" r="2.5" fill="#fff" opacity="0.7"/>
+    <circle cx="70" cy="38" r="2.5" fill="#fff" opacity="0.7"/>
+    <circle cx="85" cy="44" r="2.5" fill="#fff" opacity="0.7"/>
+  </g>
+
+  <g transform="translate(195, 35)">
+    <circle cx="14" cy="14" r="14" fill="#ffe066"/>
+    <circle cx="14" cy="14" r="10" fill="#7dd87d"/>
+    <circle cx="14" cy="14" r="6" fill="#ff8a8a"/>
+    <circle cx="14" cy="14" r="2.5" fill="#fff"/>
+    <line x1="14" y1="0" x2="14" y2="36" stroke="rgba(255,179,71,0.5)" stroke-width="2" stroke-dasharray="3,2"/>
+  </g>
+
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffb347">햄버거 쌓기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">BURGER STACK</text>
+  </g>
+</svg>

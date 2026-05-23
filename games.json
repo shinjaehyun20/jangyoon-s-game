@@ -574,5 +574,21 @@
     "description": "동물을 골라 한 칸씩 위로! 자동차 5차선을 피해 안전지대까지",
     "thumbnail": "traffic-cross/thumb.svg",
     "path": "traffic-cross/index.html"
+  },
+  {
+    "id": "burger-stack",
+    "title": "Burger Stack",
+    "title_ko": "🍔 햄버거 쌓기",
+    "description": "재료가 떨어질 때 탭! 타이밍 맞춰 햄버거 쌓기",
+    "thumbnail": "burger-stack/thumb.svg",
+    "path": "burger-stack/index.html"
+  },
+  {
+    "id": "bee-pollen",
+    "title": "Bee Pollen",
+    "title_ko": "🐝 꿀벌 꽃가루",
+    "description": "꿀벌을 드래그해 꽃 모두 방문하고 벌집으로!",
+    "thumbnail": "bee-pollen/thumb.svg",
+    "path": "bee-pollen/index.html"
   }
 ]

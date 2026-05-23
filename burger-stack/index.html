@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🍔 햄버거 쌓기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #2d1b0e;
+      --bg2: #4a2c1a;
+      --accent: #ffb347;
+      --good: #7dd87d;
+      --bad: #ff6b6b;
+      --text: #ffffff;
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      color: var(--text);
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 14px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .hud .item { display: flex; align-items: center; gap: 6px; }
+    .hud .val { color: var(--accent); font-size: 18px; min-width: 28px; text-align: center; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+      touch-action: none;
+    }
+    .stack {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      display: flex; flex-direction: column-reverse;
+      align-items: center;
+    }
+    .layer {
+      width: 100%;
+      height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      border-radius: 6px;
+      margin-top: -2px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .layer.plate {
+      width: 110%;
+      height: 12px;
+      background: #e0e0e0;
+      border-radius: 50% / 100% 100% 0 0;
+      transform: scaleY(0.4);
+    }
+    .falling {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 36px;
+      transition: top 0.05s linear, left 0.2s ease-out;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    }
+    .target-zone {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 4px;
+      background: rgba(255,179,71,0.4);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .target-zone.glow {
+      box-shadow: 0 0 16px rgba(255,179,71,0.8);
+      background: rgba(255,179,71,0.8);
+    }
+    .feedback {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 22px;
+      font-weight: 900;
+      pointer-events: none;
+      animation: float 0.8s ease-out forwards;
+    }
+    .feedback.good { color: var(--good); }
+    .feedback.bad { color: var(--bad); }
+    @keyframes float {
+      0% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -40px); }
+    }
+    .tap-hint {
+      position: absolute;
+      bottom: 14px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      pointer-events: none;
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+    .home-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      font-weight: 600;
+      min-height: 32px;
+      display: flex; align-items: center;
+    }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #5a3520, #2d1b0e);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      border: 2px solid var(--accent);
+    }
+    .overlay-card h2 {
+      font-size: 22px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .btn-start {
+      background: var(--accent);
+      color: #2d1b0e;
+      border: none;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      border-radius: 12px;
+      cursor: pointer;
+      min-height: 48px;
+      width: 100%;
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); }
+    .result-score {
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 10px 0;
+    }
+    .best-line {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍔 햄버거 쌓기</h1>
+
+    <div class="hud">
+      <div class="item">🍔 <span class="val" id="score">0</span></div>
+      <div class="item">⭐ 최고 <span class="val" id="best">0</span></div>
+      <div class="item">❤️ <span class="val" id="lives">3</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="target-zone" id="targetZone"></div>
+      <div class="stack" id="stack"></div>
+      <div class="falling" id="falling">🥬</div>
+      <div class="tap-hint" id="tapHint">화면을 탭해서 떨어뜨리기</div>
+    </div>
+
+    <footer>
+      <small>타이밍 맞춰 햄버거 쌓아요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍔 햄버거 쌓기</h2>
+      <p>재료가 떨어질 때 화면을 탭해서<br>딱 알맞은 위치에 쌓아요!<br>3번 빗나가면 끝!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 완성!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg">맛있는 햄버거 완성!</p>
+      <div class="best-line" id="bestLine"></div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      START_LIVES: 3,
+      FALL_DURATION: 1400,
+      FALL_DURATION_MIN: 600,
+      FALL_SPEEDUP_PER_SCORE: 35,
+      TARGET_HIT_RANGE: 22,
+      TARGET_PERFECT_RANGE: 10,
+      LAYER_HEIGHT: 22,
+      MAX_STACK_VISIBLE: 12,
+      INGREDIENTS: ['🥬', '🧀', '🥩', '🍅', '🧅', '🥒', '🥓', '🍳'],
+      TOP_BUN: '🍔',
+      BEST_KEY: 'burger-stack_best',
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const elScore = $('score');
+    const elBest = $('best');
+    const elLives = $('lives');
+    const elStack = $('stack');
+    const elFalling = $('falling');
+    const elTarget = $('targetZone');
+    const elGame = $('gameArea');
+    const elTapHint = $('tapHint');
+    const elStartOverlay = $('startOverlay');
+    const elEndOverlay = $('endOverlay');
+    const elFinalScore = $('finalScore');
+    const elResultMsg = $('resultMsg');
+    const elBestLine = $('bestLine');
+    const elStartBtn = $('startBtn');
+    const elRestartBtn = $('restartBtn');
+
+    let state = {
+      playing: false,
+      score: 0,
+      lives: CONFIG.START_LIVES,
+      best: parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10),
+      fallStart: 0,
+      fallDuration: CONFIG.FALL_DURATION,
+      raf: null,
+      stackItems: [],
+      fallingIngredient: '🥬',
+    };
+
+    function renderStack() {
+      const visible = state.stackItems.slice(-CONFIG.MAX_STACK_VISIBLE);
+      const plate = '<div class="layer plate"></div>';
+      const layers = visible.map((it) => `<div class="layer" style="background:${it.color}">${it.emoji}</div>`).join('');
+      elStack.innerHTML = plate + layers;
+    }
+
+    function updateTargetZone() {
+      const rect = elGame.getBoundingClientRect();
+      const stackHeight = state.stackItems.length * (CONFIG.LAYER_HEIGHT - 2);
+      const stackTopFromBottom = 60 + 12 + stackHeight;
+      const fromTop = rect.height - stackTopFromBottom - CONFIG.LAYER_HEIGHT;
+      elTarget.style.top = fromTop + 'px';
+    }
+
+    function pickIngredient() {
+      const arr = CONFIG.INGREDIENTS;
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function pickColor() {
+      const colors = ['#7dd87d', '#ffd966', '#cd6b3d', '#ff8a8a', '#e8c5e8', '#a8e6cf', '#f7d794', '#ffaaa5'];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function startFall() {
+      state.fallStart = performance.now();
+      state.fallDuration = Math.max(
+        CONFIG.FALL_DURATION_MIN,
+        CONFIG.FALL_DURATION - state.score * CONFIG.FALL_SPEEDUP_PER_SCORE
+      );
+      state.fallingIngredient = pickIngredient();
+      elFalling.textContent = state.fallingIngredient;
+      elFalling.style.top = '20px';
+      elTarget.classList.remove('glow');
+      cancelAnimationFrame(state.raf);
+      state.raf = requestAnimationFrame(animateFall);
+    }
+
+    function animateFall(now) {
+      if (!state.playing) return;
+      const elapsed = now - state.fallStart;
+      const t = Math.min(1, elapsed / state.fallDuration);
+      const rect = elGame.getBoundingClientRect();
+      const targetTop = parseFloat(elTarget.style.top) || (rect.height * 0.6);
+      const top = 20 + (targetTop + 40) * t;
+      elFalling.style.top = top + 'px';
+
+      const dist = Math.abs(top - targetTop);
+      if (dist < CONFIG.TARGET_HIT_RANGE) {
+        elTarget.classList.add('glow');
+      } else {
+        elTarget.classList.remove('glow');
+      }
+
+      if (t >= 1) {
+        miss();
+        return;
+      }
+      state.raf = requestAnimationFrame(animateFall);
+    }
+
+    function spawnFeedback(text, kind, top) {
+      const fb = document.createElement('div');
+      fb.className = 'feedback ' + kind;
+      fb.textContent = text;
+      fb.style.top = (top - 20) + 'px';
+      elGame.appendChild(fb);
+      setTimeout(() => fb.remove(), 800);
+    }
+
+    function tap() {
+      if (!state.playing) return;
+      const top = parseFloat(elFalling.style.top);
+      const targetTop = parseFloat(elTarget.style.top);
+      const dist = Math.abs(top - targetTop);
+
+      if (dist < CONFIG.TARGET_PERFECT_RANGE) {
+        score(2, '+2 완벽!', top);
+      } else if (dist < CONFIG.TARGET_HIT_RANGE) {
+        score(1, '+1 좋아요!', top);
+      } else {
+        miss(top);
+      }
+    }
+
+    function score(pts, msg, top) {
+      cancelAnimationFrame(state.raf);
+      state.score += pts;
+      state.stackItems.push({ emoji: state.fallingIngredient, color: pickColor() });
+      elScore.textContent = state.score;
+      spawnFeedback(msg, 'good', top);
+      renderStack();
+      updateTargetZone();
+      setTimeout(startFall, 350);
+    }
+
+    function miss(top) {
+      cancelAnimationFrame(state.raf);
+      state.lives -= 1;
+      elLives.textContent = state.lives;
+      spawnFeedback('빗나감!', 'bad', top || (parseFloat(elFalling.style.top) || 100));
+      if (state.lives <= 0) {
+        endGame();
+        return;
+      }
+      setTimeout(startFall, 400);
+    }
+
+    function endGame() {
+      state.playing = false;
+      cancelAnimationFrame(state.raf);
+      if (state.score > state.best) {
+        state.best = state.score;
+        localStorage.setItem(CONFIG.BEST_KEY, String(state.best));
+      }
+      elBest.textContent = state.best;
+      state.stackItems.push({ emoji: CONFIG.TOP_BUN, color: '#cd6b3d' });
+      renderStack();
+      elFinalScore.textContent = state.score;
+      elBestLine.textContent = '🏆 최고기록: ' + state.best;
+      if (state.score >= 20) {
+        elResultMsg.textContent = '대단해! 햄버거의 달인이야!';
+      } else if (state.score >= 10) {
+        elResultMsg.textContent = '맛있는 햄버거 완성!';
+      } else if (state.score >= 5) {
+        elResultMsg.textContent = '잘했어! 다시 도전!';
+      } else {
+        elResultMsg.textContent = '한 번 더 해보자!';
+      }
+      elEndOverlay.classList.remove('hidden');
+    }
+
+    function startGame() {
+      state.playing = true;
+      state.score = 0;
+      state.lives = CONFIG.START_LIVES;
+      state.stackItems = [];
+      elScore.textContent = '0';
+      elLives.textContent = state.lives;
+      elBest.textContent = state.best;
+      renderStack();
+      updateTargetZone();
+      elStartOverlay.classList.add('hidden');
+      elEndOverlay.classList.add('hidden');
+      elTapHint.style.display = 'block';
+      setTimeout(() => { elTapHint.style.display = 'none'; }, 2000);
+      startFall();
+    }
+
+    elGame.addEventListener('pointerdown', tap);
+    elStartBtn.addEventListener('click', startGame);
+    elRestartBtn.addEventListener('click', startGame);
+    window.addEventListener('resize', updateTargetZone);
+
+    elBest.textContent = state.best;
+    renderStack();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐝 꿀벌 꽃가루</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #1e4d2b;
+      --bg2: #5a8c3a;
+      --accent: #ffe066;
+      --honey: #ffb84d;
+      --good: #7dd87d;
+      --bad: #ff6b6b;
+      --text: #ffffff;
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: linear-gradient(180deg, #87ceeb 0%, var(--bg2) 60%, var(--bg) 100%);
+      color: var(--text);
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      font-weight: 900;
+      color: #2d4a1a;
+      text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 14px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .hud .item { display: flex; align-items: center; gap: 6px; }
+    .hud .val { color: var(--accent); font-size: 18px; min-width: 28px; text-align: center; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(180deg, #b8e0b0 0%, #6fb04c 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+      touch-action: none;
+      cursor: grab;
+    }
+    #gameArea:active { cursor: grabbing; }
+    .flower {
+      position: absolute;
+      font-size: 34px;
+      pointer-events: none;
+      transition: transform 0.3s ease-out;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    }
+    .flower.visited {
+      animation: shrink 0.5s ease-out forwards;
+    }
+    @keyframes shrink {
+      0% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: scale(1.4) rotate(20deg); opacity: 1; }
+      100% { transform: scale(0) rotate(-360deg); opacity: 0; }
+    }
+    .bee {
+      position: absolute;
+      font-size: 38px;
+      pointer-events: none;
+      transition: transform 0.08s ease-out;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+      z-index: 5;
+    }
+    .bee.with-pollen::after {
+      content: '✨';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      font-size: 18px;
+      animation: sparkle 0.8s infinite;
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    .hive {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      font-size: 50px;
+      pointer-events: none;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .hive.glow {
+      filter: drop-shadow(0 0 12px rgba(255,179,77,0.9));
+    }
+    .pollen {
+      position: absolute;
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(255,224,102,0.8);
+      pointer-events: none;
+      animation: drift 1.2s ease-out forwards;
+    }
+    @keyframes drift {
+      0% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.3) translate(20px, -30px); }
+    }
+    .timer-bar {
+      position: absolute;
+      top: 8px; left: 8px; right: 8px;
+      height: 5px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--good), var(--accent));
+      width: 100%;
+      transition: width 0.1s linear;
+      border-radius: 3px;
+    }
+    .timer-fill.low { background: var(--bad); }
+    .tap-hint {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      transform: translateY(-50%);
+      text-align: center;
+      font-size: 13px;
+      color: rgba(0,0,0,0.4);
+      pointer-events: none;
+      padding: 0 20px;
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: rgba(0,0,0,0.7);
+    }
+    .home-link {
+      color: rgba(0,0,0,0.8);
+      text-decoration: none;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 8px;
+      font-weight: 600;
+      min-height: 32px;
+      display: flex; align-items: center;
+    }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #ffd966, #ff9933);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      border: 2px solid #2d4a1a;
+      color: #2d4a1a;
+    }
+    .overlay-card h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: 14px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .btn-start {
+      background: #2d4a1a;
+      color: var(--accent);
+      border: none;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      border-radius: 12px;
+      cursor: pointer;
+      min-height: 48px;
+      width: 100%;
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); }
+    .result-score {
+      font-size: 44px;
+      font-weight: 900;
+      color: #2d4a1a;
+      margin: 10px 0;
+    }
+    .best-line {
+      font-size: 13px;
+      color: rgba(0,0,0,0.6);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🐝 꿀벌 꽃가루</h1>
+
+    <div class="hud">
+      <div class="item">🍯 <span class="val" id="score">0</span></div>
+      <div class="item">⭐ 최고 <span class="val" id="best">0</span></div>
+      <div class="item">🌸 <span class="val" id="left">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+      <div class="hive" id="hive">🏠</div>
+      <div class="bee" id="bee">🐝</div>
+      <div class="tap-hint" id="tapHint">꿀벌을 드래그해서 꽃을 찾아가요</div>
+    </div>
+
+    <footer>
+      <small>꽃 모두 모아 벌집으로!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🐝 꿀벌 꽃가루</h2>
+      <p>꿀벌을 손가락으로 끌어서<br>꽃을 모두 방문한 다음<br>벌집(🏠)으로 돌아가요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">🎉 성공!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <div class="best-line" id="bestLine"></div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      FLOWERS_PER_ROUND: 6,
+      ROUND_TIME_MS: 25000,
+      BEE_SIZE: 38,
+      FLOWER_SIZE: 34,
+      HIVE_SIZE: 50,
+      VISIT_DISTANCE: 36,
+      POLLEN_PER_FLOWER: 1,
+      BEST_KEY: 'bee-pollen_best',
+      FLOWERS: ['🌸', '🌺', '🌼', '🌻', '🌷', '🌹', '💐'],
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const elGame = $('gameArea');
+    const elBee = $('bee');
+    const elHive = $('hive');
+    const elScore = $('score');
+    const elBest = $('best');
+    const elLeft = $('left');
+    const elTimer = $('timerFill');
+    const elTapHint = $('tapHint');
+    const elStartOverlay = $('startOverlay');
+    const elEndOverlay = $('endOverlay');
+    const elFinalScore = $('finalScore');
+    const elResultMsg = $('resultMsg');
+    const elBestLine = $('bestLine');
+    const elEndTitle = $('endTitle');
+    const elStartBtn = $('startBtn');
+    const elRestartBtn = $('restartBtn');
+
+    let state = {
+      playing: false,
+      score: 0,
+      best: parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10),
+      flowers: [],
+      visitedCount: 0,
+      bee: { x: 0, y: 0 },
+      dragging: false,
+      timeStart: 0,
+      raf: null,
+      round: 1,
+    };
+
+    function rectGame() {
+      return elGame.getBoundingClientRect();
+    }
+
+    function spawnFlowers() {
+      state.flowers.forEach((f) => f.el.remove());
+      state.flowers = [];
+      const r = rectGame();
+      const margin = 30;
+      const hiveX = r.width - CONFIG.HIVE_SIZE - 12;
+      const hiveY = r.height - CONFIG.HIVE_SIZE - 12;
+      for (let i = 0; i < CONFIG.FLOWERS_PER_ROUND; i++) {
+        let x, y, ok = false, tries = 0;
+        while (!ok && tries < 30) {
+          tries++;
+          x = margin + Math.random() * (r.width - margin * 2 - CONFIG.FLOWER_SIZE);
+          y = margin + Math.random() * (r.height - margin * 2 - CONFIG.FLOWER_SIZE - 50);
+          if (Math.hypot(x - hiveX, y - hiveY) < 80) continue;
+          let collide = false;
+          for (const f of state.flowers) {
+            if (Math.hypot(x - f.x, y - f.y) < 50) { collide = true; break; }
+          }
+          if (!collide) ok = true;
+        }
+        const el = document.createElement('div');
+        el.className = 'flower';
+        el.textContent = CONFIG.FLOWERS[Math.floor(Math.random() * CONFIG.FLOWERS.length)];
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        elGame.appendChild(el);
+        state.flowers.push({ el, x, y, visited: false });
+      }
+      elLeft.textContent = state.flowers.length;
+    }
+
+    function placeBee() {
+      const r = rectGame();
+      state.bee.x = r.width / 2 - CONFIG.BEE_SIZE / 2;
+      state.bee.y = 50;
+      drawBee();
+    }
+
+    function drawBee() {
+      elBee.style.left = state.bee.x + 'px';
+      elBee.style.top = state.bee.y + 'px';
+    }
+
+    function spawnPollen(x, y) {
+      const p = document.createElement('div');
+      p.className = 'pollen';
+      p.style.left = (x + CONFIG.FLOWER_SIZE / 2) + 'px';
+      p.style.top = (y + CONFIG.FLOWER_SIZE / 2) + 'px';
+      elGame.appendChild(p);
+      setTimeout(() => p.remove(), 1200);
+    }
+
+    function checkVisit() {
+      const bx = state.bee.x + CONFIG.BEE_SIZE / 2;
+      const by = state.bee.y + CONFIG.BEE_SIZE / 2;
+      let allVisited = true;
+      for (const f of state.flowers) {
+        if (f.visited) continue;
+        allVisited = false;
+        const fx = f.x + CONFIG.FLOWER_SIZE / 2;
+        const fy = f.y + CONFIG.FLOWER_SIZE / 2;
+        if (Math.hypot(bx - fx, by - fy) < CONFIG.VISIT_DISTANCE) {
+          f.visited = true;
+          f.el.classList.add('visited');
+          state.visitedCount += 1;
+          state.score += CONFIG.POLLEN_PER_FLOWER;
+          elScore.textContent = state.score;
+          spawnPollen(f.x, f.y);
+          elBee.classList.add('with-pollen');
+          elLeft.textContent = state.flowers.length - state.visitedCount;
+        }
+      }
+      if (state.visitedCount === state.flowers.length) {
+        elHive.classList.add('glow');
+        const r = rectGame();
+        const hiveCx = r.width - CONFIG.HIVE_SIZE / 2 - 12;
+        const hiveCy = r.height - CONFIG.HIVE_SIZE / 2 - 12;
+        if (Math.hypot(bx - hiveCx, by - hiveCy) < CONFIG.VISIT_DISTANCE + 8) {
+          state.round += 1;
+          state.score += 5;
+          elScore.textContent = state.score;
+          elBee.classList.remove('with-pollen');
+          elHive.classList.remove('glow');
+          state.visitedCount = 0;
+          spawnFlowers();
+          state.timeStart = performance.now();
+        }
+      }
+    }
+
+    function tickTimer(now) {
+      if (!state.playing) return;
+      const elapsed = now - state.timeStart;
+      const remain = Math.max(0, CONFIG.ROUND_TIME_MS - elapsed);
+      const ratio = remain / CONFIG.ROUND_TIME_MS;
+      elTimer.style.width = (ratio * 100) + '%';
+      if (ratio < 0.3) elTimer.classList.add('low');
+      else elTimer.classList.remove('low');
+      if (remain <= 0) {
+        endGame(false);
+        return;
+      }
+      state.raf = requestAnimationFrame(tickTimer);
+    }
+
+    function onPointerDown(e) {
+      if (!state.playing) return;
+      const r = rectGame();
+      const px = e.clientX - r.left;
+      const py = e.clientY - r.top;
+      const bx = state.bee.x + CONFIG.BEE_SIZE / 2;
+      const by = state.bee.y + CONFIG.BEE_SIZE / 2;
+      if (Math.hypot(px - bx, py - by) < 50 || true) {
+        state.dragging = true;
+        moveBeeTo(px, py);
+      }
+    }
+
+    function onPointerMove(e) {
+      if (!state.playing || !state.dragging) return;
+      const r = rectGame();
+      const px = e.clientX - r.left;
+      const py = e.clientY - r.top;
+      moveBeeTo(px, py);
+    }
+
+    function onPointerUp() {
+      state.dragging = false;
+    }
+
+    function moveBeeTo(px, py) {
+      const r = rectGame();
+      let nx = px - CONFIG.BEE_SIZE / 2;
+      let ny = py - CONFIG.BEE_SIZE / 2;
+      nx = Math.max(0, Math.min(r.width - CONFIG.BEE_SIZE, nx));
+      ny = Math.max(0, Math.min(r.height - CONFIG.BEE_SIZE, ny));
+      state.bee.x = nx;
+      state.bee.y = ny;
+      drawBee();
+      checkVisit();
+    }
+
+    function endGame(success) {
+      state.playing = false;
+      state.dragging = false;
+      cancelAnimationFrame(state.raf);
+      if (state.score > state.best) {
+        state.best = state.score;
+        localStorage.setItem(CONFIG.BEST_KEY, String(state.best));
+      }
+      elBest.textContent = state.best;
+      elFinalScore.textContent = state.score;
+      elBestLine.textContent = '🏆 최고기록: ' + state.best;
+      if (state.score >= 30) {
+        elEndTitle.textContent = '🎉 완벽한 꿀벌!';
+        elResultMsg.textContent = '꿀이 가득 찼어!';
+      } else if (state.score >= 15) {
+        elEndTitle.textContent = '🐝 잘했어!';
+        elResultMsg.textContent = '꽃가루 많이 모았네!';
+      } else {
+        elEndTitle.textContent = '⏰ 시간 끝!';
+        elResultMsg.textContent = '한 번 더 도전!';
+      }
+      elEndOverlay.classList.remove('hidden');
+    }
+
+    function startGame() {
+      state.playing = true;
+      state.score = 0;
+      state.round = 1;
+      state.visitedCount = 0;
+      elScore.textContent = '0';
+      elBest.textContent = state.best;
+      elBee.classList.remove('with-pollen');
+      elHive.classList.remove('glow');
+      elStartOverlay.classList.add('hidden');
+      elEndOverlay.classList.add('hidden');
+      elTapHint.style.display = 'block';
+      setTimeout(() => { elTapHint.style.display = 'none'; }, 2000);
+      spawnFlowers();
+      placeBee();
+      state.timeStart = performance.now();
+      cancelAnimationFrame(state.raf);
+      state.raf = requestAnimationFrame(tickTimer);
+    }
+
+    elGame.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+    elStartBtn.addEventListener('click', startGame);
+    elRestartBtn.addEventListener('click', startGame);
+
+    elBest.textContent = state.best;
+    placeBee();
+  })();
+  </script>
+</body>
+</html>
