@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90">
+  <rect width="120" height="90" fill="#1a0033" rx="8"/>
+  <ellipse cx="36" cy="38" rx="14" ry="17" fill="#ff3c3c"/>
+  <ellipse cx="60" cy="34" rx="14" ry="17" fill="#ffdc00"/>
+  <ellipse cx="84" cy="38" rx="14" ry="17" fill="#2864ff"/>
+  <ellipse cx="60" cy="62" rx="16" ry="19" fill="#a028c8" opacity=".9"/>
+  <text x="60" y="82" text-anchor="middle" font-size="10" fill="#e9d5ff" font-weight="bold" font-family="sans-serif">색깔 섞기</text>
+</svg>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+<title>풍선 색깔 섞기</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:linear-gradient(180deg,#1a0033 0%,#0d0028 100%);font-family:'Segoe UI',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;user-select:none;}
+#header{width:100%;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.3);}
+#header h1{font-size:1.3rem;color:#fff;text-shadow:0 0 12px #a855f7;}
+#score-wrap{display:flex;gap:16px;}
+.sv{display:flex;flex-direction:column;align-items:center;}
+.sv span:first-child{font-size:.65rem;color:#bbb;}
+.sv span:last-child{font-size:1.1rem;font-weight:700;color:#f0abfc;}
+#target-area{padding:8px 16px;text-align:center;}
+#target-label{font-size:.8rem;color:#c4b5fd;margin-bottom:4px;}
+#target-box{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:16px;padding:8px 20px;}
+#target-color{width:42px;height:42px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 14px currentColor;flex-shrink:0;}
+#target-name{font-size:1rem;color:#fff;font-weight:600;}
+#mix-area{flex:1;width:100%;max-width:480px;position:relative;overflow:hidden;}
+#canvas{display:block;width:100%;height:100%;touch-action:none;}
+#bucket-area{display:flex;gap:10px;padding:10px 8px;justify-content:center;flex-wrap:nowrap;background:rgba(0,0,0,.25);}
+.color-bucket{width:54px;height:64px;border-radius:12px 12px 18px 18px;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.9);transition:transform .12s;position:relative;overflow:hidden;}
+.color-bucket:active{transform:scale(.9);}
+.color-bucket .label{position:absolute;bottom:4px;font-size:.6rem;color:rgba(255,255,255,.85);font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.7);}
+#result-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);border-radius:24px;padding:24px 32px;text-align:center;display:none;z-index:10;}
+#result-msg h2{font-size:2rem;color:#f0abfc;}
+#result-msg p{font-size:1rem;color:#e9d5ff;margin-top:6px;}
+#btn-next{margin-top:14px;padding:10px 28px;font-size:1rem;border:none;border-radius:20px;background:#a855f7;color:#fff;font-weight:700;cursor:pointer;}
+#mix-preview{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.5);border-radius:12px;padding:6px 12px;color:#fff;font-size:.8rem;pointer-events:none;}
+#mix-preview span{display:inline-block;width:18px;height:18px;border-radius:50%;vertical-align:middle;margin-right:4px;border:1px solid rgba(255,255,255,.4);}
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>🎈 색깔 섞기</h1>
+  <div id="score-wrap">
+    <div class="sv"><span>점수</span><span id="score-val">0</span></div>
+    <div class="sv"><span>레벨</span><span id="level-val">1</span></div>
+  </div>
+</div>
+<div id="target-area">
+  <div id="target-label">이 색깔 풍선을 만들어요!</div>
+  <div id="target-box">
+    <div id="target-color"></div>
+    <div id="target-name">빨강</div>
+  </div>
+</div>
+<div id="mix-area">
+  <canvas id="canvas"></canvas>
+  <div id="mix-preview" id="mix-prev">지금 색깔: <span id="cur-swatch"></span><span id="cur-name">없음</span></div>
+  <div id="result-msg">
+    <h2 id="result-emoji">🎉</h2>
+    <p id="result-text">정답!</p>
+    <button id="btn-next">다음 색!</button>
+  </div>
+</div>
+<div id="bucket-area"></div>
+
+<script>
+// Color definitions
+const BASE_COLORS=[
+  {id:'red',   name:'빨강', rgb:[255,60,60]},
+  {id:'yellow',name:'노랑', rgb:[255,220,0]},
+  {id:'blue',  name:'파랑', rgb:[40,100,255]},
+  {id:'white', name:'하양', rgb:[240,240,240]},
+  {id:'black', name:'검정', rgb:[30,30,30]},
+];
+
+const TARGETS=[
+  {name:'빨강',    rgb:[255,60,60],   recipe:['red'],            level:1},
+  {name:'노랑',    rgb:[255,220,0],   recipe:['yellow'],         level:1},
+  {name:'파랑',    rgb:[40,100,255],  recipe:['blue'],           level:1},
+  {name:'주황',    rgb:[255,140,30],  recipe:['red','yellow'],   level:2},
+  {name:'초록',    rgb:[30,190,60],   recipe:['yellow','blue'],  level:2},
+  {name:'보라',    rgb:[160,40,200],  recipe:['red','blue'],     level:2},
+  {name:'분홍',    rgb:[255,100,180], recipe:['red','white'],    level:2},
+  {name:'하늘색',  rgb:[100,190,255], recipe:['blue','white'],   level:2},
+  {name:'갈색',    rgb:[160,90,40],   recipe:['red','yellow','black'], level:3},
+  {name:'회색',    rgb:[140,140,140], recipe:['black','white'],  level:2},
+];
+
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+let W,H;
+let balloons=[];
+let mixedColors=[];
+let currentTarget=null;
+let score=0,level=1;
+let anim=null;
+
+function resize(){
+  const area=document.getElementById('mix-area');
+  W=area.clientWidth; H=area.clientHeight;
+  canvas.width=W; canvas.height=H;
+}
+
+// Balloon physics
+class Balloon{
+  constructor(x,y,color,name){
+    this.x=x; this.y=y;
+    this.r=28+Math.random()*10;
+    this.vx=(Math.random()-.5)*1.2;
+    this.vy=-1.5-Math.random()*1.5;
+    this.color=color; // [r,g,b]
+    this.name=name;
+    this.alpha=0.9;
+    this.popped=false;
+    this.popAnim=0;
+  }
+  update(){
+    if(this.popped){this.popAnim+=.08;return;}
+    this.x+=this.vx;
+    this.y+=this.vy;
+    this.vy+=0.015; // gravity
+    if(this.x<this.r){this.x=this.r;this.vx*=-0.7;}
+    if(this.x>W-this.r){this.x=W-this.r;this.vx*=-0.7;}
+    if(this.y>H+60) this.popped=true;
+    if(this.y<this.r&&this.vy<0) this.vy*=-0.6;
+  }
+  draw(ctx){
+    if(this.popped){
+      if(this.popAnim<1){
+        ctx.save();
+        ctx.globalAlpha=1-this.popAnim;
+        for(let i=0;i<8;i++){
+          const a=i/8*Math.PI*2;
+          const d=this.r*this.popAnim*1.5;
+          ctx.beginPath();
+          ctx.arc(this.x+Math.cos(a)*d,this.y+Math.sin(a)*d,5,0,Math.PI*2);
+          ctx.fillStyle=`rgb(${this.color.join(',')})`;
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+      return;
+    }
+    const c=this.color;
+    ctx.save();
+    ctx.globalAlpha=this.alpha;
+    // balloon body
+    const grd=ctx.createRadialGradient(this.x-this.r*.3,this.y-this.r*.3,this.r*.1,this.x,this.y,this.r*1.1);
+    grd.addColorStop(0,`rgba(${Math.min(255,c[0]+80)},${Math.min(255,c[1]+80)},${Math.min(255,c[2]+80)},1)`);
+    grd.addColorStop(.6,`rgba(${c[0]},${c[1]},${c[2]},1)`);
+    grd.addColorStop(1,`rgba(${Math.max(0,c[0]-60)},${Math.max(0,c[1]-60)},${Math.max(0,c[2]-60)},1)`);
+    ctx.beginPath();
+    ctx.ellipse(this.x,this.y,this.r,this.r*1.2,0,0,Math.PI*2);
+    ctx.fillStyle=grd;
+    ctx.fill();
+    // shine
+    ctx.beginPath();
+    ctx.ellipse(this.x-this.r*.28,this.y-this.r*.35,this.r*.22,this.r*.15,-0.4,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.fill();
+    // knot
+    ctx.beginPath();
+    ctx.moveTo(this.x,this.y+this.r*1.2);
+    ctx.lineTo(this.x-4,this.y+this.r*1.4);
+    ctx.lineTo(this.x+4,this.y+this.r*1.4);
+    ctx.closePath();
+    ctx.fillStyle=`rgb(${Math.max(0,c[0]-80)},${Math.max(0,c[1]-80)},${Math.max(0,c[2]-80)})`;
+    ctx.fill();
+    // string
+    ctx.beginPath();
+    ctx.moveTo(this.x,this.y+this.r*1.4);
+    ctx.lineTo(this.x+Math.sin(Date.now()*.002+this.x)*8,this.y+this.r*2.4);
+    ctx.strokeStyle='rgba(255,255,255,.3)';
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function spawnBalloon(color,name){
+  const b=new Balloon(W/2+(Math.random()-.5)*40,H+10,color,name);
+  balloons.push(b);
+}
+
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  // bg stars
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,.05)';
+  for(let i=0;i<30;i++){
+    const sx=(i*173)%W, sy=(i*97)%H;
+    ctx.beginPath();ctx.arc(sx,sy,1,0,Math.PI*2);ctx.fill();
+  }
+  ctx.restore();
+  balloons=balloons.filter(b=>!(b.popped&&b.popAnim>=1));
+  balloons.forEach(b=>{b.update();b.draw(ctx);});
+  anim=requestAnimationFrame(loop);
+}
+
+function mixColors(arr){
+  // arr: array of [r,g,b]
+  if(arr.length===0) return [200,200,200];
+  const r=Math.round(arr.reduce((s,c)=>s+c[0],0)/arr.length);
+  const g=Math.round(arr.reduce((s,c)=>s+c[1],0)/arr.length);
+  const b=Math.round(arr.reduce((s,c)=>s+c[2],0)/arr.length);
+  return [r,g,b];
+}
+
+function colorDist(a,b){
+  return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2);
+}
+
+function updatePreview(){
+  const sw=document.getElementById('cur-swatch');
+  const nm=document.getElementById('cur-name');
+  if(mixedColors.length===0){
+    sw.style.background='transparent';
+    nm.textContent='없음';
+    return;
+  }
+  const mc=mixColors(mixedColors.map(id=>BASE_COLORS.find(c=>c.id===id).rgb));
+  sw.style.background=`rgb(${mc.join(',')})`;
+  const closest=findClosestTarget(mc);
+  nm.textContent=closest.name;
+}
+
+function findClosestTarget(rgb){
+  let best=TARGETS[0],bestD=Infinity;
+  TARGETS.forEach(t=>{const d=colorDist(t.rgb,rgb);if(d<bestD){bestD=d;best=t;}});
+  return best;
+}
+
+function selectTarget(){
+  const pool=TARGETS.filter(t=>t.level<=Math.min(level,3));
+  currentTarget=pool[Math.floor(Math.random()*pool.length)];
+  const tc=currentTarget.rgb;
+  document.getElementById('target-color').style.background=`rgb(${tc.join(',')})`;
+  document.getElementById('target-color').style.color=`rgb(${tc.join(',')})`;
+  document.getElementById('target-name').textContent=currentTarget.name;
+  mixedColors=[];
+  updatePreview();
+}
+
+function addColor(colorId){
+  if(document.getElementById('result-msg').style.display==='flex') return;
+  const bc=BASE_COLORS.find(c=>c.id===colorId);
+  mixedColors.push(colorId);
+  spawnBalloon(bc.rgb,bc.name);
+  updatePreview();
+  checkAnswer();
+}
+
+function checkAnswer(){
+  if(mixedColors.length===0||!currentTarget)return;
+  const mc=mixColors(mixedColors.map(id=>BASE_COLORS.find(c=>c.id===id).rgb));
+  const dist=colorDist(mc,currentTarget.rgb);
+  const threshold=currentTarget.recipe.length===1?30:55;
+  if(dist<threshold){
+    score+=currentTarget.level*10;
+    document.getElementById('score-val').textContent=score;
+    if(score>=level*50) level=Math.min(3,level+1);
+    document.getElementById('level-val').textContent=level;
+    showResult(true,mc);
+  } else if(mixedColors.length>=5){
+    showResult(false,mc);
+  }
+}
+
+function showResult(ok,mc){
+  const rm=document.getElementById('result-msg');
+  document.getElementById('result-emoji').textContent=ok?'🎉':'😅';
+  document.getElementById('result-text').textContent=ok
+    ?`${currentTarget.name} 완성! +${currentTarget.level*10}점`
+    :`아쉬워요! ${currentTarget.name}이(가) 아니에요`;
+  rm.style.display='flex';
+  rm.style.flexDirection='column';
+  rm.style.alignItems='center';
+}
+
+document.getElementById('btn-next').addEventListener('click',()=>{
+  document.getElementById('result-msg').style.display='none';
+  balloons=[];
+  selectTarget();
+});
+
+// build buckets
+function buildBuckets(){
+  const ba=document.getElementById('bucket-area');
+  ba.innerHTML='';
+  BASE_COLORS.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='color-bucket';
+    btn.style.background=`rgb(${c.rgb.join(',')})`;
+    btn.style.boxShadow=`0 4px 12px rgba(${c.rgb.join(',')},0.5)`;
+    btn.innerHTML=`<span class="label">${c.name}</span>`;
+    btn.addEventListener('click',()=>addColor(c.id));
+    ba.appendChild(btn);
+  });
+}
+
+// start
+resize();
+buildBuckets();
+selectTarget();
+loop();
+window.addEventListener('resize',()=>{resize();});
+</script>
+</body>
+</html>

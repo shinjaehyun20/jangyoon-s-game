@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+<title>공룡 화석 발굴</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:#1a0f00;font-family:'Segoe UI',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;}
+#header{width:100%;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:#2d1a00;}
+#header h1{font-size:1.3rem;color:#f5c842;}
+#score-area{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.score-label{font-size:.7rem;color:#aaa;}
+.score-val{font-size:1.2rem;color:#f5c842;font-weight:700;}
+#game-area{position:relative;width:100%;max-width:480px;flex:1;overflow:hidden;cursor:none;}
+#canvas{display:block;width:100%;height:100%;touch-action:none;}
+#msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;}
+#msg h2{font-size:2rem;color:#f5c842;text-shadow:0 2px 8px #000;}
+#msg p{font-size:1rem;color:#fff;margin-top:8px;}
+#btn-start{margin-top:16px;padding:12px 32px;font-size:1.1rem;border:none;border-radius:24px;background:#f5c842;color:#1a0f00;font-weight:700;cursor:pointer;pointer-events:all;}
+#progress-bar{width:90%;max-width:440px;height:14px;background:#3a2800;border-radius:8px;margin:8px auto;overflow:hidden;}
+#progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#f5c842,#ff8c00);border-radius:8px;transition:width .3s;}
+#tool-bar{display:flex;gap:12px;padding:8px;justify-content:center;}
+.tool-btn{padding:8px 18px;border:2px solid transparent;border-radius:16px;background:#2d1a00;color:#f5c842;font-size:.9rem;cursor:pointer;transition:all .15s;}
+.tool-btn.active{border-color:#f5c842;background:#3a2800;}
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>🦕 화석 발굴</h1>
+  <div id="score-area">
+    <span class="score-label">발굴도</span>
+    <span class="score-val" id="pct-val">0%</span>
+  </div>
+</div>
+<div id="progress-bar"><div id="progress-fill"></div></div>
+<div id="tool-bar">
+  <button class="tool-btn active" data-tool="brush" id="t-brush">🖌️ 솔</button>
+  <button class="tool-btn" data-tool="pick" id="t-pick">⛏️ 곡갱이</button>
+</div>
+<div id="game-area">
+  <canvas id="canvas"></canvas>
+  <div id="msg">
+    <h2>🦕 화석 발굴</h2>
+    <p>모래를 쓸어서<br>공룡 화석을 찾아요!</p>
+    <button id="btn-start">발굴 시작!</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const msgEl = document.getElementById('msg');
+const btnStart = document.getElementById('btn-start');
+const fillEl = document.getElementById('progress-fill');
+const pctEl = document.getElementById('pct-val');
+
+const FOSSILS = [
+  {name:'티라노사우루스',emoji:'🦖',color:'#c6a24f'},
+  {name:'브라키오사우루스',emoji:'🦕',color:'#8fb84e'},
+  {name:'트리케라톱스',emoji:'🐲',color:'#4eaab8'},
+  {name:'프테라노돈',emoji:'🦅',color:'#a44eb8'},
+];
+
+let W,H,tool='brush',gameRunning=false,revealed=0,total=0;
+let sandLayer,fossilData;
+let currentFossil;
+let complete=false;
+
+function resize(){
+  const area=document.getElementById('game-area');
+  W=area.clientWidth; H=area.clientHeight;
+  canvas.width=W; canvas.height=H;
+  if(gameRunning) drawAll();
+}
+
+function buildSandOffscreen(){
+  const oc=new OffscreenCanvas(W,H);
+  const oc2=oc.getContext('2d');
+  // sand gradient
+  const grd=oc2.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,'#c9a84c');
+  grd.addColorStop(0.5,'#b8922e');
+  grd.addColorStop(1,'#8a6a1c');
+  oc2.fillStyle=grd;
+  oc2.fillRect(0,0,W,H);
+  // texture dots
+  for(let i=0;i<2000;i++){
+    oc2.fillStyle=`rgba(0,0,0,${Math.random()*.18})`;
+    oc2.beginPath();
+    oc2.arc(Math.random()*W,Math.random()*H,Math.random()*2.5,0,Math.PI*2);
+    oc2.fill();
+  }
+  return oc;
+}
+
+function drawFossil(){
+  const fossil=currentFossil;
+  const cx=W/2, cy=H/2;
+  ctx.save();
+  ctx.font=`bold ${Math.min(W,H)*.38}px serif`;
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  // shadow
+  ctx.shadowColor='rgba(0,0,0,.5)';
+  ctx.shadowBlur=12;
+  ctx.fillStyle=fossil.color;
+  ctx.fillText(fossil.emoji,cx,cy);
+  // label
+  ctx.font=`bold ${Math.min(W*0.07,22)}px sans-serif`;
+  ctx.fillStyle='#ffe0a0';
+  ctx.shadowBlur=4;
+  ctx.fillText(fossil.name,cx,cy+Math.min(W,H)*.24);
+  ctx.restore();
+}
+
+function startGame(){
+  complete=false;
+  revealed=0;
+  currentFossil=FOSSILS[Math.floor(Math.random()*FOSSILS.length)];
+  msgEl.style.display='none';
+  gameRunning=true;
+
+  // draw fossil first
+  ctx.clearRect(0,0,W,H);
+  drawFossil();
+
+  // build sand offscreen
+  const sandOc=buildSandOffscreen();
+
+  // create sand imageData with alpha=255 everywhere
+  sandLayer=new ImageData(W,H);
+  const tempCtx=new OffscreenCanvas(W,H).getContext('2d');
+  tempCtx.drawImage(sandOc,0,0);
+  const imgd=tempCtx.getImageData(0,0,W,H);
+  sandLayer=imgd; // alpha starts 255
+
+  total=W*H;
+  updatePct();
+  render();
+}
+
+function render(){
+  if(!gameRunning)return;
+  ctx.clearRect(0,0,W,H);
+  drawFossil();
+  // draw sand with current alpha
+  ctx.putImageData(sandLayer,0,0);
+}
+
+function updatePct(){
+  let cleared=0;
+  const d=sandLayer.data;
+  for(let i=3;i<d.length;i+=4) if(d[i]<128) cleared++;
+  revealed=cleared;
+  const pct=Math.min(100,Math.round(revealed/total*100));
+  fillEl.style.width=pct+'%';
+  pctEl.textContent=pct+'%';
+  if(pct>=80 && !complete){
+    complete=true;
+    setTimeout(showComplete,400);
+  }
+}
+
+function erase(x,y){
+  if(!gameRunning||complete)return;
+  const d=sandLayer.data;
+  const r=tool==='brush'?28:14;
+  const hard=tool==='pick';
+  for(let dy=-r;dy<=r;dy++){
+    for(let dx=-r;dx<=r;dx++){
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist>r)continue;
+      const px=Math.round(x+dx), py=Math.round(y+dy);
+      if(px<0||px>=W||py<0||py>=H)continue;
+      const idx=(py*W+px)*4;
+      const fade=hard?255:Math.round(255*(1-dist/r)*0.7);
+      sandLayer.data[idx+3]=Math.max(0,sandLayer.data[idx+3]-fade);
+    }
+  }
+  render();
+  updatePct();
+}
+
+function showComplete(){
+  gameRunning=false;
+  msgEl.innerHTML=`
+    <h2 style="font-size:1.5rem">🎉 발굴 완료!</h2>
+    <p style="font-size:2rem;margin:12px 0">${currentFossil.emoji}</p>
+    <p style="color:#ffe0a0;font-size:1.1rem">${currentFossil.name}<br>화석 발굴 성공!</p>
+    <button id="btn-start" style="margin-top:16px;padding:12px 32px;font-size:1.1rem;border:none;border-radius:24px;background:#f5c842;color:#1a0f00;font-weight:700;cursor:pointer;">다시 발굴!</button>`;
+  msgEl.style.display='block';
+  msgEl.querySelector('#btn-start').addEventListener('click',startGame);
+}
+
+// touch / mouse
+let isDown=false;
+function getPos(e){
+  const r=canvas.getBoundingClientRect();
+  const scaleX=W/r.width, scaleY=H/r.height;
+  if(e.touches){
+    return Array.from(e.touches).map(t=>({x:(t.clientX-r.left)*scaleX,y:(t.clientY-r.top)*scaleY}));
+  }
+  return [{x:(e.clientX-r.left)*scaleX,y:(e.clientY-r.top)*scaleY}];
+}
+canvas.addEventListener('touchstart',e=>{e.preventDefault();isDown=true;getPos(e).forEach(p=>erase(p.x,p.y));},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(isDown)getPos(e).forEach(p=>erase(p.x,p.y));},{passive:false});
+canvas.addEventListener('touchend',e=>{isDown=false;});
+canvas.addEventListener('mousedown',e=>{isDown=true;const p=getPos(e)[0];erase(p.x,p.y);});
+canvas.addEventListener('mousemove',e=>{if(isDown){const p=getPos(e)[0];erase(p.x,p.y);}});
+canvas.addEventListener('mouseup',()=>isDown=false);
+canvas.addEventListener('mouseleave',()=>isDown=false);
+
+// tool buttons
+document.querySelectorAll('.tool-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    tool=btn.dataset.tool;
+    document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+btnStart.addEventListener('click',startGame);
+window.addEventListener('resize',()=>{resize();});
+resize();
+</script>
+</body>
+</html>

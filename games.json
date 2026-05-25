@@ -606,5 +606,21 @@
     "description": "6개 드럼 패드를 탭해서 연주! 자유 연주와 비트 따라치기 2가지 모드",
     "thumbnail": "drum-beat/thumb.svg",
     "path": "drum-beat/index.html"
+  },
+  {
+    "id": "fossil-dig",
+    "title": "Fossil Dig",
+    "title_ko": "공룡 화석 발굴",
+    "description": "모래를 손가락으로 쓸어서 숨겨진 공룡 화석을 발굴해요! 솔과 곡갱이 도구 선택",
+    "thumbnail": "fossil-dig/thumb.svg",
+    "path": "fossil-dig/index.html"
+  },
+  {
+    "id": "balloon-color-mix",
+    "title": "Balloon Color Mix",
+    "title_ko": "풍선 색깔 섞기",
+    "description": "색깔 풍선을 섞어서 목표 색깔을 만들어요! 빨강+노랑=주황? 직접 확인해 보세요",
+    "thumbnail": "balloon-color-mix/thumb.svg",
+    "path": "balloon-color-mix/index.html"
   }
 ]
