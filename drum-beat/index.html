@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🥁 드럼 비트</title>
+  <style>
+    :root {
+      --bg: #1a0a00;
+      --accent: #ff6b00;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(255,107,0,0.6);
+    }
+    .hud {
+      display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 6px 16px;
+      font-size: 15px;
+    }
+    .hud span { font-weight: 700; color: var(--accent); }
+    /* 모드 탭 */
+    .mode-tabs {
+      display: flex; gap: 8px;
+    }
+    .mode-tab {
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 10px;
+      border: 2px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      touch-action: manipulation;
+    }
+    .mode-tab.active {
+      border-color: var(--accent);
+      background: rgba(255,107,0,0.15);
+      color: var(--accent);
+    }
+    /* 드럼 패드 영역 */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+    /* 비트 안내 띠 (챌린지 모드) */
+    #beatTrack {
+      height: 44px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      display: none;
+    }
+    #beatTrack.visible { display: block; }
+    .beat-dot {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.85;
+    }
+    #beatCursor {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 10%;
+      width: 3px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 2px;
+    }
+    /* 드럼 패드 그리드 */
+    .pad-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .pad {
+      border-radius: 16px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      transition: filter 0.08s;
+      position: relative;
+      overflow: hidden;
+      border: 3px solid transparent;
+    }
+    .pad:active, .pad.hit {
+      filter: brightness(1.5);
+    }
+    .pad.hit::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.25);
+      border-radius: 13px;
+      animation: padFlash 0.15s ease-out forwards;
+    }
+    @keyframes padFlash {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    .pad .pad-emoji { font-size: clamp(24px,6vw,36px); }
+    .pad .pad-label { font-size: 11px; font-weight: 700; margin-top: 4px; color: rgba(255,255,255,0.8); }
+    /* 챌린지 결과 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(26,10,0,0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #2a1200, #3d1a00);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 340px; width: 90%;
+      text-align: center;
+      border: 2px solid rgba(255,107,0,0.5);
+      box-shadow: 0 0 40px rgba(255,107,0,0.25);
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
+    .btn-start {
+      background: linear-gradient(135deg, #ff6b00, #ff9d00);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 40px;
+      min-height: 52px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+      touch-action: manipulation;
+    }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); margin: 8px 0; }
+    footer {
+      display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+      font-size: 12px; color: rgba(255,255,255,0.4);
+    }
+    .home-link {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.07);
+    }
+    /* 콤보 표시 */
+    #comboDisplay {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-size: 36px; font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(255,107,0,0.8);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 50;
+      transition: opacity 0.3s;
+    }
+    #comboDisplay.show {
+      opacity: 1;
+      animation: comboPop 0.4s ease-out forwards;
+    }
+    @keyframes comboPop {
+      0% { transform: translate(-50%,-50%) scale(0.5); opacity: 1; }
+      60% { transform: translate(-50%,-80%) scale(1.1); opacity: 1; }
+      100% { transform: translate(-50%,-110%) scale(1.0); opacity: 0; }
+    }
+    /* 챌린지 모드 정확도 표시 */
+    #accuracyBar {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.1);
+      overflow: hidden;
+      display: none;
+    }
+    #accuracyBar.visible { display: block; }
+    #accuracyFill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff4d4d, #ff6b00, #7fff00);
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🥁 드럼 비트</h1>
+
+    <div class="hud">
+      <div>🎵 콤보: <span id="comboCount">0</span></div>
+      <div>⭐ 점수: <span id="scoreDisplay">0</span></div>
+      <div>🏆 최고: <span id="bestDisplay">0</span></div>
+    </div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tabFree" data-mode="free">자유 연주</button>
+      <button class="mode-tab" id="tabChallenge" data-mode="challenge">비트 따라치기</button>
+    </div>
+
+    <div id="gameArea">
+      <div id="beatTrack">
+        <div id="beatCursor"></div>
+      </div>
+      <div id="accuracyBar"><div id="accuracyFill" style="width:100%"></div></div>
+      <div class="pad-grid" id="padGrid"></div>
+      <div id="comboDisplay"></div>
+    </div>
+
+    <footer>
+      <small id="modeHint">탭해서 드럼을 쳐요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🥁 드럼 비트</h2>
+      <p>패드를 탭해서 드럼을 쳐요!<br><strong>자유 연주</strong> — 원하는 대로 신나게!<br><strong>비트 따라치기</strong> — 리듬에 맞춰 콤보!</p>
+      <button class="btn-start" id="startBtn">드럼 시작!</button>
+    </div>
+  </div>
+
+  <!-- 챌린지 종료 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const BEST_KEY = 'drum-beat_best';
+
+    // 드럼 패드 정의
+    const PADS = [
+      { id: 'bass',    emoji: '🥁', label: '베이스',   bg: '#5a1a00', border: '#ff6b00', freq: 80,  type: 'bass'   },
+      { id: 'snare',   emoji: '🪘', label: '스네어',   bg: '#002244', border: '#4488ff', freq: 200, type: 'snare'  },
+      { id: 'hihat',   emoji: '⚡', label: '하이햇',   bg: '#003300', border: '#44ff88', freq: 800, type: 'hihat'  },
+      { id: 'clap',    emoji: '👏', label: '박수',     bg: '#330044', border: '#cc44ff', freq: 300, type: 'clap'   },
+      { id: 'cowbell', emoji: '🔔', label: '카우벨',   bg: '#443300', border: '#ffcc00', freq: 500, type: 'cowbell'},
+      { id: 'crash',   emoji: '✨', label: '크래시',   bg: '#220033', border: '#ff44aa', freq: 1200,type: 'crash'  },
+    ];
+
+    // 챌린지 패턴 (pad id, 비트 위치 0~1 in each bar, bars=4)
+    const CHALLENGE_PATTERNS = [
+      // 기본 4/4 박자
+      [
+        { id: 'bass', beat: 0.00 }, { id: 'hihat', beat: 0.25 },
+        { id: 'snare', beat: 0.50 }, { id: 'hihat', beat: 0.75 },
+        { id: 'bass', beat: 1.00 }, { id: 'bass', beat: 1.25 },
+        { id: 'hihat', beat: 1.50 }, { id: 'snare', beat: 1.75 },
+        { id: 'bass', beat: 2.00 }, { id: 'hihat', beat: 2.25 },
+        { id: 'snare', beat: 2.50 }, { id: 'hihat', beat: 2.75 },
+        { id: 'clap', beat: 3.00 }, { id: 'crash', beat: 3.50 },
+      ],
+    ];
+
+    let audioCtx = null;
+    let mode = 'free';
+    let combo = 0;
+    let score = 0;
+    let challengeRunning = false;
+    let challengeStartTime = 0;
+    const CHALLENGE_DURATION = 30000; // 30초
+    const BPM = 100;
+    const BEAT_MS = 60000 / BPM;
+    let scheduledBeats = [];
+    let nextBeatIndex = 0;
+    let challengeTimerInterval = null;
+    let challengeBeats = []; // 현재 보이는 비트 도트들
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playDrum(type, freq) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      if (type === 'bass') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.3);
+        gainNode.gain.setValueAtTime(1.0, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'snare') {
+        // 노이즈 + 오실레이터
+        const bufferSize = audioCtx.sampleRate * 0.15;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        const g2 = audioCtx.createGain();
+        source.connect(g2); g2.connect(audioCtx.destination);
+        g2.gain.setValueAtTime(0.8, now);
+        g2.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        source.start(now); source.stop(now + 0.15);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(200, now);
+        gainNode.gain.setValueAtTime(0.4, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now); osc.stop(now + 0.08);
+      } else if (type === 'hihat') {
+        const bufferSize = audioCtx.sampleRate * 0.05;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        const bpf = audioCtx.createBiquadFilter();
+        bpf.type = 'highpass'; bpf.frequency.value = 7000;
+        const g2 = audioCtx.createGain();
+        source.connect(bpf); bpf.connect(g2); g2.connect(audioCtx.destination);
+        g2.gain.setValueAtTime(0.5, now);
+        g2.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        source.start(now); source.stop(now + 0.05);
+        osc.disconnect(); // unused
+      } else {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        gainNode.gain.setValueAtTime(0.7, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.start(now); osc.stop(now + 0.2);
+      }
+    }
+
+    function showCombo(text) {
+      const el = document.getElementById('comboDisplay');
+      el.textContent = text;
+      el.classList.remove('show');
+      void el.offsetWidth;
+      el.classList.add('show');
+    }
+
+    function onPadHit(padId) {
+      initAudio();
+      const pad = PADS.find(p => p.id === padId);
+      if (!pad) return;
+      playDrum(pad.type, pad.freq);
+
+      // 패드 히트 애니메이션
+      const el = document.getElementById('pad-' + padId);
+      if (el) {
+        el.classList.add('hit');
+        setTimeout(() => el.classList.remove('hit'), 200);
+      }
+
+      if (mode === 'free') {
+        combo++;
+        score += combo;
+        document.getElementById('comboCount').textContent = combo;
+        document.getElementById('scoreDisplay').textContent = score;
+        saveBest(score);
+        if (combo >= 5 && combo % 5 === 0) {
+          showCombo('🔥 ' + combo + ' 콤보!');
+        }
+      } else if (mode === 'challenge' && challengeRunning) {
+        // 비트 정확도 판정
+        const now = Date.now();
+        const elapsed = now - challengeStartTime;
+        const beatPos = (elapsed / BEAT_MS) % (CHALLENGE_PATTERNS[0].length);
+
+        // 가장 가까운 예정 비트 찾기
+        let minDist = Infinity;
+        let hitBeat = null;
+        const windowMs = BEAT_MS * 0.35;
+
+        CHALLENGE_PATTERNS[0].forEach(b => {
+          if (b.id !== padId) return;
+          // 반복 처리: beat은 0~3.75 범위
+          const totalBeats = elapsed / BEAT_MS;
+          const loopCount = Math.floor(totalBeats / 4);
+          const loopStart = loopCount * 4 * BEAT_MS;
+          const bTime = loopStart + b.beat * BEAT_MS;
+          const dist = Math.abs(elapsed - bTime % (4 * BEAT_MS) - loopStart);
+          // 단순히 가장 가까운 계산
+          const d2 = Math.abs((elapsed % (4 * BEAT_MS)) - (b.beat * BEAT_MS));
+          if (d2 < windowMs && d2 < minDist) {
+            minDist = d2;
+            hitBeat = b;
+          }
+        });
+
+        if (hitBeat) {
+          const accuracy = 1 - minDist / windowMs;
+          const pts = Math.round(accuracy * 100);
+          combo++;
+          score += pts + combo * 5;
+          document.getElementById('comboCount').textContent = combo;
+          document.getElementById('scoreDisplay').textContent = score;
+          saveBest(score);
+          const grade = accuracy > 0.8 ? '🎯 PERFECT!' : accuracy > 0.5 ? '👍 GOOD' : '🥁 OK';
+          showCombo(grade);
+          const accFill = document.getElementById('accuracyFill');
+          accFill.style.width = Math.round(accuracy * 100) + '%';
+        } else {
+          combo = 0;
+          document.getElementById('comboCount').textContent = 0;
+        }
+      }
+    }
+
+    // 패드 그리드 생성
+    function buildPads() {
+      const grid = document.getElementById('padGrid');
+      grid.innerHTML = '';
+      PADS.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'pad';
+        div.id = 'pad-' + p.id;
+        div.style.background = p.bg;
+        div.style.borderColor = p.border;
+        div.innerHTML = `<span class="pad-emoji">${p.emoji}</span><span class="pad-label">${p.label}</span>`;
+        div.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          onPadHit(p.id);
+        });
+        grid.appendChild(div);
+      });
+    }
+
+    // 모드 전환
+    function setMode(m) {
+      mode = m;
+      document.querySelectorAll('.mode-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.mode === m);
+      });
+      const beatTrack = document.getElementById('beatTrack');
+      const accBar = document.getElementById('accuracyBar');
+      const hint = document.getElementById('modeHint');
+      if (m === 'free') {
+        beatTrack.classList.remove('visible');
+        accBar.classList.remove('visible');
+        hint.textContent = '탭해서 드럼을 쳐요!';
+        stopChallenge();
+        combo = 0; score = 0;
+        document.getElementById('comboCount').textContent = 0;
+        document.getElementById('scoreDisplay').textContent = 0;
+      } else {
+        beatTrack.classList.add('visible');
+        accBar.classList.add('visible');
+        hint.textContent = '비트에 맞춰 패드를 탭하세요!';
+        startChallenge();
+      }
+    }
+
+    function startChallenge() {
+      stopChallenge();
+      combo = 0; score = 0;
+      document.getElementById('comboCount').textContent = 0;
+      document.getElementById('scoreDisplay').textContent = 0;
+      challengeRunning = true;
+      challengeStartTime = Date.now();
+      animateBeats();
+      challengeTimerInterval = setTimeout(() => {
+        endChallenge();
+      }, CHALLENGE_DURATION);
+    }
+
+    function stopChallenge() {
+      challengeRunning = false;
+      if (challengeTimerInterval) { clearTimeout(challengeTimerInterval); challengeTimerInterval = null; }
+    }
+
+    function endChallenge() {
+      challengeRunning = false;
+      const endOverlay = document.getElementById('endOverlay');
+      document.getElementById('finalScore').textContent = score;
+      const best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+      document.getElementById('resultMsg').textContent =
+        score >= best ? '🏆 신기록 달성!' : '잘 쳤어요! 다시 도전해봐요!';
+      saveBest(score);
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 비트 도트 애니메이션
+    function animateBeats() {
+      const track = document.getElementById('beatTrack');
+      if (!track) return;
+      const pattern = CHALLENGE_PATTERNS[0];
+      const barDuration = 4 * BEAT_MS;
+
+      function render() {
+        if (!challengeRunning) return;
+        const elapsed = Date.now() - challengeStartTime;
+        const barPos = (elapsed % barDuration) / barDuration; // 0~1
+
+        track.querySelectorAll('.beat-dot').forEach(d => d.remove());
+        const trackW = track.clientWidth || 300;
+
+        pattern.forEach(b => {
+          // b.beat: 0~3.75 → 0~1 within bar
+          const dotFrac = (b.beat / 4); // 0~1
+          // 현재 진행도에서 앞으로 보이는 비트들
+          const relFrac = dotFrac - barPos;
+          const adjustedFrac = relFrac < -0.1 ? relFrac + 1 : relFrac;
+          if (adjustedFrac < 0 || adjustedFrac > 0.9) return;
+
+          const x = 0.1 * trackW + adjustedFrac * trackW * 0.85;
+          const dot = document.createElement('div');
+          dot.className = 'beat-dot';
+          dot.style.left = x + 'px';
+          const pad = PADS.find(p => p.id === b.id);
+          if (pad) dot.style.background = pad.border;
+          track.appendChild(dot);
+        });
+
+        requestAnimationFrame(render);
+      }
+      render();
+    }
+
+    function loadBest() {
+      const v = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+      document.getElementById('bestDisplay').textContent = v;
+    }
+    function saveBest(n) {
+      const prev = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+      if (n > prev) {
+        localStorage.setItem(BEST_KEY, String(n));
+        document.getElementById('bestDisplay').textContent = n;
+      }
+    }
+
+    // 이벤트 연결
+    document.getElementById('startBtn').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      initAudio();
+      document.getElementById('startOverlay').classList.add('hidden');
+    });
+
+    document.getElementById('restartBtn').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      document.getElementById('endOverlay').classList.add('hidden');
+      startChallenge();
+    });
+
+    document.querySelectorAll('.mode-tab').forEach(t => {
+      t.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        initAudio();
+        setMode(t.dataset.mode);
+      });
+    });
+
+    // 자유모드에서 조용히 있으면 콤보 리셋 (3초)
+    let freeResetTimer = null;
+    function resetFreeCombo() {
+      if (mode !== 'free') return;
+      if (freeResetTimer) clearTimeout(freeResetTimer);
+      freeResetTimer = setTimeout(() => {
+        combo = 0;
+        document.getElementById('comboCount').textContent = 0;
+      }, 3000);
+    }
+
+    // 패드 이벤트에 콤보 리셋 연결
+    PADS.forEach(p => {
+      const el = document.getElementById('pad-' + p.id);
+      if (el) {
+        el.addEventListener('pointerdown', resetFreeCombo);
+      }
+    });
+
+    // 초기화
+    buildPads();
+    loadBest();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a00"/>
+      <stop offset="100%" style="stop-color:#2d1200"/>
+    </linearGradient>
+    <radialGradient id="drumGlow" cx="50%" cy="55%" r="40%">
+      <stop offset="0%" style="stop-color:#ff6b00;stop-opacity:0.35"/>
+      <stop offset="100%" style="stop-color:#ff6b00;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 글로우 -->
+  <circle cx="95" cy="100" r="70" fill="url(#drumGlow)"/>
+
+  <!-- 드럼 본체 (타원 + 사이드) -->
+  <ellipse cx="95" cy="105" rx="55" ry="18" fill="#3a1a00" stroke="#ff6b00" stroke-width="2.5"/>
+  <rect x="40" y="80" width="110" height="25" rx="4" fill="#2a1000" stroke="#993a00" stroke-width="1.5"/>
+  <ellipse cx="95" cy="80" rx="55" ry="18" fill="#4a2200" stroke="#ff6b00" stroke-width="2.5"/>
+  <!-- 드럼 테두리 하이라이트 -->
+  <ellipse cx="95" cy="80" rx="55" ry="18" fill="none" stroke="rgba(255,200,100,0.3)" stroke-width="1"/>
+
+  <!-- 패드들 (미니어처) -->
+  <rect x="160" y="55" width="38" height="28" rx="6" fill="#002244" stroke="#4488ff" stroke-width="1.5"/>
+  <text x="179" y="74" text-anchor="middle" font-size="14">🪘</text>
+
+  <rect x="205" y="55" width="38" height="28" rx="6" fill="#003300" stroke="#44ff88" stroke-width="1.5"/>
+  <text x="224" y="74" text-anchor="middle" font-size="14">⚡</text>
+
+  <rect x="250" y="55" width="38" height="28" rx="6" fill="#330044" stroke="#cc44ff" stroke-width="1.5"/>
+  <text x="269" y="74" text-anchor="middle" font-size="14">👏</text>
+
+  <rect x="160" y="90" width="38" height="28" rx="6" fill="#443300" stroke="#ffcc00" stroke-width="1.5"/>
+  <text x="179" y="109" text-anchor="middle" font-size="14">🔔</text>
+
+  <rect x="205" y="90" width="38" height="28" rx="6" fill="#220033" stroke="#ff44aa" stroke-width="1.5"/>
+  <text x="224" y="109" text-anchor="middle" font-size="14">✨</text>
+
+  <rect x="250" y="90" width="38" height="28" rx="6" fill="#5a1a00" stroke="#ff6b00" stroke-width="1.5"/>
+  <text x="269" y="109" text-anchor="middle" font-size="14">🥁</text>
+
+  <!-- 비트 트랙 힌트 -->
+  <rect x="20" y="135" width="188" height="12" rx="5" fill="rgba(255,255,255,0.07)"/>
+  <circle cx="50" cy="141" r="4" fill="#ff6b00" opacity="0.85"/>
+  <circle cx="80" cy="141" r="4" fill="#4488ff" opacity="0.85"/>
+  <circle cx="110" cy="141" r="4" fill="#44ff88" opacity="0.85"/>
+  <circle cx="140" cy="141" r="4" fill="#ff6b00" opacity="0.85"/>
+  <circle cx="170" cy="141" r="4" fill="#44ff88" opacity="0.85"/>
+  <!-- 커서 -->
+  <rect x="58" y="132" width="2.5" height="18" rx="1" fill="rgba(255,255,255,0.8)"/>
+
+  <!-- 음표들 -->
+  <text x="22" y="60" font-size="16" opacity="0.6">🎵</text>
+  <text x="36" y="48" font-size="12" opacity="0.4">🎵</text>
+
+  <!-- 제목 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6b00">드럼 비트</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">DRUM BEAT</text>
+  </g>
+</svg>

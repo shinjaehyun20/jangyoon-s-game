@@ -590,5 +590,21 @@
     "description": "꿀벌을 드래그해 꽃 모두 방문하고 벌집으로!",
     "thumbnail": "bee-pollen/thumb.svg",
     "path": "bee-pollen/index.html"
+  },
+  {
+    "id": "magic-wand",
+    "title": "Magic Wand",
+    "title_ko": "✨ 마법 지팡이",
+    "description": "손가락으로 동그라미를 그리면 별이 탄생해요! 마법 색을 바꿔가며 별 모으기",
+    "thumbnail": "magic-wand/thumb.svg",
+    "path": "magic-wand/index.html"
+  },
+  {
+    "id": "drum-beat",
+    "title": "Drum Beat",
+    "title_ko": "🥁 드럼 비트",
+    "description": "6개 드럼 패드를 탭해서 연주! 자유 연주와 비트 따라치기 2가지 모드",
+    "thumbnail": "drum-beat/thumb.svg",
+    "path": "drum-beat/index.html"
   }
 ]

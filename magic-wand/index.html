@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>✨ 마법 지팡이</title>
+  <style>
+    :root {
+      --bg: #0a0a2e;
+      --accent: #f7c948;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(247,201,72,0.7);
+    }
+    .hud {
+      display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 6px 16px;
+      font-size: 15px;
+    }
+    .hud span { font-weight: 700; color: var(--accent); }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 60%, #1a1a4e 0%, #0a0a2e 100%);
+      cursor: crosshair;
+      touch-action: none;
+    }
+    canvas {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    footer {
+      display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+      font-size: 12px; color: rgba(255,255,255,0.5);
+    }
+    .home-link {
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.07);
+    }
+    /* 색 선택 팔레트 */
+    .palette {
+      display: flex; flex-direction: row; justify-content: center; gap: 10px;
+      padding: 4px 0;
+    }
+    .color-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      touch-action: manipulation;
+    }
+    .color-btn.active {
+      border-color: white;
+      transform: scale(1.2);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,10,46,0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1a1a4e, #2d1b69);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 340px; width: 90%;
+      text-align: center;
+      border: 2px solid rgba(247,201,72,0.4);
+      box-shadow: 0 0 40px rgba(247,201,72,0.2);
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
+    .btn-start {
+      background: linear-gradient(135deg, #f7c948, #f59f00);
+      color: #0a0a2e;
+      font-size: 18px;
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 40px;
+      min-height: 52px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+      touch-action: manipulation;
+    }
+    .result-stars { font-size: 48px; margin: 12px 0; }
+    #clearBtn {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 8px 20px;
+      min-height: 44px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    #clearBtn:active { opacity: 0.7; }
+    .star-count-badge {
+      font-size: 22px; font-weight: 900;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>✨ 마법 지팡이</h1>
+
+    <div class="hud">
+      <div>⭐ 별: <span id="starCount">0</span></div>
+      <div>🏆 최고: <span id="bestScore">0</span></div>
+      <button id="clearBtn">지우기</button>
+    </div>
+
+    <div class="palette" id="palette"></div>
+
+    <div id="gameArea">
+      <canvas id="bgCanvas"></canvas>
+      <canvas id="drawCanvas"></canvas>
+    </div>
+
+    <footer>
+      <small>손가락으로 그려서 별을 만들어요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>✨ 마법 지팡이</h2>
+      <p>손가락으로 화면을 그려요!<br>동그라미를 그리면 ⭐ 별이 탄생해요.<br>빠르게 그릴수록 마법이 강해져요!</p>
+      <button class="btn-start" id="startBtn">마법 시작!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      COLORS: ['#f7c948','#ff6b9d','#00d4ff','#7fff00','#ff9d00','#c084fc','#ff4d4d'],
+      STAR_CIRCLE_THRESHOLD: 0.75, // 원형 판정 정확도
+      MIN_DRAW_POINTS: 20,
+      PARTICLE_COUNT: 18,
+      BEST_KEY: 'magic-wand_best',
+    };
+
+    let activeColor = CONFIG.COLORS[0];
+    let starCount = 0;
+    let isDrawing = false;
+    let drawPoints = [];
+    let particles = [];
+    let stars = [];
+    let animFrame;
+    let gameStarted = false;
+
+    // DOM
+    const startOverlay = document.getElementById('startOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const gameArea = document.getElementById('gameArea');
+    const bgCanvas = document.getElementById('bgCanvas');
+    const drawCanvas = document.getElementById('drawCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    const drawCtx = drawCanvas.getContext('2d');
+    const starCountEl = document.getElementById('starCount');
+    const bestScoreEl = document.getElementById('bestScore');
+    const clearBtn = document.getElementById('clearBtn');
+
+    // 팔레트 생성
+    const palette = document.getElementById('palette');
+    CONFIG.COLORS.forEach((color, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'color-btn' + (i === 0 ? ' active' : '');
+      btn.style.background = color;
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeColor = color;
+      });
+      palette.appendChild(btn);
+    });
+
+    function loadBest() {
+      const v = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+      bestScoreEl.textContent = v;
+      return v;
+    }
+    function saveBest(n) {
+      const prev = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+      if (n > prev) {
+        localStorage.setItem(CONFIG.BEST_KEY, String(n));
+        bestScoreEl.textContent = n;
+      }
+    }
+
+    function resizeCanvases() {
+      const rect = gameArea.getBoundingClientRect();
+      [bgCanvas, drawCanvas].forEach(c => {
+        c.width = rect.width;
+        c.height = rect.height;
+      });
+      drawBg();
+    }
+
+    function drawBg() {
+      const w = bgCanvas.width, h = bgCanvas.height;
+      bgCtx.clearRect(0, 0, w, h);
+      // 배경 별빛
+      bgCtx.fillStyle = '#0a0a2e';
+      bgCtx.fillRect(0, 0, w, h);
+      // 작은 배경 별들
+      for (let i = 0; i < 60; i++) {
+        const bx = (Math.sin(i * 127.3) * 0.5 + 0.5) * w;
+        const by = (Math.sin(i * 91.7) * 0.5 + 0.5) * h;
+        const r = (Math.sin(i * 53.1) * 0.5 + 0.5) * 1.5 + 0.5;
+        const alpha = (Math.sin(i * 37.9) * 0.5 + 0.5) * 0.6 + 0.2;
+        bgCtx.beginPath();
+        bgCtx.arc(bx, by, r, 0, Math.PI * 2);
+        bgCtx.fillStyle = `rgba(255,255,255,${alpha})`;
+        bgCtx.fill();
+      }
+    }
+
+    // 원형 판정
+    function isCircle(pts) {
+      if (pts.length < CONFIG.MIN_DRAW_POINTS) return false;
+      const cx = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+      const cy = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+      const dists = pts.map(p => Math.hypot(p.x - cx, p.y - cy));
+      const avgR = dists.reduce((s, d) => s + d, 0) / dists.length;
+      if (avgR < 15) return false;
+      const variance = dists.reduce((s, d) => s + Math.pow(d - avgR, 2), 0) / dists.length;
+      const stdDev = Math.sqrt(variance);
+      const score = 1 - stdDev / avgR;
+      // 시작점과 끝점이 가까운지도 체크 (닫힌 곡선)
+      const startEnd = Math.hypot(pts[0].x - pts[pts.length-1].x, pts[0].y - pts[pts.length-1].y);
+      const closed = startEnd < avgR * 0.8;
+      return score > CONFIG.STAR_CIRCLE_THRESHOLD && closed;
+    }
+
+    function getCenterOfPoints(pts) {
+      return {
+        x: pts.reduce((s, p) => s + p.x, 0) / pts.length,
+        y: pts.reduce((s, p) => s + p.y, 0) / pts.length,
+      };
+    }
+
+    function spawnStar(cx, cy, color) {
+      const size = 28 + Math.random() * 16;
+      stars.push({ x: cx, y: cy, size, color, alpha: 1, vy: -0.4, life: 180 });
+      // 파티클
+      for (let i = 0; i < CONFIG.PARTICLE_COUNT; i++) {
+        const angle = (Math.PI * 2 / CONFIG.PARTICLE_COUNT) * i;
+        const speed = 2 + Math.random() * 3;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color,
+          alpha: 1,
+          size: 3 + Math.random() * 3,
+          life: 50 + Math.random() * 30,
+        });
+      }
+    }
+
+    function drawStar5(ctx, cx, cy, outerR, innerR, color, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 16;
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const angle = (Math.PI / 5) * i - Math.PI / 2;
+        const r = i % 2 === 0 ? outerR : innerR;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function loop() {
+      const w = drawCanvas.width, h = drawCanvas.height;
+      drawCtx.clearRect(0, 0, w, h);
+
+      // 영구 별들
+      stars.forEach(s => {
+        if (s.life > 0) {
+          drawStar5(drawCtx, s.x, s.y, s.size, s.size * 0.45, s.color, s.alpha);
+          s.life--;
+          s.y += s.vy;
+          if (s.life < 40) s.alpha = s.life / 40;
+        }
+      });
+      stars = stars.filter(s => s.life > 0);
+
+      // 파티클
+      particles.forEach(p => {
+        if (p.life > 0) {
+          drawCtx.save();
+          drawCtx.globalAlpha = p.alpha;
+          drawCtx.fillStyle = p.color;
+          drawCtx.shadowColor = p.color;
+          drawCtx.shadowBlur = 8;
+          drawCtx.beginPath();
+          drawCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          drawCtx.fill();
+          drawCtx.restore();
+          p.x += p.vx; p.y += p.vy;
+          p.vy += 0.05;
+          p.life--;
+          if (p.life < 15) p.alpha = p.life / 15;
+        }
+      });
+      particles = particles.filter(p => p.life > 0);
+
+      // 현재 그리는 선
+      if (drawPoints.length > 1) {
+        drawCtx.save();
+        drawCtx.strokeStyle = activeColor;
+        drawCtx.lineWidth = 4;
+        drawCtx.lineCap = 'round';
+        drawCtx.lineJoin = 'round';
+        drawCtx.shadowColor = activeColor;
+        drawCtx.shadowBlur = 10;
+        drawCtx.globalAlpha = 0.85;
+        drawCtx.beginPath();
+        drawCtx.moveTo(drawPoints[0].x, drawPoints[0].y);
+        for (let i = 1; i < drawPoints.length; i++) {
+          drawCtx.lineTo(drawPoints[i].x, drawPoints[i].y);
+        }
+        drawCtx.stroke();
+        drawCtx.restore();
+      }
+
+      animFrame = requestAnimationFrame(loop);
+    }
+
+    function getPos(e) {
+      const rect = drawCanvas.getBoundingClientRect();
+      const scaleX = drawCanvas.width / rect.width;
+      const scaleY = drawCanvas.height / rect.height;
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
+      };
+    }
+
+    drawCanvas.addEventListener('pointerdown', (e) => {
+      if (!gameStarted) return;
+      e.preventDefault();
+      isDrawing = true;
+      drawPoints = [getPos(e)];
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!isDrawing || !gameStarted) return;
+      e.preventDefault();
+      drawPoints.push(getPos(e));
+    });
+    window.addEventListener('pointerup', (e) => {
+      if (!isDrawing || !gameStarted) return;
+      isDrawing = false;
+      if (isCircle(drawPoints)) {
+        const center = getCenterOfPoints(drawPoints);
+        spawnStar(center.x, center.y, activeColor);
+        starCount++;
+        starCountEl.textContent = starCount;
+        saveBest(starCount);
+        // 반짝 피드백
+        starCountEl.style.transform = 'scale(1.5)';
+        setTimeout(() => { starCountEl.style.transform = 'scale(1)'; }, 200);
+      }
+      drawPoints = [];
+    });
+
+    clearBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      stars = [];
+      particles = [];
+      starCount = 0;
+      starCountEl.textContent = 0;
+    });
+
+    startBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      startOverlay.classList.add('hidden');
+      gameStarted = true;
+    });
+
+    // 초기화
+    loadBest();
+    resizeCanvases();
+    window.addEventListener('resize', resizeCanvases);
+    loop();
+  })();
+  </script>
+</body>
+</html>

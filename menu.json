@@ -247,6 +247,16 @@
         "id": "traffic-cross",
         "label": "🚦 동물 길 건너기",
         "path": "traffic-cross/index.html"
+      },
+      {
+        "id": "magic-wand",
+        "label": "✨ 마법 지팡이",
+        "path": "magic-wand/index.html"
+      },
+      {
+        "id": "drum-beat",
+        "label": "🥁 드럼 비트",
+        "path": "drum-beat/index.html"
       }
     ]
   },
