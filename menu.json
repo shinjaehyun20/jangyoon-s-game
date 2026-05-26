@@ -257,6 +257,16 @@
         "id": "drum-beat",
         "label": "🥁 드럼 비트",
         "path": "drum-beat/index.html"
+      },
+      {
+        "id": "submarine-dodge",
+        "label": "🌊 잠수함 피하기",
+        "path": "submarine-dodge/index.html"
+      },
+      {
+        "id": "memory-sequence",
+        "label": "🧠 순서 기억하기",
+        "path": "memory-sequence/index.html"
       }
     ]
   },

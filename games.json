@@ -622,5 +622,29 @@
     "description": "색깔 풍선을 섞어서 목표 색깔을 만들어요! 빨강+노랑=주황? 직접 확인해 보세요",
     "thumbnail": "balloon-color-mix/thumb.svg",
     "path": "balloon-color-mix/index.html"
+  },
+  {
+    "id": "submarine-dodge",
+    "title": "Submarine Dodge",
+    "title_ko": "🌊 잠수함 피하기",
+    "description": "드래그로 잠수함을 조종해 바위와 물고기를 피하며 30초 생존하세요!",
+    "thumbnail": "submarine-dodge/thumb.svg",
+    "path": "submarine-dodge/index.html"
+  },
+  {
+    "id": "memory-sequence",
+    "title": "Memory Sequence",
+    "title_ko": "🧠 순서 기억하기",
+    "description": "반짝이는 색깔 순서를 기억하고 따라 눌러요! 단계가 올라갈수록 길어지는 기억력 게임",
+    "thumbnail": "memory-sequence/thumb.svg",
+    "path": "memory-sequence/index.html"
+  },
+  {
+    "id": "princess-dressup",
+    "title": "Princess Dressup",
+    "title_ko": "👑 공주 옷 입히기",
+    "description": "공주에게 예쁜 옷과 액세서리를 입혀 나만의 스타일을 만들어요!",
+    "thumbnail": "princess-dressup/thumb.svg",
+    "path": "princess-dressup/index.html"
   }
 ]

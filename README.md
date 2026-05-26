@@ -66,6 +66,8 @@
 | [🐝 꿀벌 꽃가루 (bee-pollen)](./bee-pollen) | 꿀벌을 드래그해 꽃을 모두 방문한 뒤 벌집(🏠)으로 귀환! 라운드별 25초 제한, 통과마다 신규 꽃 6송이 재배치 | 드래그 |
 | [✨ 마법 지팡이 (magic-wand)](./magic-wand) | 손가락으로 동그라미를 그리면 별이 탄생! 7색 팔레트로 마법 별 수집, 캔버스 파티클 연출 | 창의 |
 | [🥁 드럼 비트 (drum-beat)](./drum-beat) | 6개 드럼 패드 탭으로 연주! 자유 연주 + 비트 따라치기 2가지 모드, Web Audio API | 음악/리듬 |
+| [🌊 잠수함 피하기 (submarine-dodge)](./submarine-dodge) | 드래그로 잠수함 조종, 바위·물고기 피하며 30초 생존! 속도 증가로 난이도 상승 | 반사/회피 |
+| [🧠 순서 기억하기 (memory-sequence)](./memory-sequence) | 반짝이는 색깔 4칸의 순서를 기억하고 따라 눌러요! 단계마다 한 칸씩 늘어나는 기억력 게임 | 기억력 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>잠수함 피하기</title>
+  <style>
+    :root {
+      --bg: #0a1f3d;
+      --accent: #00d4ff;
+      --text: #ffffff;
+      --sub: #f5c842;
+      --rock: #5a8a5a;
+      --fish: #ff6b6b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: clamp(13px, 4vw, 16px);
+      font-weight: 700;
+    }
+    .hud span { color: var(--accent); }
+    #gameCanvas {
+      flex: 1;
+      width: 100%;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #0d2b5e 0%, #0a4a7c 40%, #0d6e9e 100%);
+      display: block;
+      cursor: none;
+      touch-action: none;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      padding: 0 4px;
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #0d2b5e, #0a4a7c);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      width: min(340px, 88vw);
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+    }
+    .overlay-card h2 {
+      font-size: clamp(20px, 6vw, 28px);
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 15px);
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .result-score {
+      font-size: clamp(36px, 12vw, 56px);
+      font-weight: 900;
+      color: var(--sub);
+      margin: 10px 0;
+    }
+    .btn-start {
+      margin-top: 14px;
+      padding: 14px 36px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900;
+      background: var(--accent);
+      color: #0a1f3d;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      max-width: 220px;
+      box-shadow: 0 4px 16px rgba(0,212,255,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .best-tag {
+      margin-top: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🌊 잠수함 피하기</h1>
+    <div class="hud">
+      <div>⏱️ <span id="timeVal">30</span>초</div>
+      <div>🪨 피한 수: <span id="scoreVal">0</span></div>
+      <div>🏆 최고: <span id="bestVal">0</span></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <footer>
+      <small>화면을 드래그해 잠수함을 움직여요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🌊 잠수함 피하기</h2>
+      <p>바다 속을 헤엄치며<br>바위와 물고기를 피하세요!</p>
+      <p>화면 드래그로 잠수함 조종</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+      <div class="best-tag">🏆 최고기록: <span id="bestTagVal">0</span>개</div>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <div class="best-tag" id="newBestMsg" style="display:none;color:#f5c842;font-weight:700;font-size:15px;">🏆 새 최고기록!</div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const STORAGE_KEY = 'submarine-dodge_best';
+    const CONFIG = {
+      GAME_TIME: 30,
+      SUB_WIDTH: 60,
+      SUB_HEIGHT: 30,
+      OBSTACLE_MIN_W: 30,
+      OBSTACLE_MAX_W: 60,
+      OBSTACLE_MIN_H: 30,
+      OBSTACLE_MAX_H: 60,
+      INITIAL_SPEED: 3,
+      SPEED_INCREMENT: 0.15,
+      SPAWN_INTERVAL: 90,   // frames
+      BUBBLE_COUNT: 12,
+    };
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // DOM refs
+    const timeEl = document.getElementById('timeVal');
+    const scoreEl = document.getElementById('scoreVal');
+    const bestEl = document.getElementById('bestVal');
+    const bestTagEl = document.getElementById('bestTagVal');
+    const finalScoreEl = document.getElementById('finalScore');
+    const resultMsgEl = document.getElementById('resultMsg');
+    const newBestMsgEl = document.getElementById('newBestMsg');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+    document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+
+    let best = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+    bestEl.textContent = best;
+    bestTagEl.textContent = best;
+
+    // State
+    let state = {};
+    let raf = null;
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    function initState() {
+      resizeCanvas();
+      state = {
+        running: false,
+        frame: 0,
+        score: 0,
+        timeLeft: CONFIG.GAME_TIME,
+        lastSecond: Date.now(),
+        speed: CONFIG.INITIAL_SPEED,
+        sub: {
+          x: canvas.width * 0.2,
+          y: canvas.height * 0.5,
+          targetY: canvas.height * 0.5,
+        },
+        obstacles: [],
+        bubbles: initBubbles(),
+        dragging: false,
+        spawnCounter: 0,
+      };
+    }
+
+    function initBubbles() {
+      const arr = [];
+      for (let i = 0; i < CONFIG.BUBBLE_COUNT; i++) {
+        arr.push(randomBubble());
+      }
+      return arr;
+    }
+
+    function randomBubble() {
+      return {
+        x: Math.random() * (canvas.width || 360),
+        y: Math.random() * (canvas.height || 560),
+        r: 2 + Math.random() * 5,
+        speed: 0.3 + Math.random() * 0.7,
+        alpha: 0.1 + Math.random() * 0.3,
+      };
+    }
+
+    function spawnObstacle() {
+      const w = CONFIG.OBSTACLE_MIN_W + Math.random() * (CONFIG.OBSTACLE_MAX_W - CONFIG.OBSTACLE_MIN_W);
+      const h = CONFIG.OBSTACLE_MIN_H + Math.random() * (CONFIG.OBSTACLE_MAX_H - CONFIG.OBSTACLE_MIN_H);
+      const y = Math.random() * (canvas.height - h - 20) + 10;
+      const isFish = Math.random() < 0.35;
+      state.obstacles.push({
+        x: canvas.width + w,
+        y,
+        w,
+        h,
+        isFish,
+        wobble: Math.random() * Math.PI * 2,
+      });
+    }
+
+    // Pointer control
+    canvas.addEventListener('pointerdown', (e) => {
+      if (!state.running) return;
+      e.preventDefault();
+      state.dragging = true;
+      moveSub(e);
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!state.dragging || !state.running) return;
+      e.preventDefault();
+      moveSub(e);
+    });
+    window.addEventListener('pointerup', () => { state.dragging = false; });
+
+    function moveSub(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      const cy = clientY - rect.top;
+      state.sub.targetY = Math.max(CONFIG.SUB_HEIGHT / 2,
+        Math.min(canvas.height - CONFIG.SUB_HEIGHT / 2, cy));
+    }
+
+    function startGame() {
+      if (raf) cancelAnimationFrame(raf);
+      initState();
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      state.running = true;
+      loop();
+    }
+
+    function loop() {
+      update();
+      draw();
+      if (state.running) {
+        raf = requestAnimationFrame(loop);
+      }
+    }
+
+    function update() {
+      if (!state.running) return;
+      state.frame++;
+
+      // Timer
+      const now = Date.now();
+      if (now - state.lastSecond >= 1000) {
+        state.timeLeft--;
+        state.lastSecond = now;
+        timeEl.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) {
+          endGame();
+          return;
+        }
+      }
+
+      // Sub smoothing
+      state.sub.y += (state.sub.targetY - state.sub.y) * 0.2;
+
+      // Speed ramp
+      state.speed = CONFIG.INITIAL_SPEED + state.frame * 0.003;
+
+      // Spawn
+      state.spawnCounter++;
+      if (state.spawnCounter >= CONFIG.SPAWN_INTERVAL) {
+        spawnObstacle();
+        state.spawnCounter = 0;
+      }
+
+      // Move obstacles
+      for (let i = state.obstacles.length - 1; i >= 0; i--) {
+        const ob = state.obstacles[i];
+        ob.x -= state.speed;
+        ob.wobble += 0.06;
+        if (ob.isFish) ob.y += Math.sin(ob.wobble) * 1.2;
+
+        // Off screen
+        if (ob.x + ob.w < 0) {
+          state.obstacles.splice(i, 1);
+          state.score++;
+          scoreEl.textContent = state.score;
+          continue;
+        }
+
+        // Collision
+        const sw = CONFIG.SUB_WIDTH;
+        const sh = CONFIG.SUB_HEIGHT;
+        const sx = state.sub.x - sw / 2;
+        const sy = state.sub.y - sh / 2;
+        if (
+          sx < ob.x + ob.w - 8 &&
+          sx + sw - 8 > ob.x &&
+          sy < ob.y + ob.h - 8 &&
+          sy + sh - 8 > ob.y
+        ) {
+          endGame();
+          return;
+        }
+      }
+
+      // Bubbles
+      state.bubbles.forEach(b => {
+        b.y -= b.speed;
+        b.x += Math.sin(b.y * 0.05) * 0.3;
+        if (b.y < -b.r * 2) {
+          b.y = canvas.height + b.r;
+          b.x = Math.random() * canvas.width;
+        }
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Water gradient background
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      grad.addColorStop(0, '#0d2b5e');
+      grad.addColorStop(0.5, '#0a4a7c');
+      grad.addColorStop(1, '#0d6e9e');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Bubbles
+      state.bubbles.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(255,255,255,${b.alpha})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+      // Sea floor decoration
+      ctx.fillStyle = 'rgba(0,100,60,0.3)';
+      ctx.fillRect(0, canvas.height - 12, canvas.width, 12);
+
+      // Obstacles
+      state.obstacles.forEach(ob => {
+        if (ob.isFish) {
+          drawFish(ob.x + ob.w / 2, ob.y + ob.h / 2, ob.w, ob.h);
+        } else {
+          drawRock(ob.x, ob.y, ob.w, ob.h);
+        }
+      });
+
+      // Submarine
+      drawSub(state.sub.x, state.sub.y);
+    }
+
+    function drawSub(cx, cy) {
+      const w = CONFIG.SUB_WIDTH;
+      const h = CONFIG.SUB_HEIGHT;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Body
+      ctx.beginPath();
+      ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#f5c842';
+      ctx.fill();
+      ctx.strokeStyle = '#e0a800';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Conning tower
+      ctx.fillStyle = '#f5c842';
+      ctx.fillRect(-8, -h / 2 - 12, 16, 14);
+      ctx.strokeStyle = '#e0a800';
+      ctx.strokeRect(-8, -h / 2 - 12, 16, 14);
+
+      // Window
+      ctx.beginPath();
+      ctx.arc(4, 0, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#aef4ff';
+      ctx.fill();
+      ctx.strokeStyle = '#00d4ff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Propeller (back)
+      ctx.fillStyle = '#c0a020';
+      ctx.fillRect(-w / 2 - 8, -10, 8, 20);
+
+      // Bubbles from sub
+      if (state.frame % 8 === 0) {
+        const bx = cx + w / 2 + 5;
+        const by = cy - 5;
+        ctx.beginPath();
+        ctx.arc(bx, by, 3, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawRock(x, y, w, h) {
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.beginPath();
+      // Irregular rock shape
+      const pts = [
+        [-w/2, h/3],
+        [-w/3, -h/2],
+        [0, -h/2 - 5],
+        [w/3, -h/2],
+        [w/2, h/3],
+        [w/4, h/2],
+        [-w/4, h/2],
+      ];
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      ctx.closePath();
+      ctx.fillStyle = '#4a7a4a';
+      ctx.fill();
+      ctx.strokeStyle = '#2a5a2a';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Rock highlight
+      ctx.beginPath();
+      ctx.moveTo(-w / 4, -h / 3);
+      ctx.lineTo(0, -h / 2 + 4);
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawFish(cx, cy, w, h) {
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Body
+      ctx.beginPath();
+      ctx.ellipse(-4, 0, w / 2 - 4, h / 2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff6b6b';
+      ctx.fill();
+      ctx.strokeStyle = '#cc3333';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Tail
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 10, 0);
+      ctx.lineTo(w / 2 + 6, -h / 2 + 4);
+      ctx.lineTo(w / 2 + 6, h / 2 - 4);
+      ctx.closePath();
+      ctx.fillStyle = '#ff6b6b';
+      ctx.fill();
+
+      // Eye
+      ctx.beginPath();
+      ctx.arc(-w / 2 + 12, -3, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-w / 2 + 13, -3, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#333';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(raf);
+
+      finalScoreEl.textContent = state.score;
+
+      const msgs = [
+        '잘했어요! 🐠',
+        '바다 탐험가! 🌊',
+        '잠수함 조종 성공! 🎖️',
+        '대단해요! 🏅',
+      ];
+      resultMsgEl.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+
+      if (state.score > best) {
+        best = state.score;
+        localStorage.setItem(STORAGE_KEY, best);
+        bestEl.textContent = best;
+        bestTagEl.textContent = best;
+        newBestMsgEl.style.display = 'block';
+      } else {
+        newBestMsgEl.style.display = 'none';
+      }
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    window.addEventListener('resize', () => {
+      if (!state.running) resizeCanvas();
+    });
+
+    // Init best display
+    bestEl.textContent = best;
+    bestTagEl.textContent = best;
+  })();
+  </script>
+</body>
+</html>

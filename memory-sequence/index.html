@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>순서 기억하기</title>
+  <style>
+    :root {
+      --bg: #1a0a3d;
+      --accent: #c97dff;
+      --text: #ffffff;
+      --c0: #ff4d6d;
+      --c1: #4dbbff;
+      --c2: #4dff88;
+      --c3: #ffd94d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(201, 125, 255, 0.5);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: clamp(13px, 4vw, 16px);
+      font-weight: 700;
+    }
+    .hud span { color: var(--accent); }
+    #gameArea {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    #statusMsg {
+      font-size: clamp(16px, 5vw, 22px);
+      font-weight: 700;
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      min-height: 30px;
+      transition: opacity 0.2s;
+    }
+    #progressDots {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      min-height: 20px;
+    }
+    .dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transition: background 0.2s;
+    }
+    .dot.done { background: var(--accent); }
+    .dot.err { background: #ff4d4d; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+      max-width: 340px;
+    }
+    .cell {
+      aspect-ratio: 1;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(36px, 12vw, 54px);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s, filter 0.1s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      filter: brightness(0.45);
+      touch-action: none;
+    }
+    .cell.lit { filter: brightness(1.0); transform: scale(1.07); }
+    .cell.tap { filter: brightness(1.2); transform: scale(1.04); }
+    .cell.wrong { filter: brightness(1.0) saturate(0); transform: scale(0.96); }
+    .cell:nth-child(1) { background: var(--c0); }
+    .cell:nth-child(2) { background: var(--c1); }
+    .cell:nth-child(3) { background: var(--c2); }
+    .cell:nth-child(4) { background: var(--c3); }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      padding: 0 4px;
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1a0a3d, #2a1060);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      width: min(340px, 88vw);
+      box-shadow: 0 0 30px rgba(201, 125, 255, 0.3);
+    }
+    .overlay-card h2 {
+      font-size: clamp(20px, 6vw, 28px);
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 15px);
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 6px;
+      line-height: 1.6;
+    }
+    .result-score {
+      font-size: clamp(36px, 12vw, 56px);
+      font-weight: 900;
+      color: #ffd94d;
+      margin: 10px 0;
+    }
+    .btn-start {
+      margin-top: 14px;
+      padding: 14px 36px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900;
+      background: var(--accent);
+      color: #1a0a3d;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      max-width: 220px;
+      box-shadow: 0 4px 16px rgba(201,125,255,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .best-tag {
+      margin-top: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🧠 순서 기억하기</h1>
+    <div class="hud">
+      <div>🔢 단계: <span id="levelVal">1</span></div>
+      <div>✅ 점수: <span id="scoreVal">0</span></div>
+      <div>🏆 최고: <span id="bestVal">0</span></div>
+    </div>
+    <div id="gameArea">
+      <div id="statusMsg">시작 버튼을 눌러요!</div>
+      <div id="progressDots"></div>
+      <div class="grid">
+        <div class="cell" id="cell0">❤️</div>
+        <div class="cell" id="cell1">💙</div>
+        <div class="cell" id="cell2">💚</div>
+        <div class="cell" id="cell3">💛</div>
+      </div>
+    </div>
+    <footer>
+      <small>반짝이는 순서를 기억하고 따라 눌러요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🧠 순서 기억하기</h2>
+      <p>반짝이는 순서를 잘 보세요!<br>그 다음 같은 순서로 눌러요.</p>
+      <p>단계가 올라갈수록 길어져요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+      <div class="best-tag">🏆 최고기록: <span id="bestTagVal">0</span>단계</div>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">🎉 대단해요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <div class="best-tag" id="newBestMsg" style="display:none;color:#ffd94d;font-weight:700;font-size:15px;">🏆 새 최고기록!</div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const STORAGE_KEY = 'memory-sequence_best';
+    const CONFIG = {
+      SHOW_SPEED_BASE: 600,    // ms per step (base)
+      SHOW_SPEED_MIN: 280,     // minimum
+      PAUSE_BETWEEN: 220,      // gap between flashes
+      PLAYER_TIMEOUT: 5000,    // ms player has to tap
+    };
+
+    const cells = [0, 1, 2, 3].map(i => document.getElementById(`cell${i}`));
+    const levelEl = document.getElementById('levelVal');
+    const scoreEl = document.getElementById('scoreVal');
+    const bestEl = document.getElementById('bestVal');
+    const bestTagEl = document.getElementById('bestTagVal');
+    const statusEl = document.getElementById('statusMsg');
+    const dotsEl = document.getElementById('progressDots');
+    const finalScoreEl = document.getElementById('finalScore');
+    const resultMsgEl = document.getElementById('resultMsg');
+    const endTitleEl = document.getElementById('endTitle');
+    const newBestMsgEl = document.getElementById('newBestMsg');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+
+    document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+    document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+
+    let best = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+    bestEl.textContent = best;
+    bestTagEl.textContent = best;
+
+    let sequence = [];
+    let playerIdx = 0;
+    let level = 0;
+    let score = 0;
+    let phase = 'idle';   // idle | showing | player | result
+    let playerTimer = null;
+    let showTimer = null;
+
+    function startGame() {
+      clearTimers();
+      sequence = [];
+      playerIdx = 0;
+      level = 0;
+      score = 0;
+      phase = 'idle';
+      scoreEl.textContent = 0;
+      levelEl.textContent = 1;
+      cells.forEach(c => { c.classList.remove('lit', 'tap', 'wrong'); });
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      statusEl.textContent = '잘 봐요! 🔮';
+      setTimeout(nextLevel, 600);
+    }
+
+    function nextLevel() {
+      level++;
+      levelEl.textContent = level;
+      // Add one more random step
+      sequence.push(Math.floor(Math.random() * 4));
+      playerIdx = 0;
+      buildDots();
+      phase = 'showing';
+      statusEl.textContent = '잘 봐요! 👀';
+      playSequence(0);
+    }
+
+    function buildDots() {
+      dotsEl.innerHTML = '';
+      for (let i = 0; i < sequence.length; i++) {
+        const d = document.createElement('div');
+        d.className = 'dot';
+        dotsEl.appendChild(d);
+      }
+    }
+
+    function flashStep(idx, lit) {
+      cells[idx].classList.toggle('lit', lit);
+    }
+
+    function playSequence(stepIdx) {
+      if (stepIdx >= sequence.length) {
+        // Done showing
+        setTimeout(() => {
+          phase = 'player';
+          statusEl.textContent = '이제 따라 눌러요! 👆';
+          startPlayerTimer();
+        }, 300);
+        return;
+      }
+      const speed = Math.max(CONFIG.SHOW_SPEED_MIN,
+        CONFIG.SHOW_SPEED_BASE - level * 20);
+      flashStep(sequence[stepIdx], true);
+      showTimer = setTimeout(() => {
+        flashStep(sequence[stepIdx], false);
+        showTimer = setTimeout(() => {
+          playSequence(stepIdx + 1);
+        }, CONFIG.PAUSE_BETWEEN);
+      }, speed);
+    }
+
+    function startPlayerTimer() {
+      clearTimeout(playerTimer);
+      playerTimer = setTimeout(() => {
+        if (phase === 'player') {
+          wrongAnswer();
+        }
+      }, CONFIG.PLAYER_TIMEOUT);
+    }
+
+    function onCellTap(idx) {
+      if (phase !== 'player') return;
+
+      // Visual feedback
+      cells[idx].classList.add('tap');
+      setTimeout(() => cells[idx].classList.remove('tap'), 160);
+
+      if (idx === sequence[playerIdx]) {
+        // Correct
+        const dot = dotsEl.children[playerIdx];
+        if (dot) dot.classList.add('done');
+        playerIdx++;
+        score++;
+        scoreEl.textContent = score;
+        clearTimeout(playerTimer);
+
+        if (playerIdx >= sequence.length) {
+          // Level complete!
+          phase = 'idle';
+          statusEl.textContent = '정답! 🎉';
+          setTimeout(nextLevel, 1000);
+        } else {
+          startPlayerTimer();
+        }
+      } else {
+        wrongAnswer();
+      }
+    }
+
+    function wrongAnswer() {
+      phase = 'result';
+      clearTimers();
+
+      // Mark wrong
+      const dot = dotsEl.children[playerIdx];
+      if (dot) { dot.classList.add('err'); }
+
+      cells.forEach(c => c.classList.add('wrong'));
+      statusEl.textContent = '아쉽! 다시 해봐요 😊';
+
+      setTimeout(showEnd, 800);
+    }
+
+    function showEnd() {
+      cells.forEach(c => c.classList.remove('lit', 'tap', 'wrong'));
+
+      finalScoreEl.textContent = level - 1 + '단계';
+      endTitleEl.textContent = level <= 2 ? '도전 완료! 💪' : '🎉 대단해요!';
+
+      const msgs = [
+        `${sequence.length}개 순서까지 기억했어요!`,
+        '연습하면 더 잘할 수 있어요!',
+        '기억력이 쑥쑥! 🧠',
+      ];
+      resultMsgEl.textContent = msgs[Math.min(level - 1, msgs.length - 1)];
+
+      const reachedLevel = level - 1;
+      if (reachedLevel > best) {
+        best = reachedLevel;
+        localStorage.setItem(STORAGE_KEY, best);
+        bestEl.textContent = best;
+        bestTagEl.textContent = best;
+        newBestMsgEl.style.display = 'block';
+      } else {
+        newBestMsgEl.style.display = 'none';
+        bestEl.textContent = best;
+      }
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    function clearTimers() {
+      clearTimeout(playerTimer);
+      clearTimeout(showTimer);
+    }
+
+    // Bind cell taps
+    cells.forEach((cell, idx) => {
+      cell.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        onCellTap(idx);
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
