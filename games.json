@@ -646,5 +646,21 @@
     "description": "공주에게 예쁜 옷과 액세서리를 입혀 나만의 스타일을 만들어요!",
     "thumbnail": "princess-dressup/thumb.svg",
     "path": "princess-dressup/index.html"
+  },
+  {
+    "id": "firefly-catch",
+    "title": "Firefly Catch",
+    "title_ko": "🌙 반딧불이 잡기",
+    "description": "밤하늘에서 반짝이는 반딧불이를 탭해서 잡아요! 30초 안에 최대한 많이!",
+    "thumbnail": "firefly-catch/thumb.svg",
+    "path": "firefly-catch/index.html"
+  },
+  {
+    "id": "balance-tower",
+    "title": "Balance Tower",
+    "title_ko": "🏗️ 블록 탑 쌓기",
+    "description": "좌우로 움직이는 블록을 딱 맞게 탭해서 최대한 높이 쌓아보세요!",
+    "thumbnail": "balance-tower/thumb.svg",
+    "path": "balance-tower/index.html"
   }
 ]

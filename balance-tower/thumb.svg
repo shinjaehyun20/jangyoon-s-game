@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="skybg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a1628"/>
+      <stop offset="100%" stop-color="#243454"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#skybg)"/>
+  <!-- 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <!-- 바닥 -->
+  <rect x="0" y="160" width="320" height="20" fill="#2d5a27"/>
+  <rect x="0" y="160" width="320" height="6" fill="#4a7c3f"/>
+  <!-- 블록 탑 (왼쪽) -->
+  <!-- 기반 블록 -->
+  <rect x="40" y="148" width="90" height="18" rx="4" fill="#888"/>
+  <rect x="43" y="150" width="84" height="5" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <!-- 블록 1 -->
+  <rect x="45" y="128" width="80" height="18" rx="4" fill="#FF6B6B"/>
+  <rect x="48" y="130" width="74" height="5" rx="3" fill="rgba(255,255,255,0.25)"/>
+  <!-- 블록 2 -->
+  <rect x="50" y="108" width="72" height="18" rx="4" fill="#FFC23C"/>
+  <rect x="53" y="110" width="66" height="5" rx="3" fill="rgba(255,255,255,0.25)"/>
+  <!-- 블록 3 -->
+  <rect x="53" y="88" width="65" height="18" rx="4" fill="#A8E063"/>
+  <rect x="56" y="90" width="59" height="5" rx="3" fill="rgba(255,255,255,0.25)"/>
+  <!-- 블록 4 (좁아짐) -->
+  <rect x="57" y="68" width="56" height="18" rx="4" fill="#56CCF2"/>
+  <rect x="60" y="70" width="50" height="5" rx="3" fill="rgba(255,255,255,0.25)"/>
+  <!-- 움직이는 블록 (오른쪽, 반투명) -->
+  <rect x="150" y="48" width="60" height="18" rx="4" fill="#9B59B6" opacity="0.9"/>
+  <rect x="153" y="50" width="54" height="5" rx="3" fill="rgba(255,255,255,0.25)"/>
+  <!-- 화살표 -->
+  <path d="M 218 57 L 232 57 L 227 51 M 232 57 L 227 63" stroke="#ffcc00" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 높이 표시 -->
+  <line x1="148" y1="68" x2="148" y2="148" stroke="rgba(255,204,0,0.5)" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <text x="135" y="108" text-anchor="middle" font-size="11" fill="#ffcc00" font-family="sans-serif" opacity="0.8">5층</text>
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffcc00">블록 탑 쌓기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">BALANCE TOWER</text>
+  </g>
+</svg>

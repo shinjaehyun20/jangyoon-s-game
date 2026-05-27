@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🌙 반딧불이 잡기</title>
+  <style>
+    :root {
+      --bg: #0a0a2e;
+      --bg2: #0f0f3d;
+      --accent: #7fffb2;
+      --accent2: #ffe04a;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      text-shadow: 0 0 20px var(--accent);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; gap: 10px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 8px 14px;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      flex: 1; text-align: center;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .hud-label { font-size: 11px; opacity: 0.6; }
+    .hud-value { font-size: 22px; font-weight: 900; color: var(--accent); }
+    #timeValue { color: var(--accent2); }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 70%, #0d1a3a 0%, #050514 100%);
+      cursor: pointer;
+      user-select: none;
+    }
+    /* 별 배경 */
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle var(--dur, 3s) var(--delay, 0s) infinite ease-in-out;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.1; }
+      50% { opacity: 0.7; }
+    }
+    /* 반딧불이 */
+    .firefly {
+      position: absolute;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s;
+      filter: drop-shadow(0 0 6px var(--accent));
+    }
+    .firefly.dim {
+      filter: drop-shadow(0 0 2px rgba(127,255,178,0.3));
+      opacity: 0.4;
+    }
+    .firefly.bright {
+      filter: drop-shadow(0 0 12px var(--accent)) drop-shadow(0 0 24px rgba(127,255,178,0.6));
+      opacity: 1;
+    }
+    .firefly.caught {
+      animation: caughtPop 0.4s ease-out forwards;
+    }
+    @keyframes caughtPop {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(2.2); opacity: 0.8; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+    /* 점수 팝업 */
+    .score-pop {
+      position: absolute;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 10px var(--accent);
+      pointer-events: none;
+      animation: scoreFloat 0.8s ease-out forwards;
+    }
+    @keyframes scoreFloat {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-60px) scale(1.3); opacity: 0; }
+    }
+    /* 달 장식 */
+    .moon {
+      position: absolute;
+      top: 10px; right: 15px;
+      font-size: 40px;
+      opacity: 0.7;
+      pointer-events: none;
+      filter: drop-shadow(0 0 15px #ffe04a88);
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 12px; opacity: 0.5; }
+    .home-link {
+      font-size: 13px; color: rgba(255,255,255,0.6);
+      text-decoration: none; padding: 4px 8px;
+      border-radius: 8px; background: rgba(255,255,255,0.08);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(5,5,20,0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: rgba(15,15,60,0.95);
+      border: 2px solid rgba(127,255,178,0.3);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 300px; width: 90%;
+      box-shadow: 0 0 40px rgba(127,255,178,0.15);
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 10px; }
+    .overlay-card p { font-size: 15px; opacity: 0.8; margin-bottom: 20px; line-height: 1.6; }
+    .result-score { font-size: 56px; font-weight: 900; color: var(--accent); margin: 10px 0; text-shadow: 0 0 20px var(--accent); }
+    .best-label { font-size: 13px; opacity: 0.6; margin-bottom: 16px; }
+    .btn-start {
+      background: linear-gradient(135deg, #2aff8a, #00c85a);
+      color: #003320; border: none; border-radius: 50px;
+      font-size: 20px; font-weight: 900;
+      padding: 14px 40px;
+      cursor: pointer; width: 100%;
+      min-height: 54px;
+      box-shadow: 0 4px 20px rgba(42,255,138,0.4);
+      touch-action: manipulation;
+    }
+    .btn-start:active { transform: scale(0.96); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🌙 반딧불이 잡기</h1>
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">점수</span>
+        <span class="hud-value" id="scoreValue">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">남은 시간</span>
+        <span class="hud-value" id="timeValue">30</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">최고 기록</span>
+        <span class="hud-value" id="bestValue">0</span>
+      </div>
+    </div>
+    <div id="gameArea"></div>
+    <footer>
+      <small>빛나는 반딧불이를 탭하세요! ✨</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🌙 반딧불이<br>잡기</h2>
+      <p>밤하늘에서 빛나는<br>반딧불이를 탭해서 잡아요!<br>30초 동안 최대한 많이 잡으세요 🎯</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <div class="best-label" id="bestLabel"></div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_TIME: 30,
+      MAX_FIREFLIES: 8,
+      SPAWN_INTERVAL: 600,
+      BLINK_MIN: 800,
+      BLINK_MAX: 2000,
+      BRIGHT_DURATION: 1200,
+      MOVE_SPEED_MIN: 0.4,
+      MOVE_SPEED_MAX: 1.2,
+      FIREFLY_SIZE: 32,
+      BEST_KEY: 'firefly_catch_best'
+    };
+
+    const state = {
+      score: 0,
+      timeLeft: CONFIG.GAME_TIME,
+      running: false,
+      fireflies: [],
+      timerId: null,
+      spawnId: null,
+      areaW: 0,
+      areaH: 0,
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const area = $('gameArea');
+    const scoreEl = $('scoreValue');
+    const timeEl = $('timeValue');
+    const bestEl = $('bestValue');
+    const startOverlay = $('startOverlay');
+    const endOverlay = $('endOverlay');
+    const finalScoreEl = $('finalScore');
+    const resultMsgEl = $('resultMsg');
+    const bestLabelEl = $('bestLabel');
+
+    function getBest() {
+      return parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+    }
+    function setBest(v) {
+      localStorage.setItem(CONFIG.BEST_KEY, String(v));
+    }
+
+    bestEl.textContent = getBest();
+
+    // 별 배경 생성
+    function createStars() {
+      for (let i = 0; i < 40; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const size = Math.random() * 2 + 1;
+        s.style.cssText = `
+          width:${size}px; height:${size}px;
+          left:${Math.random()*100}%;
+          top:${Math.random()*100}%;
+          --dur:${(Math.random()*3+2).toFixed(1)}s;
+          --delay:${(Math.random()*3).toFixed(1)}s;
+        `;
+        area.appendChild(s);
+      }
+      // 달
+      const moon = document.createElement('div');
+      moon.className = 'moon';
+      moon.textContent = '🌕';
+      area.appendChild(moon);
+    }
+
+    // 반딧불이 데이터
+    class Firefly {
+      constructor() {
+        this.id = Math.random().toString(36).slice(2);
+        const rect = area.getBoundingClientRect();
+        state.areaW = rect.width;
+        state.areaH = rect.height;
+        this.x = Math.random() * (state.areaW - CONFIG.FIREFLY_SIZE - 10) + 5;
+        this.y = Math.random() * (state.areaH - CONFIG.FIREFLY_SIZE - 40) + 10;
+        this.vx = (Math.random() * (CONFIG.MOVE_SPEED_MAX - CONFIG.MOVE_SPEED_MIN) + CONFIG.MOVE_SPEED_MIN) * (Math.random() < 0.5 ? 1 : -1);
+        this.vy = (Math.random() * (CONFIG.MOVE_SPEED_MAX - CONFIG.MOVE_SPEED_MIN) + CONFIG.MOVE_SPEED_MIN) * (Math.random() < 0.5 ? 1 : -1);
+        this.bright = false;
+        this.caught = false;
+        this.blinkTimer = null;
+        this.el = null;
+        this.animId = null;
+      }
+
+      createElement() {
+        const el = document.createElement('div');
+        el.className = 'firefly dim';
+        el.style.cssText = `left:${this.x}px; top:${this.y}px;`;
+        el.textContent = '🌟';
+        el.dataset.id = this.id;
+        area.appendChild(el);
+        this.el = el;
+        el.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
+          this.trycatch();
+        });
+        this.scheduleBlink();
+        this.move();
+      }
+
+      scheduleBlink() {
+        if (!state.running) return;
+        const delay = Math.random() * (CONFIG.BLINK_MAX - CONFIG.BLINK_MIN) + CONFIG.BLINK_MIN;
+        this.blinkTimer = setTimeout(() => {
+          if (!state.running || this.caught) return;
+          this.bright = true;
+          if (this.el) {
+            this.el.classList.remove('dim');
+            this.el.classList.add('bright');
+            this.el.textContent = '✨';
+          }
+          setTimeout(() => {
+            if (!state.running || this.caught) return;
+            this.bright = false;
+            if (this.el) {
+              this.el.classList.remove('bright');
+              this.el.classList.add('dim');
+              this.el.textContent = '🌟';
+            }
+            this.scheduleBlink();
+          }, CONFIG.BRIGHT_DURATION);
+        }, delay);
+      }
+
+      move() {
+        if (!state.running || this.caught) return;
+        const rect = area.getBoundingClientRect();
+        state.areaW = rect.width;
+        state.areaH = rect.height;
+
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 5) { this.x = 5; this.vx *= -1; }
+        if (this.x > state.areaW - CONFIG.FIREFLY_SIZE - 5) { this.x = state.areaW - CONFIG.FIREFLY_SIZE - 5; this.vx *= -1; }
+        if (this.y < 5) { this.y = 5; this.vy *= -1; }
+        if (this.y > state.areaH - CONFIG.FIREFLY_SIZE - 5) { this.y = state.areaH - CONFIG.FIREFLY_SIZE - 5; this.vy *= -1; }
+
+        if (this.el) {
+          this.el.style.left = this.x + 'px';
+          this.el.style.top = this.y + 'px';
+        }
+        this.animId = requestAnimationFrame(() => this.move());
+      }
+
+      tryatch() { this.trycat(); }
+      trycat() { this.tryc(); }
+
+      tryc() {
+        if (!this.bright || this.caught || !state.running) {
+          // 안 빛날 때: 빠져나가기 애니메이션
+          if (this.el && !this.caught) {
+            this.el.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+              if (this.el) this.el.style.transform = '';
+            }, 150);
+          }
+          return;
+        }
+        this.caught = true;
+        clearTimeout(this.blinkTimer);
+        cancelAnimationFrame(this.animId);
+
+        state.score++;
+        scoreEl.textContent = state.score;
+
+        // 점수 팝업
+        const pop = document.createElement('div');
+        pop.className = 'score-pop';
+        pop.textContent = '+1 ✨';
+        pop.style.left = this.x + 'px';
+        pop.style.top = (this.y - 10) + 'px';
+        area.appendChild(pop);
+        setTimeout(() => pop.remove(), 900);
+
+        if (this.el) {
+          this.el.classList.add('caught');
+          setTimeout(() => {
+            if (this.el) this.el.remove();
+            // 제거 후 새 반딧불이 추가
+            const idx = state.fireflies.indexOf(this);
+            if (idx !== -1) state.fireflies.splice(idx, 1);
+            if (state.running) spawnFirefly();
+          }, 400);
+        }
+      }
+
+      tryatch() { this.tryc(); }
+      trycat() { this.tryc(); }
+      tryc() {
+        // 최상위 tryc 만 유지 — 아래 재정의
+      }
+
+      destroy() {
+        clearTimeout(this.blinkTimer);
+        cancelAnimationFrame(this.animId);
+        if (this.el) this.el.remove();
+      }
+    }
+
+    // tryc를 Firefly.prototype에 직접 정의
+    Firefly.prototype.tryc = function () {
+      if (!this.bright || this.caught || !state.running) {
+        if (this.el && !this.caught) {
+          this.el.style.transform = 'scale(0.8)';
+          setTimeout(() => { if (this.el) this.el.style.transform = ''; }, 150);
+        }
+        return;
+      }
+      this.caught = true;
+      clearTimeout(this.blinkTimer);
+      cancelAnimationFrame(this.animId);
+
+      state.score++;
+      scoreEl.textContent = state.score;
+
+      const pop = document.createElement('div');
+      pop.className = 'score-pop';
+      pop.textContent = '+1 ✨';
+      pop.style.left = this.x + 'px';
+      pop.style.top = (this.y - 10) + 'px';
+      area.appendChild(pop);
+      setTimeout(() => pop.remove(), 900);
+
+      if (this.el) {
+        this.el.classList.add('caught');
+        const self = this;
+        setTimeout(() => {
+          if (self.el) self.el.remove();
+          const idx = state.fireflies.indexOf(self);
+          if (idx !== -1) state.fireflies.splice(idx, 1);
+          if (state.running) spawnFirefly();
+        }, 400);
+      }
+    };
+
+    Firefly.prototype.createElement = function () {
+      const el = document.createElement('div');
+      el.className = 'firefly dim';
+      el.style.cssText = `left:${this.x}px; top:${this.y}px;`;
+      el.textContent = '🌟';
+      el.dataset.id = this.id;
+      area.appendChild(el);
+      this.el = el;
+      const self = this;
+      el.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        self.tryc();
+      });
+      this.scheduleBlink();
+      this.move();
+    };
+
+    Firefly.prototype.scheduleBlink = function () {
+      if (!state.running) return;
+      const delay = Math.random() * (CONFIG.BLINK_MAX - CONFIG.BLINK_MIN) + CONFIG.BLINK_MIN;
+      const self = this;
+      this.blinkTimer = setTimeout(() => {
+        if (!state.running || self.caught) return;
+        self.bright = true;
+        if (self.el) {
+          self.el.classList.remove('dim');
+          self.el.classList.add('bright');
+          self.el.textContent = '✨';
+        }
+        setTimeout(() => {
+          if (!state.running || self.caught) return;
+          self.bright = false;
+          if (self.el) {
+            self.el.classList.remove('bright');
+            self.el.classList.add('dim');
+            self.el.textContent = '🌟';
+          }
+          self.scheduleBlink();
+        }, CONFIG.BRIGHT_DURATION);
+      }, delay);
+    };
+
+    Firefly.prototype.move = function () {
+      if (!state.running || this.caught) return;
+      const rect = area.getBoundingClientRect();
+      state.areaW = rect.width;
+      state.areaH = rect.height;
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < 5) { this.x = 5; this.vx *= -1; }
+      if (this.x > state.areaW - CONFIG.FIREFLY_SIZE - 5) { this.x = state.areaW - CONFIG.FIREFLY_SIZE - 5; this.vx *= -1; }
+      if (this.y < 5) { this.y = 5; this.vy *= -1; }
+      if (this.y > state.areaH - CONFIG.FIREFLY_SIZE - 5) { this.y = state.areaH - CONFIG.FIREFLY_SIZE - 5; this.vy *= -1; }
+      if (this.el) {
+        this.el.style.left = this.x + 'px';
+        this.el.style.top = this.y + 'px';
+      }
+      const self = this;
+      this.animId = requestAnimationFrame(function () { self.move(); });
+    };
+
+    Firefly.prototype.destroy = function () {
+      clearTimeout(this.blinkTimer);
+      cancelAnimationFrame(this.animId);
+      if (this.el) this.el.remove();
+    };
+
+    function spawnFirefly() {
+      if (!state.running) return;
+      if (state.fireflies.length >= CONFIG.MAX_FIREFLIES) return;
+      const ff = new Firefly();
+      state.fireflies.push(ff);
+      ff.createElement();
+    }
+
+    function startGame() {
+      state.score = 0;
+      state.timeLeft = CONFIG.GAME_TIME;
+      state.running = true;
+      state.fireflies.forEach(ff => ff.destroy());
+      state.fireflies = [];
+
+      scoreEl.textContent = '0';
+      timeEl.textContent = CONFIG.GAME_TIME;
+      bestEl.textContent = getBest();
+
+      // 별 배경은 최초 1회만
+      if (area.querySelectorAll('.star').length === 0) createStars();
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      // 초기 반딧불이 5마리
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => spawnFirefly(), i * 200);
+      }
+
+      // 타이머
+      state.timerId = setInterval(() => {
+        state.timeLeft--;
+        timeEl.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(state.timerId);
+      state.fireflies.forEach(ff => ff.destroy());
+      state.fireflies = [];
+
+      const best = getBest();
+      const newBest = state.score > best;
+      if (newBest) setBest(state.score);
+      bestEl.textContent = newBest ? state.score : best;
+
+      finalScoreEl.textContent = state.score;
+      resultMsgEl.textContent = state.score >= 15 ? '와! 반딧불이 박사! 🏆' :
+        state.score >= 8 ? '잘했어요! 다시 도전해봐요 🌟' : '반딧불이가 빛날 때 잡아요! 💡';
+      bestLabelEl.textContent = newBest ? '🎊 새 최고 기록!' : `최고 기록: ${Math.max(best, state.score)}마리`;
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    $('startBtn').addEventListener('pointerdown', startGame);
+    $('restartBtn').addEventListener('pointerdown', startGame);
+
+  })();
+  </script>
+</body>
+</html>

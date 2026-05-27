@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="70%" r="80%">
+      <stop offset="0%" stop-color="#0d1a3a"/>
+      <stop offset="100%" stop-color="#050514"/>
+    </radialGradient>
+    <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7fffb2" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#7fffb2" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe04a" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffe04a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#sky)"/>
+  <!-- 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <!-- 별들 -->
+  <circle cx="30" cy="20" r="1.2" fill="white" opacity="0.7"/>
+  <circle cx="80" cy="15" r="0.8" fill="white" opacity="0.5"/>
+  <circle cx="120" cy="30" r="1.5" fill="white" opacity="0.8"/>
+  <circle cx="170" cy="12" r="1" fill="white" opacity="0.6"/>
+  <circle cx="220" cy="25" r="0.8" fill="white" opacity="0.5"/>
+  <circle cx="260" cy="18" r="1.2" fill="white" opacity="0.7"/>
+  <circle cx="50" cy="50" r="0.8" fill="white" opacity="0.4"/>
+  <circle cx="200" cy="45" r="1" fill="white" opacity="0.6"/>
+  <circle cx="290" cy="40" r="0.8" fill="white" opacity="0.5"/>
+  <!-- 달 -->
+  <circle cx="265" cy="38" r="22" fill="#fff5c0" opacity="0.85"/>
+  <circle cx="272" cy="32" r="18" fill="#0d1a3a"/>
+  <!-- 반딧불이 1 (밝은) -->
+  <circle cx="80" cy="95" r="18" fill="url(#glow1)"/>
+  <circle cx="80" cy="95" r="8" fill="#7fffb2" opacity="0.95"/>
+  <circle cx="80" cy="95" r="4" fill="white"/>
+  <!-- 반딧불이 2 -->
+  <circle cx="155" cy="70" r="14" fill="url(#glow1)" opacity="0.7"/>
+  <circle cx="155" cy="70" r="6" fill="#7fffb2" opacity="0.8"/>
+  <!-- 반딧불이 3 (노랑) -->
+  <circle cx="220" cy="110" r="12" fill="url(#glow2)" opacity="0.8"/>
+  <circle cx="220" cy="110" r="5" fill="#ffe04a" opacity="0.9"/>
+  <circle cx="220" cy="110" r="2.5" fill="white"/>
+  <!-- 반딧불이 4 (희미) -->
+  <circle cx="110" cy="130" r="8" fill="#7fffb2" opacity="0.3"/>
+  <circle cx="110" cy="130" r="3" fill="#7fffb2" opacity="0.5"/>
+  <!-- 손 탭 효과 -->
+  <circle cx="80" cy="95" r="26" fill="none" stroke="#7fffb2" stroke-width="2" opacity="0.5" stroke-dasharray="4 4"/>
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#7fffb2">반딧불이 잡기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">FIREFLY CATCH</text>
+  </g>
+</svg>

@@ -68,6 +68,8 @@
 | [🥁 드럼 비트 (drum-beat)](./drum-beat) | 6개 드럼 패드 탭으로 연주! 자유 연주 + 비트 따라치기 2가지 모드, Web Audio API | 음악/리듬 |
 | [🌊 잠수함 피하기 (submarine-dodge)](./submarine-dodge) | 드래그로 잠수함 조종, 바위·물고기 피하며 30초 생존! 속도 증가로 난이도 상승 | 반사/회피 |
 | [🧠 순서 기억하기 (memory-sequence)](./memory-sequence) | 반짝이는 색깔 4칸의 순서를 기억하고 따라 눌러요! 단계마다 한 칸씩 늘어나는 기억력 게임 | 기억력 |
+| [🌙 반딧불이 잡기 (firefly-catch)](./firefly-catch) | 밤하늘에서 반짝이는 반딧불이를 탭! 빛날 때만 잡을 수 있어요. 30초 타임어택 | 반사/타이밍 |
+| [🏗️ 블록 탑 쌓기 (balance-tower)](./balance-tower) | 좌우로 움직이는 블록을 딱 맞게 탭해서 최대한 높이 쌓아보세요! | 타이밍 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "balance-tower",
+        "label": "🏗️ 블록 탑 쌓기",
+        "path": "balance-tower/index.html"
+      },
+      {
+        "id": "firefly-catch",
+        "label": "🌙 반딧불이 잡기",
+        "path": "firefly-catch/index.html"
+      },
+      {
         "id": "burger-stack",
         "label": "🍔 햄버거 쌓기",
         "path": "burger-stack/index.html"
