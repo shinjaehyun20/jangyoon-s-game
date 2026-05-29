@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "zoo-escape",
+        "label": "🦁 동물원 탈출",
+        "path": "zoo-escape/index.html"
+      },
+      {
+        "id": "ring-toss",
+        "label": "🎪 고리 던지기",
+        "path": "ring-toss/index.html"
+      },
+      {
         "id": "balance-tower",
         "label": "🏗️ 블록 탑 쌓기",
         "path": "balance-tower/index.html"

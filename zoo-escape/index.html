@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🦁 동물원 탈출</title>
+  <style>
+    :root {
+      --bg: #1a3a2a;
+      --accent: #f5a623;
+      --accent2: #4ecdc4;
+      --text: #ffffff;
+      --card: rgba(255,255,255,0.12);
+      --success: #56c870;
+      --danger: #ff6b6b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 8px 16px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .hud span { display: flex; align-items: center; gap: 4px; }
+    #game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .animal-box {
+      font-size: clamp(52px, 14vw, 80px);
+      animation: wiggle 1.2s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(245,166,35,0.6));
+    }
+    @keyframes wiggle {
+      0%,100% { transform: rotate(-5deg) scale(1); }
+      50% { transform: rotate(5deg) scale(1.08); }
+    }
+    .prompt {
+      font-size: clamp(14px, 3.5vw, 18px);
+      font-weight: 700;
+      text-align: center;
+      color: var(--accent);
+      min-height: 28px;
+    }
+    .doors {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+    }
+    .door {
+      aspect-ratio: 1;
+      background: var(--card);
+      border: 3px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(28px, 8vw, 44px);
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s, border-color 0.15s;
+      min-height: 44px;
+      position: relative;
+      overflow: hidden;
+    }
+    .door:active { transform: scale(0.92); }
+    .door.correct {
+      background: rgba(86,200,112,0.35);
+      border-color: var(--success);
+      animation: pop 0.35s cubic-bezier(.4,1.6,.6,1);
+    }
+    .door.wrong {
+      background: rgba(255,107,107,0.35);
+      border-color: var(--danger);
+      animation: shake 0.35s;
+    }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    .door .lock {
+      position: absolute;
+      top: 4px; right: 6px;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+    .level-info {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      padding: 0 2px;
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    /* Overlay */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1e4d33 0%, #0f2a1c 100%);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 10px; }
+    .overlay-card p { font-size: 14px; color: rgba(255,255,255,0.75); margin-bottom: 18px; line-height: 1.6; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #e8931a);
+      border: none; border-radius: 14px;
+      color: #fff; font-size: 18px; font-weight: 900;
+      padding: 14px 36px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(245,166,35,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.94); }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0;
+    }
+    #bestMsg { font-size: 13px; color: var(--accent2); margin: 4px 0 12px; min-height: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🦁 동물원 탈출</h1>
+    <div class="hud">
+      <span>⭐ <span id="score">0</span></span>
+      <span>⏱ <span id="timer">30</span>s</span>
+      <span>❤️ <span id="lives">3</span></span>
+    </div>
+    <div id="game-area">
+      <div class="animal-box" id="animalEmoji">🦁</div>
+      <div class="prompt" id="prompt">올바른 문을 탭해서 탈출시켜요!</div>
+      <div class="doors" id="doors"></div>
+      <div class="level-info" id="levelInfo">레벨 1</div>
+    </div>
+    <footer>
+      <small>올바른 문 탭!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🦁 동물원 탈출</h2>
+      <p>동물이 원하는 문을 탭해서<br>탈출시켜 주세요!<br><br>정답 문에는 🗝️ 열쇠가 있어요.<br>30초 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 탈출 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div id="bestMsg"></div>
+      <p id="resultMsg">동물들이 고마워해요!</p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      totalTime: 30,
+      maxLives: 3,
+      basePoints: 10,
+      bonusPerLevel: 5,
+    };
+
+    const ANIMALS = [
+      { emoji: '🦁', name: '사자', hint: '초원 문', key: 0 },
+      { emoji: '🐘', name: '코끼리', hint: '숲 문', key: 1 },
+      { emoji: '🐯', name: '호랑이', hint: '산 문', key: 2 },
+      { emoji: '🐧', name: '펭귄', hint: '바다 문', key: 0 },
+      { emoji: '🦒', name: '기린', hint: '사바나 문', key: 1 },
+      { emoji: '🐼', name: '판다', hint: '대나무 문', key: 2 },
+      { emoji: '🦓', name: '얼룩말', hint: '들판 문', key: 0 },
+      { emoji: '🐨', name: '코알라', hint: '나무 문', key: 1 },
+      { emoji: '🦊', name: '여우', hint: '숲속 문', key: 2 },
+      { emoji: '🦋', name: '나비', hint: '꽃밭 문', key: 0 },
+    ];
+
+    const DOORS_PER_ROW = [
+      ['🚪','🚪','🚪'],
+      ['🏠','🏡','🏘️'],
+      ['🌲','🌳','🌴'],
+      ['🏔️','⛰️','🗻'],
+    ];
+
+    const CORRECT_MARKS = ['🗝️','✅','⭐','🎯'];
+
+    let state = {
+      score: 0,
+      lives: CONFIG.maxLives,
+      timeLeft: CONFIG.totalTime,
+      level: 1,
+      animalIdx: 0,
+      correctDoor: 0,
+      answered: false,
+      intervalId: null,
+      running: false,
+    };
+
+    const $ = id => document.getElementById(id);
+
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function updateHUD() {
+      $('score').textContent = state.score;
+      $('timer').textContent = state.timeLeft;
+      $('lives').textContent = '❤️'.repeat(state.lives);
+    }
+
+    function nextAnimal() {
+      state.answered = false;
+      const anims = shuffleArray(ANIMALS);
+      const animal = anims[0];
+      state.animalIdx = ANIMALS.indexOf(animal);
+      state.correctDoor = Math.floor(Math.random() * 3);
+      state.level = Math.floor(state.score / 30) + 1;
+
+      $('animalEmoji').textContent = animal.emoji;
+      $('prompt').textContent = `${animal.name}가 탈출할 문은?`;
+      $('levelInfo').textContent = `레벨 ${state.level}`;
+
+      renderDoors(animal);
+    }
+
+    function renderDoors(animal) {
+      const doorsEl = $('doors');
+      doorsEl.innerHTML = '';
+      const rowSet = DOORS_PER_ROW[state.level % DOORS_PER_ROW.length];
+      const correctMark = CORRECT_MARKS[Math.floor(Math.random() * CORRECT_MARKS.length)];
+
+      for (let i = 0; i < 3; i++) {
+        const door = document.createElement('div');
+        door.className = 'door';
+        door.textContent = rowSet[i];
+
+        if (i === state.correctDoor) {
+          const lockEl = document.createElement('span');
+          lockEl.className = 'lock';
+          lockEl.textContent = correctMark;
+          door.appendChild(lockEl);
+        }
+
+        door.addEventListener('pointerdown', () => onDoorTap(door, i));
+        doorsEl.appendChild(door);
+      }
+    }
+
+    function onDoorTap(doorEl, idx) {
+      if (!state.running || state.answered) return;
+      state.answered = true;
+
+      if (idx === state.correctDoor) {
+        doorEl.classList.add('correct');
+        const pts = CONFIG.basePoints + (state.level - 1) * CONFIG.bonusPerLevel;
+        state.score += pts;
+        $('prompt').textContent = '🎉 탈출 성공!';
+        setTimeout(nextAnimal, 600);
+      } else {
+        doorEl.classList.add('wrong');
+        state.lives -= 1;
+        $('prompt').textContent = '❌ 틀렸어요!';
+        if (state.lives <= 0) {
+          setTimeout(endGame, 500);
+          return;
+        }
+        setTimeout(nextAnimal, 700);
+      }
+      updateHUD();
+    }
+
+    function startTimer() {
+      state.intervalId = setInterval(() => {
+        state.timeLeft -= 1;
+        updateHUD();
+        if (state.timeLeft <= 0) {
+          clearInterval(state.intervalId);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function startGame() {
+      state = {
+        score: 0,
+        lives: CONFIG.maxLives,
+        timeLeft: CONFIG.totalTime,
+        level: 1,
+        animalIdx: 0,
+        correctDoor: 0,
+        answered: false,
+        intervalId: null,
+        running: true,
+      };
+      updateHUD();
+      nextAnimal();
+      startTimer();
+      $('startOverlay').classList.add('hidden');
+      $('endOverlay').classList.add('hidden');
+    }
+
+    function endGame() {
+      clearInterval(state.intervalId);
+      state.running = false;
+
+      const best = parseInt(localStorage.getItem('zoo-escape_best') || '0', 10);
+      const isNew = state.score > best;
+      if (isNew) localStorage.setItem('zoo-escape_best', state.score);
+
+      $('finalScore').textContent = state.score + '점';
+      $('bestMsg').textContent = isNew ? '🏆 최고 기록 갱신!' : `최고 기록: ${Math.max(best, state.score)}점`;
+      const msgs = ['동물들이 고마워해요! 🦁', '훌륭한 안내원이에요! 🌿', '모두 탈출 성공! 🎊'];
+      $('resultMsg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      $('endOverlay').classList.remove('hidden');
+    }
+
+    $('startBtn').addEventListener('pointerdown', startGame);
+    $('restartBtn').addEventListener('pointerdown', startGame);
+  })();
+  </script>
+</body>
+</html>

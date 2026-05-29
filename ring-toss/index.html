@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🎪 고리 던지기</title>
+  <style>
+    :root {
+      --bg: #1a1035;
+      --accent: #ff6fd8;
+      --accent2: #4fc3f7;
+      --text: #ffffff;
+      --card: rgba(255,255,255,0.10);
+      --pole: #ffcc02;
+      --ring1: #ff6fd8;
+      --ring2: #56c870;
+      --ring3: #f5a623;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(255,111,216,0.5);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 8px 16px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    #game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      position: relative;
+    }
+    #canvas {
+      width: 100%;
+      max-width: 400px;
+      touch-action: none;
+      border-radius: 16px;
+    }
+    .tap-hint {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      text-align: center;
+      margin-top: 8px;
+    }
+    .combo-flash {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 12px var(--accent);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+      white-space: nowrap;
+    }
+    .combo-flash.show {
+      opacity: 1;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      padding: 0 2px;
+    }
+    .home-link { color: var(--accent); text-decoration: none; font-weight: 700; }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #2a1050 0%, #12082a 100%);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 10px; }
+    .overlay-card p { font-size: 14px; color: rgba(255,255,255,0.75); margin-bottom: 18px; line-height: 1.7; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #c832a8);
+      border: none; border-radius: 14px;
+      color: #fff; font-size: 18px; font-weight: 900;
+      padding: 14px 36px; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,111,216,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.94); }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0;
+    }
+    #bestMsg { font-size: 13px; color: var(--accent2); margin: 4px 0 12px; min-height: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🎪 고리 던지기</h1>
+    <div class="hud">
+      <span>⭐ <span id="score">0</span></span>
+      <span>⏱ <span id="timer">40</span>s</span>
+      <span>🎯 <span id="combo">0</span> 콤보</span>
+    </div>
+    <div id="game-area">
+      <canvas id="canvas"></canvas>
+      <div class="combo-flash" id="comboFlash">NICE!</div>
+      <div class="tap-hint">화면을 탭하면 고리를 던져요!</div>
+    </div>
+    <footer>
+      <small>탭으로 고리 던지기!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🎪 고리 던지기</h2>
+      <p>화면을 탭하면 고리가 위로<br>날아올라요!<br><br>막대기 위에 착지하면 점수!<br>콤보를 이어가면 보너스!<br>40초 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div id="bestMsg"></div>
+      <p id="resultMsg">훌륭해요!</p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      totalTime: 40,
+      basePoints: 10,
+      comboMultiplier: 1.5,
+      poleCount: 3,
+      ringSpeed: 0.016,        // radians per frame (swing speed)
+      ringLaunchSpeed: 14,     // px per frame upward
+      gravity: 0.55,
+      ringRadius: 24,
+      ringThickness: 6,
+    };
+
+    const RING_COLORS = ['#ff6fd8', '#56c870', '#f5a623', '#4fc3f7', '#ff6b6b'];
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const $ = id => document.getElementById(id);
+
+    let W, H;
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = canvas.width = Math.min(rect.width, 400);
+      H = canvas.height = Math.min(rect.height * 0.82, 480);
+    }
+
+    let state = {
+      score: 0,
+      combo: 0,
+      timeLeft: CONFIG.totalTime,
+      running: false,
+      intervalId: null,
+      animId: null,
+      angle: 0,
+      rings: [],         // flying rings
+      stackedRings: [],  // rings on poles
+      poles: [],
+      colorIdx: 0,
+    };
+
+    function buildPoles() {
+      state.poles = [];
+      const spacing = W / (CONFIG.poleCount + 1);
+      for (let i = 0; i < CONFIG.poleCount; i++) {
+        state.poles.push({
+          x: spacing * (i + 1),
+          baseY: H - 30,
+          height: 80 + i * 20,
+          stacked: 0,
+        });
+      }
+    }
+
+    function updateHUD() {
+      $('score').textContent = state.score;
+      $('timer').textContent = state.timeLeft;
+      $('combo').textContent = state.combo;
+    }
+
+    function launchRing() {
+      // Pick a random pole to aim at, with slight random offset
+      const targetPole = state.poles[Math.floor(Math.random() * CONFIG.poleCount)];
+      const launchX = W / 2 + (Math.random() - 0.5) * 60;
+      const launchY = H - 20;
+      const dx = (targetPole.x - launchX) * 0.012 + (Math.random() - 0.5) * 0.3;
+
+      state.rings.push({
+        x: launchX,
+        y: launchY,
+        vx: dx * 4,
+        vy: -CONFIG.ringLaunchSpeed,
+        color: RING_COLORS[state.colorIdx % RING_COLORS.length],
+        landed: false,
+        landedPole: -1,
+        alpha: 1,
+      });
+      state.colorIdx++;
+    }
+
+    function drawPole(pole) {
+      const poleTop = pole.baseY - pole.height;
+      // Pole body
+      ctx.strokeStyle = '#ffcc02';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(pole.x, pole.baseY);
+      ctx.lineTo(pole.x, poleTop);
+      ctx.stroke();
+      // Base
+      ctx.fillStyle = '#cc9900';
+      ctx.fillRect(pole.x - 20, pole.baseY - 4, 40, 10);
+      ctx.beginPath();
+      ctx.arc(pole.x - 20, pole.baseY + 2, 5, 0, Math.PI * 2);
+      ctx.arc(pole.x + 20, pole.baseY + 2, 5, 0, Math.PI * 2);
+      ctx.fill();
+      // Tip star
+      ctx.font = '16px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('⭐', pole.x, poleTop - 4);
+      // Stacked rings on pole
+      for (let i = 0; i < pole.stacked; i++) {
+        const ringY = pole.baseY - 16 - i * 14;
+        ctx.strokeStyle = RING_COLORS[(state.colorIdx - pole.stacked + i) % RING_COLORS.length];
+        ctx.lineWidth = CONFIG.ringThickness;
+        ctx.beginPath();
+        ctx.ellipse(pole.x, ringY, CONFIG.ringRadius * 0.7, CONFIG.ringRadius * 0.25, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+
+    function drawRing(ring) {
+      ctx.globalAlpha = ring.alpha;
+      ctx.strokeStyle = ring.color;
+      ctx.lineWidth = CONFIG.ringThickness;
+      ctx.shadowColor = ring.color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.ellipse(ring.x, ring.y, CONFIG.ringRadius, CONFIG.ringRadius * 0.38, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    }
+
+    function drawBg() {
+      // Gradient bg
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#1a1035');
+      grad.addColorStop(1, '#0c0820');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Ground
+      ctx.fillStyle = 'rgba(255,204,2,0.15)';
+      ctx.fillRect(0, H - 24, W, 24);
+
+      // Circus tent decoration (top)
+      for (let i = 0; i < 7; i++) {
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(255,111,216,0.25)' : 'rgba(79,195,247,0.25)';
+        ctx.beginPath();
+        ctx.moveTo(i * (W / 6), 0);
+        ctx.lineTo((i + 0.5) * (W / 6), 16);
+        ctx.lineTo((i + 1) * (W / 6), 0);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    function checkPoleCollision(ring) {
+      for (let i = 0; i < state.poles.length; i++) {
+        const pole = state.poles[i];
+        const poleTop = pole.baseY - pole.height;
+        const dx = Math.abs(ring.x - pole.x);
+        if (dx < CONFIG.ringRadius + 4 && ring.y >= poleTop - 10 && ring.y <= poleTop + 20 && ring.vy > 0) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    function updateRings() {
+      for (let i = state.rings.length - 1; i >= 0; i--) {
+        const ring = state.rings[i];
+        if (ring.landed) {
+          ring.alpha -= 0.04;
+          if (ring.alpha <= 0) state.rings.splice(i, 1);
+          continue;
+        }
+        ring.vy += CONFIG.gravity;
+        ring.x += ring.vx;
+        ring.y += ring.vy;
+
+        const poleIdx = checkPoleCollision(ring);
+        if (poleIdx !== -1) {
+          ring.landed = true;
+          state.poles[poleIdx].stacked++;
+          const pts = CONFIG.basePoints + state.combo * 5;
+          state.score += pts;
+          state.combo++;
+          showCombo(state.combo, pts);
+          updateHUD();
+        } else if (ring.y > H + 20 || ring.x < -20 || ring.x > W + 20) {
+          // Missed
+          state.combo = 0;
+          updateHUD();
+          state.rings.splice(i, 1);
+        }
+      }
+    }
+
+    let comboTimeout = null;
+    function showCombo(combo, pts) {
+      const el = $('comboFlash');
+      if (combo >= 3) {
+        el.textContent = `${combo} 콤보! +${pts}점 🎊`;
+      } else {
+        el.textContent = `+${pts}점 ⭐`;
+      }
+      el.classList.add('show');
+      clearTimeout(comboTimeout);
+      comboTimeout = setTimeout(() => el.classList.remove('show'), 700);
+    }
+
+    let frameCount = 0;
+    function gameLoop() {
+      if (!state.running) return;
+      frameCount++;
+      drawBg();
+      state.poles.forEach(drawPole);
+      updateRings();
+      state.rings.forEach(drawRing);
+      state.animId = requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      clearInterval(state.intervalId);
+      cancelAnimationFrame(state.animId);
+
+      state = {
+        score: 0, combo: 0, timeLeft: CONFIG.totalTime,
+        running: true, intervalId: null, animId: null,
+        angle: 0, rings: [], stackedRings: [], poles: [],
+        colorIdx: 0,
+      };
+
+      resize();
+      buildPoles();
+      updateHUD();
+
+      state.intervalId = setInterval(() => {
+        state.timeLeft -= 1;
+        updateHUD();
+        if (state.timeLeft <= 0) {
+          clearInterval(state.intervalId);
+          endGame();
+        }
+      }, 1000);
+
+      $('startOverlay').classList.add('hidden');
+      $('endOverlay').classList.add('hidden');
+      gameLoop();
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(state.animId);
+      const best = parseInt(localStorage.getItem('ring-toss_best') || '0', 10);
+      const isNew = state.score > best;
+      if (isNew) localStorage.setItem('ring-toss_best', state.score);
+      $('finalScore').textContent = state.score + '점';
+      $('bestMsg').textContent = isNew ? '🏆 최고 기록 갱신!' : `최고 기록: ${Math.max(best, state.score)}점`;
+      const msgs = ['대단해요! 🎪', '서커스 챔피언! 🥇', '훌륭한 솜씨! ✨'];
+      $('resultMsg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      $('endOverlay').classList.remove('hidden');
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (!state.running) return;
+      e.preventDefault();
+      launchRing();
+    });
+
+    $('startBtn').addEventListener('pointerdown', startGame);
+    $('restartBtn').addEventListener('pointerdown', startGame);
+    window.addEventListener('resize', () => { if (state.running) { resize(); buildPoles(); } });
+    resize();
+  })();
+  </script>
+</body>
+</html>

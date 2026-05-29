@@ -662,5 +662,21 @@
     "description": "좌우로 움직이는 블록을 딱 맞게 탭해서 최대한 높이 쌓아보세요!",
     "thumbnail": "balance-tower/thumb.svg",
     "path": "balance-tower/index.html"
+  },
+  {
+    "id": "zoo-escape",
+    "title": "Zoo Escape",
+    "title_ko": "🦁 동물원 탈출",
+    "description": "동물이 탈출할 올바른 문을 탭! 30초 안에 최대한 많이 탈출시켜요",
+    "thumbnail": "zoo-escape/thumb.svg",
+    "path": "zoo-escape/index.html"
+  },
+  {
+    "id": "ring-toss",
+    "title": "Ring Toss",
+    "title_ko": "🎪 고리 던지기",
+    "description": "탭해서 고리를 날려 막대기에 올려요! 콤보 연결로 보너스 점수, 40초 도전",
+    "thumbnail": "ring-toss/thumb.svg",
+    "path": "ring-toss/index.html"
   }
 ]
