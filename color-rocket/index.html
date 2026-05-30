@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>색깔 로켓</title>
+  <style>
+    :root {
+      --bg: #0d0d2b;
+      --accent: #ff6b6b;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--text);
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(255,107,107,0.5);
+    }
+    .hud {
+      display: flex;
+      gap: 8px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 8px 12px;
+      align-items: center;
+    }
+    .hud-item {
+      flex: 1;
+      text-align: center;
+      color: var(--text);
+      font-size: clamp(13px, 3.8vw, 18px);
+      font-weight: 700;
+    }
+    .hud-item span {
+      display: block;
+      font-size: clamp(10px, 2.8vw, 13px);
+      font-weight: 400;
+      opacity: 0.6;
+    }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: transparent;
+    }
+    /* 발사대 영역 (하단) */
+    #launchZone {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 8px;
+      background: rgba(255,255,255,0.04);
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    /* 로켓 발사대 버튼 */
+    .rocket-pad {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      position: relative;
+    }
+    .rocket-body {
+      font-size: 36px;
+      line-height: 1;
+      transition: transform 0.15s;
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+    .rocket-pad:active .rocket-body { transform: scale(0.9); }
+    .rocket-color-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      opacity: 0.7;
+    }
+
+    /* 떨어지는 별 */
+    .falling-star {
+      position: absolute;
+      font-size: 32px;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      transition: transform 0.08s;
+    }
+    .falling-star.dragging {
+      pointer-events: none;
+      z-index: 30;
+      transition: none;
+    }
+
+    /* 드래그 고스트 */
+    #dragGhost {
+      position: fixed;
+      pointer-events: none;
+      font-size: 36px;
+      z-index: 50;
+      display: none;
+      transform: translate(-50%, -50%);
+    }
+
+    /* 파티클 */
+    @keyframes explode {
+      0%   { transform: scale(1); opacity: 1; }
+      100% { transform: scale(2.5) translateY(-40px); opacity: 0; }
+    }
+    .explode-fx {
+      position: absolute;
+      font-size: 22px;
+      animation: explode 0.5s ease-out forwards;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    @keyframes wrong-shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    .shake { animation: wrong-shake 0.25s ease; }
+
+    /* 별 스폰 입장 */
+    @keyframes drop-in {
+      0% { transform: translateY(-60px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .drop-in { animation: drop-in 0.35s ease-out; }
+
+    /* 배경 별 */
+    @keyframes twinkle {
+      0%,100% { opacity: 0.2; }
+      50%     { opacity: 0.8; }
+    }
+    .bg-star {
+      position: absolute;
+      border-radius: 50%;
+      animation: twinkle ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    /* 타이머 바 */
+    .timer-bar-wrap {
+      position: absolute;
+      top: 6px; left: 10px; right: 10px;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+    }
+    #timerBar {
+      height: 100%;
+      background: linear-gradient(90deg, #4fc3f7, #ab47bc);
+      border-radius: 3px;
+      width: 100%;
+      transition: width 0.1s;
+    }
+
+    /* 콤보 표시 */
+    #comboDisplay {
+      position: absolute;
+      top: 18px; right: 12px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 0 12px #ffd700;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+    footer small {
+      color: rgba(255,255,255,0.5);
+      font-size: 11px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1a1a3e, #0d0d2b);
+      border: 2px solid rgba(255,107,107,0.4);
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+    }
+    .overlay-card h2 {
+      color: var(--text);
+      font-size: 26px;
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      color: rgba(255,255,255,0.75);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    .result-score {
+      font-size: 54px;
+      font-weight: 900;
+      color: #ffd700;
+      margin: 10px 0;
+    }
+    .best-label {
+      color: #ffd700;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #ff6b6b, #c0392b);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(255,107,107,0.4);
+    }
+    .btn-start:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🚀 색깔 로켓</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <span>점수</span>
+      <span id="scoreVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span>콤보</span>
+      <span id="comboVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span>시간</span>
+      <span id="timeVal">40</span>
+    </div>
+    <div class="hud-item">
+      <span>최고</span>
+      <span id="bestVal">0</span>
+    </div>
+  </div>
+
+  <div id="gameArea">
+    <div class="timer-bar-wrap"><div id="timerBar"></div></div>
+    <div id="comboDisplay"></div>
+    <!-- 발사대 (하단 고정) -->
+    <div id="launchZone"></div>
+    <!-- 떨어지는 별들은 JS로 추가 -->
+  </div>
+
+  <footer>
+    <small>별을 로켓 색에 맞게 끌어다 놓아요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 드래그 고스트 -->
+<div id="dragGhost"></div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🚀 색깔 로켓</h2>
+    <p>하늘에서 색깔 별이 떨어져요!<br>
+    ⭐ 별을 같은 색 로켓으로 끌어다 놓아요<br>
+    🎯 맞추면 점수 UP! 콤보로 보너스!<br>
+    💥 틀리면 콤보가 끊겨요<br>
+    40초 안에 최고 점수 도전!</p>
+    <button class="btn-start" id="startBtn">발사!</button>
+  </div>
+</div>
+
+<!-- 종료 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p class="best-label" id="bestMsg"></p>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 발사!</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const COLORS = [
+    { name: '빨강', hex: '#ff4444', emoji: '🔴', rocket: '🚀' },
+    { name: '파랑', hex: '#4488ff', emoji: '🔵', rocket: '💙' },
+    { name: '노랑', hex: '#ffdd00', emoji: '🟡', rocket: '⭐' },
+    { name: '초록', hex: '#44cc44', emoji: '🟢', rocket: '💚' },
+  ];
+
+  // 로켓 실제 이모지 (색으로 구분)
+  const ROCKET_DISPLAY = ['🔴🚀', '🔵🚀', '🟡🚀', '🟢🚀'];
+  const STAR_EMOJIS = [
+    '🔴','🔵','🟡','🟢',
+    '❤️','💙','💛','💚',
+  ];
+  // 색 인덱스별 허용 이모지
+  const COLOR_EMOJIS = [
+    ['🔴','❤️'],   // 빨강
+    ['🔵','💙'],   // 파랑
+    ['🟡','💛'],   // 노랑
+    ['🟢','💚'],   // 초록
+  ];
+
+  const CONFIG = {
+    gameDuration: 40,
+    spawnIntervalMs: 1100,
+    maxStars: 5,
+    baseScore: 10,
+    comboBonus: 5,
+  };
+
+  let state = {};
+  let stars = [];
+  let animId = null;
+  let lastTime = 0;
+  let spawnTimer = 0;
+  let drag = null; // { starIdx, startX, startY }
+
+  const gameArea    = document.getElementById('gameArea');
+  const launchZone  = document.getElementById('launchZone');
+  const scoreEl     = document.getElementById('scoreVal');
+  const comboEl     = document.getElementById('comboVal');
+  const timeEl      = document.getElementById('timeVal');
+  const bestEl      = document.getElementById('bestVal');
+  const timerBar    = document.getElementById('timerBar');
+  const comboDisp   = document.getElementById('comboDisplay');
+  const dragGhost   = document.getElementById('dragGhost');
+  const startOv     = document.getElementById('startOverlay');
+  const endOv       = document.getElementById('endOverlay');
+  const finalEl     = document.getElementById('finalScore');
+  const bestMsg     = document.getElementById('bestMsg');
+  const resultEl    = document.getElementById('resultMsg');
+
+  function getBest() { return parseInt(localStorage.getItem('color-rocket_best') || '0'); }
+  function saveBest(v) { localStorage.setItem('color-rocket_best', String(v)); }
+
+  // 배경 별 생성
+  function spawnBgStars() {
+    for (let i = 0; i < 40; i++) {
+      const s = document.createElement('div');
+      s.className = 'bg-star';
+      const sz = 1 + Math.random() * 3;
+      s.style.width = sz + 'px';
+      s.style.height = sz + 'px';
+      s.style.background = '#ffffff';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top  = Math.random() * 100 + '%';
+      s.style.animationDuration = (1.5 + Math.random() * 3) + 's';
+      s.style.animationDelay    = (-Math.random() * 3) + 's';
+      gameArea.appendChild(s);
+    }
+  }
+
+  // 발사대 렌더
+  function buildLaunchPads() {
+    launchZone.innerHTML = '';
+    COLORS.forEach((c, idx) => {
+      const pad = document.createElement('div');
+      pad.className = 'rocket-pad';
+      pad.dataset.colorIdx = idx;
+      pad.innerHTML = `
+        <div class="rocket-body" style="color:${c.hex}">🚀</div>
+        <div class="rocket-color-label" style="color:${c.hex}">${c.name}</div>
+      `;
+      launchZone.appendChild(pad);
+    });
+  }
+
+  function initState() {
+    state = {
+      score: 0,
+      combo: 0,
+      timeLeft: CONFIG.gameDuration,
+      running: false,
+    };
+  }
+
+  function updateHUD() {
+    scoreEl.textContent = state.score;
+    comboEl.textContent = state.combo;
+    timeEl.textContent  = Math.ceil(state.timeLeft);
+    bestEl.textContent  = getBest();
+    timerBar.style.width = (state.timeLeft / CONFIG.gameDuration * 100) + '%';
+  }
+
+  function showCombo(combo, x, y) {
+    comboDisp.textContent = combo >= 3 ? `🔥 ${combo} 콤보!` : `✨ ${combo} 콤보`;
+    comboDisp.style.left = x + 'px';
+    comboDisp.style.top  = y + 'px';
+    comboDisp.style.opacity = '1';
+    clearTimeout(comboDisp._hide);
+    comboDisp._hide = setTimeout(() => { comboDisp.style.opacity = '0'; }, 800);
+  }
+
+  function spawnStar() {
+    if (stars.length >= CONFIG.maxStars) return;
+    const colorIdx = Math.floor(Math.random() * COLORS.length);
+    const emojis = COLOR_EMOJIS[colorIdx];
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+    const areaW = gameArea.clientWidth;
+    const areaH = gameArea.clientHeight - 90; // 발사대 높이 제외
+
+    const el = document.createElement('div');
+    el.className = 'falling-star drop-in';
+    el.textContent = emoji;
+    el.dataset.colorIdx = colorIdx;
+
+    const x = 16 + Math.random() * (areaW - 60);
+    const y = 20 + Math.random() * (areaH - 80);
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+
+    gameArea.appendChild(el);
+    stars.push({ el, colorIdx, x, y, dy: 0.3 + Math.random() * 0.3 });
+
+    // 터치 시작 이벤트
+    el.addEventListener('pointerdown', onStarPointerDown);
+  }
+
+  function explodeFx(x, y, emoji) {
+    const fx = document.createElement('div');
+    fx.className = 'explode-fx';
+    fx.textContent = emoji;
+    fx.style.left = x + 'px';
+    fx.style.top  = y + 'px';
+    gameArea.appendChild(fx);
+    fx.addEventListener('animationend', () => fx.remove());
+  }
+
+  function removeStar(idx) {
+    const s = stars[idx];
+    s.el.removeEventListener('pointerdown', onStarPointerDown);
+    s.el.remove();
+    stars.splice(idx, 1);
+  }
+
+  function onMatch(starIdx, padColorIdx, dropX, dropY) {
+    const s = stars[starIdx];
+    if (s.colorIdx === padColorIdx) {
+      // 맞음
+      state.combo++;
+      const bonus = Math.floor(state.combo / 2) * CONFIG.comboBonus;
+      state.score += CONFIG.baseScore + bonus;
+      explodeFx(dropX - 20, dropY - 20, '🌟');
+      showCombo(state.combo, dropX, dropY - 40);
+      removeStar(starIdx);
+    } else {
+      // 틀림
+      state.combo = 0;
+      // 흔들기
+      s.el.classList.remove('shake');
+      void s.el.offsetWidth;
+      s.el.classList.add('shake');
+      explodeFx(dropX - 20, dropY - 20, '💨');
+      // 원래 위치로
+      s.el.style.left = s.x + 'px';
+      s.el.style.top  = s.y + 'px';
+    }
+    updateHUD();
+  }
+
+  // 드래그 로직
+  function onStarPointerDown(e) {
+    if (!state.running) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const el = e.currentTarget;
+    const starIdx = stars.findIndex(s => s.el === el);
+    if (starIdx < 0) return;
+
+    const s = stars[starIdx];
+    drag = {
+      starIdx,
+      startX: e.clientX,
+      startY: e.clientY,
+    };
+
+    // 고스트 표시
+    dragGhost.textContent = el.textContent;
+    dragGhost.style.display = 'block';
+    dragGhost.style.left = e.clientX + 'px';
+    dragGhost.style.top  = e.clientY + 'px';
+
+    // 원본 반투명
+    el.style.opacity = '0.4';
+    el.setPointerCapture(e.pointerId);
+    el.addEventListener('pointermove', onStarPointerMove);
+    el.addEventListener('pointerup', onStarPointerUp);
+  }
+
+  function onStarPointerMove(e) {
+    e.preventDefault();
+    if (!drag) return;
+    dragGhost.style.left = e.clientX + 'px';
+    dragGhost.style.top  = e.clientY + 'px';
+  }
+
+  function onStarPointerUp(e) {
+    e.preventDefault();
+    if (!drag) return;
+
+    const el = e.currentTarget;
+    el.removeEventListener('pointermove', onStarPointerMove);
+    el.removeEventListener('pointerup', onStarPointerUp);
+    el.style.opacity = '1';
+    dragGhost.style.display = 'none';
+
+    // 드롭 위치의 발사대 판정
+    const dropX = e.clientX;
+    const dropY = e.clientY;
+
+    // 각 pad의 영역과 비교
+    let droppedPadIdx = -1;
+    const pads = launchZone.querySelectorAll('.rocket-pad');
+    pads.forEach((pad, i) => {
+      const rect = pad.getBoundingClientRect();
+      // 판정 범위 확대 (손가락 여유)
+      if (dropX >= rect.left - 20 && dropX <= rect.right + 20 &&
+          dropY >= rect.top - 30  && dropY <= rect.bottom + 20) {
+        droppedPadIdx = i;
+      }
+    });
+
+    const areaRect = gameArea.getBoundingClientRect();
+
+    if (droppedPadIdx >= 0 && drag.starIdx < stars.length) {
+      onMatch(drag.starIdx, droppedPadIdx,
+        dropX - areaRect.left, dropY - areaRect.top);
+    } else {
+      // 드롭 실패: 원위치
+      const s = stars[drag.starIdx];
+      if (s) {
+        s.el.style.left = s.x + 'px';
+        s.el.style.top  = s.y + 'px';
+      }
+    }
+
+    drag = null;
+  }
+
+  function loop(ts) {
+    if (!state.running) return;
+    const dt = Math.min(ts - lastTime, 50);
+    lastTime = ts;
+
+    // 타이머
+    state.timeLeft -= dt / 1000;
+    if (state.timeLeft <= 0) {
+      state.timeLeft = 0;
+      endGame();
+      return;
+    }
+
+    // 별 낙하
+    const areaH = gameArea.clientHeight - 90;
+    for (let i = stars.length - 1; i >= 0; i--) {
+      const s = stars[i];
+      if (drag && drag.starIdx === i) continue; // 드래그 중 낙하 정지
+      s.y += s.dy * dt / 16;
+      s.el.style.top = s.y + 'px';
+      // 바닥(발사대 위)에 닿으면 사라짐 + 콤보 리셋
+      if (s.y > areaH - 10) {
+        state.combo = 0;
+        removeStar(i);
+        updateHUD();
+      }
+    }
+
+    // 스폰
+    spawnTimer += dt;
+    if (spawnTimer >= CONFIG.spawnIntervalMs) {
+      spawnStar();
+      spawnTimer = 0;
+    }
+
+    updateHUD();
+    animId = requestAnimationFrame(loop);
+  }
+
+  function endGame() {
+    state.running = false;
+    cancelAnimationFrame(animId);
+    dragGhost.style.display = 'none';
+    drag = null;
+
+    const sc = state.score;
+    const best = getBest();
+    if (sc > best) saveBest(sc);
+
+    finalEl.textContent = sc;
+    bestMsg.textContent = sc > best ? '🏆 새 기록!' : '최고 기록: ' + Math.max(sc, best) + '점';
+    resultEl.textContent = '최대 콤보: ' + state.combo + '개';
+
+    stars.forEach(s => { s.el.removeEventListener('pointerdown', onStarPointerDown); s.el.remove(); });
+    stars = [];
+
+    endOv.classList.remove('hidden');
+  }
+
+  function startGame() {
+    stars.forEach(s => { s.el.removeEventListener('pointerdown', onStarPointerDown); s.el.remove(); });
+    stars = [];
+    drag = null;
+    dragGhost.style.display = 'none';
+
+    initState();
+    updateHUD();
+
+    startOv.classList.add('hidden');
+    endOv.classList.add('hidden');
+
+    state.running = true;
+    lastTime = performance.now();
+    spawnTimer = 0;
+    animId = requestAnimationFrame(loop);
+  }
+
+  document.getElementById('startBtn').addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    startGame();
+  });
+  document.getElementById('restartBtn').addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    startGame();
+  });
+
+  // 초기화
+  spawnBgStars();
+  buildLaunchPads();
+  updateHUD();
+})();
+</script>
+</body>
+</html>

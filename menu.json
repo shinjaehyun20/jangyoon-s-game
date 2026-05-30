@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "treasure-dive",
+        "label": "🤿 보물 잠수",
+        "path": "treasure-dive/index.html"
+      },
+      {
+        "id": "color-rocket",
+        "label": "🚀 색깔 로켓",
+        "path": "color-rocket/index.html"
+      },
+      {
         "id": "zoo-escape",
         "label": "🦁 동물원 탈출",
         "path": "zoo-escape/index.html"

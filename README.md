@@ -72,6 +72,8 @@
 | [🏗️ 블록 탑 쌓기 (balance-tower)](./balance-tower) | 좌우로 움직이는 블록을 딱 맞게 탭해서 최대한 높이 쌓아보세요! | 타이밍 |
 | [🦁 동물원 탈출 (zoo-escape)](./zoo-escape) | 동물이 탈출할 올바른 문을 탭! 정답 문에는 열쇠 표시, 30초 도전 | 인지 |
 | [🎪 고리 던지기 (ring-toss)](./ring-toss) | 탭해서 고리를 날려 막대기에 올려요! 콤보 연결로 보너스 점수, 40초 도전 | 타이밍 |
+| [🤿 보물 잠수 (treasure-dive)](./treasure-dive) | 화면 탭으로 잠수! 보물 잡고 공기방울로 숨 채우고 상어는 피해요. 생명 3개 도전 | 액션 |
+| [🚀 색깔 로켓 (color-rocket)](./color-rocket) | 떨어지는 색깔 별을 같은 색 로켓으로 드래그! 콤보 연결로 고득점, 40초 도전 | 인지/드래그 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 

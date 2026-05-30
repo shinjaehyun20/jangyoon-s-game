@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>보물 잠수</title>
+  <style>
+    :root {
+      --bg-top: #0a4a8a;
+      --bg-bot: #001a3a;
+      --accent: #ffd700;
+      --text: #ffffff;
+      --air-full: #4fc3f7;
+      --air-low: #ef5350;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--text);
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .hud {
+      display: flex;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 12px;
+      align-items: center;
+    }
+    .hud-item {
+      flex: 1;
+      text-align: center;
+      color: var(--text);
+      font-size: clamp(12px, 3.5vw, 16px);
+      font-weight: 700;
+    }
+    .hud-item span {
+      display: block;
+      font-size: clamp(10px, 2.8vw, 13px);
+      font-weight: 400;
+      opacity: 0.7;
+    }
+    .air-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 4px;
+    }
+    .air-label {
+      color: var(--text);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .air-bar-bg {
+      flex: 1;
+      height: 14px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    #airBar {
+      height: 100%;
+      background: var(--air-full);
+      border-radius: 7px;
+      transition: width 0.1s, background 0.3s;
+      width: 100%;
+    }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: transparent;
+      cursor: pointer;
+    }
+    /* 바다 배경 레이어 */
+    .sea-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    /* 다이버 */
+    #diver {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      font-size: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 20px;
+      transition: top 0.05s;
+      z-index: 10;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+    }
+    /* 게임 오브젝트 */
+    .obj {
+      position: absolute;
+      font-size: 30px;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+    footer small {
+      color: rgba(255,255,255,0.6);
+      font-size: 11px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #0a4a8a, #001a3a);
+      border: 2px solid rgba(255,215,0,0.4);
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+    }
+    .overlay-card h2 {
+      color: var(--text);
+      font-size: 26px;
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      color: rgba(255,255,255,0.8);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .result-score {
+      font-size: 54px;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 12px 0;
+    }
+    .best-label {
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      color: #1a1a00;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(255,215,0,0.4);
+    }
+    .btn-start:active { transform: scale(0.97); }
+
+    /* 공기방울 파티클 */
+    @keyframes bubble-rise {
+      0% { transform: translateY(0) scale(1); opacity: 0.8; }
+      100% { transform: translateY(-80px) scale(1.4); opacity: 0; }
+    }
+    .bubble-particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(79,195,247,0.5);
+      animation: bubble-rise 1.2s ease-out forwards;
+      pointer-events: none;
+    }
+
+    /* 수집 파티클 */
+    @keyframes collect-fly {
+      0% { transform: scale(1.5); opacity: 1; }
+      100% { transform: scale(0.3) translateY(-60px); opacity: 0; }
+    }
+    .collect-fx {
+      position: absolute;
+      font-size: 24px;
+      pointer-events: none;
+      animation: collect-fly 0.6s ease-out forwards;
+      z-index: 20;
+    }
+
+    /* 심해 물고기 배경 */
+    @keyframes swim-across {
+      0%   { transform: translateX(120%) scaleX(1); }
+      49%  { transform: translateX(-120%) scaleX(1); }
+      50%  { transform: translateX(-120%) scaleX(-1); }
+      100% { transform: translateX(120%) scaleX(-1); }
+    }
+    .bg-fish {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0.2;
+      pointer-events: none;
+      animation: swim-across linear infinite;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🤿 보물 잠수</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <span>점수</span>
+      <span id="scoreVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span>생명</span>
+      <span id="livesVal">❤️❤️❤️</span>
+    </div>
+    <div class="hud-item">
+      <span>깊이</span>
+      <span id="depthVal">0m</span>
+    </div>
+    <div class="hud-item">
+      <span>최고</span>
+      <span id="bestVal">0</span>
+    </div>
+  </div>
+
+  <div class="air-bar-wrap">
+    <span class="air-label">🫧 공기</span>
+    <div class="air-bar-bg"><div id="airBar"></div></div>
+  </div>
+
+  <div id="gameArea">
+    <div id="diver">🤿</div>
+  </div>
+
+  <footer>
+    <small>탭해서 아래로! 보물 잡고 상어 피해요</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🤿 보물 잠수</h2>
+    <p>화면을 탭하면 다이버가 내려가요!<br>
+    💎 보물을 잡으면 점수 UP<br>
+    🫧 공기방울로 숨을 채워요<br>
+    🦈 상어에 닿으면 생명 -1<br>
+    공기가 없어지면 끝!</p>
+    <button class="btn-start" id="startBtn">잠수 시작!</button>
+  </div>
+</div>
+
+<!-- 종료 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p class="best-label" id="bestMsg"></p>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 잠수!</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    diveSpeed: 2.2,
+    riseSpeed: 1.2,
+    airMax: 100,
+    airDrain: 0.25,
+    airRefill: 18,
+    sharkSpeed: 2.8,
+    sharkSpeedInc: 0.18,
+    spawnIntervalMs: 900,
+    treasureScore: 10,
+    airBubbleScore: 2,
+    maxLives: 3,
+    depthScoreInterval: 40,
+  };
+
+  const TREASURES = ['💎','💰','🏺','👑','⚓','🗝️'];
+  const DANGERS   = ['🦈','🦑','🪨'];
+  const AIR_PICK  = ['🫧','🫧','🫧','💊'];
+
+  let state = {};
+  let animId = null;
+  let lastTime = 0;
+  let spawnTimer = 0;
+  let objects = [];
+
+  const gameArea = document.getElementById('gameArea');
+  const diver    = document.getElementById('diver');
+  const scoreEl  = document.getElementById('scoreVal');
+  const livesEl  = document.getElementById('livesVal');
+  const depthEl  = document.getElementById('depthVal');
+  const bestEl   = document.getElementById('bestVal');
+  const airBar   = document.getElementById('airBar');
+  const startOv  = document.getElementById('startOverlay');
+  const endOv    = document.getElementById('endOverlay');
+  const finalEl  = document.getElementById('finalScore');
+  const bestMsg  = document.getElementById('bestMsg');
+  const resultEl = document.getElementById('resultMsg');
+
+  function getBest() { return parseInt(localStorage.getItem('treasure-dive_best') || '0'); }
+  function saveBest(v) { localStorage.setItem('treasure-dive_best', String(v)); }
+
+  function initState() {
+    state = {
+      score: 0,
+      lives: CONFIG.maxLives,
+      air: CONFIG.airMax,
+      depth: 0,
+      diverY: 30,
+      diving: false,
+      running: false,
+      sharkSpeed: CONFIG.sharkSpeed,
+      depthScoreNext: CONFIG.depthScoreInterval,
+      invincible: 0,
+    };
+  }
+
+  function updateHUD() {
+    scoreEl.textContent = state.score;
+    livesEl.textContent = '❤️'.repeat(state.lives);
+    depthEl.textContent = Math.floor(state.depth) + 'm';
+    bestEl.textContent  = getBest();
+    const pct = Math.max(0, state.air / CONFIG.airMax * 100);
+    airBar.style.width = pct + '%';
+    airBar.style.background = pct < 25 ? 'var(--air-low)' : 'var(--air-full)';
+  }
+
+  function spawnBgFish() {
+    const f = document.createElement('div');
+    f.className = 'bg-fish';
+    f.textContent = ['🐠','🐡','🐟','🦐'][Math.floor(Math.random()*4)];
+    f.style.top = (10 + Math.random() * 80) + '%';
+    const dur = 8 + Math.random() * 12;
+    f.style.animationDuration = dur + 's';
+    f.style.animationDelay = (-Math.random() * dur) + 's';
+    gameArea.appendChild(f);
+  }
+
+  function spawnObjects() {
+    const areaW = gameArea.clientWidth;
+    const areaH = gameArea.clientHeight;
+
+    const roll = Math.random();
+    let emoji, type;
+    if (roll < 0.35) {
+      emoji = TREASURES[Math.floor(Math.random() * TREASURES.length)];
+      type = 'treasure';
+    } else if (roll < 0.55) {
+      emoji = AIR_PICK[Math.floor(Math.random() * AIR_PICK.length)];
+      type = 'air';
+    } else {
+      emoji = DANGERS[Math.floor(Math.random() * DANGERS.length)];
+      type = 'danger';
+    }
+
+    const el = document.createElement('div');
+    el.className = 'obj';
+    el.textContent = emoji;
+    const x = 10 + Math.random() * (areaW - 60);
+    // spawn from bottom for dangers, random depth for others
+    let y;
+    if (type === 'danger') {
+      y = areaH + 20;
+    } else {
+      y = 30 + Math.random() * (areaH - 60);
+    }
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    gameArea.appendChild(el);
+
+    objects.push({ el, x, y, type,
+      vy: type === 'danger' ? -(state.sharkSpeed + Math.random() * 1.5) : 0,
+      vx: type === 'danger' ? (Math.random() - 0.5) * 1.2 : 0,
+    });
+  }
+
+  function collectFx(x, y, emoji) {
+    const fx = document.createElement('div');
+    fx.className = 'collect-fx';
+    fx.textContent = emoji;
+    fx.style.left = x + 'px';
+    fx.style.top  = y + 'px';
+    gameArea.appendChild(fx);
+    fx.addEventListener('animationend', () => fx.remove());
+  }
+
+  function bubbleParticle(x, y) {
+    const b = document.createElement('div');
+    b.className = 'bubble-particle';
+    const sz = 6 + Math.random() * 8;
+    b.style.width = sz + 'px';
+    b.style.height = sz + 'px';
+    b.style.left = (x - sz/2) + 'px';
+    b.style.top  = y + 'px';
+    gameArea.appendChild(b);
+    b.addEventListener('animationend', () => b.remove());
+  }
+
+  function flashDiver() {
+    let n = 0;
+    const id = setInterval(() => {
+      diver.style.opacity = diver.style.opacity === '0.3' ? '1' : '0.3';
+      if (++n >= 8) { clearInterval(id); diver.style.opacity = '1'; }
+    }, 120);
+  }
+
+  function loseLife() {
+    if (state.invincible > 0) return;
+    state.lives = Math.max(0, state.lives - 1);
+    state.invincible = 90; // ~1.5s frames
+    flashDiver();
+    if (state.lives <= 0) endGame();
+  }
+
+  function endGame() {
+    state.running = false;
+    cancelAnimationFrame(animId);
+    const sc = state.score;
+    const best = getBest();
+    if (sc > best) saveBest(sc);
+    finalEl.textContent = sc;
+    bestMsg.textContent = sc > best ? '🏆 새 기록!' : '최고 기록: ' + Math.max(sc, best) + '점';
+    const depth = Math.floor(state.depth);
+    resultEl.textContent = '🌊 최대 깊이: ' + depth + 'm';
+    endOv.classList.remove('hidden');
+    objects.forEach(o => o.el.remove());
+    objects = [];
+  }
+
+  function loop(ts) {
+    if (!state.running) return;
+    const dt = Math.min(ts - lastTime, 50);
+    lastTime = ts;
+
+    const areaH = gameArea.clientHeight;
+    const areaW = gameArea.clientWidth;
+
+    // 다이버 이동
+    if (state.diving) {
+      state.diverY = Math.min(state.diverY + CONFIG.diveSpeed * dt / 16, areaH - 60);
+    } else {
+      state.diverY = Math.max(state.diverY - CONFIG.riseSpeed * dt / 16, 10);
+    }
+    diver.style.top = state.diverY + 'px';
+
+    // 깊이 계산
+    state.depth += CONFIG.diveSpeed * dt / 400;
+
+    // 깊이 점수
+    if (state.depth >= state.depthScoreNext) {
+      state.score += 3;
+      state.depthScoreNext += CONFIG.depthScoreInterval;
+    }
+
+    // 공기 소모
+    state.air = Math.max(0, state.air - CONFIG.airDrain * dt / 16);
+    if (state.air <= 0) {
+      // 공기 부족: 생명 차감 후 리셋
+      loseLife();
+      state.air = CONFIG.airMax * 0.5;
+    }
+
+    // 공기방울 파티클 (주기적으로)
+    if (Math.random() < 0.03) {
+      bubbleParticle(
+        parseFloat(diver.style.left) || areaW/2,
+        state.diverY
+      );
+    }
+
+    // 오브젝트 이동 + 충돌
+    const diverCX = areaW / 2;
+    const diverCY = state.diverY + 26;
+
+    for (let i = objects.length - 1; i >= 0; i--) {
+      const o = objects[i];
+      if (o.type === 'danger') {
+        o.y += o.vy;
+        o.x += o.vx;
+        o.el.style.top  = o.y + 'px';
+        o.el.style.left = o.x + 'px';
+      }
+
+      // 범위 밖 제거
+      if (o.y < -60 || o.y > areaH + 60 || o.x < -60 || o.x > areaW + 60) {
+        o.el.remove();
+        objects.splice(i, 1);
+        continue;
+      }
+
+      // 충돌 판정 (원형 간략 계산)
+      const ox = parseFloat(o.el.style.left) + 15;
+      const oy = parseFloat(o.el.style.top) + 15;
+      const dist = Math.hypot(diverCX - ox, diverCY - oy);
+
+      if (dist < 32) {
+        if (o.type === 'treasure') {
+          state.score += CONFIG.treasureScore;
+          collectFx(ox - 12, oy - 12, o.el.textContent);
+        } else if (o.type === 'air') {
+          state.air = Math.min(CONFIG.airMax, state.air + CONFIG.airRefill);
+          collectFx(ox - 12, oy - 12, '✨');
+          state.score += CONFIG.airBubbleScore;
+        } else if (o.type === 'danger') {
+          loseLife();
+          collectFx(ox - 12, oy - 12, '💥');
+        }
+        o.el.remove();
+        objects.splice(i, 1);
+      }
+    }
+
+    // 스폰
+    spawnTimer += dt;
+    if (spawnTimer >= CONFIG.spawnIntervalMs) {
+      spawnObjects();
+      spawnTimer = 0;
+      state.sharkSpeed += CONFIG.sharkSpeedInc;
+    }
+
+    // 무적 카운터
+    if (state.invincible > 0) state.invincible--;
+
+    updateHUD();
+    animId = requestAnimationFrame(loop);
+  }
+
+  function startGame() {
+    // 기존 오브젝트 정리
+    objects.forEach(o => o.el.remove());
+    objects = [];
+    // 배경 물고기 초기화
+    gameArea.querySelectorAll('.bg-fish').forEach(f => f.remove());
+    for (let i = 0; i < 5; i++) spawnBgFish();
+
+    initState();
+    diver.style.top = state.diverY + 'px';
+    updateHUD();
+
+    startOv.classList.add('hidden');
+    endOv.classList.add('hidden');
+
+    state.running = true;
+    lastTime = performance.now();
+    spawnTimer = 0;
+    animId = requestAnimationFrame(loop);
+  }
+
+  // 터치/마우스 통합 입력
+  gameArea.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    if (state.running) state.diving = true;
+  });
+  window.addEventListener('pointerup', () => {
+    if (state.running) state.diving = false;
+  });
+
+  document.getElementById('startBtn').addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    startGame();
+  });
+  document.getElementById('restartBtn').addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    startGame();
+  });
+
+  // 초기 배경
+  for (let i = 0; i < 5; i++) spawnBgFish();
+  updateHUD();
+})();
+</script>
+</body>
+</html>

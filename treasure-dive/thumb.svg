@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a4a8a"/>
+      <stop offset="100%" stop-color="#001a3a"/>
+    </linearGradient>
+    <linearGradient id="bubbles" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4fc3f7" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#4fc3f7" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#sea)" rx="0"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" rx="0"/>
+
+  <!-- 수면 물결 -->
+  <path d="M0 38 Q40 30 80 38 Q120 46 160 38 Q200 30 240 38 Q280 46 320 38 L320 0 L0 0 Z" fill="rgba(79,195,247,0.25)"/>
+
+  <!-- 바닥 산호/바위 -->
+  <ellipse cx="30" cy="175" rx="28" ry="12" fill="#00112a"/>
+  <ellipse cx="100" cy="178" rx="40" ry="10" fill="#00112a"/>
+  <ellipse cx="200" cy="175" rx="35" ry="12" fill="#00112a"/>
+  <ellipse cx="295" cy="178" rx="30" ry="10" fill="#00112a"/>
+
+  <!-- 산호 -->
+  <text x="22" y="168" font-size="20">🌿</text>
+  <text x="55" y="165" font-size="18">🪸</text>
+  <text x="260" y="168" font-size="20">🌿</text>
+  <text x="285" y="164" font-size="16">🪸</text>
+
+  <!-- 공기방울 -->
+  <circle cx="148" cy="90" r="4" fill="rgba(79,195,247,0.5)"/>
+  <circle cx="155" cy="70" r="3" fill="rgba(79,195,247,0.4)"/>
+  <circle cx="143" cy="55" r="5" fill="rgba(79,195,247,0.3)"/>
+  <circle cx="152" cy="40" r="3" fill="rgba(79,195,247,0.2)"/>
+
+  <!-- 다이버 -->
+  <text x="130" y="115" font-size="40">🤿</text>
+
+  <!-- 보물들 -->
+  <text x="60" y="135" font-size="26">💎</text>
+  <text x="220" y="120" font-size="22">💰</text>
+  <text x="240" y="155" font-size="24">👑</text>
+
+  <!-- 상어 -->
+  <text x="30" y="75" font-size="28">🦈</text>
+
+  <!-- 배경 물고기 -->
+  <text x="180" y="65" font-size="16" opacity="0.4">🐠</text>
+  <text x="90" y="155" font-size="14" opacity="0.3">🐟</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd700">보물 잠수</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">TREASURE DIVE</text>
+  </g>
+</svg>

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="space" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0a3e"/>
+      <stop offset="100%" stop-color="#0d0d2b"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff4444" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4488ff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#space)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 배경 별 -->
+  <circle cx="20" cy="15" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="55" cy="35" r="1" fill="white" opacity="0.4"/>
+  <circle cx="90" cy="12" r="2" fill="white" opacity="0.7"/>
+  <circle cx="130" cy="28" r="1" fill="white" opacity="0.5"/>
+  <circle cx="170" cy="8"  r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="210" cy="22" r="1" fill="white" opacity="0.4"/>
+  <circle cx="250" cy="14" r="2" fill="white" opacity="0.7"/>
+  <circle cx="300" cy="30" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="35" cy="60" r="1" fill="white" opacity="0.3"/>
+  <circle cx="75" cy="75" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="115" cy="55" r="1" fill="white" opacity="0.4"/>
+
+  <!-- 발사대 (하단) -->
+  <rect x="0" y="148" width="320" height="32" fill="rgba(255,255,255,0.04)" rx="0"/>
+  <line x1="0" y1="148" x2="320" y2="148" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+
+  <!-- 4개 로켓 발사대 -->
+  <text x="26"  y="174" font-size="22" text-anchor="middle">🚀</text>
+  <text x="26"  y="148" font-size="8"  text-anchor="middle" fill="#ff4444" dy="6">빨강</text>
+  <text x="106" y="174" font-size="22" text-anchor="middle">🚀</text>
+  <text x="106" y="148" font-size="8"  text-anchor="middle" fill="#4488ff" dy="6">파랑</text>
+  <text x="186" y="174" font-size="22" text-anchor="middle">🚀</text>
+  <text x="186" y="148" font-size="8"  text-anchor="middle" fill="#ffdd00" dy="6">노랑</text>
+  <text x="266" y="174" font-size="22" text-anchor="middle">🚀</text>
+  <text x="266" y="148" font-size="8"  text-anchor="middle" fill="#44cc44" dy="6">초록</text>
+
+  <!-- 떨어지는 색깔 별들 -->
+  <text x="20"  y="75" font-size="28">🔴</text>
+  <text x="68"  y="50" font-size="28">💙</text>
+  <text x="116" y="90" font-size="28">💛</text>
+  <text x="164" y="60" font-size="28">💚</text>
+  <text x="212" y="80" font-size="28">🔴</text>
+  <text x="256" y="55" font-size="28">💛</text>
+
+  <!-- 글로우 효과 -->
+  <rect x="5" y="50" width="55" height="55" fill="url(#glow1)" rx="27"/>
+  <rect x="140" y="40" width="55" height="55" fill="url(#glow2)" rx="27"/>
+
+  <!-- 화살표 (드래그 암시) -->
+  <path d="M 48 95 Q 48 125 26 140" stroke="rgba(255,68,68,0.5)" stroke-width="2" fill="none" stroke-dasharray="4,3"/>
+  <polygon points="22,145 26,136 32,143" fill="rgba(255,68,68,0.5)"/>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="130" text-anchor="end" font-size="22" font-weight="900" fill="#ff6b6b">색깔 로켓</text>
+    <text x="296" y="148" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">COLOR ROCKET</text>
+  </g>
+</svg>
