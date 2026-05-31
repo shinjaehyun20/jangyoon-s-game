@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0800"/>
+      <stop offset="60%" stop-color="#3a0800"/>
+      <stop offset="100%" stop-color="#1a0000"/>
+    </linearGradient>
+    <linearGradient id="lavaGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff6600" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#cc2200"/>
+    </linearGradient>
+    <radialGradient id="ballGrad" cx="35%" cy="35%">
+      <stop offset="0%" stop-color="#ffaa00"/>
+      <stop offset="60%" stop-color="#ff4400"/>
+      <stop offset="100%" stop-color="#aa0000"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 용암 바닥 -->
+  <rect x="0" y="158" width="320" height="22" fill="url(#lavaGlow)"/>
+  <ellipse cx="60" cy="158" rx="28" ry="6" fill="#ff5500" opacity="0.7"/>
+  <ellipse cx="160" cy="158" rx="36" ry="7" fill="#ff6600" opacity="0.8"/>
+  <ellipse cx="260" cy="158" rx="24" ry="5" fill="#ff5500" opacity="0.7"/>
+
+  <!-- 화산 -->
+  <polygon points="160,72 128,158 192,158" fill="#6b0000"/>
+  <polygon points="160,72 142,100 178,100" fill="#8b0000"/>
+  <!-- 화산 연기/불꽃 -->
+  <ellipse cx="160" cy="68" rx="14" ry="8" fill="#ff4400" opacity="0.7" filter="url(#glow)"/>
+  <ellipse cx="155" cy="58" rx="8" ry="10" fill="#ff6600" opacity="0.5"/>
+  <ellipse cx="166" cy="55" rx="6" ry="8" fill="#ffaa00" opacity="0.4"/>
+
+  <!-- 플랫폼들 -->
+  <rect x="18" y="126" width="52" height="10" rx="4" fill="#5c2d00"/>
+  <rect x="18" y="120" width="48" height="7" rx="3" fill="#228B22"/>
+  <rect x="86" y="118" width="52" height="10" rx="4" fill="#5c2d00"/>
+  <rect x="86" y="112" width="48" height="7" rx="3" fill="#228B22"/>
+  <rect x="214" y="118" width="52" height="10" rx="4" fill="#5c2d00"/>
+  <rect x="214" y="112" width="48" height="7" rx="3" fill="#228B22"/>
+  <rect x="248" y="126" width="52" height="10" rx="4" fill="#5c2d00"/>
+  <rect x="248" y="120" width="48" height="7" rx="3" fill="#228B22"/>
+
+  <!-- 개구리 (플랫폼 위) -->
+  <text x="100" y="112" font-size="26" text-anchor="middle">🐸</text>
+
+  <!-- 날아오르는 용암 공들 -->
+  <circle cx="80" cy="90" r="12" fill="url(#ballGrad)" filter="url(#glow)"/>
+  <circle cx="80" cy="90" r="12" fill="none" stroke="#ff6600" stroke-width="1.5" opacity="0.6"/>
+  <circle cx="200" cy="70" r="10" fill="url(#ballGrad)" filter="url(#glow)"/>
+  <circle cx="200" cy="70" r="10" fill="none" stroke="#ff6600" stroke-width="1.5" opacity="0.6"/>
+  <circle cx="140" cy="44" r="8" fill="url(#ballGrad)" filter="url(#glow)"/>
+
+  <!-- 불꽃 파티클 -->
+  <circle cx="70" cy="82" r="3" fill="#ffcc00" opacity="0.8"/>
+  <circle cx="88" cy="78" r="2" fill="#ff6600" opacity="0.7"/>
+  <circle cx="196" cy="62" r="3" fill="#ffcc00" opacity="0.8"/>
+  <circle cx="208" cy="66" r="2" fill="#ff8800" opacity="0.6"/>
+  <circle cx="148" cy="38" r="2" fill="#ffaa00" opacity="0.7"/>
+
+  <!-- 타이틀 텍스트 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6b00">화산 점프</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">VOLCANO HOP</text>
+  </g>
+</svg>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>화산 점프</title>
+  <style>
+    :root {
+      --bg: #1a0a00;
+      --accent: #ff6b00;
+      --accent2: #ff3300;
+      --sky1: #2d0800;
+      --sky2: #5c1500;
+      --text: #ffffff;
+      --platform: #8B4513;
+      --platform-top: #228B22;
+      --lava: #ff4400;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--accent);
+      text-align: center;
+      text-shadow: 0 0 12px var(--accent2);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 107, 0, 0.15);
+      border: 1px solid rgba(255, 107, 0, 0.3);
+      border-radius: 12px;
+      padding: 8px 14px;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .hud-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .hud-value {
+      font-size: clamp(18px, 4.5vw, 24px);
+      font-weight: 900;
+      color: var(--text);
+    }
+    #livesDisplay {
+      font-size: clamp(16px, 4vw, 22px);
+    }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 50%, #3a0000 80%, #1a0000 100%);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    /* 화산 배경 */
+    .volcano-bg {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 80px;
+      background: linear-gradient(180deg, #8B0000 0%, #5c0000 100%);
+      clip-path: polygon(15% 100%, 50% 0%, 85% 100%);
+    }
+    .lava-pool {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 18px;
+      background: linear-gradient(180deg, #ff4400 0%, #cc2200 100%);
+      border-radius: 0;
+    }
+    .lava-pool::before {
+      content: '';
+      position: absolute;
+      top: -6px; left: 0; right: 0;
+      height: 12px;
+      background: radial-gradient(ellipse at 20% 50%, #ff6600 0%, transparent 60%),
+                  radial-gradient(ellipse at 50% 50%, #ff5500 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 50%, #ff6600 0%, transparent 60%);
+    }
+    /* 플랫폼들 */
+    .platform {
+      position: absolute;
+      border-radius: 8px 8px 4px 4px;
+      background: var(--platform);
+    }
+    .platform::before {
+      content: '';
+      position: absolute;
+      top: -6px; left: 2px; right: 2px;
+      height: 8px;
+      background: var(--platform-top);
+      border-radius: 4px 4px 0 0;
+    }
+    /* 개구리 캐릭터 */
+    #frog {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      transition: left 0.12s ease-out;
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    /* 용암 돌멩이 */
+    .lava-ball {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffaa00, #ff4400 60%, #aa0000);
+      box-shadow: 0 0 8px #ff4400, 0 0 20px rgba(255,68,0,0.4);
+      z-index: 5;
+    }
+    /* 파티클 */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 20;
+    }
+    /* 효과 텍스트 */
+    .effect-text {
+      position: absolute;
+      font-size: 20px;
+      font-weight: 900;
+      color: #ffcc00;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      pointer-events: none;
+      z-index: 30;
+      animation: floatUp 0.8s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
+    }
+    /* 진동 효과 */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25%       { transform: translateX(-4px); }
+      75%       { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.3s ease; }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    footer small {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+    }
+    .home-link {
+      font-size: 12px;
+      color: rgba(255,200,100,0.7);
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1px solid rgba(255,200,100,0.3);
+      border-radius: 8px;
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #2d0800, #1a0000);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(255,107,0,0.3);
+    }
+    .overlay-card h2 {
+      font-size: clamp(20px, 6vw, 28px);
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 16px);
+      color: rgba(255,255,255,0.85);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .result-score {
+      font-size: clamp(42px, 12vw, 64px);
+      font-weight: 900;
+      color: #ffcc00;
+      margin: 8px 0 4px;
+      text-shadow: 0 0 20px rgba(255,200,0,0.5);
+    }
+    .result-best {
+      font-size: 14px;
+      color: rgba(255,200,100,0.8);
+      margin-bottom: 16px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 0 28px;
+      min-height: 52px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(255,107,0,0.4);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .btn-start:active {
+      transform: scale(0.97);
+    }
+    .difficulty-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .diff-btn {
+      flex: 1;
+      min-height: 40px;
+      border-radius: 10px;
+      border: 2px solid rgba(255,107,0,0.4);
+      background: rgba(255,107,0,0.1);
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .diff-btn.active {
+      border-color: var(--accent);
+      background: rgba(255,107,0,0.3);
+      color: white;
+    }
+    /* 레벨 배지 */
+    .level-badge {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: rgba(255,107,0,0.2);
+      border: 1px solid rgba(255,107,0,0.4);
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      z-index: 6;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🌋 화산 점프</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">점수</span>
+        <span class="hud-value" id="scoreDisplay">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">최고</span>
+        <span class="hud-value" id="bestDisplay">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">목숨</span>
+        <span class="hud-value" id="livesDisplay">❤️❤️❤️</span>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <div class="volcano-bg"></div>
+      <div class="lava-pool"></div>
+      <div id="frog">🐸</div>
+      <div class="level-badge" id="levelBadge">Lv.1</div>
+    </div>
+
+    <footer>
+      <small>👆 화면을 터치하면 왼쪽·오른쪽으로 점프!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🌋 화산 점프</h2>
+      <p>화산에서 날아오는<br>🔥 용암 돌멩이를 피해요!<br><br>화면 <b>왼쪽</b>을 터치하면 왼쪽으로,<br><b>오른쪽</b>을 터치하면 오른쪽으로 점프!</p>
+      <div class="difficulty-row">
+        <button class="diff-btn active" data-diff="easy">쉬움 😊</button>
+        <button class="diff-btn" data-diff="normal">보통 😤</button>
+        <button class="diff-btn" data-diff="hard">어려움 🔥</button>
+      </div>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-best" id="bestMsg"></div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const STORAGE_KEY = 'volcano-hop_best';
+
+    const CONFIG = {
+      easy: {
+        spawnInterval: 1600,
+        speed: 2.2,
+        ballSize: 22,
+        maxBalls: 3,
+        label: '쉬움',
+      },
+      normal: {
+        spawnInterval: 1200,
+        speed: 3.0,
+        ballSize: 24,
+        maxBalls: 4,
+        label: '보통',
+      },
+      hard: {
+        spawnInterval: 900,
+        speed: 3.8,
+        ballSize: 26,
+        maxBalls: 5,
+        label: '어려움',
+      },
+      frogW: 44,
+      frogH: 44,
+      platformCount: 5,
+      platformW: 64,
+      platformH: 14,
+      invincibleMs: 1200,
+      particleCount: 8,
+    };
+
+    // DOM
+    const gameArea = document.getElementById('gameArea');
+    const frogEl = document.getElementById('frog');
+    const scoreEl = document.getElementById('scoreDisplay');
+    const bestEl = document.getElementById('bestDisplay');
+    const livesEl = document.getElementById('livesDisplay');
+    const levelBadge = document.getElementById('levelBadge');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScoreEl = document.getElementById('finalScore');
+    const bestMsgEl = document.getElementById('bestMsg');
+    const resultMsgEl = document.getElementById('resultMsg');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const diffBtns = document.querySelectorAll('.diff-btn');
+
+    // State
+    let state = {
+      running: false,
+      score: 0,
+      lives: 3,
+      frogX: 0,
+      frogY: 0,
+      frogPlatformIdx: 2,
+      balls: [],
+      platforms: [],
+      spawnTimer: 0,
+      lastTime: 0,
+      animId: null,
+      invincible: false,
+      invincibleTimer: 0,
+      level: 1,
+      levelTimer: 0,
+      diff: 'easy',
+      areaW: 0,
+      areaH: 0,
+    };
+
+    let bestScore = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+    bestEl.textContent = bestScore;
+
+    // 난이도 선택
+    diffBtns.forEach(btn => {
+      btn.addEventListener('pointerdown', e => {
+        e.stopPropagation();
+        diffBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.diff = btn.dataset.diff;
+      });
+    });
+
+    // 플랫폼 초기화
+    function initPlatforms() {
+      // 기존 플랫폼 제거
+      document.querySelectorAll('.platform').forEach(p => p.remove());
+      state.platforms = [];
+
+      const areaW = state.areaW;
+      const areaH = state.areaH;
+      const spacing = areaW / (CONFIG.platformCount);
+      const pw = CONFIG.platformW;
+      const ph = CONFIG.platformH;
+      const yPos = areaH * 0.75;
+
+      for (let i = 0; i < CONFIG.platformCount; i++) {
+        const cx = spacing * i + spacing / 2 - pw / 2;
+        const el = document.createElement('div');
+        el.className = 'platform';
+        el.style.cssText = `
+          left: ${cx}px;
+          top: ${yPos}px;
+          width: ${pw}px;
+          height: ${ph}px;
+        `;
+        gameArea.appendChild(el);
+        state.platforms.push({ x: cx, y: yPos, w: pw, h: ph, el });
+      }
+    }
+
+    // 개구리 위치 설정
+    function placeFrog(idx) {
+      state.frogPlatformIdx = idx;
+      const plat = state.platforms[idx];
+      const fw = CONFIG.frogW;
+      const fh = CONFIG.frogH;
+      state.frogX = plat.x + plat.w / 2 - fw / 2;
+      state.frogY = plat.y - fh;
+      frogEl.style.left = state.frogX + 'px';
+      frogEl.style.top = state.frogY + 'px';
+    }
+
+    // 용암 공 생성
+    function spawnBall() {
+      const cfg = CONFIG[state.diff];
+      if (state.balls.length >= cfg.maxBalls + Math.floor(state.level / 3)) return;
+
+      const areaW = state.areaW;
+      const size = cfg.ballSize + Math.random() * 8;
+      // 화산 위치 (중앙 하단 언저리)에서 분출
+      const vx = (Math.random() - 0.5) * 3.5;
+      const vy = -(4 + Math.random() * 3.5 + state.level * 0.3);
+      const x = areaW / 2 - size / 2 + (Math.random() - 0.5) * 40;
+
+      const el = document.createElement('div');
+      el.className = 'lava-ball';
+      el.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${state.areaH - 80}px;
+      `;
+      gameArea.appendChild(el);
+
+      state.balls.push({ x, y: state.areaH - 80, vx, vy, size, el });
+    }
+
+    // 파티클 효과
+    function spawnParticles(x, y) {
+      for (let i = 0; i < CONFIG.particleCount; i++) {
+        const el = document.createElement('div');
+        el.className = 'particle';
+        const size = 4 + Math.random() * 6;
+        const colors = ['#ff6600', '#ff3300', '#ffaa00', '#ff0000'];
+        el.style.cssText = `
+          left: ${x}px; top: ${y}px;
+          width: ${size}px; height: ${size}px;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+        `;
+        gameArea.appendChild(el);
+
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 40 + Math.random() * 60;
+        const dx = Math.cos(angle) * speed;
+        const dy = Math.sin(angle) * speed;
+        let life = 0;
+
+        const animate = () => {
+          life += 0.05;
+          el.style.left = (x + dx * life) + 'px';
+          el.style.top = (y + dy * life + 50 * life * life) + 'px';
+          el.style.opacity = 1 - life;
+          if (life < 1) requestAnimationFrame(animate);
+          else el.remove();
+        };
+        requestAnimationFrame(animate);
+      }
+    }
+
+    // 효과 텍스트
+    function showEffect(text, x, y) {
+      const el = document.createElement('div');
+      el.className = 'effect-text';
+      el.textContent = text;
+      el.style.left = (x - 20) + 'px';
+      el.style.top = (y - 20) + 'px';
+      gameArea.appendChild(el);
+      setTimeout(() => el.remove(), 900);
+    }
+
+    // 충돌 체크 (AABB)
+    function collides(ball) {
+      const fw = CONFIG.frogW;
+      const fh = CONFIG.frogH;
+      const margin = 8; // 여유 마진
+      const bx = ball.x + margin;
+      const by = ball.y + margin;
+      const bw = ball.size - margin * 2;
+      const bh = ball.size - margin * 2;
+      return !(
+        state.frogX + fw < bx ||
+        bx + bw < state.frogX ||
+        state.frogY + fh < by ||
+        by + bh < state.frogY
+      );
+    }
+
+    // 생명 표시
+    function updateLives() {
+      const hearts = ['', '❤️', '❤️❤️', '❤️❤️❤️'];
+      livesEl.textContent = state.lives > 0 ? hearts[state.lives] : '💀';
+    }
+
+    // 레벨업 체크
+    function checkLevel() {
+      const newLevel = Math.floor(state.score / 10) + 1;
+      if (newLevel > state.level) {
+        state.level = newLevel;
+        levelBadge.textContent = `Lv.${state.level}`;
+        showEffect(`⬆️ LV.${state.level}!`, state.areaW / 2 - 30, state.areaH / 2);
+      }
+    }
+
+    // 피격
+    function hitFrog(ball) {
+      if (state.invincible) return;
+      state.lives--;
+      updateLives();
+      spawnParticles(state.frogX + CONFIG.frogW / 2, state.frogY + CONFIG.frogH / 2);
+
+      if (state.lives <= 0) {
+        endGame();
+        return;
+      }
+
+      state.invincible = true;
+      state.invincibleTimer = CONFIG.invincibleMs;
+      // 개구리 깜빡임
+      let blink = 0;
+      const blinkInterval = setInterval(() => {
+        frogEl.style.opacity = blink % 2 === 0 ? '0.3' : '1';
+        blink++;
+        if (blink > 8) {
+          clearInterval(blinkInterval);
+          frogEl.style.opacity = '1';
+        }
+      }, 120);
+
+      // 게임영역 진동
+      gameArea.classList.add('shake');
+      setTimeout(() => gameArea.classList.remove('shake'), 300);
+    }
+
+    // 메인 루프
+    function gameLoop(timestamp) {
+      if (!state.running) return;
+      const dt = Math.min(timestamp - state.lastTime, 50);
+      state.lastTime = timestamp;
+
+      const cfg = CONFIG[state.diff];
+      const gravity = 0.18 + state.level * 0.012;
+
+      // 스폰 타이머
+      state.spawnTimer -= dt;
+      if (state.spawnTimer <= 0) {
+        spawnBall();
+        state.spawnTimer = Math.max(400, cfg.spawnInterval - state.level * 60);
+      }
+
+      // 무적 타이머
+      if (state.invincible) {
+        state.invincibleTimer -= dt;
+        if (state.invincibleTimer <= 0) {
+          state.invincible = false;
+          frogEl.style.opacity = '1';
+        }
+      }
+
+      // 레벨 타이머 (초당 1점)
+      state.levelTimer += dt;
+      if (state.levelTimer >= 1000) {
+        state.levelTimer -= 1000;
+        state.score++;
+        scoreEl.textContent = state.score;
+        checkLevel();
+      }
+
+      // 용암 공 이동
+      for (let i = state.balls.length - 1; i >= 0; i--) {
+        const ball = state.balls[i];
+        ball.vy += gravity;
+        ball.x += ball.vx * (cfg.speed / 3);
+        ball.y += ball.vy * (cfg.speed / 3);
+
+        ball.el.style.left = ball.x + 'px';
+        ball.el.style.top = ball.y + 'px';
+
+        // 화면 밖 또는 용암에 빠지면 제거
+        if (ball.y > state.areaH + 20 ||
+            ball.x < -60 || ball.x > state.areaW + 60) {
+          ball.el.remove();
+          state.balls.splice(i, 1);
+          // 피하면 +1점 보너스
+          state.score++;
+          scoreEl.textContent = state.score;
+          checkLevel();
+          continue;
+        }
+
+        // 충돌 체크
+        if (collides(ball)) {
+          hitFrog(ball);
+          ball.el.remove();
+          state.balls.splice(i, 1);
+        }
+      }
+
+      state.animId = requestAnimationFrame(gameLoop);
+    }
+
+    // 이동 (터치/클릭 기반 — 화면 왼쪽/오른쪽)
+    function handleTap(e) {
+      if (!state.running) return;
+      e.preventDefault();
+
+      const rect = gameArea.getBoundingClientRect();
+      let tapX;
+      if (e.touches && e.touches.length > 0) {
+        tapX = e.touches[0].clientX - rect.left;
+      } else if (e.clientX !== undefined) {
+        tapX = e.clientX - rect.left;
+      } else {
+        return;
+      }
+
+      const midX = state.areaW / 2;
+      const curIdx = state.frogPlatformIdx;
+      let newIdx = curIdx;
+
+      if (tapX < midX) {
+        // 왼쪽 이동
+        newIdx = Math.max(0, curIdx - 1);
+      } else {
+        // 오른쪽 이동
+        newIdx = Math.min(CONFIG.platformCount - 1, curIdx + 1);
+      }
+
+      if (newIdx !== curIdx) {
+        placeFrog(newIdx);
+        // 작은 점프 애니메이션
+        frogEl.style.transform = 'translateY(-8px) scale(1.1)';
+        setTimeout(() => {
+          frogEl.style.transform = '';
+        }, 140);
+      }
+    }
+
+    gameArea.addEventListener('touchstart', handleTap, { passive: false });
+    gameArea.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse') handleTap(e);
+    });
+
+    // 게임 시작
+    function startGame() {
+      // 크기 측정
+      state.areaW = gameArea.clientWidth;
+      state.areaH = gameArea.clientHeight;
+
+      // 초기화
+      state.running = false;
+      state.score = 0;
+      state.lives = 3;
+      state.level = 1;
+      state.invincible = false;
+      state.invincibleTimer = 0;
+      state.spawnTimer = 800;
+      state.levelTimer = 0;
+      state.lastTime = performance.now();
+
+      // 기존 공 제거
+      state.balls.forEach(b => b.el.remove());
+      state.balls = [];
+
+      scoreEl.textContent = '0';
+      updateLives();
+      levelBadge.textContent = 'Lv.1';
+      frogEl.style.opacity = '1';
+      frogEl.style.transform = '';
+
+      initPlatforms();
+      placeFrog(Math.floor(CONFIG.platformCount / 2));
+
+      state.running = true;
+      if (state.animId) cancelAnimationFrame(state.animId);
+      state.animId = requestAnimationFrame(gameLoop);
+    }
+
+    // 게임 종료
+    function endGame() {
+      state.running = false;
+      if (state.animId) cancelAnimationFrame(state.animId);
+
+      const isNewBest = state.score > bestScore;
+      if (isNewBest) {
+        bestScore = state.score;
+        localStorage.setItem(STORAGE_KEY, bestScore);
+        bestEl.textContent = bestScore;
+      }
+
+      finalScoreEl.textContent = state.score;
+      bestMsgEl.textContent = isNewBest ? '🏆 최고 기록 갱신!' : `최고: ${bestScore}점`;
+
+      const msgs = [
+        [30, '🔥 용암이 너무 뜨거워! 다음엔 더 잘 피해보자!'],
+        [60, '🐸 개구리가 잘 피했어! 대단해!'],
+        [100, '⭐ 엄청 잘했어! 진짜 점프 실력자!'],
+        [Infinity, '🏆 화산 점프 마스터! 최고야!'],
+      ];
+      for (const [limit, msg] of msgs) {
+        if (state.score < limit) {
+          resultMsgEl.textContent = msg;
+          break;
+        }
+      }
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    // 버튼 이벤트
+    startBtn.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      startOverlay.classList.add('hidden');
+      startGame();
+    });
+
+    restartBtn.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      endOverlay.classList.add('hidden');
+      startGame();
+    });
+
+    // 초기 최고기록 표시
+    bestEl.textContent = bestScore;
+  })();
+  </script>
+</body>
+</html>

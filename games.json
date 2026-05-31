@@ -710,5 +710,21 @@
     "description": "하늘에서 떨어지는 눈덩이를 피해요! 30초 생존 도전",
     "thumbnail": "snow-dodge/thumb.svg",
     "path": "snow-dodge/index.html"
+  },
+  {
+    "id": "gem-collect",
+    "title": "Gem Collect",
+    "title_ko": "보석 모으기",
+    "description": "떨어지는 보석을 바구니로 받아요! 폭탄은 피하세요",
+    "thumbnail": "gem-collect/thumb.svg",
+    "path": "gem-collect/index.html"
+  },
+  {
+    "id": "volcano-hop",
+    "title": "Volcano Hop",
+    "title_ko": "화산 점프",
+    "description": "화산에서 솟는 용암 돌멩이를 피해 플랫폼을 좌우로 점프! 생존 도전",
+    "thumbnail": "volcano-hop/thumb.svg",
+    "path": "volcano-hop/index.html"
   }
 ]

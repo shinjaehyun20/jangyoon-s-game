@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "volcano-hop",
+        "label": "🌋 화산 점프",
+        "path": "volcano-hop/index.html"
+      },
+      {
+        "id": "gem-collect",
+        "label": "💎 보석 모으기",
+        "path": "gem-collect/index.html"
+      },
+      {
         "id": "kite-fly",
         "label": "🪁 연 날리기",
         "path": "kite-fly/index.html"
