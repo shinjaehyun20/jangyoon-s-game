@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "kite-fly",
+        "label": "🪁 연 날리기",
+        "path": "kite-fly/index.html"
+      },
+      {
+        "id": "snow-dodge",
+        "label": "❄️ 눈덩이 피하기",
+        "path": "snow-dodge/index.html"
+      },
+      {
         "id": "treasure-dive",
         "label": "🤿 보물 잠수",
         "path": "treasure-dive/index.html"

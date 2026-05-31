@@ -1,0 +1,58 @@
+<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#87ceeb"/>
+      <stop offset="100%" stop-color="#c8e6f8"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#sky)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 잔디 -->
+  <rect x="0" y="162" width="320" height="18" fill="#81c784"/>
+  <rect x="0" y="168" width="320" height="12" fill="#66bb6a"/>
+
+  <!-- 구름들 -->
+  <g fill="rgba(255,255,255,0.75)">
+    <circle cx="60" cy="40" r="20"/>
+    <circle cx="45" cy="47" r="15"/>
+    <circle cx="76" cy="47" r="15"/>
+    <circle cx="62" cy="52" r="17"/>
+
+    <circle cx="240" cy="30" r="16"/>
+    <circle cx="228" cy="36" r="12"/>
+    <circle cx="253" cy="36" r="12"/>
+    <circle cx="241" cy="40" r="14"/>
+  </g>
+
+  <!-- 별 -->
+  <g fill="#ffd600" stroke="#ff8f00" stroke-width="1">
+    <polygon points="130,55 133,65 143,65 135,71 138,81 130,75 122,81 125,71 117,65 127,65" transform="scale(0.7) translate(63,30)"/>
+    <polygon points="200,35 202,42 209,42 203,46 205,53 200,49 195,53 197,46 191,42 198,42" transform="scale(0.8) translate(-30,10)"/>
+  </g>
+
+  <!-- 연줄 -->
+  <path d="M160,155 Q150,130 140,110 Q130,90 145,75" fill="none" stroke="rgba(100,60,20,0.6)" stroke-width="1.5"/>
+
+  <!-- 연 몸체 -->
+  <g transform="translate(145,75)">
+    <polygon points="0,-32 24,0 0,32 -24,0" fill="#ff6b35"/>
+    <polygon points="0,-32 0,32 -24,0" fill="#ffd600"/>
+    <polygon points="0,-32 0,32 24,0" fill="#ff6b35"/>
+    <polygon points="0,-32 24,0 0,32 -24,0" fill="none" stroke="white" stroke-width="2"/>
+    <line x1="0" y1="-32" x2="0" y2="32" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+    <line x1="-24" y1="0" x2="24" y2="0" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+  </g>
+
+  <!-- 꼬리 리본 -->
+  <circle cx="140" cy="110" r="4" fill="#ff6b35"/>
+  <circle cx="144" cy="122" r="4" fill="#ffd600"/>
+  <circle cx="150" cy="134" r="4" fill="#4fc3f7"/>
+  <circle cx="155" cy="146" r="4" fill="#ab47bc"/>
+
+  <!-- 제목 텍스트 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6b35">연 날리기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(0,80,150,0.6)" letter-spacing="2">KITE FLY</text>
+  </g>
+</svg>

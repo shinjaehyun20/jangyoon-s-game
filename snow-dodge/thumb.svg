@@ -1,0 +1,62 @@
+<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="nightsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1b6e"/>
+      <stop offset="100%" stop-color="#1a3a7a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#nightsky)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 눈 바닥 -->
+  <rect x="0" y="166" width="320" height="14" fill="#fff"/>
+  <ellipse cx="160" cy="166" rx="200" ry="16" fill="#e3f2fd"/>
+
+  <!-- 떨어지는 눈송이들 -->
+  <g fill="white" opacity="0.6">
+    <circle cx="40" cy="30" r="2.5"/>
+    <circle cx="90" cy="15" r="1.8"/>
+    <circle cx="130" cy="55" r="3"/>
+    <circle cx="200" cy="25" r="2"/>
+    <circle cx="260" cy="45" r="2.5"/>
+    <circle cx="50" cy="80" r="1.5"/>
+    <circle cx="180" cy="70" r="2"/>
+    <circle cx="280" cy="20" r="1.8"/>
+    <circle cx="310" cy="65" r="2.2"/>
+  </g>
+
+  <!-- 큰 눈덩이들 -->
+  <!-- 눈덩이 1 -->
+  <circle cx="80" cy="50" r="28" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+  <circle cx="72" cy="42" r="10" fill="white" opacity="0.7"/>
+  <circle cx="90" cy="58" r="6" fill="white" opacity="0.5"/>
+
+  <!-- 눈덩이 2 -->
+  <circle cx="200" cy="30" r="20" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+  <circle cx="193" cy="24" r="7" fill="white" opacity="0.7"/>
+
+  <!-- 눈덩이 3 -->
+  <circle cx="280" cy="75" r="16" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+  <circle cx="275" cy="69" r="5" fill="white" opacity="0.7"/>
+
+  <!-- 눈사람 플레이어 -->
+  <g transform="translate(155, 125)">
+    <!-- 몸통 -->
+    <ellipse cx="0" cy="16" rx="20" ry="22" fill="white" stroke="#90caf9" stroke-width="2"/>
+    <!-- 머리 -->
+    <circle cx="0" cy="-11" r="14" fill="white" stroke="#90caf9" stroke-width="2"/>
+    <!-- 눈 -->
+    <circle cx="-5" cy="-13" r="2.5" fill="#1a237e"/>
+    <circle cx="5" cy="-13" r="2.5" fill="#1a237e"/>
+    <!-- 코 -->
+    <polygon points="0,-10 8,-10 0,-8" fill="#ff6b35"/>
+    <!-- 목도리 -->
+    <ellipse cx="0" cy="-1" rx="16" ry="5" fill="#ef5350"/>
+  </g>
+
+  <!-- 제목 텍스트 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#4fc3f7">눈덩이 피하기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">SNOW DODGE</text>
+  </g>
+</svg>

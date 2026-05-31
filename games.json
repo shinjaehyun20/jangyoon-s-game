@@ -694,5 +694,21 @@
     "description": "떨어지는 색깔 별을 같은 색 로켓으로 드래그! 콤보 연결로 고득점, 40초 도전",
     "thumbnail": "color-rocket/thumb.svg",
     "path": "color-rocket/index.html"
+  },
+  {
+    "id": "kite-fly",
+    "title": "Kite Fly",
+    "title_ko": "🪁 연 날리기",
+    "description": "손가락으로 연을 조종해 구름과 별을 터치! 30초 도전",
+    "thumbnail": "kite-fly/thumb.svg",
+    "path": "kite-fly/index.html"
+  },
+  {
+    "id": "snow-dodge",
+    "title": "Snow Dodge",
+    "title_ko": "❄️ 눈덩이 피하기",
+    "description": "하늘에서 떨어지는 눈덩이를 피해요! 30초 생존 도전",
+    "thumbnail": "snow-dodge/thumb.svg",
+    "path": "snow-dodge/index.html"
   }
 ]

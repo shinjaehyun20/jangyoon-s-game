@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🪁 연 날리기</title>
+  <style>
+    :root {
+      --bg-top: #87ceeb;
+      --bg-bot: #c8e6f8;
+      --accent: #ff6b35;
+      --text: #1a237e;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px;
+      gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      color: var(--text);
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.35);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: 15px; font-weight: 700; color: var(--text);
+    }
+    #gameCanvas {
+      flex: 1;
+      border-radius: 16px;
+      background: transparent;
+      display: block;
+      touch-action: none;
+      cursor: none;
+    }
+    footer {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--text);
+    }
+    .home-link {
+      color: var(--text); text-decoration: none;
+      font-weight: 600; font-size: 13px;
+      background: rgba(255,255,255,0.4);
+      padding: 4px 10px; border-radius: 8px;
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px 28px;
+      text-align: center;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; }
+    .overlay-card p { font-size: 14px; color: #555; margin-bottom: 18px; line-height: 1.5; }
+    .btn-start {
+      background: linear-gradient(135deg, #ff6b35, #ff9c5b);
+      color: #fff; border: none; border-radius: 14px;
+      font-size: 18px; font-weight: 900;
+      padding: 12px 36px; cursor: pointer;
+      min-height: 48px; width: 100%;
+      box-shadow: 0 4px 12px rgba(255,107,53,0.35);
+    }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--accent); margin: 8px 0;
+    }
+    .best-label { font-size: 13px; color: #888; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🪁 연 날리기</h1>
+    <div class="hud">
+      <span>⭐ 점수: <b id="scoreDisp">0</b></span>
+      <span>⏱ <b id="timeDisp">30</b>초</span>
+      <span>🏆 최고: <b id="bestDisp">0</b></span>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <footer>
+      <small>손가락으로 연을 조종해요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🪁 연 날리기</h2>
+      <p>손가락으로 연을 드래그하거나<br>화면을 터치해 연을 조종하세요!<br>구름과 별을 만나면 점수 UP!<br>30초 동안 최고점수를 내봐요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 끝!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="best-label" id="bestLabel"></div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_TIME: 30,
+      KITE_SPEED: 0.12,
+      CLOUD_SPEED_MIN: 0.4,
+      CLOUD_SPEED_MAX: 1.1,
+      CLOUD_SPAWN_INTERVAL: 90,
+      STAR_SPAWN_INTERVAL: 60,
+      STAR_SCORE: 10,
+      CLOUD_SCORE: 5,
+      STORAGE_KEY: 'kite-fly_best',
+    };
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisp = document.getElementById('scoreDisp');
+    const timeDisp = document.getElementById('timeDisp');
+    const bestDisp = document.getElementById('bestDisp');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const bestLabel = document.getElementById('bestLabel');
+    const resultMsg = document.getElementById('resultMsg');
+
+    let state, animId, timerIntervalId;
+
+    function getBest() {
+      return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    }
+    function saveBest(s) {
+      const prev = getBest();
+      if (s > prev) localStorage.setItem(CONFIG.STORAGE_KEY, String(s));
+      return Math.max(s, prev);
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    function initState() {
+      resizeCanvas();
+      const W = canvas.width, H = canvas.height;
+      return {
+        running: false,
+        score: 0,
+        timeLeft: CONFIG.GAME_TIME,
+        kite: { x: W / 2, y: H * 0.5, tx: W / 2, ty: H * 0.5, tailPoints: [] },
+        clouds: [],
+        stars: [],
+        particles: [],
+        frame: 0,
+        windOffset: 0,
+        pointer: { active: false, x: W / 2, y: H * 0.5 },
+      };
+    }
+
+    function spawnCloud(W, H) {
+      const y = Math.random() * H * 0.7 + H * 0.05;
+      const left = Math.random() < 0.5;
+      return {
+        x: left ? -80 : W + 80,
+        y,
+        vx: (left ? 1 : -1) * (CONFIG.CLOUD_SPEED_MIN + Math.random() * (CONFIG.CLOUD_SPEED_MAX - CONFIG.CLOUD_SPEED_MIN)),
+        r: 28 + Math.random() * 20,
+        scored: false,
+      };
+    }
+
+    function spawnStar(W, H) {
+      return {
+        x: Math.random() * (W - 60) + 30,
+        y: -20,
+        vy: 0.8 + Math.random() * 0.8,
+        r: 14,
+        angle: 0,
+        scored: false,
+        pulse: 0,
+      };
+    }
+
+    function spawnParticle(x, y, color) {
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI * 2 * i) / 6 + Math.random() * 0.5;
+        state.particles.push({
+          x, y,
+          vx: Math.cos(angle) * (2 + Math.random() * 2),
+          vy: Math.sin(angle) * (2 + Math.random() * 2),
+          life: 1, color,
+          r: 5 + Math.random() * 4,
+        });
+      }
+    }
+
+    function drawKite(kite, W) {
+      const { x, y, tailPoints } = kite;
+      // 연줄 (꼬리 경로)
+      if (tailPoints.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(tailPoints[0].x, tailPoints[0].y);
+        for (let i = 1; i < tailPoints.length; i++) {
+          ctx.lineTo(tailPoints[i].x, tailPoints[i].y);
+        }
+        ctx.strokeStyle = 'rgba(100,60,20,0.5)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // 연 몸체 (마름모)
+      const kw = 22, kh = 30;
+      ctx.save();
+      ctx.translate(x, y);
+
+      // 연 그림자
+      ctx.beginPath();
+      ctx.moveTo(0, -kh); ctx.lineTo(kw, 0);
+      ctx.lineTo(0, kh); ctx.lineTo(-kw, 0);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.translate(3, 4); ctx.fill();
+      ctx.translate(-3, -4);
+
+      // 연 왼쪽 반
+      ctx.beginPath();
+      ctx.moveTo(0, -kh); ctx.lineTo(0, kh); ctx.lineTo(-kw, 0);
+      ctx.closePath();
+      ctx.fillStyle = '#ff6b35';
+      ctx.fill();
+
+      // 연 오른쪽 반
+      ctx.beginPath();
+      ctx.moveTo(0, -kh); ctx.lineTo(0, kh); ctx.lineTo(kw, 0);
+      ctx.closePath();
+      ctx.fillStyle = '#ffd600';
+      ctx.fill();
+
+      // 연 테두리 + 중심선
+      ctx.beginPath();
+      ctx.moveTo(0, -kh); ctx.lineTo(kw, 0);
+      ctx.lineTo(0, kh); ctx.lineTo(-kw, 0);
+      ctx.closePath();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, -kh); ctx.lineTo(0, kh);
+      ctx.moveTo(-kw, 0); ctx.lineTo(kw, 0);
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.restore();
+
+      // 꼬리 리본
+      const tail = tailPoints;
+      if (tail.length > 3) {
+        for (let i = 3; i < tail.length; i += 4) {
+          const t = tail[i];
+          const colors = ['#ff6b35', '#ffd600', '#4fc3f7', '#ab47bc'];
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = colors[(i / 4) % colors.length];
+          ctx.fill();
+        }
+      }
+    }
+
+    function drawCloud(cloud) {
+      ctx.save();
+      ctx.translate(cloud.x, cloud.y);
+      const r = cloud.r;
+      ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(-r * 0.6, r * 0.2, r * 0.7, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(r * 0.6, r * 0.2, r * 0.7, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, r * 0.3, r * 0.8, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
+    function drawStar(star) {
+      ctx.save();
+      ctx.translate(star.x, star.y);
+      const scale = 1 + Math.sin(star.pulse) * 0.15;
+      ctx.scale(scale, scale);
+      ctx.rotate(star.angle);
+      const r = star.r, ir = r * 0.45, n = 5;
+      ctx.beginPath();
+      for (let i = 0; i < n * 2; i++) {
+        const a = (Math.PI * i) / n - Math.PI / 2;
+        const radius = i % 2 === 0 ? r : ir;
+        i === 0 ? ctx.moveTo(Math.cos(a) * radius, Math.sin(a) * radius)
+                 : ctx.lineTo(Math.cos(a) * radius, Math.sin(a) * radius);
+      }
+      ctx.closePath();
+      ctx.fillStyle = '#ffd600';
+      ctx.strokeStyle = '#ff8f00';
+      ctx.lineWidth = 1.5;
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      state.particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.life;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function drawBackground(W, H) {
+      // 하늘 그라디언트
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#87ceeb');
+      grad.addColorStop(1, '#c8e6f8');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 작은 구름 배경 장식
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      [
+        { x: W * 0.1 + state.windOffset * 0.3, y: H * 0.15, r: 18 },
+        { x: W * 0.8 + state.windOffset * 0.2, y: H * 0.25, r: 14 },
+        { x: W * 0.5 + state.windOffset * 0.4, y: H * 0.08, r: 22 },
+      ].forEach(c => {
+        ctx.beginPath(); ctx.arc(c.x % (W + 60) - 30, c.y, c.r, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc((c.x + c.r) % (W + 60) - 30, c.y + c.r * 0.3, c.r * 0.7, 0, Math.PI * 2); ctx.fill();
+      });
+
+      // 지면 (잔디)
+      ctx.fillStyle = '#81c784';
+      ctx.fillRect(0, H - 20, W, 20);
+      ctx.fillStyle = '#66bb6a';
+      ctx.fillRect(0, H - 14, W, 8);
+    }
+
+    function update() {
+      const W = canvas.width, H = canvas.height;
+      const kite = state.kite;
+      state.frame++;
+      state.windOffset = (state.windOffset + 0.5) % (W + 60);
+
+      // 연 이동 (포인터 추적)
+      kite.x += (kite.tx - kite.x) * CONFIG.KITE_SPEED;
+      kite.y += (kite.ty - kite.y) * CONFIG.KITE_SPEED;
+
+      // 경계 클램프
+      kite.x = Math.max(25, Math.min(W - 25, kite.x));
+      kite.y = Math.max(30, Math.min(H - 70, kite.y));
+
+      // 꼬리 업데이트
+      kite.tailPoints.unshift({ x: kite.x, y: kite.y + 30 });
+      if (kite.tailPoints.length > 40) kite.tailPoints.pop();
+
+      // 구름 스폰
+      if (state.frame % CONFIG.CLOUD_SPAWN_INTERVAL === 0) {
+        state.clouds.push(spawnCloud(W, H));
+      }
+      // 별 스폰
+      if (state.frame % CONFIG.STAR_SPAWN_INTERVAL === 0) {
+        state.stars.push(spawnStar(W, H));
+      }
+
+      // 구름 이동 & 충돌
+      state.clouds = state.clouds.filter(c => {
+        c.x += c.vx;
+        const dx = kite.x - c.x, dy = kite.y - c.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (!c.scored && dist < c.r + 20) {
+          c.scored = true;
+          state.score += CONFIG.CLOUD_SCORE;
+          scoreDisp.textContent = state.score;
+          spawnParticle(c.x, c.y, '#ffffff');
+        }
+        return c.x > -100 && c.x < W + 100;
+      });
+
+      // 별 이동 & 충돌
+      state.stars = state.stars.filter(s => {
+        s.y += s.vy;
+        s.angle += 0.04;
+        s.pulse += 0.12;
+        const dx = kite.x - s.x, dy = kite.y - s.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (!s.scored && dist < s.r + 22) {
+          s.scored = true;
+          state.score += CONFIG.STAR_SCORE;
+          scoreDisp.textContent = state.score;
+          spawnParticle(s.x, s.y, '#ffd600');
+        }
+        return s.y < H + 30 && !s.scored;
+      });
+
+      // 파티클 업데이트
+      state.particles = state.particles.filter(p => {
+        p.x += p.vx; p.y += p.vy;
+        p.vy += 0.1;
+        p.life -= 0.04;
+        return p.life > 0;
+      });
+    }
+
+    function draw() {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      drawBackground(W, H);
+      state.clouds.forEach(drawCloud);
+      state.stars.forEach(drawStar);
+      drawParticles();
+      drawKite(state.kite, W);
+    }
+
+    function loop() {
+      if (!state.running) return;
+      update();
+      draw();
+      animId = requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      if (animId) cancelAnimationFrame(animId);
+      if (timerIntervalId) clearInterval(timerIntervalId);
+      state = initState();
+      state.running = true;
+      bestDisp.textContent = getBest();
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      timerIntervalId = setInterval(() => {
+        state.timeLeft--;
+        timeDisp.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+
+      loop();
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(animId);
+      clearInterval(timerIntervalId);
+
+      const best = saveBest(state.score);
+      finalScore.textContent = state.score;
+      bestLabel.textContent = `최고 기록: ${best}점`;
+      const msgs = [
+        state.score >= 100 ? '대단해요! 연 왕이에요! 🏆' :
+        state.score >= 60 ? '잘했어요! 다시 도전! 🌟' : '연을 더 높이 날려봐요! 🪁'
+      ];
+      resultMsg.textContent = msgs[0];
+      endOverlay.classList.remove('hidden');
+      bestDisp.textContent = best;
+    }
+
+    // 포인터 이벤트
+    canvas.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      state.pointer.active = true;
+      state.kite.tx = e.clientX - rect.left;
+      state.kite.ty = e.clientY - rect.top;
+    });
+    window.addEventListener('pointermove', e => {
+      if (!state || !state.pointer.active) return;
+      const rect = canvas.getBoundingClientRect();
+      state.kite.tx = e.clientX - rect.left;
+      state.kite.ty = e.clientY - rect.top;
+    });
+    window.addEventListener('pointerup', () => {
+      if (state) state.pointer.active = false;
+    });
+
+    // 버튼
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('restartBtn').addEventListener('click', startGame);
+
+    // 초기화
+    window.addEventListener('resize', () => { if (state) resizeCanvas(); });
+    state = initState();
+    bestDisp.textContent = getBest();
+
+  })();
+  </script>
+</body>
+</html>
