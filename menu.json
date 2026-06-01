@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "leaf-catch",
+        "label": "🍂 낙엽 잡기",
+        "path": "leaf-catch/index.html"
+      },
+      {
+        "id": "lighthouse-guide",
+        "label": "🔦 등대 불빛",
+        "path": "lighthouse-guide/index.html"
+      },
+      {
         "id": "volcano-hop",
         "label": "🌋 화산 점프",
         "path": "volcano-hop/index.html"

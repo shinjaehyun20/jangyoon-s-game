@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "id": "space-catcher",
     "title": "Space Catcher",
@@ -726,5 +726,22 @@
     "description": "화산에서 솟는 용암 돌멩이를 피해 플랫폼을 좌우로 점프! 생존 도전",
     "thumbnail": "volcano-hop/thumb.svg",
     "path": "volcano-hop/index.html"
+  }
+,
+  {
+    "id": "leaf-catch",
+    "title": "Leaf Catch",
+    "title_ko": "낙엽 잡기",
+    "description": "바람에 흔들리며 떨어지는 낙엽을 바구니로 받아요! 황금잎 보너스!",
+    "thumbnail": "leaf-catch/thumb.svg",
+    "path": "leaf-catch/index.html"
+  },
+  {
+    "id": "lighthouse-guide",
+    "title": "Lighthouse Guide",
+    "title_ko": "등대 불빛",
+    "description": "등대를 회전시켜 불빛으로 밤바다 배들을 항구로 안내해요!",
+    "thumbnail": "lighthouse-guide/thumb.svg",
+    "path": "lighthouse-guide/index.html"
   }
 ]
