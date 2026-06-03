@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>광물 캐기 — 장윤 마인크래프트</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+  body {
+    background: #1a0f0a;
+    font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh; color: #fff;
+    user-select: none; -webkit-user-select: none;
+  }
+
+  /* ── Header ── */
+  #header {
+    width: 100%; max-width: 420px;
+    padding: 12px 16px 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: #2d1a0e;
+    border-bottom: 3px solid #7a4f2d;
+  }
+  #header h1 { font-size: 1.1rem; color: #f5c842; letter-spacing: 1px; }
+  #stats { display: flex; gap: 12px; font-size: 0.85rem; }
+  .stat { display: flex; flex-direction: column; align-items: center; }
+  .stat-label { font-size: 0.65rem; color: #aaa; }
+  .stat-val { font-weight: bold; font-size: 1rem; }
+  #score-val { color: #f5c842; }
+  #lives-val { color: #e74c3c; }
+  #timer-val { color: #3de8a0; }
+
+  /* ── Game area ── */
+  #game-wrap {
+    width: 100%; max-width: 420px;
+    flex: 1;
+    display: flex; flex-direction: column;
+    padding: 0;
+  }
+
+  /* ── Depth indicator ── */
+  #depth-bar {
+    background: #2d1a0e;
+    padding: 6px 16px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.8rem; color: #ccc;
+    border-bottom: 2px solid #7a4f2d;
+  }
+  #depth-label { flex: 1; }
+  #depth-val { color: #f5c842; font-weight: bold; }
+
+  /* ── Block grid ── */
+  #grid-container {
+    flex: 1;
+    display: flex; align-items: stretch;
+    padding: 8px;
+    gap: 8px;
+  }
+  #grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+
+  .block {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.08s, filter 0.08s;
+    position: relative;
+    border: 2px solid rgba(255,255,255,0.12);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.18), inset 0 -2px 0 rgba(0,0,0,0.3);
+  }
+  .block:active { transform: scale(0.88); filter: brightness(1.4); }
+
+  /* Block types — background colors */
+  .b-dirt    { background: #8B6040; border-color: #6b4830; }
+  .b-stone   { background: #7a7a7a; border-color: #5a5a5a; }
+  .b-deep    { background: #4a4a5a; border-color: #3a3a4a; }
+  .b-bedrock { background: #2a2a2a; border-color: #111; cursor: not-allowed; }
+
+  /* Ore blocks — special colors */
+  .b-coal    { background: #4a4a4a; border-color: #222; }
+  .b-iron    { background: #8a6a55; border-color: #6a4a35; }
+  .b-gold    { background: #8a7a20; border-color: #6a5a10; }
+  .b-diamond { background: #205060; border-color: #103040; }
+  .b-emerald { background: #205535; border-color: #103a20; }
+
+  /* HP crack overlay */
+  .crack1::after { content: ''; position: absolute; inset: 0; border-radius: 4px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 8 L15 20 L25 22 L12 35' stroke='%23000' stroke-width='2.5' fill='none' opacity='0.35'/%3E%3C/svg%3E") center/cover; }
+  .crack2::after { content: ''; position: absolute; inset: 0; border-radius: 4px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 5 L10 18 L22 20 L8 38 M28 10 L32 25 L22 22' stroke='%23000' stroke-width='2.5' fill='none' opacity='0.5'/%3E%3C/svg%3E") center/cover; }
+
+  /* Inventory sidebar */
+  #inventory {
+    width: 56px;
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 4px 0;
+  }
+  .inv-slot {
+    width: 52px; height: 52px;
+    background: #2a2a2a;
+    border: 2px solid #555;
+    border-radius: 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  .inv-count {
+    font-size: 0.6rem; color: #f5c842;
+    font-weight: bold; line-height: 1;
+  }
+  .inv-slot.active { border-color: #f5c842; background: #3a3a1a; }
+
+  /* ── Pickaxe selector ── */
+  #pickaxe-bar {
+    background: #2d1a0e;
+    padding: 8px 16px;
+    display: flex; gap: 8px; justify-content: center;
+    border-top: 2px solid #7a4f2d;
+  }
+  .pick-btn {
+    background: #3a2010;
+    border: 2px solid #7a4f2d;
+    border-radius: 8px;
+    color: #fff; font-size: 0.8rem;
+    padding: 6px 10px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .pick-btn .pick-icon { font-size: 1.3rem; }
+  .pick-btn.selected { background: #7a4f2d; border-color: #f5c842; }
+  .pick-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Message overlay ── */
+  #msg-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  #msg-overlay.show { display: flex; }
+  #msg-box {
+    background: #2d1a0e;
+    border: 3px solid #7a4f2d;
+    border-radius: 16px;
+    padding: 28px 32px;
+    text-align: center;
+    max-width: 300px;
+  }
+  #msg-box h2 { font-size: 1.6rem; margin-bottom: 8px; color: #f5c842; }
+  #msg-box p  { font-size: 0.95rem; color: #ddd; margin-bottom: 20px; line-height: 1.5; }
+  #msg-btn {
+    background: #7a4f2d; color: #f5c842;
+    border: none; border-radius: 10px;
+    padding: 12px 32px; font-size: 1rem; font-weight: bold;
+    cursor: pointer;
+  }
+  #msg-btn:hover { background: #9a6a3d; }
+
+  /* ── Hit animation ── */
+  @keyframes hit-flash { 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
+  .hit-anim { animation: hit-flash 0.12s ease; }
+
+  /* ── Ore collect popup ── */
+  .ore-popup {
+    position: fixed;
+    font-size: 1.6rem;
+    pointer-events: none;
+    z-index: 200;
+    animation: pop-up 0.9s ease forwards;
+  }
+  @keyframes pop-up {
+    0%   { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-60px) scale(1.5); opacity: 0; }
+  }
+
+  /* ── Intro screen ── */
+  #intro {
+    display: flex; position: fixed; inset: 0;
+    background: #1a0f0a;
+    flex-direction: column; align-items: center; justify-content: center;
+    z-index: 300;
+    gap: 16px;
+    padding: 24px;
+  }
+  #intro h1 { font-size: 2rem; color: #f5c842; text-align: center; }
+  #intro p  { color: #ccc; text-align: center; line-height: 1.6; font-size: 0.95rem; }
+  #intro-table {
+    background: #2d1a0e; border-radius: 12px;
+    padding: 12px 20px; width: 100%; max-width: 320px;
+  }
+  #intro-table tr td:first-child { padding-right: 12px; font-size: 1.3rem; }
+  #intro-table tr td:last-child  { font-size: 0.85rem; color: #ddd; }
+  #intro-table tr td { padding: 4px 0; }
+  #start-btn {
+    background: #7a4f2d; color: #f5c842;
+    border: none; border-radius: 12px;
+    padding: 16px 40px; font-size: 1.2rem; font-weight: bold;
+    cursor: pointer; margin-top: 8px;
+  }
+  #start-btn:hover { background: #9a6a3d; }
+</style>
+</head>
+<body>
+
+<!-- Intro -->
+<div id="intro">
+  <h1>⛏️ 광물 캐기</h1>
+  <p>마인크래프트처럼 블록을 탭해서 광물을 캐요!<br>깊이 파고들수록 더 귀한 광물이 나와요.</p>
+  <div id="intro-table">
+    <table>
+      <tr><td>🪨</td><td>돌 — 1번 탭</td></tr>
+      <tr><td>⬛</td><td>석탄 — 2번 탭 (10점)</td></tr>
+      <tr><td>🟤</td><td>철광석 — 3번 탭 (25점)</td></tr>
+      <tr><td>🟡</td><td>금광석 — 4번 탭 (50점)</td></tr>
+      <tr><td>💎</td><td>다이아몬드 — 5번 탭 (100점)</td></tr>
+      <tr><td>💚</td><td>에메랄드 — 6번 탭 (200점)</td></tr>
+      <tr><td>⚫</td><td>기반암 — 못 캠</td></tr>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:#aaa;">⛏️ 목나무 곡괭이 무료 | 돌·철·금·다이아 곡괭이는 광물 모아서 해금!</p>
+  <button id="start-btn">게임 시작!</button>
+</div>
+
+<!-- Header -->
+<div id="header">
+  <h1>⛏️ 광물 캐기</h1>
+  <div id="stats">
+    <div class="stat">
+      <span class="stat-label">점수</span>
+      <span class="stat-val" id="score-val">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">목숨</span>
+      <span class="stat-val" id="lives-val">❤️❤️❤️</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">시간</span>
+      <span class="stat-val" id="timer-val">90</span>
+    </div>
+  </div>
+</div>
+
+<!-- Depth bar -->
+<div id="depth-bar">
+  <span id="depth-label">⬇️ 현재 깊이</span>
+  <span id="depth-val">지표면</span>
+</div>
+
+<!-- Game wrap -->
+<div id="game-wrap">
+  <div id="grid-container">
+    <div id="grid"></div>
+    <div id="inventory"></div>
+  </div>
+</div>
+
+<!-- Pickaxe bar -->
+<div id="pickaxe-bar">
+  <button class="pick-btn selected" data-pick="wood" title="목나무 곡괭이 (무료)">
+    <span class="pick-icon">🪵</span>
+    <span>목나무</span>
+  </button>
+  <button class="pick-btn" data-pick="stone" disabled title="석탄 3개 필요">
+    <span class="pick-icon">🪨</span>
+    <span>돌</span>
+  </button>
+  <button class="pick-btn" data-pick="iron" disabled title="철 5개 필요">
+    <span class="pick-icon">⚙️</span>
+    <span>철</span>
+  </button>
+  <button class="pick-btn" data-pick="gold" disabled title="금 3개 필요">
+    <span class="pick-icon">🏅</span>
+    <span>금</span>
+  </button>
+  <button class="pick-btn" data-pick="diamond" disabled title="다이아 2개 필요">
+    <span class="pick-icon">💎</span>
+    <span>다이아</span>
+  </button>
+</div>
+
+<!-- Message overlay -->
+<div id="msg-overlay">
+  <div id="msg-box">
+    <h2 id="msg-title">게임 종료!</h2>
+    <p id="msg-body">최종 점수: 0</p>
+    <button id="msg-btn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// Constants & Config
+// ═══════════════════════════════════════════════
+const COLS = 5;
+const ROWS = 4;
+const TOTAL = COLS * ROWS;
+const GAME_TIME = 90; // seconds
+
+// Pickaxe power (hits to break stone-type blocks)
+const PICK_POWER = { wood: 1, stone: 2, iron: 3, gold: 4, diamond: 5 };
+
+// Block definitions: [type, emoji, hp, class, pointsIfOre, minDepth]
+// hp = hits required to break (with wood pickaxe)
+const BLOCK_DEFS = {
+  dirt:    { emoji: '🟫', hp: 1, cls: 'b-dirt',    ore: false, points: 0,   minDepth: 0  },
+  stone:   { emoji: '🪨', hp: 2, cls: 'b-stone',   ore: false, points: 2,   minDepth: 0  },
+  deep:    { emoji: '🪨', hp: 3, cls: 'b-deep',    ore: false, points: 3,   minDepth: 3  },
+  coal:    { emoji: '⬛', hp: 2, cls: 'b-coal',    ore: true,  points: 10,  minDepth: 1  },
+  iron:    { emoji: '🟤', hp: 3, cls: 'b-iron',    ore: true,  points: 25,  minDepth: 2  },
+  gold:    { emoji: '🟡', hp: 4, cls: 'b-gold',    ore: true,  points: 50,  minDepth: 3  },
+  diamond: { emoji: '💎', hp: 5, cls: 'b-diamond', ore: true,  points: 100, minDepth: 5  },
+  emerald: { emoji: '💚', hp: 6, cls: 'b-emerald', ore: true,  points: 200, minDepth: 7  },
+  bedrock: { emoji: '⬛', hp: 999, cls: 'b-bedrock', ore: false, points: 0, minDepth: 999 },
+};
+
+const ORE_TYPES  = ['coal','iron','gold','diamond','emerald'];
+const FILL_TYPES = ['dirt','stone','deep'];
+
+// Depth layers → which blocks can appear
+// depth 0-1: dirt + stone + coal
+// depth 2-4: stone + deep + coal + iron
+// depth 5-7: deep + coal + iron + gold + diamond
+// depth 8+:  deep + iron + gold + diamond + emerald
+function blockPoolForDepth(depth) {
+  if (depth <= 1) return ['dirt','dirt','stone','stone','coal'];
+  if (depth <= 4) return ['stone','stone','deep','coal','iron'];
+  if (depth <= 7) return ['deep','deep','coal','iron','gold','diamond'];
+  return ['deep','iron','gold','diamond','emerald'];
+}
+
+const DEPTH_NAMES = [
+  '지표면','깊이 1층','깊이 2층','깊이 3층','깊이 4층',
+  '깊이 5층','깊이 6층','깊이 7층','심층부','심층부','심층부',
+];
+
+// Pickaxe unlock requirements (inventory counts)
+const PICK_UNLOCK = {
+  stone:   { coal: 3 },
+  iron:    { iron: 5 },
+  gold:    { gold: 3 },
+  diamond: { diamond: 2 },
+};
+
+// ═══════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════
+let score = 0;
+let lives = 3;
+let timeLeft = GAME_TIME;
+let depth = 0;
+let currentPick = 'wood';
+let timerInterval = null;
+let gameActive = false;
+
+// Board: array of {type, hp, maxHp, el}
+let board = [];
+
+// Inventory: counts of ores
+let inventory = { coal: 0, iron: 0, gold: 0, diamond: 0, emerald: 0 };
+
+// Broken count in current layer (to trigger depth increase)
+let brokenInLayer = 0;
+const BREAK_TO_ADVANCE = 10; // break 10 blocks to go deeper
+
+// ═══════════════════════════════════════════════
+// DOM refs
+// ═══════════════════════════════════════════════
+const gridEl    = document.getElementById('grid');
+const invEl     = document.getElementById('inventory');
+const scoreEl   = document.getElementById('score-val');
+const livesEl   = document.getElementById('lives-val');
+const timerEl   = document.getElementById('timer-val');
+const depthEl   = document.getElementById('depth-val');
+const msgOverlay = document.getElementById('msg-overlay');
+const msgTitle  = document.getElementById('msg-title');
+const msgBody   = document.getElementById('msg-body');
+const msgBtn    = document.getElementById('msg-btn');
+const pickBtns  = document.querySelectorAll('.pick-btn');
+const introEl   = document.getElementById('intro');
+const startBtn  = document.getElementById('start-btn');
+
+// ═══════════════════════════════════════════════
+// Utility
+// ═══════════════════════════════════════════════
+function randItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function livesStr(n) {
+  return '❤️'.repeat(Math.max(n, 0)) + '🖤'.repeat(Math.max(3 - n, 0));
+}
+
+function pickHits(pick, blockType) {
+  // Power: diamond pick can break emerald in 1 hit, etc.
+  const power = PICK_POWER[pick];
+  const baseHp = BLOCK_DEFS[blockType].hp;
+  return Math.max(1, Math.ceil(baseHp / power));
+}
+
+// ═══════════════════════════════════════════════
+// Board generation
+// ═══════════════════════════════════════════════
+function generateBlock(depth) {
+  const pool = blockPoolForDepth(depth);
+  // Small chance of rare ore
+  let r = Math.random();
+  let type;
+  if (depth >= 8 && r < 0.08) type = 'emerald';
+  else if (depth >= 5 && r < 0.10) type = 'diamond';
+  else type = randItem(pool);
+  return type;
+}
+
+function buildBoard() {
+  board = [];
+  gridEl.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const type = generateBlock(depth);
+    const def  = BLOCK_DEFS[type];
+    const maxHp = def.hp;
+    const el = document.createElement('div');
+    el.className = `block ${def.cls}`;
+    el.textContent = def.emoji;
+    el.dataset.idx = i;
+    el.addEventListener('click', () => onBlockClick(i));
+    gridEl.appendChild(el);
+    board.push({ type, hp: maxHp, maxHp, el });
+  }
+}
+
+function replaceBlock(idx) {
+  const type = generateBlock(depth);
+  const def  = BLOCK_DEFS[type];
+  const el   = board[idx].el;
+  el.className = `block ${def.cls}`;
+  el.textContent = def.emoji;
+  el.classList.remove('crack1', 'crack2');
+  board[idx] = { type, hp: def.hp, maxHp: def.hp, el };
+}
+
+// ═══════════════════════════════════════════════
+// Block click
+// ═══════════════════════════════════════════════
+function onBlockClick(idx) {
+  if (!gameActive) return;
+  const b = board[idx];
+  if (!b) return;
+  if (b.type === 'bedrock') return;
+
+  // Apply pickaxe power
+  const dmg = PICK_POWER[currentPick];
+  b.hp -= dmg;
+
+  // Flash animation
+  b.el.classList.remove('hit-anim');
+  void b.el.offsetWidth; // reflow
+  b.el.classList.add('hit-anim');
+
+  // Crack overlay
+  const pct = b.hp / b.maxHp;
+  b.el.classList.remove('crack1', 'crack2');
+  if (pct <= 0.66 && pct > 0.33) b.el.classList.add('crack1');
+  else if (pct <= 0.33 && b.hp > 0) b.el.classList.add('crack2');
+
+  if (b.hp <= 0) {
+    onBlockBreak(idx);
+  }
+}
+
+function onBlockBreak(idx) {
+  const b = board[idx];
+  const def = BLOCK_DEFS[b.type];
+
+  // Score
+  if (def.points > 0) {
+    score += def.points;
+    scoreEl.textContent = score;
+  }
+
+  // Ore collection
+  if (def.ore) {
+    inventory[b.type] = (inventory[b.type] || 0) + 1;
+    spawnOrePopup(b.el, def.emoji);
+    updateInventoryUI();
+    checkPickUnlocks();
+  }
+
+  brokenInLayer++;
+
+  // Depth advance
+  if (brokenInLayer >= BREAK_TO_ADVANCE) {
+    brokenInLayer = 0;
+    depth = Math.min(depth + 1, 10);
+    depthEl.textContent = DEPTH_NAMES[depth] || `깊이 ${depth}층`;
+    // Regenerate board for new depth
+    buildBoard();
+    return;
+  }
+
+  // Replace broken block
+  replaceBlock(idx);
+}
+
+// ═══════════════════════════════════════════════
+// Ore popup
+// ═══════════════════════════════════════════════
+function spawnOrePopup(blockEl, emoji) {
+  const rect = blockEl.getBoundingClientRect();
+  const popup = document.createElement('div');
+  popup.className = 'ore-popup';
+  popup.textContent = emoji;
+  popup.style.left = (rect.left + rect.width / 2 - 16) + 'px';
+  popup.style.top  = (rect.top  - 10) + 'px';
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 950);
+}
+
+// ═══════════════════════════════════════════════
+// Inventory UI
+// ═══════════════════════════════════════════════
+const ORE_EMOJIS = { coal: '⬛', iron: '🟤', gold: '🟡', diamond: '💎', emerald: '💚' };
+
+function updateInventoryUI() {
+  invEl.innerHTML = '';
+  for (const [ore, cnt] of Object.entries(inventory)) {
+    if (cnt === 0) continue;
+    const slot = document.createElement('div');
+    slot.className = 'inv-slot';
+    slot.innerHTML = `<span>${ORE_EMOJIS[ore]}</span><span class="inv-count">×${cnt}</span>`;
+    invEl.appendChild(slot);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// Pickaxe unlocks
+// ═══════════════════════════════════════════════
+function checkPickUnlocks() {
+  for (const [pick, req] of Object.entries(PICK_UNLOCK)) {
+    const btn = document.querySelector(`.pick-btn[data-pick="${pick}"]`);
+    if (!btn) continue;
+    let met = true;
+    for (const [ore, need] of Object.entries(req)) {
+      if ((inventory[ore] || 0) < need) { met = false; break; }
+    }
+    if (met) btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// Pickaxe selection
+// ═══════════════════════════════════════════════
+pickBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.disabled) return;
+    currentPick = btn.dataset.pick;
+    pickBtns.forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+});
+
+// ═══════════════════════════════════════════════
+// Timer
+// ═══════════════════════════════════════════════
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = timeLeft;
+    if (timeLeft <= 10) timerEl.style.color = '#e74c3c';
+    if (timeLeft <= 0) endGame(false);
+  }, 1000);
+}
+
+// ═══════════════════════════════════════════════
+// Game flow
+// ═══════════════════════════════════════════════
+function startGame() {
+  score = 0;
+  lives = 3;
+  timeLeft = GAME_TIME;
+  depth = 0;
+  brokenInLayer = 0;
+  currentPick = 'wood';
+  inventory = { coal: 0, iron: 0, gold: 0, diamond: 0, emerald: 0 };
+
+  scoreEl.textContent = '0';
+  livesEl.textContent = livesStr(3);
+  timerEl.textContent = GAME_TIME;
+  timerEl.style.color = '#3de8a0';
+  depthEl.textContent = '지표면';
+
+  // Reset pickaxe buttons
+  pickBtns.forEach(b => {
+    b.classList.remove('selected');
+    b.disabled = (b.dataset.pick !== 'wood');
+  });
+  document.querySelector('.pick-btn[data-pick="wood"]').classList.add('selected');
+
+  invEl.innerHTML = '';
+  msgOverlay.classList.remove('show');
+
+  buildBoard();
+  gameActive = true;
+  clearInterval(timerInterval);
+  startTimer();
+}
+
+function endGame(won) {
+  gameActive = false;
+  clearInterval(timerInterval);
+
+  // Summary
+  const oreLines = Object.entries(inventory)
+    .filter(([, c]) => c > 0)
+    .map(([ore, c]) => `${ORE_EMOJIS[ore]} ${ore} × ${c}`)
+    .join('  ');
+
+  msgTitle.textContent = won ? '🎉 성공!' : '⛏️ 게임 종료!';
+  msgBody.innerHTML =
+    `<strong>점수: ${score}</strong><br>
+     <span style="font-size:0.85rem;color:#aaa;">도달 깊이: ${DEPTH_NAMES[depth] || '심층부'}</span><br>
+     ${oreLines ? '<br>' + oreLines : ''}`;
+  msgOverlay.classList.add('show');
+}
+
+msgBtn.addEventListener('click', startGame);
+startBtn.addEventListener('click', () => {
+  introEl.style.display = 'none';
+  startGame();
+});
+</script>
+</body>
+</html>

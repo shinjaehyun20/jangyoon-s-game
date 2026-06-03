@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="16" fill="#1a0f0a"/>
+  <!-- Ground blocks -->
+  <rect x="0"  y="70" width="24" height="24" rx="3" fill="#8B6040"/>
+  <rect x="24" y="70" width="24" height="24" rx="3" fill="#7a7a7a"/>
+  <rect x="48" y="70" width="24" height="24" rx="3" fill="#8B6040"/>
+  <rect x="72" y="70" width="24" height="24" rx="3" fill="#4a4a4a"/>
+  <rect x="96" y="70" width="24" height="24" rx="3" fill="#7a7a7a"/>
+  <!-- Deep blocks -->
+  <rect x="0"  y="94" width="24" height="26" rx="3" fill="#4a4a5a"/>
+  <rect x="24" y="94" width="24" height="26" rx="3" fill="#205060"/>
+  <rect x="48" y="94" width="24" height="26" rx="3" fill="#4a4a5a"/>
+  <rect x="72" y="94" width="24" height="26" rx="3" fill="#8a7a20"/>
+  <rect x="96" y="94" width="24" height="26" rx="3" fill="#4a4a5a"/>
+  <!-- Diamond gem in center deep block -->
+  <text x="60" y="114" font-size="18" text-anchor="middle">💎</text>
+  <!-- Coal emoji -->
+  <text x="36" y="114" font-size="18" text-anchor="middle">⬛</text>
+  <!-- Gold -->
+  <text x="84" y="114" font-size="18" text-anchor="middle">🟡</text>
+  <!-- Pickaxe big -->
+  <text x="60" y="56" font-size="40" text-anchor="middle">⛏️</text>
+  <!-- Title -->
+  <text x="60" y="72" font-size="9" fill="#f5c842" text-anchor="middle" font-family="sans-serif">광물 캐기</text>
+</svg>

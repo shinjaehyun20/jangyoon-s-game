@@ -758,5 +758,13 @@
     "description": "위에서 떨어지는 사과를 바구니로 받아요! 터치로 바구니를 좌우로 움직이세요.",
     "thumbnail": "apple-catch-basket/thumb.svg",
     "path": "apple-catch-basket/index.html"
+  },
+  {
+    "id": "mine-craft-dig",
+    "title": "Mine & Craft Dig",
+    "title_ko": "⛏️ 광물 캐기",
+    "description": "블록을 탭해서 광물을 캐요! 깊이 파고들수록 석탄→철→금→다이아몬드→에메랄드가 나와요. 곡괭이를 업그레이드해서 더 빨리 캐세요!",
+    "thumbnail": "mine-craft-dig/thumb.svg",
+    "path": "mine-craft-dig/index.html"
   }
 ]
