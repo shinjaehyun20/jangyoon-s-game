@@ -726,8 +726,7 @@
     "description": "화산에서 솟는 용암 돌멩이를 피해 플랫폼을 좌우로 점프! 생존 도전",
     "thumbnail": "volcano-hop/thumb.svg",
     "path": "volcano-hop/index.html"
-  }
-,
+  },
   {
     "id": "leaf-catch",
     "title": "Leaf Catch",
@@ -743,5 +742,21 @@
     "description": "등대를 회전시켜 불빛으로 밤바다 배들을 항구로 안내해요!",
     "thumbnail": "lighthouse-guide/thumb.svg",
     "path": "lighthouse-guide/index.html"
+  },
+  {
+    "id": "shape-trace",
+    "title": "Shape Trace",
+    "title_ko": "도형 따라 그리기",
+    "description": "점선으로 그려진 도형을 손가락으로 따라 그려 완성해요! 별, 하트, 동그라미 등 6가지 도형",
+    "thumbnail": "shape-trace/thumb.svg",
+    "path": "shape-trace/index.html"
+  },
+  {
+    "id": "apple-catch-basket",
+    "title": "Apple Catch Basket",
+    "title_ko": "사과 받기",
+    "description": "위에서 떨어지는 사과를 바구니로 받아요! 터치로 바구니를 좌우로 움직이세요.",
+    "thumbnail": "apple-catch-basket/thumb.svg",
+    "path": "apple-catch-basket/index.html"
   }
 ]

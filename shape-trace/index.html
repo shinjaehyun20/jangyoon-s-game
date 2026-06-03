@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>도형 따라 그리기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #FFF8F0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    font-family: 'Nanum Gothic', sans-serif;
+    overflow: hidden; touch-action: none;
+    user-select: none;
+  }
+  #header {
+    width: 100%; padding: 12px 16px 4px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  #shape-name {
+    font-size: 2rem; font-weight: 800;
+    color: #444; letter-spacing: 0.02em;
+  }
+  #round-badge {
+    position: absolute; right: 16px; top: 12px;
+    background: #FFD166; border-radius: 999px;
+    padding: 4px 14px; font-size: 1rem; font-weight: 700;
+    color: #333;
+  }
+  #hint {
+    font-size: 1rem; color: #999; margin-bottom: 4px;
+    letter-spacing: 0.01em;
+  }
+  #canvas-wrap {
+    position: relative;
+    width: min(90vw, 90vh - 160px);
+    aspect-ratio: 1 / 1;
+  }
+  canvas {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 24px;
+  }
+  #bg-canvas { background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+  #draw-canvas { cursor: crosshair; }
+  #progress-bar-wrap {
+    width: min(90vw, 90vh - 160px);
+    height: 18px; background: #eee;
+    border-radius: 999px; margin-top: 12px;
+    overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #06D6A0, #118AB2);
+    border-radius: 999px;
+    transition: width 0.15s;
+  }
+  #feedback {
+    margin-top: 10px;
+    font-size: 1.6rem; font-weight: 800;
+    color: #06D6A0; min-height: 2rem;
+    transition: opacity 0.3s;
+    text-shadow: 0 2px 8px rgba(6,214,160,0.25);
+  }
+  #btn-area {
+    margin-top: 12px;
+    display: flex; gap: 12px;
+  }
+  button {
+    padding: 14px 32px; border: none; border-radius: 999px;
+    font-size: 1.25rem; font-weight: 700;
+    cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+  button:active { transform: scale(0.95); }
+  #btn-next { background: #06D6A0; color: #fff; display: none; }
+  #btn-retry { background: #FFD166; color: #333; }
+  #star-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 999;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="shape-name">별</div>
+  <div id="round-badge">1 / 6</div>
+</div>
+<div id="hint">점선을 손가락으로 따라 그려요!</div>
+<div id="canvas-wrap">
+  <canvas id="bg-canvas"></canvas>
+  <canvas id="draw-canvas"></canvas>
+</div>
+<div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+<div id="feedback"></div>
+<div id="btn-area">
+  <button id="btn-retry" onclick="resetDraw()">다시</button>
+  <button id="btn-next" onclick="nextShape()">다음 ➜</button>
+</div>
+<canvas id="star-overlay"></canvas>
+
+<script>
+/* ==================== 도형 정의 ==================== */
+const SHAPES = [
+  {
+    name: '별', color: '#FFD166',
+    path: starPath
+  },
+  {
+    name: '하트', color: '#EF476F',
+    path: heartPath
+  },
+  {
+    name: '동그라미', color: '#06D6A0',
+    path: circlePath
+  },
+  {
+    name: '세모', color: '#118AB2',
+    path: trianglePath
+  },
+  {
+    name: '네모', color: '#9B5DE5',
+    path: squarePath
+  },
+  {
+    name: '다이아몬드', color: '#FF6B6B',
+    path: diamondPath
+  }
+];
+
+/* ==================== 경로 함수들 ==================== */
+function starPath(cx, cy, r) {
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const angle = (Math.PI / 5) * i - Math.PI / 2;
+    const rad = i % 2 === 0 ? r : r * 0.42;
+    pts.push({ x: cx + Math.cos(angle) * rad, y: cy + Math.sin(angle) * rad });
+  }
+  return pts;
+}
+function heartPath(cx, cy, r) {
+  const pts = [];
+  const n = 64;
+  for (let i = 0; i < n; i++) {
+    const t = (2 * Math.PI * i) / n - Math.PI / 2;
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+    const scale = r / 16.5;
+    pts.push({ x: cx + x * scale, y: cy + y * scale });
+  }
+  return pts;
+}
+function circlePath(cx, cy, r) {
+  const pts = [];
+  const n = 64;
+  for (let i = 0; i < n; i++) {
+    const angle = (2 * Math.PI * i) / n - Math.PI / 2;
+    pts.push({ x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r });
+  }
+  return pts;
+}
+function trianglePath(cx, cy, r) {
+  return [
+    { x: cx, y: cy - r },
+    { x: cx + r * Math.cos(Math.PI / 6), y: cy + r * 0.5 },
+    { x: cx - r * Math.cos(Math.PI / 6), y: cy + r * 0.5 },
+    { x: cx, y: cy - r }
+  ];
+}
+function squarePath(cx, cy, r) {
+  const h = r * 0.92;
+  return [
+    { x: cx - h, y: cy - h },
+    { x: cx + h, y: cy - h },
+    { x: cx + h, y: cy + h },
+    { x: cx - h, y: cy + h },
+    { x: cx - h, y: cy - h }
+  ];
+}
+function diamondPath(cx, cy, r) {
+  return [
+    { x: cx, y: cy - r },
+    { x: cx + r * 0.65, y: cy },
+    { x: cx, y: cy + r },
+    { x: cx - r * 0.65, y: cy },
+    { x: cx, y: cy - r }
+  ];
+}
+
+/* ==================== 캔버스 셋업 ==================== */
+const bgCanvas = document.getElementById('bg-canvas');
+const drawCanvas = document.getElementById('draw-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+const drawCtx = drawCanvas.getContext('2d');
+
+let SIZE = 0;
+let shapeIdx = 0;
+let pathPoints = [];
+let drawnProgress = 0;   // 0 ~ 1
+let isDrawing = false;
+let lastPoint = null;
+let nearestIdx = 0;      // 경로 상 가장 가까운 인덱스
+let covered = [];        // 각 세그먼트 커버 여부
+let completed = false;
+
+function resize() {
+  const wrap = document.getElementById('canvas-wrap');
+  const w = wrap.clientWidth;
+  bgCanvas.width = drawCanvas.width = w;
+  bgCanvas.height = drawCanvas.height = w;
+  SIZE = w;
+  renderShape();
+}
+
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(resize, 200));
+
+/* ==================== 도형 렌더 ==================== */
+function renderShape() {
+  if (SIZE === 0) return;
+  const s = SHAPES[shapeIdx];
+  const cx = SIZE / 2, cy = SIZE / 2, r = SIZE * 0.37;
+
+  pathPoints = s.path(cx, cy, r);
+  covered = new Array(pathPoints.length - 1).fill(false);
+  drawnProgress = 0;
+  nearestIdx = 0;
+  completed = false;
+  lastPoint = null;
+
+  document.getElementById('shape-name').textContent = s.name;
+  document.getElementById('round-badge').textContent = `${shapeIdx + 1} / ${SHAPES.length}`;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('btn-retry').style.display = '';
+  document.getElementById('progress-bar').style.width = '0%';
+
+  drawBg(s);
+  clearDraw();
+}
+
+function drawBg(s) {
+  bgCtx.clearRect(0, 0, SIZE, SIZE);
+  // 점선 도형
+  bgCtx.save();
+  bgCtx.setLineDash([14, 10]);
+  bgCtx.lineDashOffset = 0;
+  bgCtx.lineWidth = SIZE * 0.025;
+  bgCtx.strokeStyle = s.color + 'AA';
+  bgCtx.lineJoin = 'round';
+  bgCtx.lineCap = 'round';
+  bgCtx.beginPath();
+  pathPoints.forEach((p, i) => {
+    if (i === 0) bgCtx.moveTo(p.x, p.y);
+    else bgCtx.lineTo(p.x, p.y);
+  });
+  bgCtx.stroke();
+  bgCtx.restore();
+
+  // 시작점 강조 (큰 원)
+  bgCtx.save();
+  bgCtx.beginPath();
+  bgCtx.arc(pathPoints[0].x, pathPoints[0].y, SIZE * 0.045, 0, Math.PI * 2);
+  bgCtx.fillStyle = s.color;
+  bgCtx.fill();
+  bgCtx.restore();
+}
+
+function clearDraw() {
+  drawCtx.clearRect(0, 0, SIZE, SIZE);
+}
+
+/* ==================== 터치/마우스 이벤트 ==================== */
+function getPos(e) {
+  const rect = drawCanvas.getBoundingClientRect();
+  const scaleX = SIZE / rect.width;
+  const scaleY = SIZE / rect.height;
+  let cx, cy;
+  if (e.touches && e.touches.length > 0) {
+    cx = (e.touches[0].clientX - rect.left) * scaleX;
+    cy = (e.touches[0].clientY - rect.top) * scaleY;
+  } else {
+    cx = (e.clientX - rect.left) * scaleX;
+    cy = (e.clientY - rect.top) * scaleY;
+  }
+  return { x: cx, y: cy };
+}
+
+function dist(a, b) {
+  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+}
+
+function onStart(e) {
+  e.preventDefault();
+  if (completed) return;
+  isDrawing = true;
+  lastPoint = getPos(e);
+  nearestIdx = 0;
+}
+
+function onMove(e) {
+  e.preventDefault();
+  if (!isDrawing || completed) return;
+  const pos = getPos(e);
+  const s = SHAPES[shapeIdx];
+  const SNAP = SIZE * 0.13;  // 경로 근처 여부 판정 반경
+
+  // 현재 위치에서 가장 가까운 경로 포인트 탐색 (nearestIdx 주변 ±15)
+  let bestDist = Infinity;
+  let bestIdx = nearestIdx;
+  const search = 20;
+  const start = Math.max(0, nearestIdx - 2);
+  const end = Math.min(pathPoints.length - 1, nearestIdx + search);
+  for (let i = start; i <= end; i++) {
+    const d = dist(pos, pathPoints[i]);
+    if (d < bestDist) { bestDist = d; bestIdx = i; }
+  }
+
+  if (bestDist < SNAP) {
+    // 경로 근처: 따라 그리기 인정
+    if (bestIdx > nearestIdx) {
+      for (let i = nearestIdx; i < bestIdx && i < covered.length; i++) {
+        covered[i] = true;
+      }
+      nearestIdx = bestIdx;
+    }
+
+    // 색 채워진 라인 그리기
+    if (lastPoint) {
+      drawCtx.save();
+      drawCtx.lineWidth = SIZE * 0.032;
+      drawCtx.lineCap = 'round';
+      drawCtx.lineJoin = 'round';
+      drawCtx.strokeStyle = s.color;
+      drawCtx.shadowColor = s.color;
+      drawCtx.shadowBlur = SIZE * 0.018;
+      drawCtx.beginPath();
+      drawCtx.moveTo(lastPoint.x, lastPoint.y);
+      drawCtx.lineTo(pos.x, pos.y);
+      drawCtx.stroke();
+      drawCtx.restore();
+    }
+  }
+
+  lastPoint = pos;
+
+  // 진행률 계산
+  const done = covered.filter(Boolean).length;
+  drawnProgress = done / covered.length;
+  document.getElementById('progress-bar').style.width = (drawnProgress * 100).toFixed(1) + '%';
+
+  // 완성 판정: 80% 이상 커버
+  if (drawnProgress >= 0.80 && !completed) {
+    onComplete();
+  }
+}
+
+function onEnd(e) {
+  e.preventDefault();
+  isDrawing = false;
+}
+
+drawCanvas.addEventListener('touchstart', onStart, { passive: false });
+drawCanvas.addEventListener('touchmove', onMove, { passive: false });
+drawCanvas.addEventListener('touchend', onEnd, { passive: false });
+drawCanvas.addEventListener('mousedown', onStart);
+drawCanvas.addEventListener('mousemove', onMove);
+drawCanvas.addEventListener('mouseup', onEnd);
+
+/* ==================== 완성 효과 ==================== */
+function onComplete() {
+  completed = true;
+  const s = SHAPES[shapeIdx];
+
+  // 도형 전체 색칠 (채우기)
+  bgCtx.save();
+  bgCtx.globalAlpha = 0.25;
+  bgCtx.fillStyle = s.color;
+  bgCtx.beginPath();
+  pathPoints.forEach((p, i) => {
+    if (i === 0) bgCtx.moveTo(p.x, p.y);
+    else bgCtx.lineTo(p.x, p.y);
+  });
+  bgCtx.closePath();
+  bgCtx.fill();
+  bgCtx.restore();
+
+  // 별 파티클
+  shootStars(s.color);
+
+  // 피드백 텍스트
+  const msgs = ['잘했어요! 🌟', '완벽해요! ✨', '대단해요! 🎉', '최고야! 💛'];
+  document.getElementById('feedback').textContent = msgs[shapeIdx % msgs.length];
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('btn-next').style.display = '';
+  document.getElementById('btn-retry').style.display = 'none';
+}
+
+/* ==================== 별 파티클 ==================== */
+function shootStars(color) {
+  const ov = document.getElementById('star-overlay');
+  ov.width = window.innerWidth;
+  ov.height = window.innerHeight;
+  ov.style.display = 'block';
+  const ctx = ov.getContext('2d');
+  const particles = [];
+  const cx = window.innerWidth / 2, cy = window.innerHeight * 0.45;
+  for (let i = 0; i < 28; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 3 + Math.random() * 5;
+    particles.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      r: 6 + Math.random() * 10,
+      alpha: 1,
+      color: [color, '#FFD166', '#06D6A0', '#EF476F'][Math.floor(Math.random() * 4)]
+    });
+  }
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, ov.width, ov.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.vy += 0.18;
+      p.alpha -= 0.022;
+      if (p.alpha < 0) p.alpha = 0;
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      drawStar5(ctx, p.x, p.y, p.r);
+      ctx.fill();
+      ctx.restore();
+    });
+    frame++;
+    if (frame < 80) requestAnimationFrame(animate);
+    else ov.style.display = 'none';
+  }
+  animate();
+}
+
+function drawStar5(ctx, cx, cy, r) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const angle = (Math.PI / 5) * i - Math.PI / 2;
+    const rad = i % 2 === 0 ? r : r * 0.45;
+    const x = cx + Math.cos(angle) * rad;
+    const y = cy + Math.sin(angle) * rad;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+
+/* ==================== 네비게이션 ==================== */
+function resetDraw() {
+  clearDraw();
+  covered.fill(false);
+  drawnProgress = 0;
+  nearestIdx = 0;
+  completed = false;
+  lastPoint = null;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('btn-retry').style.display = '';
+  document.getElementById('progress-bar').style.width = '0%';
+  drawBg(SHAPES[shapeIdx]);
+}
+
+function nextShape() {
+  shapeIdx = (shapeIdx + 1) % SHAPES.length;
+  clearDraw();
+  renderShape();
+}
+
+/* ==================== 초기화 ==================== */
+window.addEventListener('load', () => {
+  setTimeout(resize, 50);
+});
+</script>
+</body>
+</html>

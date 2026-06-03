@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "apple-catch-basket",
+        "label": "🍎 사과 바구니",
+        "path": "apple-catch-basket/index.html"
+      },
+      {
+        "id": "shape-trace",
+        "label": "✏️ 도형 따라 그리기",
+        "path": "shape-trace/index.html"
+      },
+      {
         "id": "leaf-catch",
         "label": "🍂 낙엽 잡기",
         "path": "leaf-catch/index.html"
