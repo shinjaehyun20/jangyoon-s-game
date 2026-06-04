@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>대포 쏘기</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --sky: #16213e;
+      --accent: #f5a623;
+      --btn: #e94560;
+      --text: #ffffff;
+      --ground: #2d5a27;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px;
+      gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5.5vw, 26px);
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 6px 14px;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      text-align: center;
+    }
+    .hud-label {
+      font-size: 10px;
+      opacity: 0.6;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .hud-val {
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .hud-val.lives { color: #ff6b6b; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #0f3460 0%, #16213e 60%, #1a3a12 85%, #2d5a27 100%);
+      cursor: none;
+      touch-action: none;
+    }
+    /* 게임 캔버스 */
+    #gameCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    /* 조준 크로스헤어 */
+    #crosshair {
+      position: absolute;
+      width: 40px; height: 40px;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+    #crosshair::before, #crosshair::after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 200, 50, 0.9);
+      border-radius: 2px;
+    }
+    #crosshair::before {
+      width: 2px; height: 100%;
+      left: 50%; top: 0;
+      transform: translateX(-50%);
+    }
+    #crosshair::after {
+      width: 100%; height: 2px;
+      top: 50%; left: 0;
+      transform: translateY(-50%);
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      padding: 0 2px;
+    }
+    footer small { font-size: 11px; opacity: 0.5; }
+    .home-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* 오버레이 공통 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f3460 100%);
+      border: 2px solid rgba(245, 166, 35, 0.4);
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 340px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 28px);
+      margin-bottom: 12px;
+      font-weight: 900;
+    }
+    .overlay-card p {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--btn) 0%, #c73652 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      max-width: 220px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 16px rgba(233,69,96,0.5);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(233,69,96,0.3); }
+    .result-score {
+      font-size: clamp(44px, 14vw, 60px);
+      font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0 4px;
+      text-shadow: 0 0 20px rgba(245,166,35,0.6);
+    }
+    .stars {
+      font-size: 28px;
+      margin: 8px 0 16px;
+      letter-spacing: 4px;
+    }
+    .best-badge {
+      display: inline-block;
+      background: rgba(245,166,35,0.15);
+      border: 1px solid rgba(245,166,35,0.4);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    /* 폭발 파티클 */
+    .explosion {
+      position: absolute;
+      pointer-events: none;
+      font-size: 24px;
+      animation: explode 0.6s ease-out forwards;
+      transform-origin: center;
+    }
+    @keyframes explode {
+      0%   { transform: scale(0.3); opacity: 1; }
+      50%  { transform: scale(1.4); opacity: 1; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+    /* 점수 팝업 */
+    .score-pop {
+      position: absolute;
+      pointer-events: none;
+      font-size: 20px;
+      font-weight: 900;
+      color: #ffe066;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+      animation: scoreUp 0.8s ease-out forwards;
+    }
+    @keyframes scoreUp {
+      0%   { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-60px) scale(1.3); opacity: 0; }
+    }
+    /* 미스 표시 */
+    .miss-flash {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,50,50,0.2);
+      pointer-events: none;
+      border-radius: 16px;
+      animation: flashRed 0.4s ease-out forwards;
+    }
+    @keyframes flashRed {
+      0%   { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>💣 대포 쏘기</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <div class="hud-label">점수</div>
+        <div class="hud-val" id="scoreDisplay">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">남은 시간</div>
+        <div class="hud-val" id="timerDisplay">30</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">목숨</div>
+        <div class="hud-val lives" id="livesDisplay">❤️❤️❤️</div>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <canvas id="gameCanvas"></canvas>
+      <div id="crosshair"></div>
+    </div>
+
+    <footer>
+      <small>💡 몬스터를 탭해서 맞춰요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>💣 대포 쏘기</h2>
+      <p>하늘에서 날아오는<br>몬스터를 <strong>탭</strong>해서 맞춰요!<br><br>빗나가면 목숨이 줄어요 😨<br>30초 안에 최대한 많이!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 종료 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="stars" id="starDisplay">⭐⭐⭐</div>
+      <div class="best-badge" id="bestBadge">최고 기록: 0</div>
+      <p id="resultMsg">잘했어요!</p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── CONFIG ── */
+    const CONFIG = {
+      GAME_DURATION: 30,       // 초
+      LIVES: 3,
+      SPAWN_INTERVAL_START: 1400, // ms
+      SPAWN_INTERVAL_MIN: 600,
+      SPAWN_INTERVAL_DECAY: 50,   // 매 히트마다 줄임
+      MONSTER_SPEED_MIN: 0.8,
+      MONSTER_SPEED_MAX: 2.2,
+      MONSTER_SIZE_MIN: 38,
+      MONSTER_SIZE_MAX: 62,
+      CANNON_COOLDOWN: 180,    // ms (연속 탭 방지)
+      STORAGE_KEY: 'cannon-ball_best',
+    };
+
+    const MONSTERS = ['👾','👻','🤖','💀','🦎','🐲','🕷️','🦑','👽','🎃'];
+    const HITS     = ['💥','✨','🌟','⚡','🔥'];
+    const MISS_MSG = ['앗! 빗나갔어요', '아쉽!', '다시!', '조심해요!'];
+
+    /* ── STATE ── */
+    let state = {
+      score: 0,
+      lives: CONFIG.LIVES,
+      timeLeft: CONFIG.GAME_DURATION,
+      running: false,
+      monsters: [],        // {x, y, vx, vy, size, emoji, id, hit}
+      nextId: 0,
+      spawnInterval: CONFIG.SPAWN_INTERVAL_START,
+      lastShot: 0,
+    };
+
+    let timerId = null;
+    let spawnerId = null;
+    let animId = null;
+    let lastTimestamp = 0;
+
+    /* ── DOM ── */
+    const canvas      = document.getElementById('gameCanvas');
+    const ctx         = canvas.getContext('2d');
+    const crosshair   = document.getElementById('crosshair');
+    const gameArea    = document.getElementById('gameArea');
+    const scoreDisp   = document.getElementById('scoreDisplay');
+    const timerDisp   = document.getElementById('timerDisplay');
+    const livesDisp   = document.getElementById('livesDisplay');
+    const startOverlay= document.getElementById('startOverlay');
+    const endOverlay  = document.getElementById('endOverlay');
+    const finalScore  = document.getElementById('finalScore');
+    const starDisplay = document.getElementById('starDisplay');
+    const bestBadge   = document.getElementById('bestBadge');
+    const resultMsg   = document.getElementById('resultMsg');
+    const startBtn    = document.getElementById('startBtn');
+    const restartBtn  = document.getElementById('restartBtn');
+
+    /* ── CANVAS 리사이즈 ── */
+    function resizeCanvas() {
+      const rect = gameArea.getBoundingClientRect();
+      canvas.width  = rect.width;
+      canvas.height = rect.height;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    /* ── 베스트 스코어 ── */
+    function getBest() {
+      return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    }
+    function saveBest(score) {
+      const prev = getBest();
+      if (score > prev) localStorage.setItem(CONFIG.STORAGE_KEY, String(score));
+    }
+
+    /* ── HUD 갱신 ── */
+    function updateHUD() {
+      scoreDisp.textContent = state.score;
+      timerDisp.textContent = state.timeLeft;
+      const hearts = ['','❤️','❤️❤️','❤️❤️❤️'];
+      livesDisp.textContent = hearts[Math.max(0, state.lives)] || '';
+    }
+
+    /* ── 몬스터 스폰 ── */
+    function spawnMonster() {
+      if (!state.running) return;
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const size = CONFIG.MONSTER_SIZE_MIN + Math.random() * (CONFIG.MONSTER_SIZE_MAX - CONFIG.MONSTER_SIZE_MIN);
+      // 상단/좌측/우측 랜덤 진입
+      const edge = Math.floor(Math.random() * 3); // 0=위, 1=왼, 2=오
+      let x, y, vx, vy;
+      const spd = CONFIG.MONSTER_SPEED_MIN + Math.random() * (CONFIG.MONSTER_SPEED_MAX - CONFIG.MONSTER_SPEED_MIN);
+      const cx = cw * (0.2 + Math.random() * 0.6);
+      const cy = ch * (0.5 + Math.random() * 0.3);
+
+      if (edge === 0) {
+        x = Math.random() * (cw - size * 2) + size;
+        y = -size;
+        const angle = Math.atan2(cy - y, cx - x);
+        vx = Math.cos(angle) * spd;
+        vy = Math.sin(angle) * spd;
+      } else if (edge === 1) {
+        x = -size;
+        y = Math.random() * (ch * 0.6) + ch * 0.05;
+        const angle = Math.atan2(cy - y, cx - x);
+        vx = Math.cos(angle) * spd;
+        vy = Math.sin(angle) * spd;
+      } else {
+        x = cw + size;
+        y = Math.random() * (ch * 0.6) + ch * 0.05;
+        const angle = Math.atan2(cy - y, cx - x);
+        vx = Math.cos(angle) * spd;
+        vy = Math.sin(angle) * spd;
+      }
+
+      state.monsters.push({
+        x, y, vx, vy, size,
+        emoji: MONSTERS[Math.floor(Math.random() * MONSTERS.length)],
+        id: state.nextId++,
+        hit: false,
+        alpha: 1,
+      });
+    }
+
+    /* ── 드로우 ── */
+    function draw(ts) {
+      if (!state.running) return;
+      const dt = ts - lastTimestamp;
+      lastTimestamp = ts;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const ch = canvas.height;
+      const cw = canvas.width;
+
+      // 배경 별
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      // (별은 정적으로 시작할 때 1회 초기화)
+      for (let i = 0; i < starBg.length; i++) {
+        const s = starBg[i];
+        ctx.globalAlpha = s.a;
+        ctx.fillRect(s.x, s.y, s.r, s.r);
+      }
+      ctx.globalAlpha = 1;
+
+      // 대포 (하단 중앙)
+      const cannonX = cw / 2;
+      const cannonY = ch - 20;
+      ctx.font = `${Math.min(40, cw * 0.1)}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🏰', cannonX, cannonY);
+
+      // 몬스터 이동 + 그리기
+      const toRemove = [];
+      for (let i = state.monsters.length - 1; i >= 0; i--) {
+        const m = state.monsters[i];
+        if (m.hit) {
+          m.alpha -= 0.08;
+          if (m.alpha <= 0) { toRemove.push(i); continue; }
+        } else {
+          m.x += m.vx;
+          m.y += m.vy;
+          // 하단 경계 벗어나면 → miss
+          if (m.y > ch + m.size) {
+            toRemove.push(i);
+            if (state.running) onMiss(m.x, m.y > ch ? ch - 20 : m.y);
+            continue;
+          }
+          // 화면 밖 (좌우/상) → 제거
+          if (m.x < -m.size * 2 || m.x > cw + m.size * 2 || m.y < -m.size * 3) {
+            toRemove.push(i);
+            continue;
+          }
+        }
+        ctx.globalAlpha = m.alpha;
+        ctx.font = `${m.size}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(m.emoji, m.x, m.y);
+        ctx.globalAlpha = 1;
+      }
+      for (const idx of toRemove) {
+        state.monsters.splice(idx, 1);
+      }
+
+      animId = requestAnimationFrame(draw);
+    }
+
+    /* ── 별 배경 초기화 ── */
+    const starBg = [];
+    function initStars() {
+      starBg.length = 0;
+      const cw = canvas.width;
+      const ch = canvas.height * 0.75;
+      for (let i = 0; i < 60; i++) {
+        starBg.push({
+          x: Math.random() * cw,
+          y: Math.random() * ch,
+          r: Math.random() < 0.3 ? 2 : 1,
+          a: 0.2 + Math.random() * 0.5,
+        });
+      }
+    }
+
+    /* ── 미스 처리 ── */
+    function onMiss(x, y) {
+      state.lives--;
+      updateHUD();
+      showMissEffect(x, y);
+      if (state.lives <= 0) {
+        endGame();
+      }
+    }
+
+    function showMissEffect(x, y) {
+      const flash = document.createElement('div');
+      flash.className = 'miss-flash';
+      gameArea.appendChild(flash);
+      setTimeout(() => flash.remove(), 400);
+
+      const pop = document.createElement('div');
+      pop.className = 'score-pop';
+      pop.style.left = `${Math.min(Math.max(x - 20, 5), canvas.width - 60)}px`;
+      pop.style.top  = `${Math.min(y - 20, canvas.height - 50)}px`;
+      pop.textContent = MISS_MSG[Math.floor(Math.random() * MISS_MSG.length)];
+      pop.style.color = '#ff6b6b';
+      pop.style.fontSize = '14px';
+      gameArea.appendChild(pop);
+      setTimeout(() => pop.remove(), 800);
+    }
+
+    /* ── 히트 처리 ── */
+    function onHit(monster, px, py) {
+      monster.hit = true;
+      state.score += 10;
+      updateHUD();
+
+      // 난이도 올리기
+      state.spawnInterval = Math.max(
+        CONFIG.SPAWN_INTERVAL_MIN,
+        state.spawnInterval - CONFIG.SPAWN_INTERVAL_DECAY
+      );
+
+      // 파티클
+      const fx = document.createElement('div');
+      fx.className = 'explosion';
+      fx.style.left = `${px - 20}px`;
+      fx.style.top  = `${py - 20}px`;
+      fx.textContent = HITS[Math.floor(Math.random() * HITS.length)];
+      gameArea.appendChild(fx);
+      setTimeout(() => fx.remove(), 600);
+
+      // 점수 팝업
+      const pop = document.createElement('div');
+      pop.className = 'score-pop';
+      pop.style.left = `${Math.min(px - 15, canvas.width - 50)}px`;
+      pop.style.top  = `${Math.max(py - 30, 10)}px`;
+      pop.textContent = '+10';
+      gameArea.appendChild(pop);
+      setTimeout(() => pop.remove(), 800);
+    }
+
+    /* ── 탭(포인터) 처리 ── */
+    function handlePointer(e) {
+      if (!state.running) return;
+      e.preventDefault();
+
+      const now = Date.now();
+      if (now - state.lastShot < CONFIG.CANNON_COOLDOWN) return;
+      state.lastShot = now;
+
+      const rect = gameArea.getBoundingClientRect();
+      const px = (e.clientX ?? e.touches?.[0]?.clientX) - rect.left;
+      const py = (e.clientY ?? e.touches?.[0]?.clientY) - rect.top;
+
+      // 크로스헤어
+      crosshair.style.left = px + 'px';
+      crosshair.style.top  = py + 'px';
+      crosshair.style.display = 'block';
+      setTimeout(() => { crosshair.style.display = 'none'; }, 300);
+
+      // 히트 판정 (가장 가까운 몬스터)
+      let hit = false;
+      let nearest = null;
+      let nearestDist = Infinity;
+      for (const m of state.monsters) {
+        if (m.hit) continue;
+        const dx = m.x - px;
+        const dy = m.y - py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < m.size * 0.75 && dist < nearestDist) {
+          nearestDist = dist;
+          nearest = m;
+        }
+      }
+      if (nearest) {
+        onHit(nearest, nearest.x, nearest.y);
+        hit = true;
+      }
+
+      // 빗나감 (하단 1/3 밖에 터치 + 히트 없음)
+      if (!hit && py < canvas.height * 0.85) {
+        // 탄 발사 시각 효과만 (목숨 감소 없음 - 너무 어렵지 않게)
+        const miss = document.createElement('div');
+        miss.className = 'score-pop';
+        miss.style.left = `${Math.min(px, canvas.width - 40)}px`;
+        miss.style.top  = `${Math.max(py - 20, 10)}px`;
+        miss.textContent = '💨';
+        miss.style.color = 'rgba(255,255,255,0.5)';
+        gameArea.appendChild(miss);
+        setTimeout(() => miss.remove(), 500);
+      }
+    }
+
+    gameArea.addEventListener('pointerdown', handlePointer);
+
+    /* ── 타이머 ── */
+    function startTimer() {
+      timerId = setInterval(() => {
+        if (!state.running) return;
+        state.timeLeft--;
+        updateHUD();
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    /* ── 스폰 루프 ── */
+    function scheduleSpawn() {
+      if (!state.running) return;
+      spawnMonster();
+      spawnerId = setTimeout(scheduleSpawn, state.spawnInterval);
+    }
+
+    /* ── 게임 시작 ── */
+    function startGame() {
+      state = {
+        score: 0,
+        lives: CONFIG.LIVES,
+        timeLeft: CONFIG.GAME_DURATION,
+        running: true,
+        monsters: [],
+        nextId: 0,
+        spawnInterval: CONFIG.SPAWN_INTERVAL_START,
+        lastShot: 0,
+      };
+      updateHUD();
+      resizeCanvas();
+      initStars();
+      lastTimestamp = performance.now();
+      animId = requestAnimationFrame(draw);
+      startTimer();
+      scheduleSpawn();
+    }
+
+    /* ── 게임 종료 ── */
+    function endGame() {
+      state.running = false;
+      clearInterval(timerId);
+      clearTimeout(spawnerId);
+      cancelAnimationFrame(animId);
+
+      saveBest(state.score);
+      const best = getBest();
+
+      finalScore.textContent = state.score;
+      bestBadge.textContent  = `최고 기록: ${best}`;
+
+      // 별 계산
+      let stars = '⭐';
+      let msg = '다음엔 더 잘할 수 있어요!';
+      if (state.score >= 200) { stars = '⭐⭐⭐'; msg = '완전 최고야! 대포 달인! 🏆'; }
+      else if (state.score >= 120) { stars = '⭐⭐⭐'; msg = '훌륭해요! 몬스터 잡기 고수! 🎖️'; }
+      else if (state.score >= 70)  { stars = '⭐⭐'; msg = '잘했어요! 다시 도전해봐요! 👍'; }
+      else if (state.score >= 30)  { stars = '⭐'; msg = '굿! 더 연습하면 잘할 수 있어요!'; }
+      starDisplay.textContent = stars;
+      resultMsg.textContent   = msg;
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    /* ── 버튼 ── */
+    startBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      startOverlay.classList.add('hidden');
+      startGame();
+    });
+    restartBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      endOverlay.classList.add('hidden');
+      startGame();
+    });
+
+  })();
+  </script>
+</body>
+</html>

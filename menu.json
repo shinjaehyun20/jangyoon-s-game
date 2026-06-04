@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "cannon-ball",
+        "label": "💣 대포 쏘기",
+        "path": "cannon-ball/index.html"
+      },
+      {
         "id": "apple-catch-basket",
         "label": "🍎 사과 바구니",
         "path": "apple-catch-basket/index.html"

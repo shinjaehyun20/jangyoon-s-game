@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🏰 성 쌓기</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg2: #16213e;
+      --accent: #e94560;
+      --gold: #f5c518;
+      --sky: #0f3460;
+      --text: #ffffff;
+      --block-h: 36px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px;
+      gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 6px 16px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .hud .score-box { display: flex; align-items: center; gap: 6px; }
+    .hud .best-box  { font-size: 12px; opacity: 0.7; }
+
+    /* ── 게임 영역 ── */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #0f3460 0%, #16213e 60%, #0a0a1a 100%);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* 하늘 별 */
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.8);
+      pointer-events: none;
+    }
+
+    /* 기둥(성벽 바닥) */
+    #foundation {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 80px; height: 18px;
+      background: linear-gradient(180deg, #8B5E3C, #5a3a1a);
+      border-radius: 4px 4px 0 0;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    /* 쌓인 블록들 */
+    .stacked-block {
+      position: absolute;
+      height: var(--block-h);
+      border-radius: 6px;
+      border: 2px solid rgba(255,255,255,0.25);
+      transition: transform 0.08s ease;
+      pointer-events: none;
+    }
+
+    /* 움직이는 블록 */
+    #movingBlock {
+      position: absolute;
+      height: var(--block-h);
+      border-radius: 6px;
+      border: 3px solid rgba(255,255,255,0.5);
+      box-shadow: 0 0 12px rgba(255,255,255,0.3);
+      transition: box-shadow 0.1s;
+      pointer-events: none;
+    }
+
+    /* 잘린 조각 애니메이션 */
+    .chopped {
+      position: absolute;
+      height: var(--block-h);
+      border-radius: 6px;
+      opacity: 1;
+      pointer-events: none;
+      animation: chopFall 0.7s ease-in forwards;
+    }
+    @keyframes chopFall {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(120px) rotate(30deg); }
+    }
+
+    /* 완벽 맞춤 효과 */
+    .perfect-text {
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      font-size: 22px; font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 12px var(--gold);
+      pointer-events: none;
+      animation: popUp 0.8s ease-out forwards;
+      white-space: nowrap;
+    }
+    @keyframes popUp {
+      0%   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      60%  { opacity: 1; transform: translateX(-50%) translateY(-24px) scale(1.2); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-48px) scale(0.9); }
+    }
+
+    /* 성 완성 애니메이션 */
+    #castleAnim {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 64px;
+      pointer-events: none;
+      display: none;
+      animation: castlePop 1.0s ease-out forwards;
+      z-index: 10;
+    }
+    @keyframes castlePop {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+      50%  { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1.0); }
+    }
+
+    /* 레벨 표시 */
+    #levelBar {
+      position: absolute;
+      top: 8px; right: 8px;
+      font-size: 11px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 8px;
+      padding: 3px 8px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    footer a {
+      color: #fff;
+      text-decoration: none;
+      background: rgba(255,255,255,0.1);
+      padding: 4px 10px;
+      border-radius: 8px;
+      min-height: 28px;
+      display: flex; align-items: center;
+    }
+
+    /* ── 오버레이 공통 ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10, 10, 30, 0.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #16213e, #0f3460);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 340px; width: 90%;
+      text-align: center;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 {
+      font-size: 26px; font-weight: 900;
+      margin-bottom: 10px;
+    }
+    .overlay-card p {
+      font-size: 14px;
+      line-height: 1.7;
+      opacity: 0.85;
+      margin-bottom: 20px;
+    }
+    .result-score {
+      font-size: 56px; font-weight: 900;
+      color: var(--gold);
+      margin: 8px 0 4px;
+      line-height: 1;
+    }
+    .result-label {
+      font-size: 13px; opacity: 0.7;
+      margin-bottom: 16px;
+    }
+    .stars-row {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #c0392b);
+      border: none; border-radius: 16px;
+      color: #fff; font-size: 18px; font-weight: 900;
+      padding: 14px 48px;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      touch-action: manipulation;
+      box-shadow: 0 6px 18px rgba(233,69,96,0.4);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); box-shadow: none; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏰 성 쌓기</h1>
+
+  <div class="hud">
+    <div class="score-box">🧱 층수 <span id="scoreDisplay">0</span> / 10</div>
+    <div class="best-box">최고 <span id="bestDisplay">0</span>층</div>
+  </div>
+
+  <div id="gameArea">
+    <div id="levelBar">Lv <span id="lvNum">1</span></div>
+    <div id="castleAnim">🏰</div>
+    <div id="foundation"></div>
+    <div id="movingBlock"></div>
+  </div>
+
+  <footer>
+    <small>화면을 탭해서 블록을 쌓아요!</small>
+    <a href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🏰 성 쌓기</h2>
+    <p>블록이 왔다갔다 움직여요!<br>
+       딱 맞을 때 탭하면 층이 쌓여요 🧱<br>
+       <strong>10층</strong>을 쌓으면 성이 완성!</p>
+    <button class="btn-start" id="startBtn">시작! 🚀</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="result-label">층 쌓기 성공!</div>
+    <div class="stars-row" id="starsRow">⭐⭐⭐</div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기 🔄</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    TARGET_FLOORS: 10,       // 목표 층수
+    BLOCK_HEIGHT: 36,        // px (CSS --block-h 과 동일)
+    FOUNDATION_H: 18,        // 기둥 높이 px
+    FOUNDATION_W: 80,        // 기둥 너비 px
+    INITIAL_BLOCK_W: 80,     // 첫 블록 너비 (기둥과 동일)
+    MIN_BLOCK_W: 14,         // 최소 블록 너비 — 이하면 게임 오버
+    PERFECT_MARGIN: 5,       // 완벽 맞춤 허용 px
+    BASE_SPEED: 1.4,         // 기본 이동 속도 (px/frame)
+    SPEED_STEP: 0.18,        // 층당 속도 증가
+    COLORS: [
+      ['#e74c3c','#c0392b'],
+      ['#e67e22','#d35400'],
+      ['#f1c40f','#e67e22'],
+      ['#2ecc71','#27ae60'],
+      ['#1abc9c','#16a085'],
+      ['#3498db','#2980b9'],
+      ['#9b59b6','#8e44ad'],
+      ['#e91e63','#c2185b'],
+      ['#00bcd4','#0097a7'],
+      ['#ff5722','#e64a19'],
+    ],
+    LOCAL_KEY: 'castle-builder_best',
+    STARS_INTERVAL: 50,   // 별 생성 ms
+    NUM_STARS: 22,
+  };
+
+  // ── DOM ──
+  const gameArea    = document.getElementById('gameArea');
+  const movingBlock = document.getElementById('movingBlock');
+  const foundation  = document.getElementById('foundation');
+  const castleAnim  = document.getElementById('castleAnim');
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const bestDisplay  = document.getElementById('bestDisplay');
+  const lvNum       = document.getElementById('lvNum');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay   = document.getElementById('endOverlay');
+  const finalScore   = document.getElementById('finalScore');
+  const starsRow     = document.getElementById('starsRow');
+  const resultMsg    = document.getElementById('resultMsg');
+  const startBtn    = document.getElementById('startBtn');
+  const restartBtn  = document.getElementById('restartBtn');
+
+  // ── 상태 ──
+  let state = {};
+  let raf = null;
+  let starTimer = null;
+
+  function loadBest() {
+    return parseInt(localStorage.getItem(CONFIG.LOCAL_KEY) || '0', 10);
+  }
+  function saveBest(n) {
+    if (n > loadBest()) localStorage.setItem(CONFIG.LOCAL_KEY, String(n));
+  }
+
+  // ── 별 생성 ──
+  function spawnStars() {
+    for (let i = 0; i < CONFIG.NUM_STARS; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const sz = Math.random() * 2.5 + 0.5;
+      s.style.cssText = `
+        width:${sz}px; height:${sz}px;
+        left:${Math.random() * 100}%;
+        top:${Math.random() * 70}%;
+        opacity:${0.3 + Math.random() * 0.7};
+      `;
+      gameArea.appendChild(s);
+    }
+  }
+
+  // ── 초기화 ──
+  function initGame() {
+    // 기존 쌓인 블록 제거
+    gameArea.querySelectorAll('.stacked-block, .chopped, .perfect-text').forEach(el => el.remove());
+    castleAnim.style.display = 'none';
+
+    const areaH = gameArea.clientHeight;
+
+    state = {
+      floor: 0,
+      currentW: CONFIG.INITIAL_BLOCK_W,
+      stackedBlocks: [],   // { left, width, bottom }
+      movingLeft: true,
+      blockX: 0,           // 움직이는 블록 left (게임영역 기준)
+      speed: CONFIG.BASE_SPEED,
+      running: false,
+      areaW: gameArea.clientWidth,
+      areaH: areaH,
+    };
+
+    // 기둥 위치 (항상 중앙)
+    const foundLeft = (state.areaW - CONFIG.FOUNDATION_W) / 2;
+    foundation.style.left = foundLeft + 'px';
+
+    // 바닥 블록으로 취급
+    state.stackedBlocks.push({
+      left: foundLeft,
+      width: CONFIG.FOUNDATION_W,
+      bottom: CONFIG.FOUNDATION_H,
+    });
+
+    scoreDisplay.textContent = '0';
+    bestDisplay.textContent = loadBest();
+    lvNum.textContent = '1';
+    updateMovingBlock();
+    spawnNextBlock();
+  }
+
+  function spawnNextBlock() {
+    const topBlock = state.stackedBlocks[state.stackedBlocks.length - 1];
+    state.currentBlockW = state.currentW;
+    state.speed = CONFIG.BASE_SPEED + state.floor * CONFIG.SPEED_STEP;
+
+    // 움직이는 블록 초기 위치: 왼쪽 바깥에서 시작
+    state.blockX = -state.currentBlockW;
+    state.movingLeft = false; // 왼→오른쪽 방향 시작
+
+    const colorSet = CONFIG.COLORS[state.floor % CONFIG.COLORS.length];
+    movingBlock.style.width = state.currentBlockW + 'px';
+    movingBlock.style.background = `linear-gradient(135deg, ${colorSet[0]}, ${colorSet[1]})`;
+    // 높이 위치: 쌓인 블록 바로 위
+    state.movingBottom = topBlock.bottom + CONFIG.BLOCK_HEIGHT;
+    movingBlock.style.bottom = state.movingBottom + 'px';
+    movingBlock.style.left = state.blockX + 'px';
+    movingBlock.style.display = 'block';
+
+    state.running = true;
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function updateMovingBlock() {
+    movingBlock.style.left = state.blockX + 'px';
+  }
+
+  // ── 게임 루프 ──
+  function loop() {
+    if (!state.running) return;
+
+    // 이동
+    if (state.movingLeft) {
+      state.blockX -= state.speed;
+      if (state.blockX <= -state.currentBlockW) {
+        state.movingLeft = false;
+      }
+    } else {
+      state.blockX += state.speed;
+      if (state.blockX >= state.areaW) {
+        state.movingLeft = true;
+      }
+    }
+    updateMovingBlock();
+    raf = requestAnimationFrame(loop);
+  }
+
+  // ── 탭 처리 ──
+  function onTap() {
+    if (!state.running) return;
+    state.running = false;
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+
+    const topBlock = state.stackedBlocks[state.stackedBlocks.length - 1];
+    const prevLeft  = topBlock.left;
+    const prevRight = topBlock.left + topBlock.width;
+    const curLeft   = state.blockX;
+    const curRight  = state.blockX + state.currentBlockW;
+
+    // 겹치는 영역 계산
+    const overlapLeft  = Math.max(prevLeft, curLeft);
+    const overlapRight = Math.min(prevRight, curRight);
+    const overlapW = overlapRight - overlapLeft;
+
+    if (overlapW <= 0) {
+      // 완전히 빗나감 → 게임 오버
+      showChop(curLeft, state.currentBlockW, state.movingBottom, 'both');
+      endGame();
+      return;
+    }
+
+    const isPerfect = (state.currentBlockW - overlapW) <= CONFIG.PERFECT_MARGIN;
+
+    if (isPerfect) {
+      // 완벽 → 블록 너비 유지 or 약간 복구
+      landBlock(prevLeft, topBlock.width, state.movingBottom);
+      showPerfect(state.movingBottom);
+      // 작아진 블록이면 조금 복구
+      if (state.currentW < topBlock.width) {
+        state.currentW = Math.min(state.currentW + 6, CONFIG.INITIAL_BLOCK_W);
+      }
+    } else {
+      // 겹친 부분만 쌓임, 삐져나온 부분은 잘림
+      landBlock(overlapLeft, overlapW, state.movingBottom);
+
+      // 잘린 쪽
+      if (curLeft < overlapLeft) {
+        showChop(curLeft, overlapLeft - curLeft, state.movingBottom, 'left');
+      }
+      if (curRight > overlapRight) {
+        showChop(overlapRight, curRight - overlapRight, state.movingBottom, 'right');
+      }
+      state.currentW = overlapW;
+    }
+
+    state.floor++;
+    scoreDisplay.textContent = state.floor;
+    lvNum.textContent = Math.floor(state.floor / 3) + 1;
+    saveBest(state.floor);
+    bestDisplay.textContent = loadBest();
+
+    // 최소 너비 이하면 게임 오버
+    if (state.currentW < CONFIG.MIN_BLOCK_W) {
+      endGame();
+      return;
+    }
+
+    // 목표 달성
+    if (state.floor >= CONFIG.TARGET_FLOORS) {
+      castleVictory();
+      return;
+    }
+
+    // 뷰 스크롤: 블록이 화면 중간 위로 올라가면 전체를 아래로 내림
+    repositionView();
+    spawnNextBlock();
+  }
+
+  // ── 쌓인 블록 DOM 추가 ──
+  function landBlock(left, width, bottom) {
+    const div = document.createElement('div');
+    div.className = 'stacked-block';
+    const colorSet = CONFIG.COLORS[state.floor % CONFIG.COLORS.length];
+    div.style.cssText = `
+      left:${left}px;
+      width:${width}px;
+      bottom:${bottom}px;
+      background: linear-gradient(135deg, ${colorSet[0]}, ${colorSet[1]});
+    `;
+    gameArea.appendChild(div);
+    state.stackedBlocks.push({ left, width, bottom });
+    movingBlock.style.display = 'none';
+  }
+
+  // ── 잘린 조각 ──
+  function showChop(left, width, bottom, side) {
+    if (width <= 0) return;
+    const div = document.createElement('div');
+    div.className = 'chopped';
+    const colorSet = CONFIG.COLORS[state.floor % CONFIG.COLORS.length];
+    div.style.cssText = `
+      left:${left}px;
+      width:${width}px;
+      bottom:${bottom}px;
+      background: linear-gradient(135deg, ${colorSet[0]}, ${colorSet[1]});
+    `;
+    gameArea.appendChild(div);
+    setTimeout(() => div.remove(), 800);
+  }
+
+  // ── 완벽 맞춤 텍스트 ──
+  function showPerfect(bottom) {
+    const div = document.createElement('div');
+    div.className = 'perfect-text';
+    div.textContent = '✨ 완벽!';
+    div.style.bottom = (bottom + CONFIG.BLOCK_HEIGHT + 8) + 'px';
+    gameArea.appendChild(div);
+    setTimeout(() => div.remove(), 900);
+  }
+
+  // ── 뷰 재배치 (블록이 너무 높이 쌓이면 아래로 시프트) ──
+  function repositionView() {
+    const topBlock = state.stackedBlocks[state.stackedBlocks.length - 1];
+    const topY = state.areaH - topBlock.bottom - topBlock.width; // 위에서부터 거리
+    const threshold = state.areaH * 0.45;
+
+    if (topBlock.bottom > threshold) {
+      const shift = topBlock.bottom - threshold * 0.8;
+      // 모든 쌓인 블록 + foundation 아래로
+      state.stackedBlocks.forEach((b, i) => {
+        if (i === 0) return; // foundation은 이동 안 함
+        b.bottom -= shift;
+      });
+      gameArea.querySelectorAll('.stacked-block').forEach((el, i) => {
+        const b = state.stackedBlocks[i + 1];
+        if (b) el.style.bottom = b.bottom + 'px';
+      });
+    }
+  }
+
+  // ── 성 완성 ──
+  function castleVictory() {
+    castleAnim.style.display = 'block';
+    setTimeout(() => {
+      finalScore.textContent = state.floor;
+      starsRow.textContent = '⭐⭐⭐';
+      resultMsg.innerHTML = '🎉 우와! <strong>성 완성!</strong><br>대단해요 장윤이! 🏆';
+      endOverlay.classList.remove('hidden');
+    }, 1200);
+    saveBest(state.floor);
+    bestDisplay.textContent = loadBest();
+  }
+
+  // ── 게임 오버 ──
+  function endGame() {
+    setTimeout(() => {
+      finalScore.textContent = state.floor;
+      const best = loadBest();
+      const stars = state.floor >= 8 ? '⭐⭐⭐' : state.floor >= 5 ? '⭐⭐' : '⭐';
+      starsRow.textContent = stars;
+      if (state.floor === 0) {
+        resultMsg.innerHTML = '괜찮아요! 다시 도전해봐요 💪';
+      } else if (state.floor >= CONFIG.TARGET_FLOORS) {
+        resultMsg.innerHTML = `🎉 성 완성! 최고 기록: <strong>${best}층</strong>`;
+      } else {
+        resultMsg.innerHTML = `<strong>${state.floor}층</strong> 쌓았어요!<br>최고 기록: <strong>${best}층</strong>`;
+      }
+      endOverlay.classList.remove('hidden');
+    }, 400);
+  }
+
+  // ── 이벤트 ──
+  gameArea.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    onTap();
+  });
+
+  startBtn.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    startOverlay.classList.add('hidden');
+    initGame();
+  });
+
+  restartBtn.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    endOverlay.classList.add('hidden');
+    initGame();
+  });
+
+  // ── 첫 로드 ──
+  spawnStars();
+  bestDisplay.textContent = loadBest();
+
+})();
+</script>
+</body>
+</html>
