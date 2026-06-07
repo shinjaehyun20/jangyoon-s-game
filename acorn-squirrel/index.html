@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐿️ 다람쥐 도토리 모으기</title>
+  <style>
+    :root {
+      --bg-top: #2d6a2d;
+      --bg-bot: #1a3d1a;
+      --accent: #f4a427;
+      --text: #ffffff;
+      --tree: #5c3317;
+      --leaf: #3a8c3a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      font-weight: 900;
+      text-align: center;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hud {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+    }
+    .hud-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .hud-label { font-size: 11px; font-weight: 400; opacity: 0.75; }
+    .hud-val { font-size: clamp(18px, 5vw, 24px); font-weight: 900; }
+    #best-val { color: var(--accent); }
+
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #87ceeb 0%, #b0e0b0 60%, #5c8c2a 100%);
+      cursor: pointer;
+    }
+
+    /* 나무 */
+    .tree {
+      position: absolute;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+      pointer-events: none;
+    }
+    .tree-canopy {
+      width: 0; height: 0;
+      border-left: solid transparent;
+      border-right: solid transparent;
+      border-bottom: solid var(--leaf);
+    }
+    .tree-trunk {
+      background: var(--tree);
+      border-radius: 2px;
+    }
+    /* 플랫폼(나뭇가지) */
+    .platform {
+      position: absolute;
+      background: var(--tree);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+    /* 다람쥐 */
+    #squirrel {
+      position: absolute;
+      font-size: clamp(32px, 9vw, 48px);
+      line-height: 1;
+      pointer-events: none;
+      transition: transform 0.05s;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+      z-index: 10;
+    }
+    /* 도토리 */
+    .acorn {
+      position: absolute;
+      font-size: clamp(22px, 6.5vw, 32px);
+      line-height: 1;
+      pointer-events: none;
+      z-index: 8;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    /* 떨어지는 장애물(돌) */
+    .rock {
+      position: absolute;
+      font-size: clamp(18px, 5.5vw, 28px);
+      line-height: 1;
+      pointer-events: none;
+      z-index: 8;
+    }
+    /* 땅 */
+    #ground {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 42px;
+      background: linear-gradient(180deg, #6aad3a 0%, #4a8a1a 100%);
+      border-radius: 0 0 16px 16px;
+    }
+    /* 점프 힌트 */
+    #tap-hint {
+      position: absolute;
+      bottom: 50px;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    /* 오버레이 공통 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, #2d6a2d, #1a3d1a);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: clamp(22px, 6vw, 30px); font-weight: 900; }
+    .overlay-card p { font-size: clamp(13px, 3.8vw, 16px); line-height: 1.6; opacity: 0.9; }
+    .result-score {
+      font-size: clamp(40px, 11vw, 58px);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .btn-start {
+      background: var(--accent);
+      color: #1a1a1a;
+      border: none;
+      border-radius: 14px;
+      padding: 0 24px;
+      min-height: 54px;
+      font-size: clamp(18px, 5vw, 22px);
+      font-weight: 900;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 4px 14px rgba(244,164,39,0.45);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); box-shadow: none; }
+    .best-badge {
+      background: rgba(244,164,39,0.18);
+      border-radius: 10px;
+      padding: 6px 14px;
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    footer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      opacity: 0.7;
+      padding: 2px 0;
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 4px 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐿️ 다람쥐 도토리 모으기</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">도토리</span>
+      <span class="hud-val" id="score-val">0 🌰</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">최고기록</span>
+      <span class="hud-val" id="best-val">0 🌰</span>
+    </div>
+  </div>
+
+  <div id="gameArea">
+    <div id="ground"></div>
+    <div id="squirrel">🐿️</div>
+    <div id="tap-hint">탭 해서 점프! 🌰 도토리를 모아요</div>
+  </div>
+
+  <footer>
+    <small>화면을 탭하면 점프해요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🐿️ 다람쥐<br>도토리 모으기</h2>
+    <p>화면을 탭하면 점프해요!<br>🌰 도토리는 먹고 🪨 돌은 피하세요.<br>바닥에 떨어지면 끝!</p>
+    <div class="best-badge" id="start-best">최고기록: 0 🌰</div>
+    <button class="btn-start" id="startBtn">시작! 🐿️</button>
+  </div>
+</div>
+
+<!-- 종료 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg">잘했어요! 🌰</p>
+    <div class="best-badge" id="end-best">최고기록: 0 🌰</div>
+    <button class="btn-start" id="restartBtn">다시 하기 🐿️</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CFG = {
+    GRAVITY: 0.55,       // 중력 가속도
+    JUMP_FORCE: -13,     // 점프 힘
+    SQUIRREL_SIZE: 44,   // px (충돌 판정용)
+    PLATFORM_COUNT: 4,   // 나뭇가지 수
+    PLATFORM_W_RATIO: 0.30, // 가지 너비 (게임영역 대비)
+    PLATFORM_H: 14,
+    ACORN_SPAWN_INTERVAL: 1600, // ms
+    ROCK_SPAWN_INTERVAL: 2800,
+    ITEM_SPEED_BASE: 1.6,
+    ITEM_SPEED_INC: 0.00025, // 점수 증가 시 속도 증가
+    BEST_KEY: 'acorn-squirrel_best',
+  };
+
+  /* ── STATE ── */
+  let state = {
+    running: false,
+    score: 0,
+    best: parseInt(localStorage.getItem(CFG.BEST_KEY) || '0', 10),
+    sqY: 0, sqX: 0,
+    velY: 0,
+    onGround: false,
+    items: [],      // {el, x, y, vy, type}
+    platforms: [],  // {el, x, y, w}
+    loop: null,
+    acornTimer: null,
+    rockTimer: null,
+    lastTime: 0,
+    tapLock: false,
+  };
+
+  /* ── DOM ── */
+  const gameArea   = document.getElementById('gameArea');
+  const sqEl       = document.getElementById('squirrel');
+  const scoreEl    = document.getElementById('score-val');
+  const bestEl     = document.getElementById('best-val');
+  const tapHint    = document.getElementById('tap-hint');
+  const startOver  = document.getElementById('startOverlay');
+  const endOver    = document.getElementById('endOverlay');
+  const finalScEl  = document.getElementById('finalScore');
+  const resultMsg  = document.getElementById('resultMsg');
+  const startBest  = document.getElementById('start-best');
+  const endBest    = document.getElementById('end-best');
+
+  /* ── 초기 베스트 표시 ── */
+  function refreshBestDisplay() {
+    const b = state.best;
+    bestEl.textContent    = b + ' 🌰';
+    startBest.textContent = '최고기록: ' + b + ' 🌰';
+    endBest.textContent   = '최고기록: ' + b + ' 🌰';
+  }
+  refreshBestDisplay();
+
+  /* ── 게임 영역 크기 ── */
+  function areaW() { return gameArea.clientWidth; }
+  function areaH() { return gameArea.clientHeight; }
+  const GROUND_H = 42; // ground div height
+
+  /* ── 플랫폼(나뭇가지) 생성 ── */
+  function buildPlatforms() {
+    state.platforms.forEach(p => p.el.remove());
+    state.platforms = [];
+    const ah = areaH();
+    const aw = areaW();
+    const rows = CFG.PLATFORM_COUNT;
+    const stepY = (ah - GROUND_H - 60) / (rows + 1);
+
+    for (let i = 0; i < rows; i++) {
+      const el = document.createElement('div');
+      el.className = 'platform';
+      const pw = Math.floor(aw * CFG.PLATFORM_W_RATIO + Math.random() * aw * 0.12);
+      const px = Math.floor(Math.random() * (aw - pw - 10) + 5);
+      const py = Math.floor(stepY * (i + 1) + 20);
+      el.style.width  = pw + 'px';
+      el.style.height = CFG.PLATFORM_H + 'px';
+      el.style.left   = px + 'px';
+      el.style.top    = py + 'px';
+      gameArea.appendChild(el);
+      state.platforms.push({ el, x: px, y: py, w: pw });
+    }
+  }
+
+  /* ── 다람쥐 초기 위치 ── */
+  function placeSq() {
+    const ah = areaH();
+    const aw = areaW();
+    state.sqX = aw / 2 - CFG.SQUIRREL_SIZE / 2;
+    state.sqY = ah - GROUND_H - CFG.SQUIRREL_SIZE - 4;
+    state.velY = 0;
+    state.onGround = true;
+    sqEl.style.left   = state.sqX + 'px';
+    sqEl.style.bottom = 'unset';
+    sqEl.style.top    = state.sqY + 'px';
+  }
+
+  /* ── 아이템 생성 ── */
+  function spawnAcorn() {
+    if (!state.running) return;
+    const aw = areaW();
+    const el = document.createElement('div');
+    el.className = 'acorn';
+    el.textContent = '🌰';
+    const x = Math.random() * (aw - 36) + 4;
+    el.style.left = x + 'px';
+    el.style.top  = '0px';
+    gameArea.appendChild(el);
+    state.items.push({ el, x, y: 0, vy: CFG.ITEM_SPEED_BASE + state.score * CFG.ITEM_SPEED_INC, type: 'acorn' });
+  }
+
+  function spawnRock() {
+    if (!state.running) return;
+    const aw = areaW();
+    const el = document.createElement('div');
+    el.className = 'rock';
+    el.textContent = '🪨';
+    const x = Math.random() * (aw - 32) + 4;
+    el.style.left = x + 'px';
+    el.style.top  = '0px';
+    gameArea.appendChild(el);
+    state.items.push({ el, x, y: 0, vy: (CFG.ITEM_SPEED_BASE + 0.4) + state.score * CFG.ITEM_SPEED_INC, type: 'rock' });
+  }
+
+  /* ── 충돌 판정 ── */
+  function hit(ax, ay, bx, by, size) {
+    return Math.abs(ax - bx) < size && Math.abs(ay - by) < size;
+  }
+
+  /* ── 점프 ── */
+  function doJump() {
+    if (!state.running) return;
+    // 지면 또는 플랫폼 위에 있을 때만 점프
+    if (state.onGround) {
+      state.velY = CFG.JUMP_FORCE;
+      state.onGround = false;
+      sqEl.style.transform = 'scaleY(1.2)';
+      setTimeout(() => { sqEl.style.transform = ''; }, 150);
+    }
+  }
+
+  /* ── 게임 루프 ── */
+  function gameLoop() {
+    if (!state.running) return;
+
+    const ah = areaH();
+    const aw = areaW();
+    const sqSize = CFG.SQUIRREL_SIZE;
+
+    // 다람쥐 물리
+    state.velY += CFG.GRAVITY;
+    state.sqY  += state.velY;
+    state.onGround = false;
+
+    // 지면 충돌
+    const groundY = ah - GROUND_H - sqSize;
+    if (state.sqY >= groundY) {
+      state.sqY   = groundY;
+      state.velY  = 0;
+      state.onGround = true;
+    }
+
+    // 플랫폼 충돌 (위에서 내려올 때만)
+    if (state.velY >= 0) {
+      for (const p of state.platforms) {
+        const sqBottom = state.sqY + sqSize;
+        const prevBottom = sqBottom - state.velY;
+        if (
+          prevBottom <= p.y + CFG.PLATFORM_H &&
+          sqBottom   >= p.y &&
+          state.sqX + sqSize > p.x + 4 &&
+          state.sqX          < p.x + p.w - 4
+        ) {
+          state.sqY   = p.y - sqSize;
+          state.velY  = 0;
+          state.onGround = true;
+          break;
+        }
+      }
+    }
+
+    // 화면 위 경계
+    if (state.sqY < 0) { state.sqY = 0; state.velY = 0; }
+
+    sqEl.style.top  = state.sqY + 'px';
+    sqEl.style.left = state.sqX + 'px';
+
+    // 아이템 업데이트
+    const deadItems = [];
+    for (const item of state.items) {
+      item.y += item.vy;
+      item.el.style.top = item.y + 'px';
+
+      // 화면 밖
+      if (item.y > ah) { deadItems.push(item); continue; }
+
+      // 충돌
+      if (hit(item.x, item.y, state.sqX, state.sqY, sqSize - 6)) {
+        if (item.type === 'acorn') {
+          state.score++;
+          scoreEl.textContent = state.score + ' 🌰';
+          // 반짝 효과
+          scoreEl.style.color = '#ffe066';
+          setTimeout(() => { scoreEl.style.color = ''; }, 200);
+          deadItems.push(item);
+        } else if (item.type === 'rock') {
+          // 게임 오버
+          endGame();
+          return;
+        }
+      }
+    }
+
+    // 죽은 아이템 제거
+    for (const d of deadItems) {
+      d.el.remove();
+      state.items.splice(state.items.indexOf(d), 1);
+    }
+
+    state.loop = requestAnimationFrame(gameLoop);
+  }
+
+  /* ── 게임 오버 ── */
+  function endGame() {
+    state.running = false;
+    cancelAnimationFrame(state.loop);
+    clearInterval(state.acornTimer);
+    clearInterval(state.rockTimer);
+
+    // 최고기록 갱신
+    if (state.score > state.best) {
+      state.best = state.score;
+      localStorage.setItem(CFG.BEST_KEY, state.best);
+    }
+    refreshBestDisplay();
+
+    finalScEl.textContent = state.score + ' 🌰';
+    endBest.textContent   = '최고기록: ' + state.best + ' 🌰';
+
+    const msgs = [
+      '대단해요! 🎉', '잘했어요! 🌟', '멋진 다람쥐! 🐿️',
+      '도토리 천재! 🌰', '최고예요! 🏆', '훌륭해요! 🥳'
+    ];
+    resultMsg.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+
+    endOver.classList.remove('hidden');
+  }
+
+  /* ── 게임 시작/재시작 ── */
+  function startGame() {
+    // 클린업
+    state.items.forEach(i => i.el.remove());
+    state.items = [];
+    state.score = 0;
+    state.running = false;
+    cancelAnimationFrame(state.loop);
+    clearInterval(state.acornTimer);
+    clearInterval(state.rockTimer);
+
+    scoreEl.textContent = '0 🌰';
+    tapHint.style.display = 'none';
+
+    buildPlatforms();
+    placeSq();
+
+    state.running = true;
+
+    // 아이템 스폰 타이머
+    state.acornTimer = setInterval(spawnAcorn, CFG.ACORN_SPAWN_INTERVAL);
+    state.rockTimer  = setInterval(spawnRock,  CFG.ROCK_SPAWN_INTERVAL);
+
+    // 첫 도토리 즉시 하나 스폰
+    setTimeout(spawnAcorn, 400);
+
+    state.loop = requestAnimationFrame(gameLoop);
+  }
+
+  /* ── 입력 이벤트 ── */
+  gameArea.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    doJump();
+  });
+
+  document.getElementById('startBtn').addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    startOver.classList.add('hidden');
+    startGame();
+  });
+
+  document.getElementById('restartBtn').addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    endOver.classList.add('hidden');
+    startGame();
+  });
+
+  /* ── 리사이즈 대응 ── */
+  window.addEventListener('resize', function () {
+    if (state.running) {
+      buildPlatforms();
+      placeSq();
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

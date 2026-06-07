@@ -1,5 +1,21 @@
 [
   {
+    "id": "acorn-squirrel",
+    "title": "Acorn Squirrel",
+    "title_ko": "다람쥐 도토리 모으기",
+    "description": "탭해서 점프! 나뭇가지를 밟고 도토리를 모으고 돌을 피해요",
+    "thumbnail": "acorn-squirrel/thumb.svg",
+    "path": "acorn-squirrel/index.html"
+  },
+  {
+    "id": "penguin-slide",
+    "title": "Penguin Slide",
+    "title_ko": "펭귄 얼음 미끄럼틀",
+    "description": "얼음 경사를 미끄러져 내려오며 물고기를 먹고 바위를 피해요!",
+    "thumbnail": "penguin-slide/thumb.svg",
+    "path": "penguin-slide/index.html"
+  },
+  {
     "id": "car-race",
     "title": "Car Race",
     "title_ko": "자동차 경주",

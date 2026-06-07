@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐧 펭귄 미끄럼틀</title>
+  <style>
+    :root {
+      --bg: #0a2a5e;
+      --bg2: #0e3d8a;
+      --ice: #b8e4f9;
+      --ice2: #ddf3ff;
+      --accent: #f9d71c;
+      --fish: #ff8c42;
+      --rock: #8b6f47;
+      --text: #ffffff;
+      --danger: #ff4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ── HUD ── */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 8px 16px;
+      margin: 10px 12px 0;
+      flex-shrink: 0;
+    }
+    .hud-item { display: flex; flex-direction: column; align-items: center; }
+    .hud-label { font-size: 10px; color: rgba(255,255,255,0.65); letter-spacing: 0.5px; }
+    .hud-value { font-size: 22px; font-weight: 900; color: var(--accent); line-height: 1.1; }
+
+    /* ── 게임 제목 ── */
+    .game-title {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--text);
+      text-align: center;
+      margin: 6px 0 2px;
+      flex-shrink: 0;
+    }
+
+    /* ── Canvas 영역 ── */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      margin: 0 12px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #1a4b8a 0%, #0e3060 40%, #b8e4f9 41%, #ddf3ff 100%);
+      border: 3px solid rgba(255,255,255,0.2);
+    }
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    /* ── Footer ── */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 16px 10px;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .home-link {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      background: rgba(255,255,255,0.12);
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+
+    /* ── 오버레이 공통 ── */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,10,40,0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      border-radius: 18px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(145deg, #1a3a7a, #0d2650);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      width: 86%;
+      max-width: 340px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .overlay-card p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .result-score {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+      margin: 8px 0;
+    }
+    .result-best {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 16px;
+    }
+    .result-msg {
+      font-size: 15px;
+      color: #7af9b0;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .btn-start {
+      display: block;
+      width: 100%;
+      min-height: 54px;
+      font-size: 20px;
+      font-weight: 900;
+      color: #1a2a5a;
+      background: var(--accent);
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(249,215,28,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.97); }
+
+    /* ── 레인 가이드 (시각) ── */
+    .lane-hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="game-title">🐧 펭귄 미끄럼틀</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">점수</span>
+      <span class="hud-value" id="scoreDisplay">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">물고기</span>
+      <span class="hud-value" id="fishDisplay">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">최고</span>
+      <span class="hud-value" id="bestDisplay">0</span>
+    </div>
+  </div>
+
+  <div id="gameArea">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 시작 오버레이 -->
+    <div class="overlay" id="startOverlay">
+      <div class="overlay-card">
+        <h2>🐧 펭귄 미끄럼틀</h2>
+        <p>펭귄이 얼음 언덕을 미끄러져 내려가요!<br>
+           왼쪽·오른쪽 터치로 방향을 바꿔<br>
+           🐟 물고기를 먹고 🪨 바위를 피하세요!</p>
+        <button class="btn-start" id="startBtn">시작! 🎉</button>
+      </div>
+    </div>
+
+    <!-- 종료 오버레이 -->
+    <div class="overlay hidden" id="endOverlay">
+      <div class="overlay-card">
+        <h2>🎉 게임 끝!</h2>
+        <div class="result-score" id="finalScore">0</div>
+        <div class="result-best" id="bestMsg"></div>
+        <div class="result-msg" id="resultMsg"></div>
+        <button class="btn-start" id="restartBtn">다시 하기 🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <small class="lane-hint">👈 왼쪽 터치 = 왼쪽 &nbsp;|&nbsp; 오른쪽 터치 = 오른쪽</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ───────────────────────────────────────────
+     CONFIG — 모든 매직 넘버
+  ─────────────────────────────────────────── */
+  const CFG = {
+    LANES: 5,             // 레인 수
+    PENGUIN_LANE: 2,      // 시작 레인 (0-indexed, 중앙)
+    PENGUIN_Y_FRAC: 0.72, // 캔버스 높이 대비 펭귄 Y 위치
+    PENGUIN_R: 0.07,      // 캔버스 너비 대비 펭귄 반지름
+    SPEED_INIT: 3.2,      // 초기 스크롤 속도 (px/frame)
+    SPEED_MAX: 9.0,
+    SPEED_INC: 0.0008,    // 프레임당 가속
+    FISH_SCORE: 10,
+    DODGE_SCORE: 2,       // 바위 피할 때마다
+    FISH_PROB: 0.38,      // 슬롯 채울 때 물고기 확률
+    ROCK_PROB: 0.28,
+    NOTHING_PROB: 0.34,
+    OBJ_INTERVAL: 90,     // 프레임 간격으로 새 줄 생성
+    SKI_STRIPE_H: 60,     // 얼음 스트라이프 높이
+    LIVES: 3,             // 목숨
+    LS_KEY: 'penguin-slide_best',
+  };
+
+  /* ───────────────────────────────────────────
+     DOM
+  ─────────────────────────────────────────── */
+  const canvas   = document.getElementById('gameCanvas');
+  const ctx      = canvas.getContext('2d');
+  const area     = document.getElementById('gameArea');
+  const scoreEl  = document.getElementById('scoreDisplay');
+  const fishEl   = document.getElementById('fishDisplay');
+  const bestEl   = document.getElementById('bestDisplay');
+  const startOv  = document.getElementById('startOverlay');
+  const endOv    = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const bestMsgEl    = document.getElementById('bestMsg');
+  const resultMsgEl  = document.getElementById('resultMsg');
+
+  document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+  document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+
+  /* ───────────────────────────────────────────
+     STATE
+  ─────────────────────────────────────────── */
+  let state = {};
+  let raf = null;
+  let lastW = 0, lastH = 0;
+
+  function initState() {
+    return {
+      running: false,
+      penguinLane: CFG.PENGUIN_LANE,
+      targetLane: CFG.PENGUIN_LANE,
+      penguinX: 0,      // computed
+      penguinY: 0,
+      score: 0,
+      fishCount: 0,
+      lives: CFG.LIVES,
+      speed: CFG.SPEED_INIT,
+      frame: 0,
+      scroll: 0,
+      objects: [],       // { lane, y, type: 'fish'|'rock' }
+      hitFlash: 0,       // frames remaining for hit flash
+      laneSlide: 0,      // sub-pixel lane slide progress (0→1)
+      penguinBob: 0,     // oscillation
+    };
+  }
+
+  /* ───────────────────────────────────────────
+     RESIZE
+  ─────────────────────────────────────────── */
+  function resize() {
+    const rect = area.getBoundingClientRect();
+    canvas.width  = rect.width;
+    canvas.height = rect.height;
+    lastW = rect.width;
+    lastH = rect.height;
+    if (!state.running) drawIdle();
+  }
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(area);
+  resize();
+
+  /* ───────────────────────────────────────────
+     INPUT (pointer — 화면 좌/우 탭)
+  ─────────────────────────────────────────── */
+  canvas.addEventListener('pointerdown', function(e) {
+    if (!state.running) return;
+    e.preventDefault();
+    const x = e.clientX - area.getBoundingClientRect().left;
+    if (x < canvas.width / 2) {
+      moveLane(-1);
+    } else {
+      moveLane(+1);
+    }
+  });
+
+  function moveLane(dir) {
+    const next = state.targetLane + dir;
+    if (next < 0 || next >= CFG.LANES) return;
+    state.targetLane = next;
+  }
+
+  /* ───────────────────────────────────────────
+     GAME LOOP
+  ─────────────────────────────────────────── */
+  function startGame() {
+    startOv.classList.add('hidden');
+    endOv.classList.add('hidden');
+    state = initState();
+    state.running = true;
+    updateHUD();
+    if (raf) cancelAnimationFrame(raf);
+    loop();
+  }
+
+  function loop() {
+    if (!state.running) return;
+    update();
+    render();
+    raf = requestAnimationFrame(loop);
+  }
+
+  /* ───────────────────────────────────────────
+     UPDATE
+  ─────────────────────────────────────────── */
+  function laneX(lane) {
+    const laneW = canvas.width / CFG.LANES;
+    return laneW * lane + laneW / 2;
+  }
+
+  function update() {
+    const W = canvas.width;
+    const H = canvas.height;
+
+    state.frame++;
+    state.scroll += state.speed;
+
+    // 속도 증가
+    if (state.speed < CFG.SPEED_MAX) {
+      state.speed += CFG.SPEED_INC;
+    }
+
+    // 펭귄 X 슬라이드 (부드럽게)
+    const targetX = laneX(state.targetLane);
+    const currentX = state.penguinX;
+    state.penguinX = currentX + (targetX - currentX) * 0.18;
+
+    // 펭귄 Y
+    state.penguinY = H * CFG.PENGUIN_Y_FRAC;
+
+    // 펭귄 밥 (흔들림)
+    state.penguinBob = Math.sin(state.frame * 0.15) * 2;
+
+    // 새 오브젝트 생성
+    if (state.frame % CFG.OBJ_INTERVAL === 0) {
+      spawnRow();
+    }
+
+    // 오브젝트 이동
+    for (let i = state.objects.length - 1; i >= 0; i--) {
+      state.objects[i].y += state.speed;
+      if (state.objects[i].y > H + 60) {
+        // 바위 지나친 경우 보너스
+        if (state.objects[i].type === 'rock') {
+          state.score += CFG.DODGE_SCORE;
+        }
+        state.objects.splice(i, 1);
+      }
+    }
+
+    // 충돌
+    const penR = W * CFG.PENGUIN_R;
+    for (let i = state.objects.length - 1; i >= 0; i--) {
+      const obj = state.objects[i];
+      const ox = laneX(obj.lane);
+      const oy = obj.y;
+      const dx = state.penguinX - ox;
+      const dy = state.penguinY - oy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < penR * 1.4) {
+        if (obj.type === 'fish') {
+          state.score += CFG.FISH_SCORE;
+          state.fishCount++;
+          state.objects.splice(i, 1);
+        } else if (obj.type === 'rock') {
+          state.lives--;
+          state.hitFlash = 20;
+          state.objects.splice(i, 1);
+          if (state.lives <= 0) {
+            endGame();
+            return;
+          }
+        }
+      }
+    }
+
+    if (state.hitFlash > 0) state.hitFlash--;
+
+    // 점수 반영 (dodge 지속)
+    state.score += 0.05;
+
+    updateHUD();
+  }
+
+  function spawnRow() {
+    // 오브젝트를 최대 2개까지 랜덤 레인에 배치
+    const usedLanes = new Set();
+    const count = Math.random() < 0.4 ? 2 : 1;
+    for (let k = 0; k < count; k++) {
+      let lane;
+      let attempts = 0;
+      do {
+        lane = Math.floor(Math.random() * CFG.LANES);
+        attempts++;
+      } while (usedLanes.has(lane) && attempts < 10);
+      usedLanes.add(lane);
+
+      const r = Math.random();
+      let type;
+      if (r < CFG.FISH_PROB) {
+        type = 'fish';
+      } else if (r < CFG.FISH_PROB + CFG.ROCK_PROB) {
+        type = 'rock';
+      } else {
+        continue; // nothing
+      }
+      state.objects.push({ lane, y: -40, type });
+    }
+  }
+
+  /* ───────────────────────────────────────────
+     RENDER
+  ─────────────────────────────────────────── */
+  function render() {
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    drawBackground(W, H);
+    drawLanes(W, H);
+    drawObjects(W, H);
+    drawPenguin(W, H);
+    drawLives(W, H);
+    if (state.hitFlash > 0) {
+      ctx.fillStyle = `rgba(255,50,50,${state.hitFlash / 20 * 0.3})`;
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  function drawBackground(W, H) {
+    // 하늘
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.4);
+    skyGrad.addColorStop(0, '#0a2a5e');
+    skyGrad.addColorStop(1, '#1a5aaa');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, W, H * 0.4);
+
+    // 얼음 경사면 (스크롤 스트라이프)
+    const iceGrad = ctx.createLinearGradient(0, H * 0.4, 0, H);
+    iceGrad.addColorStop(0, '#b8e4f9');
+    iceGrad.addColorStop(1, '#ddf3ff');
+    ctx.fillStyle = iceGrad;
+    ctx.fillRect(0, H * 0.4, W, H * 0.6);
+
+    // 스크롤 스트라이프 (속도감)
+    const stripeH = CFG.SKI_STRIPE_H;
+    const offset = state.scroll % (stripeH * 2);
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = '#8fd4f5';
+    for (let y = H * 0.4 - offset; y < H + stripeH; y += stripeH * 2) {
+      ctx.fillRect(0, y, W, stripeH);
+    }
+    ctx.globalAlpha = 1;
+
+    // 별
+    if (state.frame < 5 || !state._stars) {
+      state._stars = Array.from({length: 18}, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.38,
+        r: Math.random() * 1.5 + 0.5,
+      }));
+    }
+    ctx.fillStyle = '#fff';
+    for (const s of state._stars) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawLanes(W, H) {
+    // 레인 구분 점선
+    ctx.setLineDash([6, 8]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+    ctx.lineWidth = 1.5;
+    const laneW = W / CFG.LANES;
+    for (let i = 1; i < CFG.LANES; i++) {
+      ctx.beginPath();
+      ctx.moveTo(laneW * i, H * 0.4);
+      ctx.lineTo(laneW * i, H);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
+  function drawObjects(W, H) {
+    const laneW = W / CFG.LANES;
+    const objR = laneW * 0.32;
+
+    for (const obj of state.objects) {
+      const ox = laneX(obj.lane);
+      const oy = obj.y;
+
+      if (obj.type === 'fish') {
+        // 물고기 그리기 (이모지 폴백: 원형)
+        ctx.save();
+        ctx.translate(ox, oy);
+
+        // 물고기 몸통
+        ctx.fillStyle = '#ff8c42';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, objR * 0.9, objR * 0.55, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 지느러미(꼬리)
+        ctx.fillStyle = '#e06020';
+        ctx.beginPath();
+        ctx.moveTo(objR * 0.7, 0);
+        ctx.lineTo(objR * 1.2, -objR * 0.45);
+        ctx.lineTo(objR * 1.2, objR * 0.45);
+        ctx.closePath();
+        ctx.fill();
+
+        // 눈
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(-objR * 0.35, -objR * 0.1, objR * 0.18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.arc(-objR * 0.33, -objR * 0.1, objR * 0.09, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 반짝임
+        ctx.fillStyle = 'rgba(255,255,200,0.7)';
+        ctx.beginPath();
+        ctx.arc(-objR * 0.1, -objR * 0.25, objR * 0.12, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+
+      } else if (obj.type === 'rock') {
+        ctx.save();
+        ctx.translate(ox, oy);
+
+        // 바위 그림자
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.beginPath();
+        ctx.ellipse(3, objR * 0.6, objR * 0.85, objR * 0.25, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 바위 본체
+        const rockGrad = ctx.createRadialGradient(-objR*0.2, -objR*0.2, 0, 0, 0, objR);
+        rockGrad.addColorStop(0, '#b09070');
+        rockGrad.addColorStop(1, '#5a4030');
+        ctx.fillStyle = rockGrad;
+        ctx.beginPath();
+        ctx.moveTo(-objR * 0.6, objR * 0.45);
+        ctx.quadraticCurveTo(-objR * 0.85, 0, -objR * 0.5, -objR * 0.5);
+        ctx.quadraticCurveTo(0, -objR * 0.8, objR * 0.55, -objR * 0.4);
+        ctx.quadraticCurveTo(objR * 0.82, 0, objR * 0.6, objR * 0.45);
+        ctx.closePath();
+        ctx.fill();
+
+        // 바위 하이라이트
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.beginPath();
+        ctx.ellipse(-objR * 0.2, -objR * 0.3, objR * 0.22, objR * 0.12, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+  }
+
+  function drawPenguin(W, H) {
+    const px = state.penguinX;
+    const py = state.penguinY + state.penguinBob;
+    const r  = W * CFG.PENGUIN_R;
+
+    ctx.save();
+    ctx.translate(px, py);
+
+    // 그림자
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(2, r * 0.7, r * 0.7, r * 0.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 몸통 (검정)
+    ctx.fillStyle = '#1a1a2e';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.72, r, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 배 (흰색)
+    ctx.fillStyle = '#f0f0f0';
+    ctx.beginPath();
+    ctx.ellipse(0, r * 0.1, r * 0.42, r * 0.65, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 얼굴
+    ctx.fillStyle = '#f0a050';
+    // 부리
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.12, -r * 0.55);
+    ctx.lineTo(0, -r * 0.3);
+    ctx.lineTo(r * 0.12, -r * 0.55);
+    ctx.closePath();
+    ctx.fill();
+
+    // 눈 (흰자)
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.22, -r * 0.62, r * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(r * 0.22, -r * 0.62, r * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 눈 (검정)
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.arc(-r * 0.2, -r * 0.62, r * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(r * 0.2, -r * 0.62, r * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 눈 하이라이트
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.16, -r * 0.66, r * 0.04, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(r * 0.24, -r * 0.66, r * 0.04, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 날개 (팔)
+    ctx.fillStyle = '#1a1a2e';
+    // 왼쪽
+    ctx.save();
+    ctx.translate(-r * 0.65, 0);
+    ctx.rotate(-0.3 + Math.sin(state.frame * 0.15) * 0.12);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.22, r * 0.5, 0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    // 오른쪽
+    ctx.save();
+    ctx.translate(r * 0.65, 0);
+    ctx.rotate(0.3 - Math.sin(state.frame * 0.15) * 0.12);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.22, r * 0.5, -0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // 발 (스키/오리발)
+    ctx.fillStyle = '#f0a050';
+    ctx.save();
+    ctx.translate(-r * 0.2, r * 0.85);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.28, r * 0.12, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.translate(r * 0.2, r * 0.85);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.28, r * 0.12, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function drawLives(W, H) {
+    // 목숨 표시 (하트)
+    const heartSize = Math.min(W * 0.06, 22);
+    const startX = W - 12 - heartSize * 3.2;
+    const startY = 12;
+    for (let i = 0; i < CFG.LIVES; i++) {
+      ctx.font = `${heartSize}px sans-serif`;
+      ctx.fillStyle = i < state.lives ? '#ff4466' : 'rgba(255,255,255,0.2)';
+      ctx.fillText('❤', startX + i * heartSize * 1.2, startY + heartSize);
+    }
+  }
+
+  function drawIdle() {
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#0a2a5e');
+    grad.addColorStop(0.45, '#1a5aaa');
+    grad.addColorStop(0.46, '#b8e4f9');
+    grad.addColorStop(1, '#ddf3ff');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  /* ───────────────────────────────────────────
+     HUD
+  ─────────────────────────────────────────── */
+  function updateHUD() {
+    scoreEl.textContent = Math.floor(state.score);
+    fishEl.textContent = state.fishCount;
+    const best = parseInt(localStorage.getItem(CFG.LS_KEY) || '0', 10);
+    bestEl.textContent = best;
+  }
+
+  /* ───────────────────────────────────────────
+     END
+  ─────────────────────────────────────────── */
+  function endGame() {
+    state.running = false;
+    cancelAnimationFrame(raf);
+
+    const finalScore = Math.floor(state.score);
+    const prev = parseInt(localStorage.getItem(CFG.LS_KEY) || '0', 10);
+    const isNew = finalScore > prev;
+    if (isNew) {
+      localStorage.setItem(CFG.LS_KEY, String(finalScore));
+    }
+
+    finalScoreEl.textContent = finalScore;
+    bestMsgEl.textContent = isNew
+      ? '🏆 새 최고 기록!'
+      : `최고 기록: ${Math.max(prev, finalScore)}점`;
+    resultMsgEl.textContent = state.fishCount >= 5
+      ? `물고기 ${state.fishCount}마리 잡았어요! 🐟`
+      : `물고기 ${state.fishCount}마리 잡았어요. 더 도전해봐요!`;
+
+    endOv.classList.remove('hidden');
+    updateHUD();
+  }
+
+})();
+</script>
+</body>
+</html>

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "acorn-squirrel",
+        "label": "🐿️ 다람쥐 도토리",
+        "path": "acorn-squirrel/index.html"
+      },
+      {
+        "id": "penguin-slide",
+        "label": "🐧 펭귄 미끄럼틀",
+        "path": "penguin-slide/index.html"
+      },
+      {
         "id": "honey-drip",
         "label": "🍯 꿀 받기",
         "path": "honey-drip/index.html"
