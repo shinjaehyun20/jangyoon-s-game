@@ -1,5 +1,13 @@
 [
   {
+    "id": "car-race",
+    "title": "Car Race",
+    "title_ko": "자동차 경주",
+    "description": "차선을 바꿔 적 차를 피하고 코인을 모으는 스피드 레이싱!",
+    "thumbnail": "car-race/thumb.svg",
+    "path": "car-race/index.html"
+  },
+  {
     "id": "space-catcher",
     "title": "Space Catcher",
     "title_ko": "우주 장윤이(별 먹기)",
@@ -782,5 +790,13 @@
     "description": "블록을 탭해서 딱 맞게 쌓아 성을 완성하는 퍼즐 게임",
     "thumbnail": "castle-builder/thumb.svg",
     "path": "castle-builder/index.html"
+  },
+  {
+    "id": "honey-drip",
+    "title": "Honey Drip",
+    "title_ko": "🍯 꿀 받기",
+    "description": "곰을 드래그해 떨어지는 꿀을 받고 벌은 피해요! 콤보로 고득점, 40초 도전",
+    "thumbnail": "honey-drip/thumb.svg",
+    "path": "honey-drip/index.html"
   }
 ]

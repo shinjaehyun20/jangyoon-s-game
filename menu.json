@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "honey-drip",
+        "label": "🍯 꿀 받기",
+        "path": "honey-drip/index.html"
+      },
+      {
+        "id": "car-race",
+        "label": "🚗 자동차 경주",
+        "path": "car-race/index.html"
+      },
+      {
         "id": "cannon-ball",
         "label": "💣 대포 쏘기",
         "path": "cannon-ball/index.html"

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🍯 꿀 받기</title>
+  <style>
+    :root {
+      --bg: #1a1000;
+      --bg2: #2a1a00;
+      --accent: #ffb300;
+      --accent2: #ff8f00;
+      --text: #fff8e1;
+      --danger: #e53935;
+      --safe: #43a047;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5.5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    /* HUD */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,179,0,0.12);
+      border-radius: 14px;
+      padding: 6px 14px;
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: clamp(13px, 3.5vw, 17px);
+    }
+    .hud-score { color: var(--accent); }
+    .hud-time  { color: #fff; }
+    .hud-lives { font-size: clamp(15px, 4vw, 20px); letter-spacing: 2px; }
+    /* Game area */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #0d1b2a 0%, #1a3a00 60%, #2e5900 100%);
+      touch-action: none;
+      cursor: none;
+    }
+    /* Sky / ground decoration */
+    #gameArea::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 40%;
+      background: linear-gradient(180deg, #0d1b2a 0%, #1a2e10 100%);
+      pointer-events: none;
+    }
+    /* Ground */
+    .ground {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 12%;
+      background: #4e3b1e;
+      border-top: 3px solid #7a5c2e;
+      pointer-events: none;
+    }
+    .ground::after {
+      content: '🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱';
+      position: absolute;
+      top: -14px; left: 0;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 100%;
+      pointer-events: none;
+    }
+    /* Bear (player) */
+    #bear {
+      position: absolute;
+      bottom: 12%;
+      font-size: clamp(36px, 9vw, 52px);
+      transform: translateX(-50%);
+      transition: left 0.05s linear;
+      pointer-events: none;
+      text-align: center;
+      line-height: 1;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+    }
+    /* Falling objects */
+    .drop {
+      position: absolute;
+      font-size: clamp(24px, 6vw, 36px);
+      transform: translateX(-50%);
+      pointer-events: none;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+      transition: top 0.05s linear;
+    }
+    /* Catch flash */
+    .catch-flash {
+      position: absolute;
+      font-size: clamp(18px, 4vw, 24px);
+      font-weight: 900;
+      color: var(--accent);
+      animation: floatUp 0.7s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-60px); }
+    }
+    /* Combo bar */
+    #comboDisplay {
+      position: absolute;
+      top: 8px; left: 50%; transform: translateX(-50%);
+      font-size: clamp(14px, 3.5vw, 18px);
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 12px var(--accent2), 0 0 4px #000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    /* Progress bar (time) */
+    #timeBar {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 4px;
+      background: var(--accent);
+      transition: width 1s linear, background 0.3s;
+      border-radius: 0 2px 0 0;
+    }
+    /* Footer */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      font-size: clamp(11px, 3vw, 13px);
+      color: rgba(255,255,255,0.4);
+      padding: 0 2px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      min-height: 32px;
+      display: flex; align-items: center;
+    }
+    .home-link:hover { color: #fff; }
+
+    /* ── Overlays ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(145deg, #2a1a00, #3d2600);
+      border: 2px solid var(--accent2);
+      border-radius: 24px;
+      padding: 28px 24px 24px;
+      width: min(340px, 88vw);
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(255,179,0,0.3);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 30px);
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 15px);
+      line-height: 1.6;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 18px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #1a0a00;
+      font-weight: 900;
+      font-size: clamp(16px, 4.5vw, 20px);
+      border: none;
+      border-radius: 50px;
+      padding: 12px 36px;
+      min-height: 48px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255,179,0,0.5);
+      transition: transform 0.1s, box-shadow 0.1s;
+      touch-action: manipulation;
+    }
+    .btn-start:active { transform: scale(0.96); box-shadow: 0 2px 10px rgba(255,179,0,0.3); }
+    .result-score {
+      font-size: clamp(36px, 10vw, 52px);
+      font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0 4px;
+    }
+    .result-best {
+      font-size: clamp(12px, 3vw, 14px);
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 16px;
+    }
+    .emoji-preview {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+    /* Difficulty buttons */
+    .diff-btns {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+    .diff-btn {
+      background: rgba(255,179,0,0.15);
+      border: 1.5px solid var(--accent2);
+      color: var(--text);
+      font-size: clamp(12px, 3vw, 14px);
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 8px 16px;
+      min-height: 40px;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .diff-btn.active, .diff-btn:active {
+      background: var(--accent);
+      color: #1a0a00;
+      transform: scale(0.97);
+    }
+    /* Hive (goal indicator) */
+    #hive {
+      position: absolute;
+      top: 6px; right: 10px;
+      font-size: clamp(28px, 7vw, 40px);
+      pointer-events: none;
+      filter: drop-shadow(0 2px 6px rgba(255,179,0,0.6));
+    }
+    /* Honey drip from hive */
+    #honeyCord {
+      position: absolute;
+      top: 0; right: 0;
+      width: 40px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍯 꿀 받기</h1>
+    <div class="hud">
+      <span class="hud-score">🍯 <span id="scoreVal">0</span></span>
+      <span class="hud-time">⏱ <span id="timeVal">40</span>초</span>
+      <span class="hud-lives" id="livesVal">🐻🐻🐻</span>
+    </div>
+
+    <div id="gameArea">
+      <div id="hive">🏠🐝</div>
+      <div class="ground"></div>
+      <div id="bear">🐻</div>
+      <div id="comboDisplay"></div>
+      <div id="timeBar" style="width:100%"></div>
+    </div>
+
+    <footer>
+      <small>좌우 드래그로 곰 이동 • 꿀🍯 잡고 벌🐝 피하기</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <div class="emoji-preview">🐻🍯</div>
+      <h2>꿀 받기</h2>
+      <p>🍯 떨어지는 꿀을 곰이 받아요!<br>🐝 벌은 피하세요. 목숨 3개 도전!</p>
+      <div class="diff-btns">
+        <button class="diff-btn active" data-diff="easy">쉬움 🌟</button>
+        <button class="diff-btn" data-diff="normal">보통 🌟🌟</button>
+        <button class="diff-btn" data-diff="hard">어려움 🌟🌟🌟</button>
+      </div>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-best" id="bestScore"></div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기 🍯</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ── CONFIG ──────────────────────────────────────────────
+    const DIFF = {
+      easy:   { speed: 2.2, spawnMs: 1300, beeRatio: 0.2, bearW: 0.32 },
+      normal: { speed: 3.2, spawnMs: 950,  beeRatio: 0.3, bearW: 0.26 },
+      hard:   { speed: 4.4, spawnMs: 700,  beeRatio: 0.4, bearW: 0.22 }
+    };
+    const TOTAL_TIME = 40;
+    const MAX_LIVES  = 3;
+    const HONEY_EMOJIS = ['🍯','🍯','🍯','🍯','🌸','⭐','🍎'];
+    const BEE_EMOJIS   = ['🐝','🐝','🦟'];
+    const SCORE_HONEY  = [10, 15, 15, 15, 20, 25, 15]; // 꿀 종류별 점수
+    const STORAGE_KEY  = 'honey-drip_best';
+
+    // ── STATE ───────────────────────────────────────────────
+    const S = {
+      running: false, paused: false,
+      score: 0, lives: MAX_LIVES,
+      timeLeft: TOTAL_TIME,
+      combo: 0,
+      diff: 'normal',
+      drops: [],          // { el, x, y, speed, isHoney, scoreIdx }
+      spawnTimer: null,
+      countdownTimer: null,
+      rafId: null,
+      lastRaf: 0,
+      bearX: 50,          // % of game area width
+      dragging: false,
+      dragStartX: 0,
+      dragStartBearX: 0,
+      bearWPct: 0.26,     // half-width of catch zone as fraction
+    };
+
+    // ── DOM ─────────────────────────────────────────────────
+    const gameArea    = document.getElementById('gameArea');
+    const bear        = document.getElementById('bear');
+    const scoreVal    = document.getElementById('scoreVal');
+    const timeVal     = document.getElementById('timeVal');
+    const livesVal    = document.getElementById('livesVal');
+    const timeBar     = document.getElementById('timeBar');
+    const comboDisp   = document.getElementById('comboDisplay');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay   = document.getElementById('endOverlay');
+    const finalScore   = document.getElementById('finalScore');
+    const bestScoreEl  = document.getElementById('bestScore');
+    const resultMsg    = document.getElementById('resultMsg');
+    const startBtn     = document.getElementById('startBtn');
+    const restartBtn   = document.getElementById('restartBtn');
+
+    // ── DIFFICULTY BUTTONS ───────────────────────────────────
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        S.diff = btn.dataset.diff;
+      });
+    });
+
+    // ── START / RESTART ──────────────────────────────────────
+    startBtn.addEventListener('pointerdown', e => { e.preventDefault(); startGame(); });
+    restartBtn.addEventListener('pointerdown', e => { e.preventDefault(); startGame(); });
+
+    function startGame() {
+      resetState();
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      const cfg = DIFF[S.diff];
+      S.bearWPct = cfg.bearW;
+      S.running = true;
+      updateUI();
+      scheduleSpawn();
+      startCountdown();
+      S.lastRaf = performance.now();
+      requestAnimationFrame(loop);
+    }
+
+    function resetState() {
+      cancelAnimationFrame(S.rafId);
+      clearTimeout(S.spawnTimer);
+      clearInterval(S.countdownTimer);
+      S.drops.forEach(d => d.el.remove());
+      document.querySelectorAll('.catch-flash').forEach(el => el.remove());
+      S.drops = [];
+      S.score = 0; S.lives = MAX_LIVES;
+      S.timeLeft = TOTAL_TIME; S.combo = 0;
+      S.bearX = 50; S.running = false;
+      S.dragging = false;
+      bear.style.left = '50%';
+      comboDisp.style.opacity = '0';
+      timeBar.style.width = '100%';
+      timeBar.style.background = 'var(--accent)';
+    }
+
+    // ── GAME LOOP ────────────────────────────────────────────
+    function loop(now) {
+      if (!S.running) return;
+      const dt = Math.min((now - S.lastRaf) / 16.67, 4); // frame delta (1 = 60fps frame)
+      S.lastRaf = now;
+      const cfg = DIFF[S.diff];
+      const areaH = gameArea.clientHeight;
+      const groundH = areaH * 0.12;
+      const bearY = areaH - groundH;
+
+      S.drops.forEach((d, i) => {
+        d.y += d.speed * dt;
+        d.el.style.top = d.y + 'px';
+
+        // Catch / miss detection
+        if (d.y + 30 >= bearY - 24) {
+          const bearPxX = (S.bearX / 100) * gameArea.clientWidth;
+          const dropPxX = (d.x / 100) * gameArea.clientWidth;
+          const catchZone = gameArea.clientWidth * S.bearWPct;
+          if (Math.abs(dropPxX - bearPxX) < catchZone) {
+            // Caught
+            if (d.isHoney) {
+              const pts = (SCORE_HONEY[d.scoreIdx] || 10) * (1 + Math.floor(S.combo / 3));
+              S.score += pts;
+              S.combo++;
+              showFlash(d.x + '%', d.y, '+' + pts + (S.combo >= 3 ? ' x' + S.combo + '!' : ''));
+              showCombo();
+            } else {
+              // Caught a bee — lose life
+              S.lives--;
+              S.combo = 0;
+              comboDisp.style.opacity = '0';
+              showFlash(d.x + '%', d.y, '😵 아야!', true);
+              flashGameArea('#e53935');
+              updateUI();
+              if (S.lives <= 0) { endGame(); return; }
+            }
+          } else {
+            // Missed honey
+            if (d.isHoney) {
+              S.combo = 0;
+              comboDisp.style.opacity = '0';
+            } else {
+              // Missed bee — safe!
+              showFlash(d.x + '%', d.y, '✅ 피했다!');
+            }
+          }
+          d.el.remove();
+          S.drops.splice(i, 1);
+        }
+      });
+
+      scoreVal.textContent = S.score;
+      S.rafId = requestAnimationFrame(loop);
+    }
+
+    // ── SPAWN ────────────────────────────────────────────────
+    function scheduleSpawn() {
+      if (!S.running) return;
+      const cfg = DIFF[S.diff];
+      spawnDrop(cfg);
+      S.spawnTimer = setTimeout(scheduleSpawn, cfg.spawnMs + Math.random() * cfg.spawnMs * 0.4);
+    }
+
+    function spawnDrop(cfg) {
+      const isBee = Math.random() < cfg.beeRatio;
+      const scoreIdx = isBee ? -1 : Math.floor(Math.random() * HONEY_EMOJIS.length);
+      const emoji = isBee
+        ? BEE_EMOJIS[Math.floor(Math.random() * BEE_EMOJIS.length)]
+        : HONEY_EMOJIS[scoreIdx];
+
+      const el = document.createElement('div');
+      el.className = 'drop';
+      el.textContent = emoji;
+      const x = 8 + Math.random() * 84; // % from left
+      el.style.left = x + '%';
+      el.style.top  = '-40px';
+      gameArea.appendChild(el);
+
+      const speedPx = cfg.speed * (0.8 + Math.random() * 0.5);
+      S.drops.push({ el, x, y: -40, speed: speedPx, isHoney: !isBee, scoreIdx });
+    }
+
+    // ── COUNTDOWN ────────────────────────────────────────────
+    function startCountdown() {
+      S.countdownTimer = setInterval(() => {
+        if (!S.running) return;
+        S.timeLeft--;
+        timeVal.textContent = S.timeLeft;
+        const pct = (S.timeLeft / TOTAL_TIME) * 100;
+        timeBar.style.width = pct + '%';
+        if (S.timeLeft <= 10) timeBar.style.background = 'var(--danger)';
+        if (S.timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    // ── END ───────────────────────────────────────────────────
+    function endGame() {
+      S.running = false;
+      clearTimeout(S.spawnTimer);
+      clearInterval(S.countdownTimer);
+      cancelAnimationFrame(S.rafId);
+
+      const prev = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+      const isNew = S.score > prev;
+      if (isNew) localStorage.setItem(STORAGE_KEY, S.score);
+
+      finalScore.textContent = S.score + '점';
+      bestScoreEl.textContent = isNew
+        ? '🏆 새 최고 기록!'
+        : '최고 기록: ' + Math.max(prev, S.score) + '점';
+      resultMsg.textContent = S.score >= 200
+        ? '와! 꿀 수집왕 🏆🍯'
+        : S.score >= 100
+          ? '대단해요! 꿀이 가득 🐻💛'
+          : S.lives > 0
+            ? '잘 했어요! 더 도전해봐요 🍯'
+            : '벌에 쏘였지만 잘 버텼어요! 🐝';
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    // ── UI HELPERS ────────────────────────────────────────────
+    function updateUI() {
+      const hearts = ['', '🐻', '🐻🐻', '🐻🐻🐻'];
+      livesVal.textContent = hearts[Math.max(0, S.lives)] || '💀';
+    }
+
+    function showFlash(leftPct, topPx, text, isDanger) {
+      const f = document.createElement('div');
+      f.className = 'catch-flash';
+      f.textContent = text;
+      f.style.left = leftPct;
+      f.style.top = topPx + 'px';
+      f.style.color = isDanger ? 'var(--danger)' : 'var(--accent)';
+      gameArea.appendChild(f);
+      setTimeout(() => f.remove(), 750);
+    }
+
+    function showCombo() {
+      if (S.combo >= 3) {
+        comboDisp.textContent = '🔥 ' + S.combo + ' 콤보!';
+        comboDisp.style.opacity = '1';
+      } else {
+        comboDisp.style.opacity = '0';
+      }
+    }
+
+    let flashTimeout = null;
+    function flashGameArea(color) {
+      gameArea.style.boxShadow = '0 0 0 4px ' + color + ' inset';
+      clearTimeout(flashTimeout);
+      flashTimeout = setTimeout(() => { gameArea.style.boxShadow = ''; }, 350);
+    }
+
+    // ── BEAR MOVEMENT ─────────────────────────────────────────
+    // Drag on game area to move bear
+    gameArea.addEventListener('pointerdown', e => {
+      if (!S.running) return;
+      e.preventDefault();
+      gameArea.setPointerCapture(e.pointerId);
+      S.dragging = true;
+      S.dragStartX = e.clientX;
+      S.dragStartBearX = S.bearX;
+    });
+
+    window.addEventListener('pointermove', e => {
+      if (!S.running || !S.dragging) return;
+      const areaW = gameArea.clientWidth;
+      const dx = e.clientX - S.dragStartX;
+      const dxPct = (dx / areaW) * 100;
+      S.bearX = Math.max(8, Math.min(92, S.dragStartBearX + dxPct));
+      bear.style.left = S.bearX + '%';
+    });
+
+    window.addEventListener('pointerup', () => {
+      S.dragging = false;
+    });
+
+    // Tap anywhere on game area also moves bear instantly
+    gameArea.addEventListener('pointerdown', e => {
+      if (!S.running) return;
+      const rect = gameArea.getBoundingClientRect();
+      const tapX = ((e.clientX - rect.left) / rect.width) * 100;
+      S.bearX = Math.max(8, Math.min(92, tapX));
+      bear.style.left = S.bearX + '%';
+    }, { passive: false });
+
+  })();
+  </script>
+</body>
+</html>

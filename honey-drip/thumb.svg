@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1b2a"/>
+      <stop offset="60%" stop-color="#1a3a00"/>
+      <stop offset="100%" stop-color="#2e5900"/>
+    </linearGradient>
+    <linearGradient id="honey" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffb300"/>
+      <stop offset="100%" stop-color="#ff8f00"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" rx="4"/>
+
+  <!-- Ground strip -->
+  <rect x="0" y="150" width="320" height="30" fill="#4e3b1e"/>
+  <rect x="0" y="150" width="320" height="3" fill="#7a5c2e"/>
+
+  <!-- Stars background -->
+  <circle cx="30"  cy="25" r="1.5" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="90"  cy="15" r="1"   fill="rgba(255,255,255,0.5)"/>
+  <circle cx="150" cy="30" r="2"   fill="rgba(255,255,255,0.7)"/>
+  <circle cx="200" cy="12" r="1.5" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="260" cy="22" r="1"   fill="rgba(255,255,255,0.6)"/>
+
+  <!-- Hive (top center-right) -->
+  <text x="230" y="55" font-size="36" text-anchor="middle" filter="url(#glow)">🏠🐝</text>
+
+  <!-- Honey drip drops (falling) -->
+  <!-- Drop 1 -->
+  <ellipse cx="80" cy="80" rx="12" ry="16" fill="url(#honey)" opacity="0.95" filter="url(#glow)"/>
+  <ellipse cx="80" cy="72" rx="8" ry="10" fill="#ffcc40"/>
+
+  <!-- Drop 2 -->
+  <ellipse cx="190" cy="60" rx="10" ry="14" fill="url(#honey)" opacity="0.9" filter="url(#glow)"/>
+  <ellipse cx="190" cy="53" rx="7" ry="9" fill="#ffcc40"/>
+
+  <!-- Drop 3 (smallest, highest) -->
+  <ellipse cx="140" cy="40" rx="7" ry="10" fill="#ff8f00" opacity="0.8"/>
+
+  <!-- Bee -->
+  <text x="120" y="105" font-size="28" text-anchor="middle" filter="url(#glow)">🐝</text>
+
+  <!-- Bear at bottom center -->
+  <text x="90" y="155" font-size="38" text-anchor="middle" filter="url(#glow)">🐻</text>
+
+  <!-- Honey pot bear catching -->
+  <text x="90" y="155" font-size="38" text-anchor="middle">🐻</text>
+
+  <!-- Honeypot icon -->
+  <text x="40" y="55" font-size="30" text-anchor="middle" filter="url(#glow)">🍯</text>
+
+  <!-- Combo indicator -->
+  <rect x="155" y="90" width="60" height="22" rx="11" fill="rgba(255,179,0,0.25)" stroke="#ffb300" stroke-width="1.5"/>
+  <text x="185" y="105" text-anchor="middle" font-size="12" font-weight="900" fill="#ffb300" font-family="sans-serif">🔥 콤보!</text>
+
+  <!-- Title text (bottom right) -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffb300">꿀 받기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">HONEY DRIP</text>
+  </g>
+</svg>
