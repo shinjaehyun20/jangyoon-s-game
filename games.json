@@ -814,5 +814,21 @@
     "description": "곰을 드래그해 떨어지는 꿀을 받고 벌은 피해요! 콤보로 고득점, 40초 도전",
     "thumbnail": "honey-drip/thumb.svg",
     "path": "honey-drip/index.html"
+  },
+  {
+    "id": "mushroom-pick",
+    "title": "Mushroom Pick",
+    "title_ko": "🍄 버섯 바구니",
+    "description": "바구니를 좌우로 움직여 착한 버섯은 받고 독버섯(☠️)은 피해요! 금버섯은 3배 점수, 40초 도전",
+    "thumbnail": "mushroom-pick/thumb.svg",
+    "path": "mushroom-pick/index.html"
+  },
+  {
+    "id": "dolphin-jump",
+    "title": "Dolphin Jump",
+    "title_ko": "🐬 돌고래 점프",
+    "description": "탭해서 점프! 돌고래가 물에서 뛰어올라 링을 통과해요. 타이밍이 핵심!",
+    "thumbnail": "dolphin-jump/thumb.svg",
+    "path": "dolphin-jump/index.html"
   }
 ]

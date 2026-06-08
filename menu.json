@@ -362,6 +362,11 @@
         "id": "memory-sequence",
         "label": "🧠 순서 기억하기",
         "path": "memory-sequence/index.html"
+      },
+      {
+        "id": "dolphin-jump",
+        "label": "🐬 돌고래 점프",
+        "path": "dolphin-jump/index.html"
       }
     ]
   },
