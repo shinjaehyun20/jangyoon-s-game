@@ -82,6 +82,8 @@
 | [🍂 낙엽 잡기 (leaf-catch)](./leaf-catch) | 바람에 흔들리며 떨어지는 낙엽을 바구니로 받아요! 황금잎 보너스! | 어린이 |
 | [🔦 등대 불빛 (lighthouse-guide)](./lighthouse-guide) | 등대를 드래그로 회전시켜 불빛으로 밤바다 배들을 항구로 안내해요! | 어린이 |
 | [🐬 돌고래 점프 (dolphin-jump)](./dolphin-jump) | 탭해서 점프! 돌고래가 물에서 뛰어올라 링을 통과해요. 타이밍이 핵심! | 타이밍/액션 |
+| [⭐ 별 더하기 (star-adder)](./star-adder) | 두 그룹의 별을 탭해서 바구니에 넣고 덧셈을 익혀요! 5레벨, 목숨 3개 | 어린이/학습 |
+| [🔶 탱그램 퍼즐 (tangram-puzzle)](./tangram-puzzle) | 7가지 조각을 끌어다 놓아 목표 모양을 완성해요! 공간 감각 드래그 퍼즐 | 퍼즐/창의 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 

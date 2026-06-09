@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#2d1b5e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 탱그램 조각들 (집 모양) -->
+  <!-- 큰 삼각형 1 (빨강) -->
+  <polygon points="80,40 148,40 114,74" fill="#e94560" opacity="0.9"/>
+  <!-- 큰 삼각형 2 (주황) -->
+  <polygon points="148,40 216,40 182,74" fill="#f5a623" opacity="0.9"/>
+  <!-- 중간 삼각형 (초록) -->
+  <polygon points="114,74 182,74 148,108" fill="#2ecc71" opacity="0.9"/>
+  <!-- 사각형 (파랑, 기울어짐) -->
+  <polygon points="84,80 108,104 84,128 60,104" fill="#3498db" opacity="0.9"/>
+  <!-- 평행사변형 (보라) -->
+  <polygon points="108,104 162,104 178,120 124,120" fill="#9b59b6" opacity="0.9"/>
+  <!-- 작은 삼각형 1 (청록) -->
+  <polygon points="162,104 196,104 179,121" fill="#1abc9c" opacity="0.9"/>
+  <!-- 작은 삼각형 2 (주황2) -->
+  <polygon points="196,104 220,104 208,118" fill="#e67e22" opacity="0.9"/>
+
+  <!-- 테두리 강조선 -->
+  <polygon points="80,40 148,40 114,74" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <polygon points="148,40 216,40 182,74" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <polygon points="114,74 182,74 148,108" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+
+  <!-- 타이틀 (우하단) -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#f5a623">탱그램 퍼즐</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">TANGRAM PUZZLE</text>
+  </g>
+</svg>

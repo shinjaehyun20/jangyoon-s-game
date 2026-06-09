@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>탱그램 퍼즐</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg2: #16213e;
+      --accent: #e94560;
+      --accent2: #f5a623;
+      --text: #ffffff;
+      --panel: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px;
+      gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex;
+      gap: 8px;
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 8px 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 60px;
+    }
+    .hud-label {
+      font-size: 10px;
+      opacity: 0.7;
+      letter-spacing: 0.5px;
+    }
+    .hud-val {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--accent2);
+    }
+    #levelLabel { color: var(--accent); }
+    .game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+    }
+    /* 목표 영역 (상단) */
+    #targetArea {
+      flex: 1;
+      background: var(--bg2);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #targetLabel {
+      position: absolute;
+      top: 6px;
+      left: 10px;
+      font-size: 10px;
+      opacity: 0.5;
+      letter-spacing: 1px;
+    }
+    #targetCanvas {
+      display: block;
+    }
+    /* 조각 팔레트 (하단) */
+    #pieceArea {
+      flex: 0 0 auto;
+      background: var(--bg2);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    #pieceLabel {
+      position: absolute;
+      top: 6px;
+      left: 10px;
+      font-size: 10px;
+      opacity: 0.5;
+      letter-spacing: 1px;
+    }
+    #pieceCanvas {
+      display: block;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2px;
+    }
+    footer small {
+      font-size: 11px;
+      opacity: 0.5;
+    }
+    .home-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,10,30,0.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1e2a4a, #2d1b5e);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 320px;
+      width: 90%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .overlay-card h2 { font-size: 28px; }
+    .overlay-card p { font-size: 14px; line-height: 1.6; opacity: 0.85; }
+    .result-score {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--accent2);
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #c0392b);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 32px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 52px;
+      touch-action: manipulation;
+      letter-spacing: 1px;
+    }
+    .btn-start:active { opacity: 0.85; transform: scale(0.97); }
+    #successFlash {
+      position: fixed; inset: 0;
+      background: rgba(255, 200, 0, 0.35);
+      pointer-events: none;
+      display: none;
+      z-index: 200;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🔶 탱그램 퍼즐</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">레벨</span>
+        <span class="hud-val" id="levelLabel">1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">놓은 조각</span>
+        <span class="hud-val" id="placedLabel">0 / 7</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">최고 레벨</span>
+        <span class="hud-val" id="bestLabel">-</span>
+      </div>
+    </div>
+
+    <div class="game-area">
+      <div id="targetArea">
+        <span id="targetLabel">목표 모양</span>
+        <canvas id="targetCanvas"></canvas>
+      </div>
+      <div id="pieceArea">
+        <span id="pieceLabel">조각을 끌어다 놓아요!</span>
+        <canvas id="pieceCanvas"></canvas>
+      </div>
+    </div>
+
+    <footer>
+      <small>조각을 드래그해서 모양을 완성하세요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🔶 탱그램 퍼즐</h2>
+      <p>조각을 끌어다 놓아서<br>목표 모양을 완성해요!<br><br>레벨이 올라갈수록<br>더 어려운 모양이 나와요 ✨</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 대단해요!</h2>
+      <div class="result-score" id="finalScore">1</div>
+      <p id="resultMsg">레벨 완성!</p>
+      <button class="btn-start" id="nextBtn">다음 레벨 →</button>
+    </div>
+  </div>
+
+  <div id="successFlash"></div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── CONFIG ── */
+    const CONFIG = {
+      SNAP_DIST: 36,       // 스냅 판정 거리 (px, target 좌표계)
+      PIECE_COLS: 4,       // 팔레트 열 수
+      COLORS: [
+        '#e94560', '#f5a623', '#2ecc71', '#3498db',
+        '#9b59b6', '#1abc9c', '#e67e22'
+      ],
+      BEST_KEY: 'tangram-puzzle_best',
+    };
+
+    /* ── 탱그램 7조각 정의 (단위: 표준 탱그램 단위 격자 기반)
+       각 조각은 origin 기준 다각형 좌표 (unit = 1)
+       실제 렌더 시 scale 적용
+    ── */
+    const PIECE_SHAPES = [
+      // 0: 큰 삼각형 1
+      { pts: [[0,0],[2,0],[1,1]], label:'▲' },
+      // 1: 큰 삼각형 2
+      { pts: [[0,0],[2,0],[1,1]], label:'▲' },
+      // 2: 중간 삼각형
+      { pts: [[0,0],[1.414,0],[0.707,0.707]], label:'△' },
+      // 3: 작은 삼각형 1
+      { pts: [[0,0],[1,0],[0.5,0.5]], label:'▲' },
+      // 4: 작은 삼각형 2
+      { pts: [[0,0],[1,0],[0.5,0.5]], label:'▲' },
+      // 5: 사각형 (정사각형)
+      { pts: [[0,0],[0.707,0.707],[1.414,0],[0.707,-0.707]], label:'■' },
+      // 6: 평행사변형
+      { pts: [[0,0],[1,0],[1.5,0.5],[0.5,0.5]], label:'▱' },
+    ];
+
+    /* ── 레벨 정의
+       각 레벨은 puzzles 배열에서 목표 실루엣 + 조각 배치를 정의
+       target: 완성 모양의 좌표 (캔버스 기준 0~1 정규화)
+       placements: 각 조각의 [x, y, rotation(deg)] in 0~1 정규화 좌표
+    ── */
+    const LEVELS = [
+      {
+        name: '네모 집',
+        emoji: '🏠',
+        target: buildSquareHouse(),
+        placements: [
+          { pieceIdx: 0, x: 0.5, y: 0.28, rot: 0   },  // 큰삼각1 — 지붕 왼쪽
+          { pieceIdx: 1, x: 0.5, y: 0.28, rot: 180 },  // 큰삼각2 — 지붕 오른쪽
+          { pieceIdx: 5, x: 0.32, y: 0.6, rot: 45  },  // 사각형 — 몸통 왼쪽
+          { pieceIdx: 2, x: 0.65, y: 0.57, rot: 90 },  // 중간삼각 — 몸통 오른쪽
+          { pieceIdx: 3, x: 0.35, y: 0.75, rot: 0  },  // 작은삼각1 — 하단 왼쪽
+          { pieceIdx: 4, x: 0.62, y: 0.75, rot: 180},  // 작은삼각2 — 하단 오른쪽
+          { pieceIdx: 6, x: 0.5,  y: 0.75, rot: 0  },  // 평행사변형 — 하단 중간
+        ],
+      },
+      {
+        name: '고양이',
+        emoji: '🐱',
+        target: buildCat(),
+        placements: [
+          { pieceIdx: 0, x: 0.3,  y: 0.3,  rot: 0   },
+          { pieceIdx: 1, x: 0.7,  y: 0.3,  rot: 90  },
+          { pieceIdx: 2, x: 0.5,  y: 0.5,  rot: 45  },
+          { pieceIdx: 3, x: 0.3,  y: 0.65, rot: 0   },
+          { pieceIdx: 4, x: 0.68, y: 0.65, rot: 180 },
+          { pieceIdx: 5, x: 0.5,  y: 0.72, rot: 0   },
+          { pieceIdx: 6, x: 0.5,  y: 0.82, rot: 90  },
+        ],
+      },
+      {
+        name: '오리',
+        emoji: '🦆',
+        target: buildDuck(),
+        placements: [
+          { pieceIdx: 0, x: 0.28, y: 0.3,  rot: 270 },
+          { pieceIdx: 1, x: 0.65, y: 0.35, rot: 90  },
+          { pieceIdx: 2, x: 0.5,  y: 0.55, rot: 0   },
+          { pieceIdx: 3, x: 0.35, y: 0.68, rot: 45  },
+          { pieceIdx: 4, x: 0.62, y: 0.68, rot: 135 },
+          { pieceIdx: 5, x: 0.5,  y: 0.76, rot: 0   },
+          { pieceIdx: 6, x: 0.42, y: 0.84, rot: 0   },
+        ],
+      },
+      {
+        name: '물고기',
+        emoji: '🐟',
+        target: buildFish(),
+        placements: [
+          { pieceIdx: 0, x: 0.25, y: 0.38, rot: 0   },
+          { pieceIdx: 1, x: 0.65, y: 0.38, rot: 180 },
+          { pieceIdx: 2, x: 0.5,  y: 0.5,  rot: 0   },
+          { pieceIdx: 3, x: 0.32, y: 0.65, rot: 0   },
+          { pieceIdx: 4, x: 0.68, y: 0.65, rot: 90  },
+          { pieceIdx: 5, x: 0.5,  y: 0.72, rot: 0   },
+          { pieceIdx: 6, x: 0.78, y: 0.5,  rot: 270 },
+        ],
+      },
+      {
+        name: '배',
+        emoji: '⛵',
+        target: buildBoat(),
+        placements: [
+          { pieceIdx: 0, x: 0.5,  y: 0.28, rot: 180 },
+          { pieceIdx: 1, x: 0.3,  y: 0.48, rot: 270 },
+          { pieceIdx: 2, x: 0.65, y: 0.45, rot: 90  },
+          { pieceIdx: 3, x: 0.35, y: 0.68, rot: 0   },
+          { pieceIdx: 4, x: 0.62, y: 0.68, rot: 0   },
+          { pieceIdx: 5, x: 0.5,  y: 0.75, rot: 45  },
+          { pieceIdx: 6, x: 0.5,  y: 0.82, rot: 0   },
+        ],
+      },
+    ];
+
+    /* ── 목표 실루엣 생성 함수 (단순 폴리곤) ── */
+    function buildSquareHouse() {
+      // 집 모양: 지붕(삼각형) + 몸통(사각형)
+      return [
+        // outer path: normalized 0~1 좌표
+        { type: 'poly', pts: [
+          [0.2, 0.85], [0.8, 0.85],
+          [0.8, 0.45], [0.5, 0.22],
+          [0.2, 0.45]
+        ], fill: 'rgba(255,255,255,0.12)' },
+      ];
+    }
+    function buildCat() {
+      return [
+        { type: 'poly', pts: [
+          [0.38,0.85],[0.62,0.85],[0.68,0.68],
+          [0.72,0.55],[0.65,0.38],[0.58,0.25],
+          [0.5,0.20],[0.42,0.25],[0.35,0.38],
+          [0.28,0.55],[0.32,0.68]
+        ], fill: 'rgba(255,255,255,0.12)' },
+        // 귀 왼
+        { type: 'poly', pts: [[0.34,0.32],[0.40,0.18],[0.44,0.30]], fill: 'rgba(255,255,255,0.10)' },
+        // 귀 오른
+        { type: 'poly', pts: [[0.60,0.32],[0.56,0.18],[0.66,0.30]], fill: 'rgba(255,255,255,0.10)' },
+      ];
+    }
+    function buildDuck() {
+      return [
+        // 몸통
+        { type: 'ellipse', cx:0.52, cy:0.62, rx:0.22, ry:0.18, fill:'rgba(255,255,255,0.12)' },
+        // 머리
+        { type: 'ellipse', cx:0.35, cy:0.38, rx:0.12, ry:0.11, fill:'rgba(255,255,255,0.12)' },
+        // 꼬리
+        { type: 'poly', pts:[[0.70,0.5],[0.82,0.38],[0.78,0.60]], fill:'rgba(255,255,255,0.10)' },
+      ];
+    }
+    function buildFish() {
+      return [
+        // 몸통
+        { type: 'ellipse', cx:0.48, cy:0.5, rx:0.24, ry:0.16, fill:'rgba(255,255,255,0.12)' },
+        // 꼬리
+        { type: 'poly', pts:[[0.72,0.40],[0.85,0.32],[0.85,0.68],[0.72,0.60]], fill:'rgba(255,255,255,0.10)' },
+      ];
+    }
+    function buildBoat() {
+      return [
+        // 돛
+        { type: 'poly', pts:[[0.50,0.20],[0.50,0.60],[0.28,0.60]], fill:'rgba(255,255,255,0.12)' },
+        // 선체
+        { type: 'poly', pts:[[0.22,0.62],[0.78,0.62],[0.68,0.80],[0.32,0.80]], fill:'rgba(255,255,255,0.12)' },
+      ];
+    }
+
+    /* ── State ── */
+    let state = {
+      level: 0,
+      placed: [],        // placed[i] = { pieceIdx, cx, cy, rot } 또는 null
+      dragging: null,    // { srcSlot, pieceIdx, startX, startY, curX, curY }
+      complete: false,
+    };
+
+    /* ── DOM refs ── */
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay   = document.getElementById('endOverlay');
+    const startBtn     = document.getElementById('startBtn');
+    const nextBtn      = document.getElementById('nextBtn');
+    const levelLabel   = document.getElementById('levelLabel');
+    const placedLabel  = document.getElementById('placedLabel');
+    const bestLabel    = document.getElementById('bestLabel');
+    const finalScore   = document.getElementById('finalScore');
+    const resultMsg    = document.getElementById('resultMsg');
+    const successFlash = document.getElementById('successFlash');
+
+    const targetArea  = document.getElementById('targetArea');
+    const targetCanvas= document.getElementById('targetCanvas');
+    const pieceArea   = document.getElementById('pieceArea');
+    const pieceCanvas = document.getElementById('pieceCanvas');
+    const tCtx = targetCanvas.getContext('2d');
+    const pCtx = pieceCanvas.getContext('2d');
+
+    /* ── localStorage best ── */
+    function getBest() {
+      return parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+    }
+    function setBest(v) {
+      if (v > getBest()) localStorage.setItem(CONFIG.BEST_KEY, String(v));
+    }
+
+    /* ── canvas resize ── */
+    function resizeCanvases() {
+      const taRect = targetArea.getBoundingClientRect();
+      const paRect = pieceArea.getBoundingClientRect();
+      targetCanvas.width  = taRect.width;
+      targetCanvas.height = taRect.height;
+      pieceCanvas.width   = paRect.width;
+      pieceCanvas.height  = paRect.height;
+    }
+
+    /* ── 조각 크기 계산 ── */
+    function getPieceScale() {
+      // 조각 기본 크기: pieceCanvas 높이 기준
+      const h = pieceCanvas.height;
+      return Math.max(30, Math.min(50, h * 0.35));
+    }
+    function getTargetScale() {
+      const s = Math.min(targetCanvas.width, targetCanvas.height);
+      return s * 0.12;
+    }
+
+    /* ── 조각 그리기 ── */
+    function drawPiece(ctx, shapeIdx, cx, cy, rot, color, alpha, scale) {
+      const shape = PIECE_SHAPES[shapeIdx];
+      const pts   = shape.pts;
+      const rad   = (rot * Math.PI) / 180;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rad);
+      ctx.beginPath();
+      const s = scale;
+      ctx.moveTo(pts[0][0] * s, pts[0][1] * s);
+      for (let i = 1; i < pts.length; i++) {
+        ctx.lineTo(pts[i][0] * s, pts[i][1] * s);
+      }
+      ctx.closePath();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
+    /* ── 팔레트 그리기 ── */
+    function getPaletteSlotPos(slotIdx) {
+      const w = pieceCanvas.width;
+      const h = pieceCanvas.height;
+      const cols = CONFIG.PIECE_COLS;
+      const rows = Math.ceil(7 / cols);
+      const cellW = w / cols;
+      const cellH = h / rows;
+      const col = slotIdx % cols;
+      const row = Math.floor(slotIdx / cols);
+      return {
+        cx: cellW * col + cellW / 2,
+        cy: cellH * row + cellH / 2,
+        cellW, cellH,
+      };
+    }
+
+    function drawPalette() {
+      const w = pieceCanvas.width;
+      const h = pieceCanvas.height;
+      pCtx.clearRect(0, 0, w, h);
+
+      const scale = getPieceScale();
+      for (let i = 0; i < 7; i++) {
+        const isPlaced = state.placed[i] !== null;
+        const pos = getPaletteSlotPos(i);
+
+        // 슬롯 배경
+        pCtx.save();
+        pCtx.fillStyle = isPlaced
+          ? 'rgba(255,255,255,0.04)'
+          : 'rgba(255,255,255,0.10)';
+        pCtx.strokeStyle = isPlaced
+          ? 'rgba(255,255,255,0.08)'
+          : 'rgba(255,255,255,0.25)';
+        pCtx.lineWidth = 1;
+        roundRect(pCtx, pos.cx - pos.cellW * 0.4, pos.cy - pos.cellH * 0.4,
+                  pos.cellW * 0.8, pos.cellH * 0.8, 8);
+        pCtx.fill();
+        pCtx.stroke();
+        pCtx.restore();
+
+        if (!isPlaced) {
+          drawPiece(pCtx, i, pos.cx, pos.cy, 0,
+                    CONFIG.COLORS[i], 0.9, scale);
+        } else {
+          // 체크 표시
+          pCtx.save();
+          pCtx.font = `${Math.max(18, scale * 0.8)}px sans-serif`;
+          pCtx.textAlign = 'center';
+          pCtx.textBaseline = 'middle';
+          pCtx.globalAlpha = 0.6;
+          pCtx.fillText('✓', pos.cx, pos.cy);
+          pCtx.restore();
+        }
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    /* ── 목표 실루엣 그리기 ── */
+    function drawTarget() {
+      const w = targetCanvas.width;
+      const h = targetCanvas.height;
+      tCtx.clearRect(0, 0, w, h);
+
+      const level = LEVELS[state.level];
+
+      // 레벨 이름
+      tCtx.save();
+      tCtx.font = `bold 13px sans-serif`;
+      tCtx.fillStyle = 'rgba(255,255,255,0.5)';
+      tCtx.textAlign = 'center';
+      tCtx.fillText(level.emoji + ' ' + level.name, w / 2, 22);
+      tCtx.restore();
+
+      // 실루엣
+      for (const shape of level.target) {
+        tCtx.save();
+        if (shape.type === 'poly') {
+          tCtx.beginPath();
+          tCtx.moveTo(shape.pts[0][0] * w, shape.pts[0][1] * h);
+          for (let i = 1; i < shape.pts.length; i++) {
+            tCtx.lineTo(shape.pts[i][0] * w, shape.pts[i][1] * h);
+          }
+          tCtx.closePath();
+          tCtx.fillStyle = shape.fill;
+          tCtx.fill();
+          tCtx.strokeStyle = 'rgba(255,255,255,0.25)';
+          tCtx.lineWidth = 1.5;
+          tCtx.stroke();
+        } else if (shape.type === 'ellipse') {
+          tCtx.beginPath();
+          tCtx.ellipse(
+            shape.cx * w, shape.cy * h,
+            shape.rx * w, shape.ry * h,
+            0, 0, Math.PI * 2
+          );
+          tCtx.fillStyle = shape.fill;
+          tCtx.fill();
+          tCtx.strokeStyle = 'rgba(255,255,255,0.25)';
+          tCtx.lineWidth = 1.5;
+          tCtx.stroke();
+        }
+        tCtx.restore();
+      }
+
+      // 배치된 조각들 그리기
+      const tScale = getTargetScale();
+      for (let i = 0; i < 7; i++) {
+        const p = state.placed[i];
+        if (p) {
+          drawPiece(tCtx, p.pieceIdx,
+                    p.cx * w, p.cy * h,
+                    p.rot, CONFIG.COLORS[p.pieceIdx],
+                    0.88, tScale);
+        }
+      }
+
+      // 드래그 중인 조각 (target 위에 있을 때)
+      if (state.dragging && state.dragging.overTarget) {
+        const d = state.dragging;
+        const rect = targetCanvas.getBoundingClientRect();
+        const cx = d.curX - rect.left;
+        const cy = d.curY - rect.top;
+        drawPiece(tCtx, d.pieceIdx, cx, cy, 0,
+                  CONFIG.COLORS[d.pieceIdx], 0.75, tScale);
+      }
+    }
+
+    /* ── 전체 렌더 ── */
+    function render() {
+      drawTarget();
+      drawPalette();
+    }
+
+    /* ── HUD 업데이트 ── */
+    function updateHUD() {
+      const placedCount = state.placed.filter(p => p !== null).length;
+      levelLabel.textContent  = state.level + 1;
+      placedLabel.textContent = `${placedCount} / 7`;
+      const best = getBest();
+      bestLabel.textContent   = best > 0 ? `Lv.${best}` : '-';
+    }
+
+    /* ── 레벨 초기화 ── */
+    function initLevel(lvl) {
+      state.level    = lvl % LEVELS.length;
+      state.placed   = new Array(7).fill(null);
+      state.dragging = null;
+      state.complete = false;
+      resizeCanvases();
+      updateHUD();
+      render();
+    }
+
+    /* ── 완성 체크 ── */
+    function checkComplete() {
+      const placedCount = state.placed.filter(p => p !== null).length;
+      if (placedCount === 7 && !state.complete) {
+        state.complete = true;
+        const actualLevel = state.level + 1;
+        setBest(actualLevel);
+        showSuccess(actualLevel);
+      }
+    }
+
+    function showSuccess(lvl) {
+      // 플래시 효과
+      successFlash.style.display = 'block';
+      setTimeout(() => { successFlash.style.display = 'none'; }, 300);
+
+      setTimeout(() => {
+        finalScore.textContent = `Lv.${lvl}`;
+        const msgs = ['완성! 대단해요! 🎉', '훌륭해요! ✨', '최고예요! 🌟', '멋져요! 🦄'];
+        resultMsg.textContent = msgs[Math.min(lvl - 1, msgs.length - 1)];
+        endOverlay.classList.remove('hidden');
+      }, 400);
+    }
+
+    /* ── 팔레트 슬롯 hit test ── */
+    function hitTestPaletteSlot(x, y) {
+      for (let i = 0; i < 7; i++) {
+        if (state.placed[i] !== null) continue;
+        const pos = getPaletteSlotPos(i);
+        const hw = pos.cellW * 0.45;
+        const hh = pos.cellH * 0.45;
+        if (x >= pos.cx - hw && x <= pos.cx + hw &&
+            y >= pos.cy - hh && y <= pos.cy + hh) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    /* ── 배치된 조각 hit test (target canvas 좌표) ── */
+    function hitTestPlacedPiece(nx, ny) {
+      // 배치된 조각 중 터치 위치와 가장 가까운 것
+      let best = -1;
+      let bestDist = 0.12; // 정규화 거리 threshold
+      for (let i = 0; i < 7; i++) {
+        const p = state.placed[i];
+        if (!p) continue;
+        const dx = p.cx - nx;
+        const dy = p.cy - ny;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      }
+      return best;
+    }
+
+    /* ── 포인터 이벤트 ── */
+    // 팔레트에서 드래그 시작
+    pieceCanvas.addEventListener('pointerdown', (e) => {
+      if (state.complete) return;
+      const rect = pieceCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const slotIdx = hitTestPaletteSlot(x, y);
+      if (slotIdx < 0) return;
+      e.preventDefault();
+      pieceCanvas.setPointerCapture(e.pointerId);
+      state.dragging = {
+        srcSlot: slotIdx,
+        fromTarget: false,
+        pieceIdx: slotIdx,
+        startX: e.clientX,
+        startY: e.clientY,
+        curX: e.clientX,
+        curY: e.clientY,
+        overTarget: false,
+      };
+      render();
+    }, { passive: false });
+
+    // 목표 영역에서 배치된 조각 드래그 시작 (되돌리기)
+    targetCanvas.addEventListener('pointerdown', (e) => {
+      if (state.complete) return;
+      const rect = targetCanvas.getBoundingClientRect();
+      const nx = (e.clientX - rect.left) / rect.width;
+      const ny = (e.clientY - rect.top) / rect.height;
+      const slotIdx = hitTestPlacedPiece(nx, ny);
+      if (slotIdx < 0) return;
+      e.preventDefault();
+      targetCanvas.setPointerCapture(e.pointerId);
+      const piece = state.placed[slotIdx];
+      // 배치 해제
+      state.placed[slotIdx] = null;
+      updateHUD();
+      state.dragging = {
+        srcSlot: piece.pieceIdx,
+        fromTarget: true,
+        pieceIdx: piece.pieceIdx,
+        startX: e.clientX,
+        startY: e.clientY,
+        curX: e.clientX,
+        curY: e.clientY,
+        overTarget: false,
+      };
+      render();
+    }, { passive: false });
+
+    // pointermove — 공통 (window에서 캡쳐)
+    window.addEventListener('pointermove', (e) => {
+      if (!state.dragging) return;
+      state.dragging.curX = e.clientX;
+      state.dragging.curY = e.clientY;
+
+      const tRect = targetCanvas.getBoundingClientRect();
+      state.dragging.overTarget = (
+        e.clientX >= tRect.left && e.clientX <= tRect.right &&
+        e.clientY >= tRect.top  && e.clientY <= tRect.bottom
+      );
+      render();
+    }, { passive: true });
+
+    // pointerup — 드롭 처리
+    window.addEventListener('pointerup', (e) => {
+      if (!state.dragging) return;
+      const d = state.dragging;
+      state.dragging = null;
+
+      const tRect = targetCanvas.getBoundingClientRect();
+      const inTarget = (
+        e.clientX >= tRect.left && e.clientX <= tRect.right &&
+        e.clientY >= tRect.top  && e.clientY <= tRect.bottom
+      );
+
+      if (inTarget) {
+        // target canvas 위에 드롭
+        const nx = (e.clientX - tRect.left) / tRect.width;
+        const ny = (e.clientY - tRect.top)  / tRect.height;
+
+        // 스냅: 가장 가까운 배치 위치 탐색
+        const level = LEVELS[state.level];
+        const tScale = getTargetScale();
+        const snapDist = CONFIG.SNAP_DIST / Math.min(tRect.width, tRect.height);
+        let snapIdx = -1;
+        let snapDist2 = snapDist;
+        for (let i = 0; i < level.placements.length; i++) {
+          const pl = level.placements[i];
+          if (pl.pieceIdx !== d.pieceIdx) continue;
+          if (state.placed.some(p => p && p.slotId === i)) continue;
+          const dx = pl.x - nx;
+          const dy = pl.y - ny;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < snapDist2) {
+            snapDist2 = dist;
+            snapIdx = i;
+          }
+        }
+
+        if (snapIdx >= 0) {
+          const pl = level.placements[snapIdx];
+          state.placed[d.pieceIdx] = {
+            pieceIdx: d.pieceIdx,
+            slotId: snapIdx,
+            cx: pl.x,
+            cy: pl.y,
+            rot: pl.rot,
+          };
+        } else {
+          // 스냅 실패 — 자유 배치 허용 (완성은 스냅 필요)
+          state.placed[d.pieceIdx] = {
+            pieceIdx: d.pieceIdx,
+            slotId: -1,
+            cx: nx,
+            cy: ny,
+            rot: 0,
+          };
+        }
+
+        updateHUD();
+        render();
+        checkComplete();
+      } else {
+        // 팔레트로 복귀 — 이미 null이므로 그냥 렌더
+        render();
+      }
+    });
+
+    /* ── 버튼 ── */
+    startBtn.addEventListener('click', () => {
+      startOverlay.classList.add('hidden');
+      initLevel(0);
+    });
+    nextBtn.addEventListener('click', () => {
+      endOverlay.classList.add('hidden');
+      initLevel(state.level + 1);
+    });
+
+    /* ── resize ── */
+    window.addEventListener('resize', () => {
+      resizeCanvases();
+      render();
+    });
+
+    /* ── 초기 렌더 ── */
+    bestLabel.textContent = getBest() > 0 ? `Lv.${getBest()}` : '-';
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>⭐ 별 더하기</title>
+  <style>
+    :root {
+      --bg: #0a0a2e;
+      --bg2: #12124a;
+      --accent: #ffe66d;
+      --accent2: #ff6b9d;
+      --green: #4ade80;
+      --red: #f87171;
+      --text: #ffffff;
+      --card: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 14px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    /* ── 헤더 ── */
+    .game-title {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    /* ── HUD ── */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 8px 16px;
+      font-size: clamp(13px, 3.5vw, 16px);
+      gap: 6px;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 10px; opacity: 0.6; display: block; margin-bottom: 2px; }
+    .hud-val {
+      font-size: clamp(16px, 4.5vw, 22px);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .hud-lives { font-size: clamp(16px, 4vw, 20px); }
+    /* ── 게임 영역 ── */
+    #gameArea {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* ── 문제 패널 ── */
+    .question-panel {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 10px 14px;
+      text-align: center;
+    }
+    .question-label {
+      font-size: 12px;
+      opacity: 0.6;
+      margin-bottom: 4px;
+    }
+    .question-eq {
+      font-size: clamp(20px, 6vw, 32px);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    /* ── 별 그룹 행 ── */
+    .star-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .star-row {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .star-row-label {
+      font-size: 11px;
+      opacity: 0.55;
+    }
+    .star-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 36px;
+      align-items: center;
+    }
+    /* ── 별 버튼 ── */
+    .star-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      font-size: 26px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s, opacity 0.15s;
+      padding: 0;
+      line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .star-btn.selected {
+      transform: scale(1.25);
+      filter: drop-shadow(0 0 8px var(--accent));
+    }
+    .star-btn.used { opacity: 0.2; pointer-events: none; }
+    .star-btn:active { transform: scale(0.9); }
+    /* ── 바구니 행 ── */
+    .basket-row {
+      background: rgba(255,230,109,0.08);
+      border: 2px dashed rgba(255,230,109,0.35);
+      border-radius: 16px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 56px;
+    }
+    .basket-stars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      flex: 1;
+      min-height: 36px;
+    }
+    .basket-hint {
+      font-size: 12px;
+      opacity: 0.45;
+    }
+    .basket-count {
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900;
+      color: var(--accent);
+      min-width: 40px;
+      text-align: right;
+    }
+    /* ── 확인 버튼 ── */
+    .btn-check {
+      background: linear-gradient(135deg, #ffe66d, #ffb347);
+      color: #1a0a00;
+      border: none;
+      border-radius: 16px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900;
+      min-height: 52px;
+      cursor: pointer;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform 0.1s;
+    }
+    .btn-check:active { transform: scale(0.97); }
+    .btn-check:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    /* ── 피드백 팝업 ── */
+    .feedback-popup {
+      position: absolute;
+      left: 50%; top: 40%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(10,10,46,0.92);
+      border-radius: 20px;
+      padding: 20px 32px;
+      text-align: center;
+      font-size: clamp(28px, 8vw, 48px);
+      font-weight: 900;
+      z-index: 10;
+      transition: transform 0.18s cubic-bezier(0.175,0.885,0.32,1.275);
+      pointer-events: none;
+      border: 3px solid var(--accent);
+    }
+    .feedback-popup.show { transform: translate(-50%, -50%) scale(1); }
+    .feedback-popup.correct { border-color: var(--green); color: var(--green); }
+    .feedback-popup.wrong { border-color: var(--red); color: var(--red); }
+    /* ── footer ── */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      opacity: 0.55;
+      padding: 0 2px;
+    }
+    .home-link {
+      color: var(--text);
+      text-decoration: none;
+      opacity: 0.55;
+      font-size: 12px;
+    }
+    /* ── 오버레이 ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,10,46,0.93);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: var(--bg2);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 340px;
+      width: 90%;
+      border: 2px solid rgba(255,230,109,0.3);
+    }
+    .overlay-card h2 { font-size: clamp(22px,6vw,28px); margin-bottom: 12px; }
+    .overlay-card p {
+      font-size: clamp(13px,3.5vw,15px);
+      opacity: 0.8;
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #ffe66d, #ffb347);
+      color: #1a0a00;
+      border: none;
+      border-radius: 14px;
+      font-size: clamp(16px,4.5vw,20px);
+      font-weight: 900;
+      min-height: 52px;
+      padding: 0 32px;
+      cursor: pointer;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .result-score {
+      font-size: clamp(40px,12vw,64px);
+      font-weight: 900;
+      color: var(--accent);
+      margin: 12px 0;
+    }
+    .result-msg {
+      font-size: clamp(13px,3.5vw,15px);
+      opacity: 0.8;
+      margin-bottom: 18px;
+    }
+    .best-badge {
+      display: inline-block;
+      background: rgba(255,230,109,0.15);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    /* ── 별똥별 파티클 ── */
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 20px;
+      animation: flyOut 0.6s ease-out forwards;
+      z-index: 20;
+    }
+    @keyframes flyOut {
+      0% { transform: translate(0,0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="game-title">⭐ 별 더하기</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">점수</span>
+      <span class="hud-val" id="scoreVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">목숨</span>
+      <span class="hud-val hud-lives" id="livesVal">❤️❤️❤️</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">단계</span>
+      <span class="hud-val" id="levelVal">1</span>
+    </div>
+  </div>
+
+  <div id="gameArea">
+    <!-- 문제 패널 -->
+    <div class="question-panel">
+      <div class="question-label">두 그룹의 별을 바구니에 넣으면?</div>
+      <div class="question-eq" id="questionEq">⭐ + ⭐ = ?</div>
+    </div>
+
+    <!-- 별 그룹 -->
+    <div class="star-rows">
+      <div class="star-row">
+        <div class="star-row-label">그룹 A</div>
+        <div class="star-pool" id="poolA"></div>
+      </div>
+      <div class="star-row">
+        <div class="star-row-label">그룹 B</div>
+        <div class="star-pool" id="poolB"></div>
+      </div>
+    </div>
+
+    <!-- 바구니 -->
+    <div class="basket-row" id="basketRow">
+      <div style="font-size:28px">🧺</div>
+      <div class="basket-stars" id="basketStars">
+        <span class="basket-hint">별을 탭해서 바구니에 넣어요!</span>
+      </div>
+      <div class="basket-count" id="basketCount">0</div>
+    </div>
+
+    <!-- 확인 버튼 -->
+    <button class="btn-check" id="checkBtn" disabled>확인!</button>
+
+    <!-- 피드백 팝업 -->
+    <div class="feedback-popup" id="feedbackPopup"></div>
+  </div>
+
+  <footer>
+    <small>두 그룹 별을 모두 바구니에!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>⭐ 별 더하기</h2>
+    <p>두 그룹의 별을 탭해서<br>바구니에 모두 넣어요!<br><br>
+    넣은 별의 개수가 맞으면<br>✅ 정답! 목숨이 3개예요.</p>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="best-badge" id="bestBadge">최고 기록: 0</div>
+    <p class="result-msg" id="resultMsg">수고했어요!</p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    LIVES: 3,
+    BASE_MAX_STARS: 5,   // 레벨 1 기준 각 그룹 최대 별 수
+    LEVEL_UP_EVERY: 3,   // 3문제 맞히면 레벨업
+    MAX_LEVEL: 5,        // 최대 레벨 (각 그룹 최대 9개)
+    FEEDBACK_MS: 900,
+    STAR_EMOJIS: ['⭐','🌟','💫'],
+    STORAGE_KEY: 'star-adder_best',
+  };
+
+  // ── 상태 ──
+  const state = {
+    score: 0,
+    lives: CONFIG.LIVES,
+    level: 1,
+    streak: 0,          // 연속 정답 수 (레벨업 카운터)
+    groupA: [],         // 숫자 배열 (별 인덱스)
+    groupB: [],
+    countA: 0,
+    countB: 0,
+    basket: [],         // {group, idx}
+    answered: false,
+    running: false,
+  };
+
+  // ── DOM ──
+  const $ = id => document.getElementById(id);
+  const scoreEl  = $('scoreVal');
+  const livesEl  = $('livesVal');
+  const levelEl  = $('levelVal');
+  const questionEl= $('questionEq');
+  const poolAEl  = $('poolA');
+  const poolBEl  = $('poolB');
+  const basketEl = $('basketStars');
+  const basketCntEl = $('basketCount');
+  const checkBtn = $('checkBtn');
+  const feedbackEl = $('feedbackPopup');
+  const startOverlay = $('startOverlay');
+  const endOverlay   = $('endOverlay');
+  const finalScoreEl = $('finalScore');
+  const bestBadgeEl  = $('bestBadge');
+  const resultMsgEl  = $('resultMsg');
+
+  // ── 최고기록 ──
+  function getBest() {
+    return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+  }
+  function saveBest(s) {
+    const prev = getBest();
+    if (s > prev) localStorage.setItem(CONFIG.STORAGE_KEY, String(s));
+  }
+
+  // ── HUD 갱신 ──
+  function updateHUD() {
+    scoreEl.textContent = state.score;
+    levelEl.textContent = state.level;
+    let hearts = '';
+    for (let i = 0; i < CONFIG.LIVES; i++) {
+      hearts += i < state.lives ? '❤️' : '🖤';
+    }
+    livesEl.textContent = hearts;
+  }
+
+  // ── 랜덤 정수 [min, max] ──
+  function rnd(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // ── 레벨에 따른 각 그룹 최대 별 수 ──
+  function maxStarsForLevel() {
+    return Math.min(CONFIG.BASE_MAX_STARS + (state.level - 1), 9);
+  }
+
+  // ── 새 문제 생성 ──
+  function newQuestion() {
+    state.answered = false;
+    const maxS = maxStarsForLevel();
+    state.countA = rnd(1, maxS);
+    state.countB = rnd(1, maxS);
+    state.groupA = [];
+    state.groupB = [];
+    state.basket = [];
+
+    // 별 이모지 랜덤 선택
+    const emojiA = CONFIG.STAR_EMOJIS[rnd(0, CONFIG.STAR_EMOJIS.length - 1)];
+    const emojiB = CONFIG.STAR_EMOJIS[rnd(0, CONFIG.STAR_EMOJIS.length - 1)];
+
+    for (let i = 0; i < state.countA; i++) state.groupA.push({ emoji: emojiA, used: false });
+    for (let i = 0; i < state.countB; i++) state.groupB.push({ emoji: emojiB, used: false });
+
+    questionEl.textContent = `${state.countA} + ${state.countB} = ?`;
+
+    renderPools();
+    renderBasket();
+    checkBtn.disabled = true;
+  }
+
+  // ── 별 풀 렌더링 ──
+  function renderPools() {
+    renderPool(poolAEl, state.groupA, 'A');
+    renderPool(poolBEl, state.groupB, 'B');
+  }
+
+  function renderPool(container, group, groupId) {
+    container.innerHTML = '';
+    group.forEach((item, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'star-btn' + (item.used ? ' used' : '');
+      btn.textContent = item.emoji;
+      btn.setAttribute('aria-label', `그룹${groupId} 별 ${idx + 1}`);
+      if (!item.used) {
+        btn.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          onStarTap(groupId, idx);
+        });
+      }
+      container.appendChild(btn);
+    });
+  }
+
+  // ── 바구니 렌더링 ──
+  function renderBasket() {
+    const count = state.basket.length;
+    if (count === 0) {
+      basketEl.innerHTML = '<span class="basket-hint">별을 탭해서 바구니에 넣어요!</span>';
+    } else {
+      basketEl.innerHTML = '';
+      state.basket.forEach((item) => {
+        const s = document.createElement('span');
+        s.style.fontSize = '24px';
+        s.style.cursor = 'pointer';
+        s.textContent = item.emoji;
+        s.title = '탭하면 돌려보내기';
+        s.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          returnStar(item);
+        });
+        basketEl.appendChild(s);
+      });
+    }
+    basketCntEl.textContent = count;
+
+    // 확인 버튼: 바구니에 별이 1개 이상이면 활성화
+    checkBtn.disabled = count === 0;
+  }
+
+  // ── 별 탭 → 바구니로 ──
+  function onStarTap(groupId, idx) {
+    if (state.answered) return;
+    const group = groupId === 'A' ? state.groupA : state.groupB;
+    if (group[idx].used) return;
+    group[idx].used = true;
+    state.basket.push({ group: groupId, idx, emoji: group[idx].emoji });
+    renderPools();
+    renderBasket();
+    spawnParticle();
+  }
+
+  // ── 바구니에서 돌려보내기 ──
+  function returnStar(item) {
+    if (state.answered) return;
+    const group = item.group === 'A' ? state.groupA : state.groupB;
+    group[item.idx].used = false;
+    state.basket = state.basket.filter(b => !(b.group === item.group && b.idx === item.idx));
+    renderPools();
+    renderBasket();
+  }
+
+  // ── 파티클 ──
+  function spawnParticle() {
+    const wrap = document.querySelector('.wrap');
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = CONFIG.STAR_EMOJIS[rnd(0, 2)];
+    const dx = rnd(-60, 60);
+    const dy = rnd(-80, -20);
+    p.style.setProperty('--dx', dx + 'px');
+    p.style.setProperty('--dy', dy + 'px');
+    p.style.left = rnd(20, 80) + '%';
+    p.style.top = '50%';
+    wrap.appendChild(p);
+    setTimeout(() => p.remove(), 650);
+  }
+
+  // ── 정답 확인 ──
+  function checkAnswer() {
+    if (state.answered || !state.running) return;
+    state.answered = true;
+    checkBtn.disabled = true;
+
+    const basketCount = state.basket.length;
+    const correct = state.countA + state.countB;
+    const isRight = basketCount === correct;
+
+    if (isRight) {
+      // 정답
+      state.score += 10 * state.level;
+      state.streak++;
+      showFeedback('정답! 🎉', true);
+      if (state.streak % CONFIG.LEVEL_UP_EVERY === 0 && state.level < CONFIG.MAX_LEVEL) {
+        state.level++;
+      }
+      updateHUD();
+      setTimeout(newQuestion, CONFIG.FEEDBACK_MS + 200);
+    } else {
+      // 오답
+      state.lives--;
+      state.streak = 0;
+      const diff = correct - basketCount;
+      const msg = diff > 0 ? `${diff}개 더 필요해요! 😅` : `너무 많아요! 😅`;
+      showFeedback(msg, false);
+      updateHUD();
+      if (state.lives <= 0) {
+        setTimeout(endGame, CONFIG.FEEDBACK_MS + 300);
+      } else {
+        setTimeout(() => {
+          state.answered = false;
+          // 바구니 비우고 그룹 리셋
+          state.groupA.forEach(s => s.used = false);
+          state.groupB.forEach(s => s.used = false);
+          state.basket = [];
+          renderPools();
+          renderBasket();
+          checkBtn.disabled = true;
+        }, CONFIG.FEEDBACK_MS + 200);
+      }
+    }
+  }
+
+  // ── 피드백 팝업 ──
+  function showFeedback(msg, correct) {
+    feedbackEl.textContent = msg;
+    feedbackEl.className = 'feedback-popup show ' + (correct ? 'correct' : 'wrong');
+    setTimeout(() => {
+      feedbackEl.className = 'feedback-popup';
+    }, CONFIG.FEEDBACK_MS);
+  }
+
+  // ── 게임 시작 ──
+  function startGame() {
+    state.score = 0;
+    state.lives = CONFIG.LIVES;
+    state.level = 1;
+    state.streak = 0;
+    state.running = true;
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    updateHUD();
+    newQuestion();
+  }
+
+  // ── 게임 종료 ──
+  function endGame() {
+    state.running = false;
+    saveBest(state.score);
+    const best = getBest();
+    finalScoreEl.textContent = state.score + '점';
+    bestBadgeEl.textContent = `최고 기록: ${best}점`;
+    const msgs = ['잘했어요! 🌟', '멋져요! ⭐', '최고야! 💫', '대단해요! 🎊'];
+    resultMsgEl.textContent = state.score >= 50
+      ? msgs[rnd(2, 3)]
+      : msgs[rnd(0, 1)];
+    endOverlay.classList.remove('hidden');
+  }
+
+  // ── 이벤트 바인딩 ──
+  $('startBtn').addEventListener('pointerdown', e => {
+    e.preventDefault();
+    startGame();
+  });
+  $('restartBtn').addEventListener('pointerdown', e => {
+    e.preventDefault();
+    startGame();
+  });
+  checkBtn.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    checkAnswer();
+  });
+
+  // ── 초기 HUD ──
+  updateHUD();
+  bestBadgeEl.textContent = `최고 기록: ${getBest()}점`;
+
+})();
+</script>
+</body>
+</html>

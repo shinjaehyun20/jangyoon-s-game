@@ -830,5 +830,21 @@
     "description": "탭해서 점프! 돌고래가 물에서 뛰어올라 링을 통과해요. 타이밍이 핵심!",
     "thumbnail": "dolphin-jump/thumb.svg",
     "path": "dolphin-jump/index.html"
+  },
+  {
+    "id": "star-adder",
+    "title": "Star Adder",
+    "title_ko": "⭐ 별 더하기",
+    "description": "두 그룹의 별을 탭해서 바구니에 넣고 덧셈을 익혀요! 5레벨, 목숨 3개",
+    "thumbnail": "star-adder/thumb.svg",
+    "path": "star-adder/index.html"
+  },
+  {
+    "id": "tangram-puzzle",
+    "title": "Tangram Puzzle",
+    "title_ko": "🔶 탱그램 퍼즐",
+    "description": "7가지 조각을 끌어다 놓아 목표 모양을 완성해요! 공간 감각 퍼즐",
+    "thumbnail": "tangram-puzzle/thumb.svg",
+    "path": "tangram-puzzle/index.html"
   }
 ]

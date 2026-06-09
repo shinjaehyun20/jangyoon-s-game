@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "star-adder",
+        "label": "⭐ 별 더하기",
+        "path": "star-adder/index.html"
+      },
+      {
         "id": "acorn-squirrel",
         "label": "🐿️ 다람쥐 도토리",
         "path": "acorn-squirrel/index.html"
@@ -367,6 +372,11 @@
         "id": "dolphin-jump",
         "label": "🐬 돌고래 점프",
         "path": "dolphin-jump/index.html"
+      },
+      {
+        "id": "tangram-puzzle",
+        "label": "🔶 탱그램 퍼즐",
+        "path": "tangram-puzzle/index.html"
       }
     ]
   },
