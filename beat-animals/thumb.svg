@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#2d1b4e"/>
+    </linearGradient>
+    <linearGradient id="glow1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c4dff"/>
+      <stop offset="100%" stop-color="#ff6fd8"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" rx="0"/>
+
+  <!-- 별 장식 -->
+  <circle cx="30"  cy="20"  r="1.5" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="80"  cy="12"  r="1"   fill="rgba(255,255,255,0.3)"/>
+  <circle cx="140" cy="25"  r="1.2" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="260" cy="15"  r="1.5" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="300" cy="35"  r="1"   fill="rgba(255,255,255,0.25)"/>
+  <circle cx="15"  cy="90"  r="1"   fill="rgba(255,255,255,0.2)"/>
+  <circle cx="310" cy="80"  r="1.5" fill="rgba(255,255,255,0.3)"/>
+
+  <!-- 음표 장식 -->
+  <text x="18" y="50" font-size="18" opacity="0.4" fill="#ff6fd8">♩</text>
+  <text x="48" y="35" font-size="14" opacity="0.3" fill="#7c4dff">♪</text>
+  <text x="272" y="45" font-size="16" opacity="0.35" fill="#00e5ff">♫</text>
+
+  <!-- 그리드 셀 (3x3 미니어처) — 왼쪽 배치 -->
+  <!-- 비활성 셀 -->
+  <rect x="20" y="42" width="54" height="54" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+  <rect x="82" y="42" width="54" height="54" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+  <rect x="20" y="104" width="54" height="54" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+  <rect x="82" y="104" width="54" height="54" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+
+  <!-- 활성 셀 (글로우) -->
+  <rect x="144" y="42" width="54" height="54" rx="10" fill="rgba(255,111,216,0.25)" stroke="#ff6fd8" stroke-width="2" filter="url(#glow)"/>
+  <rect x="20" y="104" width="54" height="54" rx="10" fill="rgba(124,77,255,0.25)" stroke="#7c4dff" stroke-width="2" filter="url(#glow)"/>
+  <rect x="144" y="104" width="54" height="54" rx="10" fill="rgba(0,229,255,0.2)" stroke="#00e5ff" stroke-width="2" filter="url(#glow)"/>
+
+  <!-- 이모지 -->
+  <text x="47" y="78"  text-anchor="middle" font-size="28" opacity="0.3">🐶</text>
+  <text x="109" y="78" text-anchor="middle" font-size="28" opacity="0.3">🐱</text>
+  <text x="171" y="78" text-anchor="middle" font-size="28">🐰</text>
+  <text x="47" y="140" text-anchor="middle" font-size="28">🐸</text>
+  <text x="109" y="140" text-anchor="middle" font-size="28" opacity="0.3">🐻</text>
+  <text x="171" y="140" text-anchor="middle" font-size="28">🦊</text>
+
+  <!-- 박자 바 -->
+  <rect x="20" y="165" width="198" height="6" rx="3" fill="rgba(255,255,255,0.1)"/>
+  <rect x="20" y="165" width="130" height="6" rx="3" fill="url(#glow1)" opacity="0.9"/>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6fd8">비트 동물 탭!</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">BEAT ANIMALS</text>
+  </g>
+</svg>

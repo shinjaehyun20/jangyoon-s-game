@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1040"/>
+      <stop offset="100%" stop-color="#2a1a60"/>
+    </linearGradient>
+    <radialGradient id="br" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ff8080"/>
+      <stop offset="100%" stop-color="#cc2200"/>
+    </radialGradient>
+    <radialGradient id="bg2" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#80ff80"/>
+      <stop offset="100%" stop-color="#007a00"/>
+    </radialGradient>
+    <radialGradient id="bb" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#80b8ff"/>
+      <stop offset="100%" stop-color="#0040cc"/>
+    </radialGradient>
+    <radialGradient id="by" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fff07a"/>
+      <stop offset="100%" stop-color="#c8a800"/>
+    </radialGradient>
+    <radialGradient id="bp" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#cc80ff"/>
+      <stop offset="100%" stop-color="#6600bb"/>
+    </radialGradient>
+    <radialGradient id="bo" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffcc80"/>
+      <stop offset="100%" stop-color="#e06000"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 컵 3개 -->
+  <!-- 컵 1 (빨강) -->
+  <rect x="32" y="80" width="52" height="72" rx="0" ry="0" fill="rgba(255,255,255,0.07)" stroke="rgba(255,80,80,0.7)" stroke-width="2.5"/>
+  <line x1="32" y1="80" x2="84" y2="80" stroke="rgba(255,80,80,0.7)" stroke-width="0"/>
+  <!-- 컵 바닥 둥근 처리 -->
+  <path d="M32,80 L32,148 Q32,152 36,152 L80,152 Q84,152 84,148 L84,80" fill="rgba(255,255,255,0.07)" stroke="rgba(255,80,80,0.7)" stroke-width="2.5" fill-opacity="1"/>
+  <!-- 컵 2 (초록) -->
+  <path d="M134,80 L134,148 Q134,152 138,152 L182,152 Q186,152 186,148 L186,80" fill="rgba(255,255,255,0.07)" stroke="rgba(80,220,80,0.7)" stroke-width="2.5" fill-opacity="1"/>
+  <!-- 컵 3 (파랑) -->
+  <path d="M236,80 L236,148 Q236,152 240,152 L284,152 Q288,152 288,148 L288,80" fill="rgba(255,255,255,0.07)" stroke="rgba(80,140,255,0.7)" stroke-width="2.5" fill-opacity="1"/>
+
+  <!-- 컵 1 공들 (빨강 2개) -->
+  <circle cx="58" cy="140" r="13" fill="url(#br)"/>
+  <circle cx="58" cy="114" r="13" fill="url(#br)"/>
+
+  <!-- 컵 2 공들 (초록 2개) -->
+  <circle cx="160" cy="140" r="13" fill="url(#bg2)"/>
+  <circle cx="160" cy="114" r="13" fill="url(#bg2)"/>
+
+  <!-- 컵 3 공 (파랑 1개) -->
+  <circle cx="262" cy="140" r="13" fill="url(#bb)"/>
+
+  <!-- 소스 영역 섞인 공들 -->
+  <rect x="22" y="28" width="276" height="44" rx="12" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <!-- 공들 -->
+  <circle cx="50"  cy="50" r="13" fill="url(#bb)"/>
+  <circle cx="80"  cy="50" r="13" fill="url(#by)"/>
+  <circle cx="110" cy="50" r="13" fill="url(#br)"/>
+  <circle cx="140" cy="50" r="13" fill="url(#bg2)"/>
+  <circle cx="170" cy="50" r="13" fill="url(#bp)"/>
+  <circle cx="200" cy="50" r="13" fill="url(#bo)"/>
+  <circle cx="230" cy="50" r="13" fill="url(#bb)"/>
+  <circle cx="260" cy="50" r="13" fill="url(#by)"/>
+
+  <!-- 화살표 힌트 -->
+  <text x="160" y="75" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.4)" font-family="sans-serif">↓ 같은 색 컵에 넣어요!</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#f9d71c">색깔 공 분류</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">RAINBOW SORT</text>
+  </g>
+</svg>

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "beat-animals",
+        "label": "🥁 동물 비트",
+        "path": "beat-animals/index.html"
+      },
+      {
+        "id": "rainbow-sort",
+        "label": "🌈 무지개 분류",
+        "path": "rainbow-sort/index.html"
+      },
+      {
         "id": "star-adder",
         "label": "⭐ 별 더하기",
         "path": "star-adder/index.html"

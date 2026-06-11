@@ -846,5 +846,21 @@
     "description": "7가지 조각을 끌어다 놓아 목표 모양을 완성해요! 공간 감각 퍼즐",
     "thumbnail": "tangram-puzzle/thumb.svg",
     "path": "tangram-puzzle/index.html"
+  },
+  {
+    "id": "beat-animals",
+    "title": "Beat Animals",
+    "title_ko": "🥁 동물 비트",
+    "description": "박자에 맞춰 반짝이는 동물을 탭! 콤보로 고득점",
+    "thumbnail": "beat-animals/thumb.svg",
+    "path": "beat-animals/index.html"
+  },
+  {
+    "id": "rainbow-sort",
+    "title": "Rainbow Sort",
+    "title_ko": "🌈 무지개 분류",
+    "description": "색깔 공을 같은 색 컵에 끌어다 분류! 8레벨",
+    "thumbnail": "rainbow-sort/thumb.svg",
+    "path": "rainbow-sort/index.html"
   }
 ]

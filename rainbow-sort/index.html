@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🌈 색깔 공 분류</title>
+  <style>
+    :root {
+      --bg: #1a1040;
+      --bg2: #2a1a60;
+      --accent: #f9d71c;
+      --text: #ffffff;
+      --cup-w: 72px;
+      --cup-h: 100px;
+      --ball-r: 22px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(160deg, var(--bg) 0%, var(--bg2) 100%);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: clamp(13px, 3.5vw, 16px);
+      font-weight: 700;
+    }
+    .hud span { display: flex; align-items: center; gap: 4px; }
+    #game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* 컵 행 */
+    .cups-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 0 4px;
+    }
+    /* 컵 */
+    .cup {
+      position: relative;
+      width: var(--cup-w);
+      min-height: var(--cup-h);
+      border: 3px solid rgba(255,255,255,0.35);
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      background: rgba(255,255,255,0.07);
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      padding: 4px 4px 6px;
+      gap: 4px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.1s;
+      touch-action: none;
+    }
+    .cup.highlight {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px 2px rgba(249,215,28,0.5);
+    }
+    .cup.wrong-flash {
+      border-color: #ff4d4d;
+      box-shadow: 0 0 12px 2px rgba(255,77,77,0.6);
+    }
+    .cup-label {
+      position: absolute;
+      top: -26px;
+      left: 50%; transform: translateX(-50%);
+      font-size: 20px;
+      line-height: 1;
+    }
+    /* 공 */
+    .ball {
+      width: var(--ball-r); height: var(--ball-r);
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: inset -3px -3px 6px rgba(0,0,0,0.3), inset 2px 2px 4px rgba(255,255,255,0.35);
+      cursor: grab;
+      transition: transform 0.15s;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .ball.dragging {
+      cursor: grabbing;
+      transform: scale(1.25);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4), inset -3px -3px 6px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.3);
+      z-index: 1000;
+      position: fixed;
+      pointer-events: none;
+    }
+
+    /* 공 색상 */
+    .ball[data-color="red"]    { background: radial-gradient(circle at 35% 35%, #ff8080, #cc2200); }
+    .ball[data-color="orange"] { background: radial-gradient(circle at 35% 35%, #ffcc80, #e06000); }
+    .ball[data-color="yellow"] { background: radial-gradient(circle at 35% 35%, #fff07a, #c8a800); }
+    .ball[data-color="green"]  { background: radial-gradient(circle at 35% 35%, #80ff80, #007a00); }
+    .ball[data-color="blue"]   { background: radial-gradient(circle at 35% 35%, #80b8ff, #0040cc); }
+    .ball[data-color="purple"] { background: radial-gradient(circle at 35% 35%, #cc80ff, #6600bb); }
+    .ball[data-color="pink"]   { background: radial-gradient(circle at 35% 35%, #ffaacc, #cc2266); }
+    .ball[data-color="teal"]   { background: radial-gradient(circle at 35% 35%, #80ffee, #007060); }
+
+    /* 공 소스 행 (섞인 공들) */
+    .source-area {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 16px;
+      min-height: 60px;
+    }
+
+    /* 레벨 배지 */
+    .level-badge {
+      font-size: 11px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 2px 8px;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      padding: 0 2px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 8, 35, 0.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 500;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(145deg, #2e1a70, #1a0e4a);
+      border: 2px solid rgba(255,255,255,0.18);
+      border-radius: 24px;
+      padding: 28px 24px;
+      max-width: 320px; width: 90%;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; }
+    .overlay-card p  { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.82); margin-bottom: 18px; }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0 4px;
+    }
+    .result-stars { font-size: 28px; margin-bottom: 8px; }
+    .btn-start {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, #f9d71c, #f07800);
+      color: #1a0e4a;
+      border: none; border-radius: 14px;
+      font-size: 20px; font-weight: 900;
+      padding: 14px 0; cursor: pointer;
+      margin-top: 6px;
+      touch-action: manipulation;
+      box-shadow: 0 4px 14px rgba(249,180,28,0.4);
+    }
+    .btn-start:active { transform: scale(0.96); }
+
+    /* 파티클 */
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 600;
+      border-radius: 50%;
+      animation: particle-fly 0.9s ease-out forwards;
+    }
+    @keyframes particle-fly {
+      from { opacity: 1; transform: scale(1) translate(0,0); }
+      to   { opacity: 0; transform: scale(0.3) translate(var(--dx), var(--dy)); }
+    }
+    /* 공 성공 팝 */
+    @keyframes cup-flash {
+      0%   { background: rgba(255,255,255,0.25); }
+      100% { background: rgba(255,255,255,0.07); }
+    }
+    .cup.correct-flash { animation: cup-flash 0.35s ease-out; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌈 색깔 공 분류</h1>
+  <div class="hud">
+    <span>⭐ <span id="scoreDisplay">0</span></span>
+    <span class="level-badge">레벨 <span id="levelDisplay">1</span></span>
+    <span>🏆 <span id="bestDisplay">0</span></span>
+  </div>
+
+  <div id="game-area">
+    <div class="cups-row" id="cupsRow"></div>
+    <div class="source-area" id="sourceArea"></div>
+  </div>
+
+  <footer>
+    <small>공을 끌어서 같은 색 컵에 넣어요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🌈 색깔 공 분류</h2>
+    <p>섞인 색깔 공을 끌어서<br>같은 색 컵 안에 넣어요!<br>다 넣으면 레벨 클리어! 🎉</p>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 레벨 클리어!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="result-stars" id="resultStars">⭐⭐⭐</div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="nextBtn">다음 레벨!</button>
+    <button class="btn-start" id="restartBtn" style="margin-top:8px;background:linear-gradient(135deg,#5566ff,#2233cc);color:#fff;box-shadow:0 4px 14px rgba(85,102,255,0.35);">처음부터</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CONFIG = {
+    STORAGE_KEY: 'rainbow-sort_best',
+    COLORS: [
+      { id: 'red',    emoji: '🔴' },
+      { id: 'orange', emoji: '🟠' },
+      { id: 'yellow', emoji: '🟡' },
+      { id: 'green',  emoji: '🟢' },
+      { id: 'blue',   emoji: '🔵' },
+      { id: 'purple', emoji: '🟣' },
+      { id: 'pink',   emoji: '🩷' },
+      { id: 'teal',   emoji: '🩵' },
+    ],
+    LEVELS: [
+      /* level 1 */ { colors: 2, ballsPerColor: 2 },
+      /* level 2 */ { colors: 3, ballsPerColor: 2 },
+      /* level 3 */ { colors: 3, ballsPerColor: 3 },
+      /* level 4 */ { colors: 4, ballsPerColor: 3 },
+      /* level 5 */ { colors: 5, ballsPerColor: 3 },
+      /* level 6 */ { colors: 6, ballsPerColor: 3 },
+      /* level 7 */ { colors: 7, ballsPerColor: 3 },
+      /* level 8 */ { colors: 8, ballsPerColor: 3 },
+    ],
+    SCORE_PER_BALL: 10,
+    SCORE_PERFECT_BONUS: 50,
+  };
+
+  /* ── STATE ── */
+  const state = {
+    level: 1,
+    score: 0,
+    best: Number(localStorage.getItem(CONFIG.STORAGE_KEY) || 0),
+    cups: [],       // [{ colorId, balls: [colorId, ...] }]
+    sourceBalls: [], // [{colorId, el}]
+    mistakes: 0,
+    dragging: null, // {colorId, el, originIdx}
+    ghostEl: null,
+    started: false,
+  };
+
+  /* ── DOM ── */
+  const $score   = document.getElementById('scoreDisplay');
+  const $best    = document.getElementById('bestDisplay');
+  const $level   = document.getElementById('levelDisplay');
+  const $cups    = document.getElementById('cupsRow');
+  const $source  = document.getElementById('sourceArea');
+  const startOv  = document.getElementById('startOverlay');
+  const endOv    = document.getElementById('endOverlay');
+  const $final   = document.getElementById('finalScore');
+  const $stars   = document.getElementById('resultStars');
+  const $msg     = document.getElementById('resultMsg');
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    startOv.classList.add('hidden');
+    initLevel();
+    state.started = true;
+  });
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    endOv.classList.add('hidden');
+    state.level = Math.min(state.level + 1, CONFIG.LEVELS.length);
+    initLevel();
+  });
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    endOv.classList.add('hidden');
+    state.level = 1;
+    state.score = 0;
+    state.mistakes = 0;
+    updateHUD();
+    initLevel();
+  });
+
+  /* ── INIT LEVEL ── */
+  function initLevel() {
+    state.mistakes = 0;
+    const cfg  = CONFIG.LEVELS[state.level - 1];
+    const pool = shuffle([...CONFIG.COLORS]).slice(0, cfg.colors);
+
+    // 컵 생성
+    state.cups = pool.map(c => ({ colorId: c.id, emoji: c.emoji, balls: [] }));
+    renderCups();
+
+    // 공 생성 후 셔플
+    let balls = [];
+    pool.forEach(c => {
+      for (let i = 0; i < cfg.ballsPerColor; i++) balls.push(c.id);
+    });
+    balls = shuffle(balls);
+    state.sourceBalls = balls.map(cid => ({ colorId: cid, el: null }));
+    renderSource();
+
+    updateHUD();
+  }
+
+  /* ── RENDER ── */
+  function renderCups() {
+    $cups.innerHTML = '';
+    state.cups.forEach((cup, ci) => {
+      const div = document.createElement('div');
+      div.className = 'cup';
+      div.dataset.ci = ci;
+
+      const label = document.createElement('div');
+      label.className = 'cup-label';
+      label.textContent = cup.emoji;
+      div.appendChild(label);
+
+      cup.balls.forEach(cid => {
+        const b = makeBallEl(cid, false);
+        div.appendChild(b);
+      });
+
+      // 컵 클릭 = 드래그 중인 공 놓기
+      div.addEventListener('pointerdown', e => {
+        e.stopPropagation();
+        if (state.dragging) dropOnCup(ci);
+      });
+      $cups.appendChild(div);
+    });
+  }
+
+  function renderSource() {
+    $source.innerHTML = '';
+    state.sourceBalls.forEach((sb, si) => {
+      if (!sb) return;
+      const el = makeBallEl(sb.colorId, true);
+      el.dataset.si = si;
+      sb.el = el;
+      $source.appendChild(el);
+    });
+  }
+
+  function makeBallEl(colorId, draggable) {
+    const el = document.createElement('div');
+    el.className = 'ball';
+    el.dataset.color = colorId;
+    if (draggable) {
+      el.addEventListener('pointerdown', onBallPointerDown);
+    }
+    return el;
+  }
+
+  /* ── DRAG ── */
+  function onBallPointerDown(e) {
+    if (!state.started) return;
+    e.preventDefault();
+    const si = Number(e.currentTarget.dataset.si);
+    const sb = state.sourceBalls[si];
+    if (!sb) return;
+
+    state.dragging = { colorId: sb.colorId, si };
+
+    // 고스트 공
+    const ghost = makeBallEl(sb.colorId, false);
+    ghost.classList.add('dragging');
+    ghost.style.left = (e.clientX - 11) + 'px';
+    ghost.style.top  = (e.clientY - 11) + 'px';
+    document.body.appendChild(ghost);
+    state.ghostEl = ghost;
+
+    // 원본 반투명
+    sb.el.style.opacity = '0.3';
+
+    // 컵들 하이라이트
+    document.querySelectorAll('.cup').forEach(c => c.classList.add('highlight'));
+  }
+
+  window.addEventListener('pointermove', e => {
+    if (!state.ghostEl) return;
+    state.ghostEl.style.left = (e.clientX - 11) + 'px';
+    state.ghostEl.style.top  = (e.clientY - 11) + 'px';
+  });
+
+  window.addEventListener('pointerup', e => {
+    if (!state.ghostEl || !state.dragging) return;
+
+    // 어느 컵 위에서 뗐는지 계산
+    const x = e.clientX, y = e.clientY;
+    let landed = -1;
+    document.querySelectorAll('.cup').forEach(cupEl => {
+      const rect = cupEl.getBoundingClientRect();
+      if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+        landed = Number(cupEl.dataset.ci);
+      }
+    });
+
+    cleanDrag();
+
+    if (landed >= 0) {
+      dropOnCup(landed);
+    } else {
+      // 소스 영역 위에서 뗌 = 취소
+      if (state.dragging) {
+        const sb = state.sourceBalls[state.dragging.si];
+        if (sb && sb.el) sb.el.style.opacity = '';
+        state.dragging = null;
+      }
+    }
+  });
+
+  function cleanDrag() {
+    document.querySelectorAll('.cup').forEach(c => c.classList.remove('highlight'));
+    if (state.ghostEl) { state.ghostEl.remove(); state.ghostEl = null; }
+  }
+
+  function dropOnCup(ci) {
+    if (!state.dragging) return;
+    const { colorId, si } = state.dragging;
+    const cup = state.cups[ci];
+    state.dragging = null;
+
+    // 원본 복원
+    const sb = state.sourceBalls[si];
+    if (sb && sb.el) sb.el.style.opacity = '';
+
+    if (cup.colorId === colorId) {
+      // 정답!
+      cup.balls.push(colorId);
+      state.sourceBalls[si] = null;
+      state.score += CONFIG.SCORE_PER_BALL;
+      updateHUD();
+      flashCup(ci, true);
+      spawnParticles(ci);
+      renderSource();
+      renderCups();
+      checkLevelClear();
+    } else {
+      // 오답
+      state.mistakes++;
+      flashCup(ci, false);
+      vibrate();
+    }
+  }
+
+  function flashCup(ci, correct) {
+    const els = document.querySelectorAll('.cup');
+    const el = els[ci];
+    if (!el) return;
+    if (correct) {
+      el.classList.add('correct-flash');
+      setTimeout(() => el.classList.remove('correct-flash'), 350);
+    } else {
+      el.classList.add('wrong-flash');
+      setTimeout(() => el.classList.remove('wrong-flash'), 400);
+    }
+  }
+
+  /* ── LEVEL CLEAR ── */
+  function checkLevelClear() {
+    const allPlaced = state.sourceBalls.every(sb => sb === null);
+    if (!allPlaced) return;
+
+    state.started = false;
+
+    // 보너스
+    if (state.mistakes === 0) state.score += CONFIG.SCORE_PERFECT_BONUS;
+
+    // 베스트
+    if (state.score > state.best) {
+      state.best = state.score;
+      localStorage.setItem(CONFIG.STORAGE_KEY, state.best);
+    }
+    updateHUD();
+
+    // 별 계산
+    let starsStr = '⭐⭐⭐';
+    if (state.mistakes > 4) starsStr = '⭐';
+    else if (state.mistakes > 1) starsStr = '⭐⭐';
+
+    $final.textContent = state.score;
+    $stars.textContent = starsStr;
+    $msg.textContent = state.mistakes === 0
+      ? '완벽해요! 실수가 하나도 없어요 🎊'
+      : `실수 ${state.mistakes}번. 다음엔 더 잘할 수 있어요!`;
+
+    // 마지막 레벨
+    const nextBtn = document.getElementById('nextBtn');
+    if (state.level >= CONFIG.LEVELS.length) {
+      nextBtn.textContent = '🏆 완전 클리어!';
+      nextBtn.disabled = true;
+      nextBtn.style.opacity = '0.5';
+    } else {
+      nextBtn.textContent = '다음 레벨!';
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '';
+    }
+
+    setTimeout(() => {
+      endOv.classList.remove('hidden');
+      state.started = true;
+    }, 600);
+  }
+
+  /* ── HUD ── */
+  function updateHUD() {
+    $score.textContent = state.score;
+    $best.textContent  = state.best;
+    $level.textContent = state.level;
+  }
+
+  /* ── PARTICLES ── */
+  function spawnParticles(ci) {
+    const cupEls = document.querySelectorAll('.cup');
+    const el = cupEls[ci];
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const colors = ['#f9d71c','#ff6b6b','#6bffa5','#6bb5ff','#ff6bdf','#ffb86b'];
+    for (let i = 0; i < 10; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 6 + Math.random() * 8;
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 60;
+      p.style.cssText = `
+        width:${size}px; height:${size}px;
+        left:${cx - size/2}px; top:${cy - size/2}px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        --dx:${Math.cos(angle)*dist}px;
+        --dy:${Math.sin(angle)*dist}px;
+        animation-duration:${0.6 + Math.random()*0.5}s;
+      `;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1100);
+    }
+  }
+
+  /* ── VIBRATE ── */
+  function vibrate() {
+    if (navigator.vibrate) navigator.vibrate([60, 30, 60]);
+  }
+
+  /* ── UTIL ── */
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  /* ── INIT ── */
+  updateHUD();
+})();
+</script>
+</body>
+</html>
