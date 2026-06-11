@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#03041a"/>
+      <stop offset="60%" stop-color="#080c2e"/>
+      <stop offset="100%" stop-color="#0a1040"/>
+    </linearGradient>
+    <radialGradient id="moon" cx="40%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="rgba(255,248,200,0.95)"/>
+      <stop offset="70%" stop-color="rgba(230,220,140,0.6)"/>
+      <stop offset="100%" stop-color="rgba(180,170,80,0)"/>
+    </radialGradient>
+    <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(255,200,80,0.7)"/>
+      <stop offset="100%" stop-color="rgba(255,100,30,0)"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(100,160,255,0.7)"/>
+      <stop offset="100%" stop-color="rgba(60,80,255,0)"/>
+    </radialGradient>
+    <radialGradient id="glow3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(200,80,255,0.7)"/>
+      <stop offset="100%" stop-color="rgba(150,30,200,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- Stars -->
+  <circle cx="20" cy="18" r="1.2" fill="rgba(255,255,255,0.8)"/>
+  <circle cx="55" cy="9" r="0.8" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="90" cy="22" r="1.0" fill="rgba(255,255,255,0.7)"/>
+  <circle cx="130" cy="7" r="1.2" fill="rgba(255,255,255,0.85)"/>
+  <circle cx="170" cy="14" r="0.7" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="210" cy="6" r="1.0" fill="rgba(255,255,255,0.7)"/>
+  <circle cx="250" cy="19" r="0.8" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="38" cy="50" r="0.7" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="75" cy="42" r="0.9" fill="rgba(255,255,255,0.65)"/>
+  <circle cx="195" cy="35" r="0.8" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="230" cy="45" r="1.1" fill="rgba(255,255,255,0.75)"/>
+  <circle cx="15" cy="80" r="0.8" fill="rgba(255,255,255,0.5)"/>
+
+  <!-- Moon -->
+  <circle cx="280" cy="28" r="16" fill="url(#moon)"/>
+  <circle cx="280" cy="28" r="30" fill="rgba(255,240,150,0.07)"/>
+
+  <!-- Firework 1 — Gold burst (center) -->
+  <circle cx="120" cy="72" r="28" fill="url(#glow1)" opacity="0.85"/>
+  <!-- Rays -->
+  <g stroke="#ffe066" stroke-width="2" stroke-linecap="round" opacity="0.95">
+    <line x1="120" y1="72" x2="120" y2="42"/>
+    <line x1="120" y1="72" x2="120" y2="102"/>
+    <line x1="120" y1="72" x2="90" y2="72"/>
+    <line x1="120" y1="72" x2="150" y2="72"/>
+    <line x1="120" y1="72" x2="99" y2="51"/>
+    <line x1="120" y1="72" x2="141" y2="51"/>
+    <line x1="120" y1="72" x2="99" y2="93"/>
+    <line x1="120" y1="72" x2="141" y2="93"/>
+  </g>
+  <g fill="#ffe066" opacity="0.9">
+    <circle cx="120" cy="42" r="3"/>
+    <circle cx="120" cy="102" r="3"/>
+    <circle cx="90" cy="72" r="3"/>
+    <circle cx="150" cy="72" r="3"/>
+    <circle cx="99" cy="51" r="2.5"/>
+    <circle cx="141" cy="51" r="2.5"/>
+    <circle cx="99" cy="93" r="2.5"/>
+    <circle cx="141" cy="93" r="2.5"/>
+  </g>
+  <!-- Center flash -->
+  <circle cx="120" cy="72" r="7" fill="#fff" opacity="0.95"/>
+  <circle cx="120" cy="72" r="4" fill="#ffe066"/>
+
+  <!-- Firework 2 — Blue burst (left) -->
+  <circle cx="55" cy="100" r="18" fill="url(#glow2)" opacity="0.8"/>
+  <g stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round" opacity="0.9">
+    <line x1="55" y1="100" x2="55" y2="80"/>
+    <line x1="55" y1="100" x2="55" y2="120"/>
+    <line x1="55" y1="100" x2="35" y2="100"/>
+    <line x1="55" y1="100" x2="75" y2="100"/>
+    <line x1="55" y1="100" x2="41" y2="86"/>
+    <line x1="55" y1="100" x2="69" y2="86"/>
+    <line x1="55" y1="100" x2="41" y2="114"/>
+    <line x1="55" y1="100" x2="69" y2="114"/>
+  </g>
+  <g fill="#4fc3f7" opacity="0.9">
+    <circle cx="55" cy="80" r="2.5"/>
+    <circle cx="55" cy="120" r="2.5"/>
+    <circle cx="35" cy="100" r="2.5"/>
+    <circle cx="75" cy="100" r="2.5"/>
+    <circle cx="41" cy="86" r="2"/>
+    <circle cx="69" cy="86" r="2"/>
+    <circle cx="41" cy="114" r="2"/>
+    <circle cx="69" cy="114" r="2"/>
+  </g>
+  <circle cx="55" cy="100" r="5" fill="#fff" opacity="0.9"/>
+
+  <!-- Firework 3 — Purple burst (right) -->
+  <circle cx="210" cy="85" r="22" fill="url(#glow3)" opacity="0.8"/>
+  <g stroke="#ce93d8" stroke-width="1.8" stroke-linecap="round" opacity="0.9">
+    <line x1="210" y1="85" x2="210" y2="60"/>
+    <line x1="210" y1="85" x2="210" y2="110"/>
+    <line x1="210" y1="85" x2="185" y2="85"/>
+    <line x1="210" y1="85" x2="235" y2="85"/>
+    <line x1="210" y1="85" x2="192" y2="67"/>
+    <line x1="210" y1="85" x2="228" y2="67"/>
+    <line x1="210" y1="85" x2="192" y2="103"/>
+    <line x1="210" y1="85" x2="228" y2="103"/>
+  </g>
+  <g fill="#ce93d8" opacity="0.9">
+    <circle cx="210" cy="60" r="3"/>
+    <circle cx="210" cy="110" r="3"/>
+    <circle cx="185" cy="85" r="3"/>
+    <circle cx="235" cy="85" r="3"/>
+    <circle cx="192" cy="67" r="2.5"/>
+    <circle cx="228" cy="67" r="2.5"/>
+    <circle cx="192" cy="103" r="2.5"/>
+    <circle cx="228" cy="103" r="2.5"/>
+  </g>
+  <circle cx="210" cy="85" r="6" fill="#fff" opacity="0.9"/>
+
+  <!-- Small sparkles scattered -->
+  <g fill="#ffe066" opacity="0.8">
+    <polygon points="30,55 31.5,59 35.5,59 32.5,61.5 33.5,65.5 30,63 26.5,65.5 27.5,61.5 24.5,59 28.5,59"/>
+  </g>
+  <g fill="#4fc3f7" opacity="0.75">
+    <polygon points="165,50 166.2,54 170,54 167,56 168.2,60 165,58 161.8,60 163,56 160,54 163.8,54"/>
+  </g>
+  <g fill="#f48fb1" opacity="0.8">
+    <polygon points="255,60 256.2,64 260,64 257,66 258.2,70 255,68 251.8,70 253,66 250,64 253.8,64"/>
+  </g>
+  <g fill="#a5d6a7" opacity="0.75">
+    <polygon points="85,130 86.2,134 90,134 87,136 88.2,140 85,138 81.8,140 83,136 80,134 83.8,134"/>
+  </g>
+
+  <!-- Emoji center -->
+  <text x="120" y="78" text-anchor="middle" font-size="14" opacity="0.0">🎆</text>
+
+  <!-- Falling sparks -->
+  <g stroke="#ff9800" stroke-width="1.2" stroke-linecap="round" opacity="0.7">
+    <line x1="108" y1="100" x2="105" y2="115"/>
+    <line x1="115" y1="102" x2="113" y2="117"/>
+    <line x1="125" y1="100" x2="128" y2="116"/>
+    <line x1="132" y1="98" x2="136" y2="113"/>
+  </g>
+  <g fill="#ffcc02" opacity="0.75">
+    <circle cx="105" cy="116" r="2"/>
+    <circle cx="113" cy="118" r="1.5"/>
+    <circle cx="128" cy="117" r="2"/>
+    <circle cx="136" cy="114" r="1.5"/>
+  </g>
+
+  <!-- Title -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffe066">불꽃 폭죽</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">FIREWORKS TAP</text>
+  </g>
+</svg>

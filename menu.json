@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "claw-machine",
+        "label": "🎁 인형뽑기",
+        "path": "claw-machine/index.html"
+      },
+      {
+        "id": "fireworks-tap",
+        "label": "🎆 불꽃놀이",
+        "path": "fireworks-tap/index.html"
+      },
+      {
         "id": "beat-animals",
         "label": "🥁 동물 비트",
         "path": "beat-animals/index.html"

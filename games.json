@@ -862,5 +862,21 @@
     "description": "색깔 공을 같은 색 컵에 끌어다 분류! 8레벨",
     "thumbnail": "rainbow-sort/thumb.svg",
     "path": "rainbow-sort/index.html"
+  },
+  {
+    "id": "claw-machine",
+    "title": "Claw Machine",
+    "title_ko": "🎁 인형뽑기",
+    "description": "집게를 좌우로 움직여 탭! 귀여운 인형을 뽑아봐요. 5번 도전",
+    "thumbnail": "claw-machine/thumb.svg",
+    "path": "claw-machine/index.html"
+  },
+  {
+    "id": "fireworks-tap",
+    "title": "Fireworks Tap",
+    "title_ko": "🎆 불꽃 폭죽",
+    "description": "화면을 탭하면 폭죽이 팡팡! 콤보로 점수를 올려봐요. 60초 도전",
+    "thumbnail": "fireworks-tap/thumb.svg",
+    "path": "fireworks-tap/index.html"
   }
 ]

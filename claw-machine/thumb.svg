@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#2d1b69"/>
+    </linearGradient>
+    <linearGradient id="machine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b1f82"/>
+      <stop offset="100%" stop-color="#1a0a2e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 뽑기 기계 몸통 -->
+  <rect x="48" y="18" width="140" height="140" rx="12" fill="url(#machine)" stroke="#7c3aed" stroke-width="3"/>
+  <!-- 유리 영역 -->
+  <rect x="56" y="26" width="124" height="80" rx="8" fill="rgba(120,200,255,0.10)" stroke="rgba(120,200,255,0.25)" stroke-width="1.5"/>
+
+  <!-- 레일 -->
+  <line x1="66" y1="45" x2="170" y2="45" stroke="rgba(200,180,255,0.35)" stroke-width="2" stroke-dasharray="6 4"/>
+
+  <!-- 집게 와이어 -->
+  <line x1="118" y1="45" x2="118" y2="72" stroke="rgba(200,200,255,0.8)" stroke-width="2.5"/>
+
+  <!-- 집게 몸통 -->
+  <rect x="108" y="62" width="20" height="14" rx="4" fill="#c084fc"/>
+  <!-- 집게 좌 -->
+  <line x1="113" y1="76" x2="102" y2="90" stroke="#e879f9" stroke-width="4" stroke-linecap="round"/>
+  <!-- 집게 우 -->
+  <line x1="123" y1="76" x2="134" y2="90" stroke="#e879f9" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- 인형들 -->
+  <text x="75"  y="120" font-size="22" text-anchor="middle">🐻</text>
+  <text x="118" y="120" font-size="22" text-anchor="middle">🐱</text>
+  <text x="158" y="120" font-size="22" text-anchor="middle">🐶</text>
+  <text x="75"  y="146" font-size="22" text-anchor="middle">🐼</text>
+  <text x="118" y="146" font-size="22" text-anchor="middle">🐰</text>
+  <text x="158" y="146" font-size="22" text-anchor="middle">🦊</text>
+
+  <!-- 기계 하단 버튼 -->
+  <rect x="76" y="154" width="84" height="10" rx="5" fill="#7c3aed" opacity="0.7"/>
+  <circle cx="118" cy="159" r="4" fill="#ff6fcf"/>
+
+  <!-- 반짝이 효과 -->
+  <circle cx="220" cy="30" r="3" fill="#ffe66d" opacity="0.8"/>
+  <circle cx="240" cy="55" r="2" fill="#ff6fcf" opacity="0.7"/>
+  <circle cx="210" cy="70" r="2.5" fill="#4dffee" opacity="0.6"/>
+  <circle cx="255" cy="40" r="1.5" fill="#fff" opacity="0.5"/>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6fcf">인형뽑기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">CLAW MACHINE</text>
+  </g>
+</svg>

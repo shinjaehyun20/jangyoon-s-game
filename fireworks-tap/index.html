@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🎆 불꽃 폭죽</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: #05071a;
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    /* HUD */
+    #hud {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px 6px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hud-box {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 6px 14px;
+      color: #fff;
+      font-size: clamp(13px, 3.8vw, 18px);
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(255,220,100,0.7);
+      min-width: 60px;
+      text-align: center;
+    }
+    .hud-box span {
+      display: block;
+      font-size: clamp(9px, 2.5vw, 12px);
+      font-weight: 500;
+      opacity: 0.75;
+      margin-bottom: 1px;
+    }
+    #combo-display {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(22px, 7vw, 42px);
+      font-weight: 900;
+      color: #ffe066;
+      text-shadow: 0 0 12px #ff9500, 0 0 30px #ff6600;
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0;
+      transition: opacity 0.3s;
+      white-space: nowrap;
+    }
+
+    /* Footer */
+    #footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 16px 10px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #footer small {
+      color: rgba(255,255,255,0.45);
+      font-size: clamp(11px, 2.8vw, 13px);
+    }
+    .home-link {
+      pointer-events: all;
+      color: rgba(255,255,255,0.55);
+      font-size: clamp(12px, 3vw, 14px);
+      text-decoration: none;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 5px 10px;
+    }
+
+    /* Overlay */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(5,7,26,0.82);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: rgba(20,22,55,0.96);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 24px;
+      padding: 30px 28px 26px;
+      text-align: center;
+      max-width: 320px;
+      width: 88%;
+      color: #fff;
+      box-shadow: 0 0 40px rgba(100,120,255,0.25);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 900;
+      margin-bottom: 10px;
+      text-shadow: 0 0 16px #8888ff;
+    }
+    .overlay-card p {
+      font-size: clamp(14px, 3.8vw, 17px);
+      color: rgba(255,255,255,0.8);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+    .overlay-card .result-score {
+      font-size: clamp(44px, 14vw, 70px);
+      font-weight: 900;
+      color: #ffe066;
+      text-shadow: 0 0 18px #ff9500;
+      margin: 10px 0;
+      line-height: 1;
+    }
+    .overlay-card .best-tag {
+      font-size: clamp(12px, 3vw, 15px);
+      color: #aaffcc;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #6644ee, #cc44ff);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      padding: 14px 40px;
+      cursor: pointer;
+      width: 100%;
+      min-height: 54px;
+      box-shadow: 0 4px 20px rgba(120,60,255,0.5);
+      transition: transform 0.1s, box-shadow 0.1s;
+      touch-action: manipulation;
+    }
+    .btn-start:active { transform: scale(0.96); box-shadow: 0 2px 10px rgba(120,60,255,0.4); }
+
+    /* Tap hints (star trail) */
+    .tap-ring {
+      position: absolute;
+      width: 60px; height: 60px;
+      border: 3px solid rgba(255,255,255,0.8);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 30;
+      animation: tapRing 0.5s ease-out forwards;
+      transform: translate(-50%, -50%);
+    }
+    @keyframes tapRing {
+      from { transform: translate(-50%,-50%) scale(0.2); opacity: 1; }
+      to   { transform: translate(-50%,-50%) scale(2.2); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-box"><span>점수</span><span id="scoreVal">0</span></div>
+  <div class="hud-box"><span>최고</span><span id="bestVal">0</span></div>
+  <div class="hud-box"><span>남은 시간</span><span id="timerVal">60</span></div>
+</div>
+
+<!-- Combo -->
+<div id="combo-display"></div>
+
+<!-- Footer -->
+<div id="footer">
+  <small>화면을 탭해서 폭죽을 터트려요! 🎆</small>
+  <a class="home-link" href="../index.html">← 홈으로</a>
+</div>
+
+<!-- Start Overlay -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🎆 불꽃 폭죽</h2>
+    <p>화면을 탭하면 그 자리에서<br>폭죽이 팡팡 터져요!<br>빠르게 탭하면 콤보 보너스! 🌟</p>
+    <button class="btn-start" id="startBtn">시작! 🎇</button>
+  </div>
+</div>
+
+<!-- End Overlay -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 폭죽 끝!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="best-tag" id="bestTag"></div>
+    <button class="btn-start" id="restartBtn">다시 하기 🎆</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CFG = {
+    GAME_DURATION: 60,       // seconds
+    BASE_SCORE:    10,       // per tap
+    COMBO_WINDOW:  1200,     // ms — combo resets if gap > this
+    COMBO_BONUS_MUL: [1, 1, 1.5, 2, 2.5, 3, 4, 5], // index = combo count (0-based), capped at last
+    PARTICLE_MIN:  20,
+    PARTICLE_MAX:  38,
+    GRAVITY:       0.04,
+    TRAIL_ALPHA:   0.18,     // canvas trail fade
+    STAR_COUNT:    120,
+    MOON_SHOW:     true,
+  };
+
+  /* ── STATE ── */
+  let state = {
+    running: false,
+    score: 0,
+    best: parseInt(localStorage.getItem('fireworks-tap_best') || '0', 10),
+    timeLeft: CFG.GAME_DURATION,
+    combo: 0,
+    lastTapTime: 0,
+    timerInterval: null,
+  };
+
+  /* ── DOM ── */
+  const canvas       = document.getElementById('canvas');
+  const ctx          = canvas.getContext('2d');
+  const scoreVal     = document.getElementById('scoreVal');
+  const bestVal      = document.getElementById('bestVal');
+  const timerVal     = document.getElementById('timerVal');
+  const comboDisplay = document.getElementById('combo-display');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay   = document.getElementById('endOverlay');
+  const finalScore   = document.getElementById('finalScore');
+  const bestTag      = document.getElementById('bestTag');
+  document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+  document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+
+  /* ── RESIZE ── */
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drawBackground(true);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  /* ── PARTICLES ── */
+  const particles = [];
+
+  const COLORS = [
+    ['#ff4e50','#f9d423'],
+    ['#a18cd1','#fbc2eb'],
+    ['#00c6ff','#0072ff'],
+    ['#f7971e','#ffd200'],
+    ['#56ab2f','#a8e063'],
+    ['#ee9ca7','#ffdde1'],
+    ['#4facfe','#00f2fe'],
+    ['#f953c6','#b91d73'],
+    ['#fff176','#ffe066'],
+    ['#80deea','#26c6da'],
+  ];
+
+  const SHAPES = ['circle', 'star', 'spark', 'ring'];
+
+  function randomColor() {
+    const pair = COLORS[Math.floor(Math.random() * COLORS.length)];
+    return pair[Math.floor(Math.random() * 2)];
+  }
+
+  function createParticle(x, y, shape) {
+    const angle   = Math.random() * Math.PI * 2;
+    const speed   = 1.5 + Math.random() * 5.5;
+    const size    = 2.5 + Math.random() * 5;
+    const life    = 0.85 + Math.random() * 0.7;
+    return {
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1.5,
+      size,
+      color: randomColor(),
+      shape: shape || SHAPES[Math.floor(Math.random() * SHAPES.length)],
+      life,         // total life (seconds)
+      age: 0,
+      trail: [],
+      glitter: Math.random() < 0.35,
+    };
+  }
+
+  function launchFirework(x, y) {
+    const count   = CFG.PARTICLE_MIN + Math.floor(Math.random() * (CFG.PARTICLE_MAX - CFG.PARTICLE_MIN));
+    const shape   = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+    // Rising shell flash
+    particles.push({
+      x, y,
+      vx: 0, vy: 0,
+      size: 0, color: '#fff',
+      shape: 'flash',
+      life: 0.15, age: 0,
+      trail: [],
+      flashRadius: 18 + Math.random() * 22,
+      glitter: false,
+    });
+    for (let i = 0; i < count; i++) {
+      particles.push(createParticle(x, y, shape));
+    }
+  }
+
+  function drawStar(ctx, x, y, r, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const a1 = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+      const a2 = a1 + Math.PI / 5;
+      if (i === 0) ctx.moveTo(Math.cos(a1) * r, Math.sin(a1) * r);
+      else         ctx.lineTo(Math.cos(a1) * r, Math.sin(a1) * r);
+      ctx.lineTo(Math.cos(a2) * (r * 0.45), Math.sin(a2) * (r * 0.45));
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function updateParticles(dt) {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.age += dt;
+      if (p.age >= p.life) { particles.splice(i, 1); continue; }
+      p.trail.push({ x: p.x, y: p.y });
+      if (p.trail.length > 6) p.trail.shift();
+      p.x  += p.vx;
+      p.y  += p.vy;
+      p.vy += CFG.GRAVITY;
+      p.vx *= 0.992;
+    }
+  }
+
+  function drawParticles() {
+    for (const p of particles) {
+      const ratio   = 1 - p.age / p.life;
+      const alpha   = Math.max(0, ratio);
+
+      if (p.shape === 'flash') {
+        const r = p.flashRadius * (p.age / p.life);
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        grad.addColorStop(0, `rgba(255,255,220,${alpha * 0.9})`);
+        grad.addColorStop(1, `rgba(255,200,100,0)`);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        continue;
+      }
+
+      // Trail
+      if (p.trail.length > 1) {
+        for (let t = 1; t < p.trail.length; t++) {
+          const ta = (t / p.trail.length) * alpha * 0.5;
+          ctx.beginPath();
+          ctx.moveTo(p.trail[t - 1].x, p.trail[t - 1].y);
+          ctx.lineTo(p.trail[t].x, p.trail[t].y);
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = p.size * 0.35 * (t / p.trail.length);
+          ctx.globalAlpha = ta;
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.globalAlpha = alpha;
+      const sz = p.size * ratio;
+
+      if (p.shape === 'star') {
+        drawStar(ctx, p.x, p.y, sz, p.color);
+      } else if (p.shape === 'ring') {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, sz * 1.2, 0, Math.PI * 2);
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = sz * 0.4;
+        ctx.stroke();
+      } else if (p.shape === 'spark') {
+        ctx.beginPath();
+        ctx.moveTo(p.x - p.vx * 1.5, p.y - p.vy * 1.5);
+        ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = sz * 0.55;
+        ctx.stroke();
+      } else {
+        // circle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, sz, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      }
+
+      // Glitter sparkle
+      if (p.glitter && Math.random() < 0.3) {
+        ctx.save();
+        ctx.globalAlpha = alpha * 0.8;
+        ctx.fillStyle = '#fff';
+        const gs = sz * 0.3;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, gs, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  /* ── BACKGROUND ── */
+  const stars = [];
+  for (let i = 0; i < CFG.STAR_COUNT; i++) {
+    stars.push({
+      x: Math.random(),
+      y: Math.random(),
+      r: 0.5 + Math.random() * 1.6,
+      blink: Math.random() * Math.PI * 2,
+      speed: 0.4 + Math.random() * 1.2,
+    });
+  }
+
+  function drawBackground(full) {
+    const W = canvas.width, H = canvas.height;
+    if (full) {
+      // Deep night sky gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#03041a');
+      grad.addColorStop(0.55, '#080c2e');
+      grad.addColorStop(1, '#0a1040');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    } else {
+      // Trail fade
+      ctx.fillStyle = `rgba(3,4,26,${CFG.TRAIL_ALPHA})`;
+      ctx.fillRect(0, 0, W, H);
+    }
+    // Stars
+    const now = performance.now() / 1000;
+    for (const s of stars) {
+      const blink = 0.5 + 0.5 * Math.sin(now * s.speed + s.blink);
+      ctx.beginPath();
+      ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${0.3 + blink * 0.7})`;
+      ctx.fill();
+    }
+    // Moon
+    if (CFG.MOON_SHOW) {
+      const mx = W * 0.82, my = H * 0.1, mr = Math.min(W, H) * 0.055;
+      const moonGrad = ctx.createRadialGradient(mx - mr * 0.2, my - mr * 0.2, mr * 0.1, mx, my, mr);
+      moonGrad.addColorStop(0, 'rgba(255,248,200,0.95)');
+      moonGrad.addColorStop(0.7, 'rgba(230,220,140,0.7)');
+      moonGrad.addColorStop(1, 'rgba(180,170,80,0)');
+      ctx.beginPath();
+      ctx.arc(mx, my, mr, 0, Math.PI * 2);
+      ctx.fillStyle = moonGrad;
+      ctx.fill();
+      // Moon glow
+      const glowGrad = ctx.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 2.2);
+      glowGrad.addColorStop(0, 'rgba(255,240,150,0.12)');
+      glowGrad.addColorStop(1, 'rgba(255,240,150,0)');
+      ctx.beginPath();
+      ctx.arc(mx, my, mr * 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = glowGrad;
+      ctx.fill();
+    }
+  }
+
+  /* ── RENDER LOOP ── */
+  let lastTime = 0;
+  let animId   = null;
+
+  function loop(ts) {
+    animId = requestAnimationFrame(loop);
+    const dt  = Math.min((ts - lastTime) / 1000, 0.1);
+    lastTime  = ts;
+
+    drawBackground(false);
+    updateParticles(dt);
+    drawParticles();
+  }
+
+  // Start background animation immediately (title screen)
+  lastTime = performance.now();
+  animId   = requestAnimationFrame(loop);
+
+  /* ── TAP HANDLER ── */
+  canvas.addEventListener('pointerdown', onTap, { passive: false });
+
+  function onTap(e) {
+    e.preventDefault();
+    if (!state.running) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x    = e.clientX - rect.left;
+    const y    = e.clientY - rect.top;
+
+    launchFirework(x, y);
+    addTapRing(e.clientX, e.clientY);
+
+    // Combo
+    const now  = Date.now();
+    if (now - state.lastTapTime < CFG.COMBO_WINDOW) {
+      state.combo++;
+    } else {
+      state.combo = 0;
+    }
+    state.lastTapTime = now;
+
+    // Score
+    const ci   = Math.min(state.combo, CFG.COMBO_BONUS_MUL.length - 1);
+    const mul  = CFG.COMBO_BONUS_MUL[ci];
+    const pts  = Math.round(CFG.BASE_SCORE * mul);
+    state.score += pts;
+    scoreVal.textContent = state.score;
+
+    // Combo display
+    if (state.combo >= 2) {
+      showCombo(state.combo, mul);
+    }
+
+    // Multi-touch: additional fireworks
+    if (e.isPrimary === false) { /* additional touches handled below */ }
+  }
+
+  // Multi-touch support
+  canvas.addEventListener('touchstart', function (e) {
+    if (!state.running) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    for (let i = 1; i < e.touches.length; i++) {
+      const t = e.touches[i];
+      launchFirework(t.clientX - rect.left, t.clientY - rect.top);
+    }
+  }, { passive: false });
+
+  function addTapRing(cx, cy) {
+    const ring = document.createElement('div');
+    ring.className = 'tap-ring';
+    ring.style.left = cx + 'px';
+    ring.style.top  = cy + 'px';
+    document.body.appendChild(ring);
+    ring.addEventListener('animationend', () => ring.remove());
+  }
+
+  /* ── COMBO DISPLAY ── */
+  let comboHideTimer = null;
+  function showCombo(count, mul) {
+    const labels = ['', '', '더블!', '트리플!', '쿼드!', '5콤보!', '6콤보!', '7콤보!', '8콤보!'];
+    const label  = (count < labels.length) ? labels[count] : `${count}콤보!`;
+    comboDisplay.textContent = `${label}  ×${mul}`;
+    comboDisplay.style.opacity = '1';
+    comboDisplay.style.transform = 'translateX(-50%) scale(1.15)';
+    clearTimeout(comboHideTimer);
+    comboHideTimer = setTimeout(() => {
+      comboDisplay.style.opacity  = '0';
+      comboDisplay.style.transform = 'translateX(-50%) scale(1)';
+    }, 800);
+  }
+
+  /* ── TIMER ── */
+  function startTimer() {
+    state.timeLeft = CFG.GAME_DURATION;
+    timerVal.textContent = state.timeLeft;
+    state.timerInterval = setInterval(() => {
+      state.timeLeft--;
+      timerVal.textContent = state.timeLeft;
+      if (state.timeLeft <= 0) endGame();
+    }, 1000);
+  }
+
+  /* ── GAME FLOW ── */
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    particles.length = 0;
+
+    state.running      = true;
+    state.score        = 0;
+    state.combo        = 0;
+    state.lastTapTime  = 0;
+
+    scoreVal.textContent = 0;
+    bestVal.textContent  = state.best;
+
+    clearInterval(state.timerInterval);
+    startTimer();
+  }
+
+  function endGame() {
+    clearInterval(state.timerInterval);
+    state.running = false;
+
+    // Celebratory burst
+    const W = canvas.width, H = canvas.height;
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => {
+        const x = W * (0.2 + Math.random() * 0.6);
+        const y = H * (0.2 + Math.random() * 0.5);
+        launchFirework(x, y);
+      }, i * 150);
+    }
+
+    if (state.score > state.best) {
+      state.best = state.score;
+      localStorage.setItem('fireworks-tap_best', state.best);
+      bestTag.textContent = '🌟 새 최고 기록!';
+    } else {
+      bestTag.textContent = `최고 기록: ${state.best}점`;
+    }
+
+    finalScore.textContent   = state.score;
+    bestVal.textContent      = state.best;
+
+    setTimeout(() => {
+      endOverlay.classList.remove('hidden');
+    }, 1400);
+  }
+
+  /* ── BEST INIT ── */
+  bestVal.textContent = state.best;
+
+})();
+</script>
+</body>
+</html>
