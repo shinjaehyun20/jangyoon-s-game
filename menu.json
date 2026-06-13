@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "super-mario",
+        "label": "🍄 슈퍼 점프 모험",
+        "path": "super-mario/index.html"
+      },
+      {
         "id": "claw-machine",
         "label": "🎁 인형뽑기",
         "path": "claw-machine/index.html"

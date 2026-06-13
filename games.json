@@ -1,5 +1,13 @@
 [
   {
+    "id": "super-mario",
+    "title": "Super Jump Adventure",
+    "title_ko": "슈퍼 점프 모험",
+    "description": "달리고 점프해서 코인을 모으고 적을 밟아요! 깃발에 도착하면 클리어",
+    "thumbnail": "super-mario/thumb.svg",
+    "path": "super-mario/index.html"
+  },
+  {
     "id": "acorn-squirrel",
     "title": "Acorn Squirrel",
     "title_ko": "다람쥐 도토리 모으기",
