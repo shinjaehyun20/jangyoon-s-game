@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>양말 짝 맞추기</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg2: #16213e;
+      --accent: #f9c74f;
+      --accent2: #f8961e;
+      --text: #ffffff;
+      --card-back: #2d4a7a;
+      --card-border: #4a90d9;
+      --success: #43aa8b;
+      --danger: #f94144;
+      --shadow: rgba(0,0,0,0.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; gap: 8px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 8px 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      display: flex; flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .hud-label {
+      font-size: 10px;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .hud-value {
+      font-size: clamp(16px, 4.5vw, 22px);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    #timer-bar-wrap {
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      height: 12px;
+      overflow: hidden;
+      margin: 0 6px;
+    }
+    #timer-bar {
+      height: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.2s linear, background 0.3s;
+    }
+    /* 게임 영역 */
+    #gameArea {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+    /* 선택 슬롯 (위쪽 2개) */
+    #selection-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      padding: 6px 0;
+      flex-shrink: 0;
+    }
+    .selection-slot {
+      width: 90px; height: 90px;
+      border-radius: 18px;
+      border: 3px dashed rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 46px;
+      background: rgba(255,255,255,0.04);
+      position: relative;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .selection-slot.filled {
+      border-color: var(--accent);
+      background: rgba(249,199,79,0.1);
+    }
+    .selection-slot.match {
+      border-color: var(--success);
+      background: rgba(67,170,139,0.18);
+    }
+    .selection-slot.no-match {
+      border-color: var(--danger);
+      background: rgba(249,65,68,0.18);
+    }
+    #check-btn {
+      display: none;
+      padding: 10px 28px;
+      font-size: 16px;
+      font-weight: 900;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #1a1a2e;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 4px 14px rgba(249,199,79,0.35);
+      transition: transform 0.1s;
+    }
+    #check-btn:active { transform: scale(0.95); }
+
+    #match-msg {
+      text-align: center;
+      font-size: clamp(14px, 3.5vw, 18px);
+      font-weight: 700;
+      min-height: 26px;
+    }
+    /* 양말 그리드 */
+    #sock-grid {
+      flex: 1;
+      display: grid;
+      gap: 8px;
+      overflow: hidden;
+    }
+    .sock-card {
+      border-radius: 14px;
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.15s, background 0.15s;
+      position: relative;
+      touch-action: manipulation;
+    }
+    .sock-card:active { transform: scale(0.93); }
+    .sock-card.selected {
+      border-color: var(--accent);
+      background: rgba(249,199,79,0.15);
+    }
+    .sock-card.matched {
+      opacity: 0.38;
+      pointer-events: none;
+      transform: scale(0.92);
+    }
+    .sock-inner {
+      font-size: 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .sock-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      opacity: 0.75;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; opacity: 0.55; }
+    .home-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,10,30,0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: var(--bg2);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; }
+    .overlay-card p { font-size: 14px; opacity: 0.75; line-height: 1.6; margin-bottom: 8px; }
+    .result-score {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 12px 0;
+      line-height: 1;
+    }
+    .result-sub {
+      font-size: 13px;
+      opacity: 0.6;
+      margin-bottom: 4px;
+    }
+    .btn-start {
+      margin-top: 18px;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #1a1a2e;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 6px 20px rgba(249,199,79,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .stars { font-size: 36px; letter-spacing: 4px; margin-bottom: 4px; }
+    .diff-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 14px 0 4px;
+    }
+    .diff-btn {
+      flex: 1;
+      padding: 10px 0;
+      font-size: 14px;
+      font-weight: 700;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .diff-btn.active, .diff-btn:active {
+      border-color: var(--accent);
+      background: rgba(249,199,79,0.14);
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🧦 양말 짝 맞추기</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">짝 맞춤</span>
+      <span class="hud-value" id="pairCount">0</span>
+    </div>
+    <div id="timer-bar-wrap">
+      <div id="timer-bar" style="width:100%"></div>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">남은 시간</span>
+      <span class="hud-value" id="timerDisplay">60</span>
+    </div>
+  </div>
+
+  <div id="gameArea">
+    <div id="selection-row">
+      <div class="selection-slot" id="slot0"></div>
+      <div class="selection-slot" id="slot1"></div>
+    </div>
+    <div style="display:flex;justify-content:center;">
+      <button id="check-btn">확인! 🧦</button>
+    </div>
+    <div id="match-msg"></div>
+    <div id="sock-grid"></div>
+  </div>
+
+  <footer>
+    <small>같은 양말 2짝을 골라요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🧦 양말 짝 맞추기</h2>
+    <p>빨래 바구니에서<br>같은 양말 2짝을 찾아요!<br>터치로 2개 고른 뒤 확인!</p>
+    <p style="margin-top:8px;font-size:12px;color:var(--accent);">⭐ 빨리 맞출수록 점수가 올라요!</p>
+    <div class="diff-row">
+      <button class="diff-btn active" data-diff="easy">쉬움<br>🟢</button>
+      <button class="diff-btn" data-diff="normal">보통<br>🟡</button>
+      <button class="diff-btn" data-diff="hard">어려움<br>🔴</button>
+    </div>
+    <button class="btn-start" id="startBtn">시작!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <div class="stars" id="starDisplay">⭐⭐⭐</div>
+    <h2>🎉 대단해요!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="result-sub">짝을 맞췄어요!</div>
+    <p id="resultMsg"></p>
+    <p id="bestMsg" style="font-size:12px;color:var(--accent);margin-top:4px;"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── 양말 데이터 (색+무늬 조합) ── */
+  const SOCKS = [
+    { id: 'red-stripe',    emoji: '🧦', bg: '#ff6b6b', label: '빨간 줄무늬', pattern: '줄줄' },
+    { id: 'blue-dot',      emoji: '🧦', bg: '#4d9de0', label: '파란 물방울', pattern: '점점' },
+    { id: 'yellow-star',   emoji: '🧦', bg: '#f9c74f', label: '노란 별',    pattern: '★★' },
+    { id: 'green-wave',    emoji: '🧦', bg: '#43aa8b', label: '초록 물결',   pattern: '~~~' },
+    { id: 'purple-heart',  emoji: '🧦', bg: '#a855f7', label: '보라 하트',   pattern: '♥♥' },
+    { id: 'orange-zigzag', emoji: '🧦', bg: '#f8961e', label: '주황 지그재그', pattern: 'ZZZ' },
+    { id: 'pink-flower',   emoji: '🧦', bg: '#f72585', label: '분홍 꽃',    pattern: '❀❀' },
+    { id: 'sky-cloud',     emoji: '🧦', bg: '#5bc0eb', label: '하늘 구름',   pattern: '☁☁' },
+    { id: 'mint-leaf',     emoji: '🧦', bg: '#06d6a0', label: '민트 잎',    pattern: '🌿' },
+    { id: 'brown-check',   emoji: '🧦', bg: '#8b5e3c', label: '갈색 체크',   pattern: '▦▦' },
+    { id: 'navy-anchor',   emoji: '🧦', bg: '#264653', label: '남색 닻',    pattern: '⚓' },
+    { id: 'lime-alien',    emoji: '🧦', bg: '#90e0af', label: '연두 외계인',  pattern: '👾' },
+  ];
+
+  /* ── 난이도 설정 ── */
+  const DIFF = {
+    easy:   { pairs: 4,  time: 90, cols: 2, label: '쉬움' },
+    normal: { pairs: 6,  time: 70, cols: 3, label: '보통' },
+    hard:   { pairs: 9,  time: 60, cols: 3, label: '어려움' },
+  };
+
+  /* ── 상태 ── */
+  let state = {
+    diff: 'easy',
+    cards: [],          // { id, sockId, matched, selected }
+    selected: [],       // 최대 2개 카드 인덱스
+    pairs: 0,
+    totalPairs: 0,
+    timer: 0,
+    timerId: null,
+    maxTime: 90,
+    running: false,
+  };
+
+  /* ── DOM ── */
+  const $pairCount    = document.getElementById('pairCount');
+  const $timerDisplay = document.getElementById('timerDisplay');
+  const $timerBar     = document.getElementById('timer-bar');
+  const $sockGrid     = document.getElementById('sock-grid');
+  const $slot0        = document.getElementById('slot0');
+  const $slot1        = document.getElementById('slot1');
+  const $checkBtn     = document.getElementById('check-btn');
+  const $matchMsg     = document.getElementById('match-msg');
+  const $startOverlay = document.getElementById('startOverlay');
+  const $endOverlay   = document.getElementById('endOverlay');
+  const $startBtn     = document.getElementById('startBtn');
+  const $restartBtn   = document.getElementById('restartBtn');
+  const $finalScore   = document.getElementById('finalScore');
+  const $resultMsg    = document.getElementById('resultMsg');
+  const $bestMsg      = document.getElementById('bestMsg');
+  const $starDisplay  = document.getElementById('starDisplay');
+  const diffBtns      = document.querySelectorAll('.diff-btn');
+
+  /* ── 난이도 선택 ── */
+  diffBtns.forEach(btn => {
+    btn.addEventListener('pointerdown', () => {
+      diffBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.diff = btn.dataset.diff;
+    });
+  });
+
+  /* ── 게임 시작 ── */
+  function startGame() {
+    $startOverlay.classList.add('hidden');
+    $endOverlay.classList.add('hidden');
+    $matchMsg.textContent = '';
+
+    const cfg = DIFF[state.diff];
+    state.pairs = 0;
+    state.totalPairs = cfg.pairs;
+    state.selected = [];
+    state.timer = cfg.time;
+    state.maxTime = cfg.time;
+    state.running = true;
+
+    // 양말 쌍 생성 (pairs × 2 cards, 섞기)
+    const pool = shuffle(SOCKS.slice()).slice(0, cfg.pairs);
+    const cardList = [];
+    pool.forEach(sock => {
+      cardList.push({ id: cardList.length, sockId: sock.id, matched: false, selected: false });
+      cardList.push({ id: cardList.length, sockId: sock.id, matched: false, selected: false });
+    });
+    state.cards = shuffle(cardList).map((c, i) => ({ ...c, id: i }));
+
+    renderGrid(cfg.cols);
+    updateHUD();
+    updateSlots();
+    $checkBtn.style.display = 'none';
+
+    clearInterval(state.timerId);
+    state.timerId = setInterval(tickTimer, 1000);
+  }
+
+  /* ── 그리드 렌더 ── */
+  function renderGrid(cols) {
+    $sockGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    $sockGrid.innerHTML = '';
+    state.cards.forEach((card, idx) => {
+      const sock = SOCKS.find(s => s.id === card.sockId);
+      const el = document.createElement('div');
+      el.className = 'sock-card';
+      el.dataset.idx = idx;
+      el.style.background = sock.bg + '22';
+      el.style.border = `2px solid ${sock.bg}55`;
+      el.innerHTML = `
+        <div class="sock-inner">
+          <span style="font-size:30px;filter:none;">🧦</span>
+          <span style="font-size:18px;color:${sock.bg};font-weight:900;">${sock.pattern}</span>
+          <span class="sock-label" style="color:${sock.bg};">${sock.label}</span>
+        </div>`;
+      el.addEventListener('pointerdown', () => onCardTap(idx));
+      $sockGrid.appendChild(el);
+    });
+  }
+
+  /* ── 카드 탭 ── */
+  function onCardTap(idx) {
+    if (!state.running) return;
+    const card = state.cards[idx];
+    if (card.matched) return;
+    if (state.selected.length >= 2) return;
+    if (state.selected.includes(idx)) {
+      // 토글 해제
+      state.selected = state.selected.filter(i => i !== idx);
+      card.selected = false;
+    } else {
+      state.selected.push(idx);
+      card.selected = true;
+    }
+    updateCardStyles();
+    updateSlots();
+
+    if (state.selected.length === 2) {
+      $checkBtn.style.display = 'block';
+    } else {
+      $checkBtn.style.display = 'none';
+    }
+  }
+
+  /* ── 확인 버튼 ── */
+  $checkBtn.addEventListener('pointerdown', checkMatch);
+
+  function checkMatch() {
+    if (state.selected.length !== 2) return;
+    const [i, j] = state.selected;
+    const a = state.cards[i], b = state.cards[j];
+    if (a.sockId === b.sockId) {
+      // 짝 맞음!
+      a.matched = b.matched = true;
+      state.pairs++;
+      state.selected = [];
+      updateCardStyles();
+      updateSlots();
+      updateHUD();
+      $checkBtn.style.display = 'none';
+      showMsg('정답이에요! 🎉', '#43aa8b');
+      markSlotsMatch(true);
+      setTimeout(() => {
+        clearSlotsMsg();
+        if (state.pairs >= state.totalPairs) {
+          endGame(true);
+        }
+      }, 700);
+    } else {
+      // 틀림
+      markSlotsMatch(false);
+      showMsg('아~ 다시 해봐요! 💪', '#f94144');
+      setTimeout(() => {
+        a.selected = b.selected = false;
+        state.selected = [];
+        updateCardStyles();
+        updateSlots();
+        $checkBtn.style.display = 'none';
+        clearSlotsMsg();
+      }, 800);
+    }
+  }
+
+  /* ── 슬롯 갱신 ── */
+  function updateSlots() {
+    const slots = [$slot0, $slot1];
+    [0, 1].forEach(si => {
+      const idx = state.selected[si];
+      const slot = slots[si];
+      slot.className = 'selection-slot';
+      slot.textContent = '';
+      if (idx !== undefined) {
+        const sock = SOCKS.find(s => s.id === state.cards[idx].sockId);
+        slot.classList.add('filled');
+        slot.style.background = sock.bg + '22';
+        slot.innerHTML = `<div class="sock-inner">
+          <span style="font-size:32px;">🧦</span>
+          <span style="font-size:16px;color:${sock.bg};font-weight:900;">${sock.pattern}</span>
+        </div>`;
+      } else {
+        slot.style.background = '';
+      }
+    });
+  }
+
+  function markSlotsMatch(ok) {
+    const cls = ok ? 'match' : 'no-match';
+    $slot0.classList.add(cls);
+    $slot1.classList.add(cls);
+  }
+
+  function clearSlotsMsg() {
+    $slot0.classList.remove('match', 'no-match');
+    $slot1.classList.remove('match', 'no-match');
+    $matchMsg.textContent = '';
+  }
+
+  /* ── 카드 스타일 갱신 ── */
+  function updateCardStyles() {
+    const cells = $sockGrid.querySelectorAll('.sock-card');
+    state.cards.forEach((card, idx) => {
+      const el = cells[idx];
+      if (!el) return;
+      el.classList.remove('selected', 'matched');
+      if (card.matched) el.classList.add('matched');
+      else if (card.selected) el.classList.add('selected');
+    });
+  }
+
+  /* ── HUD ── */
+  function updateHUD() {
+    $pairCount.textContent = state.pairs;
+  }
+
+  /* ── 타이머 ── */
+  function tickTimer() {
+    if (!state.running) return;
+    state.timer--;
+    $timerDisplay.textContent = state.timer;
+    const pct = Math.max(0, state.timer / state.maxTime) * 100;
+    $timerBar.style.width = pct + '%';
+    if (pct < 25) {
+      $timerBar.style.background = 'linear-gradient(90deg, #f94144, #f8961e)';
+    } else {
+      $timerBar.style.background = 'linear-gradient(90deg, #f9c74f, #f8961e)';
+    }
+    if (state.timer <= 0) {
+      endGame(false);
+    }
+  }
+
+  /* ── 메시지 ── */
+  function showMsg(text, color) {
+    $matchMsg.textContent = text;
+    $matchMsg.style.color = color || 'var(--accent)';
+  }
+
+  /* ── 게임 종료 ── */
+  function endGame(cleared) {
+    state.running = false;
+    clearInterval(state.timerId);
+
+    const score = state.pairs;
+    const best  = loadBest();
+    if (score > best) saveBest(score);
+    const newBest = score > best;
+
+    $finalScore.textContent = score;
+    const pct = score / state.totalPairs;
+    let stars = '⭐';
+    if (pct >= 1)   stars = '⭐⭐⭐';
+    else if (pct >= 0.6) stars = '⭐⭐';
+    $starDisplay.textContent = stars;
+
+    if (cleared) {
+      $resultMsg.textContent = `모든 양말 짝을 다 맞췄어요! 정말 최고예요! 🧦✨`;
+    } else {
+      $resultMsg.textContent = `시간이 다 됐어요! ${score}짝 맞췄어요. 잘했어요! 💪`;
+    }
+    $bestMsg.textContent = newBest ? '🏆 새 기록이에요!' : `최고 기록: ${Math.max(score, best)}짝`;
+
+    $endOverlay.classList.remove('hidden');
+  }
+
+  /* ── localStorage ── */
+  function loadBest() {
+    return parseInt(localStorage.getItem('sock-match_best') || '0', 10);
+  }
+  function saveBest(v) {
+    localStorage.setItem('sock-match_best', String(v));
+  }
+
+  /* ── 셔플 ── */
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  /* ── 이벤트 연결 ── */
+  $startBtn.addEventListener('pointerdown', startGame);
+  $restartBtn.addEventListener('pointerdown', startGame);
+
+})();
+</script>
+</body>
+</html>

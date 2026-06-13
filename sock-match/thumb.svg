@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f9c74f"/>
+      <stop offset="100%" stop-color="#f8961e"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 장식 원형 빛 -->
+  <circle cx="60" cy="90" r="70" fill="rgba(249,199,79,0.06)"/>
+  <circle cx="260" cy="90" r="55" fill="rgba(248,150,30,0.05)"/>
+
+  <!-- 양말 1 (빨간 줄무늬) -->
+  <g transform="translate(45,50)">
+    <rect x="0" y="0" width="44" height="55" rx="10" fill="#ff6b6b" opacity="0.9"/>
+    <rect x="4" y="14" width="36" height="5" fill="rgba(255,255,255,0.35)" rx="2"/>
+    <rect x="4" y="26" width="36" height="5" fill="rgba(255,255,255,0.35)" rx="2"/>
+    <rect x="4" y="38" width="36" height="5" fill="rgba(255,255,255,0.35)" rx="2"/>
+    <rect x="0" y="40" width="20" height="15" rx="0 0 8 8" fill="#ff6b6b" opacity="0.9"/>
+  </g>
+
+  <!-- 양말 2 (파란 물방울) -->
+  <g transform="translate(105,38)">
+    <rect x="0" y="0" width="44" height="55" rx="10" fill="#4d9de0" opacity="0.9"/>
+    <circle cx="12" cy="18" r="4" fill="rgba(255,255,255,0.4)"/>
+    <circle cx="28" cy="28" r="5" fill="rgba(255,255,255,0.4)"/>
+    <circle cx="14" cy="38" r="3" fill="rgba(255,255,255,0.4)"/>
+    <circle cx="32" cy="15" r="3" fill="rgba(255,255,255,0.4)"/>
+    <rect x="0" y="40" width="20" height="15" rx="0 0 8 8" fill="#4d9de0" opacity="0.9"/>
+  </g>
+
+  <!-- 양말 3 (노란 별) -->
+  <g transform="translate(165,52)">
+    <rect x="0" y="0" width="44" height="55" rx="10" fill="#f9c74f" opacity="0.9"/>
+    <text x="22" y="32" text-anchor="middle" font-size="22" fill="rgba(255,255,255,0.7)">★</text>
+    <text x="22" y="50" text-anchor="middle" font-size="14" fill="rgba(255,255,255,0.5)">★</text>
+    <rect x="0" y="40" width="20" height="15" rx="0 0 8 8" fill="#f9c74f" opacity="0.9"/>
+  </g>
+
+  <!-- 양말 4 (초록 물결 — 짝!) -->
+  <g transform="translate(225,42)">
+    <rect x="0" y="0" width="44" height="55" rx="10" fill="#43aa8b" opacity="0.9"/>
+    <text x="22" y="30" text-anchor="middle" font-size="22" fill="rgba(255,255,255,0.65)">~~~</text>
+    <text x="22" y="48" text-anchor="middle" font-size="14" fill="rgba(255,255,255,0.45)">~~~</text>
+    <rect x="0" y="40" width="20" height="15" rx="0 0 8 8" fill="#43aa8b" opacity="0.9"/>
+  </g>
+
+  <!-- 하트 표시 (짝 맞음) -->
+  <text x="160" y="130" text-anchor="middle" font-size="20" fill="url(#accent)" opacity="0.85">♥ 짝 찾기!</text>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR','Apple SD Gothic Neo',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#f9c74f">양말 짝 맞추기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.45)" letter-spacing="2">SOCK MATCH</text>
+  </g>
+</svg>

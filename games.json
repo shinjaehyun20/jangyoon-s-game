@@ -1,5 +1,13 @@
 [
   {
+    "id": "sock-match",
+    "title": "Sock Match",
+    "title_ko": "양말 짝 맞추기",
+    "description": "같은 색·무늬 양말 2짝을 찾아 짝 맞추기! 색/무늬 인지 매칭 게임",
+    "thumbnail": "sock-match/thumb.svg",
+    "path": "sock-match/index.html"
+  },
+  {
     "id": "acorn-squirrel",
     "title": "Acorn Squirrel",
     "title_ko": "다람쥐 도토리 모으기",
@@ -878,5 +886,13 @@
     "description": "화면을 탭하면 폭죽이 팡팡! 콤보로 점수를 올려봐요. 60초 도전",
     "thumbnail": "fireworks-tap/thumb.svg",
     "path": "fireworks-tap/index.html"
+  },
+  {
+    "id": "cotton-candy",
+    "title": "Cotton Candy",
+    "title_ko": "솜사탕 만들기",
+    "description": "빙글빙글 돌려 솜사탕을 만들어 손님에게 전달!",
+    "thumbnail": "cotton-candy/thumb.svg",
+    "path": "cotton-candy/index.html"
   }
 ]

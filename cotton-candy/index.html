@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>솜사탕 만들기</title>
+  <style>
+    :root {
+      --bg: #1a0a2e;
+      --accent: #ff6eb4;
+      --accent2: #ffda6e;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(18px, 5.5vw, 26px);
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(255,110,180,0.6);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: clamp(13px, 3.5vw, 17px);
+      flex-shrink: 0;
+    }
+    .hud-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .hud-label { font-size: 10px; opacity: 0.7; }
+    .hud-val { font-size: clamp(15px, 4vw, 20px); font-weight: 900; }
+    .hud-val.score { color: var(--accent2); }
+    .hud-val.order { color: var(--accent); }
+
+    /* order color swatch */
+    .order-swatch {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      vertical-align: middle;
+      border: 2px solid rgba(255,255,255,0.5);
+      margin-left: 4px;
+    }
+
+    /* game area */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* cotton candy machine */
+    .machine-wrap {
+      position: relative;
+      width: min(260px, 70vw);
+      height: min(260px, 70vw);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* stick */
+    .stick {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: min(120px, 32vw);
+      background: linear-gradient(to bottom, #e8c89a, #c4934f);
+      border-radius: 5px;
+      z-index: 1;
+    }
+
+    /* candy cloud */
+    #candyCloud {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .candy-blob {
+      position: absolute;
+      border-radius: 50%;
+      transform-origin: center center;
+      opacity: 0.88;
+    }
+
+    /* spin ring (touch target) */
+    #spinRing {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      border: 3px dashed rgba(255,255,255,0.2);
+      cursor: grab;
+      touch-action: none;
+      z-index: 5;
+    }
+    #spinRing.active { cursor: grabbing; border-color: rgba(255,255,255,0.5); }
+
+    /* spin arrow hint */
+    .spin-hint {
+      position: absolute;
+      top: -28px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 22px;
+      animation: hintBounce 1s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes hintBounce {
+      0%,100% { transform: translateX(-50%) rotate(0deg); }
+      50% { transform: translateX(-50%) rotate(30deg); }
+    }
+
+    /* progress bar */
+    .progress-wrap {
+      width: 90%; max-width: 300px;
+      height: 14px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 7px;
+      margin-top: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 7px;
+      transition: width 0.2s, background 0.3s;
+      background: var(--accent);
+    }
+
+    /* delivery zone */
+    .delivery-zone {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .delivery-zone.show { display: flex; }
+    .customer-emoji {
+      font-size: clamp(36px, 10vw, 52px);
+      animation: customerBounce 0.6s ease-in-out infinite alternate;
+    }
+    @keyframes customerBounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-6px); }
+    }
+    .btn-deliver {
+      background: linear-gradient(135deg, #ff6eb4, #ff9de2);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 28px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,110,180,0.5);
+      min-height: 44px;
+      touch-action: manipulation;
+    }
+    .btn-deliver:active { transform: scale(0.96); }
+
+    /* footer */
+    footer {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+      padding: 0 2px;
+    }
+    footer small { font-size: 11px; opacity: 0.55; }
+    .home-link {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    /* overlays */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,0,30,0.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 28px 24px;
+      max-width: 340px;
+      width: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 14px;
+      text-align: center;
+    }
+    .overlay-card h2 { font-size: clamp(22px, 6vw, 30px); font-weight: 900; color: var(--accent); }
+    .overlay-card p { font-size: clamp(14px, 3.8vw, 16px); line-height: 1.6; opacity: 0.88; }
+    .result-score { font-size: clamp(44px, 14vw, 64px); font-weight: 900; color: var(--accent2); }
+    .btn-start {
+      background: linear-gradient(135deg, #ff6eb4, #c44fa0);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 14px 36px;
+      font-size: clamp(17px, 5vw, 22px);
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255,110,180,0.55);
+      min-height: 52px;
+      touch-action: manipulation;
+      width: 100%;
+    }
+    .btn-start:active { transform: scale(0.97); }
+
+    /* praise burst */
+    .praise {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      font-size: clamp(28px, 8vw, 44px);
+      font-weight: 900;
+      color: var(--accent2);
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      z-index: 200;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), opacity 0.4s;
+      opacity: 0;
+    }
+    .praise.show {
+      transform: translateX(-50%) scale(1);
+      opacity: 1;
+    }
+
+    /* best badge */
+    .best-badge {
+      font-size: 12px;
+      background: rgba(255,218,110,0.2);
+      color: var(--accent2);
+      border-radius: 8px;
+      padding: 3px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍬 솜사탕 만들기</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <div class="hud-label">점수</div>
+        <div class="hud-val score" id="scoreVal">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">주문 색</div>
+        <div class="hud-val order" id="orderVal">
+          <span id="orderColorName">분홍</span>
+          <span class="order-swatch" id="orderSwatch"></span>
+        </div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">최고</div>
+        <div class="hud-val" id="bestVal">0</div>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <div class="machine-wrap" id="machineWrap">
+        <div class="spin-hint" id="spinHint">👆</div>
+        <div id="spinRing"></div>
+        <div id="candyCloud"></div>
+        <div class="stick"></div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+
+      <div class="delivery-zone" id="deliveryZone">
+        <div class="customer-emoji" id="customerEmoji">👦</div>
+        <button class="btn-deliver" id="deliverBtn">손님에게 전달!</button>
+      </div>
+    </div>
+
+    <footer>
+      <small>빙글빙글 돌려서 솜사탕을 만들어요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 칭찬 burst -->
+  <div class="praise" id="praise"></div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍬 솜사탕 만들기</h2>
+      <p>막대기를 빙글빙글 돌려서<br>솜사탕을 크게 만들어요!<br><br>주문 색에 맞춰 솜을 감으면<br>더 많은 점수를 받아요 ⭐</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 대단해요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg">솜사탕을 멋지게 만들었어요!</p>
+      <div class="best-badge" id="bestBadge" style="display:none">🏆 최고 기록!</div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── CONFIG ── */
+    const CONFIG = {
+      roundsPerGame: 5,
+      blobsPerRound: 8,          // blobs to fill = full cotton candy
+      blobSize: { min: 28, max: 48 },
+      rotateThreshold: 15,       // degrees of arc per blob gain
+      colors: [
+        { name: '분홍', hex: '#ff9de2', dark: '#d45fa0' },
+        { name: '파랑', hex: '#74c0fc', dark: '#3b82c4' },
+        { name: '노랑', hex: '#ffe066', dark: '#c4a830' },
+        { name: '초록', hex: '#74efc0', dark: '#2daa78' },
+        { name: '보라', hex: '#c084fc', dark: '#7c3aed' },
+        { name: '주황', hex: '#ffa94d', dark: '#c47020' },
+      ],
+      customers: ['👦', '👧', '👶', '🧒', '👼'],
+      praises: ['잘했어요! 🎉', '대단해! ⭐', '완벽해요! 🌟', '훌륭해! 🏆', '최고야! 🎊'],
+      STORAGE_KEY: 'cotton-candy_best',
+    };
+
+    /* ── STATE ── */
+    const state = {
+      phase: 'idle',       // idle | spinning | delivering | gameover
+      round: 0,
+      score: 0,
+      best: 0,
+      orderColor: null,
+      progress: 0,         // 0..CONFIG.blobsPerRound
+      blobs: [],           // { x, y, size, color, elem }
+      // spin tracking
+      spinning: false,
+      lastAngle: null,
+      totalRotation: 0,    // cumulative degrees this round
+    };
+
+    /* ── DOM ── */
+    const $ = id => document.getElementById(id);
+    const startOverlay = $('startOverlay');
+    const endOverlay   = $('endOverlay');
+    const startBtn     = $('startBtn');
+    const restartBtn   = $('restartBtn');
+    const deliverBtn   = $('deliverBtn');
+    const spinRing     = $('spinRing');
+    const candyCloud   = $('candyCloud');
+    const deliveryZone = $('deliveryZone');
+    const progressFill = $('progressFill');
+    const scoreVal     = $('scoreVal');
+    const bestVal      = $('bestVal');
+    const orderVal     = $('orderVal');
+    const orderColorName = $('orderColorName');
+    const orderSwatch  = $('orderSwatch');
+    const finalScore   = $('finalScore');
+    const resultMsg    = $('resultMsg');
+    const bestBadge    = $('bestBadge');
+    const customerEmoji = $('customerEmoji');
+    const praiseEl     = $('praise');
+    const spinHint     = $('spinHint');
+    const machineWrap  = $('machineWrap');
+
+    /* ── LOAD BEST ── */
+    function loadBest() {
+      try { state.best = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10) || 0; }
+      catch(e) { state.best = 0; }
+      bestVal.textContent = state.best;
+    }
+    function saveBest() {
+      if (state.score > state.best) {
+        state.best = state.score;
+        try { localStorage.setItem(CONFIG.STORAGE_KEY, String(state.best)); } catch(e){}
+        bestVal.textContent = state.best;
+        return true;
+      }
+      return false;
+    }
+
+    /* ── HELPERS ── */
+    function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+    function randItem(arr) { return arr[randInt(0, arr.length - 1)]; }
+
+    function pickOrderColor() {
+      state.orderColor = randItem(CONFIG.colors);
+      orderColorName.textContent = state.orderColor.name;
+      orderSwatch.style.background = state.orderColor.hex;
+    }
+
+    /* ── BLOB GENERATION ── */
+    function addBlob() {
+      const cloud = candyCloud;
+      const W = cloud.offsetWidth || 180;
+      const H = cloud.offsetHeight || 180;
+      const cx = W / 2;
+      const cy = H * 0.42;
+
+      // Blobs cluster around center, increasing density with progress
+      const spread = Math.max(20, 70 - state.progress * 5);
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = Math.random() * spread;
+      const x = cx + Math.cos(angle) * dist;
+      const y = cy + Math.sin(angle) * dist;
+      const size = randInt(CONFIG.blobSize.min, CONFIG.blobSize.max);
+
+      // Use order color most of the time (fun mix sometimes)
+      const colorObj = Math.random() < 0.75 ? state.orderColor : randItem(CONFIG.colors);
+
+      const div = document.createElement('div');
+      div.className = 'candy-blob';
+      div.style.cssText = `
+        left: ${x - size/2}px;
+        top:  ${y - size/2}px;
+        width: ${size}px;
+        height: ${size}px;
+        background: radial-gradient(circle at 35% 35%, ${colorObj.hex}, ${colorObj.dark});
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 3px rgba(255,255,255,0.4);
+        transform: scale(0);
+        transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
+      `;
+      cloud.appendChild(div);
+      // trigger animation
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { div.style.transform = 'scale(1)'; });
+      });
+      state.blobs.push({ elem: div });
+      state.progress++;
+    }
+
+    function clearBlobs() {
+      candyCloud.innerHTML = '';
+      state.blobs = [];
+      state.progress = 0;
+    }
+
+    /* ── PROGRESS UI ── */
+    function updateProgress() {
+      const pct = Math.min(100, (state.progress / CONFIG.blobsPerRound) * 100);
+      progressFill.style.width = pct + '%';
+      progressFill.style.background =
+        state.orderColor ? state.orderColor.hex : '#ff6eb4';
+    }
+
+    /* ── SPIN CALCULATION ── */
+    function getAngle(e, rect) {
+      const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top  + rect.height / 2;
+      return Math.atan2(clientY - cy, clientX - cx) * 180 / Math.PI;
+    }
+
+    function deltaAngle(a, b) {
+      // shortest signed delta, range -180..180
+      let d = b - a;
+      while (d > 180)  d -= 360;
+      while (d < -180) d += 360;
+      return d;
+    }
+
+    /* ── ROUND SETUP ── */
+    function startRound() {
+      clearBlobs();
+      updateProgress();
+      pickOrderColor();
+      state.spinning = false;
+      state.lastAngle = null;
+      state.totalRotation = 0;
+      deliveryZone.classList.remove('show');
+      spinHint.style.display = '';
+      spinRing.classList.remove('active');
+    }
+
+    /* ── COMPLETE ROUND ── */
+    function completeRound() {
+      state.phase = 'delivering';
+      spinRing.removeEventListener('pointerdown', onPointerDown);
+
+      // pick customer
+      customerEmoji.textContent = randItem(CONFIG.customers);
+      deliveryZone.classList.add('show');
+      spinHint.style.display = 'none';
+
+      // score = blobs matching order color (rough: just full blobs × color bonus)
+      const basePoints = state.progress;
+      state.score += basePoints;
+      scoreVal.textContent = state.score;
+    }
+
+    /* ── DELIVER ── */
+    function onDeliver() {
+      showPraise(randItem(CONFIG.praises));
+      deliveryZone.classList.remove('show');
+      state.round++;
+      if (state.round >= CONFIG.roundsPerGame) {
+        setTimeout(endGame, 900);
+      } else {
+        setTimeout(() => {
+          startRound();
+          state.phase = 'spinning';
+          spinRing.addEventListener('pointerdown', onPointerDown);
+        }, 600);
+      }
+    }
+
+    /* ── GAME START / END ── */
+    function startGame() {
+      state.phase = 'spinning';
+      state.round = 0;
+      state.score = 0;
+      scoreVal.textContent = '0';
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      startRound();
+      spinRing.addEventListener('pointerdown', onPointerDown);
+    }
+
+    function endGame() {
+      state.phase = 'gameover';
+      spinRing.removeEventListener('pointerdown', onPointerDown);
+      finalScore.textContent = state.score;
+      const isNew = saveBest();
+      bestBadge.style.display = isNew ? '' : 'none';
+      resultMsg.textContent = state.score >= 30
+        ? '솜사탕 장인이에요! 🍬✨'
+        : '솜사탕을 맛있게 만들었어요! 🥳';
+      endOverlay.classList.remove('hidden');
+    }
+
+    /* ── POINTER SPIN EVENTS ── */
+    function onPointerDown(e) {
+      if (state.phase !== 'spinning') return;
+      e.preventDefault();
+      spinRing.setPointerCapture(e.pointerId);
+      spinRing.classList.add('active');
+      state.spinning = true;
+      const rect = spinRing.getBoundingClientRect();
+      state.lastAngle = getAngle(e, rect);
+      spinRing.addEventListener('pointermove', onPointerMove);
+      spinRing.addEventListener('pointerup',   onPointerUp);
+      spinRing.addEventListener('pointercancel', onPointerUp);
+    }
+
+    function onPointerMove(e) {
+      if (!state.spinning) return;
+      e.preventDefault();
+      const rect = spinRing.getBoundingClientRect();
+      const angle = getAngle(e, rect);
+      const delta = Math.abs(deltaAngle(state.lastAngle, angle));
+      state.lastAngle = angle;
+      state.totalRotation += delta;
+
+      // add blob for every threshold degrees rotated
+      while (state.totalRotation >= CONFIG.rotateThreshold && state.progress < CONFIG.blobsPerRound) {
+        state.totalRotation -= CONFIG.rotateThreshold;
+        addBlob();
+        updateProgress();
+      }
+
+      // rotate machine visual
+      machineWrap.style.transform = `rotate(${angle * 0.3}deg)`;
+      machineWrap.style.transition = 'transform 0.05s linear';
+
+      if (state.progress >= CONFIG.blobsPerRound) {
+        // candy is full!
+        state.spinning = false;
+        spinRing.releasePointerCapture(e.pointerId);
+        spinRing.classList.remove('active');
+        spinRing.removeEventListener('pointermove', onPointerMove);
+        spinRing.removeEventListener('pointerup', onPointerUp);
+        spinRing.removeEventListener('pointercancel', onPointerUp);
+        machineWrap.style.transform = '';
+        completeRound();
+      }
+    }
+
+    function onPointerUp(e) {
+      if (!state.spinning) return;
+      state.spinning = false;
+      spinRing.classList.remove('active');
+      spinRing.removeEventListener('pointermove', onPointerMove);
+      spinRing.removeEventListener('pointerup', onPointerUp);
+      spinRing.removeEventListener('pointercancel', onPointerUp);
+      machineWrap.style.transform = '';
+    }
+
+    /* ── PRAISE BURST ── */
+    let praiseTimer = null;
+    function showPraise(text) {
+      if (praiseTimer) clearTimeout(praiseTimer);
+      praiseEl.textContent = text;
+      praiseEl.classList.add('show');
+      praiseTimer = setTimeout(() => { praiseEl.classList.remove('show'); }, 1400);
+    }
+
+    /* ── BUTTON EVENTS ── */
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+    deliverBtn.addEventListener('click', onDeliver);
+
+    /* ── INIT ── */
+    loadBest();
+  })();
+  </script>
+</body>
+</html>

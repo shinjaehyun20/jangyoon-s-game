@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "sock-match",
+        "label": "🧦 양말 짝 맞추기",
+        "path": "sock-match/index.html"
+      },
+      {
         "id": "claw-machine",
         "label": "🎁 인형뽑기",
         "path": "claw-machine/index.html"
@@ -397,6 +402,11 @@
         "id": "tangram-puzzle",
         "label": "🔶 탱그램 퍼즐",
         "path": "tangram-puzzle/index.html"
+      },
+      {
+        "id": "cotton-candy",
+        "label": "🍬 솜사탕 만들기",
+        "path": "cotton-candy/index.html"
       }
     ]
   },
