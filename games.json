@@ -1,5 +1,13 @@
 [
   {
+    "id": "dandelion",
+    "title": "Dandelion Fluff",
+    "title_ko": "민들레 홀씨 날리기",
+    "description": "민들레를 탭하거나 쓸어서 홀씨를 바람에 날려요!",
+    "thumbnail": "dandelion/thumb.svg",
+    "path": "dandelion/index.html"
+  },
+  {
     "id": "sock-match",
     "title": "Sock Match",
     "title_ko": "양말 짝 맞추기",
@@ -894,5 +902,13 @@
     "description": "빙글빙글 돌려 솜사탕을 만들어 손님에게 전달!",
     "thumbnail": "cotton-candy/thumb.svg",
     "path": "cotton-candy/index.html"
+  },
+  {
+    "id": "snail-race",
+    "title": "Snail Race",
+    "title_ko": "달팽이 경주",
+    "description": "내 달팽이를 골라 탭탭탭! 결승선에 1등으로 달려가자!",
+    "thumbnail": "snail-race/thumb.svg",
+    "path": "snail-race/index.html"
   }
 ]

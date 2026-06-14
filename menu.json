@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "dandelion",
+        "label": "🌼 민들레 홀씨",
+        "path": "dandelion/index.html"
+      },
+      {
         "id": "sock-match",
         "label": "🧦 양말 짝 맞추기",
         "path": "sock-match/index.html"
@@ -407,6 +412,11 @@
         "id": "cotton-candy",
         "label": "🍬 솜사탕 만들기",
         "path": "cotton-candy/index.html"
+      },
+      {
+        "id": "snail-race",
+        "label": "🐌 달팽이 경주",
+        "path": "snail-race/index.html"
       }
     ]
   },
