@@ -65,6 +65,7 @@
       display: block;
       width: 100%;
       height: 100%;
+      object-fit: contain;
       image-rendering: pixelated;
     }
     /* 터치 컨트롤 */
@@ -309,7 +310,7 @@
     }
 
     function initState() {
-      state = { coins: 0, score: 0, lives: START_LIVES, world: 1, flagX: 0, won: false };
+      state = { coins: 0, score: 0, lives: START_LIVES, world: 1, flagX: 0, won: false, lastSafeX: 2 * TILE };
       buildLevel();
       player = {
         x: 2 * TILE, y: (ROWS - 4) * TILE, w: 24, h: 30,
@@ -361,8 +362,11 @@
       // 좌측 경계
       if (player.x < 0) { player.x = 0; player.vx = 0; }
 
-      // 낙사
-      if (player.y > LEVEL_H + 80) loseLife();
+      // 단단한 땅 위에 서 있으면 마지막 안전 위치 기록 (구덩이 부활 방지)
+      if (player.onGround) state.lastSafeX = player.x;
+
+      // 낙사 — 무적 중이라도 항상 처리 (영원히 떨어지는 것 방지)
+      if (player.y > LEVEL_H + 80) loseLife(true);
 
       if (Math.abs(player.vx) > 0.4 && player.onGround) player.walkPhase += 0.25;
     }
@@ -502,15 +506,16 @@
     }
 
     // ===== 목숨 / 종료 =====
-    function loseLife() {
-      if (player.invincible > 0) return;
+    function loseLife(isFall) {
+      // 적 피격은 무적 중 무시하지만, 추락(isFall)은 항상 처리
+      if (!isFall && player.invincible > 0) return;
       state.lives--;
       updateHUD();
       if (state.lives <= 0) {
         endGame(false);
       } else {
-        // 리스폰 (시작 지점 근처)
-        player.x = Math.max(0, camX + TILE);
+        // 마지막으로 땅을 밟았던 안전 위치로 부활
+        player.x = state.lastSafeX;
         player.y = (ROWS - 5) * TILE;
         player.vx = 0; player.vy = 0;
         player.invincible = 90;
