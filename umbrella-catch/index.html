@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>☂️ 우산 캐치</title>
+  <style>
+    :root {
+      --bg-top: #5b8dee;
+      --bg-bot: #a8d8ea;
+      --accent: #ffd700;
+      --text: #ffffff;
+      --card: rgba(255,255,255,0.18);
+      --shadow: rgba(0,0,0,0.18);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(170deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+      color: var(--text);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* HUD */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px 6px;
+      background: var(--card);
+      backdrop-filter: blur(6px);
+      flex-shrink: 0;
+    }
+    .hud-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 1px;
+    }
+    .hud-label { font-size: 11px; opacity: 0.8; font-weight: 600; letter-spacing: 0.5px; }
+    .hud-value { font-size: 22px; font-weight: 900; line-height: 1; }
+    #scoreVal { color: var(--accent); text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+    #bestVal  { color: #ffe082; }
+    #livesVal { font-size: 20px; letter-spacing: 2px; }
+
+    /* 게임 영역 */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      touch-action: none;
+      cursor: none;
+    }
+
+    /* 우산 */
+    #umbrella {
+      position: absolute;
+      bottom: 16px;
+      transform: translateX(-50%);
+      font-size: 56px;
+      line-height: 1;
+      transition: none;
+      will-change: left;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+    }
+
+    /* 낙하 아이템 */
+    .item {
+      position: absolute;
+      font-size: 32px;
+      line-height: 1;
+      transform: translateX(-50%);
+      will-change: top;
+      transition: none;
+      pointer-events: none;
+    }
+    /* 반짝임 */
+    .sparkle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 26px;
+      animation: sparkleAnim 0.55s ease-out forwards;
+    }
+    @keyframes sparkleAnim {
+      0%   { opacity: 1; transform: scale(0.8) translateY(0); }
+      60%  { opacity: 1; transform: scale(1.4) translateY(-22px); }
+      100% { opacity: 0; transform: scale(1.1) translateY(-44px); }
+    }
+    /* 번개 피함 OK */
+    .dodge-ok {
+      position: absolute;
+      pointer-events: none;
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff176;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      animation: dodgeAnim 0.7s ease-out forwards;
+    }
+    @keyframes dodgeAnim {
+      0%   { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-36px); }
+    }
+    /* 우산 흔들림 */
+    @keyframes shake {
+      0%,100% { transform: translateX(-50%) rotate(0deg); }
+      20%      { transform: translateX(-50%) rotate(-10deg); }
+      50%      { transform: translateX(-50%) rotate(10deg); }
+      80%      { transform: translateX(-50%) rotate(-6deg); }
+    }
+    .shaking { animation: shake 0.35s ease; }
+
+    /* 비 배경 */
+    .rain-drop {
+      position: absolute;
+      width: 2px;
+      background: rgba(255,255,255,0.35);
+      border-radius: 1px;
+      pointer-events: none;
+      animation: rainFall linear infinite;
+    }
+    @keyframes rainFall {
+      0%   { transform: translateY(-20px); }
+      100% { transform: translateY(110vh); }
+    }
+
+    /* Footer */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 14px 6px;
+      background: var(--card);
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    footer small { opacity: 0.75; }
+    .home-link {
+      color: var(--text); text-decoration: none;
+      font-size: 12px; font-weight: 600;
+      opacity: 0.8;
+    }
+    .home-link:hover { opacity: 1; }
+
+    /* 오버레이 */
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(30, 60, 120, 0.78);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: rgba(255,255,255,0.14);
+      border: 1.5px solid rgba(255,255,255,0.28);
+      border-radius: 24px;
+      padding: 32px 28px 28px;
+      text-align: center;
+      max-width: 300px; width: 88%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+    }
+    .overlay-card h2 { font-size: clamp(22px,6vw,30px); margin-bottom: 12px; }
+    .overlay-card p { font-size: 14px; line-height: 1.6; opacity: 0.92; margin-bottom: 20px; }
+    .btn-start {
+      background: var(--accent);
+      color: #333;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 48px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.1s;
+      touch-action: manipulation;
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .result-score {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+    #resultMsg { font-size: 15px; }
+
+    /* 주의: 번개 경고 */
+    #warningFlash {
+      position: absolute; inset: 0;
+      background: rgba(255, 220, 0, 0.22);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 50;
+      transition: opacity 0.08s;
+    }
+    #warningFlash.on { opacity: 1; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">SCORE</span>
+      <span class="hud-value" id="scoreVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">BEST</span>
+      <span class="hud-value" id="bestVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">LIFE</span>
+      <span class="hud-value" id="livesVal">❤️❤️❤️</span>
+    </div>
+  </div>
+
+  <!-- 게임 영역 -->
+  <div id="gameArea">
+    <div id="warningFlash"></div>
+    <!-- 우산은 JS가 생성 -->
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <small>☂️ 우산으로 사탕·별을 받으세요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>☂️ 우산 캐치!</h2>
+    <p>우산을 <strong>좌우로 밀어서</strong><br>
+       🍬 사탕·⭐ 별을 받으세요!<br>
+       ⚡ 번개·☁️ 먹구름은 피하세요!</p>
+    <button class="btn-start" id="startBtn">시작! 🎮</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 끝!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기! 🔄</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CONFIG = {
+    GAME_DURATION: 40,          // 게임 시간(초)
+    LIVES: 3,                   // 초기 목숨
+    UMBRELLA_WIDTH: 60,         // 우산 충돌 반경(px)
+    ITEM_SPAWN_INTERVAL: 1100,  // ms
+    ITEM_BASE_SPEED: 2.2,       // px/frame
+    SPEED_UP_PER_10: 0.4,       // 10점마다 속도 증가
+    RAIN_DROPS: 22,             // 배경 빗방울 수
+    GOOD_ITEMS: ['🍬','🍭','⭐','🌟','🍡','🎀','🫧','🎊'],
+    BAD_ITEMS:  ['⚡','☁️','🌩️'],
+    GOOD_SCORE: [10, 15, 20],   // GOOD_ITEMS 대응 점수 (순환)
+    BAD_LIVES: 1,               // BAD_ITEMS 충돌 시 목숨 감소
+    STORAGE_KEY: 'umbrella-catch_best',
+  };
+
+  /* ── STATE ── */
+  let state = {
+    score: 0,
+    lives: CONFIG.LIVES,
+    best: 0,
+    running: false,
+    umbrellaX: 50,        // % of gameArea width
+    items: [],            // { el, x, y, type:'good'|'bad', emoji, speed }
+    animId: null,
+    spawnTimer: null,
+    timeLeft: CONFIG.GAME_DURATION,
+    clockTimer: null,
+    dragging: false,
+    dragOffsetX: 0,
+  };
+
+  /* ── DOM ── */
+  const gameArea   = document.getElementById('gameArea');
+  const scoreEl    = document.getElementById('scoreVal');
+  const bestEl     = document.getElementById('bestVal');
+  const livesEl    = document.getElementById('livesVal');
+  const startOvl   = document.getElementById('startOverlay');
+  const endOvl     = document.getElementById('endOverlay');
+  const finalScore = document.getElementById('finalScore');
+  const resultMsg  = document.getElementById('resultMsg');
+  const startBtn   = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const warnFlash  = document.getElementById('warningFlash');
+
+  /* ── 우산 DOM ── */
+  const umbrellaEl = document.createElement('div');
+  umbrellaEl.id = 'umbrella';
+  umbrellaEl.textContent = '☂️';
+  gameArea.appendChild(umbrellaEl);
+
+  /* ── AUDIO (WebAudio API) ── */
+  let audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+    return audioCtx;
+  }
+  function playTone(freq, type, dur, gain) {
+    const ctx = getAudio(); if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const g   = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(gain || 0.18, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(); osc.stop(ctx.currentTime + dur);
+  }
+  function playCatch() {
+    playTone(880, 'sine', 0.12, 0.18);
+    setTimeout(() => playTone(1100, 'sine', 0.1, 0.14), 80);
+  }
+  function playHit() {
+    playTone(220, 'sawtooth', 0.2, 0.14);
+    setTimeout(() => playTone(160, 'sawtooth', 0.15, 0.10), 100);
+  }
+  function playDodge() {
+    playTone(660, 'triangle', 0.09, 0.10);
+  }
+  function playEnd() {
+    [523, 659, 784, 1047].forEach((f, i) => {
+      setTimeout(() => playTone(f, 'sine', 0.25, 0.14), i * 110);
+    });
+  }
+
+  /* ── 베스트 스코어 ── */
+  function loadBest() {
+    const v = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0', 10);
+    state.best = isNaN(v) ? 0 : v;
+    bestEl.textContent = state.best;
+  }
+  function saveBest() {
+    if (state.score > state.best) {
+      state.best = state.score;
+      localStorage.setItem(CONFIG.STORAGE_KEY, state.best);
+      bestEl.textContent = state.best;
+    }
+  }
+
+  /* ── 배경 비 ── */
+  function buildRain() {
+    for (let i = 0; i < CONFIG.RAIN_DROPS; i++) {
+      const d = document.createElement('div');
+      d.className = 'rain-drop';
+      const h = 12 + Math.random() * 22;
+      d.style.left   = (Math.random() * 100) + '%';
+      d.style.top    = (-h) + 'px';
+      d.style.height = h + 'px';
+      d.style.opacity = (0.2 + Math.random() * 0.3).toString();
+      d.style.animationDuration = (0.7 + Math.random() * 0.8) + 's';
+      d.style.animationDelay   = -(Math.random() * 1.5) + 's';
+      gameArea.appendChild(d);
+    }
+  }
+
+  /* ── HUD 갱신 ── */
+  function updateHUD() {
+    scoreEl.textContent = state.score;
+    const hearts = '❤️'.repeat(Math.max(0, state.lives));
+    const empty  = '🖤'.repeat(Math.max(0, CONFIG.LIVES - state.lives));
+    livesEl.textContent = hearts + empty;
+  }
+
+  /* ── 우산 위치 ── */
+  function setUmbrellaX(px) {
+    const areaW = gameArea.offsetWidth;
+    const half  = 28; // 우산 반폭(px)
+    const clamped = Math.max(half, Math.min(areaW - half, px));
+    state.umbrellaX = clamped;
+    umbrellaEl.style.left = clamped + 'px';
+  }
+
+  /* ── 아이템 스폰 ── */
+  function spawnItem() {
+    if (!state.running) return;
+    const areaW = gameArea.offsetWidth;
+    const isGood = Math.random() < 0.72;
+    const arr = isGood ? CONFIG.GOOD_ITEMS : CONFIG.BAD_ITEMS;
+    const emoji = arr[Math.floor(Math.random() * arr.length)];
+    const speedBonus = Math.floor(state.score / 10) * CONFIG.SPEED_UP_PER_10;
+    const speed = CONFIG.ITEM_BASE_SPEED + speedBonus + Math.random() * 0.6;
+    const xPx = 30 + Math.random() * (areaW - 60);
+
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.textContent = emoji;
+    el.style.left = xPx + 'px';
+    el.style.top  = '-36px';
+    gameArea.appendChild(el);
+
+    const item = { el, x: xPx, y: -36, type: isGood ? 'good' : 'bad', emoji, speed };
+    state.items.push(item);
+  }
+
+  /* ── 반짝임 ── */
+  function showSparkle(x, y, emoji) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.textContent = emoji === '⭐' || emoji === '🌟' ? '✨' : '💥';
+    s.style.left = (x - 16) + 'px';
+    s.style.top  = (y - 16) + 'px';
+    gameArea.appendChild(s);
+    setTimeout(() => s.remove(), 600);
+  }
+  function showDodgeOK(x, y) {
+    const d = document.createElement('div');
+    d.className = 'dodge-ok';
+    d.textContent = 'OK!';
+    d.style.left = (x - 16) + 'px';
+    d.style.top  = (y - 20) + 'px';
+    gameArea.appendChild(d);
+    setTimeout(() => d.remove(), 750);
+  }
+
+  /* ── 충돌 판정 ── */
+  function checkCollision(item) {
+    const areaH   = gameArea.offsetHeight;
+    const umbY    = areaH - 16 - 28; // 우산 중심 Y (bottom:16, 반높이 28)
+    const dX = Math.abs(item.x - state.umbrellaX);
+    const dY = Math.abs(item.y - umbY);
+    return dX < CONFIG.UMBRELLA_WIDTH * 0.72 && dY < 38;
+  }
+
+  /* ── 메인 루프 ── */
+  function gameLoop() {
+    if (!state.running) return;
+    const areaH = gameArea.offsetHeight;
+
+    for (let i = state.items.length - 1; i >= 0; i--) {
+      const item = state.items[i];
+      item.y += item.speed;
+      item.el.style.top = item.y + 'px';
+
+      if (checkCollision(item)) {
+        // 충돌
+        item.el.remove();
+        state.items.splice(i, 1);
+        if (item.type === 'good') {
+          state.score += 10;
+          showSparkle(item.x, item.y, item.emoji);
+          playCatch();
+        } else {
+          state.lives -= CONFIG.BAD_LIVES;
+          showSparkle(item.x, item.y, '💢');
+          playHit();
+          umbrellaEl.classList.remove('shaking');
+          void umbrellaEl.offsetWidth; // reflow
+          umbrellaEl.classList.add('shaking');
+          warnFlash.classList.add('on');
+          setTimeout(() => warnFlash.classList.remove('on'), 120);
+        }
+        updateHUD();
+        if (state.lives <= 0) { endGame(); return; }
+        continue;
+      }
+
+      // 화면 아래 벗어남
+      if (item.y > areaH + 10) {
+        item.el.remove();
+        state.items.splice(i, 1);
+        if (item.type === 'bad') {
+          // 나쁜 아이템 피함 → OK
+          showDodgeOK(item.x, areaH - 30);
+          playDodge();
+        }
+        // 사탕·별 놓친 건 점수 감점 없음 (7세용: 실패 스트레스 최소화)
+      }
+    }
+
+    state.animId = requestAnimationFrame(gameLoop);
+  }
+
+  /* ── 게임 시작 ── */
+  function startGame() {
+    // 초기화
+    state.score = 0;
+    state.lives = CONFIG.LIVES;
+    state.running = true;
+    state.timeLeft = CONFIG.GAME_DURATION;
+    state.items.forEach(it => it.el.remove());
+    state.items = [];
+
+    // 우산 중앙
+    setUmbrellaX(gameArea.offsetWidth / 2);
+    updateHUD();
+
+    // 오버레이 닫기
+    startOvl.classList.add('hidden');
+    endOvl.classList.add('hidden');
+
+    // 아이템 스폰 타이머
+    state.spawnTimer = setInterval(spawnItem, CONFIG.ITEM_SPAWN_INTERVAL);
+
+    // 시계
+    state.clockTimer = setInterval(() => {
+      state.timeLeft--;
+      if (state.timeLeft <= 0) endGame();
+    }, 1000);
+
+    // 루프
+    state.animId = requestAnimationFrame(gameLoop);
+  }
+
+  /* ── 게임 종료 ── */
+  function endGame() {
+    state.running = false;
+    clearInterval(state.spawnTimer);
+    clearInterval(state.clockTimer);
+    cancelAnimationFrame(state.animId);
+    state.items.forEach(it => it.el.remove());
+    state.items = [];
+
+    saveBest();
+    finalScore.textContent = state.score;
+    const msgs = [
+      state.score >= 120 ? '🏆 엄청나다! 최고야!' :
+      state.score >= 80  ? '🌟 잘했어요! 대단해!' :
+      state.score >= 40  ? '😊 좋아요! 다시 해봐요!' :
+                           '☂️ 괜찮아요! 다시 도전!',
+    ];
+    resultMsg.textContent = msgs[0];
+    endOvl.classList.remove('hidden');
+    playEnd();
+  }
+
+  /* ── 터치/드래그 조작 ── */
+  gameArea.addEventListener('pointerdown', (e) => {
+    if (!state.running) return;
+    e.preventDefault();
+    gameArea.setPointerCapture(e.pointerId);
+    state.dragging = true;
+    state.dragOffsetX = 0;
+    setUmbrellaX(e.clientX - gameArea.getBoundingClientRect().left);
+  }, { passive: false });
+
+  window.addEventListener('pointermove', (e) => {
+    if (!state.dragging || !state.running) return;
+    const rect = gameArea.getBoundingClientRect();
+    setUmbrellaX(e.clientX - rect.left);
+  });
+
+  window.addEventListener('pointerup', () => {
+    state.dragging = false;
+  });
+
+  /* ── 버튼 ── */
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+
+  /* ── 초기화 ── */
+  loadBest();
+  buildRain();
+
+  // 우산 초기 위치
+  umbrellaEl.style.left = '50%';
+
+})();
+</script>
+</body>
+</html>

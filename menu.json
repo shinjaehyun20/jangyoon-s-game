@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "elevator-floor",
+        "label": "🛗 엘리베이터 층 맞추기",
+        "path": "elevator-floor/index.html"
+      },
+      {
+        "id": "umbrella-catch",
+        "label": "☂️ 우산 캐치",
+        "path": "umbrella-catch/index.html"
+      },
+      {
         "id": "dandelion",
         "label": "🌼 민들레 홀씨",
         "path": "dandelion/index.html"

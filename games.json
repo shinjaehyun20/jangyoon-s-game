@@ -910,5 +910,21 @@
     "description": "내 달팽이를 골라 탭탭탭! 결승선에 1등으로 달려가자!",
     "thumbnail": "snail-race/thumb.svg",
     "path": "snail-race/index.html"
+  },
+  {
+    "id": "umbrella-catch",
+    "title": "Umbrella Catch",
+    "title_ko": "☂️ 우산 캐치",
+    "description": "우산으로 사탕·별을 받고 번개·먹구름은 피하는 낙하 게임",
+    "thumbnail": "umbrella-catch/thumb.svg",
+    "path": "umbrella-catch/index.html"
+  },
+  {
+    "id": "elevator-floor",
+    "title": "Elevator Floor",
+    "title_ko": "🛗 엘리베이터 층 맞추기",
+    "description": "동물 손님이 원하는 층 버튼을 눌러 엘리베이터를 보내줘요! 숫자 1~5 인식",
+    "thumbnail": "elevator-floor/thumb.svg",
+    "path": "elevator-floor/index.html"
   }
 ]

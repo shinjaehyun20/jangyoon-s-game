@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a6bc4"/>
+      <stop offset="100%" stop-color="#6aaccc"/>
+    </linearGradient>
+    <linearGradient id="cloud" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#c8ddf5" stop-opacity="0.35"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- 비 배경 선 -->
+  <line x1="30"  y1="0"  x2="18"  y2="70"  stroke="rgba(255,255,255,0.22)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="70"  y1="0"  x2="58"  y2="70"  stroke="rgba(255,255,255,0.18)" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="110" y1="0"  x2="98"  y2="70"  stroke="rgba(255,255,255,0.20)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="155" y1="0"  x2="143" y2="70"  stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="200" y1="20" x2="188" y2="90"  stroke="rgba(255,255,255,0.14)" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="50"  y1="80" x2="38"  y2="140" stroke="rgba(255,255,255,0.18)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="95"  y1="90" x2="83"  y2="150" stroke="rgba(255,255,255,0.14)" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="140" y1="85" x2="128" y2="155" stroke="rgba(255,255,255,0.18)" stroke-width="1.4" stroke-linecap="round"/>
+
+  <!-- 구름 -->
+  <ellipse cx="62" cy="38" rx="36" ry="18" fill="url(#cloud)"/>
+  <ellipse cx="82" cy="30" rx="24" ry="16" fill="url(#cloud)"/>
+  <ellipse cx="44" cy="32" rx="20" ry="14" fill="url(#cloud)"/>
+
+  <!-- 낙하 아이템 이모지 -->
+  <text x="38"  y="78"  font-size="24" text-anchor="middle">🍬</text>
+  <text x="95"  y="62"  font-size="22" text-anchor="middle">⭐</text>
+  <text x="155" y="80"  font-size="22" text-anchor="middle">🍭</text>
+  <text x="72"  y="118" font-size="20" text-anchor="middle">⚡</text>
+  <text x="128" y="105" font-size="20" text-anchor="middle">🌟</text>
+
+  <!-- 우산 (큰 이모지) -->
+  <text x="110" y="162" font-size="54" text-anchor="middle">☂️</text>
+
+  <!-- 타이틀 (우하단) -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd700">우산 캐치</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">UMBRELLA CATCH</text>
+  </g>
+</svg>
