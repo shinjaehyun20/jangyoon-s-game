@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5c94fc"/>
+      <stop offset="100%" stop-color="#93c7ff"/>
+    </linearGradient>
+  </defs>
+  <!-- 하늘 -->
+  <rect width="320" height="180" fill="url(#sky)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <!-- 구름 -->
+  <g fill="rgba(255,255,255,0.92)">
+    <circle cx="48" cy="38" r="11"/><circle cx="62" cy="42" r="14"/><circle cx="78" cy="38" r="11"/>
+    <circle cx="210" cy="28" r="9"/><circle cx="222" cy="31" r="12"/><circle cx="234" cy="28" r="9"/>
+  </g>
+  <!-- 언덕 -->
+  <path d="M-10 140 Q40 88 90 140 Z" fill="#3a9d3a"/>
+  <!-- 지면 -->
+  <rect x="0" y="140" width="320" height="40" fill="#c84c0c"/>
+  <rect x="0" y="140" width="320" height="8" fill="#e07b39"/>
+  <!-- 물음표 블록 -->
+  <rect x="120" y="86" width="26" height="26" fill="#f5b700" stroke="rgba(0,0,0,0.35)"/>
+  <text x="133" y="106" text-anchor="middle" font-size="18" font-weight="900" fill="#fff">?</text>
+  <!-- 코인 -->
+  <ellipse cx="100" cy="98" rx="6" ry="9" fill="#ffd000" stroke="#c79100"/>
+  <ellipse cx="166" cy="98" rx="6" ry="9" fill="#ffd000" stroke="#c79100"/>
+  <!-- 파이프 -->
+  <rect x="240" y="108" width="34" height="32" fill="#2e9e2e" stroke="rgba(0,0,0,0.3)"/>
+  <rect x="236" y="98" width="42" height="14" fill="#2e9e2e" stroke="rgba(0,0,0,0.3)"/>
+  <!-- 굼바 -->
+  <ellipse cx="285" cy="130" rx="13" ry="11" fill="#8b5a2b"/>
+  <rect x="274" y="130" width="22" height="9" fill="#8b5a2b"/>
+  <rect x="278" y="124" width="5" height="6" fill="#fff"/><rect x="288" y="124" width="5" height="6" fill="#fff"/>
+  <!-- 마리오 -->
+  <g transform="translate(40,108)">
+    <rect x="2" y="0" width="20" height="7" fill="#e52521"/>
+    <rect x="4" y="7" width="16" height="9" fill="#ffcc99"/>
+    <rect x="6" y="13" width="11" height="3" fill="#5a3a1a"/>
+    <rect x="3" y="16" width="18" height="14" fill="#2b5fd9"/>
+    <rect x="0" y="16" width="5" height="8" fill="#e52521"/>
+    <rect x="19" y="16" width="5" height="8" fill="#e52521"/>
+    <rect x="3" y="28" width="8" height="4" fill="#5a3a1a"/>
+    <rect x="13" y="28" width="8" height="4" fill="#5a3a1a"/>
+  </g>
+  <!-- 깃발 -->
+  <line x1="306" y1="40" x2="306" y2="140" stroke="#bdbdbd" stroke-width="3"/>
+  <path d="M306 44 L286 52 L306 60 Z" fill="#e52521"/>
+  <circle cx="306" cy="38" r="5" fill="#2e9e2e"/>
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="14" y="160" font-size="20" font-weight="900" fill="#fff" stroke="#b71c1c" stroke-width="0.6">슈퍼 점프 모험</text>
+    <text x="14" y="174" font-size="9" font-weight="500" fill="rgba(255,255,255,0.8)" letter-spacing="2">SUPER JUMP</text>
+  </g>
+</svg>

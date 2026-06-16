@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "super-mario",
+        "label": "🍄 슈퍼 점프 모험",
+        "path": "super-mario/index.html"
+      },
+      {
         "id": "elevator-floor",
         "label": "🛗 엘리베이터 층 맞추기",
         "path": "elevator-floor/index.html"

@@ -1,5 +1,13 @@
 [
   {
+    "id": "super-mario",
+    "title": "Super Jump Adventure",
+    "title_ko": "슈퍼 점프 모험",
+    "description": "달리고 점프해서 코인을 모으고 적을 밟아요! 깃발에 도착하면 클리어",
+    "thumbnail": "super-mario/thumb.svg",
+    "path": "super-mario/index.html"
+  },
+  {
     "id": "dandelion",
     "title": "Dandelion Fluff",
     "title_ko": "민들레 홀씨 날리기",
@@ -555,7 +563,7 @@
     "id": "maze-escape",
     "title": "Maze Escape",
     "title_ko": "🔵 미로 탈출",
-    "description": "DFS로 생성된 미로에서 보라 공을 드래그해 탈출! 4레벨 난이도, 60초 타임어택",
+    "description": "DFS로 생성된 미로에서 보라 공을 드래그해 탈출! 4레벨 난이도, 시간 제한 없이 완주",
     "thumbnail": "maze-escape/thumb.svg",
     "path": "maze-escape/index.html"
   },
