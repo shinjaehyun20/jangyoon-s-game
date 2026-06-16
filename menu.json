@@ -9,6 +9,26 @@
         "path": "super-mario/index.html"
       },
       {
+        "id": "elevator-floor",
+        "label": "🛗 엘리베이터 층 맞추기",
+        "path": "elevator-floor/index.html"
+      },
+      {
+        "id": "umbrella-catch",
+        "label": "☂️ 우산 캐치",
+        "path": "umbrella-catch/index.html"
+      },
+      {
+        "id": "dandelion",
+        "label": "🌼 민들레 홀씨",
+        "path": "dandelion/index.html"
+      },
+      {
+        "id": "sock-match",
+        "label": "🧦 양말 짝 맞추기",
+        "path": "sock-match/index.html"
+      },
+      {
         "id": "claw-machine",
         "label": "🎁 인형뽑기",
         "path": "claw-machine/index.html"
@@ -402,6 +422,16 @@
         "id": "tangram-puzzle",
         "label": "🔶 탱그램 퍼즐",
         "path": "tangram-puzzle/index.html"
+      },
+      {
+        "id": "cotton-candy",
+        "label": "🍬 솜사탕 만들기",
+        "path": "cotton-candy/index.html"
+      },
+      {
+        "id": "snail-race",
+        "label": "🐌 달팽이 경주",
+        "path": "snail-race/index.html"
       }
     ]
   },

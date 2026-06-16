@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🛗 엘리베이터 층 맞추기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(160deg, #1a237e 0%, #283593 40%, #303f9f 100%);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+
+    /* 제목 */
+    h1 {
+      text-align: center;
+      color: #fff;
+      font-size: clamp(18px, 5.5vw, 26px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+
+    /* HUD */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 8px 16px;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .hud-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.65);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .hud-val {
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      color: #fff;
+    }
+    #scoreVal { color: #FFD54F; }
+    #comboVal { color: #80DEEA; }
+
+    /* 게임 영역 */
+    #gameArea {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    /* 엘리베이터 샤프트 */
+    #shaft {
+      width: 90px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.25);
+      border-radius: 16px;
+      padding: 8px 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 층 레이블 (샤프트 안) */
+    .shaft-floor-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 0;   /* flex space-between이 알아서 분배 */
+      flex: 1;
+      color: rgba(255,255,255,0.25);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* 엘리베이터 카 */
+    #elevCar {
+      position: absolute;
+      left: 6px; right: 6px;
+      height: 56px;
+      background: linear-gradient(135deg, #FFF9C4 0%, #FFF176 50%, #FFEE58 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+      transition: bottom 0.45s cubic-bezier(0.4,0,0.2,1);
+      z-index: 2;
+    }
+    #elevCar::before {
+      content: '';
+      position: absolute;
+      top: 4px; left: 8px; right: 8px; height: 6px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 4px;
+    }
+
+    /* 우측 패널 */
+    #rightPanel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* 손님 카드 */
+    #guestCard {
+      background: rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    #guestCard .guest-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    #guestEmoji {
+      font-size: clamp(34px, 10vw, 48px);
+      line-height: 1;
+      transition: transform 0.3s;
+    }
+    #guestEmoji.happy {
+      transform: scale(1.25);
+      animation: bounce 0.4s ease;
+    }
+    @keyframes bounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1.25); }
+    }
+    #speechBubble {
+      background: #fff;
+      border-radius: 14px;
+      padding: 8px 14px;
+      font-size: clamp(22px, 6.5vw, 32px);
+      font-weight: 900;
+      color: #1a237e;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      min-width: 80px;
+      text-align: center;
+      position: relative;
+    }
+    #speechBubble::after {
+      content: '';
+      position: absolute;
+      bottom: -10px; left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #fff;
+    }
+    #floorText {
+      font-size: clamp(10px, 3vw, 13px);
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+    }
+
+    /* 층 버튼 패널 */
+    #btnPanel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: center;
+    }
+    #btnPanel .floor-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.25);
+      border-radius: 16px;
+      font-size: clamp(24px, 7vw, 36px);
+      font-weight: 900;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.12s, transform 0.1s, border-color 0.12s;
+      min-height: 52px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btnPanel .floor-btn:active {
+      transform: scale(0.94);
+      background: rgba(255,255,255,0.3);
+    }
+    #btnPanel .floor-btn.correct {
+      background: #43A047;
+      border-color: #66BB6A;
+      animation: flashGreen 0.5s ease;
+    }
+    #btnPanel .floor-btn.wrong {
+      background: #E53935;
+      border-color: #EF5350;
+      animation: shake 0.4s ease;
+    }
+    @keyframes flashGreen {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    /* 피드백 텍스트 */
+    #feedback {
+      text-align: center;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 800;
+      color: #FFD54F;
+      min-height: 24px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+
+    /* 진행 바 */
+    .progress-wrap {
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.12);
+      border-radius: 8px;
+      height: 10px;
+      overflow: hidden;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #26C6DA, #42A5F5);
+      border-radius: 8px;
+      transition: width 0.35s ease;
+    }
+
+    /* Footer */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    footer small {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+    }
+    .home-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 4px 10px;
+    }
+
+    /* 오버레이 공통 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13,22,60,0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1E3A8A, #1a237e);
+      border-radius: 24px;
+      padding: 28px 24px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6.5vw, 30px);
+      color: #fff;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      color: rgba(255,255,255,0.75);
+      font-size: clamp(13px, 3.5vw, 16px);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .result-score {
+      font-size: clamp(44px, 13vw, 64px);
+      font-weight: 900;
+      color: #FFD54F;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+    #resultMsg {
+      font-size: clamp(13px, 3.5vw, 15px);
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 18px;
+    }
+    .btn-start {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #FFD54F, #FFCA28);
+      color: #1a237e;
+      font-size: clamp(18px, 5vw, 22px);
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 14px rgba(255,213,79,0.35);
+    }
+    .btn-start:active { transform: scale(0.97); }
+    .best-display {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🛗 엘리베이터 층 맞추기</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">점수</span>
+        <span class="hud-val" id="scoreVal">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">문제</span>
+        <span class="hud-val" id="questionVal">0 / 10</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">콤보</span>
+        <span class="hud-val" id="comboVal">0</span>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <!-- 엘리베이터 샤프트 -->
+      <div id="shaft">
+        <div class="shaft-floor-label">5층</div>
+        <div class="shaft-floor-label">4층</div>
+        <div class="shaft-floor-label">3층</div>
+        <div class="shaft-floor-label">2층</div>
+        <div class="shaft-floor-label">1층</div>
+        <div id="elevCar">🛗</div>
+      </div>
+
+      <!-- 우측 패널 -->
+      <div id="rightPanel">
+        <!-- 손님 카드 -->
+        <div id="guestCard">
+          <span class="guest-label">손님이 원해요!</span>
+          <span id="guestEmoji">🐶</span>
+          <div id="speechBubble"><span id="targetFloor">3</span>층</div>
+          <span id="floorText">버튼을 눌러주세요</span>
+        </div>
+
+        <!-- 층 버튼 -->
+        <div id="btnPanel"></div>
+      </div>
+    </div>
+
+    <div id="feedback">&nbsp;</div>
+
+    <div class="progress-wrap">
+      <div id="progressBar"></div>
+    </div>
+
+    <footer>
+      <small>층 버튼을 눌러 손님을 태워요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🛗 엘리베이터<br>층 맞추기</h2>
+      <p>동물 손님이 원하는 층을 말풍선으로 알려줘요!<br>맞는 층 버튼을 탭해서 손님을 내려드려요 🐾</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+      <div class="best-display" id="bestDisplay"></div>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg">최고 기록을 확인해요!</p>
+      <button class="btn-start" id="restartBtn">다시 하기!</button>
+      <div class="best-display" id="endBestDisplay"></div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ── CONFIG ──────────────────────────────────────────────
+    const CONFIG = {
+      TOTAL_QUESTIONS: 10,
+      FLOORS: 5,
+      CORRECT_SCORE: 10,
+      COMBO_BONUS: 5,
+      ANIM_DURATION: 450,   // ms — matches CSS transition
+      STORAGE_KEY: 'elevator-floor_best',
+    };
+
+    // 동물 이모지 목록
+    const ANIMALS = ['🐶','🐱','🐻','🐼','🐸','🐰','🦊','🐯','🐮','🐷',
+                     '🐧','🐦','🦆','🦁','🐨','🦘','🦒','🐘','🐬','🦄'];
+
+    // ── STATE ───────────────────────────────────────────────
+    let state = {
+      score: 0,
+      combo: 0,
+      questionIndex: 0,
+      targetFloor: 1,
+      currentFloor: 1,
+      guestIndex: 0,
+      isAnimating: false,
+      isPlaying: false,
+    };
+
+    // ── AUDIO (Web Audio API) ────────────────────────────────
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, type, duration, volume, detune) {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = type || 'sine';
+        osc.frequency.value = freq;
+        if (detune) osc.detune.value = detune;
+        gain.gain.setValueAtTime(volume || 0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function sfxButton() {
+      playTone(660, 'sine', 0.12, 0.25);
+    }
+
+    function sfxCorrect() {
+      // 딩동! 엘리베이터 도착음
+      playTone(880, 'sine', 0.15, 0.3);
+      setTimeout(() => playTone(1100, 'sine', 0.2, 0.3), 120);
+    }
+
+    function sfxWrong() {
+      playTone(200, 'square', 0.15, 0.2);
+    }
+
+    function sfxCombo() {
+      playTone(1320, 'sine', 0.12, 0.25);
+      setTimeout(() => playTone(1760, 'sine', 0.15, 0.3), 80);
+      setTimeout(() => playTone(2200, 'sine', 0.18, 0.3), 160);
+    }
+
+    function sfxMoving() {
+      // 윙~
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(160, ctx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.45);
+      } catch(e) {}
+    }
+
+    function sfxVictory() {
+      const notes = [523, 659, 784, 1047];
+      notes.forEach((f, i) => {
+        setTimeout(() => playTone(f, 'sine', 0.3, 0.25), i * 120);
+      });
+    }
+
+    // ── DOM REFS ─────────────────────────────────────────────
+    const $score    = document.getElementById('scoreVal');
+    const $question = document.getElementById('questionVal');
+    const $combo    = document.getElementById('comboVal');
+    const $elevCar  = document.getElementById('elevCar');
+    const $shaft    = document.getElementById('shaft');
+    const $guestEmoji   = document.getElementById('guestEmoji');
+    const $speechBubble = document.getElementById('targetFloor');
+    const $floorText    = document.getElementById('floorText');
+    const $btnPanel = document.getElementById('btnPanel');
+    const $feedback = document.getElementById('feedback');
+    const $progress = document.getElementById('progressBar');
+    const $startOverlay = document.getElementById('startOverlay');
+    const $endOverlay   = document.getElementById('endOverlay');
+    const $finalScore   = document.getElementById('finalScore');
+    const $resultMsg    = document.getElementById('resultMsg');
+    const $bestDisplay  = document.getElementById('bestDisplay');
+    const $endBestDisplay = document.getElementById('endBestDisplay');
+
+    // ── 층 버튼 생성 ─────────────────────────────────────────
+    function buildButtons() {
+      $btnPanel.innerHTML = '';
+      // 5층부터 1층 순으로 배치 (위가 높은 층)
+      for (let f = CONFIG.FLOORS; f >= 1; f--) {
+        const btn = document.createElement('button');
+        btn.className = 'floor-btn';
+        btn.dataset.floor = f;
+        btn.textContent = f + '층';
+        btn.addEventListener('pointerdown', onFloorBtn);
+        $btnPanel.appendChild(btn);
+      }
+    }
+
+    // ── 엘리베이터 위치 계산 ──────────────────────────────────
+    function getCarBottomPct(floor) {
+      // shaft 안에서 1층=하단, 5층=상단
+      // shaft 높이 100%, 패딩 8px 각, 버튼 5개 → 각 20%
+      const slot = (floor - 1) / (CONFIG.FLOORS - 1); // 0(1층) ~ 1(5층)
+      // bottom: 8px(padding) ~ height - 56px - 8px(car높이56+패딩)
+      // CSS로 계산: 사용자 단위로 bottom % 설정
+      return slot; // 0~1
+    }
+
+    function moveElevator(toFloor, cb) {
+      if (state.isAnimating) return;
+      state.isAnimating = true;
+      sfxMoving();
+
+      const shaftH = $shaft.clientHeight;
+      const carH = 56;
+      const pad = 8;
+      const usable = shaftH - carH - pad * 2;
+      const slot = (toFloor - 1) / (CONFIG.FLOORS - 1);
+      const bottomPx = pad + slot * usable;
+      $elevCar.style.bottom = bottomPx + 'px';
+      state.currentFloor = toFloor;
+
+      setTimeout(() => {
+        state.isAnimating = false;
+        if (cb) cb();
+      }, CONFIG.ANIM_DURATION + 60);
+    }
+
+    function initElevatorPos() {
+      const shaftH = $shaft.clientHeight;
+      const carH = 56;
+      const pad = 8;
+      const usable = shaftH - carH - pad * 2;
+      // 1층(하단)
+      $elevCar.style.transition = 'none';
+      $elevCar.style.bottom = pad + 'px';
+      setTimeout(() => {
+        $elevCar.style.transition = 'bottom 0.45s cubic-bezier(0.4,0,0.2,1)';
+      }, 50);
+    }
+
+    // ── 문제 생성 ─────────────────────────────────────────────
+    function nextQuestion() {
+      if (state.questionIndex >= CONFIG.TOTAL_QUESTIONS) {
+        endGame(); return;
+      }
+
+      // 랜덤 층 (현재 층과 다르게)
+      let floor;
+      do {
+        floor = Math.floor(Math.random() * CONFIG.FLOORS) + 1;
+      } while (floor === state.targetFloor && CONFIG.FLOORS > 1);
+      state.targetFloor = floor;
+
+      // 랜덤 동물
+      state.guestIndex = Math.floor(Math.random() * ANIMALS.length);
+
+      // UI 갱신
+      $speechBubble.textContent = floor;
+      $guestEmoji.textContent = ANIMALS[state.guestIndex];
+      $guestEmoji.classList.remove('happy');
+      $floorText.textContent = floor + '층 버튼을 눌러요!';
+      $question.textContent = (state.questionIndex + 1) + ' / ' + CONFIG.TOTAL_QUESTIONS;
+      $feedback.innerHTML = '&nbsp;';
+      $progress.style.width = (state.questionIndex / CONFIG.TOTAL_QUESTIONS * 100) + '%';
+
+      // 버튼 초기화
+      document.querySelectorAll('.floor-btn').forEach(b => {
+        b.classList.remove('correct', 'wrong');
+        b.disabled = false;
+      });
+    }
+
+    // ── 버튼 클릭 ─────────────────────────────────────────────
+    function onFloorBtn(e) {
+      if (!state.isPlaying || state.isAnimating) return;
+      const btn = e.currentTarget;
+      const pressed = parseInt(btn.dataset.floor);
+      sfxButton();
+
+      // 모든 버튼 잠금
+      document.querySelectorAll('.floor-btn').forEach(b => b.disabled = true);
+
+      moveElevator(pressed, () => {
+        if (pressed === state.targetFloor) {
+          // 정답
+          btn.classList.add('correct');
+          state.combo++;
+          const bonus = state.combo > 1 ? state.combo * CONFIG.COMBO_BONUS : 0;
+          state.score += CONFIG.CORRECT_SCORE + bonus;
+          $guestEmoji.classList.add('happy');
+
+          if (state.combo >= 3) {
+            sfxCombo();
+            $feedback.textContent = '🌟 콤보 ' + state.combo + '! +' + (CONFIG.CORRECT_SCORE + bonus) + '점!';
+          } else {
+            sfxCorrect();
+            $feedback.textContent = '🎉 맞아요! +' + (CONFIG.CORRECT_SCORE + bonus) + '점';
+          }
+
+          state.questionIndex++;
+          updateHUD();
+          setTimeout(() => nextQuestion(), 900);
+        } else {
+          // 오답
+          btn.classList.add('wrong');
+          state.combo = 0;
+          sfxWrong();
+          $feedback.textContent = '😅 틀렸어요! 다시 눌러볼까요?';
+
+          // 오답 버튼만 잠그고 나머지 다시 활성
+          setTimeout(() => {
+            document.querySelectorAll('.floor-btn').forEach(b => {
+              if (b !== btn) b.disabled = false;
+            });
+          }, 400);
+          updateHUD();
+        }
+      });
+    }
+
+    // ── HUD 갱신 ─────────────────────────────────────────────
+    function updateHUD() {
+      $score.textContent = state.score;
+      $combo.textContent = state.combo;
+    }
+
+    // ── 게임 시작 ─────────────────────────────────────────────
+    function startGame() {
+      state = {
+        score: 0, combo: 0,
+        questionIndex: 0,
+        targetFloor: 1, currentFloor: 1,
+        guestIndex: 0,
+        isAnimating: false, isPlaying: true,
+      };
+      updateHUD();
+      $progress.style.width = '0%';
+      $startOverlay.classList.add('hidden');
+      $endOverlay.classList.add('hidden');
+      initElevatorPos();
+      buildButtons();
+      setTimeout(() => nextQuestion(), 200);
+    }
+
+    // ── 게임 종료 ─────────────────────────────────────────────
+    function endGame() {
+      state.isPlaying = false;
+      sfxVictory();
+      $progress.style.width = '100%';
+      $finalScore.textContent = state.score;
+
+      const best = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0');
+      const isNew = state.score > best;
+      if (isNew) localStorage.setItem(CONFIG.STORAGE_KEY, state.score);
+
+      const msgs = [
+        '손님들이 모두 만족했어요! 🎉',
+        '엘리베이터 달인이 됐어요! 🏆',
+        '완벽한 엘리베이터 기사예요! 🛗',
+      ];
+      $resultMsg.textContent = (isNew ? '🌟 최고 기록 갱신! ' : '') + msgs[Math.floor(Math.random() * msgs.length)];
+      $endBestDisplay.textContent = '최고 기록: ' + (isNew ? state.score : best) + '점';
+      $endOverlay.classList.remove('hidden');
+    }
+
+    // ── 베스트 표시 ───────────────────────────────────────────
+    function showBest() {
+      const best = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0');
+      $bestDisplay.textContent = best > 0 ? '최고 기록: ' + best + '점' : '';
+    }
+
+    // ── 이벤트 연결 ───────────────────────────────────────────
+    document.getElementById('startBtn').addEventListener('pointerdown', () => {
+      sfxButton();
+      startGame();
+    });
+    document.getElementById('restartBtn').addEventListener('pointerdown', () => {
+      sfxButton();
+      startGame();
+    });
+
+    // ── 초기화 ────────────────────────────────────────────────
+    showBest();
+    initElevatorPos();
+
+  })();
+  </script>
+</body>
+</html>

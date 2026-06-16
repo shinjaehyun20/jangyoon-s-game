@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐌 달팽이 경주</title>
+  <style>
+    :root {
+      --bg-top:    #87CEEB;
+      --bg-bot:    #90EE90;
+      --accent:    #FF6B35;
+      --track-bg:  #C8E6C9;
+      --track-br:  #81C784;
+      --text:      #2E4057;
+      --btn-bg:    #FF6B35;
+      --btn-hover: #E55A28;
+      --gold:      #FFD700;
+      --silver:    #C0C0C0;
+      --bronze:    #CD7F32;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{
+      height:100vh;height:100dvh;
+      overflow:hidden;
+      touch-action:manipulation;
+      font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+      user-select:none;
+      -webkit-user-select:none;
+    }
+    .wrap{
+      width:100%;max-width:480px;
+      height:100vh;height:100dvh;
+      display:flex;flex-direction:column;
+      padding:10px 12px 8px;gap:6px;
+      margin:0 auto;
+      position:relative;
+    }
+
+    /* ── 헤더 ── */
+    h1{
+      font-size:clamp(20px,5.5vw,26px);
+      font-weight:900;
+      text-align:center;
+      color:var(--text);
+      text-shadow:0 2px 4px rgba(0,0,0,.15);
+      flex-shrink:0;
+    }
+
+    /* ── HUD ── */
+    .hud{
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(255,255,255,.4);
+      border-radius:12px;padding:6px 14px;
+      font-size:clamp(13px,3.8vw,16px);
+      font-weight:700;color:var(--text);
+      flex-shrink:0;
+    }
+
+    /* ── 경주 트랙 ── */
+    #raceArea{
+      flex:1;
+      display:flex;flex-direction:column;
+      gap:6px;
+      overflow:hidden;
+    }
+    .track{
+      flex:1;
+      background:var(--track-bg);
+      border:3px solid var(--track-br);
+      border-radius:16px;
+      display:flex;align-items:center;
+      position:relative;
+      overflow:hidden;
+      cursor:pointer;
+      transition:background .1s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .track:active,.track.pressing{
+      background:#B2DFDB;
+    }
+
+    /* 트랙 줄무늬 */
+    .track::before{
+      content:'';
+      position:absolute;inset:0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 40px,
+        rgba(255,255,255,.35) 40px,
+        rgba(255,255,255,.35) 44px
+      );
+      pointer-events:none;
+    }
+
+    /* 결승선 */
+    .finish-line{
+      position:absolute;right:8px;top:0;bottom:0;
+      width:6px;
+      background:repeating-linear-gradient(
+        180deg,
+        #000 0px,#000 5px,
+        #fff 5px,#fff 10px
+      );
+      border-radius:3px;
+    }
+
+    /* 달팽이 */
+    .snail{
+      position:absolute;
+      left:4%;
+      font-size:clamp(28px,8vw,42px);
+      transition:left .1s linear;
+      line-height:1;
+      display:flex;align-items:center;gap:4px;
+      z-index:2;
+    }
+    .snail-name{
+      font-size:clamp(11px,3.2vw,15px);
+      font-weight:800;
+      color:var(--text);
+      white-space:nowrap;
+      background:rgba(255,255,255,.6);
+      border-radius:6px;
+      padding:1px 5px;
+    }
+
+    /* 탭 안내 */
+    .tap-hint{
+      position:absolute;
+      bottom:4px;right:12px;
+      font-size:clamp(10px,2.8vw,12px);
+      color:rgba(46,64,87,.55);
+      font-weight:600;
+      pointer-events:none;
+    }
+
+    /* ── 플레이어 선택 표시 ── */
+    .track.selected{
+      border-color:#FF6B35;
+      box-shadow:0 0 0 3px rgba(255,107,53,.35);
+    }
+    .my-badge{
+      position:absolute;left:4px;top:4px;
+      background:var(--accent);
+      color:#fff;font-size:10px;font-weight:900;
+      padding:2px 6px;border-radius:8px;
+      z-index:3;
+      pointer-events:none;
+    }
+
+    /* ── 진행 바(탭 에너지) ── */
+    .energy-bar{
+      position:absolute;bottom:3px;left:4px;right:4px;
+      height:4px;
+      background:rgba(0,0,0,.12);
+      border-radius:4px;
+      overflow:hidden;
+    }
+    .energy-fill{
+      height:100%;
+      background:var(--accent);
+      border-radius:4px;
+      transition:width .05s;
+    }
+
+    /* ── footer ── */
+    footer{
+      display:flex;justify-content:space-between;align-items:center;
+      flex-shrink:0;
+    }
+    footer small{
+      font-size:clamp(11px,3vw,13px);
+      color:rgba(46,64,87,.7);
+    }
+    .home-link{
+      font-size:clamp(11px,3vw,13px);
+      color:var(--text);
+      text-decoration:none;
+      background:rgba(255,255,255,.5);
+      border-radius:8px;padding:4px 10px;
+      font-weight:700;
+    }
+
+    /* ── 오버레이 ── */
+    .overlay{
+      position:fixed;inset:0;
+      background:rgba(0,0,0,.55);
+      display:flex;align-items:center;justify-content:center;
+      z-index:100;
+    }
+    .overlay.hidden{display:none}
+    .overlay-card{
+      background:#fff;
+      border-radius:24px;
+      padding:28px 24px 24px;
+      max-width:340px;width:90%;
+      text-align:center;
+      box-shadow:0 8px 32px rgba(0,0,0,.2);
+    }
+    .overlay-card h2{
+      font-size:clamp(20px,6vw,26px);
+      font-weight:900;margin-bottom:10px;color:var(--text);
+    }
+    .overlay-card p{
+      font-size:clamp(13px,3.8vw,16px);
+      color:#555;line-height:1.55;margin-bottom:16px;
+    }
+
+    /* 달팽이 선택 버튼 */
+    .pick-row{
+      display:flex;gap:10px;justify-content:center;margin-bottom:14px;
+    }
+    .pick-btn{
+      display:flex;flex-direction:column;align-items:center;
+      background:#f5f5f5;border:3px solid #ddd;
+      border-radius:16px;padding:10px 14px;cursor:pointer;
+      font-size:28px;gap:4px;
+      transition:border-color .15s,background .15s;
+      min-width:72px;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .pick-btn span.pname{
+      font-size:12px;font-weight:800;color:var(--text);
+    }
+    .pick-btn.chosen{
+      border-color:var(--accent);
+      background:rgba(255,107,53,.08);
+    }
+
+    .btn-start{
+      background:var(--btn-bg);color:#fff;
+      border:none;border-radius:14px;
+      padding:13px 36px;
+      font-size:clamp(15px,4.5vw,19px);
+      font-weight:900;cursor:pointer;
+      box-shadow:0 4px 10px rgba(255,107,53,.4);
+      min-height:48px;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn-start:active{background:var(--btn-hover)}
+    .btn-disabled{opacity:.45;pointer-events:none}
+
+    /* 결과 오버레이 */
+    .medal-icon{font-size:56px;margin-bottom:6px}
+    .result-name{
+      font-size:clamp(18px,5.5vw,24px);
+      font-weight:900;color:var(--text);margin-bottom:6px;
+    }
+    .result-msg{font-size:clamp(13px,3.8vw,16px);color:#555;margin-bottom:4px}
+    .result-tap{font-size:clamp(12px,3.5vw,14px);color:#888;margin-bottom:16px}
+
+    /* 컨페티 */
+    .confetti-container{
+      position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden;
+    }
+    .conf{
+      position:absolute;
+      width:10px;height:10px;
+      border-radius:2px;
+      opacity:0;
+      animation:fall var(--dur,1.5s) ease-in var(--delay,0s) forwards;
+    }
+    @keyframes fall{
+      0%  {opacity:1;transform:translateY(-10px) rotate(0deg)}
+      100%{opacity:0;transform:translateY(110vh) rotate(720deg)}
+    }
+
+    /* 순위 배지 */
+    .rank-badge{
+      position:absolute;right:20px;top:50%;transform:translateY(-50%);
+      font-size:clamp(20px,6vw,28px);
+      z-index:3;pointer-events:none;
+      opacity:0;transition:opacity .3s;
+    }
+    .rank-badge.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐌 달팽이 경주</h1>
+
+  <div class="hud">
+    <span>내 달팽이: <span id="hudMySnail">—</span></span>
+    <span>최고기록 <span id="hudBest">—</span></span>
+  </div>
+
+  <div id="raceArea">
+    <!-- 트랙 3개: JS로 생성 -->
+  </div>
+
+  <footer>
+    <small id="footHint">달팽이를 골라보세요!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🐌 달팽이 경주</h2>
+    <p>내 달팽이를 골라서<br><strong>화면을 빠르게 탭!</strong><br>결승선에 제일 먼저 도착하면 🥇</p>
+    <div class="pick-row" id="pickRow"></div>
+    <button class="btn-start btn-disabled" id="startBtn">달팽이를 골라요!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <div class="medal-icon" id="resultMedal">🏅</div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-msg"  id="resultMsg"></div>
+    <div class="result-tap"  id="resultTap"></div>
+    <button class="btn-start" id="restartBtn">🔄 다시 하기</button>
+  </div>
+</div>
+
+<!-- 컨페티 컨테이너 -->
+<div class="confetti-container" id="confettiBox"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ══ CONFIG ══ */
+const CFG = {
+  snails: [
+    {id:0, emoji:'🐌', name:'초록이', color:'#43A047'},
+    {id:1, emoji:'🐛', name:'꼬물이', color:'#8E24AA'},
+    {id:2, emoji:'🦎', name:'도마뱀', color:'#E53935'},
+  ],
+  trackWidthPct: 86,   // 결승선 위치(%)
+  startPct:      4,    // 시작 위치(%)
+  tapBoost:      0.55, // 탭 1회 전진량(%)
+  autoSpeed:     [0.04, 0.055, 0.035], // CPU 달팽이 자동 이동 속도(% per frame)
+  autoJitter:    0.02, // CPU 속도 랜덤 편차
+  confettiColors:['#FF6B35','#FFD700','#43A047','#8E24AA','#E53935','#00BCD4'],
+  storageKey:    'snail-race_best',
+};
+
+/* ══ STATE ══ */
+const S = {
+  chosen:     -1,     // 플레이어가 고른 달팽이 idx
+  phase:      'pick', // 'pick' | 'race' | 'end'
+  pos:        [CFG.startPct, CFG.startPct, CFG.startPct], // 현재 위치(%)
+  finished:   [],     // 완주 순서 [snail idx]
+  raf:        null,
+  lastTime:   0,
+  pressMap:   {},     // 현재 누르고 있는 트랙
+  tapCount:   0,      // 이번 레이스 총 탭 수
+  bestTaps:   parseInt(localStorage.getItem(CFG.storageKey)) || 0,
+};
+
+/* ══ DOM 참조 ══ */
+const $ = id => document.getElementById(id);
+const raceArea    = $('raceArea');
+const startOverlay= $('startOverlay');
+const endOverlay  = $('endOverlay');
+const pickRow     = $('pickRow');
+const startBtn    = $('startBtn');
+const restartBtn  = $('restartBtn');
+const hudMySnail  = $('hudMySnail');
+const hudBest     = $('hudBest');
+const footHint    = $('footHint');
+const confettiBox = $('confettiBox');
+
+let trackEls   = [];  // .track DOM 배열
+let snailEls   = [];  // .snail DOM 배열
+let energyEls  = [];  // .energy-fill DOM 배열
+let rankBadges = [];  // .rank-badge DOM 배열
+
+/* ══ 초기화 ══ */
+function init(){
+  buildTracks();
+  buildPick();
+  updateHUD();
+}
+
+function buildTracks(){
+  raceArea.innerHTML = '';
+  trackEls=[];snailEls=[];energyEls=[];rankBadges=[];
+
+  CFG.snails.forEach((sn,i)=>{
+    const track = document.createElement('div');
+    track.className = 'track';
+    track.dataset.idx = i;
+
+    // 결승선
+    const fl = document.createElement('div');
+    fl.className = 'finish-line';
+    track.appendChild(fl);
+
+    // 달팽이
+    const snailEl = document.createElement('div');
+    snailEl.className = 'snail';
+    snailEl.innerHTML = `${sn.emoji}<span class="snail-name">${sn.name}</span>`;
+    snailEl.style.left = CFG.startPct + '%';
+    track.appendChild(snailEl);
+
+    // 내 달팽이 배지 (나중에 표시)
+    const myBadge = document.createElement('div');
+    myBadge.className = 'my-badge';
+    myBadge.textContent = '나!';
+    myBadge.style.display = 'none';
+    track.appendChild(myBadge);
+
+    // 순위 배지
+    const rankBadge = document.createElement('div');
+    rankBadge.className = 'rank-badge';
+    track.appendChild(rankBadge);
+    rankBadges.push(rankBadge);
+
+    // 에너지 바
+    const energyBar = document.createElement('div');
+    energyBar.className = 'energy-bar';
+    const energyFill = document.createElement('div');
+    energyFill.className = 'energy-fill';
+    energyFill.style.width = '0%';
+    energyBar.appendChild(energyFill);
+    track.appendChild(energyBar);
+
+    // 탭 힌트
+    const hint = document.createElement('div');
+    hint.className = 'tap-hint';
+    hint.textContent = '탭!';
+    hint.style.display = 'none';
+    track.appendChild(hint);
+
+    // 포인터 이벤트
+    track.addEventListener('pointerdown', e=>{
+      e.preventDefault();
+      onTrackPress(i, true);
+    });
+    track.addEventListener('pointerup',   ()=> onTrackPress(i, false));
+    track.addEventListener('pointerleave',()=> onTrackPress(i, false));
+
+    raceArea.appendChild(track);
+    trackEls.push(track);
+    snailEls.push(snailEl);
+    energyEls.push(energyFill);
+  });
+}
+
+function buildPick(){
+  pickRow.innerHTML = '';
+  CFG.snails.forEach((sn,i)=>{
+    const btn = document.createElement('div');
+    btn.className = 'pick-btn';
+    btn.dataset.idx = i;
+    btn.innerHTML = `<span>${sn.emoji}</span><span class="pname">${sn.name}</span>`;
+    btn.addEventListener('pointerdown', e=>{
+      e.preventDefault();
+      choosePick(i);
+    });
+    pickRow.appendChild(btn);
+  });
+}
+
+function choosePick(idx){
+  S.chosen = idx;
+  document.querySelectorAll('.pick-btn').forEach((b,i)=>{
+    b.classList.toggle('chosen', i===idx);
+  });
+  startBtn.textContent = `${CFG.snails[idx].emoji} ${CFG.snails[idx].name}으로 출발!`;
+  startBtn.classList.remove('btn-disabled');
+}
+
+/* ══ 레이스 시작 ══ */
+startBtn.addEventListener('pointerdown', e=>{
+  e.preventDefault();
+  if(S.chosen===-1) return;
+  startRace();
+});
+
+function startRace(){
+  startOverlay.classList.add('hidden');
+  S.phase    = 'race';
+  S.pos      = [CFG.startPct, CFG.startPct, CFG.startPct];
+  S.finished = [];
+  S.tapCount = 0;
+  S.pressMap = {};
+  confettiBox.innerHTML = '';
+
+  // 트랙 리셋
+  trackEls.forEach((tr,i)=>{
+    tr.classList.remove('selected');
+    rankBadges[i].className = 'rank-badge';
+    rankBadges[i].textContent = '';
+    snailEls[i].style.left = CFG.startPct + '%';
+    energyEls[i].style.width = '0%';
+    tr.querySelectorAll('.my-badge').forEach(b=>b.style.display='none');
+    tr.querySelectorAll('.tap-hint').forEach(h=>h.style.display='none');
+  });
+
+  // 내 달팽이 표시
+  const myTrack = trackEls[S.chosen];
+  myTrack.classList.add('selected');
+  myTrack.querySelector('.my-badge').style.display = 'block';
+  myTrack.querySelector('.tap-hint').style.display = 'block';
+
+  hudMySnail.textContent = CFG.snails[S.chosen].emoji + ' ' + CFG.snails[S.chosen].name;
+  footHint.textContent   = '내 달팽이 트랙을 탭탭탭!';
+
+  S.lastTime = performance.now();
+  S.raf = requestAnimationFrame(loop);
+}
+
+/* ══ 게임 루프 ══ */
+function loop(now){
+  const dt = Math.min((now - S.lastTime) / 1000, 0.05); // 초 단위
+  S.lastTime = now;
+
+  // CPU 달팽이 자동 이동
+  CFG.snails.forEach((_,i)=>{
+    if(S.finished.includes(i)) return;
+    if(i === S.chosen) return; // 플레이어 직접 조작
+    const speed = CFG.autoSpeed[i] + (Math.random()-0.5)*CFG.autoJitter;
+    S.pos[i] = Math.min(S.pos[i] + speed, CFG.trackWidthPct);
+    snailEls[i].style.left = S.pos[i] + '%';
+    if(S.pos[i]>=CFG.trackWidthPct) finishSnail(i);
+  });
+
+  // 플레이어 탭 시 연속 이동 (pointerdown 중)
+  if(S.pressMap[S.chosen] && !S.finished.includes(S.chosen)){
+    const boost = CFG.tapBoost * 55 * dt; // 프레임당 부스트
+    S.pos[S.chosen] = Math.min(S.pos[S.chosen] + boost, CFG.trackWidthPct);
+    snailEls[S.chosen].style.left = S.pos[S.chosen] + '%';
+    // 에너지 바 (현재 진행률)
+    const pct = (S.pos[S.chosen]-CFG.startPct)/(CFG.trackWidthPct-CFG.startPct)*100;
+    energyEls[S.chosen].style.width = pct + '%';
+    if(S.pos[S.chosen]>=CFG.trackWidthPct) finishSnail(S.chosen);
+  }
+
+  if(S.finished.length < CFG.snails.length){
+    S.raf = requestAnimationFrame(loop);
+  }
+}
+
+/* ══ 탭 / 포인터 이벤트 ══ */
+function onTrackPress(idx, down){
+  if(S.phase !== 'race') return;
+  if(idx !== S.chosen) return; // 내 트랙만 반응
+  if(S.finished.includes(S.chosen)) return;
+
+  if(down){
+    S.pressMap[idx] = true;
+    S.tapCount++;
+    trackEls[idx].classList.add('pressing');
+    // 탭 1회 즉각 boost
+    S.pos[S.chosen] = Math.min(S.pos[S.chosen] + CFG.tapBoost, CFG.trackWidthPct);
+    snailEls[S.chosen].style.left = S.pos[S.chosen] + '%';
+    const pct = (S.pos[S.chosen]-CFG.startPct)/(CFG.trackWidthPct-CFG.startPct)*100;
+    energyEls[S.chosen].style.width = pct + '%';
+    if(S.pos[S.chosen]>=CFG.trackWidthPct) finishSnail(S.chosen);
+  } else {
+    S.pressMap[idx] = false;
+    trackEls[idx].classList.remove('pressing');
+  }
+}
+
+/* ══ 완주 처리 ══ */
+const RANKS = ['🥇','🥈','🥉'];
+const RANK_MSG = {
+  0: {my1:'🎉 1등이야! 최고!',    myCpu:'너무 잘했어! 정말 빠르다!', other:'아깝다! 다시 해봐!'},
+  1: {my1:'🥈 2등! 아주 잘했어!', myCpu:'조금만 더 빠르면 1등!',     other:'2등도 대단해!'},
+  2: {my1:'🥉 3등이지만 멋져!',   myCpu:'응원했는데 아쉽다!',         other:'다음엔 1등 할 수 있어!'},
+};
+
+function finishSnail(idx){
+  if(S.finished.includes(idx)) return;
+  S.finished.push(idx);
+  const rank = S.finished.length - 1; // 0=1등
+  rankBadges[idx].textContent = RANKS[rank] || '🏅';
+  rankBadges[idx].classList.add('show');
+  snailEls[idx].style.left = CFG.trackWidthPct + '%';
+
+  // 레이스 종료 (3마리 모두 완주 또는 플레이어 완주)
+  if(S.finished.length === CFG.snails.length ||
+     (idx === S.chosen && S.finished.length >= 1)){
+    // 나머지 CPU도 즉시 완주 처리
+    CFG.snails.forEach((_,i)=>{
+      if(!S.finished.includes(i)){
+        S.finished.push(i);
+        const r = S.finished.length-1;
+        rankBadges[i].textContent = RANKS[r]||'🏅';
+        rankBadges[i].classList.add('show');
+        snailEls[i].style.left = CFG.trackWidthPct+'%';
+      }
+    });
+    cancelAnimationFrame(S.raf);
+    S.phase = 'end';
+    setTimeout(showResult, 600);
+  }
+}
+
+/* ══ 결과 화면 ══ */
+function showResult(){
+  const myRank = S.finished.indexOf(S.chosen); // 0=1등
+  const sn     = CFG.snails[S.chosen];
+
+  // 최고기록(1등 달성 탭 수 저장) — 1등일 때만
+  let bestMsg = '';
+  if(myRank===0){
+    if(S.bestTaps===0 || S.tapCount < S.bestTaps){
+      S.bestTaps = S.tapCount;
+      localStorage.setItem(CFG.storageKey, S.bestTaps);
+      bestMsg = `🏆 최고기록 갱신! ${S.tapCount}번 탭`;
+    } else {
+      bestMsg = `탭 횟수: ${S.tapCount}번 (최고 ${S.bestTaps}번)`;
+    }
+    updateHUD();
+  } else {
+    bestMsg = `탭 횟수: ${S.tapCount}번`;
+  }
+
+  const medalMap = ['🥇','🥈','🥉'];
+  $('resultMedal').textContent = medalMap[myRank]||'🏅';
+  $('resultName').textContent  = sn.emoji+' '+sn.name+' '+(myRank===0?'1등!':myRank===1?'2등!':'3등!');
+
+  const msgs = RANK_MSG[myRank] || RANK_MSG[2];
+  $('resultMsg').textContent = myRank===0
+    ? (S.finished[0]===S.chosen ? msgs.my1 : msgs.myCpu)
+    : msgs.other;
+  $('resultTap').textContent = bestMsg;
+
+  endOverlay.classList.remove('hidden');
+
+  if(myRank===0) launchConfetti(30);
+  else if(myRank===1) launchConfetti(15);
+}
+
+/* ══ 다시 하기 ══ */
+restartBtn.addEventListener('pointerdown', e=>{
+  e.preventDefault();
+  endOverlay.classList.add('hidden');
+  confettiBox.innerHTML = '';
+  // 선택 화면으로 리셋
+  S.phase  = 'pick';
+  S.chosen = -1;
+  document.querySelectorAll('.pick-btn').forEach(b=>b.classList.remove('chosen'));
+  startBtn.textContent = '달팽이를 골라요!';
+  startBtn.classList.add('btn-disabled');
+  buildTracks();
+  footHint.textContent   = '달팽이를 골라보세요!';
+  startOverlay.classList.remove('hidden');
+});
+
+/* ══ HUD 갱신 ══ */
+function updateHUD(){
+  hudBest.textContent = S.bestTaps ? S.bestTaps+'번 탭' : '—';
+}
+
+/* ══ 컨페티 ══ */
+function launchConfetti(count){
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className='conf';
+    el.style.setProperty('--dur', (1.2+Math.random()*1.2)+'s');
+    el.style.setProperty('--delay',(Math.random()*.6)+'s');
+    el.style.left  = Math.random()*100+'vw';
+    el.style.background = CFG.confettiColors[Math.floor(Math.random()*CFG.confettiColors.length)];
+    el.style.width = el.style.height = (8+Math.random()*8)+'px';
+    confettiBox.appendChild(el);
+  }
+  // 2초 후 컨페티 정리
+  setTimeout(()=>{ confettiBox.innerHTML=''; }, 2500);
+}
+
+/* ══ 시작 ══ */
+init();
+
+})();
+</script>
+</body>
+</html>

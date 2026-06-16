@@ -8,6 +8,22 @@
     "path": "super-mario/index.html"
   },
   {
+    "id": "dandelion",
+    "title": "Dandelion Fluff",
+    "title_ko": "민들레 홀씨 날리기",
+    "description": "민들레를 탭하거나 쓸어서 홀씨를 바람에 날려요!",
+    "thumbnail": "dandelion/thumb.svg",
+    "path": "dandelion/index.html"
+  },
+  {
+    "id": "sock-match",
+    "title": "Sock Match",
+    "title_ko": "양말 짝 맞추기",
+    "description": "같은 색·무늬 양말 2짝을 찾아 짝 맞추기! 색/무늬 인지 매칭 게임",
+    "thumbnail": "sock-match/thumb.svg",
+    "path": "sock-match/index.html"
+  },
+  {
     "id": "acorn-squirrel",
     "title": "Acorn Squirrel",
     "title_ko": "다람쥐 도토리 모으기",
@@ -547,7 +563,7 @@
     "id": "maze-escape",
     "title": "Maze Escape",
     "title_ko": "🔵 미로 탈출",
-    "description": "DFS로 생성된 미로에서 보라 공을 드래그해 탈출! 4레벨 난이도, 60초 타임어택",
+    "description": "DFS로 생성된 미로에서 보라 공을 드래그해 탈출! 4레벨 난이도, 시간 제한 없이 완주",
     "thumbnail": "maze-escape/thumb.svg",
     "path": "maze-escape/index.html"
   },
@@ -886,5 +902,37 @@
     "description": "화면을 탭하면 폭죽이 팡팡! 콤보로 점수를 올려봐요. 60초 도전",
     "thumbnail": "fireworks-tap/thumb.svg",
     "path": "fireworks-tap/index.html"
+  },
+  {
+    "id": "cotton-candy",
+    "title": "Cotton Candy",
+    "title_ko": "솜사탕 만들기",
+    "description": "빙글빙글 돌려 솜사탕을 만들어 손님에게 전달!",
+    "thumbnail": "cotton-candy/thumb.svg",
+    "path": "cotton-candy/index.html"
+  },
+  {
+    "id": "snail-race",
+    "title": "Snail Race",
+    "title_ko": "달팽이 경주",
+    "description": "내 달팽이를 골라 탭탭탭! 결승선에 1등으로 달려가자!",
+    "thumbnail": "snail-race/thumb.svg",
+    "path": "snail-race/index.html"
+  },
+  {
+    "id": "umbrella-catch",
+    "title": "Umbrella Catch",
+    "title_ko": "☂️ 우산 캐치",
+    "description": "우산으로 사탕·별을 받고 번개·먹구름은 피하는 낙하 게임",
+    "thumbnail": "umbrella-catch/thumb.svg",
+    "path": "umbrella-catch/index.html"
+  },
+  {
+    "id": "elevator-floor",
+    "title": "Elevator Floor",
+    "title_ko": "🛗 엘리베이터 층 맞추기",
+    "description": "동물 손님이 원하는 층 버튼을 눌러 엘리베이터를 보내줘요! 숫자 1~5 인식",
+    "thumbnail": "elevator-floor/thumb.svg",
+    "path": "elevator-floor/index.html"
   }
 ]

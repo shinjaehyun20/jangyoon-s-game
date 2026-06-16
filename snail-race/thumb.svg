@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#87CEEB"/>
+      <stop offset="100%" stop-color="#90EE90"/>
+    </linearGradient>
+    <linearGradient id="track1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#C8E6C9"/>
+      <stop offset="100%" stop-color="#A5D6A7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- 트랙 3개 -->
+  <rect x="20" y="30"  width="230" height="30" rx="10" fill="url(#track1)" opacity="0.9"/>
+  <rect x="20" y="70"  width="230" height="30" rx="10" fill="url(#track1)" opacity="0.9"/>
+  <rect x="20" y="110" width="230" height="30" rx="10" fill="url(#track1)" opacity="0.9"/>
+
+  <!-- 결승선 -->
+  <rect x="240" y="30"  width="5" height="30" fill="url(#chk)" rx="2"/>
+  <rect x="240" y="70"  width="5" height="30" fill="url(#chk)" rx="2"/>
+  <rect x="240" y="110" width="5" height="30" fill="url(#chk)" rx="2"/>
+  <defs>
+    <pattern id="chk" x="0" y="0" width="5" height="10" patternUnits="userSpaceOnUse">
+      <rect width="5" height="5" fill="#222"/>
+      <rect y="5" width="5" height="5" fill="#fff"/>
+    </pattern>
+  </defs>
+
+  <!-- 달팽이 이모지(텍스트) -->
+  <text x="50"  y="52"  font-size="22" text-anchor="middle">🐌</text>
+  <text x="45"  y="92"  font-size="18" text-anchor="middle">🐛</text>
+  <text x="55"  y="132" font-size="20" text-anchor="middle">🦎</text>
+
+  <!-- 탭 물결 -->
+  <text x="145" y="158" font-size="13" text-anchor="middle" fill="rgba(46,64,87,0.55)" font-family="sans-serif" font-weight="bold">탭탭탭! 응원해줘요!</text>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#FF6B35">달팽이 경주</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.55)" letter-spacing="2">SNAIL RACE</text>
+  </g>
+</svg>
