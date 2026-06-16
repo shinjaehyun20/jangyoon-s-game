@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>아이스크림 스쿱 쌓기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: linear-gradient(180deg, #ffe0f0 0%, #fff5e0 60%, #ffe8c0 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100dvh;
+    font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+  }
+
+  #header {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 6px;
+  }
+
+  #score-box {
+    background: #ff7eb3;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 8px 20px;
+    border-radius: 40px;
+    box-shadow: 0 4px 0 #d45a8a;
+    min-width: 90px;
+    text-align: center;
+  }
+
+  #best-box {
+    background: #ffb347;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 40px;
+    box-shadow: 0 4px 0 #c07820;
+    min-width: 90px;
+    text-align: center;
+  }
+
+  #lives-box {
+    font-size: 26px;
+    letter-spacing: 2px;
+  }
+
+  #game-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    touch-action: none;
+  }
+
+  /* Overlay screens */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,230,240,0.93);
+    border-radius: 0;
+    z-index: 10;
+  }
+
+  .overlay.hidden { display: none; }
+
+  .overlay h1 {
+    font-size: 44px;
+    color: #ff4f8b;
+    text-shadow: 0 3px 0 #c4306a;
+    margin-bottom: 12px;
+  }
+  .overlay h2 {
+    font-size: 30px;
+    color: #ff7a00;
+    text-shadow: 0 2px 0 #b85300;
+    margin-bottom: 6px;
+  }
+  .overlay p {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 8px;
+    text-align: center;
+    padding: 0 20px;
+    line-height: 1.5;
+  }
+
+  .btn-big {
+    background: #ff4f8b;
+    color: #fff;
+    font-size: 28px;
+    font-weight: bold;
+    padding: 18px 52px;
+    border: none;
+    border-radius: 60px;
+    box-shadow: 0 6px 0 #b52e60;
+    cursor: pointer;
+    margin-top: 18px;
+    transition: transform 0.1s;
+  }
+  .btn-big:active { transform: translateY(4px); box-shadow: 0 2px 0 #b52e60; }
+
+  #final-score {
+    font-size: 64px;
+    color: #ff4f8b;
+    font-weight: bold;
+    text-shadow: 0 4px 0 #c4306a;
+    margin: 10px 0 4px;
+  }
+
+  #new-best {
+    font-size: 22px;
+    color: #ffb347;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  #hint-arrow {
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 36px;
+    animation: arrowBounce 0.8s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  @keyframes arrowBounce {
+    from { transform: translateX(-50%) translateY(0); }
+    to   { transform: translateX(-50%) translateY(-12px); }
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="score-box">🍦 <span id="score-display">0</span></div>
+  <div id="lives-box" id="lives-display">❤️❤️❤️</div>
+  <div id="best-box">최고 <span id="best-display">0</span></div>
+</div>
+
+<div id="game-wrap">
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Start Screen -->
+  <div class="overlay" id="start-screen">
+    <h1>🍦 아이스크림<br>스쿱 쌓기!</h1>
+    <p>스쿱을 받아서<br>최대한 높이 쌓아봐요!</p>
+    <p style="font-size:15px; color:#888;">화면을 누르면 콘이 움직여요</p>
+    <button class="btn-big" id="start-btn">시작! 🎉</button>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div class="overlay hidden" id="gameover-screen">
+    <h2>게임 끝!</h2>
+    <p>스쿱을 <br><span id="final-score">0</span>개 쌓았어요!</p>
+    <div id="new-best" class="hidden">🏆 새 기록!</div>
+    <button class="btn-big" id="restart-btn">다시 하기 🔄</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── Constants ────────────────────────────────────────────
+  const FLAVORS = [
+    { color: '#ff8fae', outline: '#e05070', label: '딸기' },
+    { color: '#c5a3ff', outline: '#8854d0', label: '포도' },
+    { color: '#fffb8f', outline: '#e0c000', label: '바나나' },
+    { color: '#a8e6cf', outline: '#3dab70', label: '민트' },
+    { color: '#ffb347', outline: '#d07000', label: '망고' },
+    { color: '#b0e0ff', outline: '#3a80c0', label: '블루베리' },
+    { color: '#ffcccb', outline: '#e05555', label: '체리' },
+    { color: '#d4f5a2', outline: '#5a8f00', label: '메론' },
+  ];
+
+  const CONE_COLOR    = '#f5c842';
+  const CONE_OUTLINE  = '#b88a00';
+  const CONE_W_RATIO  = 0.22;   // fraction of canvas width
+  const SCOOP_R_RATIO = 0.10;
+  const DROP_INTERVAL_MS_START = 1800;
+  const DROP_INTERVAL_MS_MIN   = 700;
+  const SPEED_STEP_MS          = 80;   // reduce interval every scoop
+  const MISS_LIMIT             = 3;
+  const GRAVITY                = 0.38;
+  const CONE_SPEED_RATIO       = 0.018; // fraction of canvas width per frame
+
+  // ── State ─────────────────────────────────────────────────
+  let W, H;
+  let score = 0;
+  let bestScore = parseInt(localStorage.getItem('iceCreamBest') || '0');
+  let lives = MISS_LIMIT;
+  let gameActive = false;
+  let animId;
+  let lastTimestamp = 0;
+
+  // Cone
+  let coneX;     // center x
+  let coneVx = 0;
+  let pressing = false;
+  let pressX = 0;
+
+  // Falling scoops
+  let fallingScoop = null;   // { x, y, vy, flavor, r }
+  let nextDropTimeout;
+  let dropIntervalMs;
+  let scoopsMissed = 0;
+
+  // Stacked scoops
+  let stack = [];  // [{ x, y, r, flavor }] bottom → top, y is center
+
+  // Particles
+  let particles = [];
+
+  // ── Canvas setup ─────────────────────────────────────────
+  const canvas = document.getElementById('gameCanvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    const wrap = document.getElementById('game-wrap');
+    W = Math.min(wrap.clientWidth, 480);
+    H = Math.floor(window.innerHeight - document.getElementById('header').offsetHeight);
+    canvas.width  = W;
+    canvas.height = H;
+    if (gameActive) drawFrame();
+  }
+
+  window.addEventListener('resize', resize);
+
+  // ── DOM refs ─────────────────────────────────────────────
+  const scoreDisplay  = document.getElementById('score-display');
+  const bestDisplay   = document.getElementById('best-display');
+  const livesBox      = document.getElementById('lives-box');
+  const startScreen   = document.getElementById('start-screen');
+  const gameoverScreen= document.getElementById('gameover-screen');
+  const finalScoreEl  = document.getElementById('final-score');
+  const newBestEl     = document.getElementById('new-best');
+  const startBtn      = document.getElementById('start-btn');
+  const restartBtn    = document.getElementById('restart-btn');
+
+  bestDisplay.textContent = bestScore;
+
+  // ── Input ─────────────────────────────────────────────────
+  function getCanvasX(evt) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    if (evt.touches && evt.touches.length > 0) {
+      return (evt.touches[0].clientX - rect.left) * scaleX;
+    }
+    return (evt.clientX - rect.left) * scaleX;
+  }
+
+  canvas.addEventListener('touchstart',  onPressStart, { passive: false });
+  canvas.addEventListener('touchmove',   onPressMove,  { passive: false });
+  canvas.addEventListener('touchend',    onPressEnd,   { passive: false });
+  canvas.addEventListener('mousedown',   onPressStart);
+  canvas.addEventListener('mousemove',   onPressMove);
+  canvas.addEventListener('mouseup',     onPressEnd);
+
+  function onPressStart(e) {
+    e.preventDefault();
+    pressing = true;
+    pressX = getCanvasX(e);
+  }
+  function onPressMove(e) {
+    e.preventDefault();
+    if (pressing) pressX = getCanvasX(e);
+  }
+  function onPressEnd(e) {
+    e.preventDefault();
+    pressing = false;
+  }
+
+  // ── Game lifecycle ────────────────────────────────────────
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+
+  function startGame() {
+    score = 0;
+    lives = MISS_LIMIT;
+    scoopsMissed = 0;
+    stack = [];
+    fallingScoop = null;
+    particles = [];
+    dropIntervalMs = DROP_INTERVAL_MS_START;
+    pressing = false;
+
+    resize();
+    coneX = W / 2;
+    coneVx = 0;
+
+    updateHUD();
+    startScreen.classList.add('hidden');
+    gameoverScreen.classList.add('hidden');
+    gameActive = true;
+
+    clearTimeout(nextDropTimeout);
+    scheduleNextDrop();
+
+    if (animId) cancelAnimationFrame(animId);
+    lastTimestamp = 0;
+    animId = requestAnimationFrame(loop);
+  }
+
+  function endGame() {
+    gameActive = false;
+    cancelAnimationFrame(animId);
+    clearTimeout(nextDropTimeout);
+
+    finalScoreEl.textContent = score + '개';
+    if (score > bestScore) {
+      bestScore = score;
+      localStorage.setItem('iceCreamBest', bestScore);
+      bestDisplay.textContent = bestScore;
+      newBestEl.classList.remove('hidden');
+    } else {
+      newBestEl.classList.add('hidden');
+    }
+    gameoverScreen.classList.remove('hidden');
+  }
+
+  // ── Drop scheduling ───────────────────────────────────────
+  function scheduleNextDrop() {
+    if (!gameActive) return;
+    nextDropTimeout = setTimeout(dropScoop, dropIntervalMs);
+  }
+
+  function dropScoop() {
+    if (!gameActive) return;
+    if (fallingScoop) return; // still one in air
+
+    const r = Math.round(W * SCOOP_R_RATIO);
+    const margin = r + 10;
+    const x = margin + Math.random() * (W - margin * 2);
+    const flavor = FLAVORS[Math.floor(Math.random() * FLAVORS.length)];
+    fallingScoop = { x, y: -r, vy: 0, r, flavor };
+  }
+
+  // ── Physics helpers ───────────────────────────────────────
+  function coneTop() {
+    const coneW = W * CONE_W_RATIO;
+    const coneH = coneW * 1.4;
+    const coneY = H - 20;
+    return coneY - coneH; // top of cone = where scoops sit
+  }
+
+  function stackTopY() {
+    const r = Math.round(W * SCOOP_R_RATIO);
+    if (stack.length === 0) return coneTop() - r;
+    const top = stack[stack.length - 1];
+    return top.y - top.r * 1.55; // next center y
+  }
+
+  // ── Main loop ─────────────────────────────────────────────
+  function loop(ts) {
+    if (!gameActive) return;
+    const dt = lastTimestamp ? Math.min(ts - lastTimestamp, 50) : 16;
+    lastTimestamp = ts;
+
+    update(dt);
+    drawFrame();
+    animId = requestAnimationFrame(loop);
+  }
+
+  function update(dt) {
+    const dFrac = dt / 16.67; // normalize to 60fps
+
+    // Move cone toward pressed position
+    const coneW = W * CONE_W_RATIO;
+    const halfCone = coneW / 2;
+    const coneSpeed = W * CONE_SPEED_RATIO * dFrac;
+
+    if (pressing) {
+      const dx = pressX - coneX;
+      if (Math.abs(dx) > 2) {
+        coneVx = Math.sign(dx) * coneSpeed;
+      } else {
+        coneVx = 0;
+      }
+    } else {
+      coneVx *= 0.85;
+    }
+
+    coneX += coneVx;
+    coneX = Math.max(halfCone + 4, Math.min(W - halfCone - 4, coneX));
+
+    // Update falling scoop
+    if (fallingScoop) {
+      fallingScoop.vy += GRAVITY * dFrac;
+      fallingScoop.y  += fallingScoop.vy * dFrac;
+
+      const landY = stackTopY();
+      const catchThresh = fallingScoop.r * 0.8;
+      const catchHalfW  = coneW * 0.55 + fallingScoop.r * 0.4;
+
+      if (fallingScoop.y + fallingScoop.r >= landY) {
+        // Check if within cone/stack horizontal range
+        const dx = Math.abs(fallingScoop.x - coneX);
+
+        if (dx <= catchHalfW) {
+          // Caught!
+          const landedX = coneX + (fallingScoop.x - coneX) * 0.25; // slight center pull
+          stack.push({
+            x: landedX,
+            y: landY,
+            r: fallingScoop.r,
+            flavor: fallingScoop.flavor
+          });
+          score++;
+          scoreDisplay.textContent = score;
+          spawnParticles(fallingScoop.x, landY, fallingScoop.flavor.color);
+
+          // Speed up
+          dropIntervalMs = Math.max(DROP_INTERVAL_MS_MIN,
+            DROP_INTERVAL_MS_START - score * SPEED_STEP_MS);
+
+          fallingScoop = null;
+          scheduleNextDrop();
+        } else if (fallingScoop.y - fallingScoop.r > H) {
+          // Missed — fell off screen
+          lives--;
+          updateHUD();
+          spawnParticles(fallingScoop.x, H - 20, '#ccc');
+          fallingScoop = null;
+          if (lives <= 0) {
+            endGame();
+          } else {
+            scheduleNextDrop();
+          }
+        }
+      }
+    }
+
+    // Update particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x  += p.vx * dFrac;
+      p.y  += p.vy * dFrac;
+      p.vy += 0.25 * dFrac;
+      p.life -= dt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+  }
+
+  function spawnParticles(x, y, color) {
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.PI * 2 / 12) * i + Math.random() * 0.4;
+      const speed = 2 + Math.random() * 4;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3,
+        color,
+        r: 4 + Math.random() * 5,
+        life: 500 + Math.random() * 300
+      });
+    }
+  }
+
+  // ── Draw ──────────────────────────────────────────────────
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    drawBackground();
+    drawStack();
+    drawCone();
+    if (fallingScoop) drawScoop(fallingScoop.x, fallingScoop.y, fallingScoop.r, fallingScoop.flavor);
+    drawParticles();
+    if (!gameActive && !gameoverScreen.classList.contains('hidden')) return;
+    drawMissIndicator();
+  }
+
+  function drawBackground() {
+    // Soft gradient sky already via CSS body; draw some fluffy decorations
+    // Clouds (static, just decorative)
+    drawCloud(ctx, W * 0.15, H * 0.08, 38);
+    drawCloud(ctx, W * 0.72, H * 0.14, 30);
+    drawCloud(ctx, W * 0.5,  H * 0.04, 22);
+  }
+
+  function drawCloud(ctx, x, y, r) {
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(x,       y,     r,       0, Math.PI * 2);
+    ctx.arc(x + r,   y - r * 0.3, r * 0.8, 0, Math.PI * 2);
+    ctx.arc(x - r,   y - r * 0.2, r * 0.7, 0, Math.PI * 2);
+    ctx.arc(x + r * 1.6, y, r * 0.65, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCone() {
+    const coneW = W * CONE_W_RATIO;
+    const coneH = coneW * 1.4;
+    const coneY = H - 20;       // bottom of cone
+    const coneTopY = coneY - coneH;
+
+    // Cone body (triangle)
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(coneX, coneY);
+    ctx.lineTo(coneX - coneW / 2, coneTopY);
+    ctx.lineTo(coneX + coneW / 2, coneTopY);
+    ctx.closePath();
+    ctx.fillStyle = CONE_COLOR;
+    ctx.fill();
+    ctx.strokeStyle = CONE_OUTLINE;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Waffle pattern (2 diagonal lines)
+    ctx.globalAlpha = 0.25;
+    ctx.strokeStyle = '#8b6000';
+    ctx.lineWidth = 2;
+    const numLines = 4;
+    for (let i = 1; i <= numLines; i++) {
+      const t = i / (numLines + 1);
+      const lx = coneX - (coneW / 2) * t;
+      const rx = coneX + (coneW / 2) * t;
+      const ly = coneTopY + coneH * t;
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      ctx.lineTo(rx, ly);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawScoop(x, y, r, flavor) {
+    ctx.save();
+    // Shadow
+    ctx.beginPath();
+    ctx.ellipse(x, y + r * 0.6, r * 0.85, r * 0.25, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.fill();
+
+    // Main sphere
+    const grad = ctx.createRadialGradient(x - r * 0.25, y - r * 0.25, r * 0.05, x, y, r);
+    grad.addColorStop(0, lighten(flavor.color, 40));
+    grad.addColorStop(0.7, flavor.color);
+    grad.addColorStop(1, flavor.outline);
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.strokeStyle = flavor.outline;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // Shine
+    ctx.beginPath();
+    ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawStack() {
+    for (let i = 0; i < stack.length; i++) {
+      const s = stack[i];
+      drawScoop(s.x, s.y, s.r, s.flavor);
+    }
+  }
+
+  function drawParticles() {
+    for (const p of particles) {
+      const alpha = Math.max(0, p.life / 800);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawMissIndicator() {
+    // gentle shake visual — nothing needed here; handled in HUD
+  }
+
+  function updateHUD() {
+    scoreDisplay.textContent = score;
+    bestDisplay.textContent  = bestScore;
+    let hearts = '';
+    for (let i = 0; i < MISS_LIMIT; i++) {
+      hearts += i < lives ? '❤️' : '🖤';
+    }
+    livesBox.textContent = hearts;
+  }
+
+  // ── Color helper ──────────────────────────────────────────
+  function lighten(hex, amount) {
+    const num = parseInt(hex.slice(1), 16);
+    const r = Math.min(255, (num >> 16) + amount);
+    const g = Math.min(255, ((num >> 8) & 0xff) + amount);
+    const b = Math.min(255, (num & 0xff) + amount);
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  }
+
+  // ── Init ──────────────────────────────────────────────────
+  resize();
+  // Draw background even on start screen
+  ctx.clearRect(0, 0, W, H);
+  drawBackground();
+
+})();
+</script>
+</body>
+</html>

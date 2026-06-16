@@ -432,6 +432,16 @@
         "id": "snail-race",
         "label": "🐌 달팽이 경주",
         "path": "snail-race/index.html"
+      },
+      {
+        "id": "pearl-diver",
+        "label": "🤿 진주 잠수부",
+        "path": "pearl-diver/index.html"
+      },
+      {
+        "id": "ice-cream-scoop",
+        "label": "🍦 아이스크림 스쿱",
+        "path": "ice-cream-scoop/index.html"
       }
     ]
   },

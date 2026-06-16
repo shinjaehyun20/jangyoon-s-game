@@ -934,5 +934,21 @@
     "description": "동물 손님이 원하는 층 버튼을 눌러 엘리베이터를 보내줘요! 숫자 1~5 인식",
     "thumbnail": "elevator-floor/thumb.svg",
     "path": "elevator-floor/index.html"
+  },
+  {
+    "id": "pearl-diver",
+    "title": "Pearl Diver",
+    "title_ko": "🤿 진주 잠수부",
+    "description": "잠수부를 터치로 움직여 바닷속 진주를 모으고 해파리를 피해요! 수면에서 공기 충전",
+    "thumbnail": "pearl-diver/thumb.svg",
+    "path": "pearl-diver/index.html"
+  },
+  {
+    "id": "ice-cream-scoop",
+    "title": "Ice Cream Scoop",
+    "title_ko": "🍦 아이스크림 스쿱",
+    "description": "콘을 좌우로 움직여 떨어지는 아이스크림 스쿱을 받아 높이 쌓아요!",
+    "thumbnail": "ice-cream-scoop/thumb.svg",
+    "path": "ice-cream-scoop/index.html"
   }
 ]
