@@ -363,3 +363,10 @@ git add -A
 git commit -m "Refactor: unified thumbnails, modernize listing page, cleanup custom games"
 git push
 ```
+
+## 게임 2종 추가 (2026-06-18 굿모닝)
+
+- **버블티 만들기 (bubble-tea-maker)** — 손님 주문대로 시럽·펄·토핑 매칭, 60초 타임어택.
+- **소원등 띄우기 (lantern-float)** — 탭으로 등불 켜서 밤하늘로 띄우기, 장애물 회피.
+
+ID는 빌드 전 games.json에 사전 예약 후 단일 작성자 fan-in(병렬 JSON 충돌 방지).

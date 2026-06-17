@@ -1,5 +1,21 @@
 [
   {
+    "id": "bubble-tea-maker",
+    "title": "Bubble Tea Maker",
+    "title_ko": "버블티 만들기",
+    "description": "손님 주문대로 시럽 붓고 펄·토핑 올려서 버블티를 완성해요!",
+    "thumbnail": "bubble-tea-maker/thumb.svg",
+    "path": "bubble-tea-maker/index.html"
+  },
+  {
+    "id": "lantern-float",
+    "title": "Lantern Float",
+    "title_ko": "소원등 띄우기",
+    "description": "탭해서 소원등에 불을 켜고 밤하늘로 두둥실 띄워 보내요!",
+    "thumbnail": "lantern-float/thumb.svg",
+    "path": "lantern-float/index.html"
+  },
+  {
     "id": "super-mario",
     "title": "Super Jump Adventure",
     "title_ko": "슈퍼 점프 모험",

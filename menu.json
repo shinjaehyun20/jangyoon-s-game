@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "bubble-tea-maker",
+        "label": "🧋 버블티 만들기",
+        "path": "bubble-tea-maker/index.html"
+      },
+      {
+        "id": "lantern-float",
+        "label": "🏮 소원등 띄우기",
+        "path": "lantern-float/index.html"
+      },
+      {
         "id": "super-mario",
         "label": "🍄 슈퍼 점프 모험",
         "path": "super-mario/index.html"

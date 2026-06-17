@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>소원등 띄우기</title>
+  <style>
+    :root {
+      --bg: #0a0a2e;
+      --bg2: #12123a;
+      --accent: #ffbb44;
+      --accent2: #ff8c00;
+      --star: #ffffff;
+      --cloud: #8899cc;
+      --text: #ffffff;
+      --btn: #ffbb44;
+      --btn-text: #1a1a3e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 12px 8px;
+      gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5.5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(255,187,68,0.6);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 8px 14px;
+      font-size: clamp(13px, 3.5vw, 16px);
+      flex-shrink: 0;
+      gap: 6px;
+    }
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+    .hud-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.5px;
+    }
+    .hud-val {
+      font-size: clamp(15px, 4vw, 19px);
+      font-weight: 700;
+      color: var(--accent);
+    }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #06061a 0%, #0d0d2b 50%, #14143a 100%);
+      cursor: pointer;
+      touch-action: none;
+    }
+    /* 별 배경 */
+    #starsCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    /* 메인 게임 캔버스 */
+    #gameCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    /* 달 */
+    .moon {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      background: radial-gradient(circle at 35% 35%, #fffde0, #f5c842);
+      border-radius: 50%;
+      box-shadow: 0 0 18px 6px rgba(245,200,66,0.35);
+      pointer-events: none;
+      z-index: 1;
+    }
+    footer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      padding: 0 2px;
+    }
+    footer small {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+    }
+    .home-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.07);
+      transition: background 0.2s;
+    }
+    .home-link:active { background: rgba(255,255,255,0.15); }
+
+    /* 오버레이 공통 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5,5,25,0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(3px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(145deg, #1a1a40, #0f0f2e);
+      border: 1.5px solid rgba(255,187,68,0.3);
+      border-radius: 22px;
+      padding: 28px 24px 24px;
+      max-width: 320px;
+      width: 88vw;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 0 40px rgba(255,187,68,0.2);
+    }
+    .overlay-card h2 {
+      font-size: clamp(18px, 5vw, 22px);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 15px);
+      line-height: 1.6;
+      color: rgba(255,255,255,0.8);
+    }
+    .rule-list {
+      text-align: left;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .rule-list li {
+      font-size: clamp(12px, 3.2vw, 14px);
+      color: rgba(255,255,255,0.75);
+      padding-left: 4px;
+    }
+    .result-score {
+      font-size: clamp(38px, 12vw, 52px);
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 24px rgba(255,187,68,0.7);
+      line-height: 1;
+    }
+    .result-best {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+    }
+    .btn-start {
+      display: block;
+      width: 100%;
+      min-height: 52px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: var(--btn-text);
+      border: none;
+      border-radius: 14px;
+      font-size: clamp(15px, 4.5vw, 18px);
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      box-shadow: 0 4px 16px rgba(255,187,68,0.4);
+      font-family: inherit;
+    }
+    .btn-start:active {
+      transform: scale(0.96);
+      box-shadow: 0 2px 8px rgba(255,187,68,0.3);
+    }
+    /* 탭 힌트 애니메이션 */
+    @keyframes pulse-hint {
+      0%,100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+    .tap-hint {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      animation: pulse-hint 2s infinite;
+      pointer-events: none;
+      z-index: 2;
+      white-space: nowrap;
+    }
+    /* 점수 팝업 */
+    @keyframes score-pop {
+      0% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%,-110%) scale(1.3); }
+    }
+    .score-popup {
+      position: absolute;
+      pointer-events: none;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(255,187,68,0.8);
+      animation: score-pop 0.7s ease-out forwards;
+      z-index: 10;
+    }
+    /* 레벨업 배너 */
+    @keyframes level-banner {
+      0% { opacity: 0; transform: scale(0.7); }
+      30% { opacity: 1; transform: scale(1.1); }
+      70% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.9); }
+    }
+    .level-banner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%) scale(0.7);
+      background: linear-gradient(135deg, rgba(255,140,0,0.9), rgba(255,187,68,0.9));
+      color: #1a1a3e;
+      font-size: 20px;
+      font-weight: 900;
+      padding: 10px 24px;
+      border-radius: 14px;
+      pointer-events: none;
+      z-index: 20;
+      animation: level-banner 1.2s ease-out forwards;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏮 소원등 띄우기</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">소원등</span>
+      <span class="hud-val" id="scoreVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">레벨</span>
+      <span class="hud-val" id="levelVal">1</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">최고기록</span>
+      <span class="hud-val" id="bestVal">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">남은 시간</span>
+      <span class="hud-val" id="timerVal">60</span>
+    </div>
+  </div>
+
+  <div id="gameArea">
+    <canvas id="starsCanvas"></canvas>
+    <canvas id="gameCanvas"></canvas>
+    <div class="moon"></div>
+    <div class="tap-hint" id="tapHint">🏮 탭해서 불을 켜요!</div>
+  </div>
+
+  <footer>
+    <small>🌟 별을 모으고 장애물을 피하세요</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🏮 소원등 띄우기</h2>
+    <ul class="rule-list">
+      <li>🔥 탭해서 소원등에 불을 켜요!</li>
+      <li>⬆️ 등불이 하늘로 올라가요</li>
+      <li>⭐ 별을 모으면 점수가 올라요</li>
+      <li>☁️ 구름과 🐦 새를 피하세요</li>
+      <li>💫 60초 동안 소원을 보내요!</li>
+    </ul>
+    <button class="btn-start" id="startBtn">시작! 🏮</button>
+  </div>
+</div>
+
+<!-- 종료 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🌟 소원이 이루어졌어요!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="result-best" id="bestMsg"></div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 띄우기 🏮</button>
+    <a class="home-link" href="../index.html" style="margin-top:4px;">← 홈으로</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CONFIG = {
+    LS_KEY: 'lantern-float_best',
+    GAME_DURATION: 60,       // 초
+    LANTERN_W: 36,           // 등불 너비
+    LANTERN_H: 50,           // 등불 높이
+    RISE_SPEED_BASE: 1.8,    // 기본 상승 속도
+    SWAY_AMP: 1.2,           // 좌우 흔들림 진폭
+    STAR_SCORE: 5,           // 별 획득 점수
+    OBSTACLE_PENALTY: 0,     // 충돌 시 해당 등불 소멸 (점수 없음)
+    MAX_LANTERNS: 15,        // 화면 최대 등불 수
+    SPAWN_STAR_CHANCE: 0.35, // 별 생성 확률
+    SPAWN_CLOUD_INTERVAL_BASE: 4000,
+    SPAWN_BIRD_INTERVAL_BASE: 5000,
+    CLOUD_W: 70,
+    CLOUD_H: 30,
+    BIRD_W: 32,
+    BIRD_H: 20,
+    STAR_R: 8,
+    LEVEL_UP_SCORE: 20,      // 레벨업 점수
+    TAP_HINT_HIDE_DELAY: 2500,
+  };
+
+  /* ── 요소 ── */
+  const starsCanvas = document.getElementById('starsCanvas');
+  const gameCanvas  = document.getElementById('gameCanvas');
+  const starsCtx   = starsCanvas.getContext('2d');
+  const ctx        = gameCanvas.getContext('2d');
+
+  const scoreEl   = document.getElementById('scoreVal');
+  const levelEl   = document.getElementById('levelVal');
+  const bestEl    = document.getElementById('bestVal');
+  const timerEl   = document.getElementById('timerVal');
+  const tapHint   = document.getElementById('tapHint');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay   = document.getElementById('endOverlay');
+  const startBtn   = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const finalScoreEl = document.getElementById('finalScore');
+  const bestMsgEl  = document.getElementById('bestMsg');
+  const resultMsgEl = document.getElementById('resultMsg');
+  const gameArea   = document.getElementById('gameArea');
+
+  /* ── 상태 ── */
+  let W = 0, H = 0;
+  let running = false;
+  let score = 0, best = 0, level = 1;
+  let timeLeft = CONFIG.GAME_DURATION;
+  let timerInterval = null;
+  let rafId = null;
+  let lastTs = 0;
+
+  let lanterns = [];
+  let stars = [];
+  let clouds = [];
+  let birds = [];
+  let particles = [];
+  let bgStars = [];
+  let cloudTimer = 0, birdTimer = 0;
+  let cloudInterval = CONFIG.SPAWN_CLOUD_INTERVAL_BASE;
+  let birdInterval  = CONFIG.SPAWN_BIRD_INTERVAL_BASE;
+  let hintHidden = false;
+
+  /* ── localStorage ── */
+  function loadBest() {
+    try { best = parseInt(localStorage.getItem(CONFIG.LS_KEY)) || 0; } catch(e) { best = 0; }
+    bestEl.textContent = best;
+  }
+  function saveBest() {
+    try { localStorage.setItem(CONFIG.LS_KEY, best); } catch(e) {}
+  }
+
+  /* ── 리사이즈 ── */
+  function resize() {
+    const rect = gameArea.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    starsCanvas.width  = gameCanvas.width  = W;
+    starsCanvas.height = gameCanvas.height = H;
+    drawBgStars();
+  }
+  window.addEventListener('resize', resize);
+
+  /* ── 배경 별 ── */
+  function initBgStars() {
+    bgStars = [];
+    const count = Math.floor((W * H) / 3200);
+    for (let i = 0; i < count; i++) {
+      bgStars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.2 + 0.3,
+        a: Math.random() * 0.6 + 0.2,
+        tw: Math.random() * 2 + 1,
+        to: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+  function drawBgStars() {
+    starsCtx.clearRect(0, 0, W, H);
+    const t = performance.now() / 1000;
+    bgStars.forEach(s => {
+      const alpha = s.a * (0.6 + 0.4 * Math.sin(t / s.tw + s.to));
+      starsCtx.beginPath();
+      starsCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      starsCtx.fillStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
+      starsCtx.fill();
+    });
+  }
+
+  /* ── 오브젝트 생성 ── */
+  function spawnLantern(px, py) {
+    if (lanterns.length >= CONFIG.MAX_LANTERNS) return;
+    const lit = false;
+    lanterns.push({
+      x: px,
+      y: py,
+      vy: 0,
+      vx: 0,
+      lit: true,
+      glow: 0,
+      angle: (Math.random() - 0.5) * 0.3,
+      swayPhase: Math.random() * Math.PI * 2,
+      id: Date.now() + Math.random(),
+      alive: true,
+      alpha: 1,
+      dying: false,
+    });
+    // 별도 띄우기 힌트
+    if (!hintHidden) {
+      tapHint.style.display = 'none';
+      hintHidden = true;
+    }
+    // 별 생성
+    if (Math.random() < CONFIG.SPAWN_STAR_CHANCE) {
+      spawnStar();
+    }
+  }
+
+  function spawnStar() {
+    stars.push({
+      x: Math.random() * (W - 30) + 15,
+      y: Math.random() * (H * 0.6) + H * 0.05,
+      r: CONFIG.STAR_R,
+      twinkle: Math.random() * Math.PI * 2,
+      twinkleSpeed: 2 + Math.random() * 2,
+      alive: true,
+      collected: false,
+      collectAnim: 0,
+    });
+  }
+
+  function spawnCloud() {
+    const fromLeft = Math.random() < 0.5;
+    clouds.push({
+      x: fromLeft ? -CONFIG.CLOUD_W - 10 : W + CONFIG.CLOUD_W + 10,
+      y: Math.random() * H * 0.55 + H * 0.05,
+      vx: fromLeft ? (1 + Math.random() * 1.5) : -(1 + Math.random() * 1.5),
+      alive: true,
+    });
+  }
+
+  function spawnBird() {
+    const fromLeft = Math.random() < 0.5;
+    birds.push({
+      x: fromLeft ? -CONFIG.BIRD_W - 10 : W + CONFIG.BIRD_W + 10,
+      y: Math.random() * H * 0.65 + H * 0.05,
+      vx: fromLeft ? (2 + Math.random() * 2) : -(2 + Math.random() * 2),
+      flapPhase: 0,
+      alive: true,
+    });
+  }
+
+  /* ── 파티클 (등불 소멸 or 별 획득) ── */
+  function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.5 + Math.random() * 3;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: 2 + Math.random() * 3,
+        alpha: 1,
+        color,
+        alive: true,
+      });
+    }
+  }
+
+  /* ── 등불 그리기 ── */
+  function drawLantern(l) {
+    ctx.save();
+    ctx.translate(l.x, l.y);
+    ctx.rotate(l.angle);
+    ctx.globalAlpha = l.alpha;
+
+    const lw = CONFIG.LANTERN_W;
+    const lh = CONFIG.LANTERN_H;
+
+    // 글로우
+    if (l.lit) {
+      const glow = ctx.createRadialGradient(0, 0, 2, 0, 0, lh * 0.8 + l.glow * 10);
+      glow.addColorStop(0, 'rgba(255,200,60,0.55)');
+      glow.addColorStop(1, 'rgba(255,150,0,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, lw * 0.9 + l.glow * 8, lh * 0.7 + l.glow * 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 등불 몸체 (lantern body)
+    const grad = ctx.createLinearGradient(-lw/2, -lh/2, lw/2, lh/2);
+    if (l.lit) {
+      grad.addColorStop(0, '#ff6a00');
+      grad.addColorStop(0.4, '#ffb347');
+      grad.addColorStop(1, '#cc4400');
+    } else {
+      grad.addColorStop(0, '#664422');
+      grad.addColorStop(1, '#442211');
+    }
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    // 위 좁고 아래 좁은 랜턴 실루엣
+    ctx.moveTo(-lw * 0.3, -lh / 2);
+    ctx.bezierCurveTo(-lw * 0.55, -lh * 0.2, -lw * 0.55, lh * 0.2, -lw * 0.3, lh / 2);
+    ctx.lineTo(lw * 0.3, lh / 2);
+    ctx.bezierCurveTo(lw * 0.55, lh * 0.2, lw * 0.55, -lh * 0.2, lw * 0.3, -lh / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // 내부 빛
+    if (l.lit) {
+      const inner = ctx.createRadialGradient(0, lh * 0.1, 1, 0, lh * 0.1, lw * 0.35);
+      inner.addColorStop(0, 'rgba(255,240,120,0.7)');
+      inner.addColorStop(1, 'rgba(255,140,0,0)');
+      ctx.fillStyle = inner;
+      ctx.beginPath();
+      ctx.ellipse(0, lh * 0.1, lw * 0.3, lh * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 상단 고리
+    ctx.strokeStyle = '#aa6600';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-lw * 0.12, -lh / 2);
+    ctx.lineTo(lw * 0.12, -lh / 2);
+    ctx.stroke();
+
+    // 상단 매달리는 선
+    ctx.beginPath();
+    ctx.moveTo(0, -lh / 2 - 2);
+    ctx.lineTo(0, -lh / 2 - 8);
+    ctx.strokeStyle = 'rgba(200,150,80,0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 하단 술 (fringe)
+    for (let i = -2; i <= 2; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i * lw * 0.07, lh / 2);
+      ctx.lineTo(i * lw * 0.07 + (Math.random() - 0.5) * 2, lh / 2 + 8);
+      ctx.strokeStyle = l.lit ? 'rgba(255,180,50,0.6)' : 'rgba(150,80,30,0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  /* ── 별 그리기 ── */
+  function drawStar(s) {
+    if (s.collected) {
+      ctx.save();
+      ctx.globalAlpha = 1 - s.collectAnim;
+      ctx.font = `${20 + s.collectAnim * 10}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('⭐', s.x, s.y - s.collectAnim * 20);
+      ctx.restore();
+      return;
+    }
+    const t = performance.now() / 1000;
+    const alpha = 0.7 + 0.3 * Math.sin(t * s.twinkleSpeed + s.twinkle);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.font = `${s.r * 2.2}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⭐', s.x, s.y);
+    ctx.restore();
+  }
+
+  /* ── 구름 그리기 ── */
+  function drawCloud(c) {
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    const cw = CONFIG.CLOUD_W;
+    const ch = CONFIG.CLOUD_H;
+    ctx.fillStyle = '#c0cce8';
+    ctx.beginPath();
+    ctx.ellipse(c.x, c.y, cw * 0.5, ch * 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(c.x - cw * 0.28, c.y + ch * 0.1, cw * 0.3, ch * 0.42, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(c.x + cw * 0.28, c.y + ch * 0.1, cw * 0.3, ch * 0.42, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  /* ── 새 그리기 ── */
+  function drawBird(b) {
+    b.flapPhase += 0.18;
+    const flapY = Math.sin(b.flapPhase) * 5;
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.font = `${CONFIG.BIRD_H}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🐦', b.x, b.y + flapY);
+    ctx.restore();
+  }
+
+  /* ── 파티클 그리기 ── */
+  function drawParticles() {
+    particles.forEach(p => {
+      if (!p.alive) return;
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  /* ── 점수 팝업 ── */
+  function showScorePopup(x, y, text) {
+    const el = document.createElement('div');
+    el.className = 'score-popup';
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    gameArea.appendChild(el);
+    setTimeout(() => el.remove(), 750);
+  }
+
+  /* ── 레벨업 배너 ── */
+  function showLevelBanner(lv) {
+    const el = document.createElement('div');
+    el.className = 'level-banner';
+    el.textContent = `레벨 ${lv} 달성! 🚀`;
+    gameArea.appendChild(el);
+    setTimeout(() => el.remove(), 1300);
+  }
+
+  /* ── 충돌 감지 ── */
+  function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+    return (
+      ax - aw/2 < bx + bw/2 &&
+      ax + aw/2 > bx - bw/2 &&
+      ay - ah/2 < by + bh/2 &&
+      ay + ah/2 > by - bh/2
+    );
+  }
+  function circleRect(cx, cy, cr, rx, ry, rw, rh) {
+    const nearX = Math.max(rx - rw/2, Math.min(cx, rx + rw/2));
+    const nearY = Math.max(ry - rh/2, Math.min(cy, ry + rh/2));
+    const dx = cx - nearX, dy = cy - nearY;
+    return dx*dx + dy*dy < cr*cr;
+  }
+
+  /* ── 업데이트 ── */
+  function update(dt) {
+    const speedMult = 1 + (level - 1) * 0.2;
+    const t = performance.now() / 1000;
+
+    // 배경 별 반짝임
+    drawBgStars();
+
+    // 등불 업데이트
+    lanterns.forEach(l => {
+      if (!l.alive) return;
+      if (l.dying) {
+        l.alpha -= dt * 3;
+        if (l.alpha <= 0) l.alive = false;
+        return;
+      }
+      l.vy = -(CONFIG.RISE_SPEED_BASE + level * 0.15) * speedMult;
+      l.vx = Math.sin(t * 0.8 + l.swayPhase) * CONFIG.SWAY_AMP;
+      l.x += l.vx;
+      l.y += l.vy;
+      l.angle = l.vx * 0.04;
+      l.glow = 0.5 + 0.5 * Math.sin(t * 2 + l.swayPhase);
+
+      // 화면 위로 나가면 점수 + 소멸
+      if (l.y < -CONFIG.LANTERN_H) {
+        l.alive = false;
+        score++;
+        scoreEl.textContent = score;
+        if (score > best) { best = score; bestEl.textContent = best; saveBest(); }
+        checkLevelUp();
+        showScorePopup(l.x, 20, '+1 🏮');
+        spawnParticles(l.x, 10, 'rgba(255,200,50,0.8)', 8);
+      }
+    });
+
+    // 별 업데이트 & 충돌
+    stars.forEach(s => {
+      if (!s.alive) return;
+      if (s.collected) {
+        s.collectAnim += dt * 2.5;
+        if (s.collectAnim >= 1) s.alive = false;
+        return;
+      }
+      // 등불과 충돌
+      lanterns.forEach(l => {
+        if (!l.alive || l.dying) return;
+        if (circleRect(s.x, s.y, s.r + 4, l.x, l.y, CONFIG.LANTERN_W, CONFIG.LANTERN_H)) {
+          s.collected = true;
+          score += CONFIG.STAR_SCORE;
+          scoreEl.textContent = score;
+          if (score > best) { best = score; bestEl.textContent = best; saveBest(); }
+          checkLevelUp();
+          showScorePopup(s.x, s.y, `+${CONFIG.STAR_SCORE} ⭐`);
+          spawnParticles(s.x, s.y, 'rgba(255,230,50,0.9)', 12);
+        }
+      });
+    });
+
+    // 구름 업데이트 & 충돌
+    cloudTimer += dt * 1000;
+    const ci = cloudInterval / speedMult;
+    if (cloudTimer >= ci) {
+      spawnCloud();
+      cloudTimer = 0;
+    }
+    clouds.forEach(c => {
+      if (!c.alive) return;
+      c.x += c.vx * speedMult;
+      if (c.x < -CONFIG.CLOUD_W * 2 || c.x > W + CONFIG.CLOUD_W * 2) {
+        c.alive = false; return;
+      }
+      lanterns.forEach(l => {
+        if (!l.alive || l.dying) return;
+        if (rectsOverlap(l.x, l.y, CONFIG.LANTERN_W, CONFIG.LANTERN_H,
+                          c.x, c.y, CONFIG.CLOUD_W, CONFIG.CLOUD_H)) {
+          l.dying = true;
+          spawnParticles(l.x, l.y, 'rgba(200,200,255,0.7)', 8);
+        }
+      });
+    });
+
+    // 새 업데이트 & 충돌
+    birdTimer += dt * 1000;
+    const bi = birdInterval / speedMult;
+    if (birdTimer >= bi) {
+      spawnBird();
+      birdTimer = 0;
+    }
+    birds.forEach(b => {
+      if (!b.alive) return;
+      b.x += b.vx * speedMult;
+      if (b.x < -CONFIG.BIRD_W * 3 || b.x > W + CONFIG.BIRD_W * 3) {
+        b.alive = false; return;
+      }
+      lanterns.forEach(l => {
+        if (!l.alive || l.dying) return;
+        if (rectsOverlap(l.x, l.y, CONFIG.LANTERN_W - 6, CONFIG.LANTERN_H - 6,
+                          b.x, b.y, CONFIG.BIRD_W, CONFIG.BIRD_H)) {
+          l.dying = true;
+          spawnParticles(l.x, l.y, 'rgba(255,100,100,0.7)', 8);
+        }
+      });
+    });
+
+    // 파티클 업데이트
+    particles.forEach(p => {
+      if (!p.alive) return;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.08;
+      p.alpha -= 0.03;
+      if (p.alpha <= 0) p.alive = false;
+    });
+
+    // 배열 정리
+    lanterns = lanterns.filter(l => l.alive);
+    stars    = stars.filter(s => s.alive);
+    clouds   = clouds.filter(c => c.alive);
+    birds    = birds.filter(b => b.alive);
+    particles= particles.filter(p => p.alive);
+  }
+
+  /* ── 레벨업 ── */
+  function checkLevelUp() {
+    const newLevel = Math.floor(score / CONFIG.LEVEL_UP_SCORE) + 1;
+    if (newLevel > level) {
+      level = newLevel;
+      levelEl.textContent = level;
+      cloudInterval = Math.max(1500, CONFIG.SPAWN_CLOUD_INTERVAL_BASE - (level - 1) * 300);
+      birdInterval  = Math.max(2000, CONFIG.SPAWN_BIRD_INTERVAL_BASE  - (level - 1) * 400);
+      showLevelBanner(level);
+    }
+  }
+
+  /* ── 렌더 ── */
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    clouds.forEach(c => { if (c.alive) drawCloud(c); });
+    stars.forEach(s => { if (s.alive) drawStar(s); });
+    lanterns.forEach(l => { if (l.alive) drawLantern(l); });
+    birds.forEach(b => { if (b.alive) drawBird(b); });
+    drawParticles();
+  }
+
+  /* ── 게임 루프 ── */
+  function loop(ts) {
+    if (!running) return;
+    const dt = Math.min((ts - lastTs) / 1000, 0.05);
+    lastTs = ts;
+    update(dt);
+    render();
+    rafId = requestAnimationFrame(loop);
+  }
+
+  /* ── 타이머 ── */
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        endGame();
+      }
+    }, 1000);
+  }
+
+  /* ── 게임 시작 ── */
+  function startGame() {
+    score = 0; level = 1; timeLeft = CONFIG.GAME_DURATION;
+    cloudTimer = 0; birdTimer = 0;
+    cloudInterval = CONFIG.SPAWN_CLOUD_INTERVAL_BASE;
+    birdInterval  = CONFIG.SPAWN_BIRD_INTERVAL_BASE;
+    lanterns = []; stars = []; clouds = []; birds = []; particles = [];
+    hintHidden = false;
+    tapHint.style.display = '';
+
+    scoreEl.textContent = '0';
+    levelEl.textContent = '1';
+    timerEl.textContent = CONFIG.GAME_DURATION;
+    bestEl.textContent  = best;
+
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    running = true;
+
+    // 초기 별 몇 개
+    for (let i = 0; i < 4; i++) spawnStar();
+
+    lastTs = performance.now();
+    rafId = requestAnimationFrame(loop);
+    startTimer();
+  }
+
+  /* ── 게임 종료 ── */
+  function endGame() {
+    running = false;
+    cancelAnimationFrame(rafId);
+    clearInterval(timerInterval);
+
+    finalScoreEl.textContent = score;
+    if (score >= best && score > 0) {
+      bestMsgEl.textContent = '🏆 새 최고기록!';
+    } else {
+      bestMsgEl.textContent = `최고기록: ${best}개`;
+    }
+
+    let msg = '';
+    if (score >= 30) msg = '훌륭해요! 소원이 모두 이루어졌을 거예요 🌟';
+    else if (score >= 15) msg = '멋져요! 소원등이 하늘 가득 펼쳐졌어요 ✨';
+    else if (score >= 5)  msg = '잘했어요! 소원등이 밤하늘을 밝혔어요 🏮';
+    else                  msg = '장윤이의 소원을 담아 다시 도전해요! 💫';
+    resultMsgEl.textContent = msg;
+
+    endOverlay.classList.remove('hidden');
+  }
+
+  /* ── 탭/클릭 핸들러 ── */
+  function handleTap(e) {
+    if (!running) return;
+    e.preventDefault();
+
+    const rect = gameCanvas.getBoundingClientRect();
+    let cx, cy;
+    if (e.touches && e.touches.length > 0) {
+      cx = e.touches[0].clientX - rect.left;
+      cy = e.touches[0].clientY - rect.top;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      cx = e.changedTouches[0].clientX - rect.left;
+      cy = e.changedTouches[0].clientY - rect.top;
+    } else {
+      cx = (e.clientX || 0) - rect.left;
+      cy = (e.clientY || 0) - rect.top;
+    }
+    // 게임 캔버스 비율 보정
+    const scaleX = W / rect.width;
+    const scaleY = H / rect.height;
+    cx *= scaleX;
+    cy *= scaleY;
+
+    // 하단 근처에서 탭 시 등불 생성
+    const spawnY = Math.min(cy, H * 0.85);
+    spawnLantern(cx, spawnY);
+  }
+
+  gameArea.addEventListener('pointerdown', handleTap, { passive: false });
+
+  /* ── 버튼 ── */
+  startBtn.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    startGame();
+  });
+  restartBtn.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    startGame();
+  });
+
+  /* ── 초기화 ── */
+  function init() {
+    resize();
+    initBgStars();
+    drawBgStars();
+    loadBest();
+    // 초기 별 몇 개 미리 그리기 (배경 연출)
+    for (let i = 0; i < 5; i++) spawnStar();
+    render();
+  }
+
+  init();
+
+})();
+</script>
+</body>
+</html>
