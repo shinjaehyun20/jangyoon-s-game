@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>신호등 달리기</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --track-bg: #16213e;
+      --green: #4ade80;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --text: #ffffff;
+      --accent: #38bdf8;
+      --card-bg: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 14px 8px;
+      gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: clamp(13px, 3.5vw, 16px);
+      font-weight: 700;
+    }
+    .hud-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .hud-label { font-size: 10px; font-weight: 500; opacity: 0.6; }
+    .hud-val { font-size: clamp(15px, 4vw, 19px); font-weight: 900; }
+    #roundVal { color: var(--accent); }
+    #timeVal { color: var(--yellow); }
+    #bestVal { color: var(--green); }
+
+    /* ── 게임 영역 ── */
+    #gameArea {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    /* 신호등 */
+    .traffic-light-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .traffic-light {
+      width: 54px;
+      border-radius: 30px;
+      background: #0f172a;
+      border: 3px solid #334155;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .light {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      transition: box-shadow 0.15s, opacity 0.15s;
+      opacity: 0.22;
+    }
+    .light.red-light   { background: var(--red); }
+    .light.yellow-light { background: var(--yellow); }
+    .light.green-light { background: var(--green); }
+    .light.on-red    { opacity: 1; box-shadow: 0 0 18px 6px rgba(248,113,113,0.7); }
+    .light.on-green  { opacity: 1; box-shadow: 0 0 18px 6px rgba(74,222,128,0.7); }
+
+    /* 신호 텍스트 */
+    .signal-text {
+      text-align: center;
+      font-size: clamp(15px, 4.5vw, 22px);
+      font-weight: 900;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+    .signal-text.green-msg { color: var(--green); }
+    .signal-text.red-msg   { color: var(--red); }
+
+    /* 트랙 + 캐릭터 */
+    .track-wrap {
+      flex: 1;
+      background: var(--track-bg);
+      border-radius: 16px;
+      border: 2px solid #1e3a5f;
+      overflow: hidden;
+      position: relative;
+      min-height: 120px;
+    }
+    /* 결승선 */
+    .finish-line {
+      position: absolute;
+      top: 0; bottom: 0;
+      right: 10px;
+      width: 6px;
+      background: repeating-linear-gradient(
+        to bottom,
+        #fff 0px, #fff 8px,
+        #000 8px, #000 16px
+      );
+      border-radius: 3px;
+      opacity: 0.7;
+    }
+    .finish-flag {
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      font-size: 20px;
+    }
+    /* 트랙 라인 */
+    .track-line {
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-50%);
+    }
+    /* 캐릭터 */
+    #character {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: clamp(28px, 8vw, 38px);
+      transition: left 0.12s ease-out;
+      user-select: none;
+      will-change: left;
+    }
+    /* 진행 바 */
+    .progress-bar-wrap {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: -4px;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      border-radius: 4px;
+      transition: width 0.12s;
+      width: 0%;
+    }
+
+    /* 탭 영역 */
+    #tapZone {
+      border-radius: 16px;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform 0.08s, background 0.15s;
+      touch-action: manipulation;
+    }
+    #tapZone.green-zone {
+      background: linear-gradient(135deg, #166534, #15803d);
+      border: 2px solid var(--green);
+    }
+    #tapZone.red-zone {
+      background: linear-gradient(135deg, #7f1d1d, #991b1b);
+      border: 2px solid var(--red);
+      cursor: default;
+    }
+    #tapZone.pressed { transform: scale(0.97); }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      opacity: 0.6;
+      padding: 0 2px;
+    }
+    .home-link { color: var(--text); text-decoration: none; }
+    .home-link:hover { opacity: 0.8; }
+
+    /* ── 오버레이 ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,30,0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1e293b;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+    .overlay-card h2 {
+      font-size: clamp(20px, 6vw, 28px);
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 15px);
+      line-height: 1.6;
+      opacity: 0.85;
+      margin-bottom: 14px;
+    }
+    .btn-start {
+      display: block;
+      width: 100%;
+      min-height: 52px;
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    .btn-start:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-green { background: linear-gradient(135deg, var(--green), #16a34a); color: #0f172a; }
+    .btn-blue  { background: linear-gradient(135deg, var(--accent), #0284c7); color: #0f172a; }
+    .result-score {
+      font-size: clamp(36px, 12vw, 56px);
+      font-weight: 900;
+      color: var(--yellow);
+      line-height: 1;
+      margin: 8px 0;
+    }
+    .round-badge {
+      display: inline-block;
+      background: rgba(56,189,248,0.15);
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      border-radius: 20px;
+      padding: 2px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .catch-flash {
+      animation: flash-red 0.3s ease;
+    }
+    @keyframes flash-red {
+      0%   { background: rgba(248,113,113,0.25); }
+      100% { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🚦 신호등 달리기</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">라운드</span>
+      <span class="hud-val" id="roundVal">1</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">시간</span>
+      <span class="hud-val" id="timeVal">0.0s</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">최고</span>
+      <span class="hud-val" id="bestVal">--</span>
+    </div>
+  </div>
+
+  <div id="gameArea">
+    <!-- 신호등 + 텍스트 -->
+    <div class="traffic-light-wrap">
+      <div class="traffic-light">
+        <div class="light red-light" id="lightRed"></div>
+        <div class="light yellow-light"></div>
+        <div class="light green-light" id="lightGreen"></div>
+      </div>
+      <div class="signal-text" id="signalText">잠깐...</div>
+    </div>
+
+    <!-- 트랙 -->
+    <div class="track-wrap" id="trackWrap">
+      <div class="track-line"></div>
+      <div class="finish-line"></div>
+      <span class="finish-flag">🏁</span>
+      <div id="character">🏃</div>
+    </div>
+
+    <!-- 진행 바 -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-inner" id="progressBar"></div>
+    </div>
+
+    <!-- 탭 영역 -->
+    <div id="tapZone" class="green-zone">
+      👆 여기를 빠르게 탭하세요!
+    </div>
+  </div>
+
+  <footer>
+    <small>초록불 → 빠르게 탭! 빨간불 → 멈춰!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🚦 신호등 달리기</h2>
+    <p>
+      <strong>초록불🟢</strong>이면 화면을 빠르게 탭해서 달려요!<br>
+      <strong>빨간불🔴</strong>이면 멈추세요! 탭하면 뒤로 가요.<br><br>
+      결승선까지 제일 빨리 달려봐요! 🏁
+    </p>
+    <button class="btn-start btn-green" id="startBtn">출발! 🚀</button>
+  </div>
+</div>
+
+<!-- 종료 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <div id="endEmoji" style="font-size:48px;margin-bottom:6px;">🎉</div>
+    <div class="round-badge" id="clearRoundBadge">1라운드</div>
+    <h2 id="endTitle">도착!</h2>
+    <div class="result-score" id="finalScore">0.0s</div>
+    <p id="resultMsg">잘했어요!</p>
+    <button class="btn-start btn-blue" id="nextBtn">다음 라운드 →</button>
+    <button class="btn-start btn-green" id="restartBtn" style="margin-top:8px;">처음부터 다시</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CONFIG = {
+    GOAL_DISTANCE:       100,    // 결승선 기준 단위 거리
+    ADVANCE_PER_TAP:     4,      // 초록불 1탭당 전진 거리
+    RETREAT_ON_RED:      8,      // 빨간불 탭 시 후퇴 거리 (최소 0 보장)
+    MIN_GREEN_MS:        1200,   // 초록불 최소 지속
+    MAX_GREEN_MS:        2800,   // 초록불 최대 지속
+    MIN_RED_MS:          900,    // 빨간불 최소 지속
+    MAX_RED_MS:          2200,   // 빨간불 최대 지속
+    SPEED_FACTOR:        0.08,   // 라운드당 빨라지는 비율
+    MAX_ROUND:           10,
+    LS_KEY:              'green-light-run_best',
+    MUGUNGHWA_DURATION:  1600,   // "무궁화 꽃이…" 사운드 길이(ms)
+  };
+
+  /* ── STATE ── */
+  let state = {
+    phase:      'idle',  // idle | green | red | transitioning
+    distance:   0,
+    round:      1,
+    startTime:  0,
+    elapsed:    0,
+    timer:      null,
+    phaseTimer: null,
+    running:    false,
+  };
+
+  /* ── DOM ── */
+  const startOverlay  = document.getElementById('startOverlay');
+  const endOverlay    = document.getElementById('endOverlay');
+  const startBtn      = document.getElementById('startBtn');
+  const nextBtn       = document.getElementById('nextBtn');
+  const restartBtn    = document.getElementById('restartBtn');
+  const character     = document.getElementById('character');
+  const trackWrap     = document.getElementById('trackWrap');
+  const progressBar   = document.getElementById('progressBar');
+  const tapZone       = document.getElementById('tapZone');
+  const lightRed      = document.getElementById('lightRed');
+  const lightGreen    = document.getElementById('lightGreen');
+  const signalText    = document.getElementById('signalText');
+  const roundVal      = document.getElementById('roundVal');
+  const timeVal       = document.getElementById('timeVal');
+  const bestVal       = document.getElementById('bestVal');
+  const endEmoji      = document.getElementById('endEmoji');
+  const endTitle      = document.getElementById('endTitle');
+  const finalScore    = document.getElementById('finalScore');
+  const resultMsg     = document.getElementById('resultMsg');
+  const clearBadge    = document.getElementById('clearRoundBadge');
+
+  /* ── WEB AUDIO ── */
+  let audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+    return audioCtx;
+  }
+
+  function playBeep(freq, duration, type='sine', vol=0.3) {
+    const ctx = getAudio(); if (!ctx) return;
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + duration);
+    } catch(e) {}
+  }
+
+  function playRunTap() {
+    // 경쾌한 달리기 탭음
+    playBeep(660, 0.06, 'square', 0.18);
+  }
+
+  function playCatch() {
+    // 잡힘 — 낮은 경고음
+    playBeep(180, 0.12, 'sawtooth', 0.25);
+    setTimeout(() => playBeep(140, 0.18, 'sawtooth', 0.2), 100);
+  }
+
+  function playGreenSignal() {
+    // 초록 전환 — 밝은 두 음
+    playBeep(520, 0.1, 'sine', 0.25);
+    setTimeout(() => playBeep(780, 0.12, 'sine', 0.28), 110);
+  }
+
+  function playRedSignal() {
+    // 빨간 전환 — 낮은 경고
+    playBeep(300, 0.14, 'square', 0.22);
+  }
+
+  function playClearSound() {
+    // 클리어 — 오름차순 아르페지오
+    [523, 659, 784, 1047].forEach((f, i) => {
+      setTimeout(() => playBeep(f, 0.2, 'sine', 0.3), i * 110);
+    });
+  }
+
+  /* "무궁화 꽃이 피었습니다" 신호음 (8분음표 패턴) */
+  function playMugunghwa() {
+    const notes = [
+      [392, 0.12], [440, 0.12], [392, 0.12], [440, 0.12],
+      [494, 0.18], [440, 0.12], [494, 0.20],
+      [392, 0.14], [523, 0.28],
+    ];
+    let t = 0;
+    notes.forEach(([freq, dur]) => {
+      setTimeout(() => playBeep(freq, dur, 'sine', 0.22), t * 1000);
+      t += dur + 0.04;
+    });
+  }
+
+  /* ── UTILS ── */
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function speedMul(round) {
+    return Math.max(0.45, 1 - (round - 1) * CONFIG.SPEED_FACTOR);
+  }
+
+  function getBest() { return parseFloat(localStorage.getItem(CONFIG.LS_KEY)) || null; }
+  function setBest(val) {
+    const cur = getBest();
+    if (cur === null || val < cur) { localStorage.setItem(CONFIG.LS_KEY, val.toFixed(2)); return true; }
+    return false;
+  }
+  function renderBest() {
+    const b = getBest();
+    bestVal.textContent = b !== null ? b.toFixed(1)+'s' : '--';
+  }
+
+  /* ── 캐릭터 위치 ── */
+  function renderCharacter() {
+    const trackW = trackWrap.clientWidth;
+    const charW  = character.offsetWidth || 38;
+    const finishX = trackW - 28; // 결승선 오른쪽 여백
+    const startX  = 6;
+    const pct     = Math.min(state.distance / CONFIG.GOAL_DISTANCE, 1);
+    const posX    = startX + pct * (finishX - startX - charW);
+    character.style.left = Math.max(startX, posX) + 'px';
+    progressBar.style.width = (pct * 100) + '%';
+  }
+
+  /* ── 신호 표시 ── */
+  function setSignal(phase) {
+    if (phase === 'green') {
+      lightRed.classList.remove('on-red');
+      lightGreen.classList.add('on-green');
+      signalText.textContent = '🟢 달려!';
+      signalText.className = 'signal-text green-msg';
+      tapZone.className = 'green-zone';
+      tapZone.innerHTML = '👆 여기를 빠르게 탭하세요!';
+      character.textContent = '🏃';
+    } else {
+      lightGreen.classList.remove('on-green');
+      lightRed.classList.add('on-red');
+      signalText.textContent = '🔴 멈춰!';
+      signalText.className = 'signal-text red-msg';
+      tapZone.className = 'red-zone';
+      tapZone.innerHTML = '🛑 멈추세요!';
+      character.textContent = '🧍';
+    }
+  }
+
+  /* ── 게임 루프 ── */
+  function startPhase(phase) {
+    clearTimeout(state.phaseTimer);
+    state.phase = phase;
+    setSignal(phase);
+
+    const mul = speedMul(state.round);
+    let duration;
+    if (phase === 'green') {
+      playGreenSignal();
+      duration = rand(CONFIG.MIN_GREEN_MS, CONFIG.MAX_GREEN_MS) * mul;
+    } else {
+      playRedSignal();
+      // 빨간불 직전 "무궁화 꽃이" 연주
+      playMugunghwa();
+      duration = rand(CONFIG.MIN_RED_MS, CONFIG.MAX_RED_MS) * mul;
+    }
+
+    state.phaseTimer = setTimeout(() => {
+      if (!state.running) return;
+      // 전환: 짧은 '이미 빨강' 상태 없이 바로 반대로
+      startPhase(phase === 'green' ? 'red' : 'green');
+    }, duration);
+  }
+
+  function tickTimer() {
+    if (!state.running) return;
+    state.elapsed = (Date.now() - state.startTime) / 1000;
+    timeVal.textContent = state.elapsed.toFixed(1) + 's';
+    state.timer = requestAnimationFrame(tickTimer);
+  }
+
+  /* ── 탭 처리 ── */
+  function handleTap(e) {
+    e.preventDefault();
+    if (!state.running) return;
+    if (tapZone.classList.contains('pressed')) return;
+    tapZone.classList.add('pressed');
+    setTimeout(() => tapZone.classList.remove('pressed'), 80);
+
+    if (state.phase === 'green') {
+      state.distance += CONFIG.ADVANCE_PER_TAP;
+      playRunTap();
+      renderCharacter();
+      if (state.distance >= CONFIG.GOAL_DISTANCE) {
+        clearRound();
+        return;
+      }
+    } else {
+      // 빨간불 탭 — 후퇴
+      state.distance = Math.max(0, state.distance - CONFIG.RETREAT_ON_RED);
+      playCatch();
+      character.textContent = '😱';
+      setTimeout(() => { character.textContent = '🧍'; }, 400);
+      // 화면 flash
+      trackWrap.classList.add('catch-flash');
+      setTimeout(() => trackWrap.classList.remove('catch-flash'), 320);
+      renderCharacter();
+    }
+  }
+
+  /* ── 클리어 ── */
+  function clearRound() {
+    state.running = false;
+    clearTimeout(state.phaseTimer);
+    cancelAnimationFrame(state.timer);
+
+    character.textContent = '🎉';
+    renderCharacter();
+    playClearSound();
+
+    const secs = state.elapsed;
+    const isNew = setBest(secs);
+    renderBest();
+
+    finalScore.textContent = secs.toFixed(1) + 's';
+    clearBadge.textContent = state.round + '라운드';
+    endTitle.textContent = '결승선 도착!';
+    endEmoji.textContent = '🏆';
+    resultMsg.innerHTML = isNew
+      ? `<strong style="color:#fbbf24">새 최고기록! 🎉</strong><br>${state.round}라운드 클리어!`
+      : `${state.round}라운드 클리어!<br>더 빠르게 도전해봐요!`;
+    nextBtn.textContent = state.round < CONFIG.MAX_ROUND
+      ? `${state.round + 1}라운드 도전 →`
+      : '다시 처음부터 →';
+
+    endOverlay.classList.remove('hidden');
+  }
+
+  /* ── 초기화 ── */
+  function initRound(round) {
+    clearTimeout(state.phaseTimer);
+    cancelAnimationFrame(state.timer);
+
+    state.phase     = 'idle';
+    state.distance  = 0;
+    state.running   = false;
+    state.round     = round;
+    state.elapsed   = 0;
+
+    roundVal.textContent = round;
+    timeVal.textContent  = '0.0s';
+    character.textContent = '🏃';
+    setSignal('green');
+    lightGreen.classList.remove('on-green');
+    lightRed.classList.remove('on-red');
+    signalText.textContent = '준비!';
+    signalText.className = 'signal-text';
+    tapZone.className = 'red-zone';
+    tapZone.innerHTML = '잠깐...';
+    renderCharacter();
+    renderBest();
+  }
+
+  function startRound() {
+    state.running  = true;
+    state.startTime = Date.now();
+    tickTimer();
+    // 1초 카운트다운 후 첫 신호
+    setTimeout(() => {
+      if (!state.running) return;
+      startPhase('green');
+    }, 800);
+  }
+
+  /* ── 이벤트 ── */
+  startBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    startOverlay.classList.add('hidden');
+    initRound(1);
+    startRound();
+  });
+
+  nextBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    endOverlay.classList.add('hidden');
+    const nextRound = state.round < CONFIG.MAX_ROUND ? state.round + 1 : 1;
+    initRound(nextRound);
+    startRound();
+  });
+
+  restartBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    endOverlay.classList.add('hidden');
+    initRound(1);
+    startRound();
+  });
+
+  tapZone.addEventListener('pointerdown', handleTap);
+  tapZone.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+
+  // 키보드 보조 (스페이스/엔터)
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      if (!state.running) return;
+      handleTap(new Event('keydown'));
+    }
+  });
+
+  /* ── 초기 화면 ── */
+  initRound(1);
+  renderBest();
+
+})();
+</script>
+</body>
+</html>

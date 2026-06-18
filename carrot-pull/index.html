@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>당근 뽑기</title>
+  <style>
+    :root {
+      --bg-top:    #87CEEB;
+      --bg-btm:    #8B5E3C;
+      --soil:      #6B4226;
+      --grass:     #4CAF50;
+      --accent:    #FF6B35;
+      --gold:      #FFD700;
+      --text:      #ffffff;
+      --gauge-ok:  #4CAF50;
+      --gauge-over:#F44336;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      background: linear-gradient(to bottom, var(--bg-top) 50%, var(--bg-btm) 50%);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ── HUD ── */
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 16px 6px;
+      gap: 10px;
+    }
+    .hud-box {
+      background: rgba(255,255,255,0.25);
+      border-radius: 14px;
+      padding: 6px 14px;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      flex: 1; text-align: center;
+    }
+    .hud-box span { font-size: 0.75em; display: block; font-weight: 500; opacity: 0.9; }
+
+    /* ── 게임 영역 ── */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 땅 + 잔디 */
+    .ground {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 50%;
+      background: var(--soil);
+      border-top: 12px solid var(--grass);
+      border-radius: 0 0 0 0;
+    }
+
+    /* ── 당근 래퍼 ── */
+    #carrotWrap {
+      position: absolute;
+      left: 50%; bottom: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      transition: transform 0.08s ease;
+    }
+
+    /* SVG 당근 */
+    #carrotSvg {
+      display: block;
+      transition: transform 0.12s ease;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+    }
+
+    /* 당근 잎 (SVG 위) */
+    .leaf-group {
+      transition: transform 0.1s ease;
+    }
+
+    /* ── 게이지 바 ── */
+    #gaugeWrap {
+      position: absolute;
+      right: 20px; top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 200px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.5);
+      display: none;
+    }
+    #gaugeFill {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: var(--gauge-ok);
+      border-radius: 18px;
+      transition: height 0.05s linear, background 0.1s;
+      height: 0%;
+    }
+    /* 적정 구간 표시 */
+    #gaugeZone {
+      position: absolute;
+      left: 0; right: 0;
+      background: rgba(255,255,255,0.35);
+      border-top: 2px dashed rgba(255,255,255,0.8);
+      border-bottom: 2px dashed rgba(255,255,255,0.8);
+    }
+    .gauge-label {
+      position: absolute;
+      right: 44px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+      display: none;
+    }
+
+    /* ── 이펙트 텍스트 ── */
+    .effect-text {
+      position: absolute;
+      left: 50%; top: 30%;
+      transform: translateX(-50%) translateY(0);
+      font-size: clamp(28px, 8vw, 48px);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.4);
+      pointer-events: none;
+      animation: floatUp 1s ease forwards;
+      white-space: nowrap;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-80px); }
+    }
+
+    /* 당근 뽑기 흔들림 */
+    @keyframes pull {
+      0%,100% { transform: translateX(-50%) rotate(0deg); }
+      25%      { transform: translateX(-50%) rotate(-4deg); }
+      75%      { transform: translateX(-50%) rotate(4deg); }
+    }
+    @keyframes popUp {
+      0%   { bottom: 50%; }
+      60%  { bottom: 72%; }
+      80%  { bottom: 66%; }
+      100% { bottom: 70%; }
+    }
+    @keyframes breakCarrot {
+      0%,100% { transform: translateX(-50%) rotate(0deg); }
+      20%     { transform: translateX(-50%) rotate(-12deg); }
+      40%     { transform: translateX(-50%) rotate(10deg); }
+      60%     { transform: translateX(-50%) rotate(-6deg); }
+    }
+
+    /* 파티클 */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: particleFly 0.8s ease forwards;
+    }
+    @keyframes particleFly {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: var(--tx) scale(0.3); }
+    }
+
+    /* ── 오버레이 ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #fff;
+      border-radius: 28px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 340px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: clamp(14px, 4vw, 17px);
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #FF6B35, #FF3D00);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 40px;
+      font-size: clamp(17px, 5vw, 22px);
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255,61,0,0.4);
+      transition: transform 0.1s;
+      min-height: 54px;
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .result-score {
+      font-size: clamp(40px, 12vw, 60px);
+      font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0 4px;
+    }
+    .best-badge {
+      display: inline-block;
+      background: var(--gold);
+      color: #333;
+      border-radius: 20px;
+      padding: 3px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    /* 홀드 힌트 */
+    #holdHint {
+      position: absolute;
+      bottom: 55%; left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(15px, 4.5vw, 20px);
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      pointer-events: none;
+      animation: pulse 1.2s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: translateX(-50%) scale(1); }
+      50%      { opacity: 0.6; transform: translateX(-50%) scale(0.95); }
+    }
+
+    /* 타이머 링 */
+    #timerRing {
+      position: absolute;
+      top: 10px; left: 50%;
+      transform: translateX(-50%);
+      width: 54px; height: 54px;
+      display: none;
+    }
+    .ring-bg  { fill: none; stroke: rgba(255,255,255,0.2); stroke-width: 5; }
+    .ring-bar {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 5;
+      stroke-linecap: round;
+      transform-origin: center;
+      transform: rotate(-90deg);
+      transition: stroke-dashoffset 1s linear, stroke 0.3s;
+    }
+
+    /* footer */
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 16px 10px;
+      color: rgba(255,255,255,0.8);
+      font-size: 13px;
+    }
+    .home-link {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-box" id="scoreBox">0<span>점수</span></div>
+    <div class="hud-box" id="countBox">0/8<span>수확</span></div>
+    <div class="hud-box" id="timeBox">30<span>초</span></div>
+  </div>
+
+  <!-- 게임 영역 -->
+  <div id="gameArea">
+    <div class="ground"></div>
+
+    <!-- 게이지 -->
+    <div id="gaugeWrap">
+      <div id="gaugeZone"></div>
+      <div id="gaugeFill"></div>
+    </div>
+    <div class="gauge-label" id="gaugeLabel">💪</div>
+
+    <!-- 당근 -->
+    <div id="carrotWrap">
+      <svg id="carrotSvg" width="80" height="160" viewBox="0 0 80 160">
+        <!-- 잎 -->
+        <g class="leaf-group" id="leafGroup">
+          <ellipse cx="40" cy="28" rx="8" ry="28" fill="#2E7D32" transform="rotate(-15 40 40)"/>
+          <ellipse cx="40" cy="28" rx="8" ry="28" fill="#388E3C" transform="rotate(15 40 40)"/>
+          <ellipse cx="40" cy="22" rx="6" ry="22" fill="#43A047"/>
+          <ellipse cx="28" cy="35" rx="5" ry="18" fill="#2E7D32" transform="rotate(-30 28 50)"/>
+          <ellipse cx="52" cy="35" rx="5" ry="18" fill="#388E3C" transform="rotate(30 52 50)"/>
+        </g>
+        <!-- 당근 몸통 -->
+        <path id="carrotBody" d="M24,50 Q20,110 40,155 Q60,110 56,50 Q50,42 40,40 Q30,42 24,50Z" fill="#FF6B35"/>
+        <!-- 당근 줄무늬 -->
+        <path d="M26,70 Q40,68 54,70" stroke="#FF8A50" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M25,90 Q40,87 55,90" stroke="#FF8A50" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M26,110 Q40,107 54,110" stroke="#FF8A50" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- 하이라이트 -->
+        <ellipse cx="34" cy="70" rx="5" ry="12" fill="rgba(255,255,255,0.2)" transform="rotate(-10 34 70)"/>
+        <!-- 당근 끝 -->
+        <path d="M40,155 Q38,160 40,162 Q42,160 40,155Z" fill="#E64A19"/>
+      </svg>
+    </div>
+
+    <!-- 홀드 힌트 -->
+    <div id="holdHint">꾹 눌러요! 🥕</div>
+  </div>
+
+  <footer>
+    <small id="footerHint">적정 구간에서 손을 떼면 쑥!</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🥕 당근 뽑기</h2>
+    <p>
+      화면을 <strong>꾹 누르면</strong> 힘 게이지가 차요!<br>
+      초록 구간에서 <strong>손을 떼면</strong> 당근이 쑥!<br>
+      <small style="color:#888">너무 세면 당근이 부러질 수 있어요 🥲</small>
+    </p>
+    <div id="bestDisplay" style="margin-bottom:12px; color:#FF6B35; font-weight:700; font-size:16px;"></div>
+    <button class="btn-start" id="startBtn">시작! 🥕</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎉 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div id="bestBadge" class="best-badge" style="display:none">🏆 최고 기록!</div>
+    <p id="resultMsg">당근을 열심히 뽑았어요!</p>
+    <button class="btn-start" id="restartBtn">다시 하기 🥕</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CONFIG = {
+    GAME_TIME:      30,    // 초
+    GAUGE_SPEED:    1.8,   // %/frame (누르는 동안 게이지 상승 속도)
+    ZONE_MIN:       42,    // 적정 구간 시작 %
+    ZONE_MAX:       72,    // 적정 구간 끝 %
+    PERFECT_MIN:    55,    // 완벽 구간
+    PERFECT_MAX:    65,
+    MAX_GAUGE:      100,
+    SCORE_PERFECT:  50,
+    SCORE_GOOD:     30,
+    SCORE_WEAK:     5,
+    SCORE_BROKEN:   10,
+    BEST_KEY:       'carrot-pull_best',
+    GOLDEN_CHANCE:  0.12,  // 황금당근 등장 확률
+    WEIRD_CHANCE:   0.10,  // 이상한 무 등장 확률
+    PULL_ANIM_MS:   600,
+    BREAK_ANIM_MS:  400,
+  };
+
+  /* ── 오디오 컨텍스트 ── */
+  let audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+  }
+
+  function playTone(freq, type, dur, vol, delay) {
+    try {
+      const ctx = getAudio();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, ctx.currentTime + (delay||0));
+      g.gain.setValueAtTime(vol || 0.3, ctx.currentTime + (delay||0));
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (delay||0) + dur);
+      o.start(ctx.currentTime + (delay||0));
+      o.stop(ctx.currentTime + (delay||0) + dur);
+    } catch(e) {}
+  }
+
+  function playNoise(dur, vol) {
+    try {
+      const ctx = getAudio();
+      const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1);
+      const src = ctx.createBufferSource();
+      const g = ctx.createGain();
+      src.buffer = buf;
+      src.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(vol||0.2, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      src.start(); src.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  /* 효과음들 */
+  function sfxGauge(pct) {
+    // 게이지 상승 중 틱틱 (가끔)
+    if (Math.random() < 0.12) {
+      playTone(300 + pct * 4, 'square', 0.04, 0.05);
+    }
+  }
+  function sfxPull() {
+    // 쑥! — 상승 후 하강
+    playTone(300, 'sawtooth', 0.06, 0.15);
+    playTone(500, 'sine', 0.08, 0.18, 0.06);
+    playTone(700, 'sine', 0.12, 0.22, 0.12);
+    playTone(900, 'sine', 0.1,  0.15, 0.20);
+    playNoise(0.1, 0.08);
+  }
+  function sfxBroken() {
+    // 부러짐 — 툭!
+    playTone(200, 'sawtooth', 0.08, 0.2);
+    playTone(150, 'square',   0.1,  0.15, 0.05);
+    playNoise(0.15, 0.12);
+  }
+  function sfxGolden() {
+    // 황금당근 — 반짝!
+    [500, 700, 900, 1100].forEach((f, i) => {
+      playTone(f, 'sine', 0.15, 0.2, i * 0.07);
+    });
+  }
+  function sfxWeak() {
+    playTone(180, 'sine', 0.12, 0.12);
+  }
+
+  /* ── DOM 참조 ── */
+  const $ = (id) => document.getElementById(id);
+  const scoreBox    = $('scoreBox');
+  const countBox    = $('countBox');
+  const timeBox     = $('timeBox');
+  const carrotWrap  = $('carrotWrap');
+  const carrotSvg   = $('carrotSvg');
+  const carrotBody  = $('carrotBody');
+  const leafGroup   = $('leafGroup');
+  const gaugeWrap   = $('gaugeWrap');
+  const gaugeFill   = $('gaugeFill');
+  const gaugeZone   = $('gaugeZone');
+  const gaugeLabel  = $('gaugeLabel');
+  const holdHint    = $('holdHint');
+  const startOverlay= $('startOverlay');
+  const endOverlay  = $('endOverlay');
+  const finalScore  = $('finalScore');
+  const resultMsg   = $('resultMsg');
+  const bestBadge   = $('bestBadge');
+  const startBtn    = $('startBtn');
+  const restartBtn  = $('restartBtn');
+  const gameArea    = $('gameArea');
+  const bestDisplay = $('bestDisplay');
+
+  /* ── 상태 ── */
+  const state = {
+    phase: 'idle',  // idle | playing | pulling | cooldown
+    score: 0,
+    count: 0,
+    target: 8,
+    timeLeft: CONFIG.GAME_TIME,
+    gauge: 0,
+    holding: false,
+    gaugeRaf: null,
+    timerInterval: null,
+    isGolden: false,
+    isWeird: false,
+    carrotSize: 1,  // 1=보통, 1.3=큰, 0.7=작음
+    pullPending: false,
+  };
+
+  /* ── localStorage ── */
+  function getBest() {
+    return parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+  }
+  function saveBest(s) {
+    const cur = getBest();
+    if (s > cur) { localStorage.setItem(CONFIG.BEST_KEY, s); return true; }
+    return false;
+  }
+
+  /* ── 초기화 ── */
+  function showBestOnStart() {
+    const b = getBest();
+    if (b > 0) {
+      bestDisplay.textContent = '최고 기록: ' + b + '점 🏆';
+    }
+  }
+
+  /* 게이지 적정 구간 표시 업데이트 */
+  function updateGaugeZone() {
+    const h = gaugeWrap.offsetHeight;
+    const bottom = (CONFIG.ZONE_MIN / 100) * h;
+    const top    = (CONFIG.ZONE_MAX / 100) * h;
+    gaugeZone.style.bottom = bottom + 'px';
+    gaugeZone.style.height = (top - bottom) + 'px';
+  }
+
+  /* 당근 타입 결정 */
+  function pickCarrotType() {
+    const r = Math.random();
+    if (r < CONFIG.GOLDEN_CHANCE) {
+      state.isGolden = true; state.isWeird = false;
+      carrotBody.setAttribute('fill', '#FFD700');
+      carrotBody.setAttribute('d', 'M24,50 Q20,110 40,155 Q60,110 56,50 Q50,42 40,40 Q30,42 24,50Z');
+      leafGroup.children[0].setAttribute('fill', '#1B5E20');
+      leafGroup.children[1].setAttribute('fill', '#2E7D32');
+      state.carrotSize = 1.2;
+    } else if (r < CONFIG.GOLDEN_CHANCE + CONFIG.WEIRD_CHANCE) {
+      state.isGolden = false; state.isWeird = true;
+      // 이상한 무 (둥근 모양)
+      carrotBody.setAttribute('fill', '#CE93D8');
+      carrotBody.setAttribute('d', 'M20,52 Q16,100 40,148 Q64,100 60,52 Q55,38 40,36 Q25,38 20,52Z');
+      leafGroup.children[0].setAttribute('fill', '#4A148C');
+      leafGroup.children[1].setAttribute('fill', '#6A1B9A');
+      state.carrotSize = 1.1;
+    } else {
+      state.isGolden = false; state.isWeird = false;
+      // 보통 당근 (크기 랜덤)
+      carrotBody.setAttribute('fill', '#FF6B35');
+      carrotBody.setAttribute('d', 'M24,50 Q20,110 40,155 Q60,110 56,50 Q50,42 40,40 Q30,42 24,50Z');
+      leafGroup.children[0].setAttribute('fill', '#2E7D32');
+      leafGroup.children[1].setAttribute('fill', '#388E3C');
+      const sizes = [0.8, 0.9, 1.0, 1.0, 1.1, 1.2, 1.3];
+      state.carrotSize = sizes[Math.floor(Math.random() * sizes.length)];
+    }
+    const s = state.carrotSize;
+    carrotSvg.setAttribute('width',  Math.round(80 * s));
+    carrotSvg.setAttribute('height', Math.round(160 * s));
+  }
+
+  /* 당근 위치 초기화 */
+  function resetCarrot() {
+    carrotWrap.style.animation = '';
+    carrotWrap.style.bottom = '50%';
+    carrotWrap.style.transition = '';
+    pickCarrotType();
+    holdHint.style.display = 'block';
+    holdHint.textContent = state.isGolden ? '황금 당근이다! 🌟' : (state.isWeird ? '이상한 무?! 😂' : '꾹 눌러요! 🥕');
+  }
+
+  /* ── 게임 시작 ── */
+  function startGame() {
+    state.score = 0; state.count = 0; state.timeLeft = CONFIG.GAME_TIME;
+    state.phase = 'playing'; state.gauge = 0; state.holding = false;
+    state.pullPending = false;
+    updateHUD();
+    gaugeWrap.style.display = 'block';
+    gaugeLabel.style.display = 'block';
+    updateGaugeZone();
+    gaugeFill.style.height = '0%';
+    gaugeFill.style.background = 'var(--gauge-ok)';
+    resetCarrot();
+
+    state.timerInterval = setInterval(() => {
+      state.timeLeft--;
+      timeBox.textContent = state.timeLeft;
+      if (state.timeLeft <= 5) timeBox.style.color = '#FF3D00';
+      if (state.timeLeft <= 0) endGame();
+    }, 1000);
+  }
+
+  function updateHUD() {
+    scoreBox.textContent = state.score;
+    countBox.textContent = state.count + '/' + state.target;
+  }
+
+  /* ── 게이지 루프 ── */
+  function gaugeLoop() {
+    if (!state.holding || state.phase !== 'playing') return;
+    state.gauge = Math.min(state.gauge + CONFIG.GAUGE_SPEED, CONFIG.MAX_GAUGE);
+    const pct = state.gauge;
+    gaugeFill.style.height = pct + '%';
+
+    if (pct > CONFIG.ZONE_MAX) {
+      gaugeFill.style.background = 'var(--gauge-over)';
+    } else if (pct >= CONFIG.ZONE_MIN) {
+      gaugeFill.style.background = 'var(--gauge-ok)';
+    } else {
+      gaugeFill.style.background = '#FFC107';
+    }
+
+    // 잎 흔들기
+    const wiggle = Math.sin(Date.now() / 100) * (pct / 30);
+    leafGroup.style.transform = `rotate(${wiggle}deg)`;
+
+    sfxGauge(pct);
+
+    // 과충전 시 당근 흔들기
+    if (pct >= 90) {
+      carrotWrap.style.animation = 'pull 0.15s infinite';
+    }
+
+    state.gaugeRaf = requestAnimationFrame(gaugeLoop);
+  }
+
+  /* ── 홀드 시작 ── */
+  function onHoldStart(e) {
+    if (state.phase !== 'playing' || state.holding || state.pullPending) return;
+    e.preventDefault();
+    state.holding = true;
+    state.gauge = 0;
+    holdHint.style.display = 'none';
+    gaugeWrap.style.display = 'block';
+    updateGaugeZone();
+    carrotWrap.style.animation = '';
+    state.gaugeRaf = requestAnimationFrame(gaugeLoop);
+  }
+
+  /* ── 홀드 종료 → 결과 판정 ── */
+  function onHoldEnd(e) {
+    if (!state.holding || state.phase !== 'playing') return;
+    e.preventDefault();
+    state.holding = false;
+    cancelAnimationFrame(state.gaugeRaf);
+    leafGroup.style.transform = '';
+    carrotWrap.style.animation = '';
+
+    const pct = state.gauge;
+    state.pullPending = true;
+    state.phase = 'pulling';
+
+    if (pct < CONFIG.ZONE_MIN) {
+      // 너무 약함
+      sfxWeak();
+      showEffect('너무 약해! 💨', '#FFC107');
+      gaugeFill.style.height = '0%';
+      setTimeout(() => {
+        state.gauge = 0;
+        state.phase = 'playing';
+        state.pullPending = false;
+        holdHint.style.display = 'block';
+      }, 700);
+    } else if (pct > CONFIG.ZONE_MAX) {
+      // 과충전 → 부러짐
+      sfxBroken();
+      carrotWrap.style.animation = 'breakCarrot 0.4s ease';
+      const pts = CONFIG.SCORE_BROKEN + (state.isGolden ? 20 : 0);
+      state.score += pts;
+      state.count++;
+      updateHUD();
+      showEffect('아이쿠! 부러졌어요 😅 +' + pts, '#F44336');
+      setTimeout(() => nextCarrot(), CONFIG.BREAK_ANIM_MS + 200);
+    } else {
+      // 성공!
+      let pts;
+      if (pct >= CONFIG.PERFECT_MIN && pct <= CONFIG.PERFECT_MAX) {
+        pts = CONFIG.SCORE_PERFECT;
+        const bonus = state.isGolden ? 80 : (state.isWeird ? 40 : 0);
+        pts += bonus;
+        if (state.isGolden) { sfxGolden(); showEffect('황금 당근! ✨ +' + pts, '#FFD700'); }
+        else if (state.isWeird) { showEffect('이상한 무?! 😂 +' + pts, '#CE93D8'); sfxPull(); }
+        else { showEffect('완벽! 🥕 +' + pts, '#4CAF50'); sfxPull(); }
+      } else {
+        pts = CONFIG.SCORE_GOOD;
+        const bonus = state.isGolden ? 50 : (state.isWeird ? 20 : 0);
+        pts += bonus + Math.round((state.carrotSize - 1) * 20);
+        sfxPull();
+        showEffect('쑥! 🥕 +' + pts, '#FF6B35');
+      }
+      state.score += pts;
+      state.count++;
+      updateHUD();
+
+      // 뽑힘 애니메이션
+      spawnParticles();
+      carrotWrap.style.transition = 'bottom 0.3s cubic-bezier(0.22,1,0.36,1)';
+      carrotWrap.style.bottom = '72%';
+      setTimeout(() => nextCarrot(), CONFIG.PULL_ANIM_MS);
+    }
+    gaugeFill.style.height = '0%';
+    gaugeFill.style.background = '#FFC107';
+  }
+
+  function nextCarrot() {
+    carrotWrap.style.transition = '';
+    carrotWrap.style.bottom = '50%';
+    state.gauge = 0;
+    state.phase = 'playing';
+    state.pullPending = false;
+    resetCarrot();
+    if (state.count >= state.target) endGame();
+  }
+
+  /* ── 파티클 ── */
+  function spawnParticles() {
+    const colors = state.isGolden
+      ? ['#FFD700','#FFF176','#FFCC02']
+      : ['#FF6B35','#FF8A50','#4CAF50','#8BC34A'];
+    const rect = carrotWrap.getBoundingClientRect();
+    const areaRect = gameArea.getBoundingClientRect();
+    for (let i = 0; i < 10; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 8 + Math.random() * 10;
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 60;
+      p.style.cssText = `
+        width:${size}px; height:${size}px;
+        background:${colors[i % colors.length]};
+        left:${rect.left - areaRect.left + rect.width/2}px;
+        top:${rect.top  - areaRect.top  + rect.height/3}px;
+        --tx:translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px);
+      `;
+      gameArea.appendChild(p);
+      setTimeout(() => p.remove(), 850);
+    }
+  }
+
+  /* ── 이펙트 텍스트 ── */
+  function showEffect(text, color) {
+    const el = document.createElement('div');
+    el.className = 'effect-text';
+    el.style.color = color || '#fff';
+    el.textContent = text;
+    gameArea.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+
+  /* ── 게임 종료 ── */
+  function endGame() {
+    clearInterval(state.timerInterval);
+    state.phase = 'idle';
+    cancelAnimationFrame(state.gaugeRaf);
+    gaugeWrap.style.display = 'none';
+    gaugeLabel.style.display = 'none';
+
+    finalScore.textContent = state.score + '점';
+
+    const isNew = saveBest(state.score);
+    if (isNew) {
+      bestBadge.style.display = 'inline-block';
+      sfxGolden();
+    } else {
+      bestBadge.style.display = 'none';
+    }
+
+    const msgs = [
+      '당근을 열심히 뽑았어요! 🥕',
+      '훌륭한 농부예요! 🌾',
+      '다음엔 더 잘 할 수 있어! 💪',
+      '황금 당근도 찾아봐요! ✨',
+    ];
+    resultMsg.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+
+    endOverlay.classList.remove('hidden');
+  }
+
+  /* ── 포인터 이벤트 등록 ── */
+  gameArea.addEventListener('pointerdown', onHoldStart, { passive: false });
+  window.addEventListener('pointerup',   onHoldEnd,   { passive: false });
+  // 캔슬(전화 등) 처리
+  window.addEventListener('pointercancel', onHoldEnd, { passive: false });
+
+  /* ── 버튼 ── */
+  startBtn.addEventListener('pointerup', (e) => {
+    e.stopPropagation();
+    startOverlay.classList.add('hidden');
+    startGame();
+  });
+  restartBtn.addEventListener('pointerup', (e) => {
+    e.stopPropagation();
+    endOverlay.classList.add('hidden');
+    startGame();
+  });
+
+  /* ── 초기 화면 ── */
+  showBestOnStart();
+
+})();
+</script>
+</body>
+</html>

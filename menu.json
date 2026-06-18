@@ -452,6 +452,16 @@
         "id": "ice-cream-scoop",
         "label": "🍦 아이스크림 스쿱",
         "path": "ice-cream-scoop/index.html"
+      },
+      {
+        "id": "green-light-run",
+        "label": "🚦 신호등 달리기",
+        "path": "green-light-run/index.html"
+      },
+      {
+        "id": "carrot-pull",
+        "label": "🥕 당근 뽑기",
+        "path": "carrot-pull/index.html"
       }
     ]
   },

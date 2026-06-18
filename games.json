@@ -966,5 +966,21 @@
     "description": "콘을 좌우로 움직여 떨어지는 아이스크림 스쿱을 받아 높이 쌓아요!",
     "thumbnail": "ice-cream-scoop/thumb.svg",
     "path": "ice-cream-scoop/index.html"
+  },
+  {
+    "id": "green-light-run",
+    "title": "Green Light Run",
+    "title_ko": "신호등 달리기",
+    "description": "무궁화꽃이 피었습니다! 초록불엔 달리고 빨간불엔 멈춰요",
+    "thumbnail": "green-light-run/thumb.svg",
+    "path": "green-light-run/index.html"
+  },
+  {
+    "id": "carrot-pull",
+    "title": "Carrot Pull",
+    "title_ko": "당근 뽑기",
+    "description": "꾹 누르다 딱 맞게 손 떼면 쑥! 황금 당근도 찾아봐요",
+    "thumbnail": "carrot-pull/thumb.svg",
+    "path": "carrot-pull/index.html"
   }
 ]
