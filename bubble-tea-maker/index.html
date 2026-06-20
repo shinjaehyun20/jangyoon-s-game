@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🧋 버블티 만들기</title>
+  <style>
+    :root {
+      --bg: #2d1b4e;
+      --bg2: #3d2468;
+      --accent: #f8a5c2;
+      --accent2: #a29bfe;
+      --text: #ffffff;
+      --card: rgba(255,255,255,0.1);
+      --card-border: rgba(255,255,255,0.2);
+      --btn-radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5.5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    /* HUD */
+    .hud {
+      display: flex; gap: 8px; align-items: center;
+      background: var(--card); border-radius: 12px;
+      padding: 6px 12px;
+      flex-shrink: 0;
+    }
+    .hud-item {
+      flex: 1; text-align: center;
+    }
+    .hud-label {
+      font-size: 10px; opacity: 0.7; display: block;
+    }
+    .hud-value {
+      font-size: clamp(18px, 4.5vw, 24px);
+      font-weight: 900; display: block;
+    }
+    .hud-item.time .hud-value { color: #ffeaa7; }
+    .hud-item.score .hud-value { color: var(--accent); }
+    .hud-item.best .hud-value { color: var(--accent2); }
+
+    /* 주문 영역 */
+    .order-area {
+      background: var(--card);
+      border: 1.5px solid var(--card-border);
+      border-radius: 16px;
+      padding: 8px 12px;
+      flex-shrink: 0;
+    }
+    .order-label {
+      font-size: 11px; opacity: 0.7; margin-bottom: 4px;
+    }
+    .order-content {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .order-cup {
+      font-size: clamp(28px, 8vw, 42px);
+      line-height: 1;
+    }
+    .order-details {
+      flex: 1;
+    }
+    .order-name {
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+    }
+    .order-toppings {
+      display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px;
+    }
+    .order-topping-chip {
+      font-size: 11px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px; padding: 2px 7px;
+    }
+    .order-timer-bar-wrap {
+      height: 5px; background: rgba(255,255,255,0.15);
+      border-radius: 3px; margin-top: 5px; overflow: hidden;
+    }
+    .order-timer-bar {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, #55efc4, #00cec9);
+      transition: width 0.3s linear;
+    }
+
+    /* 게임 메인 영역 */
+    .game-main {
+      flex: 1; display: flex; gap: 10px;
+      min-height: 0;
+    }
+
+    /* 컵 제작 영역 */
+    .cup-area {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: flex-end; gap: 6px;
+    }
+    .cup-wrapper {
+      position: relative;
+      width: clamp(80px, 22vw, 120px);
+      flex-shrink: 0;
+    }
+    .cup-svg {
+      width: 100%; height: auto;
+    }
+    .cup-layers {
+      position: absolute;
+      bottom: 14%; left: 9%; right: 9%;
+      height: 70%;
+      border-radius: 0 0 14px 14px;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+    }
+    .cup-layer {
+      width: 100%;
+      transition: height 0.4s ease;
+    }
+    .cup-pearls {
+      position: absolute;
+      bottom: 14%; left: 9%; right: 9%;
+      height: 18%;
+      display: flex; align-items: flex-end; justify-content: center;
+      gap: 3px; padding: 2px 4px;
+      pointer-events: none;
+    }
+    .pearl-dot {
+      width: clamp(8px, 2.5vw, 14px);
+      height: clamp(8px, 2.5vw, 14px);
+      border-radius: 50%;
+      background: #2d1b4e;
+      border: 2px solid rgba(255,255,255,0.4);
+      flex-shrink: 0;
+    }
+    .cup-topping-display {
+      position: absolute;
+      top: -8px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 2px;
+    }
+    .topping-on-cup {
+      font-size: clamp(14px, 4vw, 20px);
+    }
+    .make-btn {
+      width: 100%; padding: 10px;
+      background: linear-gradient(135deg, var(--accent), #e17055);
+      color: white; font-size: clamp(14px, 4vw, 18px);
+      font-weight: 900; border: none; border-radius: var(--btn-radius);
+      cursor: pointer; flex-shrink: 0;
+      min-height: 44px;
+      box-shadow: 0 4px 12px rgba(248,165,194,0.4);
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    .make-btn:active { transform: scale(0.97); opacity: 0.9; }
+    .make-btn:disabled { opacity: 0.4; cursor: default; }
+
+    /* 재료 선택 패널 */
+    .ingredients-panel {
+      width: clamp(90px, 28vw, 145px);
+      display: flex; flex-direction: column; gap: 6px;
+      overflow-y: auto; overflow-x: hidden;
+      padding-right: 2px;
+    }
+    .ingredients-panel::-webkit-scrollbar { width: 3px; }
+    .ingredients-panel::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2); border-radius: 2px;
+    }
+    .panel-section-label {
+      font-size: 10px; opacity: 0.6;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .ingredient-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+    .ing-btn {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 2px;
+      padding: 6px 4px;
+      background: var(--card);
+      border: 1.5px solid transparent;
+      border-radius: 12px; cursor: pointer;
+      transition: transform 0.1s, border-color 0.15s, background 0.15s;
+      min-height: 54px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .ing-btn:active { transform: scale(0.93); }
+    .ing-btn.selected {
+      border-color: var(--accent);
+      background: rgba(248,165,194,0.2);
+    }
+    .ing-btn.syrup-btn { --ibg: rgba(255,107,107,0.15); }
+    .ing-btn.topping-btn { --ibg: rgba(162,155,254,0.15); }
+    .ing-emoji { font-size: clamp(18px, 5vw, 26px); line-height: 1; }
+    .ing-label { font-size: clamp(9px, 2.5vw, 11px); text-align: center; color: rgba(255,255,255,0.85); }
+
+    /* footer */
+    footer {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; padding: 0 2px;
+    }
+    .hint-text { font-size: 10px; opacity: 0.5; }
+    .home-link {
+      font-size: 12px; color: rgba(255,255,255,0.6);
+      text-decoration: none; padding: 4px 8px;
+      background: var(--card); border-radius: 8px;
+      min-height: 32px; display: flex; align-items: center;
+    }
+    .home-link:hover { color: white; }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(20,10,40,0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #3d2468, #2d1b4e);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 24px; padding: 28px 24px;
+      width: 100%; max-width: 340px;
+      text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900; margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: clamp(13px, 3.5vw, 15px);
+      opacity: 0.85; line-height: 1.6; margin-bottom: 16px;
+    }
+    .result-score {
+      font-size: clamp(48px, 14vw, 72px);
+      font-weight: 900; color: var(--accent);
+      line-height: 1; margin: 8px 0;
+    }
+    .result-sub {
+      font-size: clamp(13px, 3.5vw, 16px); opacity: 0.8; margin-bottom: 18px;
+    }
+    .btn-start {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--accent), #e17055);
+      color: white; font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 900; border: none; border-radius: var(--btn-radius);
+      cursor: pointer; min-height: 52px;
+      box-shadow: 0 6px 20px rgba(248,165,194,0.4);
+      transition: transform 0.1s;
+      margin-top: 4px;
+    }
+    .btn-start:active { transform: scale(0.97); }
+
+    /* 피드백 토스트 */
+    .toast {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border-radius: 20px; padding: 16px 28px;
+      font-size: clamp(20px, 6vw, 32px);
+      font-weight: 900; text-align: center;
+      z-index: 200; pointer-events: none;
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .toast.hidden { display: none; }
+    .toast.good { color: #55efc4; border: 2px solid #55efc4; }
+    .toast.bad  { color: #ff7675; border: 2px solid #ff7675; }
+
+    /* 파티클 */
+    @keyframes particle-up {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-80px) scale(0.3); opacity: 0; }
+    }
+    .particle {
+      position: fixed; pointer-events: none; z-index: 300;
+      animation: particle-up 0.8s ease-out forwards;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🧋 버블티 만들기</h1>
+
+    <div class="hud">
+      <div class="hud-item score">
+        <span class="hud-label">점수</span>
+        <span class="hud-value" id="scoreDisplay">0</span>
+      </div>
+      <div class="hud-item time">
+        <span class="hud-label">시간</span>
+        <span class="hud-value" id="timerDisplay">60</span>
+      </div>
+      <div class="hud-item best">
+        <span class="hud-label">최고</span>
+        <span class="hud-value" id="bestDisplay">0</span>
+      </div>
+    </div>
+
+    <div class="order-area">
+      <div class="order-label">☝️ 손님 주문</div>
+      <div class="order-content">
+        <div class="order-cup" id="orderCupEmoji">🧋</div>
+        <div class="order-details">
+          <div class="order-name" id="orderName">--</div>
+          <div class="order-toppings" id="orderToppings"></div>
+          <div class="order-timer-bar-wrap">
+            <div class="order-timer-bar" id="orderTimerBar" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-main">
+      <div class="cup-area">
+        <div class="cup-wrapper" id="cupWrapper">
+          <!-- 컵 SVG -->
+          <svg class="cup-svg" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+            <!-- 컵 본체 -->
+            <path d="M12 20 L18 148 Q50 155 82 148 L88 20 Z" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+            <!-- 컵 위쪽 테두리 -->
+            <ellipse cx="50" cy="20" rx="38" ry="8" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <!-- 뚜껑 -->
+            <path d="M8 16 Q10 5 50 3 Q90 5 92 16 Q80 12 50 12 Q20 12 8 16Z" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+            <!-- 빨대 -->
+            <rect x="54" y="-10" width="6" height="80" rx="3" fill="rgba(248,165,194,0.8)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+            <rect x="54" y="-10" width="6" height="6" rx="3" fill="var(--accent)"/>
+          </svg>
+          <!-- 음료 레이어들 (컵 안) -->
+          <div class="cup-layers" id="cupLayers"></div>
+          <!-- 펄 (하단) -->
+          <div class="cup-pearls" id="cupPearls"></div>
+          <!-- 토핑 (컵 위) -->
+          <div class="cup-topping-display" id="cupToppingDisplay"></div>
+        </div>
+        <button class="make-btn" id="makeBtn" disabled>완성! 🧋</button>
+      </div>
+
+      <!-- 재료 패널 -->
+      <div class="ingredients-panel">
+        <div class="panel-section-label">🍬 시럽</div>
+        <div class="ingredient-grid" id="syrupGrid"></div>
+        <div class="panel-section-label" style="margin-top:4px">🍡 토핑</div>
+        <div class="ingredient-grid" id="toppingGrid"></div>
+      </div>
+    </div>
+
+    <footer>
+      <small class="hint-text">주문 보고 재료를 골라요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🧋 버블티 만들기</h2>
+      <p>손님 주문을 보고<br>시럽 색깔과 토핑을 골라서<br>버블티를 완성하세요! 🎉</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 종료 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-sub" id="resultMsg">버블티 명인!</div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <!-- 피드백 토스트 -->
+  <div class="toast hidden" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  const CONFIG = {
+    GAME_TIME: 60,
+    ORDER_TIME: 12,        // 주문당 제한시간(초)
+    SCORE_CORRECT: 10,
+    SCORE_TOPPING_BONUS: 3,
+    SCORE_MISS: -3,
+    BEST_KEY: 'bubble-tea-maker_best',
+  };
+
+  /* ── 시럽 데이터 ── */
+  const SYRUPS = [
+    { id: 'strawberry', label: '딸기',   emoji: '🍓', color: '#ff6b6b' },
+    { id: 'mango',      label: '망고',   emoji: '🥭', color: '#f9ca24' },
+    { id: 'grape',      label: '포도',   emoji: '🍇', color: '#6c5ce7' },
+    { id: 'mint',       label: '민트',   emoji: '🌿', color: '#00b894' },
+    { id: 'milk',       label: '밀크',   emoji: '🥛', color: '#dfe6e9' },
+    { id: 'caramel',    label: '카라멜', emoji: '🍮', color: '#e17055' },
+  ];
+
+  /* ── 토핑 데이터 ── */
+  const TOPPINGS = [
+    { id: 'pearl',   label: '타피오카펄', emoji: '⚫', isPearl: true  },
+    { id: 'jelly',   label: '코코젤리',   emoji: '🟡', isPearl: false },
+    { id: 'pudding', label: '푸딩',       emoji: '🧁', isPearl: false },
+    { id: 'cream',   label: '크림',       emoji: '☁️', isPearl: false },
+  ];
+
+  /* ── 주문 조합 생성 ── */
+  const ORDER_NAMES = [
+    '딸기 버블티', '망고 버블티', '포도 버블티',
+    '민트 버블티', '밀크티', '카라멜 버블티',
+  ];
+  function generateOrder() {
+    const syrup = SYRUPS[Math.floor(Math.random() * SYRUPS.length)];
+    // 0~2개 토핑 선택 (중복 없이)
+    const count = Math.floor(Math.random() * 3); // 0,1,2
+    const shuffled = [...TOPPINGS].sort(() => Math.random() - 0.5);
+    const toppings = shuffled.slice(0, count);
+    return { syrup, toppings };
+  }
+
+  /* ── STATE ── */
+  let state = {
+    score: 0,
+    best: parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10),
+    timeLeft: CONFIG.GAME_TIME,
+    orderTimeLeft: CONFIG.ORDER_TIME,
+    running: false,
+    currentOrder: null,
+    selectedSyrup: null,
+    selectedToppings: new Set(),
+    mainTimer: null,
+    orderTimer: null,
+  };
+
+  /* ── DOM refs ── */
+  const $ = id => document.getElementById(id);
+  const scoreDisplay   = $('scoreDisplay');
+  const timerDisplay   = $('timerDisplay');
+  const bestDisplay    = $('bestDisplay');
+  const orderCupEmoji  = $('orderCupEmoji');
+  const orderName      = $('orderName');
+  const orderToppings  = $('orderToppings');
+  const orderTimerBar  = $('orderTimerBar');
+  const cupLayers      = $('cupLayers');
+  const cupPearls      = $('cupPearls');
+  const cupToppingDisp = $('cupToppingDisplay');
+  const makeBtn        = $('makeBtn');
+  const syrupGrid      = $('syrupGrid');
+  const toppingGrid    = $('toppingGrid');
+  const startOverlay   = $('startOverlay');
+  const endOverlay     = $('endOverlay');
+  const finalScore     = $('finalScore');
+  const resultMsg      = $('resultMsg');
+  const toast          = $('toast');
+
+  /* ── 초기 베스트 표시 ── */
+  bestDisplay.textContent = state.best;
+
+  /* ── 재료 버튼 렌더 ── */
+  function renderIngredients() {
+    // 시럽
+    SYRUPS.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'ing-btn syrup-btn';
+      btn.dataset.id = s.id;
+      btn.dataset.type = 'syrup';
+      btn.innerHTML = `<span class="ing-emoji">${s.emoji}</span><span class="ing-label">${s.label}</span>`;
+      btn.style.borderBottom = `3px solid ${s.color}`;
+      btn.addEventListener('pointerdown', () => selectSyrup(s, btn));
+      syrupGrid.appendChild(btn);
+    });
+    // 토핑
+    TOPPINGS.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'ing-btn topping-btn';
+      btn.dataset.id = t.id;
+      btn.dataset.type = 'topping';
+      btn.innerHTML = `<span class="ing-emoji">${t.emoji}</span><span class="ing-label">${t.label}</span>`;
+      btn.addEventListener('pointerdown', () => selectTopping(t, btn));
+      toppingGrid.appendChild(btn);
+    });
+  }
+
+  /* ── 시럽 선택 ── */
+  function selectSyrup(syrup, btn) {
+    if (!state.running) return;
+    // 이미 선택된 시럽 해제
+    syrupGrid.querySelectorAll('.ing-btn').forEach(b => b.classList.remove('selected'));
+    state.selectedSyrup = syrup;
+    btn.classList.add('selected');
+    updateCupDisplay();
+    updateMakeBtn();
+  }
+
+  /* ── 토핑 선택 (토글) ── */
+  function selectTopping(topping, btn) {
+    if (!state.running) return;
+    if (state.selectedToppings.has(topping.id)) {
+      state.selectedToppings.delete(topping.id);
+      btn.classList.remove('selected');
+    } else {
+      state.selectedToppings.add(topping.id);
+      btn.classList.add('selected');
+    }
+    updateCupDisplay();
+    updateMakeBtn();
+  }
+
+  /* ── 컵 시각화 업데이트 ── */
+  function updateCupDisplay() {
+    // 음료 레이어
+    cupLayers.innerHTML = '';
+    if (state.selectedSyrup) {
+      // 기본 베이스 (흰색 반투명)
+      const base = document.createElement('div');
+      base.className = 'cup-layer';
+      base.style.cssText = `height: 40%; background: rgba(255,255,255,0.25);`;
+      cupLayers.appendChild(base);
+      // 시럽 레이어
+      const syrupLayer = document.createElement('div');
+      syrupLayer.className = 'cup-layer';
+      syrupLayer.style.cssText = `height: 55%; background: ${state.selectedSyrup.color}; opacity: 0.85;`;
+      cupLayers.appendChild(syrupLayer);
+    }
+
+    // 펄
+    cupPearls.innerHTML = '';
+    if (state.selectedToppings.has('pearl')) {
+      for (let i = 0; i < 5; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'pearl-dot';
+        cupPearls.appendChild(dot);
+      }
+    }
+
+    // 컵 위 토핑
+    cupToppingDisp.innerHTML = '';
+    TOPPINGS.filter(t => !t.isPearl && state.selectedToppings.has(t.id)).forEach(t => {
+      const span = document.createElement('span');
+      span.className = 'topping-on-cup';
+      span.textContent = t.emoji;
+      cupToppingDisp.appendChild(span);
+    });
+  }
+
+  /* ── 완성 버튼 활성화 판단 ── */
+  function updateMakeBtn() {
+    makeBtn.disabled = !state.running || !state.selectedSyrup;
+  }
+
+  /* ── 주문 표시 ── */
+  function showOrder(order) {
+    state.currentOrder = order;
+    state.orderTimeLeft = CONFIG.ORDER_TIME;
+
+    orderCupEmoji.textContent = '🧋';
+    orderName.textContent = order.syrup.emoji + ' ' + order.syrup.label + ' 버블티';
+
+    orderToppings.innerHTML = '';
+    if (order.toppings.length === 0) {
+      const chip = document.createElement('span');
+      chip.className = 'order-topping-chip';
+      chip.textContent = '토핑 없음';
+      orderToppings.appendChild(chip);
+    } else {
+      order.toppings.forEach(t => {
+        const chip = document.createElement('span');
+        chip.className = 'order-topping-chip';
+        chip.textContent = t.emoji + ' ' + t.label;
+        orderToppings.appendChild(chip);
+      });
+    }
+    orderTimerBar.style.width = '100%';
+    orderTimerBar.style.background = 'linear-gradient(90deg, #55efc4, #00cec9)';
+  }
+
+  /* ── 주문 타이머 틱 ── */
+  function tickOrderTimer() {
+    state.orderTimeLeft -= 0.1;
+    const ratio = Math.max(0, state.orderTimeLeft / CONFIG.ORDER_TIME);
+    orderTimerBar.style.width = (ratio * 100) + '%';
+    if (ratio < 0.35) {
+      orderTimerBar.style.background = 'linear-gradient(90deg, #e17055, #d63031)';
+    } else if (ratio < 0.6) {
+      orderTimerBar.style.background = 'linear-gradient(90deg, #ffeaa7, #fdcb6e)';
+    }
+    if (state.orderTimeLeft <= 0) {
+      // 시간 초과 — 다음 주문
+      missOrder();
+    }
+  }
+
+  /* ── 주문 놓침 ── */
+  function missOrder() {
+    addScore(CONFIG.SCORE_MISS);
+    showToast('⏰ 시간 초과!', 'bad');
+    resetSelection();
+    nextOrder();
+  }
+
+  /* ── 완성 버튼 클릭 ── */
+  function handleMake() {
+    if (!state.running || !state.selectedSyrup || !state.currentOrder) return;
+
+    const order = state.currentOrder;
+    let correct = true;
+    let bonusCount = 0;
+
+    // 시럽 매칭
+    if (state.selectedSyrup.id !== order.syrup.id) correct = false;
+
+    // 토핑 매칭 (주문한 토핑을 모두 선택했는지)
+    const orderToppingIds = new Set(order.toppings.map(t => t.id));
+    orderToppingIds.forEach(tid => {
+      if (state.selectedToppings.has(tid)) bonusCount++;
+      else correct = false;
+    });
+    // 주문하지 않은 토핑은 penalty 없음 (어린이 친화)
+
+    if (correct) {
+      const bonus = bonusCount * CONFIG.SCORE_TOPPING_BONUS;
+      addScore(CONFIG.SCORE_CORRECT + bonus);
+      showToast('🎉 완벽해요!', 'good');
+      spawnParticles('🎉', 8);
+    } else {
+      addScore(CONFIG.SCORE_MISS);
+      showToast('😅 다시 봐요!', 'bad');
+    }
+
+    resetSelection();
+    nextOrder();
+  }
+
+  /* ── 다음 주문 ── */
+  function nextOrder() {
+    showOrder(generateOrder());
+  }
+
+  /* ── 선택 초기화 ── */
+  function resetSelection() {
+    state.selectedSyrup = null;
+    state.selectedToppings = new Set();
+    // 버튼 선택 해제
+    document.querySelectorAll('.ing-btn.selected').forEach(b => b.classList.remove('selected'));
+    updateCupDisplay();
+    updateMakeBtn();
+  }
+
+  /* ── 점수 ── */
+  function addScore(delta) {
+    state.score = Math.max(0, state.score + delta);
+    scoreDisplay.textContent = state.score;
+  }
+
+  /* ── 메인 타이머 틱 ── */
+  function tickMainTimer() {
+    state.timeLeft--;
+    timerDisplay.textContent = state.timeLeft;
+    if (state.timeLeft <= 10) {
+      timerDisplay.style.color = '#ff7675';
+    }
+    if (state.timeLeft <= 0) endGame();
+  }
+
+  /* ── 게임 시작 ── */
+  function startGame() {
+    state.score = 0;
+    state.timeLeft = CONFIG.GAME_TIME;
+    state.running = true;
+    scoreDisplay.textContent = '0';
+    timerDisplay.textContent = CONFIG.GAME_TIME;
+    timerDisplay.style.color = '#ffeaa7';
+
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    toast.classList.add('hidden');
+
+    resetSelection();
+    nextOrder();
+
+    // 메인 타이머 (1초)
+    if (state.mainTimer) clearInterval(state.mainTimer);
+    state.mainTimer = setInterval(tickMainTimer, 1000);
+
+    // 주문 타이머 (0.1초 단위로 바 업데이트)
+    if (state.orderTimer) clearInterval(state.orderTimer);
+    state.orderTimer = setInterval(tickOrderTimer, 100);
+  }
+
+  /* ── 게임 종료 ── */
+  function endGame() {
+    state.running = false;
+    if (state.mainTimer) { clearInterval(state.mainTimer); state.mainTimer = null; }
+    if (state.orderTimer) { clearInterval(state.orderTimer); state.orderTimer = null; }
+
+    makeBtn.disabled = true;
+
+    // 베스트 갱신
+    if (state.score > state.best) {
+      state.best = state.score;
+      localStorage.setItem(CONFIG.BEST_KEY, state.best);
+      bestDisplay.textContent = state.best;
+    }
+
+    finalScore.textContent = state.score;
+
+    let msg = '';
+    if (state.score >= 80) msg = '🏆 버블티 마스터!';
+    else if (state.score >= 50) msg = '🥇 버블티 명인!';
+    else if (state.score >= 20) msg = '😊 잘 했어요!';
+    else msg = '🌱 다음엔 더 잘 할 수 있어!';
+    resultMsg.textContent = msg;
+
+    setTimeout(() => {
+      endOverlay.classList.remove('hidden');
+    }, 600);
+  }
+
+  /* ── 토스트 표시 ── */
+  let toastTimer = null;
+  function showToast(msg, type) {
+    toast.textContent = msg;
+    toast.className = 'toast ' + type;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 900);
+  }
+
+  /* ── 파티클 ── */
+  function spawnParticles(emoji, n) {
+    for (let i = 0; i < n; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = emoji;
+      p.style.left = (20 + Math.random() * 60) + '%';
+      p.style.top = (30 + Math.random() * 40) + '%';
+      p.style.animationDelay = (i * 0.05) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1000);
+    }
+  }
+
+  /* ── 이벤트 연결 ── */
+  $('startBtn').addEventListener('pointerdown', startGame);
+  $('restartBtn').addEventListener('pointerdown', startGame);
+  makeBtn.addEventListener('pointerdown', handleMake);
+
+  /* ── 초기화 ── */
+  renderIngredients();
+
+})();
+</script>
+</body>
+</html>

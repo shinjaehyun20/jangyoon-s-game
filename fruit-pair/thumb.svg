@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2a1a"/>
+      <stop offset="100%" style="stop-color:#0d1a0d"/>
+    </linearGradient>
+    <linearGradient id="cardBack" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d5a27"/>
+      <stop offset="100%" style="stop-color:#1e3d1a"/>
+    </linearGradient>
+    <linearGradient id="cardFront" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f9f4e8"/>
+      <stop offset="100%" style="stop-color:#f0e8d0"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/>
+    </filter>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" rx="0"/>
+
+  <!-- 카드 그리드 (4x2 미니어처) -->
+  <!-- 뒤집힌 카드들 (초록) -->
+  <rect x="18" y="28" width="44" height="44" rx="8" fill="url(#cardBack)" filter="url(#shadow)"/>
+  <text x="40" y="57" text-anchor="middle" font-size="20">🌿</text>
+
+  <rect x="68" y="28" width="44" height="44" rx="8" fill="url(#cardBack)" filter="url(#shadow)"/>
+  <text x="90" y="57" text-anchor="middle" font-size="20">🌿</text>
+
+  <!-- 매칭된 카드들 (밝은 초록) -->
+  <rect x="118" y="28" width="44" height="44" rx="8" fill="url(#cardFront)" filter="url(#shadow)" stroke="#4caf50" stroke-width="2"/>
+  <text x="140" y="58" text-anchor="middle" font-size="26">🍎</text>
+
+  <rect x="168" y="28" width="44" height="44" rx="8" fill="url(#cardFront)" filter="url(#shadow)" stroke="#4caf50" stroke-width="2"/>
+  <text x="190" y="58" text-anchor="middle" font-size="26">🍎</text>
+
+  <!-- 뒤집힌 카드들 더 -->
+  <rect x="18" y="80" width="44" height="44" rx="8" fill="url(#cardFront)" filter="url(#shadow)" stroke="#4caf50" stroke-width="2"/>
+  <text x="40" y="110" text-anchor="middle" font-size="26">🍊</text>
+
+  <rect x="68" y="80" width="44" height="44" rx="8" fill="url(#cardFront)" filter="url(#shadow)" stroke="#4caf50" stroke-width="2"/>
+  <text x="90" y="110" text-anchor="middle" font-size="26">🍊</text>
+
+  <rect x="118" y="80" width="44" height="44" rx="8" fill="url(#cardBack)" filter="url(#shadow)"/>
+  <text x="140" y="109" text-anchor="middle" font-size="20">🌿</text>
+
+  <rect x="168" y="80" width="44" height="44" rx="8" fill="url(#cardBack)" filter="url(#shadow)"/>
+  <text x="190" y="109" text-anchor="middle" font-size="20">🌿</text>
+
+  <!-- 콤보 뱃지 -->
+  <rect x="220" y="40" width="82" height="32" rx="16" fill="#ff6b35" opacity="0.9"/>
+  <text x="261" y="61" text-anchor="middle" font-size="14" font-weight="900" fill="white" font-family="sans-serif">2콤보! +200</text>
+
+  <!-- 점수 표시 -->
+  <rect x="220" y="78" width="82" height="28" rx="8" fill="rgba(255,255,255,0.08)"/>
+  <text x="261" y="97" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.7)" font-family="sans-serif">점수</text>
+  <text x="261" y="97" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.7)" font-family="sans-serif"> </text>
+
+  <rect x="220" y="108" width="82" height="28" rx="8" fill="rgba(255,255,255,0.08)"/>
+  <text x="261" y="126" text-anchor="middle" font-size="16" font-weight="800" fill="#ffd23f" font-family="sans-serif">350</text>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="154" text-anchor="end" font-size="20" font-weight="900" fill="#ff6b35">과일 짝 맞추기</text>
+    <text x="296" y="168" text-anchor="end" font-size="9" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">FRUIT PAIR MATCH</text>
+  </g>
+</svg>

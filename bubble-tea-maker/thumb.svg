@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d1b4e"/>
+      <stop offset="100%" style="stop-color:#4a2090"/>
+    </linearGradient>
+    <linearGradient id="cupGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.25)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.08)"/>
+    </linearGradient>
+    <linearGradient id="syrupGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8a5c2"/>
+      <stop offset="100%" style="stop-color:#e17055"/>
+    </linearGradient>
+    <linearGradient id="milkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.5)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.2)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bgGrad)" rx="12"/>
+  <!-- 내부 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" rx="12"/>
+
+  <!-- 배경 장식 원형들 -->
+  <circle cx="260" cy="30" r="50" fill="rgba(162,155,254,0.08)"/>
+  <circle cx="30" cy="150" r="40" fill="rgba(248,165,194,0.07)"/>
+  <circle cx="280" cy="140" r="30" fill="rgba(85,239,196,0.06)"/>
+
+  <!-- 왼쪽 큰 버블티 컵 -->
+  <!-- 컵 본체 -->
+  <path d="M55 38 L62 145 Q95 152 128 145 L135 38 Z" fill="url(#cupGrad)" stroke="rgba(255,255,255,0.45)" stroke-width="2"/>
+  <!-- 컵 안 밀크 베이스 -->
+  <path d="M59 90 L63 145 Q95 151 127 145 L131 90 Z" fill="url(#milkGrad)"/>
+  <!-- 시럽 레이어 -->
+  <path d="M59 110 L63 145 Q95 151 127 145 L131 110 Z" fill="url(#syrupGrad)" opacity="0.85"/>
+  <!-- 타피오카 펄 -->
+  <circle cx="78"  cy="140" r="7" fill="#2d1b4e" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <circle cx="95"  cy="142" r="7" fill="#2d1b4e" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <circle cx="112" cy="140" r="7" fill="#2d1b4e" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <!-- 컵 위 테두리/뚜껑 -->
+  <ellipse cx="95" cy="38" rx="40" ry="9" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+  <path d="M52 35 Q55 24 95 22 Q135 24 138 35 Q120 30 95 30 Q70 30 52 35Z" fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+  <!-- 빨대 -->
+  <rect x="104" y="5" width="8" height="85" rx="4" fill="rgba(248,165,194,0.9)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+  <!-- 크림 토핑 -->
+  <ellipse cx="95" cy="23" rx="22" ry="7" fill="rgba(255,255,255,0.55)"/>
+  <ellipse cx="82" cy="21" rx="10" ry="5" fill="rgba(255,255,255,0.6)"/>
+  <ellipse cx="108" cy="21" rx="10" ry="5" fill="rgba(255,255,255,0.6)"/>
+
+  <!-- 작은 버블티 2 (오른쪽 중간) -->
+  <path d="M150 60 L155 130 Q173 136 191 130 L196 60 Z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <path d="M152 90 L155 130 Q173 135 191 130 L194 90 Z" fill="rgba(162,155,254,0.7)"/>
+  <ellipse cx="173" cy="60" rx="23" ry="5" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+  <rect x="177" y="42" width="5" height="50" rx="2.5" fill="rgba(162,155,254,0.9)"/>
+  <circle cx="162" cy="126" r="5" fill="#2d1b4e" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+  <circle cx="173" cy="128" r="5" fill="#2d1b4e" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+  <circle cx="184" cy="126" r="5" fill="#2d1b4e" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+
+  <!-- 재료 이모지 떠다니는 것들 -->
+  <text x="205" y="55" font-size="22" opacity="0.75">🍓</text>
+  <text x="238" y="90" font-size="18" opacity="0.65">🥭</text>
+  <text x="215" y="120" font-size="16" opacity="0.6">🍇</text>
+  <text x="248" y="140" font-size="18" opacity="0.6">⚫</text>
+
+  <!-- 반짝이 장식 -->
+  <text x="30"  y="50"  font-size="12" opacity="0.5">✨</text>
+  <text x="195" y="35"  font-size="14" opacity="0.45">⭐</text>
+  <text x="145" y="155" font-size="11" opacity="0.4">✨</text>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR','Apple SD Gothic Neo',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#f8a5c2">버블티 만들기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">BUBBLE TEA MAKER</text>
+  </g>
+</svg>

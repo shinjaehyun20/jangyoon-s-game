@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#87CEEB"/>
+      <stop offset="60%" stop-color="#B0E0FF"/>
+    </linearGradient>
+    <linearGradient id="soil" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6B4226"/>
+      <stop offset="100%" stop-color="#4A2C17"/>
+    </linearGradient>
+    <linearGradient id="carrotGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#FF8A50"/>
+      <stop offset="100%" stop-color="#E64A19"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#FFE082"/>
+      <stop offset="100%" stop-color="#FFB300"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.3)"/>
+    </filter>
+  </defs>
+
+  <!-- 배경 하늘 -->
+  <rect width="320" height="180" fill="url(#sky)"/>
+
+  <!-- 구름 -->
+  <ellipse cx="60"  cy="30" rx="30" ry="14" fill="rgba(255,255,255,0.75)"/>
+  <ellipse cx="80"  cy="24" rx="20" ry="12" fill="rgba(255,255,255,0.75)"/>
+  <ellipse cx="40"  cy="28" rx="18" ry="10" fill="rgba(255,255,255,0.75)"/>
+  <ellipse cx="240" cy="22" rx="24" ry="11" fill="rgba(255,255,255,0.6)"/>
+  <ellipse cx="258" cy="17" rx="16" ry="9"  fill="rgba(255,255,255,0.6)"/>
+
+  <!-- 잔디 + 흙 -->
+  <rect x="0" y="96" width="320" height="84" fill="url(#soil)"/>
+  <rect x="0" y="90" width="320" height="12" fill="#4CAF50"/>
+  <!-- 잔디 디테일 -->
+  <path d="M0,90 Q10,82 20,90 Q30,82 40,90 Q50,82 60,90 Q70,82 80,90 Q90,82 100,90 Q110,82 120,90 Q130,82 140,90 Q150,82 160,90 Q170,82 180,90 Q190,82 200,90 Q210,82 220,90 Q230,82 240,90 Q250,82 260,90 Q270,82 280,90 Q290,82 300,90 Q310,82 320,90" fill="#66BB6A"/>
+
+  <!-- 메인 당근 (중앙, 반쯤 뽑힌 상태) -->
+  <g transform="translate(130, 10)" filter="url(#shadow)">
+    <!-- 잎 -->
+    <ellipse cx="30" cy="30" rx="7" ry="26" fill="#2E7D32" transform="rotate(-18 30 45)"/>
+    <ellipse cx="30" cy="30" rx="7" ry="26" fill="#388E3C" transform="rotate(18 30 45)"/>
+    <ellipse cx="30" cy="22" rx="5" ry="22" fill="#43A047"/>
+    <ellipse cx="20" cy="38" rx="4" ry="16" fill="#2E7D32" transform="rotate(-28 20 52)"/>
+    <ellipse cx="40" cy="38" rx="4" ry="16" fill="#388E3C" transform="rotate(28 40 52)"/>
+    <!-- 당근 몸통 -->
+    <path d="M14,48 Q10,90 30,128 Q50,90 46,48 Q40,40 30,38 Q20,40 14,48Z" fill="url(#carrotGrad)"/>
+    <!-- 줄무늬 -->
+    <path d="M16,65 Q30,62 44,65" stroke="#FF8A50" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M15,82 Q30,79 45,82" stroke="#FF8A50" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M16,99 Q30,96 44,99" stroke="#FF8A50" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- 하이라이트 -->
+    <ellipse cx="24" cy="72" rx="4" ry="10" fill="rgba(255,255,255,0.22)" transform="rotate(-10 24 72)"/>
+    <!-- 끝 -->
+    <path d="M30,128 Q28,133 30,135 Q32,133 30,128Z" fill="#E64A19"/>
+  </g>
+
+  <!-- 황금 당근 (우측, 작게) -->
+  <g transform="translate(222, 30) scale(0.7)" filter="url(#shadow)">
+    <ellipse cx="20" cy="22" rx="5" ry="18" fill="#1B5E20" transform="rotate(-18 20 30)"/>
+    <ellipse cx="20" cy="22" rx="5" ry="18" fill="#2E7D32" transform="rotate(18 20 30)"/>
+    <ellipse cx="20" cy="16" rx="4" ry="14" fill="#388E3C"/>
+    <path d="M10,36 Q6,74 20,105 Q34,74 30,36 Q26,30 20,28 Q14,30 10,36Z" fill="url(#goldGrad)"/>
+    <path d="M11,52 Q20,50 29,52" stroke="#FFF176" stroke-width="2" fill="none"/>
+    <path d="M10,66 Q20,64 30,66" stroke="#FFF176" stroke-width="2" fill="none"/>
+    <ellipse cx="15" cy="56" rx="3" ry="7" fill="rgba(255,255,255,0.3)" transform="rotate(-10 15 56)"/>
+    <!-- 반짝임 -->
+    <text x="28" y="8" font-size="14" fill="#FFD700">✨</text>
+  </g>
+
+  <!-- 왼쪽 조그만 당근 -->
+  <g transform="translate(48, 50) scale(0.55)" filter="url(#shadow)">
+    <ellipse cx="20" cy="20" rx="5" ry="16" fill="#2E7D32" transform="rotate(-15 20 28)"/>
+    <ellipse cx="20" cy="20" rx="5" ry="16" fill="#388E3C" transform="rotate(15 20 28)"/>
+    <ellipse cx="20" cy="14" rx="4" ry="13" fill="#43A047"/>
+    <path d="M10,32 Q7,64 20,90 Q33,64 30,32 Q26,26 20,24 Q14,26 10,32Z" fill="#FF7043"/>
+    <path d="M11,45 Q20,43 29,45" stroke="#FF8A50" stroke-width="2" fill="none"/>
+    <path d="M11,58 Q20,56 29,58" stroke="#FF8A50" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- 흙 속 당근 힌트 (아래쪽에 당근 끝 보임) -->
+  <path d="M160,140 Q158,155 160,162 Q162,155 160,140Z" fill="#E64A19" opacity="0.7"/>
+  <path d="M200,145 Q198,158 200,164 Q202,158 200,145Z" fill="#FF7043" opacity="0.6"/>
+
+  <!-- 게이지 바 힌트 -->
+  <rect x="276" y="30" width="22" height="100" rx="11" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+  <rect x="276" y="72" width="22" height="38" rx="11" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+  <!-- 게이지 채워진 부분 -->
+  <rect x="278" y="78" width="18" height="28" rx="9" fill="#4CAF50" opacity="0.9"/>
+  <!-- 화살표 힌트 -->
+  <text x="274" y="22" font-size="13" fill="rgba(255,255,255,0.8)" text-anchor="middle">💪</text>
+
+  <!-- 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="150" text-anchor="end" font-size="22" font-weight="900" fill="#FF6B35">당근 뽑기</text>
+    <text x="296" y="168" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.55)" letter-spacing="2">CARROT PULL</text>
+  </g>
+</svg>

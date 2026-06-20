@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>공룡알 탭탭!</title>
+  <style>
+    :root {
+      --bg: #1a2744;
+      --bg2: #243059;
+      --accent: #f7c948;
+      --accent2: #ff6b35;
+      --green: #4ecb71;
+      --red: #ff4444;
+      --text: #ffffff;
+      --card: rgba(255,255,255,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+    .hud {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 6px 14px;
+      gap: 8px;
+    }
+    .hud-item {
+      display: flex; flex-direction: column; align-items: center;
+      font-size: 11px; color: rgba(255,255,255,0.7);
+      gap: 1px;
+    }
+    .hud-val {
+      font-size: 22px; font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .hud-val.time { color: #7fd6ff; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: var(--bg2);
+      border: 2px solid rgba(255,255,255,0.08);
+    }
+    /* Ground */
+    .ground {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 32px;
+      background: linear-gradient(to top, #3a5a2a, #4a7a3a);
+      border-radius: 0 0 14px 14px;
+    }
+    .ground::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 4px;
+      background: #5aaa4a;
+    }
+    /* Grass tufts */
+    .grass-tuft {
+      position: absolute; bottom: 30px;
+      font-size: 18px;
+      pointer-events: none;
+    }
+    /* Clouds */
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.12);
+      border-radius: 50px;
+      pointer-events: none;
+    }
+    /* Egg */
+    .egg {
+      position: absolute;
+      width: 64px; height: 72px;
+      cursor: pointer;
+      transition: transform 0.08s;
+      will-change: transform;
+    }
+    .egg:active { transform: scale(0.88); }
+    .egg svg { width: 100%; height: 100%; }
+    /* Crack overlay */
+    .egg .crack-overlay {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      border-radius: 50%;
+    }
+    /* Hatch animation */
+    @keyframes hatchShake {
+      0%,100% { transform: rotate(0deg); }
+      20% { transform: rotate(-8deg); }
+      40% { transform: rotate(8deg); }
+      60% { transform: rotate(-6deg); }
+      80% { transform: rotate(6deg); }
+    }
+    @keyframes hatchPop {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.8; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+    @keyframes dinoAppear {
+      0% { transform: scale(0) translateY(20px); opacity: 0; }
+      60% { transform: scale(1.2) translateY(-10px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-60px); opacity: 0; }
+    }
+    .egg.shaking { animation: hatchShake 0.3s linear; }
+    .egg.popping { animation: hatchPop 0.4s ease-in forwards; }
+    /* Score popup */
+    .score-popup {
+      position: absolute;
+      font-size: 22px; font-weight: 900;
+      color: var(--accent);
+      pointer-events: none;
+      animation: floatUp 0.8s ease-out forwards;
+      z-index: 10;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    /* Dino sprite */
+    .dino-sprite {
+      position: absolute;
+      font-size: 38px;
+      pointer-events: none;
+      animation: dinoAppear 0.5s ease-out forwards;
+      z-index: 5;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+    }
+    /* Combo indicator */
+    #comboBar {
+      display: none;
+      position: absolute;
+      top: 8px; left: 50%; transform: translateX(-50%);
+      background: var(--accent2);
+      color: #fff;
+      font-size: 14px; font-weight: 900;
+      padding: 4px 14px;
+      border-radius: 20px;
+      z-index: 20;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+    footer {
+      display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;
+      padding: 0 2px;
+    }
+    footer small { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .home-link {
+      font-size: 12px; color: rgba(255,255,255,0.5);
+      text-decoration: none; padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      transition: background 0.2s;
+    }
+    .home-link:active { background: rgba(255,255,255,0.15); }
+    /* Overlays */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(10, 15, 35, 0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #1e2f60 0%, #2a3f80 100%);
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900; margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: 15px; color: rgba(255,255,255,0.8);
+      line-height: 1.6; margin-bottom: 20px;
+    }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--accent);
+      margin: 12px 0;
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(247,201,72,0.4);
+    }
+    .result-label {
+      font-size: 13px; color: rgba(255,255,255,0.6);
+      margin-bottom: 6px;
+    }
+    .best-score {
+      font-size: 16px; color: var(--green);
+      font-weight: 700; margin-bottom: 18px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      color: #1a1a2e;
+      font-size: 18px; font-weight: 900;
+      border: none; border-radius: 50px;
+      padding: 14px 36px;
+      cursor: pointer;
+      min-height: 52px;
+      width: 100%;
+      box-shadow: 0 6px 20px rgba(247,201,72,0.35);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-start:active {
+      transform: scale(0.96);
+      box-shadow: 0 3px 10px rgba(247,201,72,0.2);
+    }
+    .dino-list {
+      display: flex; justify-content: center;
+      gap: 6px; margin: 10px 0;
+      font-size: 26px;
+    }
+    #levelBadge {
+      display: inline-block;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 12px; font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    #resultMsg {
+      font-size: 16px; color: var(--accent);
+      font-weight: 700; margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🦕 공룡알 탭탭!</h1>
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-val" id="scoreVal">0</span>
+        <span>점수</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-val time" id="timeVal">30</span>
+        <span>초</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-val" id="bestVal">0</span>
+        <span>최고</span>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <div class="ground"></div>
+      <div id="comboBar">🔥 COMBO!</div>
+    </div>
+
+    <footer>
+      <small>🥚 빠르게 탭!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🦕 공룡알 탭탭!</h2>
+      <div class="dino-list">🦕 🦖 🐊 🦎 🐢</div>
+      <p>공룡알이 나타나면 빠르게 탭해서<br>아기 공룡을 부화시켜요!<br><br>빠를수록 고득점! 콤보 연결!<br>⏱️ <strong>30초</strong> 도전</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-label">부화시킨 공룡</div>
+      <div class="result-score" id="finalScore">0</div>
+      <div id="resultMsg"></div>
+      <div class="best-score" id="bestMsg"></div>
+      <button class="btn-start" id="restartBtn">다시 하기!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── CONFIG ── */
+    const CONFIG = {
+      GAME_TIME: 30,
+      EGG_BASE_INTERVAL: 1100,   // ms
+      EGG_MIN_INTERVAL: 500,
+      EGG_MAX_ON_SCREEN: 5,
+      EGG_MISS_GRACE: 4000,      // ms before egg disappears
+      EGG_TAP_NEEDED_BASE: 2,    // taps to hatch at start
+      EGG_TAP_NEEDED_MIN: 1,
+      COMBO_THRESHOLD: 3,
+      COMBO_BONUS: 10,
+      BASE_SCORE: 10,
+      SPEED_INCREASE_EVERY: 8,   // hatch every N to speed up
+      STORAGE_KEY: 'dinosaur-tap_best',
+    };
+
+    const DINOS = ['🦕','🦖','🐊','🦎','🐢','🐉','🦴','🌋'];
+    const EGG_COLORS = [
+      { fill: '#a8e063', stroke: '#5aaa1a', spot: '#7ecc3a' },
+      { fill: '#f7c948', stroke: '#c8962a', spot: '#e8aa30' },
+      { fill: '#87ceeb', stroke: '#4a8fb5', spot: '#5aaedd' },
+      { fill: '#ffaabb', stroke: '#cc6677', spot: '#ee88aa' },
+      { fill: '#c9a0ff', stroke: '#8844dd', spot: '#aa77ee' },
+    ];
+
+    /* ── STATE ── */
+    let state = {
+      running: false,
+      score: 0,
+      timeLeft: CONFIG.GAME_TIME,
+      combo: 0,
+      hatched: 0,
+      timerInterval: null,
+      spawnTimeout: null,
+      eggs: [],          // { el, tapsLeft, color, x, y, timeout }
+      bestScore: parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0'),
+    };
+
+    /* ── DOM ── */
+    const gameArea    = document.getElementById('gameArea');
+    const scoreVal    = document.getElementById('scoreVal');
+    const timeVal     = document.getElementById('timeVal');
+    const bestVal     = document.getElementById('bestVal');
+    const comboBar    = document.getElementById('comboBar');
+    const startOverlay= document.getElementById('startOverlay');
+    const endOverlay  = document.getElementById('endOverlay');
+    const finalScore  = document.getElementById('finalScore');
+    const resultMsg   = document.getElementById('resultMsg');
+    const bestMsg     = document.getElementById('bestMsg');
+
+    /* ── HELPERS ── */
+    function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    function makeSvgEgg(c) {
+      return `<svg viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="40" rx="28" ry="30" fill="${c.fill}" stroke="${c.stroke}" stroke-width="2.5"/>
+        <ellipse cx="32" cy="22" rx="22" ry="20" fill="${c.fill}" stroke="${c.stroke}" stroke-width="2"/>
+        <!-- spots -->
+        <circle cx="22" cy="30" r="4" fill="${c.spot}" opacity="0.55"/>
+        <circle cx="42" cy="38" r="3" fill="${c.spot}" opacity="0.5"/>
+        <circle cx="30" cy="50" r="3.5" fill="${c.spot}" opacity="0.5"/>
+        <circle cx="20" cy="48" r="2.5" fill="${c.spot}" opacity="0.45"/>
+        <!-- shine -->
+        <ellipse cx="22" cy="16" rx="6" ry="4" fill="rgba(255,255,255,0.35)" transform="rotate(-20 22 16)"/>
+      </svg>`;
+    }
+
+    function makeSvgCrack(stage, c) {
+      // stage 0 = no crack, 1 = hairline, 2 = big crack
+      if (stage === 0) return '';
+      const lines = stage === 1
+        ? `<path d="M32 28 L28 38 L34 44" stroke="#5a3a10" stroke-width="2" fill="none" opacity="0.7"/>`
+        : `<path d="M32 24 L26 36 L32 42 L28 54" stroke="#3a2008" stroke-width="2.5" fill="none"/>
+           <path d="M36 30 L42 38 L38 46" stroke="#3a2008" stroke-width="2" fill="none"/>
+           <path d="M30 34 L24 32" stroke="#3a2008" stroke-width="1.8" fill="none"/>`;
+      return `<svg viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+        ${lines}
+      </svg>`;
+    }
+
+    function getTapsNeeded() {
+      const n = Math.max(
+        CONFIG.EGG_TAP_NEEDED_MIN,
+        CONFIG.EGG_TAP_NEEDED_BASE - Math.floor(state.hatched / CONFIG.SPEED_INCREASE_EVERY)
+      );
+      return n;
+    }
+
+    function getSpawnInterval() {
+      const base = CONFIG.EGG_BASE_INTERVAL;
+      const reduction = Math.floor(state.hatched / 5) * 80;
+      return Math.max(CONFIG.EGG_MIN_INTERVAL, base - reduction);
+    }
+
+    function spawnEgg() {
+      if (!state.running) return;
+      if (state.eggs.length >= CONFIG.EGG_MAX_ON_SCREEN) {
+        scheduleSpawn();
+        return;
+      }
+
+      const area = gameArea.getBoundingClientRect();
+      const W = area.width || 340;
+      const H = area.height || 300;
+      const eggW = 64, eggH = 72;
+      const groundH = 32;
+
+      const x = rand(8, W - eggW - 8);
+      const y = rand(8, H - eggH - groundH - 10);
+      const cIdx = rand(0, EGG_COLORS.length - 1);
+      const color = EGG_COLORS[cIdx];
+      const tapsNeeded = getTapsNeeded();
+
+      const el = document.createElement('div');
+      el.className = 'egg';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.innerHTML = makeSvgEgg(color) + '<div class="crack-overlay"></div>';
+      gameArea.appendChild(el);
+
+      const eggData = { el, tapsLeft: tapsNeeded, totalTaps: tapsNeeded, color, x, y, timeout: null };
+
+      // Auto-despawn
+      eggData.timeout = setTimeout(() => {
+        removeEgg(eggData, false);
+      }, CONFIG.EGG_MISS_GRACE);
+
+      el.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        tapEgg(eggData);
+      });
+
+      state.eggs.push(eggData);
+      scheduleSpawn();
+    }
+
+    function scheduleSpawn() {
+      clearTimeout(state.spawnTimeout);
+      state.spawnTimeout = setTimeout(spawnEgg, getSpawnInterval());
+    }
+
+    function tapEgg(eggData) {
+      if (!eggData.el.isConnected) return;
+      eggData.tapsLeft--;
+
+      // shake
+      eggData.el.classList.remove('shaking');
+      void eggData.el.offsetWidth;
+      eggData.el.classList.add('shaking');
+
+      // update crack visual
+      const crackStage = eggData.tapsLeft <= 0 ? 2 :
+                         (eggData.tapsLeft < eggData.totalTaps) ? 1 : 0;
+      const crackEl = eggData.el.querySelector('.crack-overlay');
+      if (crackEl) crackEl.innerHTML = makeSvgCrack(crackStage, eggData.color);
+
+      if (eggData.tapsLeft <= 0) {
+        hatchEgg(eggData);
+      }
+    }
+
+    function hatchEgg(eggData) {
+      clearTimeout(eggData.timeout);
+      const idx = state.eggs.indexOf(eggData);
+      if (idx !== -1) state.eggs.splice(idx, 1);
+
+      // Combo
+      state.combo++;
+      let bonus = 0;
+      if (state.combo >= CONFIG.COMBO_THRESHOLD) {
+        bonus = CONFIG.COMBO_BONUS;
+        showCombo();
+      } else {
+        hideCombo();
+      }
+
+      const points = CONFIG.BASE_SCORE + bonus;
+      state.score += points;
+      state.hatched++;
+      scoreVal.textContent = state.score;
+
+      // Score popup
+      const popup = document.createElement('div');
+      popup.className = 'score-popup';
+      popup.textContent = '+' + points + (bonus ? ' COMBO!' : '');
+      popup.style.left = (eggData.x + 10) + 'px';
+      popup.style.top = (eggData.y - 10) + 'px';
+      gameArea.appendChild(popup);
+      setTimeout(() => popup.remove(), 850);
+
+      // Hatch animation
+      eggData.el.classList.add('popping');
+      eggData.el.addEventListener('animationend', () => {
+        // Show dino
+        const dino = document.createElement('div');
+        dino.className = 'dino-sprite';
+        dino.textContent = DINOS[Math.floor(Math.random() * DINOS.length)];
+        dino.style.left = (eggData.x + 10) + 'px';
+        dino.style.top = (eggData.y) + 'px';
+        gameArea.appendChild(dino);
+        eggData.el.remove();
+        setTimeout(() => dino.remove(), 700);
+      }, { once: true });
+    }
+
+    function removeEgg(eggData, hatched) {
+      clearTimeout(eggData.timeout);
+      const idx = state.eggs.indexOf(eggData);
+      if (idx !== -1) state.eggs.splice(idx, 1);
+      if (!hatched && eggData.el.isConnected) {
+        state.combo = 0;
+        hideCombo();
+        eggData.el.style.transition = 'opacity 0.3s';
+        eggData.el.style.opacity = '0';
+        setTimeout(() => eggData.el.remove(), 320);
+      }
+    }
+
+    let comboHideTimer = null;
+    function showCombo() {
+      comboBar.style.display = 'block';
+      comboBar.textContent = '🔥 ' + state.combo + ' COMBO!';
+      clearTimeout(comboHideTimer);
+      comboHideTimer = setTimeout(hideCombo, 1200);
+    }
+    function hideCombo() {
+      comboBar.style.display = 'none';
+    }
+
+    /* ── DECORATION ── */
+    function addDecoration() {
+      // Clouds
+      const cloudPositions = [{l:8,t:12,w:70,h:22},{l:55,t:5,w:50,h:18},{l:30,t:18,w:60,h:20}];
+      cloudPositions.forEach(cp => {
+        const c = document.createElement('div');
+        c.className = 'cloud';
+        c.style.left = cp.l + '%'; c.style.top = cp.t + '%';
+        c.style.width = cp.w + 'px'; c.style.height = cp.h + 'px';
+        gameArea.insertBefore(c, gameArea.firstChild);
+      });
+      // Grass tufts
+      const tuftEmojis = ['🌿','🍀','🌱','🌾','🌿'];
+      [10,28,48,68,84].forEach((pos, i) => {
+        const g = document.createElement('div');
+        g.className = 'grass-tuft';
+        g.textContent = tuftEmojis[i % tuftEmojis.length];
+        g.style.left = pos + '%';
+        gameArea.appendChild(g);
+      });
+    }
+
+    /* ── TIMER ── */
+    function startTimer() {
+      state.timeLeft = CONFIG.GAME_TIME;
+      timeVal.textContent = state.timeLeft;
+      state.timerInterval = setInterval(() => {
+        state.timeLeft--;
+        timeVal.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    /* ── GAME FLOW ── */
+    function startGame() {
+      // Reset state
+      state.running = true;
+      state.score = 0;
+      state.combo = 0;
+      state.hatched = 0;
+      scoreVal.textContent = '0';
+      bestVal.textContent = state.bestScore;
+
+      // Clear old eggs
+      state.eggs.forEach(e => { clearTimeout(e.timeout); e.el.remove(); });
+      state.eggs = [];
+      // Remove popups/dinos
+      gameArea.querySelectorAll('.score-popup,.dino-sprite').forEach(el => el.remove());
+      hideCombo();
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      startTimer();
+      scheduleSpawn();
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(state.timerInterval);
+      clearTimeout(state.spawnTimeout);
+      state.eggs.forEach(e => { clearTimeout(e.timeout); e.el.remove(); });
+      state.eggs = [];
+      hideCombo();
+
+      const isNew = state.score > state.bestScore;
+      if (isNew) {
+        state.bestScore = state.score;
+        localStorage.setItem(CONFIG.STORAGE_KEY, state.bestScore);
+      }
+      bestVal.textContent = state.bestScore;
+
+      finalScore.textContent = state.hatched + '마리';
+
+      // Result message
+      const msgs = ['대단해요! 🦕', '잘했어요! 🌟', '짱이에요! 🎉', '최고예요! 🏆'];
+      resultMsg.textContent = state.hatched >= 15 ? msgs[3] :
+                              state.hatched >= 10 ? msgs[2] :
+                              state.hatched >= 5  ? msgs[1] : msgs[0];
+      bestMsg.textContent = isNew ? '🌟 새 최고 기록!' : '최고: ' + state.bestScore + '점 (' + state.score + '점)';
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    /* ── INIT ── */
+    addDecoration();
+    bestVal.textContent = state.bestScore;
+
+    document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+    document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+
+    // Prevent context menu on long press
+    gameArea.addEventListener('contextmenu', e => e.preventDefault());
+
+  })();
+  </script>
+</body>
+</html>

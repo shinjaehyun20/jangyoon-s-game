@@ -4,6 +4,26 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "dinosaur-tap",
+        "label": "🦕 공룡알 탭탭",
+        "path": "dinosaur-tap/index.html"
+      },
+      {
+        "id": "fruit-pair",
+        "label": "🍓 과일 짝 맞추기",
+        "path": "fruit-pair/index.html"
+      },
+      {
+        "id": "bubble-tea-maker",
+        "label": "🧋 버블티 만들기",
+        "path": "bubble-tea-maker/index.html"
+      },
+      {
+        "id": "lantern-float",
+        "label": "🏮 소원등 띄우기",
+        "path": "lantern-float/index.html"
+      },
+      {
         "id": "super-mario",
         "label": "🍄 슈퍼 점프 모험",
         "path": "super-mario/index.html"
@@ -432,6 +452,26 @@
         "id": "snail-race",
         "label": "🐌 달팽이 경주",
         "path": "snail-race/index.html"
+      },
+      {
+        "id": "pearl-diver",
+        "label": "🤿 진주 잠수부",
+        "path": "pearl-diver/index.html"
+      },
+      {
+        "id": "ice-cream-scoop",
+        "label": "🍦 아이스크림 스쿱",
+        "path": "ice-cream-scoop/index.html"
+      },
+      {
+        "id": "green-light-run",
+        "label": "🚦 신호등 달리기",
+        "path": "green-light-run/index.html"
+      },
+      {
+        "id": "carrot-pull",
+        "label": "🥕 당근 뽑기",
+        "path": "carrot-pull/index.html"
       }
     ]
   },

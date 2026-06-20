@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>진주 잠수부</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
+  body {
+    background: #003366;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+    user-select: none;
+  }
+  #game-wrap {
+    position: relative;
+    width: 360px;
+    max-width: 100vw;
+  }
+  #hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(0,0,80,0.7);
+    border-radius: 16px 16px 0 0;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  #score-label { color: #ffe066; }
+  #air-bar-wrap {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    width: 100px;
+    height: 16px;
+    overflow: hidden;
+    border: 2px solid #66ccff;
+  }
+  #air-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #00e0ff, #0099ff);
+    transition: width 0.3s;
+    border-radius: 6px;
+  }
+  #canvas {
+    display: block;
+    width: 360px;
+    max-width: 100vw;
+    height: 540px;
+    max-height: 75vh;
+    border-radius: 0 0 16px 16px;
+    cursor: pointer;
+  }
+  #overlay {
+    position: absolute;
+    top: 44px;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,20,60,0.82);
+    border-radius: 0 0 16px 16px;
+    z-index: 10;
+  }
+  #overlay h1 {
+    font-size: 36px;
+    color: #ffe066;
+    text-shadow: 0 2px 8px #0006;
+    margin-bottom: 8px;
+  }
+  #overlay .sub {
+    font-size: 17px;
+    color: #ccf0ff;
+    margin-bottom: 24px;
+    text-align: center;
+    line-height: 1.6;
+    padding: 0 20px;
+  }
+  #overlay .final-score {
+    font-size: 28px;
+    color: #ffe066;
+    margin-bottom: 18px;
+    font-weight: bold;
+  }
+  #start-btn {
+    background: linear-gradient(135deg, #00ccff, #0055ff);
+    color: #fff;
+    font-size: 26px;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 48px;
+    cursor: pointer;
+    box-shadow: 0 4px 18px #0055ff88;
+    letter-spacing: 1px;
+  }
+  #start-btn:active { transform: scale(0.95); }
+</style>
+</head>
+<body>
+<div id="game-wrap">
+  <div id="hud">
+    <span id="score-label">진주 🐚 <span id="score">0</span></span>
+    <div id="air-bar-wrap"><div id="air-bar"></div></div>
+    <span id="level-label">⭐ <span id="level">1</span></span>
+  </div>
+  <canvas id="canvas" width="360" height="540"></canvas>
+  <div id="overlay">
+    <h1>🌊 진주 잠수부</h1>
+    <div class="sub">화면을 터치하면<br>잠수부가 움직여요!<br>진주를 모으고 해파리를 피하세요!</div>
+    <div class="final-score" id="final-score" style="display:none"></div>
+    <button id="start-btn">▶ 시작!</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // --- State ---
+  let state = 'idle'; // idle | playing | dead
+  let score = 0;
+  let level = 1;
+  let air = 1.0;        // 0~1
+  let airDrain = 0.0018;
+  let animId = null;
+
+  // --- Diver ---
+  const diver = {
+    x: W / 2,
+    y: H * 0.3,
+    r: 28,
+    vx: 0,
+    vy: 0,
+    tx: W / 2,
+    ty: H * 0.3,
+    trail: []
+  };
+
+  // --- Pearls ---
+  let pearls = [];
+  const PEARL_R = 16;
+
+  // --- Jellyfish ---
+  let jellies = [];
+
+  // --- Bubbles (deco) ---
+  let bubbles = [];
+
+  // --- Fish (deco) ---
+  let fishDeco = [];
+
+  // --- Touch target ---
+  let touchTarget = null;
+
+  // -----------------------------------------------
+  function randomBetween(a, b) { return a + Math.random() * (b - a); }
+
+  function spawnPearl() {
+    pearls.push({
+      x: randomBetween(PEARL_R + 10, W - PEARL_R - 10),
+      y: randomBetween(H * 0.5, H - 30),
+      r: PEARL_R,
+      glow: 0,
+      glowDir: 1
+    });
+  }
+
+  function spawnJelly() {
+    const fromLeft = Math.random() < 0.5;
+    const size = randomBetween(22, 38);
+    jellies.push({
+      x: fromLeft ? -size : W + size,
+      y: randomBetween(H * 0.08, H * 0.85),
+      r: size,
+      vx: fromLeft ? randomBetween(0.8, 1.6 + level * 0.2) : -randomBetween(0.8, 1.6 + level * 0.2),
+      vy: Math.sin(Date.now() * 0.001) * 0.3,
+      phase: Math.random() * Math.PI * 2,
+      color: ['#ff88cc','#cc88ff','#ff66aa','#88aaff','#ffaaee'][Math.floor(Math.random()*5)]
+    });
+  }
+
+  function spawnBubble() {
+    bubbles.push({
+      x: randomBetween(10, W - 10),
+      y: H + 10,
+      r: randomBetween(3, 10),
+      vy: randomBetween(0.4, 1.2),
+      alpha: randomBetween(0.2, 0.5)
+    });
+  }
+
+  function spawnFishDeco() {
+    const fromLeft = Math.random() < 0.5;
+    fishDeco.push({
+      x: fromLeft ? -30 : W + 30,
+      y: randomBetween(H * 0.1, H * 0.9),
+      vx: fromLeft ? randomBetween(0.5, 1.2) : -randomBetween(0.5, 1.2),
+      flip: !fromLeft,
+      color: ['#ffaa33','#ff6633','#33ccff','#ff33aa'][Math.floor(Math.random()*4)],
+      size: randomBetween(12, 22)
+    });
+  }
+
+  function initGame() {
+    score = 0;
+    level = 1;
+    air = 1.0;
+    airDrain = 0.0018;
+    diver.x = W / 2;
+    diver.y = H * 0.3;
+    diver.vx = 0; diver.vy = 0;
+    diver.tx = W / 2; diver.ty = H * 0.3;
+    diver.trail = [];
+    pearls = [];
+    jellies = [];
+    bubbles = [];
+    fishDeco = [];
+    touchTarget = null;
+
+    for (let i = 0; i < 5; i++) spawnPearl();
+    for (let i = 0; i < 2; i++) spawnJelly();
+    for (let i = 0; i < 8; i++) {
+      bubbles.push({
+        x: randomBetween(10, W-10),
+        y: randomBetween(0, H),
+        r: randomBetween(3,10),
+        vy: randomBetween(0.4,1.2),
+        alpha: randomBetween(0.2,0.5)
+      });
+    }
+
+    updateHUD();
+  }
+
+  // -----------------------------------------------
+  // Timers
+  let pearlTimer = 0;
+  let jellyTimer = 0;
+  let bubbleTimer = 0;
+  let fishTimer = 0;
+  let airTimer = 0;
+
+  function update(dt) {
+    // Move diver toward touch target
+    if (touchTarget) {
+      const dx = touchTarget.x - diver.x;
+      const dy = touchTarget.y - diver.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const speed = Math.min(dist, 4.5);
+      if (dist > 4) {
+        diver.vx = (dx / dist) * speed;
+        diver.vy = (dy / dist) * speed;
+      } else {
+        diver.vx *= 0.7;
+        diver.vy *= 0.7;
+      }
+    } else {
+      diver.vx *= 0.92;
+      diver.vy *= 0.92;
+    }
+
+    diver.x += diver.vx;
+    diver.y += diver.vy;
+    diver.x = Math.max(diver.r, Math.min(W - diver.r, diver.x));
+    diver.y = Math.max(diver.r, Math.min(H - diver.r, diver.y));
+
+    // Trail
+    diver.trail.unshift({ x: diver.x, y: diver.y });
+    if (diver.trail.length > 10) diver.trail.pop();
+
+    // Air refill near surface
+    if (diver.y < H * 0.12) {
+      air = Math.min(1, air + 0.012);
+    } else {
+      air -= airDrain;
+      if (air < 0) { air = 0; die(); return; }
+    }
+
+    // Pearls
+    pearlTimer += dt;
+    if (pearlTimer > 2200 - level * 80 && pearls.length < 7) {
+      spawnPearl();
+      pearlTimer = 0;
+    }
+    pearls.forEach(p => {
+      p.glow += p.glowDir * 0.04;
+      if (p.glow > 1 || p.glow < 0) p.glowDir *= -1;
+    });
+    // Collect
+    pearls = pearls.filter(p => {
+      const dx = diver.x - p.x, dy = diver.y - p.y;
+      if (Math.sqrt(dx*dx+dy*dy) < diver.r + p.r - 4) {
+        score++;
+        air = Math.min(1, air + 0.08); // pearl gives a little air boost
+        if (score % 5 === 0) {
+          level = Math.min(10, level + 1);
+          airDrain = 0.0018 + (level - 1) * 0.00015;
+        }
+        updateHUD();
+        return false;
+      }
+      return true;
+    });
+
+    // Jellyfish
+    jellyTimer += dt;
+    if (jellyTimer > 3500 - level * 150 && jellies.length < 4 + level) {
+      spawnJelly();
+      jellyTimer = 0;
+    }
+    jellies.forEach(j => {
+      j.x += j.vx;
+      j.phase += 0.04;
+      j.y += Math.sin(j.phase) * 0.5;
+    });
+    jellies = jellies.filter(j => j.x > -60 && j.x < W + 60);
+
+    // Collision with jellyfish
+    for (const j of jellies) {
+      const dx = diver.x - j.x, dy = diver.y - j.y;
+      if (Math.sqrt(dx*dx+dy*dy) < diver.r + j.r - 10) {
+        die(); return;
+      }
+    }
+
+    // Bubbles
+    bubbleTimer += dt;
+    if (bubbleTimer > 600 && bubbles.length < 20) {
+      spawnBubble();
+      bubbleTimer = 0;
+    }
+    bubbles.forEach(b => { b.y -= b.vy; b.x += Math.sin(b.y * 0.05) * 0.3; });
+    bubbles = bubbles.filter(b => b.y > -20);
+
+    // Fish deco
+    fishTimer += dt;
+    if (fishTimer > 4000 && fishDeco.length < 3) {
+      spawnFishDeco();
+      fishTimer = 0;
+    }
+    fishDeco.forEach(f => { f.x += f.vx; });
+    fishDeco = fishDeco.filter(f => f.x > -60 && f.x < W + 60);
+
+    updateAirBar();
+  }
+
+  // -----------------------------------------------
+  function drawBackground() {
+    // Sky / surface
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.13);
+    skyGrad.addColorStop(0, '#87ceeb');
+    skyGrad.addColorStop(1, '#66aaee');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, W, H * 0.13);
+
+    // Water gradient
+    const waterGrad = ctx.createLinearGradient(0, H * 0.13, 0, H);
+    waterGrad.addColorStop(0, '#1a9ed4');
+    waterGrad.addColorStop(0.4, '#0d6fa8');
+    waterGrad.addColorStop(1, '#003366');
+    ctx.fillStyle = waterGrad;
+    ctx.fillRect(0, H * 0.13, W, H);
+
+    // Surface waves
+    ctx.beginPath();
+    ctx.moveTo(0, H * 0.13);
+    const waveY = H * 0.13;
+    for (let x = 0; x <= W; x += 5) {
+      ctx.lineTo(x, waveY + Math.sin((x * 0.04) + Date.now() * 0.002) * 5);
+    }
+    ctx.lineTo(W, 0);
+    ctx.lineTo(0, 0);
+    ctx.closePath();
+    ctx.fillStyle = '#87ceeb';
+    ctx.fill();
+
+    // Wave shimmer line
+    ctx.beginPath();
+    ctx.moveTo(0, waveY);
+    for (let x = 0; x <= W; x += 4) {
+      ctx.lineTo(x, waveY + Math.sin((x * 0.04) + Date.now() * 0.002) * 5);
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Light rays from surface
+    ctx.save();
+    for (let i = 0; i < 5; i++) {
+      const rx = (W * 0.1) + i * (W * 0.2);
+      const angle = Math.sin(Date.now() * 0.0005 + i) * 0.12;
+      ctx.save();
+      ctx.translate(rx, H * 0.13);
+      ctx.rotate(angle);
+      const rayGrad = ctx.createLinearGradient(0, 0, 0, H * 0.5);
+      rayGrad.addColorStop(0, 'rgba(255,255,200,0.10)');
+      rayGrad.addColorStop(1, 'rgba(255,255,200,0)');
+      ctx.fillStyle = rayGrad;
+      ctx.beginPath();
+      ctx.moveTo(-15, 0);
+      ctx.lineTo(15, 0);
+      ctx.lineTo(40, H * 0.55);
+      ctx.lineTo(-40, H * 0.55);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // Seabed
+    const sandGrad = ctx.createLinearGradient(0, H - 38, 0, H);
+    sandGrad.addColorStop(0, '#c8a96e');
+    sandGrad.addColorStop(1, '#a07840');
+    ctx.fillStyle = sandGrad;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 10) {
+      ctx.lineTo(x, H - 28 + Math.sin(x * 0.07) * 8);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+
+    // Coral decoration
+    drawCoral(50, H - 30, '#ff6688', 28);
+    drawCoral(160, H - 32, '#ff9933', 22);
+    drawCoral(280, H - 28, '#cc44ff', 26);
+    drawCoral(330, H - 26, '#ff4466', 18);
+    drawCoral(90, H - 26, '#33ccff', 16);
+  }
+
+  function drawCoral(x, y, color, size) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    // Main stem
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y - size);
+    ctx.stroke();
+    // Branches
+    for (let i = 0; i < 3; i++) {
+      const bx = x + (i - 1) * (size * 0.4);
+      const by = y - size * (0.4 + i * 0.15);
+      const bl = size * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(x, by);
+      ctx.lineTo(bx, by - bl);
+      ctx.stroke();
+      // Tips
+      ctx.beginPath();
+      ctx.arc(bx, by - bl, 4, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawBubbles() {
+    bubbles.forEach(b => {
+      ctx.save();
+      ctx.globalAlpha = b.alpha;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(200,240,255,0.8)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  function drawFishDeco() {
+    fishDeco.forEach(f => {
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      if (f.flip) ctx.scale(-1, 1);
+      ctx.fillStyle = f.color;
+      // Body
+      ctx.beginPath();
+      ctx.ellipse(0, 0, f.size, f.size * 0.55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Tail
+      ctx.beginPath();
+      ctx.moveTo(-f.size + 2, 0);
+      ctx.lineTo(-f.size - f.size * 0.5, -f.size * 0.4);
+      ctx.lineTo(-f.size - f.size * 0.5, f.size * 0.4);
+      ctx.closePath();
+      ctx.fill();
+      // Eye
+      ctx.beginPath();
+      ctx.arc(f.size * 0.45, -f.size * 0.1, f.size * 0.12, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(f.size * 0.47, -f.size * 0.1, f.size * 0.06, 0, Math.PI * 2);
+      ctx.fillStyle = '#222';
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  function drawPearls() {
+    pearls.forEach(p => {
+      // Glow
+      const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r + 10);
+      glow.addColorStop(0, `rgba(255,240,220,${0.3 + p.glow * 0.3})`);
+      glow.addColorStop(1, 'rgba(255,240,220,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r + 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pearl body
+      const pearlGrad = ctx.createRadialGradient(p.x - 5, p.y - 5, 2, p.x, p.y, p.r);
+      pearlGrad.addColorStop(0, '#fff8f0');
+      pearlGrad.addColorStop(0.5, '#f0d8c0');
+      pearlGrad.addColorStop(1, '#c8a080');
+      ctx.fillStyle = pearlGrad;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Shine
+      ctx.beginPath();
+      ctx.arc(p.x - 5, p.y - 5, 5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fill();
+
+      // Shell hint below
+      ctx.save();
+      ctx.strokeStyle = 'rgba(180,130,80,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y + p.r + 6, 10, 0.2, Math.PI - 0.2);
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  function drawJellies() {
+    jellies.forEach(j => {
+      ctx.save();
+      ctx.globalAlpha = 0.82;
+
+      // Bell
+      const bellGrad = ctx.createRadialGradient(j.x, j.y - j.r * 0.2, j.r * 0.1, j.x, j.y, j.r);
+      bellGrad.addColorStop(0, j.color + 'cc');
+      bellGrad.addColorStop(1, j.color + '44');
+      ctx.fillStyle = bellGrad;
+      ctx.beginPath();
+      ctx.arc(j.x, j.y, j.r, Math.PI, 0);
+      ctx.quadraticCurveTo(j.x + j.r, j.y + j.r * 0.3, j.x, j.y + j.r * 0.15);
+      ctx.quadraticCurveTo(j.x - j.r, j.y + j.r * 0.3, j.x - j.r, j.y);
+      ctx.fill();
+
+      // Tentacles
+      ctx.strokeStyle = j.color + 'aa';
+      ctx.lineWidth = 2;
+      for (let t = -3; t <= 3; t++) {
+        const tx = j.x + (t * j.r * 0.25);
+        ctx.beginPath();
+        ctx.moveTo(tx, j.y + j.r * 0.1);
+        for (let k = 0; k < 5; k++) {
+          const kx = tx + Math.sin(j.phase + k * 0.8 + t) * 5;
+          const ky = j.y + j.r * 0.1 + k * (j.r * 0.35);
+          ctx.lineTo(kx, ky);
+        }
+        ctx.stroke();
+      }
+
+      // Spots
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.beginPath();
+      ctx.arc(j.x - j.r * 0.3, j.y - j.r * 0.3, j.r * 0.18, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    });
+  }
+
+  function drawDiver() {
+    // Trail
+    for (let i = diver.trail.length - 1; i >= 0; i--) {
+      const t = diver.trail[i];
+      const alpha = (1 - i / diver.trail.length) * 0.15;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, diver.r * (1 - i / diver.trail.length * 0.5), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,200,255,${alpha})`;
+      ctx.fill();
+    }
+
+    const d = diver;
+    ctx.save();
+    ctx.translate(d.x, d.y);
+
+    // Determine facing direction
+    const facingRight = diver.vx >= 0;
+    if (!facingRight) ctx.scale(-1, 1);
+
+    // Wetsuit body
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 16, 22, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a3a8a';
+    ctx.fill();
+    ctx.strokeStyle = '#0a2060';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Suit stripe
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 9, 22, 0, -0.4, 0.4);
+    ctx.fillStyle = '#ffcc00';
+    ctx.fill();
+
+    // Head / helmet
+    ctx.beginPath();
+    ctx.arc(6, -16, 13, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffcc66';
+    ctx.fill();
+
+    // Helmet visor
+    ctx.beginPath();
+    ctx.ellipse(10, -16, 9, 10, 0, -0.6, 0.6);
+    ctx.fillStyle = 'rgba(100,200,255,0.6)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Eyes (visible through visor)
+    ctx.beginPath();
+    ctx.arc(9, -17, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#222';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(10, -18, 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.fill();
+
+    // Tank (oxygen)
+    ctx.beginPath();
+    ctx.roundRect(-18, -10, 8, 18, 4);
+    ctx.fillStyle = '#cccccc';
+    ctx.fill();
+    ctx.strokeStyle = '#999';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(-14, -12, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#88ccff';
+    ctx.fill();
+
+    // Fins
+    ctx.beginPath();
+    ctx.moveTo(-8, 18);
+    ctx.lineTo(-20, 26);
+    ctx.lineTo(-4, 22);
+    ctx.closePath();
+    ctx.fillStyle = '#ffcc00';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(8, 18);
+    ctx.lineTo(20, 26);
+    ctx.lineTo(4, 22);
+    ctx.closePath();
+    ctx.fillStyle = '#ffcc00';
+    ctx.fill();
+
+    // Bubble from helmet
+    if (Math.random() < 0.08) {
+      bubbles.push({
+        x: d.x + (facingRight ? 18 : -18),
+        y: d.y - 18,
+        r: randomBetween(2, 5),
+        vy: randomBetween(0.5, 1),
+        alpha: 0.4
+      });
+    }
+
+    ctx.restore();
+  }
+
+  function drawTouchTarget() {
+    if (!touchTarget) return;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,150,0.5)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.arc(touchTarget.x, touchTarget.y, 16, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  function drawAirZone() {
+    // surface air zone hint
+    if (diver.y < H * 0.18) {
+      ctx.save();
+      ctx.globalAlpha = 0.2;
+      ctx.fillStyle = '#aaeeff';
+      ctx.fillRect(0, 0, W, H * 0.13);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 13px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('💨 공기 충전 중!', W / 2, H * 0.08);
+      ctx.restore();
+    }
+  }
+
+  // -----------------------------------------------
+  let lastTime = 0;
+  function gameLoop(ts) {
+    const dt = ts - lastTime;
+    lastTime = ts;
+
+    ctx.clearRect(0, 0, W, H);
+    drawBackground();
+    drawBubbles();
+    drawFishDeco();
+    drawPearls();
+    drawJellies();
+    drawTouchTarget();
+    drawDiver();
+    drawAirZone();
+
+    if (state === 'playing') {
+      update(dt);
+    }
+
+    animId = requestAnimationFrame(gameLoop);
+  }
+
+  function updateHUD() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('level').textContent = level;
+  }
+
+  function updateAirBar() {
+    document.getElementById('air-bar').style.width = (air * 100) + '%';
+    const bar = document.getElementById('air-bar');
+    if (air < 0.3) {
+      bar.style.background = 'linear-gradient(90deg, #ff4444, #ff8800)';
+    } else {
+      bar.style.background = 'linear-gradient(90deg, #00e0ff, #0099ff)';
+    }
+  }
+
+  function die() {
+    state = 'dead';
+    const el = document.getElementById('final-score');
+    el.textContent = '진주 ' + score + '개 모았어요! 🐚';
+    el.style.display = 'block';
+    const overlay = document.getElementById('overlay');
+    overlay.querySelector('h1').textContent = score >= 10 ? '🎉 잘했어요!' : '😢 다시 해볼까요?';
+    overlay.querySelector('.sub').textContent = score >= 10 ? '진주를 많이 모았어요!' : '해파리를 조심해요!';
+    document.getElementById('start-btn').textContent = '▶ 다시!';
+    overlay.style.display = 'flex';
+  }
+
+  // -----------------------------------------------
+  // Input
+  function getPos(e, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const scaleY = H / rect.height;
+    let cx, cy;
+    if (e.touches) {
+      cx = e.touches[0].clientX;
+      cy = e.touches[0].clientY;
+    } else {
+      cx = e.clientX;
+      cy = e.clientY;
+    }
+    return {
+      x: (cx - rect.left) * scaleX,
+      y: (cy - rect.top) * scaleY
+    };
+  }
+
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (state === 'playing') {
+      touchTarget = getPos(e, canvas);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (state === 'playing') {
+      touchTarget = getPos(e, canvas);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    touchTarget = null;
+  }, { passive: false });
+
+  canvas.addEventListener('mousedown', e => {
+    if (state === 'playing') {
+      touchTarget = getPos(e, canvas);
+    }
+  });
+
+  canvas.addEventListener('mousemove', e => {
+    if (state === 'playing' && e.buttons) {
+      touchTarget = getPos(e, canvas);
+    }
+  });
+
+  canvas.addEventListener('mouseup', () => { touchTarget = null; });
+
+  // -----------------------------------------------
+  document.getElementById('start-btn').addEventListener('click', () => {
+    initGame();
+    state = 'playing';
+    document.getElementById('overlay').style.display = 'none';
+  });
+
+  // Start animation loop immediately (shows background)
+  requestAnimationFrame(ts => { lastTime = ts; gameLoop(ts); });
+
+})();
+</script>
+</body>
+</html>

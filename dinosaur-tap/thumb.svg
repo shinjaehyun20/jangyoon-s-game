@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2744;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#243059;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5aaa4a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3a5a2a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="320" height="180" fill="url(#bgGrad)"/>
+
+  <!-- Clouds -->
+  <ellipse cx="50" cy="28" rx="30" ry="12" fill="rgba(255,255,255,0.10)"/>
+  <ellipse cx="80" cy="22" rx="22" ry="10" fill="rgba(255,255,255,0.08)"/>
+  <ellipse cx="200" cy="20" rx="25" ry="10" fill="rgba(255,255,255,0.08)"/>
+
+  <!-- Ground -->
+  <rect x="0" y="148" width="320" height="32" fill="url(#groundGrad)"/>
+  <rect x="0" y="148" width="320" height="4" fill="#6acc5a"/>
+
+  <!-- Grass tufts -->
+  <text x="18" y="152" font-size="16">🌿</text>
+  <text x="68" y="152" font-size="14">🍀</text>
+  <text x="230" y="152" font-size="14">🌱</text>
+  <text x="280" y="152" font-size="16">🌿</text>
+
+  <!-- Large center egg (main) -->
+  <ellipse cx="130" cy="100" rx="34" ry="38" fill="#a8e063" stroke="#5aaa1a" stroke-width="3"/>
+  <ellipse cx="130" cy="74" rx="26" ry="24" fill="#a8e063" stroke="#5aaa1a" stroke-width="2.5"/>
+  <circle cx="118" cy="88" r="5" fill="#7ecc3a" opacity="0.55"/>
+  <circle cx="142" cy="98" r="4" fill="#7ecc3a" opacity="0.5"/>
+  <circle cx="126" cy="112" r="4.5" fill="#7ecc3a" opacity="0.5"/>
+  <ellipse cx="118" cy="68" rx="7" ry="5" fill="rgba(255,255,255,0.35)" transform="rotate(-20 118 68)"/>
+  <!-- Crack on center egg -->
+  <path d="M130 80 L125 94 L132 102" stroke="#3a6010" stroke-width="2.5" fill="none" opacity="0.8"/>
+
+  <!-- Tap indicator (hand) -->
+  <text x="154" y="90" font-size="28" opacity="0.9">👆</text>
+
+  <!-- Small egg left -->
+  <ellipse cx="64" cy="118" rx="22" ry="25" fill="#f7c948" stroke="#c8962a" stroke-width="2.5"/>
+  <ellipse cx="64" cy="98" rx="17" ry="16" fill="#f7c948" stroke="#c8962a" stroke-width="2"/>
+  <circle cx="56" cy="106" r="3.5" fill="#e8aa30" opacity="0.55"/>
+  <circle cx="72" cy="114" r="3" fill="#e8aa30" opacity="0.5"/>
+  <ellipse cx="55" cy="93" rx="5" ry="3.5" fill="rgba(255,255,255,0.30)" transform="rotate(-15 55 93)"/>
+
+  <!-- Small egg right -->
+  <ellipse cx="210" cy="112" rx="20" ry="23" fill="#87ceeb" stroke="#4a8fb5" stroke-width="2.5"/>
+  <ellipse cx="210" cy="94" rx="16" ry="15" fill="#87ceeb" stroke="#4a8fb5" stroke-width="2"/>
+  <circle cx="202" cy="102" r="3" fill="#5aaedd" opacity="0.55"/>
+  <circle cx="218" cy="110" r="2.5" fill="#5aaedd" opacity="0.5"/>
+  <ellipse cx="202" cy="88" rx="5" ry="3.5" fill="rgba(255,255,255,0.35)" transform="rotate(-20 202 88)"/>
+
+  <!-- Hatched dino (right side) -->
+  <text x="242" y="105" font-size="42" opacity="0.95">🦕</text>
+
+  <!-- Score popup visual -->
+  <rect x="88" y="42" width="64" height="26" rx="13" fill="#f7c948" opacity="0.15"/>
+  <text x="120" y="60" font-size="13" font-weight="900" fill="#f7c948" text-anchor="middle">+10 🔥</text>
+
+  <!-- Sparkles -->
+  <text x="36" y="52" font-size="14" opacity="0.7">✨</text>
+  <text x="170" y="48" font-size="12" opacity="0.6">⭐</text>
+  <text x="258" y="60" font-size="14" opacity="0.7">✨</text>
+
+  <!-- Border -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- Title text -->
+  <g font-family="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#f7c948">공룡알 탭탭!</text>
+    <text x="296" y="164" text-anchor="end" font-size="9" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">DINOSAUR TAP</text>
+  </g>
+</svg>
