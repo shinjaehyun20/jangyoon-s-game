@@ -199,7 +199,7 @@
       </div>
     </div>
     <footer>
-      <small>◀▶ 이동 · 점프 · ▼ 파이프 진입 · 🔥 불꽃(파이어 상태)</small>
+      <small>◀▶ 이동 · 점프 · ▼ 숙이기/파이프 · 🔥 불꽃 · 적·보스는 밟아서!</small>
       <a class="home-link" href="../index.html">← 홈으로</a>
     </footer>
   </div>
@@ -207,10 +207,10 @@
   <div class="overlay" id="startOverlay">
     <div class="overlay-card">
       <h2>🍄 슈퍼 점프 모험</h2>
-      <p>방향패드로 움직이고 <b>점프</b>해요!<br>
+      <p>방향패드로 움직이고 <b>점프</b>해요! (커지면 ▼로 숙이기)<br>
          🍄 버섯=커지기, 🌸 꽃=불꽃발사(🔥), ⭐ 별=무적!<br>
          숨은 블록·파이프(▼) 속 비밀길도 찾아봐요.<br>
-         스테이지를 모두 깨고 <b>👑 보스</b>까지 무찌르면 승리!</p>
+         1-1~1-5를 깨고 <b>👑 보스 성</b>으로! 보스는 <b>밟거나</b> 끝의 <b>도끼</b>로 무찔러요!</p>
       <button class="btn-start" id="startBtn">모험 시작!</button>
       <div id="bestLine">최고 점수: <b id="bestDisplay">0</b></div>
     </div>
@@ -250,7 +250,7 @@
     // 타일: 'X' 땅, 'B' 벽돌, '?' 코인블록, 'U' 파워업(적응형), 'S' 별블록,
     //       'H' 히든코인, 'h' 히든파워업, 'P'/'p' 파이프, 'W' 워프파이프상단,
     //       'E' 적, 'G' 보스, 'C' 코인, 'F' 깃발, '-' 빈칸
-    const STAGES = [{"name": "1-1", "theme": "overworld", "tiles": ["--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------CCC--------------------------------------CCC--------------------X-------", "--------?U?---H---CC----------B?BUB------------------CCC----------------------------BBBB-------------------XX-------", "---------CCC-----XXXX-------------------------------XXXXX-------------------------------------------------XXX-------", "--------------------------------------------WW--------------------------------PP-------------------------XXXX-------", "--------------------E-------------E---------pp----E---------------------E-----pp----------E-------------XXXXX--F----", "XXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [{"col": 44, "room": "b1", "returnX": 1536, "returnY": 256}], "rooms": {"b1": {"theme": "cave", "tiles": ["---------------", "---------------", "---------------", "---------------", "---------------", "---------------", "--CCCCCCCCCC---", "--CCCCCCCCCC---", "--CCCCCCCCCWW--", "-----------pp--", "XXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXX"]}}}, {"name": "1-2", "theme": "overworld", "tiles": ["----------------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------------", "----------CC--------------------------------CCC---------------------------------------------------------------X-------", "---------U--S------CC---------------B?B?B---------h------------CCC--------------------B?B--------------------XX-------", "------------------XXXX----------------------------------------XXXXX-----------------------------------------XXX-------", "----------------------------------------------------------PP-----------------------------------------------XXXX-------", "----------------------E-----------------E--------------E--pp--------------------E---------------E---------XXXXX--F----", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [], "rooms": {}}, {"name": "1-3", "theme": "overworld", "tiles": ["------------------------------------------------------------------------------------------------------------------------", "------------------------------------------------------------------------------------------------------------------------", "------------------------------------------------------------------------------------------------------------------------", "------------------------------------------------------------------------------------------------------------------------", "------------------------------------------------------------------------------------------------------------------------", "----------------------------------------CC----------------------------------------------------------------------X-------", "--------?U?--H-----------CC-----------BB?BB-----------------------S----CCC------------------?B?----------------XX-------", "------------------------XXXX------------------------------------------XXXXX-----------------------------------XXX-------", "------------------------------------------------------PP-----------------------------------------------------XXXX-------", "----------------E-----------------E---------E---------pp----E---------------E---------------------E---------XXXXX--F----", "XXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [], "rooms": {}}, {"name": "boss", "theme": "castle", "boss": true, "tiles": ["----------------------------", "----------------------------", "XX------------------------XX", "XX------------------------XX", "XX------------------------XX", "XX----------CCC-----------XX", "XX---U-U------------------XX", "XX------------------------XX", "XX------------------------XX", "XX------------------G-----XX", "XXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [], "rooms": {}}];
+    const STAGES = [{"name": "1-1", "theme": "overworld", "tiles": ["----------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------", "--------------------------------------------CCC--------------------------------------CCC------------------X-----", "--------?U?--H----CC----------B?BUB------------------CCC----------------------------BBBB-----------------XX-----", "---------CCC-----XXXX-------------------------------XXXXX-----------------------------------------------XXX-----", "--------------------------------------------WW--------------------------------PP-----------------------XXXX-----", "--------------------E-------------E---------pp----E---------------------E-----pp----------E-----------XXXXXF----", "XXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [{"col": 44, "room": "b1", "returnX": 1536, "returnY": 256}], "rooms": {"b1": {"theme": "cave", "tiles": ["----------------", "----------------", "----------------", "----------------", "----------------", "----------------", "--CCCCCCCCCC----", "--CCCCCCCCCC----", "-------------WW-", "-------------pp-", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX"]}}}, {"name": "1-2", "theme": "cave", "tiles": ["--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------", "----------CC--------------------------------CCC---------------------------------------------------------------X-----", "---------U--S------CC---------------B?B?B---------h------------CCC--------------------B?B--------------------XX-----", "------------------XXXX----------------------------------------XXXXX-----------------------------------------XXX-----", "----------------------------------------------------------PP-----------------------------------------------XXXX-----", "----------------------E-----------------E--------------E--pp----------------------E---------------E-------XXXXXF----", "XXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [], "rooms": {}}, {"name": "1-3", "theme": "overworld", "tiles": ["------------------------------------------------------------------------------------------------------------------------", "------------------------------------------------------------------------------------------------------------------------", "------------------------------------------------------------------------------------------------------------------------", "------------------------------------------------------------------------------------------------------------------------", "------------------------------------------------------------------------------------------------------------------------", "----------------------------------------CC------------------------------------------------------------------------X-----", "--------?U?--H-----------CC-----------BB?BB-----------------------S----CCC------------------?B?------------------XX-----", "------------------------XXXX------------------------------------------XXXXX-------------------------------------XXX-----", "------------------------------------------------------PP-------------------------------------------------------XXXX-----", "----------------E-----------------E---------E---------pp----E---------------E---------------------E-----------XXXXXF----", "XXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [], "rooms": {}}, {"name": "1-4", "theme": "cave", "tiles": ["----------------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------------", "----------------------------------------------------------------------------------------------------------------------", "--------------------------------------------CC------------------------------------------------------------------X-----", "--------?U----h------CCC----------------BB?BB----------------------------S------------CCC----------------------XX-----", "--------------------XXXXX-----------------------------------------------XXXX----------------------------------XXX-----", "----------------------------------------------------PP-------------------------------------------------------XXXX-----", "------------------E-----------E---------------E-----pp----------E---------------E-------------------E-------XXXXXF----", "XXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXX"], "warps": [], "rooms": {}}, {"name": "1-5", "theme": "overworld", "tiles": ["--------------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------------", "--------------------------------------------------------------------------------------------------------------------X-----", "--------?US?--H------------CC-----------B?B?B---------------------S----CCC----------------------?BU----------------XX-----", "--------------------------XXXX----------------------------------------XXXXX---------------------------------------XXX-----", "--------------------------------------------------PP-------------------------------------------------------------XXXX-----", "------------------E-------------E-------------E---pp----------------E---------------E-------------------E-------XXXXXF----", "XXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX---XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [], "rooms": {}}, {"name": "boss", "theme": "castle", "boss": true, "tiles": ["----------------------------------------", "----------------------------------------", "XX------------------------------------XX", "XX------------------------------------XX", "XX------------------------------------XX", "XX--------CCC-----------------------A-XX", "XX---U-U---------------------------XX-XX", "XX--------------------------------XXX-XX", "XX-------------------------------XXXX-XX", "XX--------------------G---------XXXXX-XX", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"], "warps": [], "rooms": {}}];
 
     // ===== DOM =====
     const canvas = document.getElementById('game');
@@ -301,6 +301,9 @@
       brick() { beep(120, 0.12, 'sawtooth', 0.11, 55); },
       stomp() { beep(220, 0.10, 'square', 0.13, 90); },
       power() { [523, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.12, 'square', 0.13), i * 80)); },
+      grow() { [392, 523, 659, 784].forEach((f, i) => setTimeout(() => beep(f, 0.09, 'square', 0.12), i * 60)); },
+      firepower() { [659, 988, 1319, 1568].forEach((f, i) => setTimeout(() => beep(f, 0.08, 'square', 0.13), i * 55)); },
+      shrink() { [784, 587, 440, 330].forEach((f, i) => setTimeout(() => beep(f, 0.09, 'sawtooth', 0.12), i * 55)); },
       fire() { beep(900, 0.06, 'square', 0.10, 480); },
       star() { [659, 880, 1175, 1568].forEach((f, i) => setTimeout(() => beep(f, 0.10, 'square', 0.12), i * 70)); },
       warp() { beep(520, 0.30, 'sine', 0.13, 120); },
@@ -317,6 +320,7 @@
     let ROWS, COLS, LEVEL_W, LEVEL_H, currentMap, theme, isBossStage;
     let warpList = [], inBonus = false, savedMain = null, warpTarget = null;
     let bannerTimer = 0, bannerText = '';
+    let stageClearTimer = 0, warpStandTimer = 0, axeX = 0, axeY = 0;
     const keys = { left: false, right: false, up: false, down: false, jump: false, jumpHeld: false };
 
     // 타일맵 → tiles[][], 동적객체 배열
@@ -325,6 +329,7 @@
       LEVEL_W = COLS * TILE; LEVEL_H = ROWS * TILE;
       tiles = []; coins = []; enemies = []; items = [];
       fireballs = []; enemyShots = []; particles = []; boss = null;
+      axeX = 0; axeY = 0;
       let flagX = LEVEL_W + TILE;
       for (let r = 0; r < ROWS; r++) {
         tiles[r] = [];
@@ -345,6 +350,7 @@
           else if (ch === 'C') coins.push({ x: x + 6, y: y + 4, w: 20, h: 24, taken: false, bob: Math.random() * 6.28 });
           else if (ch === 'E') enemies.push(makeEnemy(x, y));
           else if (ch === 'G') boss = makeBoss(x, y);
+          else if (ch === 'A') { axeX = x; axeY = y; }
           tiles[r][c] = t;
         }
       }
@@ -358,7 +364,7 @@
       return { x: x + 4, y: y, w: 24, h: 24, vx: 1.4, vy: 0, kind: kind, collected: false };
     }
     function makeBoss(x, y) {
-      return { x: x, y: y - 16, w: 50, h: 48, vx: 1.4, vy: 0, hp: 4, maxhp: 4,
+      return { x: x, y: y - 16, w: 50, h: 48, vx: 1.4, vy: 0, hp: 3, maxhp: 3,
                jumpTimer: 90, shootTimer: 110, hitFlash: 0, dead: false, deadTimer: 0 };
     }
 
@@ -375,11 +381,14 @@
     }
 
     function initState() {
+      // 이전 판의 잔여 타이머/상태 초기화 (재시작·전환 배너가 새 판을 얼리는 버그 방지)
+      bannerTimer = 0; bannerText = ''; stageClearTimer = 0; warpStandTimer = 0;
+      inBonus = false; savedMain = null; warpTarget = null;
       state = { coins: 0, score: 0, lives: START_LIVES, world: 1, flagX: 0, won: false, lastSafeX: 2 * TILE, stageIdx: 0 };
       player = {
         x: 2 * TILE, y: (12 - 4) * TILE, w: 24, h: 30,
         vx: 0, vy: 0, onGround: false, facing: 1,
-        invincible: 0, walkPhase: 0, power: 0, starTimer: 0, onWarp: null, fireCooldown: 0
+        invincible: 0, walkPhase: 0, power: 0, starTimer: 0, onWarp: null, fireCooldown: 0, crouching: false, coyote: 0
       };
       loadStage(0);
     }
@@ -418,9 +427,11 @@
     }
 
     function movePlayer() {
-      if (keys.left) { player.vx -= MOVE_ACCEL; player.facing = -1; }
-      if (keys.right) { player.vx += MOVE_ACCEL; player.facing = 1; }
-      if (!keys.left && !keys.right) player.vx *= FRICTION;
+      // 큰 마리오 ▼ 숙이기 (워프 파이프 위/보너스 룸에선 워프 우선)
+      player.crouching = (player.power >= 1 && (player.onGround || player.coyote > 0) && keys.down && !player.onWarp && !inBonus);
+      if (keys.left && !player.crouching) { player.vx -= MOVE_ACCEL; player.facing = -1; }
+      if (keys.right && !player.crouching) { player.vx += MOVE_ACCEL; player.facing = 1; }
+      if (player.crouching || (!keys.left && !keys.right)) player.vx *= FRICTION;
       const maxRun = player.starTimer > 0 ? MAX_RUN * 1.25 : MAX_RUN;
       player.vx = Math.max(-maxRun, Math.min(maxRun, player.vx));
       if (Math.abs(player.vx) < 0.05) player.vx = 0;
@@ -428,9 +439,9 @@
       player.x += player.vx;
       resolveCollision('x');
 
-      if (keys.jump && player.onGround) {
+      if (keys.jump && (player.onGround || player.coyote > 0)) {
         player.vy = -JUMP_FORCE;
-        player.onGround = false;
+        player.onGround = false; player.coyote = 0;
         keys.jump = false;
         sfx.jump();
       }
@@ -452,6 +463,10 @@
         }
       }
 
+      // 코요테 타임: 지면에 닿으면 충전, 떠나면 감소 (경계 진동·낭떠러지 점프 관용 → 크라우치/점프 안정)
+      if (player.onGround) player.coyote = 6;
+      else if (player.coyote > 0) player.coyote--;
+
       if (player.x < 0) { player.x = 0; player.vx = 0; }
 
       // 워프 파이프 위에 서 있는지
@@ -467,9 +482,16 @@
         }
       }
 
+      // 보너스 룸 자동 탈출: 복귀 파이프 위 또는 오른쪽 끝에 도달하면 잠깐 뒤 복귀 (데드엔드 방지)
+      if (inBonus) {
+        if (player.onWarp || (player.x + player.w > LEVEL_W * 0.72)) {
+          if (++warpStandTimer > 22) { warpStandTimer = 0; exitWarp(); return; }
+        } else warpStandTimer = 0;
+      }
+
       if (player.onGround) state.lastSafeX = player.x;
       if (player.y > LEVEL_H + 80) loseLife(true);
-      if (Math.abs(player.vx) > 0.4 && player.onGround) player.walkPhase += 0.25;
+      if (Math.abs(player.vx) > 0.4 && player.onGround && !player.crouching) player.walkPhase += 0.25;
     }
 
     function resolveCollision(axis) {
@@ -588,15 +610,15 @@
     }
 
     function applyPowerup(kind) {
-      if (kind === 'mushroom') { if (player.power < 1) player.power = 1; sfx.power(); }
-      else if (kind === 'fire') { player.power = 2; sfx.power(); }
+      if (kind === 'mushroom') { if (player.power < 1) player.power = 1; sfx.grow(); }
+      else if (kind === 'fire') { player.power = 2; sfx.firepower(); }
       else if (kind === 'star') { player.starTimer = STAR_DURATION; sfx.star(); }
       updateControls();
     }
     function damagePlayer() {
       if (player.starTimer > 0 || player.invincible > 0) return;
-      if (player.power === 2) { player.power = 1; player.invincible = 90; sfx.hurt(); }
-      else if (player.power === 1) { player.power = 0; player.invincible = 90; sfx.hurt(); }
+      if (player.power === 2) { player.power = 1; player.invincible = 90; sfx.shrink(); }
+      else if (player.power === 1) { player.power = 0; player.invincible = 90; sfx.shrink(); }
       else loseLife(false);
       updateControls();
     }
@@ -660,12 +682,13 @@
         const dir = player.x < boss.x ? -1 : 1;
         enemyShots.push({ x: boss.x + boss.w / 2, y: boss.y + 14, w: 16, h: 16, vx: 3 * dir, vy: -2 });
       }
-      // 플레이어 충돌
+      // 플레이어 충돌 — 머리 밟기(파워업 불필요)로도 처치 가능
       if (rectsOverlap(player, boss)) {
         if (player.starTimer > 0) { hurtBoss(1); player.vy = -JUMP_FORCE * 0.6; }
         else if (player.invincible <= 0) {
-          const stomp = player.vy > 0 && (player.y + player.h) - boss.y < 24;
-          if (stomp) { hurtBoss(1); player.vy = -JUMP_FORCE * 0.85; player.invincible = 36; }
+          // 위에서 내려오며 보스 상반부에 닿으면 밟기로 판정(관대하게)
+          const stomp = player.vy > 0 && (player.y + player.h) - boss.y < boss.h * 0.6;
+          if (stomp) { hurtBoss(1); player.vy = -JUMP_FORCE * 0.9; player.invincible = 40; }
           else damagePlayer();
         }
       }
@@ -749,7 +772,7 @@
     }
     function handleWarpInput() {
       if (!inBonus && keys.down && player.onWarp && player.onGround) { keys.down = false; enterWarp(player.onWarp); }
-      else if (inBonus && keys.up && player.onWarp) { keys.up = false; exitWarp(); }
+      else if (inBonus && (keys.up || keys.down) && player.onWarp) { keys.up = false; keys.down = false; exitWarp(); }
     }
 
     // ===== 목숨 / 스테이지 / 종료 =====
@@ -766,15 +789,31 @@
     }
 
     function checkGoal() {
-      if (state.won || inBonus || isBossStage) return;
+      if (state.won || inBonus || isBossStage || stageClearTimer > 0) return;
       if (player.x + player.w >= state.flagX) {
+        // 깃발 도착 → 클리어 연출(깃대 슬라이드) 시퀀스 시작
+        stageClearTimer = 80;
         state.score += 500 + state.lives * 100;
-        if (state.stageIdx < STAGES.length - 1) {
-          state.stageIdx++;
-          loadStage(state.stageIdx);
-          showBanner(isBossStage ? '👑 보스 등장!' : '스테이지 1-' + (state.stageIdx + 1));
-          sfx.stage();
-        } else { worldClear(); }
+        player.x = state.flagX - player.w + 2; player.vx = 0;
+        updateHUD();
+        sfx.stage();
+      }
+    }
+    function advanceAfterClear() {
+      if (state.stageIdx < STAGES.length - 1) {
+        state.stageIdx++;
+        loadStage(state.stageIdx);
+        showBanner(isBossStage ? '👑 보스 성!' : '스테이지 1-' + (state.stageIdx + 1));
+      } else { worldClear(); }
+    }
+    // 도끼/스위치 도달 시 보스 처치 (파워업 불필요한 확실한 승리 경로)
+    function checkAxe() {
+      if (isBossStage && axeX > 0 && boss && !boss.dead) {
+        const box = { x: axeX - 6, y: axeY, w: TILE + 12, h: TILE };
+        if (rectsOverlap(player, box)) {
+          boss.hp = 0; boss.dead = true; boss.deadTimer = 70; state.score += 3000;
+          spawnPop(boss.x + boss.w / 2, boss.y, '💥'); sfx.bossDie(); updateHUD();
+        }
       }
     }
     function worldClear() {
@@ -819,6 +858,7 @@
         for (let c = cStart; c < cEnd; c++) { const t = tiles[r][c]; if (t) drawTile(t, c * TILE, r * TILE); }
 
       if (!isBossStage && !inBonus && state.flagX <= LEVEL_W) drawFlag(state.flagX);
+      if (isBossStage && axeX > 0) drawAxe();
 
       coins.forEach(co => { if (!co.taken) drawCoin(co.x + co.w / 2, co.y + co.h / 2 + Math.sin(co.bob) * 3); });
       items.forEach(it => drawItem(it));
@@ -834,8 +874,28 @@
 
       ctx.restore();
 
-      if (boss && !inBonus) drawBossBar();
+      if (boss && !boss.dead && !inBonus) drawBossBar();
       if (bannerTimer > 0) drawBanner();
+      if (stageClearTimer > 0) drawClearBanner();
+    }
+
+    function drawAxe() {
+      const x = axeX + TILE / 2, y = axeY + TILE;
+      // 받침대
+      ctx.fillStyle = '#9e6b2f'; ctx.fillRect(axeX + 6, axeY + 18, TILE - 12, 14);
+      // 손잡이
+      ctx.strokeStyle = '#7a4a1a'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(x, axeY + 18); ctx.lineTo(x, axeY + 4); ctx.stroke(); ctx.lineWidth = 1;
+      // 도끼날
+      ctx.fillStyle = '#cfd8dc';
+      ctx.beginPath(); ctx.moveTo(x, axeY); ctx.lineTo(x + 12, axeY + 2); ctx.lineTo(x + 8, axeY + 12); ctx.lineTo(x, axeY + 8); ctx.fill();
+      ctx.fillStyle = '#90a4ae';
+      ctx.beginPath(); ctx.moveTo(x, axeY); ctx.lineTo(x - 12, axeY + 2); ctx.lineTo(x - 8, axeY + 12); ctx.lineTo(x, axeY + 8); ctx.fill();
+    }
+    function drawClearBanner() {
+      ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(0, VIEW_H / 2 - 28, VIEW_W, 56);
+      ctx.fillStyle = '#ffd000'; ctx.font = 'bold 26px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('🏁 스테이지 클리어!', VIEW_W / 2, VIEW_H / 2 + 9); ctx.textAlign = 'left';
     }
 
     function drawClouds() {
@@ -989,7 +1049,9 @@
     function drawPlayer() {
       const p = player;
       if (p.invincible > 0 && p.starTimer <= 0 && Math.floor(p.invincible / 4) % 2 === 0) return;
-      const w = p.w, h = (p.power >= 1) ? 44 : p.h, x = p.x, y = (p.y + p.h) - h, f = p.facing;
+      let h = (p.power >= 1) ? 44 : p.h;
+      if (p.crouching) h = 28;   // 숙이기: 키를 낮춤
+      const w = p.w, x = p.x, y = (p.y + p.h) - h, f = p.facing;
       // 색상 (파워/별)
       let hatCol = '#e52521', bodyCol = '#2b5fd9';
       if (p.power === 2) { hatCol = '#e52521'; bodyCol = '#f5f5f5'; }
@@ -1012,6 +1074,17 @@
     function loop() {
       if (!running) return;
       if (bannerTimer > 0) { bannerTimer--; draw(); raf = requestAnimationFrame(loop); return; }
+      // 스테이지 클리어 연출: 입력 freeze + 깃대 슬라이드
+      if (stageClearTimer > 0) {
+        stageClearTimer--;
+        player.vx = 0; player.crouching = false;
+        if (player.y + player.h < (ROWS - 2) * TILE) { player.y += 3; player.onGround = false; }
+        updateParticles();
+        if (stageClearTimer === 0) advanceAfterClear();
+        draw();
+        if (running) raf = requestAnimationFrame(loop);
+        return;
+      }
       movePlayer();
       if (boss) updateBoss();
       updateEnemies();
@@ -1024,6 +1097,7 @@
       if (player.starTimer > 0) { player.starTimer--; if (player.starTimer === 0) updateControls(); }
       if (player.fireCooldown > 0) player.fireCooldown--;
       handleWarpInput();
+      checkAxe();
       checkGoal();
       camX = Math.max(0, Math.min(LEVEL_W - VIEW_W, player.x - VIEW_W * 0.4));
       draw();
@@ -1096,7 +1170,7 @@
         getState: () => state, getPlayer: () => player,
         getEnemies: () => enemies, getItems: () => items, getFireballs: () => fireballs,
         getBoss: () => boss, getTiles: () => tiles, isSolid, tileAt,
-        getInfo: () => ({ inBonus, isBossStage, stageIdx: state.stageIdx, ROWS, COLS, LEVEL_W }),
+        getInfo: () => ({ inBonus, isBossStage, stageIdx: state.stageIdx, ROWS, COLS, LEVEL_W, axeX, axeY, stageClearTimer }),
         keys, applyPowerup, shootFireball, enterWarp, exitWarp, STAGES
       };
     }
