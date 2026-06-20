@@ -35,7 +35,7 @@
     "id": "super-mario",
     "title": "Super Jump Adventure",
     "title_ko": "슈퍼 점프 모험",
-    "description": "달리고 점프해서 코인을 모으고 적을 밟아요! 깃발에 도착하면 클리어",
+    "description": "3스테이지+보스의 옆스크롤 플랫포머! 버섯·불꽃·별 파워업, 숨은 블록·파이프 비밀길",
     "thumbnail": "super-mario/thumb.svg",
     "path": "super-mario/index.html"
   },
