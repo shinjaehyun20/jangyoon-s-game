@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>벽돌 깨기 🧱</title>
+  <style>
+    :root {
+      --bg: #1a1a3e;
+      --bg2: #0d0d2b;
+      --accent: #f7c948;
+      --paddle: #5ee7df;
+      --ball: #ff6b6b;
+      --text: #ffffff;
+      --hud-bg: rgba(255,255,255,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 12px 6px;
+      gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      background: var(--hud-bg);
+      border-radius: 12px;
+      padding: 6px 12px;
+      flex-shrink: 0;
+      align-items: center;
+    }
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    .hud-label {
+      font-size: 10px;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .hud-value {
+      font-size: clamp(15px, 4vw, 20px);
+      font-weight: 700;
+      color: var(--accent);
+    }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      background: var(--bg2);
+      border: 2px solid rgba(255,255,255,0.08);
+      touch-action: none;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    footer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      padding: 2px 0;
+    }
+    footer small {
+      font-size: 11px;
+      opacity: 0.55;
+    }
+    .home-link {
+      font-size: 12px;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ── 오버레이 ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(145deg, #1e1e4a, #12122e);
+      border-radius: 24px;
+      padding: 28px 24px;
+      max-width: 320px;
+      width: 90%;
+      text-align: center;
+      border: 2px solid rgba(255,255,255,0.12);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 {
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+    .overlay-card p {
+      font-size: 14px;
+      opacity: 0.8;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .overlay-card .rules {
+      font-size: 13px;
+      opacity: 0.7;
+      text-align: left;
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+    .result-score {
+      font-size: clamp(38px, 10vw, 56px);
+      font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0;
+    }
+    .result-best {
+      font-size: 13px;
+      opacity: 0.7;
+      margin-bottom: 16px;
+    }
+    .result-stars {
+      font-size: 28px;
+      letter-spacing: 4px;
+      margin-bottom: 12px;
+    }
+    .btn-start {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      font-weight: 800;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #f98a00);
+      color: #1a1a1a;
+      margin-top: 8px;
+      min-height: 52px;
+      letter-spacing: -0.3px;
+      box-shadow: 0 4px 16px rgba(247,201,72,0.35);
+    }
+    .btn-start:active { transform: scale(0.97); }
+    .level-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 12px;
+      margin-bottom: 14px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🧱 벽돌 깨기</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">점수</span>
+        <span class="hud-value" id="hudScore">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">최고</span>
+        <span class="hud-value" id="hudBest">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">목숨</span>
+        <span class="hud-value" id="hudLives">❤️❤️❤️</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">레벨</span>
+        <span class="hud-value" id="hudLevel">1</span>
+      </div>
+    </div>
+
+    <div id="gameArea">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <footer>
+      <small>손가락으로 패들을 움직여요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🧱 벽돌 깨기</h2>
+      <p>패들을 움직여 공을 튕기고<br>모든 벽돌을 깨부숴요!</p>
+      <div class="rules">
+        🎯 화면을 터치해서 패들 이동<br>
+        ❤️ 공을 3번 놓치면 게임 종료<br>
+        ⭐ 모두 깨면 다음 레벨 도전!<br>
+        🏆 최고 점수에 도전해봐요
+      </div>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 레벨업 오버레이 -->
+  <div class="overlay hidden" id="levelOverlay">
+    <div class="overlay-card">
+      <h2>🎉 레벨 클리어!</h2>
+      <div class="result-stars" id="levelStars">⭐⭐⭐</div>
+      <p id="levelMsg">다음 레벨로 도전!</p>
+      <button class="btn-start" id="nextLevelBtn">다음 레벨 →</button>
+    </div>
+  </div>
+
+  <!-- 종료 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-best" id="resultBest"></div>
+      <div class="result-stars" id="endStars">⭐</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기 🔄</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── CONFIG ── */
+    const CONFIG = {
+      PADDLE_HEIGHT: 12,
+      PADDLE_RADIUS: 6,
+      BALL_RADIUS: 9,
+      BALL_SPEED_BASE: 5.5,
+      BALL_SPEED_MAX: 11,
+      BALL_SPEED_INC: 0.08,   // 벽돌 깰 때마다 속도 증가
+      LIVES_MAX: 3,
+      BRICK_ROWS_BASE: 4,
+      BRICK_COLS_BASE: 7,
+      BRICK_GAP: 5,
+      BRICK_TOP_OFFSET: 0.12, // canvas 높이 대비
+      STORAGE_KEY: 'brick-break_best',
+    };
+
+    /* 레벨별 설정 */
+    const LEVEL_CONFIG = [
+      { rows: 4, cols: 7, speedMul: 1.00, label: '레벨 1 — 기초 훈련' },
+      { rows: 5, cols: 7, speedMul: 1.10, label: '레벨 2 — 중급' },
+      { rows: 5, cols: 8, speedMul: 1.20, label: '레벨 3 — 고급' },
+      { rows: 6, cols: 8, speedMul: 1.30, label: '레벨 4 — 최종 보스!' },
+    ];
+
+    /* 레벨별 벽돌 색상 팔레트 */
+    const BRICK_PALETTES = [
+      ['#ff6b6b','#ff8e53','#ffd93d','#6bcb77','#4d96ff'],
+      ['#c77dff','#7b2ff7','#f72585','#4cc9f0','#4361ee'],
+      ['#f72585','#b5179e','#7209b7','#560bad','#480ca8'],
+      ['#48cae4','#00b4d8','#0096c7','#0077b6','#023e8a'],
+    ];
+
+    /* ── STATE ── */
+    const state = {
+      lives: CONFIG.LIVES_MAX,
+      score: 0,
+      best: 0,
+      level: 1,
+      running: false,
+      paused: false,
+      ball: { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
+      paddle: { x: 0, width: 0 },
+      bricks: [],
+      animId: null,
+      bricksBroken: 0,
+      totalBricks: 0,
+    };
+
+    /* ── DOM ── */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const gameArea = document.getElementById('gameArea');
+    const startOverlay = document.getElementById('startOverlay');
+    const levelOverlay = document.getElementById('levelOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const hudScore = document.getElementById('hudScore');
+    const hudBest = document.getElementById('hudBest');
+    const hudLives = document.getElementById('hudLives');
+    const hudLevel = document.getElementById('hudLevel');
+    const finalScore = document.getElementById('finalScore');
+    const resultBest = document.getElementById('resultBest');
+    const resultMsg = document.getElementById('resultMsg');
+    const endTitle = document.getElementById('endTitle');
+    const endStars = document.getElementById('endStars');
+    const levelStars = document.getElementById('levelStars');
+    const levelMsg = document.getElementById('levelMsg');
+
+    /* ── 캔버스 크기 동기화 ── */
+    function resizeCanvas() {
+      const rect = gameArea.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    /* ── 벽돌 생성 ── */
+    function createBricks(level) {
+      const lcfg = LEVEL_CONFIG[Math.min(level - 1, LEVEL_CONFIG.length - 1)];
+      const cols = lcfg.cols;
+      const rows = lcfg.rows;
+      const palette = BRICK_PALETTES[(level - 1) % BRICK_PALETTES.length];
+      const W = canvas.width;
+      const H = canvas.height;
+      const brickW = (W - CONFIG.BRICK_GAP * (cols + 1)) / cols;
+      const brickH = Math.min(22, (H * 0.38 - CONFIG.BRICK_GAP * (rows + 1)) / rows);
+      const topOff = H * CONFIG.BRICK_TOP_OFFSET;
+      const bricks = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const hp = rows - r; // 위 줄일수록 hp 높음 (max=rows)
+          bricks.push({
+            x: CONFIG.BRICK_GAP + c * (brickW + CONFIG.BRICK_GAP),
+            y: topOff + r * (brickH + CONFIG.BRICK_GAP),
+            w: brickW,
+            h: brickH,
+            color: palette[r % palette.length],
+            hp,
+            maxHp: hp,
+            alive: true,
+          });
+        }
+      }
+      state.totalBricks = bricks.length;
+      state.bricksBroken = 0;
+      return bricks;
+    }
+
+    /* ── 공·패들 초기화 ── */
+    function initBallPaddle(level) {
+      const W = canvas.width;
+      const H = canvas.height;
+      const lcfg = LEVEL_CONFIG[Math.min(level - 1, LEVEL_CONFIG.length - 1)];
+      const speed = CONFIG.BALL_SPEED_BASE * lcfg.speedMul;
+      const paddleW = Math.max(60, W * 0.28);
+      state.paddle.x = (W - paddleW) / 2;
+      state.paddle.width = paddleW;
+      state.ball.x = W / 2;
+      state.ball.y = H * 0.72;
+      state.ball.speed = speed;
+      const angle = -Math.PI / 2 + (Math.random() * 0.6 - 0.3);
+      state.ball.vx = speed * Math.cos(angle);
+      state.ball.vy = speed * Math.sin(angle);
+    }
+
+    /* ── 레벨 시작 ── */
+    function startLevel(level) {
+      resizeCanvas();
+      state.bricks = createBricks(level);
+      initBallPaddle(level);
+      state.running = true;
+      state.paused = false;
+      updateHUD();
+      cancelAnimationFrame(state.animId);
+      state.animId = requestAnimationFrame(loop);
+    }
+
+    /* ── 게임 전체 시작 ── */
+    function startGame() {
+      state.score = 0;
+      state.lives = CONFIG.LIVES_MAX;
+      state.level = 1;
+      state.best = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0');
+      hide(startOverlay);
+      hide(endOverlay);
+      hide(levelOverlay);
+      startLevel(1);
+    }
+
+    /* ── 공 놓침 처리 ── */
+    function ballLost() {
+      state.lives--;
+      updateHUD();
+      if (state.lives <= 0) {
+        endGame(false);
+      } else {
+        // 잠시 멈춤 후 재발사
+        state.paused = true;
+        setTimeout(() => {
+          initBallPaddle(state.level);
+          state.paused = false;
+        }, 600);
+      }
+    }
+
+    /* ── 레벨 클리어 ── */
+    function levelClear() {
+      state.running = false;
+      cancelAnimationFrame(state.animId);
+      levelStars.textContent = state.level >= 4 ? '🏆🏆🏆' : '⭐⭐⭐';
+      const bonus = state.level * 500;
+      state.score += bonus;
+      levelMsg.textContent = `+${bonus}점 보너스! ${
+        state.level < LEVEL_CONFIG.length ? '다음 레벨에 도전!' : '최종 클리어!'
+      }`;
+      updateHUD();
+      if (state.level < LEVEL_CONFIG.length) {
+        document.getElementById('nextLevelBtn').textContent = `레벨 ${state.level + 1} 시작 →`;
+        show(levelOverlay);
+      } else {
+        // 전 레벨 클리어
+        endGame(true, true);
+      }
+    }
+
+    /* ── 게임 종료 ── */
+    function endGame(win, fullClear) {
+      state.running = false;
+      cancelAnimationFrame(state.animId);
+      if (state.score > state.best) {
+        state.best = state.score;
+        localStorage.setItem(CONFIG.STORAGE_KEY, state.best);
+      }
+      finalScore.textContent = state.score;
+      if (fullClear) {
+        endTitle.textContent = '🎊 전 레벨 클리어!';
+        endStars.textContent = '🏆⭐🏆';
+        resultMsg.textContent = '모든 벽돌을 깨부쉈어요! 대단해요!';
+      } else if (win) {
+        endTitle.textContent = '🎉 게임 종료!';
+        endStars.textContent = '⭐⭐⭐';
+        resultMsg.textContent = '정말 잘했어요!';
+      } else {
+        endTitle.textContent = '😢 게임 오버';
+        endStars.textContent = state.score > 1000 ? '⭐⭐' : '⭐';
+        resultMsg.textContent = '다음엔 더 잘할 수 있어! 다시 해봐요!';
+      }
+      resultBest.textContent = `최고기록: ${state.best}점`;
+      hide(levelOverlay);
+      show(endOverlay);
+    }
+
+    /* ── HUD 갱신 ── */
+    function updateHUD() {
+      hudScore.textContent = state.score;
+      hudBest.textContent = state.best;
+      hudLevel.textContent = state.level;
+      const hearts = ['', '❤️', '❤️❤️', '❤️❤️❤️'];
+      hudLives.textContent = hearts[Math.max(0, state.lives)] || '';
+    }
+
+    /* ── 메인 루프 ── */
+    function loop() {
+      if (!state.running) return;
+      if (!state.paused) update();
+      draw();
+      state.animId = requestAnimationFrame(loop);
+    }
+
+    /* ── 업데이트 ── */
+    function update() {
+      const W = canvas.width;
+      const H = canvas.height;
+      const b = state.ball;
+      const p = state.paddle;
+      const paddleY = H - CONFIG.PADDLE_HEIGHT - 10;
+
+      // 공 이동
+      b.x += b.vx;
+      b.y += b.vy;
+
+      // 벽 반사 (좌우, 위)
+      if (b.x - CONFIG.BALL_RADIUS < 0) { b.x = CONFIG.BALL_RADIUS; b.vx = Math.abs(b.vx); }
+      if (b.x + CONFIG.BALL_RADIUS > W) { b.x = W - CONFIG.BALL_RADIUS; b.vx = -Math.abs(b.vx); }
+      if (b.y - CONFIG.BALL_RADIUS < 0) { b.y = CONFIG.BALL_RADIUS; b.vy = Math.abs(b.vy); }
+
+      // 공이 바닥 밖으로
+      if (b.y - CONFIG.BALL_RADIUS > H) {
+        ballLost();
+        return;
+      }
+
+      // 패들 충돌
+      if (
+        b.vy > 0 &&
+        b.y + CONFIG.BALL_RADIUS >= paddleY &&
+        b.y - CONFIG.BALL_RADIUS <= paddleY + CONFIG.PADDLE_HEIGHT &&
+        b.x >= p.x - 2 &&
+        b.x <= p.x + p.width + 2
+      ) {
+        // 패들 위치에 따라 반사 각도 조정
+        const hitPos = (b.x - p.x) / p.width; // 0(왼쪽) ~ 1(오른쪽)
+        const angle = (hitPos - 0.5) * Math.PI * 0.7; // -63° ~ +63°
+        const speed = Math.min(b.speed, CONFIG.BALL_SPEED_MAX);
+        b.vx = speed * Math.sin(angle);
+        b.vy = -Math.abs(speed * Math.cos(angle));
+        b.y = paddleY - CONFIG.BALL_RADIUS - 1;
+      }
+
+      // 벽돌 충돌
+      let hitAny = false;
+      for (const brick of state.bricks) {
+        if (!brick.alive) continue;
+        const bLeft = brick.x;
+        const bRight = brick.x + brick.w;
+        const bTop = brick.y;
+        const bBottom = brick.y + brick.h;
+
+        if (
+          b.x + CONFIG.BALL_RADIUS > bLeft &&
+          b.x - CONFIG.BALL_RADIUS < bRight &&
+          b.y + CONFIG.BALL_RADIUS > bTop &&
+          b.y - CONFIG.BALL_RADIUS < bBottom
+        ) {
+          // 어느 면 충돌인지 판별
+          const overlapLeft = b.x + CONFIG.BALL_RADIUS - bLeft;
+          const overlapRight = bRight - (b.x - CONFIG.BALL_RADIUS);
+          const overlapTop = b.y + CONFIG.BALL_RADIUS - bTop;
+          const overlapBottom = bBottom - (b.y - CONFIG.BALL_RADIUS);
+          const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+          if (minOverlap === overlapTop || minOverlap === overlapBottom) {
+            b.vy = -b.vy;
+          } else {
+            b.vx = -b.vx;
+          }
+
+          brick.hp--;
+          if (brick.hp <= 0) {
+            brick.alive = false;
+            state.bricksBroken++;
+            // 속도 미세 증가
+            const newSpeed = Math.min(b.speed + CONFIG.BALL_SPEED_INC, CONFIG.BALL_SPEED_MAX);
+            b.speed = newSpeed;
+            const curSpeed = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+            if (curSpeed > 0) {
+              b.vx = (b.vx / curSpeed) * newSpeed;
+              b.vy = (b.vy / curSpeed) * newSpeed;
+            }
+            // 점수: 행 위치 + 레벨 보너스
+            const pts = (brick.maxHp * 10) * state.level;
+            state.score += pts;
+            updateHUD();
+          }
+
+          hitAny = true;
+          break; // 프레임당 1벽돌만 처리 (터널링 방지)
+        }
+      }
+
+      // 모든 벽돌 클리어 확인
+      if (state.bricks.every(b => !b.alive)) {
+        levelClear();
+      }
+    }
+
+    /* ── 렌더 ── */
+    function draw() {
+      const W = canvas.width;
+      const H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      // 배경 그라디언트
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#0d0d2b');
+      bgGrad.addColorStop(1, '#1a1a3e');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 벽돌
+      for (const brick of state.bricks) {
+        if (!brick.alive) continue;
+        const ratio = brick.hp / brick.maxHp;
+        ctx.save();
+        ctx.globalAlpha = 0.7 + 0.3 * ratio;
+        ctx.shadowColor = brick.color;
+        ctx.shadowBlur = 8 * ratio;
+
+        // 벽돌 몸체
+        ctx.beginPath();
+        roundRect(ctx, brick.x, brick.y, brick.w, brick.h, 5);
+        ctx.fillStyle = brick.color;
+        ctx.fill();
+
+        // HP 표시 (maxHp > 1인 경우)
+        if (brick.maxHp > 1) {
+          ctx.fillStyle = 'rgba(0,0,0,0.35)';
+          roundRect(ctx, brick.x, brick.y, brick.w * (1 - ratio), brick.h, 5);
+          ctx.fill();
+        }
+
+        // 하이라이트
+        const hiGrad = ctx.createLinearGradient(brick.x, brick.y, brick.x, brick.y + brick.h * 0.5);
+        hiGrad.addColorStop(0, 'rgba(255,255,255,0.3)');
+        hiGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = hiGrad;
+        ctx.beginPath();
+        roundRect(ctx, brick.x, brick.y, brick.w, brick.h * 0.5, [5, 5, 0, 0]);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // 공
+      const b = state.ball;
+      ctx.save();
+      ctx.shadowColor = '#ff6b6b';
+      ctx.shadowBlur = 14;
+      const ballGrad = ctx.createRadialGradient(b.x - 2, b.y - 2, 1, b.x, b.y, CONFIG.BALL_RADIUS);
+      ballGrad.addColorStop(0, '#ffb3b3');
+      ballGrad.addColorStop(1, '#ff6b6b');
+      ctx.fillStyle = ballGrad;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, CONFIG.BALL_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // 패들
+      const paddleY = H - CONFIG.PADDLE_HEIGHT - 10;
+      const p = state.paddle;
+      ctx.save();
+      ctx.shadowColor = '#5ee7df';
+      ctx.shadowBlur = 12;
+      const padGrad = ctx.createLinearGradient(p.x, paddleY, p.x, paddleY + CONFIG.PADDLE_HEIGHT);
+      padGrad.addColorStop(0, '#a0f5ef');
+      padGrad.addColorStop(1, '#5ee7df');
+      ctx.fillStyle = padGrad;
+      ctx.beginPath();
+      roundRect(ctx, p.x, paddleY, p.width, CONFIG.PADDLE_HEIGHT, CONFIG.PADDLE_RADIUS);
+      ctx.fill();
+      ctx.restore();
+
+      // 일시정지 중 메시지
+      if (state.paused) {
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = `bold 18px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('준비 중... 💨', W / 2, H / 2);
+      }
+    }
+
+    /* ── 유틸: 둥근 사각형 ── */
+    function roundRect(ctx, x, y, w, h, r) {
+      const radii = Array.isArray(r) ? r : [r, r, r, r];
+      ctx.beginPath();
+      ctx.moveTo(x + radii[0], y);
+      ctx.arcTo(x + w, y, x + w, y + h, radii[1]);
+      ctx.arcTo(x + w, y + h, x, y + h, radii[2]);
+      ctx.arcTo(x, y + h, x, y, radii[3]);
+      ctx.arcTo(x, y, x + w, y, radii[0]);
+      ctx.closePath();
+    }
+
+    /* ── 유틸: 오버레이 show/hide ── */
+    function show(el) { el.classList.remove('hidden'); }
+    function hide(el) { el.classList.add('hidden'); }
+
+    /* ── 입력 처리: 패들 이동 (pointerdown/move) ── */
+    let pointerActive = false;
+    function updatePaddleFromPointer(e) {
+      const rect = gameArea.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) * (canvas.width / rect.width);
+      state.paddle.x = Math.max(0, Math.min(canvas.width - state.paddle.width, relX - state.paddle.width / 2));
+    }
+
+    gameArea.addEventListener('pointerdown', (e) => {
+      if (!state.running || state.paused) return;
+      pointerActive = true;
+      updatePaddleFromPointer(e);
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!pointerActive || !state.running) return;
+      updatePaddleFromPointer(e);
+    });
+    window.addEventListener('pointerup', () => { pointerActive = false; });
+    window.addEventListener('pointercancel', () => { pointerActive = false; });
+
+    /* ── 버튼 ── */
+    document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+    document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+    document.getElementById('nextLevelBtn').addEventListener('pointerdown', () => {
+      hide(levelOverlay);
+      state.level++;
+      updateHUD();
+      startLevel(state.level);
+    });
+
+    /* ── 리사이즈 ── */
+    window.addEventListener('resize', () => {
+      if (state.running) {
+        resizeCanvas();
+        initBallPaddle(state.level);
+        state.bricks = createBricks(state.level);
+      }
+    });
+
+    /* ── 초기화 ── */
+    resizeCanvas();
+    state.best = parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0');
+    updateHUD();
+  })();
+  </script>
+</body>
+</html>

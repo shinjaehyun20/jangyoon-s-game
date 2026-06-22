@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>강아지 산책 🐾</title>
+  <style>
+    :root {
+      --bg: #87ceeb;
+      --ground: #6abf5e;
+      --accent: #ff9f43;
+      --text: #1a1a1a;
+      --hud-bg: rgba(255,255,255,0.4);
+      --btn: #ff6b6b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5.5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      color: #1a1a1a;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--hud-bg);
+      border-radius: 12px;
+      padding: 6px 14px;
+      flex-shrink: 0;
+    }
+    .hud-item { font-size: 14px; font-weight: 700; }
+    .hud-item span { font-size: 18px; font-weight: 900; color: #e84393; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #87ceeb 0%, #b0e0ff 60%, #6abf5e 60%, #5aaf4e 100%);
+      cursor: pointer;
+      user-select: none;
+    }
+    /* Sky decoration */
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50px;
+      pointer-events: none;
+    }
+    /* Road */
+    #road {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 38%;
+      background: linear-gradient(180deg, #6abf5e 0%, #5aaf4e 100%);
+    }
+    /* Dog character */
+    #dog {
+      position: absolute;
+      bottom: 38%;
+      font-size: 48px;
+      line-height: 1;
+      transform: translateX(-50%);
+      transition: left 0.15s ease-out;
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Obstacle */
+    .obstacle {
+      position: absolute;
+      bottom: 38%;
+      font-size: 36px;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Treat (collectible) */
+    .treat {
+      position: absolute;
+      font-size: 28px;
+      pointer-events: none;
+      user-select: none;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      padding: 0 2px;
+    }
+    footer small { font-size: 12px; color: rgba(0,0,0,0.5); }
+    .home-link {
+      font-size: 13px;
+      color: rgba(0,0,0,0.55);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.4);
+    }
+    /* Overlays */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 320px;
+      width: 88%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; }
+    .overlay-card p { font-size: 14px; color: #555; margin-bottom: 18px; line-height: 1.5; }
+    .result-score {
+      font-size: 52px;
+      font-weight: 900;
+      color: #ff6b6b;
+      margin: 10px 0;
+    }
+    .btn-start {
+      background: var(--btn);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 20px;
+      font-weight: 800;
+      min-height: 52px;
+      width: 100%;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(255,107,107,0.4);
+    }
+    .btn-start:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🐾 강아지 산책</h1>
+    <div class="hud">
+      <div class="hud-item">점수 <span id="score">0</span></div>
+      <div class="hud-item">거리 <span id="dist">0</span>m</div>
+      <div class="hud-item">최고 <span id="best">0</span></div>
+      <div class="hud-item">⏱ <span id="timer">30</span></div>
+    </div>
+    <div id="gameArea">
+      <div id="dog">🐕</div>
+    </div>
+    <footer>
+      <small>좌우 탭/드래그로 강아지 이동!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🐾 강아지 산책</h2>
+      <p>강아지를 좌우로 움직여<br>🌿 풀숲·🚗 차를 피하고<br>🦴 뼈다귀를 모아요!<br><br>화면 좌·우 탭 또는 드래그</p>
+      <button class="btn-start" id="startBtn">산책 시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 산책 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 산책!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_DURATION: 30,       // 초
+      LANES: 5,                // 레인 수
+      OBSTACLE_INTERVAL: 1200, // ms
+      TREAT_INTERVAL: 900,     // ms
+      SCROLL_SPEED_INIT: 3,    // px/frame
+      SCROLL_SPEED_MAX: 7,
+      TREAT_SCORE: 5,
+      DIST_PER_FRAME: 0.05,    // m per frame
+      BEST_KEY: 'dog-walk_best',
+    };
+
+    // State
+    let state = {
+      running: false,
+      score: 0,
+      dist: 0,
+      timeLeft: CONFIG.GAME_DURATION,
+      lane: 2,            // 0~4, 중앙 시작
+      scrollSpeed: CONFIG.SCROLL_SPEED_INIT,
+      obstacles: [],      // { el, lane, y }
+      treats: [],         // { el, y, lane }
+      raf: null,
+      timerInterval: null,
+      obstacleTimer: null,
+      treatTimer: null,
+    };
+
+    // DOM
+    const gameArea   = document.getElementById('gameArea');
+    const dogEl      = document.getElementById('dog');
+    const scoreEl    = document.getElementById('score');
+    const distEl     = document.getElementById('dist');
+    const bestEl     = document.getElementById('best');
+    const timerEl    = document.getElementById('timer');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay   = document.getElementById('endOverlay');
+    const finalScoreEl = document.getElementById('finalScore');
+    const resultMsgEl  = document.getElementById('resultMsg');
+    const startBtn   = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    // Best score
+    let best = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+    bestEl.textContent = best;
+
+    // Lane helpers
+    function laneX(lane) {
+      const w = gameArea.offsetWidth;
+      const step = w / CONFIG.LANES;
+      return step * lane + step / 2;
+    }
+
+    function positionDog() {
+      dogEl.style.left = laneX(state.lane) + 'px';
+    }
+
+    // Obstacle types
+    const OBSTACLES = ['🌿', '🚗', '🐈', '🌵', '🚧'];
+    const TREATS    = ['🦴', '⭐', '🎾'];
+
+    function spawnObstacle() {
+      if (!state.running) return;
+      const lane = Math.floor(Math.random() * CONFIG.LANES);
+      const type = OBSTACLES[Math.floor(Math.random() * OBSTACLES.length)];
+      const el = document.createElement('div');
+      el.className = 'obstacle';
+      el.textContent = type;
+      const w = gameArea.offsetWidth;
+      const step = w / CONFIG.LANES;
+      el.style.left = (step * lane + step / 2 - 18) + 'px';
+      el.style.top = '-50px';
+      gameArea.appendChild(el);
+      state.obstacles.push({ el, lane, y: -50 });
+    }
+
+    function spawnTreat() {
+      if (!state.running) return;
+      // Avoid placing treat where obstacle was recently
+      const lane = Math.floor(Math.random() * CONFIG.LANES);
+      const type = TREATS[Math.floor(Math.random() * TREATS.length)];
+      const el = document.createElement('div');
+      el.className = 'treat';
+      el.textContent = type;
+      const w = gameArea.offsetWidth;
+      const step = w / CONFIG.LANES;
+      const areaH = gameArea.offsetHeight;
+      // Place in upper half
+      const startY = -30 + Math.random() * (areaH * 0.3);
+      el.style.left = (step * lane + step / 2 - 14) + 'px';
+      el.style.top = startY + 'px';
+      gameArea.appendChild(el);
+      state.treats.push({ el, lane, y: startY });
+    }
+
+    // Collision detection (lane-based)
+    function checkCollision(obj, isDog) {
+      const dogLane = state.lane;
+      const areaH = gameArea.offsetHeight;
+      const dogY = areaH * 0.62; // dog sits at ~62% from top
+
+      if (obj.lane !== dogLane) return false;
+      const objY = obj.y;
+      return Math.abs(objY - dogY) < 40;
+    }
+
+    function gameLoop() {
+      if (!state.running) return;
+
+      const areaH = gameArea.offsetHeight;
+      state.scrollSpeed = Math.min(
+        CONFIG.SCROLL_SPEED_INIT + (CONFIG.GAME_DURATION - state.timeLeft) * 0.15,
+        CONFIG.SCROLL_SPEED_MAX
+      );
+
+      // Move obstacles
+      const deadObstacles = [];
+      state.obstacles.forEach((obs, i) => {
+        obs.y += state.scrollSpeed;
+        obs.el.style.top = obs.y + 'px';
+        if (obs.y > areaH + 10) {
+          obs.el.remove();
+          deadObstacles.push(i);
+          return;
+        }
+        if (checkCollision(obs)) {
+          // Hit! — shake dog, end game
+          dogEl.style.fontSize = '40px';
+          dogEl.textContent = '💥';
+          setTimeout(endGame, 350);
+          state.running = false;
+        }
+      });
+      for (let i = deadObstacles.length - 1; i >= 0; i--) {
+        state.obstacles.splice(deadObstacles[i], 1);
+      }
+
+      // Move treats
+      const deadTreats = [];
+      state.treats.forEach((tr, i) => {
+        tr.y += state.scrollSpeed * 0.8;
+        tr.el.style.top = tr.y + 'px';
+        if (tr.y > areaH + 10) {
+          tr.el.remove();
+          deadTreats.push(i);
+          return;
+        }
+        if (checkCollision(tr)) {
+          // Collect!
+          state.score += CONFIG.TREAT_SCORE;
+          scoreEl.textContent = state.score;
+          tr.el.remove();
+          deadTreats.push(i);
+        }
+      });
+      for (let i = deadTreats.length - 1; i >= 0; i--) {
+        state.treats.splice(deadTreats[i], 1);
+      }
+
+      // Distance
+      state.dist += CONFIG.DIST_PER_FRAME;
+      distEl.textContent = Math.floor(state.dist);
+
+      if (state.running) state.raf = requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      // Reset state
+      state.running = false;
+      cancelAnimationFrame(state.raf);
+      clearInterval(state.timerInterval);
+      clearInterval(state.obstacleTimer);
+      clearInterval(state.treatTimer);
+
+      // Clear stale elements
+      state.obstacles.forEach(o => o.el.remove());
+      state.treats.forEach(t => t.el.remove());
+      state.obstacles = [];
+      state.treats = [];
+
+      state.score = 0;
+      state.dist = 0;
+      state.timeLeft = CONFIG.GAME_DURATION;
+      state.lane = 2;
+      state.scrollSpeed = CONFIG.SCROLL_SPEED_INIT;
+
+      scoreEl.textContent = '0';
+      distEl.textContent = '0';
+      timerEl.textContent = CONFIG.GAME_DURATION;
+
+      dogEl.textContent = '🐕';
+      dogEl.style.fontSize = '48px';
+      positionDog();
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      state.running = true;
+
+      // Timer
+      state.timerInterval = setInterval(() => {
+        if (!state.running) return;
+        state.timeLeft--;
+        timerEl.textContent = state.timeLeft;
+        if (state.timeLeft <= 0) {
+          state.running = false;
+          clearInterval(state.timerInterval);
+          clearInterval(state.obstacleTimer);
+          clearInterval(state.treatTimer);
+          cancelAnimationFrame(state.raf);
+          endGame();
+        }
+      }, 1000);
+
+      // Spawn timers
+      state.obstacleTimer = setInterval(spawnObstacle, CONFIG.OBSTACLE_INTERVAL);
+      state.treatTimer    = setInterval(spawnTreat,    CONFIG.TREAT_INTERVAL);
+
+      state.raf = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(state.raf);
+      clearInterval(state.timerInterval);
+      clearInterval(state.obstacleTimer);
+      clearInterval(state.treatTimer);
+
+      const total = state.score + Math.floor(state.dist);
+      finalScoreEl.textContent = total;
+
+      if (total > best) {
+        best = total;
+        localStorage.setItem(CONFIG.BEST_KEY, best);
+        bestEl.textContent = best;
+        resultMsgEl.textContent = '🎉 새 최고 기록! 대단해요!';
+      } else if (total >= best * 0.8) {
+        resultMsgEl.textContent = '🐾 잘했어요! 또 산책해요!';
+      } else {
+        resultMsgEl.textContent = '🦴 뼈다귀를 더 모아봐요!';
+      }
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    // Input: pointer (touch + mouse unified)
+    let pointerStartX = null;
+
+    gameArea.addEventListener('pointerdown', (e) => {
+      if (!state.running) return;
+      pointerStartX = e.clientX;
+      e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!state.running || pointerStartX === null) return;
+      const dx = e.clientX - pointerStartX;
+      if (Math.abs(dx) > 25) {
+        if (dx > 0 && state.lane < CONFIG.LANES - 1) {
+          state.lane++;
+        } else if (dx < 0 && state.lane > 0) {
+          state.lane--;
+        }
+        pointerStartX = e.clientX;
+        positionDog();
+      }
+    }, { passive: true });
+
+    window.addEventListener('pointerup', (e) => {
+      if (!state.running || pointerStartX === null) return;
+      const dx = e.clientX - pointerStartX;
+      // Tap (small movement) = move toward tap side
+      if (Math.abs(dx) < 15) {
+        const midX = gameArea.getBoundingClientRect().left + gameArea.offsetWidth / 2;
+        if (e.clientX > midX && state.lane < CONFIG.LANES - 1) {
+          state.lane++;
+        } else if (e.clientX <= midX && state.lane > 0) {
+          state.lane--;
+        }
+        positionDog();
+      }
+      pointerStartX = null;
+    }, { passive: true });
+
+    // Keyboard support (optional, desktop)
+    document.addEventListener('keydown', (e) => {
+      if (!state.running) return;
+      if (e.key === 'ArrowLeft' && state.lane > 0) {
+        state.lane--;
+        positionDog();
+      }
+      if (e.key === 'ArrowRight' && state.lane < CONFIG.LANES - 1) {
+        state.lane++;
+        positionDog();
+      }
+    });
+
+    // Buttons
+    startBtn.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      startGame();
+    });
+    restartBtn.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      startGame();
+    });
+
+    // Init dog position after paint
+    requestAnimationFrame(positionDog);
+  })();
+  </script>
+</body>
+</html>

@@ -998,5 +998,21 @@
     "description": "꾹 누르다 딱 맞게 손 떼면 쑥! 황금 당근도 찾아봐요",
     "thumbnail": "carrot-pull/thumb.svg",
     "path": "carrot-pull/index.html"
+  },
+  {
+    "id": "brick-break",
+    "title": "Brick Break",
+    "title_ko": "벽돌 깨기",
+    "description": "공을 튕겨 벽돌을 모두 깨요! 패들을 좌우로 움직여 공을 받아내세요. 30초 스피드 도전!",
+    "thumbnail": "brick-break/thumb.svg",
+    "path": "brick-break/index.html"
+  },
+  {
+    "id": "dog-walk",
+    "title": "Dog Walk",
+    "title_ko": "강아지 산책",
+    "description": "강아지를 좌우로 이동해 장애물을 피하고 뼈다귀를 모아요! 30초 산책 도전",
+    "thumbnail": "dog-walk/thumb.svg",
+    "path": "dog-walk/index.html"
   }
 ]
