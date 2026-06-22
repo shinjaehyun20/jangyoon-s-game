@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#10243f"/>
+      <stop offset="1" stop-color="#0a1730"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <polygon points="92,172 228,172 194,58 126,58" fill="#16345c" opacity="0.6"/>
+  <g fill="#ffffff">
+    <ellipse cx="150" cy="72" rx="6" ry="13"/>
+    <ellipse cx="166" cy="70" rx="6" ry="13"/>
+    <ellipse cx="182" cy="72" rx="6" ry="13"/>
+    <ellipse cx="158" cy="88" rx="6" ry="13"/>
+    <ellipse cx="174" cy="88" rx="6" ry="13"/>
+  </g>
+  <circle cx="134" cy="142" r="22" fill="#1f6feb"/>
+  <circle cx="127" cy="135" r="3" fill="#0a1730"/>
+  <circle cx="137" cy="133" r="3" fill="#0a1730"/>
+  <circle cx="132" cy="143" r="3" fill="#0a1730"/>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#88ccff">볼링</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">BOWLING</text>
+  </g>
+</svg>

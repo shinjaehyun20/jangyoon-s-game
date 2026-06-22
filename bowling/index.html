@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🎳 볼링</title>
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --panel: rgba(255,255,255,0.08);
+      --accent: #60a5fa;
+      --pin-normal: #f1f5f9;
+      --pin-down: #64748b;
+      --ball: #1d4ed8;
+      --lane: #1e293b;
+      --gutter: #0f172a;
+      --foul: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 14px 8px; gap: 8px;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      text-align: center; color: var(--accent);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; justify-content: space-around; align-items: center;
+      background: var(--panel); border-radius: 12px; padding: 8px;
+      flex-shrink: 0;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 10px; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; }
+    .hud-value { font-size: 22px; font-weight: 900; }
+    .hud-value.accent { color: var(--accent); }
+
+    /* 프레임 표시줄 */
+    .frames-bar {
+      display: flex; gap: 3px; justify-content: center;
+      flex-shrink: 0; flex-wrap: nowrap;
+    }
+    .frame-box {
+      flex: 1; min-width: 0;
+      background: var(--panel); border-radius: 6px;
+      padding: 4px 2px; text-align: center;
+      border: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .frame-box.active { border-color: var(--accent); }
+    .frame-box .f-rolls {
+      font-size: 9px; opacity: 0.7;
+      white-space: nowrap; overflow: hidden;
+      min-height: 12px;
+    }
+    .frame-box .f-score {
+      font-size: 12px; font-weight: 900;
+      min-height: 16px;
+    }
+    .frame-box .f-num { font-size: 8px; opacity: 0.4; }
+
+    /* 게임 캔버스 영역 */
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--gutter);
+      touch-action: none;
+      cursor: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+    canvas {
+      display: block;
+      touch-action: none;
+    }
+
+    /* 스와이프 피드백 메시지 */
+    #feedback {
+      position: absolute;
+      top: 12px; left: 50%; transform: translateX(-50%);
+      font-size: 26px; font-weight: 900;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+    #feedback.show { opacity: 1; }
+
+    /* 파워 바 */
+    #powerWrap {
+      position: absolute;
+      bottom: 16px; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 10px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 5px; overflow: hidden;
+      display: none;
+    }
+    #powerBar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+      border-radius: 5px;
+      transition: width 0.05s;
+    }
+    #powerLabel {
+      position: absolute;
+      bottom: 30px; left: 50%; transform: translateX(-50%);
+      font-size: 11px; opacity: 0.7;
+      display: none; white-space: nowrap;
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; opacity: 0.5; }
+    .home-link {
+      padding: 6px 14px; border-radius: 8px;
+      background: rgba(255,255,255,0.07); color: #fff;
+      text-decoration: none; font-size: 12px; font-weight: 600;
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center; z-index: 20;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1a1a2e; border-radius: 22px; padding: 28px 22px;
+      text-align: center; width: min(340px, 90vw);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      border: 1px solid rgba(96,165,250,0.3);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 10px; color: var(--accent); }
+    .overlay-card p  { font-size: 14px; opacity: 0.85; margin-bottom: 14px; line-height: 1.7; }
+    .result-score { font-size: 60px; font-weight: 900; color: var(--accent); margin: 6px 0; }
+    .result-detail { font-size: 13px; opacity: 0.7; margin-bottom: 14px; }
+    .btn-start {
+      background: var(--accent); border: none; color: #0d0d1a;
+      font-size: 20px; font-weight: 900;
+      padding: 14px 36px; border-radius: 14px;
+      cursor: pointer; touch-action: manipulation;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+      min-height: 52px;
+    }
+    .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+    .btn-home {
+      display: block; margin-top: 10px;
+      background: #374151; color: #fff;
+      border: none; border-radius: 14px;
+      font-size: 17px; font-weight: 700;
+      padding: 14px 20px; cursor: pointer;
+      min-height: 52px; width: 100%;
+      text-decoration: none; text-align: center;
+    }
+    .btn-home:active { transform: scale(0.97); }
+    .rules-list {
+      text-align: left; margin-bottom: 16px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .rules-list li { list-style: none; font-size: 13px; color: rgba(255,255,255,0.85); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎳 볼링</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <div class="hud-label">점수</div>
+      <div class="hud-value accent" id="scoreEl">0</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">프레임</div>
+      <div class="hud-value" id="frameEl">1</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">투구</div>
+      <div class="hud-value" id="throwEl">1</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">최고</div>
+      <div class="hud-value" id="bestEl">0</div>
+    </div>
+  </div>
+
+  <!-- 프레임 점수판 -->
+  <div class="frames-bar" id="framesBar"></div>
+
+  <!-- 게임 영역 (캔버스) -->
+  <div id="gameArea">
+    <canvas id="gameCanvas"></canvas>
+    <div id="feedback"></div>
+    <div id="powerLabel">꾹 누른 뒤 손 떼세요!</div>
+    <div id="powerWrap"><div id="powerBar"></div></div>
+  </div>
+
+  <footer>
+    <small>화면을 스와이프해서 공을 굴려요!</small>
+    <a class="home-link" href="../index.html">🏠 게임 목록으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🎳 볼링</h2>
+    <ul class="rules-list">
+      <li>👆 화면을 아래에서 위로 스와이프!</li>
+      <li>📐 방향을 잘 맞춰 핀을 쓰러뜨려요</li>
+      <li>🎯 스트라이크 = 핀 10개 전부!</li>
+      <li>🎉 스페어 = 두 번에 다 쓰러뜨리기!</li>
+      <li>🏆 10프레임 후 최고 점수 도전!</li>
+    </ul>
+    <button class="btn-start" id="startBtn">도전!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2>🎳 게임 종료!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <div class="result-detail" id="finalDetail"></div>
+    <p id="resultMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+    <a class="btn-home" href="../index.html">🏠 게임 목록으로</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ─── 상수 ───────────────────────────────────────────────────────────────
+  const STORAGE_KEY = 'bowling_best';
+  const TOTAL_FRAMES = 10;
+
+  // 핀 배열 (볼링 삼각형, 0=front)
+  // 핀 번호 배열 (4행): [7,8,9,10] / [4,5,6] / [2,3] / [1]
+  const PIN_ROWS = [[0], [1,2], [3,4,5], [6,7,8,9]];
+
+  // ─── DOM ────────────────────────────────────────────────────────────────
+  const canvas      = document.getElementById('gameCanvas');
+  const ctx         = canvas.getContext('2d');
+  const gameArea    = document.getElementById('gameArea');
+  const feedback    = document.getElementById('feedback');
+  const powerWrap   = document.getElementById('powerWrap');
+  const powerBar    = document.getElementById('powerBar');
+  const powerLabel  = document.getElementById('powerLabel');
+  const scoreEl     = document.getElementById('scoreEl');
+  const frameEl     = document.getElementById('frameEl');
+  const throwEl     = document.getElementById('throwEl');
+  const bestEl      = document.getElementById('bestEl');
+  const framesBar   = document.getElementById('framesBar');
+  const startOverlay= document.getElementById('startOverlay');
+  const endOverlay  = document.getElementById('endOverlay');
+  const finalScoreEl= document.getElementById('finalScore');
+  const finalDetailEl= document.getElementById('finalDetail');
+  const resultMsg   = document.getElementById('resultMsg');
+
+  // ─── 상태 ───────────────────────────────────────────────────────────────
+  let CW, CH; // canvas size
+  let LANE_X, LANE_W, LANE_H; // lane geometry
+  let PIN_R, BALL_R; // radii
+  let PIN_AREA_TOP; // where pins start (from top of canvas)
+  let PIN_AREA_H;
+
+  let game = {
+    active: false,
+    frame: 0,        // 0-indexed (0~9)
+    throw_: 0,       // 0=first, 1=second, 2=third(10th only)
+    frames: [],      // each: { rolls: [], score: null }
+    pins: [],        // 10 booleans: standing=true, down=false
+    ball: null,      // { x, y, vx, vy, rolling }
+    anim: null,
+    waitingNext: false,
+    phase: 'idle',   // idle | rolling | pinfall | waiting
+    feedbackTimer: null,
+  };
+
+  // ─── 프레임 초기화 ───────────────────────────────────────────────────────
+  function initFrames() {
+    game.frames = [];
+    for (let i = 0; i < TOTAL_FRAMES; i++) {
+      game.frames.push({ rolls: [], score: null });
+    }
+  }
+
+  // ─── 크기 계산 ───────────────────────────────────────────────────────────
+  function resize() {
+    const rect = gameArea.getBoundingClientRect();
+    CW = rect.width;
+    CH = rect.height;
+    canvas.width  = CW;
+    canvas.height = CH;
+
+    LANE_W = Math.min(CW * 0.62, 210);
+    LANE_X = (CW - LANE_W) / 2;
+    LANE_H = CH;
+
+    BALL_R = Math.max(14, LANE_W * 0.10);
+    PIN_R  = Math.max(8,  LANE_W * 0.06);
+
+    PIN_AREA_TOP = CH * 0.06;
+    PIN_AREA_H   = CH * 0.28;
+  }
+
+  // ─── 핀 위치 계산 ────────────────────────────────────────────────────────
+  function getPinPositions() {
+    // 역삼각형: 맨 앞 핀이 아래, 뒷 행이 위
+    const spacing = PIN_R * 2.6;
+    const positions = [];
+    PIN_ROWS.forEach((row, rowIdx) => {
+      const rowY = PIN_AREA_TOP + PIN_AREA_H - rowIdx * spacing;
+      const totalW = (row.length - 1) * spacing;
+      row.forEach((pinIdx, colIdx) => {
+        const cx = CW / 2 - totalW / 2 + colIdx * spacing;
+        positions[pinIdx] = { x: cx, y: rowY };
+      });
+    });
+    return positions;
+  }
+
+  // ─── 핀 리셋 ─────────────────────────────────────────────────────────────
+  function resetPins(keepDown = false) {
+    if (!keepDown) {
+      game.pins = new Array(10).fill(true);
+    }
+    // keepDown: 2번째 투구 시 이미 쓰러진 핀 유지
+  }
+
+  // ─── 볼 초기화 ────────────────────────────────────────────────────────────
+  function initBall() {
+    game.ball = {
+      x: CW / 2,
+      y: CH - BALL_R - 12,
+      vx: 0,
+      vy: 0,
+      rolling: false,
+    };
+  }
+
+  // ─── 프레임 점수판 렌더 ──────────────────────────────────────────────────
+  function renderFramesBar() {
+    framesBar.innerHTML = '';
+    for (let i = 0; i < TOTAL_FRAMES; i++) {
+      const box = document.createElement('div');
+      box.className = 'frame-box' + (i === game.frame && game.active ? ' active' : '');
+
+      const fr = game.frames[i];
+      const r  = fr.rolls;
+      let rollStr = '';
+
+      if (i < 9) {
+        // 일반 프레임
+        if (r.length > 0) {
+          if (r[0] === 10) {
+            rollStr = 'X';
+          } else {
+            rollStr = r[0];
+            if (r.length > 1) {
+              rollStr += ' ' + (r[0] + r[1] === 10 ? '/' : r[1]);
+            }
+          }
+        }
+      } else {
+        // 10번 프레임
+        r.forEach((v, idx) => {
+          let s;
+          if (v === 10) s = 'X';
+          else if (idx > 0 && r[idx-1] !== 10 && r[idx-1] + v === 10) s = '/';
+          else s = v;
+          rollStr += (idx > 0 ? ' ' : '') + s;
+        });
+      }
+
+      const scoreStr = fr.score !== null ? fr.score : '';
+
+      box.innerHTML = `<div class="f-num">${i+1}</div><div class="f-rolls">${rollStr}</div><div class="f-score">${scoreStr}</div>`;
+      framesBar.appendChild(box);
+    }
+  }
+
+  // ─── 점수 계산 ────────────────────────────────────────────────────────────
+  function calcScores() {
+    // 볼링 공식 점수 계산
+    // 모든 투구 값을 1차원 배열로 펼침
+    const allRolls = [];
+    game.frames.forEach(f => allRolls.push(...f.rolls));
+
+    let rollIdx = 0;
+    let cumulative = 0;
+    let allDone = true;
+
+    for (let f = 0; f < TOTAL_FRAMES; f++) {
+      const fr = game.frames[f];
+      if (fr.rolls.length === 0) { allDone = false; fr.score = null; break; }
+
+      if (f < 9) {
+        if (fr.rolls[0] === 10) {
+          // 스트라이크
+          const b1 = allRolls[rollIdx + 1];
+          const b2 = allRolls[rollIdx + 2];
+          if (b1 === undefined || b2 === undefined) {
+            allDone = false; fr.score = null;
+          } else {
+            cumulative += 10 + b1 + b2;
+            fr.score = cumulative;
+          }
+          rollIdx += 1;
+        } else if (fr.rolls.length < 2) {
+          allDone = false; fr.score = null;
+          rollIdx += fr.rolls.length;
+        } else {
+          const sum = fr.rolls[0] + fr.rolls[1];
+          if (sum === 10) {
+            // 스페어
+            const b1 = allRolls[rollIdx + 2];
+            if (b1 === undefined) { allDone = false; fr.score = null; }
+            else { cumulative += 10 + b1; fr.score = cumulative; }
+          } else {
+            cumulative += sum;
+            fr.score = cumulative;
+          }
+          rollIdx += 2;
+        }
+      } else {
+        // 10번 프레임
+        const need = (fr.rolls[0] === 10 || (fr.rolls.length >= 2 && fr.rolls[0]+fr.rolls[1]===10)) ? 3 : 2;
+        if (fr.rolls.length < need) {
+          allDone = false; fr.score = null;
+        } else {
+          cumulative += fr.rolls.slice(0, need).reduce((a,b)=>a+b, 0);
+          fr.score = cumulative;
+        }
+      }
+    }
+    return allDone;
+  }
+
+  // ─── HUD 업데이트 ────────────────────────────────────────────────────────
+  function updateHUD() {
+    calcScores();
+    const lastScore = game.frames.map(f=>f.score).filter(s=>s!==null).pop() || 0;
+    scoreEl.textContent  = lastScore;
+    frameEl.textContent  = Math.min(game.frame + 1, 10);
+    throwEl.textContent  = game.throw_ + 1;
+    bestEl.textContent   = getBest();
+    renderFramesBar();
+  }
+
+  // ─── best score ──────────────────────────────────────────────────────────
+  function getBest() { return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10); }
+  function saveBest(s) { if (s > getBest()) localStorage.setItem(STORAGE_KEY, s); }
+
+  // ─── 피드백 표시 ─────────────────────────────────────────────────────────
+  function showFeedback(text, color, duration) {
+    feedback.textContent = text;
+    feedback.style.color = color || '#fff';
+    feedback.classList.add('show');
+    clearTimeout(game.feedbackTimer);
+    game.feedbackTimer = setTimeout(() => feedback.classList.remove('show'), duration || 1200);
+  }
+
+  // ─── 핀 충돌 계산 ────────────────────────────────────────────────────────
+  function checkPinCollisions() {
+    const positions = getPinPositions();
+    const b = game.ball;
+    positions.forEach((pos, idx) => {
+      if (!game.pins[idx]) return;
+      const dx = b.x - pos.x;
+      const dy = b.y - pos.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < BALL_R + PIN_R) {
+        // 핀 쓰러뜨리기
+        game.pins[idx] = false;
+        // 인접 핀 체인 반응 (단순화: 거리 기반)
+        positions.forEach((p2, idx2) => {
+          if (idx2 === idx || !game.pins[idx2]) return;
+          const dx2 = pos.x - p2.x;
+          const dy2 = pos.y - p2.y;
+          if (Math.sqrt(dx2*dx2+dy2*dy2) < PIN_R * 3.0) {
+            if (Math.random() < 0.75) game.pins[idx2] = false;
+          }
+        });
+      }
+    });
+  }
+
+  // ─── 애니메이션 루프 ─────────────────────────────────────────────────────
+  function gameLoop() {
+    if (!game.active || game.phase !== 'rolling') return;
+    const b = game.ball;
+
+    // 공 이동
+    b.x += b.vx;
+    b.y += b.vy;
+
+    // 속도 감쇠 (레인 마찰)
+    b.vx *= 0.995;
+    b.vy *= 0.995;
+
+    // 레인 벽 반사
+    const left  = LANE_X + BALL_R;
+    const right = LANE_X + LANE_W - BALL_R;
+    if (b.x < left)  { b.x = left;  b.vx = Math.abs(b.vx) * 0.5; }
+    if (b.x > right) { b.x = right; b.vx = -Math.abs(b.vx) * 0.5; }
+
+    // 핀 충돌
+    checkPinCollisions();
+
+    // 공이 핀 구역 통과 or 화면 위로 벗어남
+    const pinsY = PIN_AREA_TOP;
+    if (b.y < pinsY - BALL_R || b.y < 0) {
+      // 투구 완료
+      game.phase = 'pinfall';
+      setTimeout(afterRoll, 900);
+      return;
+    }
+
+    // 속도가 거의 멈추면 (거터 등)
+    const speed = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
+    if (speed < 0.3 && b.y > CH * 0.4) {
+      game.phase = 'pinfall';
+      setTimeout(afterRoll, 500);
+      return;
+    }
+
+    draw();
+    game.anim = requestAnimationFrame(gameLoop);
+  }
+
+  // ─── 투구 후 처리 ────────────────────────────────────────────────────────
+  function afterRoll() {
+    const knocked = game.pins.filter(p => !p).length;
+
+    // 이번 투구에서 쓰러뜨린 핀 수 계산
+    // throw_ 0이면 처음 투구, 1이면 두 번째
+    let pinsDownThisRoll;
+    if (game.throw_ === 0) {
+      pinsDownThisRoll = knocked; // 처음엔 전체 쓰러진 수
+    } else {
+      // 이전 turn에 쓰러진 수 = 이전 roll에서 이미 쓰러진 수
+      const prevKnocked = game.frames[game.frame].rolls[0] || 0;
+      pinsDownThisRoll = knocked - prevKnocked;
+    }
+
+    // 10번 프레임에서 3번째 투구
+    if (game.frame === 9 && game.throw_ === 2) {
+      pinsDownThisRoll = game.pins.filter(p => !p).length - (
+        game.frames[9].rolls.reduce((a,b)=>a+b, 0)
+      );
+      pinsDownThisRoll = Math.max(0, Math.min(pinsDownThisRoll, 10));
+    }
+
+    pinsDownThisRoll = Math.max(0, Math.min(pinsDownThisRoll, 10));
+    game.frames[game.frame].rolls.push(pinsDownThisRoll);
+
+    // 피드백 메시지
+    const totalDown = game.pins.filter(p => !p).length;
+    if (game.throw_ === 0 && pinsDownThisRoll === 10) {
+      showFeedback('🎳 스트라이크!', '#facc15', 1500);
+    } else if (game.throw_ === 1 && totalDown === 10) {
+      showFeedback('✨ 스페어!', '#4ade80', 1300);
+    } else if (pinsDownThisRoll >= 8) {
+      showFeedback(`👏 ${pinsDownThisRoll}개!`, '#60a5fa', 1000);
+    } else if (pinsDownThisRoll === 0) {
+      showFeedback('😅 아이쿠!', '#f87171', 900);
+    } else {
+      showFeedback(`🎳 ${pinsDownThisRoll}개`, '#fff', 700);
+    }
+
+    calcScores();
+    updateHUD();
+
+    // 다음 단계 결정
+    setTimeout(() => nextStep(pinsDownThisRoll, knocked), 1200);
+  }
+
+  // ─── 다음 단계 결정 ──────────────────────────────────────────────────────
+  function nextStep(pinsDownThisRoll, totalKnocked) {
+    const fr = game.frames[game.frame];
+    const isLastFrame = game.frame === 9;
+
+    if (!isLastFrame) {
+      // 일반 프레임 (1~9)
+      if (game.throw_ === 0 && pinsDownThisRoll === 10) {
+        // 스트라이크 → 다음 프레임
+        advanceFrame();
+      } else if (game.throw_ === 0) {
+        // 첫 투구, 아직 핀 남음 → 두 번째 투구
+        game.throw_ = 1;
+        initBall();
+        game.phase = 'idle';
+        updateHUD();
+        draw();
+      } else {
+        // 두 번째 투구 완료 → 다음 프레임
+        advanceFrame();
+      }
+    } else {
+      // 10번 프레임
+      const rolls = fr.rolls;
+      const r0 = rolls[0] || 0;
+      const r1 = rolls[1] || 0;
+      const needExtra = r0 === 10 || r0 + r1 === 10;
+
+      if (rolls.length === 1 && r0 < 10) {
+        // 첫 투구, 스트라이크 아님 → 두 번째
+        game.throw_ = 1;
+        initBall();
+        game.phase = 'idle';
+        updateHUD(); draw();
+      } else if (rolls.length === 2) {
+        if (needExtra) {
+          // 세 번째 투구 허용
+          // 스트라이크 후 두 번째 스트라이크면 핀 리셋
+          if (r0 === 10) resetPins(false);
+          else if (r0 + r1 === 10) resetPins(false); // 스페어 후 핀 리셋
+          game.throw_ = 2;
+          initBall();
+          game.phase = 'idle';
+          updateHUD(); draw();
+        } else {
+          endGame();
+        }
+      } else if (rolls.length >= 3) {
+        endGame();
+      }
+    }
+  }
+
+  function advanceFrame() {
+    game.frame++;
+    game.throw_ = 0;
+    if (game.frame >= TOTAL_FRAMES) {
+      endGame();
+      return;
+    }
+    resetPins(false);
+    initBall();
+    game.phase = 'idle';
+    updateHUD();
+    draw();
+  }
+
+  // ─── 그리기 ─────────────────────────────────────────────────────────────
+  function draw() {
+    ctx.clearRect(0, 0, CW, CH);
+
+    // 배경 (거터)
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, CW, CH);
+
+    // 레인
+    const laneGrad = ctx.createLinearGradient(LANE_X, 0, LANE_X + LANE_W, 0);
+    laneGrad.addColorStop(0,   '#1e293b');
+    laneGrad.addColorStop(0.5, '#243447');
+    laneGrad.addColorStop(1,   '#1e293b');
+    ctx.fillStyle = laneGrad;
+    ctx.beginPath();
+    ctx.roundRect(LANE_X, 0, LANE_W, CH, [0, 0, 10, 10]);
+    ctx.fill();
+
+    // 레인 라인 장식
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(LANE_X + LANE_W * (i/4), 0);
+      ctx.lineTo(LANE_X + LANE_W * (i/4), CH);
+      ctx.stroke();
+    }
+
+    // 파울선
+    const foulY = CH - BALL_R * 2.5 - 8;
+    ctx.strokeStyle = 'rgba(239,68,68,0.6)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(LANE_X, foulY);
+    ctx.lineTo(LANE_X + LANE_W, foulY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(239,68,68,0.5)';
+    ctx.font = '9px sans-serif';
+    ctx.fillText('파울선', LANE_X + 4, foulY - 3);
+
+    // 화살표 가이드 (레인 중앙)
+    const arrowY = CH * 0.55;
+    const arrowCount = 5;
+    for (let i = 0; i < arrowCount; i++) {
+      const ax = LANE_X + LANE_W * ((i+1) / (arrowCount+1));
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.beginPath();
+      ctx.moveTo(ax, arrowY - 8);
+      ctx.lineTo(ax - 5, arrowY + 2);
+      ctx.lineTo(ax + 5, arrowY + 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // 핀 그리기
+    const pinPos = getPinPositions();
+    pinPos.forEach((pos, idx) => {
+      const standing = game.pins[idx];
+      if (standing) {
+        // 핀 그림자
+        ctx.beginPath();
+        ctx.ellipse(pos.x + 2, pos.y + PIN_R + 2, PIN_R * 0.8, PIN_R * 0.3, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fill();
+
+        // 핀 몸통 (흰색 볼링핀 모양)
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, PIN_R, 0, Math.PI * 2);
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fill();
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // 핀 빨간 띠
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, PIN_R * 0.6, 0, Math.PI * 2);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = PIN_R * 0.25;
+        ctx.stroke();
+      } else {
+        // 쓰러진 핀 (회색 원)
+        ctx.beginPath();
+        ctx.ellipse(pos.x, pos.y + PIN_R * 0.5, PIN_R * 1.1, PIN_R * 0.35, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(100,116,139,0.5)';
+        ctx.fill();
+      }
+    });
+
+    // 볼 그리기
+    if (game.ball) {
+      const b = game.ball;
+      // 그림자
+      ctx.beginPath();
+      ctx.ellipse(b.x + 3, b.y + 4, BALL_R * 0.85, BALL_R * 0.3, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.fill();
+
+      // 볼 본체 그라디언트
+      const ballGrad = ctx.createRadialGradient(
+        b.x - BALL_R * 0.3, b.y - BALL_R * 0.3, BALL_R * 0.1,
+        b.x, b.y, BALL_R
+      );
+      ballGrad.addColorStop(0, '#93c5fd');
+      ballGrad.addColorStop(0.5, '#1d4ed8');
+      ballGrad.addColorStop(1, '#1e3a5f');
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, BALL_R, 0, Math.PI * 2);
+      ctx.fillStyle = ballGrad;
+      ctx.fill();
+
+      // 볼 손가락 구멍
+      const holeColor = 'rgba(0,0,0,0.4)';
+      ctx.fillStyle = holeColor;
+      ctx.beginPath(); ctx.arc(b.x - BALL_R*0.25, b.y - BALL_R*0.15, BALL_R*0.13, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(b.x + BALL_R*0.15, b.y - BALL_R*0.28, BALL_R*0.10, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(b.x + BALL_R*0.28, b.y + BALL_R*0.05, BALL_R*0.10, 0, Math.PI*2); ctx.fill();
+
+      // 반짝이
+      ctx.beginPath();
+      ctx.arc(b.x - BALL_R*0.28, b.y - BALL_R*0.28, BALL_R*0.12, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fill();
+    }
+  }
+
+  // ─── 스와이프 입력 ───────────────────────────────────────────────────────
+  let touchStart = null;
+  let holdTimer  = null;
+  let holding    = false;
+  let holdStartTime = 0;
+  const MAX_POWER_MS = 600;
+
+  function getRelXY(e) {
+    const rect = gameArea.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  gameArea.addEventListener('pointerdown', (e) => {
+    if (!game.active || game.phase !== 'idle') return;
+    gameArea.setPointerCapture(e.pointerId);
+    const pt = getRelXY(e);
+    touchStart = { x: pt.x, y: pt.y, t: Date.now() };
+    holdStartTime = Date.now();
+    holding = true;
+    powerWrap.style.display = 'block';
+    powerLabel.style.display = 'block';
+    holdTimer = setInterval(() => {
+      const elapsed = Date.now() - holdStartTime;
+      const pct = Math.min(elapsed / MAX_POWER_MS * 100, 100);
+      powerBar.style.width = pct + '%';
+    }, 30);
+  });
+
+  gameArea.addEventListener('pointerup', (e) => {
+    if (!game.active || game.phase !== 'idle' || !touchStart) return;
+    clearInterval(holdTimer);
+    powerWrap.style.display = 'none';
+    powerLabel.style.display = 'none';
+    powerBar.style.width = '0%';
+    holding = false;
+
+    const pt = getRelXY(e);
+    const dx = pt.x - touchStart.x;
+    const dy = pt.y - touchStart.y;
+    const elapsed = Date.now() - touchStart.t;
+
+    // 파워: 꾹 누른 시간 기반
+    const power = Math.min((elapsed / MAX_POWER_MS), 1.0) * 0.75 + 0.25;
+
+    // 스와이프가 위쪽 방향이어야 함 (dy < 0)
+    // 거리가 너무 짧으면 탭으로 간주 → 정면 발사
+    const dist = Math.sqrt(dx*dx + dy*dy);
+
+    let angleRad;
+    if (dist < 20) {
+      // 탭: 직진
+      angleRad = -Math.PI / 2; // 위 방향
+    } else {
+      angleRad = Math.atan2(dy, dx);
+    }
+
+    const SPEED = 14 * power;
+
+    game.ball.vx = Math.cos(angleRad) * SPEED;
+    game.ball.vy = Math.sin(angleRad) * SPEED;
+
+    // 위 방향이 아니면 보정
+    if (game.ball.vy > -1) game.ball.vy = -Math.abs(SPEED) * 0.6;
+
+    game.phase = 'rolling';
+    touchStart = null;
+    game.anim = requestAnimationFrame(gameLoop);
+  });
+
+  // ─── 게임 시작 ──────────────────────────────────────────────────────────
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    game.active = true;
+    game.frame  = 0;
+    game.throw_ = 0;
+    game.phase  = 'idle';
+    initFrames();
+    resetPins(false);
+    initBall();
+    updateHUD();
+    draw();
+  }
+
+  // ─── 게임 종료 ──────────────────────────────────────────────────────────
+  function endGame() {
+    game.active = false;
+    game.phase  = 'idle';
+    if (game.anim) cancelAnimationFrame(game.anim);
+    calcScores();
+    const finalS = game.frames[TOTAL_FRAMES - 1].score || 0;
+    saveBest(finalS);
+    finalScoreEl.textContent = finalS;
+
+    const strikes = game.frames.filter((f,i) => i < 9 && f.rolls[0] === 10).length;
+    const spares  = game.frames.filter((f,i) => i < 9 && f.rolls[0] !== 10 && f.rolls[0]+f.rolls[1]===10).length;
+    finalDetailEl.textContent = `스트라이크 ${strikes}번 · 스페어 ${spares}번`;
+
+    let msg = '';
+    if (finalS >= 200) msg = '🏆 볼링 마스터!';
+    else if (finalS >= 150) msg = '🌟 굉장한 실력이에요!';
+    else if (finalS >= 100) msg = '🎳 아주 잘했어요!';
+    else if (finalS >= 50)  msg = '👍 더 연습하면 최고!';
+    else                    msg = '😊 계속 도전해봐요!';
+
+    const best = getBest();
+    if (finalS >= best) msg += ' 🎉 최고 기록!';
+    resultMsg.textContent = msg;
+
+    endOverlay.classList.remove('hidden');
+    renderFramesBar();
+  }
+
+  // ─── 이벤트 ────────────────────────────────────────────────────────────
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('restartBtn').addEventListener('click', startGame);
+
+  // ─── 초기화 ────────────────────────────────────────────────────────────
+  function init() {
+    resize();
+    bestEl.textContent = getBest();
+    renderFramesBar();
+    draw();
+    // 처음엔 빈 레인 그려두기
+    if (game.ball === null) {
+      game.ball = { x: CW/2, y: CH - 50, vx: 0, vy: 0 };
+      game.pins = new Array(10).fill(true);
+      draw();
+    }
+  }
+
+  window.addEventListener('resize', () => { resize(); draw(); });
+  init();
+})();
+</script>
+</body>
+</html>

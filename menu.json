@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "bowling",
+        "label": "🎳 볼링",
+        "path": "bowling/index.html"
+      },
+      {
+        "id": "parachute-drop",
+        "label": "🪂 낙하산 착륙",
+        "path": "parachute-drop/index.html"
+      },
+      {
         "id": "dinosaur-tap",
         "label": "🦕 공룡알 탭탭",
         "path": "dinosaur-tap/index.html"

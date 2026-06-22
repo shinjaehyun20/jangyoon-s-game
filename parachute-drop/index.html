@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🪂 낙하산 착륙</title>
+  <style>
+    :root {
+      --bg-top: #0d1a3a;
+      --bg-bot: #1a3a6a;
+      --accent: #88ccff;
+      --pad-color: #22c55e;
+      --pad-glow: rgba(34,197,94,0.5);
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+      color: var(--text);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      text-align: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .hud {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 6px 14px;
+      flex-shrink: 0;
+    }
+    .hud-item { text-align: center; }
+    .hud-label { font-size: 10px; opacity: 0.65; }
+    .hud-value { font-size: 20px; font-weight: 700; color: var(--accent); }
+    .game-canvas-wrap {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #061228 0%, #0d1f42 60%, #1a3a6a 100%);
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .ctrl-hint {
+      position: absolute;
+      bottom: 8px; left: 0; right: 0;
+      text-align: center;
+      font-size: 11px;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    footer {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    footer small { font-size: 11px; opacity: 0.5; }
+    .home-link {
+      font-size: 13px; color: var(--accent);
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(136,204,255,0.12);
+    }
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1a3a6a;
+      border-radius: 24px;
+      padding: 28px 22px;
+      max-width: 320px; width: 90%;
+      text-align: center;
+      display: flex; flex-direction: column; gap: 12px;
+      border: 1px solid rgba(136,204,255,0.2);
+    }
+    .overlay-card h2 { font-size: 26px; }
+    .overlay-card p { font-size: 14px; opacity: 0.85; line-height: 1.65; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); }
+    .result-sub { font-size: 13px; opacity: 0.7; }
+    .btn-start {
+      background: #2277cc;
+      color: #fff;
+      border: none; border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 18px; font-weight: 700;
+      cursor: pointer;
+      min-height: 52px;
+      transition: opacity 0.15s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-start:active { opacity: 0.75; }
+    .btn-home-link {
+      display: block; margin-top: 4px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: none; border-radius: 14px;
+      padding: 12px 20px;
+      font-size: 16px; font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn-home-link:active { opacity: 0.75; }
+    /* 칭찬 배너 */
+    .praise {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: clamp(28px, 8vw, 48px);
+      font-weight: 900;
+      color: #fde68a;
+      text-shadow: 0 0 24px rgba(253,230,138,0.8), 0 2px 4px rgba(0,0,0,0.5);
+      text-align: center;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 50;
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      opacity: 0;
+    }
+    .praise.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🪂 낙하산 착륙</h1>
+
+  <div class="hud">
+    <div class="hud-item">
+      <div class="hud-label">점수</div>
+      <div class="hud-value" id="scoreVal">0</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">최고</div>
+      <div class="hud-value" id="bestVal">0</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">목숨</div>
+      <div class="hud-value" id="livesVal">❤️❤️❤️</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">단계</div>
+      <div class="hud-value" id="levelVal">1</div>
+    </div>
+  </div>
+
+  <div class="game-canvas-wrap" id="canvasWrap">
+    <canvas id="gameCanvas"></canvas>
+    <div class="ctrl-hint" id="ctrlHint">← 왼쪽 탭 · 오른쪽 탭 →</div>
+    <div class="praise" id="praiseEl"></div>
+  </div>
+
+  <footer>
+    <small>탭해서 좌우 조종, 착륙 패드에 내려요!</small>
+    <a class="home-link" href="../index.html">&#8592; 홈으로</a>
+  </footer>
+</div>
+
+<!-- 시작 오버레이 -->
+<div class="overlay" id="startOverlay">
+  <div class="overlay-card">
+    <h2>🪂 낙하산 착륙</h2>
+    <p>
+      낙하산을 타고 하늘에서 내려와요!<br><br>
+      🟢 <strong>녹색 착륙 패드</strong>에 내려야 해요<br>
+      👈 <strong>왼쪽 탭</strong> → 왼쪽으로<br>
+      👉 <strong>오른쪽 탭</strong> → 오른쪽으로<br><br>
+      🐦 새와 ☁️ 바람을 조심해요!
+    </p>
+    <button class="btn-start" id="startBtn">도전!</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-card">
+    <h2 id="endTitle">🎉 착륙 성공!</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="resultMsg"></p>
+    <p class="result-sub" id="bestMsg"></p>
+    <button class="btn-start" id="restartBtn">다시 하기</button>
+    <a class="btn-home-link" href="../index.html">🏠 게임 목록으로</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ────────── 캔버스 셋업 ────────── */
+  var canvas  = document.getElementById('gameCanvas');
+  var ctx     = canvas.getContext('2d');
+  var wrap    = document.getElementById('canvasWrap');
+  var praiseEl = document.getElementById('praiseEl');
+
+  var W, H;
+  function resize() {
+    W = wrap.clientWidth;
+    H = wrap.clientHeight;
+    canvas.width  = W;
+    canvas.height = H;
+  }
+  resize();
+  window.addEventListener('resize', function () { resize(); if (!running) drawStatic(); });
+
+  /* ────────── 상수 ────────── */
+  var GRAVITY       = 0.12;   // 천천히 떨어짐 (7세 난이도)
+  var LATERAL_ACCEL = 0.22;   // 좌우 가속
+  var LATERAL_DRAG  = 0.94;   // 마찰
+  var MAX_VX        = 3.5;
+
+  var PAD_H    = 14;
+  var CHUTE_W  = 44;
+  var CHUTE_H  = 30;
+  var PERSON_W = 18;
+  var PERSON_H = 20;
+
+  var PHRASES = [
+    '완벽해요! 🌟', '잘 했어요! 👏', '굉장해요! 🎉',
+    '멋져요! 💪', '최고예요! 🏆', '짱이에요! ✨'
+  ];
+
+  /* ────────── 상태 ────────── */
+  var state = {};
+  var running  = false;
+  var animId   = null;
+  var leftDown  = false;
+  var rightDown = false;
+  var best = parseInt(localStorage.getItem('parachute_best') || '0', 10);
+  document.getElementById('bestVal').textContent = best;
+
+  /* ────────── 게임 초기화 ────────── */
+  function initState(level) {
+    var pad = makePad(level);
+    var birds = [];
+    var windParticles = [];
+    for (var i = 0; i < 12; i++) windParticles.push(makeWindParticle());
+    state = {
+      px: W / 2,
+      py: H * 0.05,
+      vx: 0,
+      vy: 0,
+      score: 0,
+      lives: 3,
+      level: level || 1,
+      pad: pad,
+      birds: birds,
+      wind: { dx: 0, timer: 0, nextChange: 120 },
+      windParticles: windParticles,
+      stars: makeStars(),
+      clouds: makeClouds(),
+      landed: false,
+      crashed: false,
+      praiseTimer: 0,
+      spawnBirdTimer: 120
+    };
+    spawnBirds(state, level || 1);
+  }
+
+  function makePad(level) {
+    var w = Math.max(60, 120 - (level - 1) * 12);
+    var x = (Math.random() * 0.6 + 0.15) * W;
+    if (x + w > W - 10) x = W - w - 10;
+    return { x: x, y: H * 0.88, w: w, glow: 0 };
+  }
+
+  function makeStars() {
+    var arr = [];
+    for (var i = 0; i < 35; i++) {
+      arr.push({ x: Math.random() * 1000, y: Math.random() * (H * 0.6), r: Math.random() * 1.4 + 0.4, a: Math.random() * 0.8 + 0.2 });
+    }
+    return arr;
+  }
+
+  function makeClouds() {
+    var arr = [];
+    for (var i = 0; i < 4; i++) {
+      arr.push({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.55 + 10,
+        w: 50 + Math.random() * 40,
+        speed: (Math.random() > 0.5 ? 1 : -1) * (0.3 + Math.random() * 0.3),
+        alpha: 0.18 + Math.random() * 0.12
+      });
+    }
+    return arr;
+  }
+
+  function makeWindParticle() {
+    return {
+      x: Math.random() * 1200 - 200,
+      y: Math.random() * H,
+      len: 10 + Math.random() * 20,
+      speed: 1 + Math.random() * 2,
+      alpha: 0.05 + Math.random() * 0.12
+    };
+  }
+
+  function spawnBirds(s, level) {
+    var count = Math.min(1 + Math.floor((level - 1) / 2), 4);
+    s.birds = [];
+    for (var i = 0; i < count; i++) {
+      s.birds.push(makeBird(level));
+    }
+  }
+
+  function makeBird(level) {
+    var side   = Math.random() > 0.5 ? 1 : -1;
+    var startX = side > 0 ? -60 : W + 60;
+    var speed  = 1.2 + Math.random() * 0.8 + (level - 1) * 0.2;
+    return {
+      x: startX,
+      y: H * 0.1 + Math.random() * H * 0.55,
+      vx: side * speed,
+      flapT: Math.random() * Math.PI * 2
+    };
+  }
+
+  /* ────────── 업데이트 ────────── */
+  function update() {
+    if (!running) return;
+    var s = state;
+    if (s.landed || s.crashed) return;
+
+    /* 바람 */
+    s.wind.timer++;
+    if (s.wind.timer >= s.wind.nextChange) {
+      s.wind.dx = (Math.random() - 0.5) * 0.8;
+      s.wind.timer = 0;
+      s.wind.nextChange = 90 + Math.floor(Math.random() * 120);
+    }
+
+    /* 물리 */
+    if (leftDown)  s.vx -= LATERAL_ACCEL;
+    if (rightDown) s.vx += LATERAL_ACCEL;
+    s.vx += s.wind.dx * 0.06;
+    s.vx  = Math.max(-MAX_VX, Math.min(MAX_VX, s.vx));
+    s.vx *= LATERAL_DRAG;
+    s.vy += GRAVITY;
+    s.px += s.vx;
+    s.py += s.vy;
+
+    /* 수평 경계 */
+    var halfW = PERSON_W / 2 + 2;
+    if (s.px < halfW)     { s.px = halfW;     s.vx = Math.abs(s.vx) * 0.3; }
+    if (s.px > W - halfW) { s.px = W - halfW; s.vx = -Math.abs(s.vx) * 0.3; }
+
+    /* 바람 파티클 이동 */
+    s.windParticles.forEach(function (p) {
+      p.x += p.speed + (s.wind.dx > 0 ? s.wind.dx * 4 : 0);
+      if (p.x > W + 200) p.x = -200;
+      if (p.x < -200)    p.x = W + 200;
+    });
+
+    /* 구름 이동 */
+    s.clouds.forEach(function (c) {
+      c.x += c.speed;
+      if (c.x > W + 80)  c.x = -80;
+      if (c.x < -80)     c.x = W + 80;
+    });
+
+    /* 새 이동 */
+    s.birds.forEach(function (b) {
+      b.x += b.vx;
+      b.flapT += 0.15;
+      if (b.x > W + 80)  { b.x = -60; b.y = H * 0.1 + Math.random() * H * 0.55; }
+      if (b.x < -80)     { b.x = W + 60; b.y = H * 0.1 + Math.random() * H * 0.55; }
+    });
+
+    /* 새 추가 스폰 */
+    s.spawnBirdTimer--;
+    if (s.spawnBirdTimer <= 0 && s.birds.length < Math.min(2 + s.level, 5)) {
+      s.birds.push(makeBird(s.level));
+      s.spawnBirdTimer = 180 + Math.floor(Math.random() * 120);
+    }
+
+    /* 착지 판정 */
+    var personBottom = s.py + PERSON_H / 2;
+    var personLeft   = s.px - PERSON_W / 2;
+    var personRight  = s.px + PERSON_W / 2;
+    var pad = s.pad;
+
+    if (personBottom >= pad.y && personBottom <= pad.y + PAD_H + 10 &&
+        personRight > pad.x + 4 && personLeft < pad.x + pad.w - 4) {
+      // 착지 속도 체크
+      var speedPenalty = Math.abs(s.vx);
+      var accuracy     = Math.abs((s.px - (pad.x + pad.w / 2)) / (pad.w / 2)); // 0=중앙 1=끝
+      var bonus = Math.max(0, Math.round((1 - accuracy) * 50));
+      var earned = 100 - Math.round(speedPenalty * 10) + bonus + (s.level - 1) * 20;
+      earned = Math.max(10, earned);
+      s.score += earned;
+      s.landed = true;
+      s.pad.glow = 1;
+      showPraise(s.level, accuracy);
+      document.getElementById('scoreVal').textContent = s.score;
+      setTimeout(function () { nextLevel(); }, 1600);
+      return;
+    }
+
+    /* 충돌: 새 */
+    var birdHit = false;
+    s.birds.forEach(function (b) {
+      if (Math.abs(b.x - s.px) < 22 && Math.abs(b.y - s.py) < 22) {
+        birdHit = true;
+      }
+    });
+    if (birdHit) { loseLife(); return; }
+
+    /* 바닥 충돌 (패드 외) */
+    if (personBottom > H - 4) {
+      loseLife();
+    }
+  }
+
+  function loseLife() {
+    state.lives--;
+    updateLivesUI();
+    if (state.lives <= 0) {
+      endGame(false);
+    } else {
+      // 리셋 위치 (하늘 위)
+      state.px = W / 2;
+      state.py = H * 0.05;
+      state.vx = 0;
+      state.vy = 0;
+      state.crashed = true;
+      setTimeout(function () { state.crashed = false; }, 800);
+    }
+  }
+
+  function nextLevel() {
+    if (!running) return;
+    state.level++;
+    document.getElementById('levelVal').textContent = state.level;
+    var pad = makePad(state.level);
+    state.pad = pad;
+    state.px = W / 2;
+    state.py = H * 0.05;
+    state.vx = 0;
+    state.vy = 0;
+    state.wind.dx = 0;
+    state.landed = false;
+    spawnBirds(state, state.level);
+  }
+
+  function showPraise(level, accuracy) {
+    var text;
+    if (accuracy < 0.15) {
+      text = '완벽 착지! 🌟🌟🌟';
+    } else if (accuracy < 0.4) {
+      text = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+    } else {
+      text = '착지 성공! 🎉';
+    }
+    praiseEl.textContent = text;
+    praiseEl.classList.add('show');
+    setTimeout(function () { praiseEl.classList.remove('show'); }, 1200);
+  }
+
+  function updateLivesUI() {
+    var h = ['', '❤️', '❤️❤️', '❤️❤️❤️'];
+    document.getElementById('livesVal').textContent = h[Math.max(0, state.lives)] || '💀';
+  }
+
+  /* ────────── 그리기 ────────── */
+  function draw() {
+    var s = state;
+    ctx.clearRect(0, 0, W, H);
+
+    /* 하늘 배경 */
+    var sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#040e20');
+    sky.addColorStop(0.6, '#0d1f42');
+    sky.addColorStop(1, '#1a3a6a');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    /* 별 */
+    s.stars.forEach(function (st) {
+      ctx.globalAlpha = st.a * (0.6 + 0.4 * Math.sin(Date.now() / 800 + st.x));
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(st.x % W, st.y, st.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    /* 바람 파티클 */
+    if (Math.abs(s.wind.dx) > 0.05) {
+      s.windParticles.forEach(function (p) {
+        ctx.globalAlpha = p.alpha;
+        ctx.strokeStyle = '#88ccff';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - p.len * (s.wind.dx > 0 ? 1 : -1), p.y);
+        ctx.stroke();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    /* 구름 */
+    s.clouds.forEach(function (c) {
+      ctx.globalAlpha = c.alpha;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(c.x, c.y, c.w, 16, 8);
+      else { ctx.rect(c.x, c.y, c.w, 16); }
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(c.x + c.w * 0.3, c.y - 6, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(c.x + c.w * 0.65, c.y - 4, 8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    /* 새 */
+    s.birds.forEach(function (b) {
+      var flap = Math.sin(b.flapT) * 8;
+      ctx.fillStyle = '#f97316';
+      ctx.font = '22px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.save();
+      if (b.vx < 0) {
+        ctx.scale(-1, 1);
+        ctx.fillText('🐦', -b.x, b.y + flap * 0.3);
+      } else {
+        ctx.fillText('🐦', b.x, b.y + flap * 0.3);
+      }
+      ctx.restore();
+    });
+
+    /* 착륙 패드 */
+    var pad = s.pad;
+    pad.glow = Math.max(0, pad.glow - 0.03);
+    // 패드 발광
+    if (pad.glow > 0) {
+      ctx.save();
+      ctx.shadowColor = '#22c55e';
+      ctx.shadowBlur  = 30 * pad.glow;
+      ctx.globalAlpha = pad.glow;
+      ctx.fillStyle   = '#a7f3d0';
+      ctx.fillRect(pad.x - 4, pad.y - 2, pad.w + 8, PAD_H + 4);
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+    // 패드 본체
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(pad.x, pad.y, pad.w, PAD_H);
+    // 패드 X 표시
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('X', pad.x + pad.w / 2, pad.y + PAD_H / 2);
+    // 패드 다리
+    ctx.strokeStyle = '#16a34a';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(pad.x + pad.w * 0.2, pad.y + PAD_H);
+    ctx.lineTo(pad.x + pad.w * 0.2, pad.y + PAD_H + 12);
+    ctx.moveTo(pad.x + pad.w * 0.8, pad.y + PAD_H);
+    ctx.lineTo(pad.x + pad.w * 0.8, pad.y + PAD_H + 12);
+    ctx.stroke();
+
+    /* 낙하산 + 사람 */
+    if (!s.crashed) {
+      drawParachute(s.px, s.py, s.vx);
+    } else {
+      /* 충돌 중 깜빡 */
+      if (Math.floor(Date.now() / 100) % 2 === 0) {
+        drawParachute(s.px, s.py, s.vx);
+      }
+    }
+
+    /* 바람 방향 표시 */
+    if (Math.abs(s.wind.dx) > 0.15) {
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.font = '18px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(s.wind.dx > 0 ? '💨 →' : '← 💨', W / 2, H * 0.08);
+      ctx.restore();
+    }
+  }
+
+  function drawParachute(px, py, vx) {
+    /* 낙하산 캐노피 */
+    var cx   = px;
+    var cy   = py - PERSON_H / 2 - 6;
+    var lean = vx * 0.8; // 기울기
+
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // 캐노피 반원
+    var grd = ctx.createRadialGradient(lean * 0.3, -CHUTE_H * 0.3, 2, lean * 0.3, -CHUTE_H * 0.2, CHUTE_W * 0.5);
+    grd.addColorStop(0, '#93c5fd');
+    grd.addColorStop(0.6, '#1d4ed8');
+    grd.addColorStop(1, '#1e3a8a');
+
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.ellipse(lean * 0.3, -CHUTE_H, CHUTE_W * 0.5, CHUTE_H * 0.65, 0, Math.PI, 0);
+    ctx.fill();
+
+    // 캐노피 줄 (4가닥)
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.lineWidth = 1;
+    var ropeOffsets = [-CHUTE_W * 0.45, -CHUTE_W * 0.15, CHUTE_W * 0.15, CHUTE_W * 0.45];
+    ropeOffsets.forEach(function (ox) {
+      ctx.beginPath();
+      ctx.moveTo(lean * 0.3 + ox, -CHUTE_H * 0.35);
+      ctx.lineTo(0, 0);
+      ctx.stroke();
+    });
+
+    ctx.restore();
+
+    /* 사람 (이모지) */
+    ctx.font = PERSON_H + 'px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🧒', px, py + 4);
+  }
+
+  function drawStatic() {
+    ctx.clearRect(0, 0, W, H);
+    var sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#040e20');
+    sky.addColorStop(1, '#1a3a6a');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  /* ────────── 게임 루프 ────────── */
+  function gameLoop() {
+    if (!running) return;
+    update();
+    draw();
+    animId = requestAnimationFrame(gameLoop);
+  }
+
+  /* ────────── 엔드 / 스타트 ────────── */
+  function endGame(won) {
+    running = false;
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+
+    var sc = state.score;
+    document.getElementById('endTitle').textContent = won ? '🎉 착륙 성공!' : '💥 게임 오버!';
+    document.getElementById('finalScore').textContent = sc + '점';
+    document.getElementById('scoreVal').textContent = sc;
+
+    if (won || state.lives <= 0) {
+      if (sc >= 200) document.getElementById('resultMsg').textContent = '하늘을 정복했어요! 🌟';
+      else if (sc >= 100) document.getElementById('resultMsg').textContent = '대단해요! 계속 도전!';
+      else document.getElementById('resultMsg').textContent = '💪 더 높은 점수에 도전!';
+    } else {
+      document.getElementById('resultMsg').textContent = '다시 해봐요! 할 수 있어요! 💪';
+    }
+
+    if (sc > best) {
+      best = sc;
+      localStorage.setItem('parachute_best', best);
+      document.getElementById('bestMsg').textContent = '🏆 최고 기록 갱신! ' + best + '점';
+      document.getElementById('bestVal').textContent = best;
+    } else {
+      document.getElementById('bestMsg').textContent = '최고 기록: ' + best + '점';
+    }
+
+    document.getElementById('endOverlay').classList.remove('hidden');
+  }
+
+  function startGame() {
+    document.getElementById('startOverlay').classList.add('hidden');
+    document.getElementById('endOverlay').classList.add('hidden');
+    resize();
+    initState(1);
+    updateLivesUI();
+    document.getElementById('scoreVal').textContent = '0';
+    document.getElementById('levelVal').textContent = '1';
+    running = true;
+    leftDown  = false;
+    rightDown = false;
+    if (animId) cancelAnimationFrame(animId);
+    gameLoop();
+  }
+
+  /* ────────── 입력: 터치 (좌/우 영역) ────────── */
+  var wrap = document.getElementById('canvasWrap');
+
+  wrap.addEventListener('pointerdown', function (e) {
+    if (!running || state.landed || state.crashed) return;
+    e.preventDefault();
+    var rect = wrap.getBoundingClientRect();
+    var relX = e.clientX - rect.left;
+    if (relX < rect.width / 2) { leftDown  = true; }
+    else                        { rightDown = true; }
+  }, { passive: false });
+
+  wrap.addEventListener('pointerup',   function (e) { leftDown = false; rightDown = false; });
+  wrap.addEventListener('pointerout',  function (e) { leftDown = false; rightDown = false; });
+  wrap.addEventListener('pointerleave',function (e) { leftDown = false; rightDown = false; });
+
+  /* 기울기 지원 (DeviceOrientation) */
+  var tiltActive = false;
+  if (typeof DeviceOrientationEvent !== 'undefined') {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+ 권한 요청은 사용자 제스처에서 → 탭 시작 시 요청
+      document.getElementById('startBtn').addEventListener('pointerup', function () {
+        DeviceOrientationEvent.requestPermission().then(function (r) {
+          if (r === 'granted') { tiltActive = true; window.addEventListener('deviceorientation', onTilt); }
+        }).catch(function () {});
+      }, { once: true });
+    } else {
+      window.addEventListener('deviceorientation', onTilt);
+      tiltActive = true;
+    }
+  }
+
+  function onTilt(e) {
+    if (!running || !tiltActive) return;
+    var gamma = e.gamma || 0; // -90(왼쪽) ~ +90(오른쪽)
+    var clamped = Math.max(-30, Math.min(30, gamma));
+    state.vx += clamped * 0.008;
+  }
+
+  /* ────────── 버튼 연결 ────────── */
+  document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+  document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+
+  /* 최초 정적 배경 */
+  drawStatic();
+
+})();
+</script>
+</body>
+</html>

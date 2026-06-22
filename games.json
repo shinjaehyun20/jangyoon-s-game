@@ -1,5 +1,21 @@
 [
   {
+    "id": "bowling",
+    "title": "Bowling",
+    "title_ko": "볼링",
+    "description": "스와이프로 공을 굴려 핀을 쓰러뜨려요! 스트라이크·스페어, 10프레임 볼링",
+    "thumbnail": "bowling/thumb.svg",
+    "path": "bowling/index.html"
+  },
+  {
+    "id": "parachute-drop",
+    "title": "Parachute Drop",
+    "title_ko": "낙하산 착륙",
+    "description": "낙하산을 조종해 착륙 패드에 안전하게 내려요! 바람·새 피하기, 레벨업",
+    "thumbnail": "parachute-drop/thumb.svg",
+    "path": "parachute-drop/index.html"
+  },
+  {
     "id": "dinosaur-tap",
     "title": "Dino Egg Tap",
     "title_ko": "공룡알 탭탭",
