@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#064e3b"/>
+      <stop offset="1" stop-color="#022c22"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16a34a"/>
+      <stop offset="1" stop-color="#15803d"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 잔디 그린 (홀 코스) -->
+  <ellipse cx="120" cy="110" rx="85" ry="55" fill="url(#green)" opacity="0.85"/>
+  <!-- 모래 벙커 -->
+  <ellipse cx="155" cy="130" rx="22" ry="13" fill="#d4a853" opacity="0.7"/>
+  <!-- 홀(컵) -->
+  <ellipse cx="88" cy="90" rx="10" ry="7" fill="#022c22"/>
+  <ellipse cx="88" cy="90" rx="7" ry="5" fill="#011a15"/>
+  <!-- 깃발 폴 -->
+  <line x1="88" y1="90" x2="88" y2="50" stroke="#e5e7eb" stroke-width="2"/>
+  <!-- 깃발 -->
+  <polygon points="88,50 110,58 88,66" fill="#ef4444"/>
+  <!-- 골프공 -->
+  <circle cx="158" cy="88" r="14" fill="white" opacity="0.95"/>
+  <circle cx="152" cy="82" r="2" fill="#d1d5db"/>
+  <circle cx="160" cy="80" r="2" fill="#d1d5db"/>
+  <circle cx="164" cy="88" r="2" fill="#d1d5db"/>
+  <circle cx="157" cy="94" r="2" fill="#d1d5db"/>
+  <!-- 궤적 점선 -->
+  <path d="M155 100 Q125 100 100 92" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+  <!-- 이모지 느낌 ⛳ -->
+  <text x="60" y="170" font-size="26" opacity="0.3">⛳</text>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#86efac">미니골프</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">MINI GOLF</text>
+  </g>
+</svg>

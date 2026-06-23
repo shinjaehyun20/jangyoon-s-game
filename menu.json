@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "penalty-kick",
+        "label": "⚽ 페널티킥",
+        "path": "penalty-kick/index.html"
+      },
+      {
+        "id": "mini-golf",
+        "label": "⛳ 미니골프",
+        "path": "mini-golf/index.html"
+      },
+      {
         "id": "bowling",
         "label": "🎳 볼링",
         "path": "bowling/index.html"

@@ -1030,5 +1030,21 @@
     "description": "강아지를 좌우로 이동해 장애물을 피하고 뼈다귀를 모아요! 30초 산책 도전",
     "thumbnail": "dog-walk/thumb.svg",
     "path": "dog-walk/index.html"
+  },
+  {
+    "id": "penalty-kick",
+    "title": "Penalty Kick",
+    "title_ko": "페널티킥",
+    "description": "공을 스와이프해 골키퍼를 피해 골을 넣어요",
+    "thumbnail": "penalty-kick/thumb.svg",
+    "path": "penalty-kick/index.html"
+  },
+  {
+    "id": "mini-golf",
+    "title": "Mini Golf",
+    "title_ko": "미니골프",
+    "description": "공을 당겨 굴려 홀에 넣는 미니골프",
+    "thumbnail": "mini-golf/thumb.svg",
+    "path": "mini-golf/index.html"
   }
 ]

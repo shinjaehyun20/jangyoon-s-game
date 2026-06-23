@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>⛳ 미니골프</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  height:100vh;height:100dvh;
+  overflow:hidden;
+  touch-action:manipulation;
+  background:#022c22;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.wrap{
+  max-width:480px;margin:0 auto;
+  height:100dvh;
+  display:flex;flex-direction:column;
+  background:linear-gradient(180deg,#064e3b 0%,#022c22 100%);
+}
+h1{
+  font-size:clamp(20px,5.5vw,28px);
+  text-align:center;padding:6px 0 2px;
+  color:#86efac;letter-spacing:1px;
+  flex-shrink:0;
+}
+.hud{
+  display:flex;justify-content:space-around;
+  padding:3px 8px;flex-shrink:0;
+  font-size:clamp(12px,3.5vw,15px);color:#a7f3d0;
+  background:rgba(0,0,0,0.25);border-bottom:1px solid rgba(134,239,172,0.15);
+}
+.hud span{font-weight:700;color:#ffffff}
+.game-area{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+canvas{
+  display:block;
+  touch-action:none;
+  cursor:crosshair;
+  max-width:100%;max-height:100%;
+}
+footer{
+  flex-shrink:0;
+  text-align:center;padding:4px 8px;
+  font-size:clamp(11px,3vw,13px);color:#6ee7b7;
+  background:rgba(0,0,0,0.3);
+}
+footer a{color:#86efac;text-decoration:none;font-weight:600}
+footer a:hover{text-decoration:underline}
+/* 오버레이 공통 */
+.overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(2,44,34,0.88);
+  z-index:10;gap:14px;
+}
+.overlay.hidden{display:none}
+.overlay h2{
+  font-size:clamp(20px,6vw,28px);
+  color:#86efac;text-align:center;
+  line-height:1.4;
+}
+.overlay p{
+  font-size:clamp(13px,3.8vw,16px);
+  color:#a7f3d0;text-align:center;max-width:300px;
+  line-height:1.6;
+}
+.grade-display{
+  font-size:clamp(28px,8vw,42px);
+  text-align:center;
+}
+.btn{
+  background:#16a34a;color:#fff;border:none;
+  border-radius:28px;cursor:pointer;
+  font-size:clamp(15px,4.5vw,19px);font-weight:700;
+  min-height:44px;padding:10px 36px;
+  letter-spacing:1px;
+  box-shadow:0 4px 12px rgba(22,163,74,0.4);
+  transition:background 0.15s;
+}
+.btn:hover{background:#15803d}
+.best-label{font-size:clamp(11px,3vw,13px);color:#6ee7b7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⛳ 미니 골프</h1>
+  <div class="hud">
+    <div>홀 <span id="hud-hole">1</span>/7</div>
+    <div>이번 홀 <span id="hud-stroke">0</span>타</div>
+    <div>총 <span id="hud-total">0</span>타</div>
+  </div>
+  <div class="game-area">
+    <canvas id="gc"></canvas>
+
+    <!-- 시작 오버레이 -->
+    <div class="overlay" id="ov-start">
+      <h2>⛳ 미니 골프</h2>
+      <p>공을 <b>뒤로 당겼다가 놓아</b> 굴려요!<br>홀(구멍)에 공을 넣으면 통과!<br>물에 빠지면 다시 시작!</p>
+      <button class="btn" id="btn-start">시작!</button>
+    </div>
+
+    <!-- 홀 통과 오버레이 -->
+    <div class="overlay hidden" id="ov-hole">
+      <h2 id="ov-hole-text">홀인! 🎉</h2>
+      <p id="ov-hole-sub"></p>
+      <button class="btn" id="btn-next">다음 홀 ▶</button>
+    </div>
+
+    <!-- 결과 오버레이 -->
+    <div class="overlay hidden" id="ov-result">
+      <h2>게임 완료! 🏆</h2>
+      <div class="grade-display" id="res-grade"></div>
+      <p id="res-score"></p>
+      <p class="best-label" id="res-best"></p>
+      <button class="btn" id="btn-retry">다시하기</button>
+    </div>
+  </div>
+  <footer>
+    당기고 놓아서 공을 굴려요 &nbsp;|&nbsp;
+    <a href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<script>
+(function(){'use strict';
+
+/* ─── CONFIG ─────────────────────────────────────────── */
+var CFG={
+  FRICTION:0.985,       // 감속 계수
+  MIN_SPEED:0.5,        // 정지 판정 속도
+  RESTITUTION:0.72,     // 벽 반사 계수
+  MAX_DRAG:90,          // 최대 드래그 픽셀
+  POWER_SCALE:0.18,     // 드래그 → 속도 배율
+  BALL_R:9,             // 공 반지름
+  HOLE_R:11,            // 홀 반지름
+  HOLE_ATTRACT:22,      // 홀 흡인 범위
+  HOLE_ATTRACT_F:0.05,  // 홀 흡인력
+  SAND_FRIC:0.945,      // 모래 마찰
+  WATER_DIST:13,        // 물 감지 반경
+  STORAGE_KEY:'mini-golf_best'
+};
+
+/* ─── CANVAS SETUP ────────────────────────────────────── */
+var canvas=document.getElementById('gc');
+var ctx=canvas.getContext('2d');
+var W=0,H=0;
+
+function resizeCanvas(){
+  var area=canvas.parentElement;
+  var aw=area.clientWidth,ah=area.clientHeight;
+  var asp=4/3;
+  var cw=Math.min(aw,ah*asp)|0;
+  var ch=(cw/asp)|0;
+  if(ch>ah){ch=ah;cw=(ch*asp)|0;}
+  canvas.width=cw; canvas.height=ch;
+  W=cw; H=ch;
+}
+window.addEventListener('resize',function(){resizeCanvas();if(state.running)drawFrame();});
+
+/* ─── LEVELS ──────────────────────────────────────────── */
+// 레벨 데이터: 비율값(0~1), 실제 픽셀은 렌더 시 W/H로 환산
+// walls: [{x,y,w,h}], sands: [{cx,cy,rx,ry}], waters: [{cx,cy,r}]
+// ball: {x,y}, hole: {x,y}
+var LEVELS=[
+  // 홀 1: 간단한 직선
+  {
+    ball:{x:.15,y:.5},hole:{x:.82,y:.5},
+    walls:[
+      {x:0,y:0,w:1,h:.12},{x:0,y:.88,w:1,h:.12}, // 위아래 경계
+      {x:0,y:0,w:.05,h:1},{x:.95,y:0,w:.05,h:1},  // 좌우 경계
+    ],
+    sands:[{cx:.5,cy:.5,rx:.09,ry:.07}],
+    waters:[]
+  },
+  // 홀 2: 꺾인 코스 (중간 벽)
+  {
+    ball:{x:.12,y:.3},hole:{x:.83,y:.7},
+    walls:[
+      {x:0,y:0,w:1,h:.12},{x:0,y:.88,w:1,h:.12},
+      {x:0,y:0,w:.05,h:1},{x:.95,y:0,w:.05,h:1},
+      {x:.38,y:.12,w:.08,h:.5},  // 중간 수직벽
+    ],
+    sands:[{cx:.22,cy:.65,rx:.1,ry:.08}],
+    waters:[{cx:.7,cy:.3,r:.07}]
+  },
+  // 홀 3: 좁은 통로
+  {
+    ball:{x:.12,y:.5},hole:{x:.85,y:.5},
+    walls:[
+      {x:0,y:0,w:1,h:.18},{x:0,y:.82,w:1,h:.18},
+      {x:0,y:0,w:.05,h:1},{x:.95,y:0,w:.05,h:1},
+      {x:.3,y:.18,w:.08,h:.32},  // 상단 돌출
+      {x:.55,y:.5,w:.08,h:.32},  // 하단 돌출
+    ],
+    sands:[],
+    waters:[{cx:.72,cy:.28,r:.06},{cx:.45,cy:.72,r:.06}]
+  },
+  // 홀 4: 모래 천국
+  {
+    ball:{x:.1,y:.75},hole:{x:.88,y:.25},
+    walls:[
+      {x:0,y:0,w:1,h:.12},{x:0,y:.88,w:1,h:.12},
+      {x:0,y:0,w:.05,h:1},{x:.95,y:0,w:.05,h:1},
+      {x:.42,y:.12,w:.06,h:.4},{x:.42,y:.6,w:.06,h:.28},
+    ],
+    sands:[
+      {cx:.25,cy:.45,rx:.12,ry:.1},
+      {cx:.65,cy:.6,rx:.12,ry:.1},
+      {cx:.75,cy:.35,rx:.1,ry:.08}
+    ],
+    waters:[]
+  },
+  // 홀 5: L자 코스
+  {
+    ball:{x:.12,y:.5},hole:{x:.82,y:.18},
+    walls:[
+      {x:0,y:0,w:1,h:.12},{x:0,y:.88,w:1,h:.12},
+      {x:0,y:0,w:.05,h:1},{x:.95,y:0,w:.05,h:1},
+      {x:.55,y:.35,w:.06,h:.53},  // 세로 칸막이
+      {x:.05,y:.35,w:.5,h:.06},   // 가로 칸막이
+    ],
+    sands:[{cx:.3,cy:.65,rx:.12,ry:.1}],
+    waters:[{cx:.75,cy:.65,r:.08}]
+  },
+  // 홀 6: 물 장애물 집중
+  {
+    ball:{x:.12,y:.75},hole:{x:.85,y:.25},
+    walls:[
+      {x:0,y:0,w:1,h:.12},{x:0,y:.88,w:1,h:.12},
+      {x:0,y:0,w:.05,h:1},{x:.95,y:0,w:.05,h:1},
+    ],
+    sands:[],
+    waters:[
+      {cx:.35,cy:.45,r:.09},
+      {cx:.55,cy:.62,r:.08},
+      {cx:.65,cy:.38,r:.07}
+    ]
+  },
+  // 홀 7: 최종
+  {
+    ball:{x:.1,y:.5},hole:{x:.88,y:.5},
+    walls:[
+      {x:0,y:0,w:1,h:.14},{x:0,y:.86,w:1,h:.14},
+      {x:0,y:0,w:.05,h:1},{x:.95,y:0,w:.05,h:1},
+      {x:.28,y:.14,w:.06,h:.38},
+      {x:.28,y:.64,w:.06,h:.22},
+      {x:.52,y:.28,w:.06,h:.22},
+      {x:.52,y:.58,w:.06,h:.28},
+      {x:.72,y:.14,w:.06,h:.3},
+      {x:.72,y:.56,w:.06,h:.3},
+    ],
+    sands:[{cx:.4,cy:.55,rx:.08,ry:.06}],
+    waters:[{cx:.62,cy:.45,r:.07}]
+  }
+];
+
+/* ─── STATE ───────────────────────────────────────────── */
+var state={
+  running:false,
+  holeIdx:0,      // 0-based
+  strokeHole:0,
+  strokeTotal:0,
+  ball:{x:0,y:0,vx:0,vy:0,rolling:false},
+  drag:{active:false,sx:0,sy:0,cx:0,cy:0},
+  animId:null,
+  holeCelebrate:false
+};
+
+function getBall(){return state.ball;}
+function getLevel(){return LEVELS[state.holeIdx];}
+
+/* ─── 레벨 초기화 ─────────────────────────────────────── */
+function initHole(){
+  var lv=getLevel();
+  var b=state.ball;
+  b.x=lv.ball.x*W; b.y=lv.ball.y*H;
+  b.vx=0; b.vy=0; b.rolling=false;
+  state.drag.active=false;
+  state.holeCelebrate=false;
+  updateHUD();
+}
+
+/* ─── HUD ─────────────────────────────────────────────── */
+function updateHUD(){
+  document.getElementById('hud-hole').textContent=state.holeIdx+1;
+  document.getElementById('hud-stroke').textContent=state.strokeHole;
+  document.getElementById('hud-total').textContent=state.strokeTotal;
+}
+
+/* ─── 충돌·물리 ───────────────────────────────────────── */
+function scaleWall(w){
+  return {x:w.x*W,y:w.y*H,w:w.w*W,h:w.h*H};
+}
+function scaleSand(s){
+  return {cx:s.cx*W,cy:s.cy*H,rx:s.rx*W,ry:s.ry*H};
+}
+function scaleWater(wa){
+  return {cx:wa.cx*W,cy:wa.cy*H,r:wa.r*Math.min(W,H)};
+}
+
+function ballInSand(){
+  var lv=getLevel();
+  var b=state.ball;
+  for(var i=0;i<lv.sands.length;i++){
+    var s=scaleSand(lv.sands[i]);
+    var dx=(b.x-s.cx)/s.rx, dy=(b.y-s.cy)/s.ry;
+    if(dx*dx+dy*dy<=1) return true;
+  }
+  return false;
+}
+
+function ballInWater(){
+  var lv=getLevel();
+  var b=state.ball;
+  for(var i=0;i<lv.waters.length;i++){
+    var wa=scaleWater(lv.waters[i]);
+    var dx=b.x-wa.cx,dy=b.y-wa.cy;
+    if(dx*dx+dy*dy<=(wa.r-CFG.WATER_DIST)*(wa.r-CFG.WATER_DIST)) return true;
+  }
+  return false;
+}
+
+function resolveWalls(){
+  var lv=getLevel();
+  var b=state.ball;
+  var r=CFG.BALL_R;
+  for(var i=0;i<lv.walls.length;i++){
+    var rw=scaleWall(lv.walls[i]);
+    // AABB + 원 충돌
+    var nearX=Math.max(rw.x,Math.min(b.x,rw.x+rw.w));
+    var nearY=Math.max(rw.y,Math.min(b.y,rw.y+rw.h));
+    var dx=b.x-nearX, dy=b.y-nearY;
+    var dist2=dx*dx+dy*dy;
+    if(dist2<r*r && dist2>0){
+      var dist=Math.sqrt(dist2);
+      var nx=dx/dist,ny=dy/dist;
+      // 밀어내기
+      b.x=nearX+nx*(r+0.5);
+      b.y=nearY+ny*(r+0.5);
+      // 반사
+      var dot=b.vx*nx+b.vy*ny;
+      b.vx=(b.vx-2*dot*nx)*CFG.RESTITUTION;
+      b.vy=(b.vy-2*dot*ny)*CFG.RESTITUTION;
+    }
+  }
+}
+
+function attractHole(){
+  var lv=getLevel();
+  var hx=lv.hole.x*W, hy=lv.hole.y*H;
+  var b=state.ball;
+  var dx=hx-b.x,dy=hy-b.y;
+  var dist=Math.sqrt(dx*dx+dy*dy);
+  if(dist<CFG.HOLE_ATTRACT && dist>0){
+    b.vx+=dx/dist*CFG.HOLE_ATTRACT_F;
+    b.vy+=dy/dist*CFG.HOLE_ATTRACT_F;
+  }
+}
+
+function checkHoleIn(){
+  var lv=getLevel();
+  var hx=lv.hole.x*W, hy=lv.hole.y*H;
+  var b=state.ball;
+  var dx=b.x-hx, dy=b.y-hy;
+  return Math.sqrt(dx*dx+dy*dy)<CFG.HOLE_R*0.7;
+}
+
+/* ─── 물에 빠짐 ───────────────────────────────────────── */
+function resetToBall(){
+  // 공 원위치 복원(타수는 유지)
+  var lv=getLevel();
+  var b=state.ball;
+  b.x=lv.ball.x*W; b.y=lv.ball.y*H;
+  b.vx=0; b.vy=0; b.rolling=false;
+}
+
+/* ─── 물리 루프 ───────────────────────────────────────── */
+function physicsTick(){
+  var b=state.ball;
+  if(!b.rolling) return;
+
+  // 홀 흡인
+  attractHole();
+
+  // 마찰
+  var fric=ballInSand()?CFG.SAND_FRIC:CFG.FRICTION;
+  b.vx*=fric; b.vy*=fric;
+
+  // 이동
+  b.x+=b.vx; b.y+=b.vy;
+
+  // 벽 충돌
+  resolveWalls();
+
+  // 홀인 체크
+  if(checkHoleIn()){
+    b.rolling=false;
+    b.vx=0;b.vy=0;
+    var lv=getLevel();
+    b.x=lv.hole.x*W; b.y=lv.hole.y*H;
+    onHoleIn();
+    return;
+  }
+
+  // 물 체크
+  if(ballInWater()){
+    b.rolling=false;
+    b.vx=0;b.vy=0;
+    setTimeout(resetToBall,400);
+    return;
+  }
+
+  // 정지 판정
+  var spd=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
+  if(spd<CFG.MIN_SPEED){b.vx=0;b.vy=0;b.rolling=false;}
+}
+
+/* ─── 홀인 처리 ───────────────────────────────────────── */
+function onHoleIn(){
+  state.holeCelebrate=true;
+  // 홀 별 타수 표시
+  var st=state.strokeHole;
+  var par=3;
+  var diff=st-par;
+  var msg='';
+  if(diff<=-3) msg='알바트로스 🦅🦅🦅';
+  else if(diff==-2) msg='이글 🦅🦅';
+  else if(diff==-1) msg='버디 🦅';
+  else if(diff==0) msg='파! 👏';
+  else if(diff==1) msg='보기 😅';
+  else msg='+'+diff+' 타... 💪';
+
+  document.getElementById('ov-hole-text').textContent=
+    '홀인! '+(['⭐','🎉','✨','💫'][st%4]);
+  document.getElementById('ov-hole-sub').textContent=
+    st+'타 / '+msg;
+  document.getElementById('ov-hole').classList.remove('hidden');
+}
+
+/* ─── 다음 홀 / 게임 종료 ─────────────────────────────── */
+document.getElementById('btn-next').addEventListener('click',function(){
+  document.getElementById('ov-hole').classList.add('hidden');
+  state.holeIdx++;
+  state.strokeHole=0;
+  if(state.holeIdx>=LEVELS.length){
+    showResult();
+  } else {
+    initHole();
+  }
+});
+
+function showResult(){
+  var total=state.strokeTotal;
+  var best=getBest();
+  var newBest=false;
+  if(best===null||total<best){
+    saveBest(total);
+    newBest=true;
+    best=total;
+  }
+  // 등급
+  var par=LEVELS.length*3;
+  var diff=total-par;
+  var grade='';
+  if(diff<=-5) grade='🏆🏆🏆 EAGLE';
+  else if(diff<=-2) grade='🏆🏆 GREAT';
+  else if(diff<=0) grade='🏆 PAR';
+  else if(diff<=4) grade='⭐ GOOD';
+  else grade='💪 도전!';
+
+  document.getElementById('res-grade').textContent=grade;
+  document.getElementById('res-score').textContent=
+    '총 '+total+'타 (기준 '+par+'타)';
+  document.getElementById('res-best').textContent=
+    newBest?'★ 새 최고기록!':'최고기록: '+best+'타';
+  document.getElementById('ov-result').classList.remove('hidden');
+  cancelAnimationFrame(state.animId);
+}
+
+/* ─── localStorage ────────────────────────────────────── */
+function getBest(){
+  try{var v=localStorage.getItem(CFG.STORAGE_KEY);return v===null?null:parseInt(v,10);}
+  catch(e){return null;}
+}
+function saveBest(n){
+  try{localStorage.setItem(CFG.STORAGE_KEY,n);}catch(e){}
+}
+
+/* ─── 드래그 조작 ─────────────────────────────────────── */
+function pointerToCanvas(e){
+  var rect=canvas.getBoundingClientRect();
+  return {x:e.clientX-rect.left, y:e.clientY-rect.top};
+}
+
+canvas.addEventListener('pointerdown',function(e){
+  e.preventDefault();
+  if(!state.running||state.ball.rolling||state.holeCelebrate) return;
+  var pt=pointerToCanvas(e);
+  var b=state.ball;
+  var dx=pt.x-b.x,dy=pt.y-b.y;
+  if(Math.sqrt(dx*dx+dy*dy)>CFG.BALL_R*4) return; // 공 근처에서만
+  state.drag.active=true;
+  state.drag.sx=b.x; state.drag.sy=b.y;
+  state.drag.cx=pt.x; state.drag.cy=pt.y;
+  canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener('pointermove',function(e){
+  e.preventDefault();
+  if(!state.drag.active) return;
+  var pt=pointerToCanvas(e);
+  state.drag.cx=pt.x; state.drag.cy=pt.y;
+});
+
+canvas.addEventListener('pointerup',function(e){
+  e.preventDefault();
+  if(!state.drag.active) return;
+  state.drag.active=false;
+  var b=state.ball;
+  var ddx=b.x-state.drag.cx;
+  var ddy=b.y-state.drag.cy;
+  var dist=Math.sqrt(ddx*ddx+ddy*ddy);
+  if(dist<3) return; // 너무 짧으면 무시
+  var power=Math.min(dist,CFG.MAX_DRAG)*CFG.POWER_SCALE;
+  var nx=ddx/dist, ny=ddy/dist;
+  b.vx=nx*power; b.vy=ny*power;
+  b.rolling=true;
+  state.strokeHole++;
+  state.strokeTotal++;
+  updateHUD();
+});
+
+canvas.addEventListener('pointercancel',function(){
+  state.drag.active=false;
+});
+
+/* ─── 렌더 ────────────────────────────────────────────── */
+function drawFrame(){
+  ctx.clearRect(0,0,W,H);
+  var lv=getLevel();
+
+  // 배경 잔디
+  ctx.fillStyle='#16a34a';
+  ctx.fillRect(0,0,W,H);
+
+  // 잔디 격자 (장식)
+  ctx.strokeStyle='rgba(21,128,61,0.35)';
+  ctx.lineWidth=1;
+  var gs=Math.min(W,H)/10;
+  for(var gx=0;gx<W;gx+=gs){
+    ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();
+  }
+  for(var gy=0;gy<H;gy+=gs){
+    ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();
+  }
+
+  // 모래
+  for(var i=0;i<lv.sands.length;i++){
+    var s=scaleSand(lv.sands[i]);
+    ctx.beginPath();
+    ctx.ellipse(s.cx,s.cy,s.rx,s.ry,0,0,Math.PI*2);
+    ctx.fillStyle='#d4a853';ctx.fill();
+    // 모래 점
+    ctx.fillStyle='#c49240';
+    for(var j=0;j<8;j++){
+      var sx=s.cx+(Math.random()-.5)*s.rx*1.5;
+      var sy=s.cy+(Math.random()-.5)*s.ry*1.5;
+      ctx.beginPath();ctx.arc(sx,sy,1.5,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // 물
+  for(var i=0;i<lv.waters.length;i++){
+    var wa=scaleWater(lv.waters[i]);
+    var grad=ctx.createRadialGradient(wa.cx,wa.cy,wa.r*.2,wa.cx,wa.cy,wa.r);
+    grad.addColorStop(0,'#38bdf8');
+    grad.addColorStop(1,'#0284c7');
+    ctx.beginPath();
+    ctx.arc(wa.cx,wa.cy,wa.r,0,Math.PI*2);
+    ctx.fillStyle=grad;ctx.fill();
+    // 물결
+    ctx.strokeStyle='rgba(255,255,255,0.25)';
+    ctx.lineWidth=1;
+    for(var w=1;w<=2;w++){
+      ctx.beginPath();
+      ctx.arc(wa.cx,wa.cy,wa.r*w*.4,Math.PI*0.2,Math.PI*0.8);
+      ctx.stroke();
+    }
+  }
+
+  // 홀(컵)
+  var hx=lv.hole.x*W, hy=lv.hole.y*H;
+  ctx.beginPath();
+  ctx.arc(hx,hy,CFG.HOLE_R,0,Math.PI*2);
+  ctx.fillStyle='#011a15';ctx.fill();
+  ctx.strokeStyle='rgba(134,239,172,0.4)';
+  ctx.lineWidth=1.5;ctx.stroke();
+  // 깃발대
+  ctx.strokeStyle='#e5e7eb';ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(hx,hy-CFG.HOLE_R);
+  ctx.lineTo(hx,hy-CFG.HOLE_R-Math.min(W,H)*.13);
+  ctx.stroke();
+  // 깃발
+  var fh=hy-CFG.HOLE_R-Math.min(W,H)*.13;
+  var fw=Math.min(W,H)*.06;
+  ctx.beginPath();
+  ctx.moveTo(hx,fh);
+  ctx.lineTo(hx+fw,fh+fw*.5);
+  ctx.lineTo(hx,fh+fw);
+  ctx.closePath();
+  ctx.fillStyle='#ef4444';ctx.fill();
+
+  // 벽
+  for(var i=0;i<lv.walls.length;i++){
+    var rw=scaleWall(lv.walls[i]);
+    ctx.fillStyle='#064e3b';
+    ctx.fillRect(rw.x,rw.y,rw.w,rw.h);
+    ctx.strokeStyle='rgba(52,211,153,0.25)';
+    ctx.lineWidth=1;
+    ctx.strokeRect(rw.x,rw.y,rw.w,rw.h);
+  }
+
+  // 드래그 가이드라인
+  var b=state.ball;
+  if(state.drag.active){
+    var ddx=b.x-state.drag.cx;
+    var ddy=b.y-state.drag.cy;
+    var dist=Math.sqrt(ddx*ddx+ddy*ddy);
+    var clamped=Math.min(dist,CFG.MAX_DRAG);
+    var power=clamped/CFG.MAX_DRAG;
+    // 조준선
+    ctx.save();
+    ctx.setLineDash([6,5]);
+    ctx.strokeStyle='rgba(250,204,21,'+((0.3+power*.5)).toFixed(2)+')';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(b.x,b.y);
+    var nx=ddx/dist,ny=ddy/dist;
+    ctx.lineTo(b.x+nx*clamped*2.5, b.y+ny*clamped*2.5);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    // 파워 게이지 원
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,CFG.BALL_R+4,0,Math.PI*2*power);
+    ctx.strokeStyle='rgba(250,204,21,0.8)';
+    ctx.lineWidth=2.5;ctx.stroke();
+    // 당긴 지점 점
+    ctx.beginPath();
+    ctx.arc(state.drag.cx,state.drag.cy,5,0,Math.PI*2);
+    ctx.fillStyle='rgba(250,204,21,0.6)';ctx.fill();
+  }
+
+  // 공
+  var grad2=ctx.createRadialGradient(b.x-CFG.BALL_R*.3,b.y-CFG.BALL_R*.3,2,b.x,b.y,CFG.BALL_R);
+  grad2.addColorStop(0,'#ffffff');
+  grad2.addColorStop(1,'#d1d5db');
+  ctx.beginPath();
+  ctx.arc(b.x,b.y,CFG.BALL_R,0,Math.PI*2);
+  ctx.fillStyle=grad2;ctx.fill();
+  // 딤플
+  ctx.fillStyle='rgba(200,200,200,0.5)';
+  var dp=[[-.3,-.3],[.3,-.2],[-.1,.35],[.3,.25]];
+  for(var k=0;k<dp.length;k++){
+    ctx.beginPath();
+    ctx.arc(b.x+dp[k][0]*CFG.BALL_R,b.y+dp[k][1]*CFG.BALL_R,1.2,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  // 홀인 축하 파티클 (간단)
+  if(state.holeCelebrate){
+    var t=Date.now()%1200;
+    var emojis=['🎉','⭐','✨','🌟'];
+    ctx.font=Math.floor(Math.min(W,H)*.07)+'px serif';
+    ctx.textAlign='center';
+    for(var p=0;p<4;p++){
+      var angle=(Math.PI*2/4*p)+(t/1200*Math.PI);
+      var rad=Math.min(W,H)*.18;
+      var px=W*.5+Math.cos(angle)*rad;
+      var py=H*.5+Math.sin(angle)*rad;
+      ctx.globalAlpha=0.8;
+      ctx.fillText(emojis[p],px,py);
+    }
+    ctx.globalAlpha=1;
+    ctx.textAlign='left';
+  }
+
+  physicsTick();
+  state.animId=requestAnimationFrame(drawFrame);
+}
+
+/* ─── 게임 시작/재시작 ────────────────────────────────── */
+function startGame(){
+  state.holeIdx=0;
+  state.strokeHole=0;
+  state.strokeTotal=0;
+  state.running=true;
+  initHole();
+  cancelAnimationFrame(state.animId);
+  state.animId=requestAnimationFrame(drawFrame);
+}
+
+document.getElementById('btn-start').addEventListener('click',function(){
+  document.getElementById('ov-start').classList.add('hidden');
+  resizeCanvas();
+  startGame();
+});
+
+document.getElementById('btn-retry').addEventListener('click',function(){
+  document.getElementById('ov-result').classList.add('hidden');
+  resizeCanvas();
+  startGame();
+});
+
+/* ─── 초기 캔버스 크기 설정 ───────────────────────────── */
+resizeCanvas();
+
+})();
+</script>
+</body>
+</html>

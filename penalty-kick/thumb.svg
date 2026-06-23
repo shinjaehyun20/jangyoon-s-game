@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a1628"/>
+      <stop offset="60%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0f2a18"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a7a3c"/>
+      <stop offset="100%" stop-color="#0f4d24"/>
+    </linearGradient>
+    <linearGradient id="ballGrad" cx="35%" cy="35%" r="65%" fx="35%" fy="35%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cccccc"/>
+    </linearGradient>
+    <radialGradient id="ballRG" cx="35%" cy="35%" r="65%" fx="35%" fy="35%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cccccc"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+
+  <!-- 내부 경계선 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 잔디 -->
+  <rect x="0" y="115" width="320" height="65" fill="url(#grass)"/>
+  <!-- 잔디 줄무늬 -->
+  <rect x="0"   y="115" width="40" height="65" fill="rgba(0,0,0,0.12)"/>
+  <rect x="80"  y="115" width="40" height="65" fill="rgba(0,0,0,0.12)"/>
+  <rect x="160" y="115" width="40" height="65" fill="rgba(0,0,0,0.12)"/>
+  <rect x="240" y="115" width="40" height="65" fill="rgba(0,0,0,0.12)"/>
+
+  <!-- 골대 프레임 -->
+  <!-- 골대 그물 배경 -->
+  <rect x="22" y="32" width="148" height="84" fill="rgba(20,40,70,0.65)"/>
+  <!-- 그물 세로선 -->
+  <line x1="37"  y1="32" x2="37"  y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="52"  y1="32" x2="52"  y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="67"  y1="32" x2="67"  y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="82"  y1="32" x2="82"  y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="97"  y1="32" x2="97"  y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="112" y1="32" x2="112" y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="127" y1="32" x2="127" y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="142" y1="32" x2="142" y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="157" y1="32" x2="157" y2="116" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <!-- 그물 가로선 -->
+  <line x1="22" y1="46"  x2="170" y2="46"  stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="22" y1="60"  x2="170" y2="60"  stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="22" y1="74"  x2="170" y2="74"  stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="22" y1="88"  x2="170" y2="88"  stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <line x1="22" y1="102" x2="170" y2="102" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>
+  <!-- 골대 기둥 -->
+  <polyline points="22,116 22,32 170,32 170,116" fill="none" stroke="#f1f5f9" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 키퍼 실루엣 (골대 안) -->
+  <!-- 몸통 -->
+  <rect x="74" y="52" width="44" height="40" rx="6" fill="#3b82f6"/>
+  <!-- 머리 -->
+  <circle cx="96" cy="48" r="14" fill="#fde68a"/>
+  <!-- 눈 -->
+  <circle cx="91" cy="46" r="2.5" fill="#1e3a5f"/>
+  <circle cx="101" cy="46" r="2.5" fill="#1e3a5f"/>
+  <!-- 장갑 왼 -->
+  <circle cx="65" cy="64" r="9" fill="#fbbf24"/>
+  <!-- 장갑 오 -->
+  <circle cx="127" cy="64" r="9" fill="#fbbf24"/>
+
+  <!-- 공 (오른쪽 아래 날아오는 중) -->
+  <circle cx="200" cy="128" r="22" fill="url(#ballRG)" opacity="0.96"/>
+  <!-- 공 패턴 -->
+  <polygon points="200,113 207,120 204,129 196,129 193,120" fill="none" stroke="#222" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="200" cy="128" r="4" fill="#222"/>
+  <!-- 공 그림자 -->
+  <ellipse cx="200" cy="152" rx="18" ry="5" fill="rgba(0,0,0,0.25)"/>
+
+  <!-- 속도감 궤적 -->
+  <line x1="245" y1="165" x2="225" y2="137" stroke="rgba(74,222,128,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="258" y1="168" x2="232" y2="133" stroke="rgba(74,222,128,0.25)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="270" y1="170" x2="240" y2="130" stroke="rgba(74,222,128,0.13)" stroke-width="1" stroke-linecap="round"/>
+
+  <!-- 타이틀 텍스트 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#4ade80">페널티킥</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">PENALTY KICK</text>
+  </g>
+</svg>
