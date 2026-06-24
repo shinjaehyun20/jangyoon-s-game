@@ -1046,5 +1046,21 @@
     "description": "공을 당겨 굴려 홀에 넣는 미니골프",
     "thumbnail": "mini-golf/thumb.svg",
     "path": "mini-golf/index.html"
+  },
+  {
+    "id": "train-track",
+    "title": "Train Track",
+    "title_ko": "기차 길 잇기",
+    "description": "선로 타일을 돌려 출발역에서 도착역까지 길을 잇는 퍼즐",
+    "thumbnail": "train-track/thumb.svg",
+    "path": "train-track/index.html"
+  },
+  {
+    "id": "slide-puzzle",
+    "title": "Slide Puzzle",
+    "title_ko": "그림 밀기 퍼즐",
+    "description": "3x3 조각을 밀어 그림·숫자를 순서대로 맞추는 퍼즐",
+    "thumbnail": "slide-puzzle/thumb.svg",
+    "path": "slide-puzzle/index.html"
   }
 ]

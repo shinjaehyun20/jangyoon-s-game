@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🚂 기차 길 잇기</title>
+  <style>
+    :root {
+      --bg: #14233a;
+      --bg2: #1d3556;
+      --accent: #ffd34e;
+      --rail: #7fc8ff;
+      --rail-on: #ffd34e;
+      --tile: #2a4467;
+      --tile-on: #34618f;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      -webkit-user-select: none; user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      background: radial-gradient(circle at 50% 0%, var(--bg2), var(--bg) 70%);
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 0 rgba(0,0,0,.35);
+    }
+    .hud {
+      display: flex; justify-content: space-around; align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 6px;
+      font-weight: 800;
+    }
+    .hud .cell { text-align: center; line-height: 1.1; }
+    .hud .lbl { font-size: 11px; opacity: .7; font-weight: 600; }
+    .hud .val { font-size: 20px; color: var(--accent); }
+    #gameArea {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 0;
+    }
+    #board {
+      display: grid;
+      gap: 4px;
+      background: rgba(0,0,0,.25);
+      padding: 6px;
+      border-radius: 14px;
+      width: 100%;
+    }
+    .tile {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--tile);
+      border-radius: 8px;
+      transition: background .15s;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .tile.connected { background: var(--tile-on); }
+    .tile.fixed { cursor: default; }
+    .tile svg { width: 100%; height: 100%; display: block; }
+    .tile .rotor {
+      width: 100%; height: 100%;
+      transform-origin: 50% 50%;
+      transition: transform .18s ease-out;
+    }
+    .rail-line {
+      stroke: var(--rail);
+      stroke-width: 14;
+      stroke-linecap: round;
+      fill: none;
+      transition: stroke .15s;
+    }
+    .tile.connected .rail-line { stroke: var(--rail-on); }
+    .station {
+      font-size: clamp(22px, 9vw, 40px);
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 100%;
+    }
+    .tile.start { background: #2e6b3f; cursor: default; }
+    .tile.end { background: #7a3a5e; cursor: default; }
+    .tile.win-flash { animation: flash .4s ease-in-out 3; }
+    @keyframes flash {
+      0%,100% { background: var(--tile-on); }
+      50% { background: var(--accent); }
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 4px;
+    }
+    footer small { font-size: 12px; opacity: .75; }
+    .home-link {
+      color: var(--accent); text-decoration: none;
+      font-size: 13px; font-weight: 700;
+      background: rgba(255,255,255,.08);
+      padding: 6px 10px; border-radius: 10px;
+      min-height: 44px; display: inline-flex; align-items: center;
+    }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(8, 16, 30, .88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 20; padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, var(--bg2), var(--bg));
+      border: 2px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 26px 22px;
+      text-align: center;
+      max-width: 340px; width: 100%;
+      box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 16px; line-height: 1.6; margin-bottom: 18px; opacity: .92; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); margin: 8px 0; }
+    .btn-start {
+      background: var(--accent); color: #1a2a1a;
+      border: none; border-radius: 14px;
+      font-size: 22px; font-weight: 900;
+      padding: 14px 30px; min-height: 56px;
+      cursor: pointer; width: 100%;
+      box-shadow: 0 4px 0 #c9a838;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: 0 1px 0 #c9a838; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🚂 기차 길 잇기</h1>
+
+    <div class="hud">
+      <div class="cell"><div class="lbl">단계</div><div class="val" id="lvl">1</div></div>
+      <div class="cell"><div class="lbl">별</div><div class="val" id="stars">0</div></div>
+      <div class="cell"><div class="lbl">최고 별</div><div class="val" id="best">0</div></div>
+    </div>
+
+    <div id="gameArea">
+      <div id="board"></div>
+    </div>
+
+    <footer>
+      <small>타일을 톡! 눌러 길을 이어요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🚂 기차 길 잇기</h2>
+      <p>선로 타일을 톡 누르면 빙글 돌아요.<br>출발역 🚉에서 도착역 🏁까지<br>길을 이어 주세요!</p>
+      <button class="btn-start" id="startBtn">시작! 🚦</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">🎉 도착!</h2>
+      <div class="result-score" id="finalScore">⭐</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다음 길 🚂</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      BEST_KEY: 'train-track_best',
+      MIN_GRID: 3,
+      MAX_GRID: 6,
+      // 타일 종류별 연결 방향 (N=상,E=우,S=하,W=좌), 회전 0도 기준
+      // straight: 가로(W-E), curve: 좌상 코너(N-W)
+    };
+
+    // 방향 비트: N=1, E=2, S=4, W=8
+    const N = 1, E = 2, S = 4, W = 8;
+    const DIRS = [N, E, S, W];
+    const OPP = { [N]: S, [E]: W, [S]: N, [W]: E };
+    const DXY = { [N]: [0, -1], [E]: [1, 0], [S]: [0, 1], [W]: [-1, 0] };
+
+    // 타일 기본 연결(회전 0): 직선=W|E, 커브=N|E, T자=N|E|S, 십자=전부
+    const TILE_BASE = {
+      straight: W | E,
+      curve: N | E,
+      tee: N | E | S,
+      cross: N | E | S | W,
+    };
+
+    const el = {
+      board: document.getElementById('board'),
+      lvl: document.getElementById('lvl'),
+      stars: document.getElementById('stars'),
+      best: document.getElementById('best'),
+      startOverlay: document.getElementById('startOverlay'),
+      endOverlay: document.getElementById('endOverlay'),
+      startBtn: document.getElementById('startBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      finalScore: document.getElementById('finalScore'),
+      resultMsg: document.getElementById('resultMsg'),
+      endTitle: document.getElementById('endTitle'),
+    };
+
+    const state = {
+      level: 1,
+      stars: 0,
+      grid: 3,
+      cells: [],   // {type, rot, fixed, kind, x, y, dom}
+      startIdx: 0,
+      endIdx: 0,
+      solving: false,
+    };
+
+    function rotConn(base, rot) {
+      // rot: 0,1,2,3 (90도씩). N->E->S->W 순으로 시프트
+      let c = base;
+      for (let i = 0; i < rot; i++) {
+        let nc = 0;
+        if (c & N) nc |= E;
+        if (c & E) nc |= S;
+        if (c & S) nc |= W;
+        if (c & W) nc |= N;
+        c = nc;
+      }
+      return c;
+    }
+
+    function conn(cell) {
+      return rotConn(TILE_BASE[cell.type], cell.rot);
+    }
+
+    // 레벨에 맞는 그리드 크기
+    function gridForLevel(lv) {
+      return Math.min(CONFIG.MAX_GRID, CONFIG.MIN_GRID + Math.floor((lv - 1) / 2));
+    }
+
+    // 보장된 풀이 가능한 퍼즐 생성:
+    // start(왼쪽 가운데) -> end(오른쪽 가운데)까지 랜덤 경로를 만들고
+    // 경로 타일에 정답 연결을 깐 뒤, 회전을 랜덤으로 흐트러뜨린다.
+    function buildPuzzle() {
+      const g = state.grid = gridForLevel(state.level);
+      const total = g * g;
+      const sy = Math.floor(g / 2);
+      const ey = Math.floor(g / 2);
+      const startIdx = 0 * 1 + sy * g;      // x=0
+      const endIdx = (g - 1) + ey * g;      // x=g-1
+      state.startIdx = startIdx;
+      state.endIdx = endIdx;
+
+      // 경로 생성 (random walk, 항상 x로 전진 가능하게 보장)
+      const path = makePath(g, 0, sy, g - 1, ey);
+
+      // 각 셀의 정답 연결 비트 계산
+      const required = new Array(total).fill(0);
+      for (let i = 0; i < path.length; i++) {
+        const cur = path[i];
+        const ci = cur.x + cur.y * g;
+        if (i > 0) {
+          const prev = path[i - 1];
+          const d = dirBetween(cur, prev);
+          required[ci] |= d;
+        }
+        if (i < path.length - 1) {
+          const nxt = path[i + 1];
+          const d = dirBetween(cur, nxt);
+          required[ci] |= d;
+        }
+      }
+      // 출발/도착역은 보드 밖으로 향하는 연결도 표시 (시각용)
+      required[startIdx] |= W;
+      required[endIdx] |= E;
+
+      // 셀 객체 만들기
+      state.cells = [];
+      for (let idx = 0; idx < total; idx++) {
+        const x = idx % g, y = Math.floor(idx / g);
+        const isStart = idx === startIdx;
+        const isEnd = idx === endIdx;
+        let type = null, rot = 0, kind = 'path';
+        const req = required[idx];
+
+        if (isStart || isEnd) {
+          type = null; kind = isStart ? 'start' : 'end';
+        } else if (req === 0) {
+          // 경로 밖 칸: 장식용 빈 타일(직선 회전 가능, 연결 영향 없음 — 그냥 놀이용)
+          type = Math.random() < 0.5 ? 'straight' : 'curve';
+          rot = Math.floor(Math.random() * 4);
+          kind = 'decoy';
+        } else {
+          // req 비트 수로 타일 종류 결정
+          type = typeForConn(req);
+          rot = rotForConn(type, req);
+          kind = 'path';
+          // 회전을 랜덤으로 흐트러뜨림 (정답이 아니게)
+          let r;
+          let guard = 0;
+          do { r = Math.floor(Math.random() * 4); guard++; }
+          while (rotConn(TILE_BASE[type], r) === req && guard < 8);
+          rot = r;
+        }
+        state.cells.push({ type, rot, fixed: false, kind, x, y, dom: null });
+      }
+    }
+
+    function dirBetween(a, b) {
+      const dx = b.x - a.x, dy = b.y - a.y;
+      if (dx === 1) return E;
+      if (dx === -1) return W;
+      if (dy === 1) return S;
+      if (dy === -1) return N;
+      return 0;
+    }
+
+    function makePath(g, sx, sy, ex, ey) {
+      // 항상 풀 수 있는 경로:
+      // 출발역(0,sy)은 반드시 오른쪽 칸(1,sy)으로 진입하고,
+      // 도착역(g-1,ey)은 반드시 왼쪽 칸(g-2,ey)에서 진입한다.
+      // (역 타일은 보드 안쪽 한 방향만 연결을 내보내므로 첫/끝 진행 방향을 고정해야 한다.)
+      const path = [{ x: 0, y: sy }, { x: 1, y: sy }];
+      let x = 1, y = sy;
+      const tex = g - 2, tey = ey; // 도착역 왼쪽 칸이 random walk의 목표
+      while (x < tex) {
+        if (Math.random() < 0.45) {
+          const up = Math.random() < 0.5;
+          const ny = up ? y - 1 : y + 1;
+          if (ny >= 0 && ny < g && !occupied(path, x, ny)) {
+            y = ny;
+            path.push({ x, y });
+            continue;
+          }
+        }
+        x += 1;
+        if (!occupied(path, x, y)) path.push({ x, y });
+        else path.push({ x, y });
+      }
+      // 목표 y로 수직 보정 (도착역 왼쪽 칸까지)
+      while (y !== tey) {
+        const step = y < tey ? 1 : -1;
+        const ny = y + step;
+        if (occupied(path, x, ny)) break;
+        y = ny;
+        path.push({ x, y });
+      }
+      // 도착역 추가
+      path.push({ x: g - 1, y: ey });
+      return path;
+    }
+
+    function occupied(path, x, y) {
+      return path.some(p => p.x === x && p.y === y);
+    }
+
+    function typeForConn(req) {
+      const count = countBits(req);
+      if (count >= 4) return 'cross';
+      if (count === 3) return 'tee';
+      if (count === 2) {
+        // 마주보면 직선, 아니면 커브
+        if ((req & N) && (req & S)) return 'straight';
+        if ((req & E) && (req & W)) return 'straight';
+        return 'curve';
+      }
+      // count<=1 은 커브로 표현 (한쪽만 — dead end 방지용으로 커브)
+      return 'curve';
+    }
+
+    function rotForConn(type, req) {
+      for (let r = 0; r < 4; r++) {
+        if (rotConn(TILE_BASE[type], r) === req) return r;
+      }
+      // 정확히 안 맞으면(직선/커브 단방향 등) 가장 가까운 회전
+      for (let r = 0; r < 4; r++) {
+        if ((rotConn(TILE_BASE[type], r) & req) === req) return r;
+      }
+      return 0;
+    }
+
+    function countBits(n) {
+      let c = 0;
+      while (n) { c += n & 1; n >>= 1; }
+      return c;
+    }
+
+    // ── 렌더 ──
+    function render() {
+      const g = state.grid;
+      el.board.style.gridTemplateColumns = `repeat(${g}, 1fr)`;
+      el.board.innerHTML = '';
+      state.cells.forEach((cell, idx) => {
+        const t = document.createElement('div');
+        t.className = 'tile';
+        if (cell.kind === 'start') {
+          t.classList.add('start', 'fixed');
+          t.innerHTML = '<div class="station">🚉</div>';
+        } else if (cell.kind === 'end') {
+          t.classList.add('end', 'fixed');
+          t.innerHTML = '<div class="station">🏁</div>';
+        } else {
+          t.innerHTML = svgFor(cell.type);
+          t.addEventListener('pointerdown', () => onTap(idx));
+        }
+        cell.dom = t;
+        applyRot(cell);
+        el.board.appendChild(t);
+      });
+      updateConnected();
+    }
+
+    function svgFor(type) {
+      const c = TILE_BASE[type];
+      let paths = '';
+      const cx = 50, cy = 50;
+      const seg = {
+        [N]: `M${cx},${cy} L${cx},0`,
+        [E]: `M${cx},${cy} L100,${cy}`,
+        [S]: `M${cx},${cy} L${cx},100`,
+        [W]: `M${cx},${cy} L0,${cy}`,
+      };
+      DIRS.forEach(d => { if (c & d) paths += `<path class="rail-line" d="${seg[d]}"/>`; });
+      // 중앙 점
+      paths += `<circle cx="${cx}" cy="${cy}" r="9" fill="rgba(255,255,255,.25)"/>`;
+      return `<svg viewBox="0 0 100 100"><g class="rotor">${paths}</g></svg>`;
+    }
+
+    function applyRot(cell) {
+      if (!cell.dom) return;
+      const rotor = cell.dom.querySelector('.rotor');
+      if (rotor) rotor.style.transform = `rotate(${cell.rot * 90}deg)`;
+    }
+
+    function onTap(idx) {
+      if (state.solving) return;
+      const cell = state.cells[idx];
+      if (cell.fixed || cell.kind === 'start' || cell.kind === 'end') return;
+      cell.rot = (cell.rot + 1) % 4;
+      applyRot(cell);
+      const won = updateConnected();
+      if (won) onWin();
+    }
+
+    // BFS로 start->end 연결 확인 + connected 클래스 칠하기
+    function updateConnected() {
+      const g = state.grid;
+      const total = g * g;
+      const visited = new Set();
+      const stack = [state.startIdx];
+      visited.add(state.startIdx);
+      let reached = false;
+
+      while (stack.length) {
+        const cur = stack.pop();
+        const cx = cur % g, cy = Math.floor(cur / g);
+        const cell = state.cells[cur];
+        const curConn = cellOutConn(cell);
+        for (const d of DIRS) {
+          if (!(curConn & d)) continue;
+          const [dx, dy] = DXY[d];
+          const nx = cx + dx, ny = cy + dy;
+          if (nx < 0 || nx >= g || ny < 0 || ny >= g) continue;
+          const ni = nx + ny * g;
+          if (visited.has(ni)) continue;
+          const ncell = state.cells[ni];
+          const nConn = cellOutConn(ncell);
+          // 양방향 연결돼야 통함
+          if (nConn & OPP[d]) {
+            visited.add(ni);
+            stack.push(ni);
+            if (ni === state.endIdx) reached = true;
+          }
+        }
+      }
+
+      // 칠하기: start에서 도달 가능 + (도착 연결됐을 때만 끝까지 빛남)
+      state.cells.forEach((cell, idx) => {
+        if (!cell.dom) return;
+        if (cell.kind === 'start' || cell.kind === 'end') return;
+        if (visited.has(idx)) cell.dom.classList.add('connected');
+        else cell.dom.classList.remove('connected');
+      });
+
+      return reached;
+    }
+
+    // 역은 보드 안쪽 방향으로만 연결을 내보냄
+    function cellOutConn(cell) {
+      if (cell.kind === 'start') return E;   // 출발역은 오른쪽으로
+      if (cell.kind === 'end') return W;     // 도착역은 왼쪽으로
+      if (!cell.type) return 0;
+      return conn(cell);
+    }
+
+    function onWin() {
+      state.solving = true;
+      // 경로 타일 반짝임
+      state.cells.forEach(cell => {
+        if (cell.dom && cell.dom.classList.contains('connected')) {
+          cell.dom.classList.add('win-flash');
+        }
+      });
+      state.stars += 1;
+      el.stars.textContent = state.stars;
+      const best = Math.max(state.stars, +localStorage.getItem(CONFIG.BEST_KEY) || 0);
+      localStorage.setItem(CONFIG.BEST_KEY, best);
+      el.best.textContent = best;
+
+      setTimeout(() => {
+        el.endTitle.textContent = '🎉 칙칙폭폭 도착!';
+        el.finalScore.textContent = '⭐'.repeat(Math.min(5, state.level));
+        el.resultMsg.textContent = `${state.level}단계 성공! 별 ${state.stars}개`;
+        el.endOverlay.classList.remove('hidden');
+        state.solving = false;
+      }, 1100);
+    }
+
+    function startLevel() {
+      buildPuzzle();
+      render();
+      el.lvl.textContent = state.level;
+      el.stars.textContent = state.stars;
+    }
+
+    function newGame() {
+      state.level = 1;
+      state.stars = 0;
+      el.best.textContent = +localStorage.getItem(CONFIG.BEST_KEY) || 0;
+      startLevel();
+    }
+
+    function nextLevel() {
+      state.level += 1;
+      startLevel();
+    }
+
+    // ── 이벤트 ──
+    el.startBtn.addEventListener('pointerdown', () => {
+      el.startOverlay.classList.add('hidden');
+      newGame();
+    });
+    el.restartBtn.addEventListener('pointerdown', () => {
+      el.endOverlay.classList.add('hidden');
+      nextLevel();
+    });
+
+    // 초기 best 표시
+    el.best.textContent = +localStorage.getItem(CONFIG.BEST_KEY) || 0;
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d3556"/>
+      <stop offset="1" stop-color="#14233a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- 선로 (이어진 길) -->
+  <g fill="none" stroke="#ffd34e" stroke-width="7" stroke-linecap="round">
+    <path d="M22,96 L70,96"/>
+    <path d="M70,96 L70,60 L118,60"/>
+    <path d="M118,60 L118,108 L172,108"/>
+    <path d="M172,108 L172,72 L218,72"/>
+  </g>
+  <!-- 침목 점들 -->
+  <g fill="rgba(255,255,255,0.22)">
+    <circle cx="70" cy="96" r="5"/>
+    <circle cx="70" cy="60" r="5"/>
+    <circle cx="118" cy="60" r="5"/>
+    <circle cx="118" cy="108" r="5"/>
+    <circle cx="172" cy="108" r="5"/>
+    <circle cx="172" cy="72" r="5"/>
+  </g>
+
+  <!-- 출발역 / 기차 / 도착 깃발 -->
+  <text x="18" y="108" font-size="26" text-anchor="middle">🚉</text>
+  <text x="200" y="64" font-size="26">🚂</text>
+  <text x="240" y="80" font-size="22">🏁</text>
+
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd34e">기차 길 잇기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">TRAIN TRACK</text>
+  </g>
+</svg>

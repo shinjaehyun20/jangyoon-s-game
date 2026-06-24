@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>그림 밀기 퍼즐</title>
+  <style>
+    :root {
+      --bg: #1b2a4a;
+      --bg2: #2c4470;
+      --accent: #ffcc4d;
+      --accent2: #4dd0e1;
+      --text: #ffffff;
+      --tile: #fff7e6;
+      --tile-edge: #e0b94d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      user-select: none; -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      background: radial-gradient(circle at 50% 0%, var(--bg2), var(--bg) 70%);
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(20px, 5.5vw, 28px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hud {
+      display: flex; justify-content: space-around; align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 15px; font-weight: 700;
+    }
+    .hud .stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .hud .stat .label { font-size: 11px; font-weight: 500; opacity: 0.7; }
+    .hud .stat .val { font-size: 20px; color: var(--accent); }
+    .picker {
+      display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
+    }
+    .picker button {
+      flex: 1; min-width: 0;
+      min-height: 38px;
+      border: none; border-radius: 10px;
+      background: rgba(255,255,255,0.12);
+      color: #fff; font-size: 18px; font-weight: 700;
+      cursor: pointer; transition: transform 0.1s, background 0.15s;
+    }
+    .picker button.sel { background: var(--accent); color: #1b2a4a; transform: scale(1.05); }
+    .picker button:active { transform: scale(0.95); }
+    #gameArea {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 0;
+    }
+    .board {
+      position: relative;
+      width: min(86vw, 360px, 60vh);
+      height: min(86vw, 360px, 60vh);
+      background: rgba(0,0,0,0.25);
+      border-radius: 16px;
+      padding: 6px;
+      box-shadow: inset 0 2px 12px rgba(0,0,0,0.4);
+    }
+    .tile {
+      position: absolute;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--tile);
+      color: #5a3e00;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: left 0.15s ease, top 0.15s ease, transform 0.08s;
+      box-shadow: 0 3px 0 var(--tile-edge), 0 4px 8px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .tile:active { transform: scale(0.96); }
+    .tile.empty { display: none; }
+    .tile .emoji { font-size: 1em; line-height: 1; }
+    .tile .num {
+      position: absolute; top: 2px; left: 6px;
+      font-size: 14px; font-weight: 700; color: rgba(90,62,0,0.55);
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; opacity: 0.85;
+    }
+    footer small { font-size: 12px; }
+    .home-link {
+      color: var(--accent2); text-decoration: none; font-weight: 700;
+      padding: 6px 10px; border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+    }
+    .overlay {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(10,16,32,0.82);
+      z-index: 10;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, #2c4470, #1b2a4a);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 340px; width: 100%;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 16px; line-height: 1.6; margin-bottom: 20px; opacity: 0.92; }
+    .result-score { font-size: 52px; font-weight: 900; color: var(--accent); margin: 8px 0; }
+    .btn-start {
+      min-height: 56px; width: 100%;
+      border: none; border-radius: 14px;
+      background: var(--accent); color: #1b2a4a;
+      font-size: 22px; font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--tile-edge);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--tile-edge); }
+    .confetti {
+      position: fixed; top: -20px; font-size: 26px;
+      pointer-events: none; z-index: 20;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(540deg); opacity: 0.2; }
+    }
+    .win-pulse { animation: pulse 0.5s ease infinite alternate; }
+    @keyframes pulse { to { box-shadow: 0 3px 0 var(--tile-edge), 0 0 18px var(--accent); } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🧩 그림 밀기 퍼즐</h1>
+
+    <div class="hud">
+      <div class="stat"><span class="label">움직인 횟수</span><span class="val" id="moveCount">0</span></div>
+      <div class="stat"><span class="label">최소 기록</span><span class="val" id="bestMoves">-</span></div>
+    </div>
+
+    <div class="picker" id="picker">
+      <button data-pic="🦁" class="sel">🦁</button>
+      <button data-pic="🐶">🐶</button>
+      <button data-pic="🚗">🚗</button>
+      <button data-pic="🚀">🚀</button>
+      <button data-pic="num">123</button>
+    </div>
+
+    <div id="gameArea">
+      <div class="board" id="board"></div>
+    </div>
+
+    <footer>
+      <small>빈 칸 옆 조각을 눌러 밀어요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🧩 그림 밀기 퍼즐</h2>
+      <p>조각이 섞여 있어요!<br>빈 칸 옆 조각을 눌러서<br>그림을 맞춰 보세요 😊</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 완성했어요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg">잘했어요!</p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      SIZE: 3,                 // 3x3 퍼즐 (7살 난이도)
+      GAP: 6,                  // 타일 간격(px)
+      SHUFFLE_MOVES: 60,       // 섞기 시 랜덤 이동 횟수
+      BEST_KEY: 'slide-puzzle_best',
+      CONFETTI: 18
+    };
+
+    const state = {
+      pic: '🦁',
+      tiles: [],               // 길이 9, 값 0..8 (0 = 빈칸)
+      moves: 0,
+      playing: false,
+      tileEls: []              // 인덱스별 DOM 엘리먼트 캐시 (value -> el)
+    };
+
+    // 동물/사물 이모지는 9칸을 9개의 다른 이모지 묶음으로 표현(그림 조각 느낌)
+    const PIC_SETS = {
+      '🦁': ['🦁','🐯','🐱','🦊','🐶','🐻','🐼','🐨','🐹'],
+      '🐶': ['🐶','🐕','🦴','🐾','🐩','🐕‍🦺','🦮','🐕','🐶'],
+      '🚗': ['🚗','🚕','🚙','🚌','🚓','🚑','🚒','🛻','🚚'],
+      '🚀': ['🚀','🛸','🌟','🪐','☄️','🌙','⭐','🌍','🛰️'],
+    };
+
+    const board = document.getElementById('board');
+    const moveCountEl = document.getElementById('moveCount');
+    const bestMovesEl = document.getElementById('bestMoves');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScoreEl = document.getElementById('finalScore');
+    const resultMsgEl = document.getElementById('resultMsg');
+    const picker = document.getElementById('picker');
+
+    function loadBest() {
+      const v = localStorage.getItem(CONFIG.BEST_KEY);
+      bestMovesEl.textContent = v ? v : '-';
+    }
+
+    function saveBest(moves) {
+      const cur = localStorage.getItem(CONFIG.BEST_KEY);
+      if (!cur || moves < parseInt(cur, 10)) {
+        localStorage.setItem(CONFIG.BEST_KEY, String(moves));
+        bestMovesEl.textContent = String(moves);
+        return true;
+      }
+      return false;
+    }
+
+    function tileSize() {
+      const inner = board.clientWidth - 12; // padding 6*2
+      return (inner - CONFIG.GAP * (CONFIG.SIZE - 1)) / CONFIG.SIZE;
+    }
+
+    // value(1..8)에 해당하는 정답 위치 -> 화면 좌표 갱신
+    function layout() {
+      const ts = tileSize();
+      for (let pos = 0; pos < state.tiles.length; pos++) {
+        const val = state.tiles[pos];
+        if (val === 0) continue;
+        const el = state.tileEls[val];
+        if (!el) continue;
+        const r = Math.floor(pos / CONFIG.SIZE);
+        const c = pos % CONFIG.SIZE;
+        el.style.width = ts + 'px';
+        el.style.height = ts + 'px';
+        el.style.left = (6 + c * (ts + CONFIG.GAP)) + 'px';
+        el.style.top = (6 + r * (ts + CONFIG.GAP)) + 'px';
+        el.style.fontSize = (ts * 0.5) + 'px';
+      }
+    }
+
+    function buildTiles() {
+      board.innerHTML = '';
+      state.tileEls = [];
+      const isNum = state.pic === 'num';
+      const set = isNum ? null : (PIC_SETS[state.pic] || PIC_SETS['🦁']);
+      for (let val = 1; val <= 8; val++) {
+        const el = document.createElement('div');
+        el.className = 'tile';
+        if (isNum) {
+          el.innerHTML = '<span class="emoji">' + val + '</span>';
+        } else {
+          el.innerHTML = '<span class="emoji">' + set[val - 1] + '</span>' +
+                         '<span class="num">' + val + '</span>';
+        }
+        el.dataset.val = val;
+        el.addEventListener('pointerdown', onTileTap);
+        board.appendChild(el);
+        state.tileEls[val] = el;
+      }
+      layout();
+    }
+
+    function emptyPos() {
+      return state.tiles.indexOf(0);
+    }
+
+    function neighbors(pos) {
+      const r = Math.floor(pos / CONFIG.SIZE);
+      const c = pos % CONFIG.SIZE;
+      const res = [];
+      if (r > 0) res.push(pos - CONFIG.SIZE);
+      if (r < CONFIG.SIZE - 1) res.push(pos + CONFIG.SIZE);
+      if (c > 0) res.push(pos - 1);
+      if (c < CONFIG.SIZE - 1) res.push(pos + 1);
+      return res;
+    }
+
+    function slideTile(pos) {
+      const ep = emptyPos();
+      if (!neighbors(pos).includes(ep)) return false;
+      state.tiles[ep] = state.tiles[pos];
+      state.tiles[pos] = 0;
+      return true;
+    }
+
+    function onTileTap(e) {
+      if (!state.playing) return;
+      const val = parseInt(e.currentTarget.dataset.val, 10);
+      const pos = state.tiles.indexOf(val);
+      if (slideTile(pos)) {
+        state.moves++;
+        moveCountEl.textContent = state.moves;
+        layout();
+        if (isSolved()) onWin();
+      }
+    }
+
+    function isSolved() {
+      for (let i = 0; i < 8; i++) {
+        if (state.tiles[i] !== i + 1) return false;
+      }
+      return state.tiles[8] === 0;
+    }
+
+    function shuffle() {
+      // 정답 상태에서 시작해 무작위 합법 이동으로 섞음 -> 항상 풀 수 있음
+      state.tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+      let prev = -1;
+      for (let i = 0; i < CONFIG.SHUFFLE_MOVES; i++) {
+        const ep = emptyPos();
+        const nbrs = neighbors(ep).filter(p => p !== prev);
+        const pick = nbrs[Math.floor(Math.random() * nbrs.length)];
+        prev = ep;
+        state.tiles[ep] = state.tiles[pick];
+        state.tiles[pick] = 0;
+      }
+      // 이미 풀린 상태로 섞이면 한 번 더
+      if (isSolved()) shuffle();
+    }
+
+    function startGame() {
+      state.moves = 0;
+      state.playing = true;
+      moveCountEl.textContent = '0';
+      buildTiles();
+      shuffle();
+      layout();
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+    }
+
+    function fireConfetti() {
+      const emojis = ['🎉','⭐','🎊','✨','🌟','🥳'];
+      for (let i = 0; i < CONFIG.CONFETTI; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.animationDuration = (1.2 + Math.random() * 1.3) + 's';
+        c.style.animationDelay = (Math.random() * 0.4) + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3000);
+      }
+    }
+
+    function onWin() {
+      state.playing = false;
+      for (let v = 1; v <= 8; v++) {
+        if (state.tileEls[v]) state.tileEls[v].classList.add('win-pulse');
+      }
+      fireConfetti();
+      const isBest = saveBest(state.moves);
+      finalScoreEl.textContent = state.moves + '번';
+      resultMsgEl.textContent = isBest ? '🏆 새로운 최소 기록!' : '참 잘했어요!';
+      setTimeout(() => {
+        endOverlay.classList.remove('hidden');
+        for (let v = 1; v <= 8; v++) {
+          if (state.tileEls[v]) state.tileEls[v].classList.remove('win-pulse');
+        }
+      }, 900);
+    }
+
+    // 그림 선택
+    picker.addEventListener('click', function (e) {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      [...picker.children].forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      state.pic = btn.dataset.pic;
+      if (state.playing) {
+        // 진행 중 그림만 갈아끼우기 (배치 유지)
+        const keep = state.tiles.slice();
+        buildTiles();
+        state.tiles = keep;
+        layout();
+      }
+    });
+
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('restartBtn').addEventListener('click', startGame);
+    window.addEventListener('resize', () => { if (board.clientWidth) layout(); });
+
+    loadBest();
+    buildTiles(); // 시작 화면 뒤로 보이도록 정답 배치 미리 렌더
+  })();
+  </script>
+</body>
+</html>
