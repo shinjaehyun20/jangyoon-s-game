@@ -1,26 +1,24 @@
 /**
  * Space Catcher — 장윤이 잡기
- * 하늘에서 떨어지는 별을 좌/우 이동으로 잡는 간단한 게임.
+ * 하늘에서 떨어지는 3D 장윤이 카드를 좌/우 이동으로 잡는 게임.
  * 제어: 키보드(←/→), 모바일 버튼(◀/▶), 드래그.
  */
 
 (function () {
   'use strict';
 
-  // ================== 설정 ==================
   const CONFIG = {
-    TOTAL_TIME: 60,           // 초
-    SPAWN_INTERVAL: 900,      // ms
+    TOTAL_TIME: 60,
+    SPAWN_INTERVAL: 820,
     POINT_PER_STAR: 10,
-    PLAYER_PADDING: 6,        // 좌우 가장자리 여백(px)
-    MOVEMENT_SPEED: 0.016,    // 게임 영역 폭 대비 프레임당 이동 비율
-    STAR_SPEED_MIN: 1,
-    STAR_SPEED_MAX: 3.6,
-    STAR_SPEED_MULT: 4,       // 프레임당 추가 가속
-    FLASH_DURATION: 120,      // 캐치 피드백 ms
+    PLAYER_PADDING: 6,
+    MOVEMENT_SPEED: 0.016,
+    STAR_SPEED_MIN: 1.05,
+    STAR_SPEED_MAX: 3.7,
+    STAR_SPEED_MULT: 4,
+    FLASH_DURATION: 160,
   };
 
-  // ================== DOM 참조 ==================
   const $ = (id) => document.getElementById(id);
   const gameArea = $('gameArea');
   const player = $('player');
@@ -31,7 +29,6 @@
   const rightBtn = $('rightBtn');
   const message = $('message');
 
-  // ================== 상태 ==================
   const state = {
     score: 0,
     timeLeft: CONFIG.TOTAL_TIME,
@@ -42,7 +39,16 @@
     drag: { isDragging: false, pointerId: null },
   };
 
-  // ================== 게임 플로우 ==================
+  function getCenteredLeft() {
+    return Math.max(CONFIG.PLAYER_PADDING, (gameArea.clientWidth - player.clientWidth) / 2);
+  }
+
+  function setPlayerLeft(left) {
+    const maxLeft = gameArea.clientWidth - player.clientWidth - CONFIG.PLAYER_PADDING;
+    const clamped = Math.max(CONFIG.PLAYER_PADDING, Math.min(maxLeft, left));
+    player.style.left = `${clamped}px`;
+  }
+
   function resetGame() {
     state.score = 0;
     state.timeLeft = CONFIG.TOTAL_TIME;
@@ -50,15 +56,15 @@
     scoreEl.textContent = state.score;
     timeEl.textContent = state.timeLeft;
     message.classList.add('hidden');
-    document.querySelectorAll('.star').forEach(s => s.remove());
-    player.style.left = '50%';
+    document.querySelectorAll('.star').forEach((s) => s.remove());
+    setPlayerLeft(getCenteredLeft());
+    setPlayerTilt(0, 1);
   }
 
   function startGame() {
     resetGame();
     state.active = true;
     startBtn.textContent = '재시작';
-
     state.gameTimer = setInterval(tickTimer, 1000);
     state.spawnTimer = setInterval(spawnStar, CONFIG.SPAWN_INTERVAL);
     requestAnimationFrame(gameLoop);
@@ -70,6 +76,7 @@
     clearInterval(state.spawnTimer);
     message.innerHTML = `
       <p style="font-size:18px;font-weight:700;margin-bottom:10px;">시간 종료! 점수: ${state.score}점 🎉</p>
+      <p style="margin:0;color:#bcd6ff;">3D 장윤이 카드를 ${state.score / CONFIG.POINT_PER_STAR | 0}장 모았어요!</p>
       <a href="../index.html" style="display:flex;align-items:center;justify-content:center;margin-top:10px;padding:16px;border-radius:14px;background:#374151;color:#fff;text-decoration:none;font-size:17px;font-weight:700;min-height:56px;box-sizing:border-box;">🏠 게임 목록으로</a>`;
     message.classList.remove('hidden');
   }
@@ -80,38 +87,52 @@
     if (state.timeLeft <= 0) endGame();
   }
 
-  // ================== 별 생성/이동 ==================
   function spawnStar() {
+    if (!state.active) return;
     const star = document.createElement('div');
     star.className = 'star';
-    star.style.left = Math.random() * (gameArea.clientWidth - 42) + 'px';
-    star.style.top = '-50px';
-    const speed = CONFIG.STAR_SPEED_MIN +
-                  Math.random() * (CONFIG.STAR_SPEED_MAX - CONFIG.STAR_SPEED_MIN);
-    star.dataset.speed = speed;
+    star.innerHTML = '<div class="star-shadow"></div><div class="star-card"><span class="star-face side"></span><span class="star-face front"></span></div>';
+    star.style.left = `${Math.random() * Math.max(10, gameArea.clientWidth - 58)}px`;
+    star.style.top = '-70px';
+    const speed = CONFIG.STAR_SPEED_MIN + Math.random() * (CONFIG.STAR_SPEED_MAX - CONFIG.STAR_SPEED_MIN);
+    const drift = (Math.random() - 0.5) * 1.2;
+    const swing = 0.92 + Math.random() * 0.22;
+    star.dataset.speed = speed.toFixed(3);
+    star.dataset.drift = drift.toFixed(3);
+    star.dataset.swing = swing.toFixed(3);
     gameArea.appendChild(star);
   }
 
   function updatePlayerPosition(rect) {
-    if (!state.keys.left && !state.keys.right) return;
+    if (!state.keys.left && !state.keys.right) {
+      setPlayerTilt(0, 1);
+      return;
+    }
     const step = rect.width * CONFIG.MOVEMENT_SPEED;
     const curLeft = player.offsetLeft;
-    const maxLeft = rect.width - player.clientWidth - CONFIG.PLAYER_PADDING;
     if (state.keys.left) {
-      player.style.left = Math.max(CONFIG.PLAYER_PADDING, curLeft - step) + 'px';
+      setPlayerLeft(curLeft - step);
+      setPlayerTilt(-12, 1.03);
     } else if (state.keys.right) {
-      player.style.left = Math.min(maxLeft, curLeft + step) + 'px';
+      setPlayerLeft(curLeft + step);
+      setPlayerTilt(12, 1.03);
     }
   }
 
   function updateStars(rect) {
     const pRect = player.getBoundingClientRect();
-    document.querySelectorAll('.star').forEach(star => {
+    document.querySelectorAll('.star').forEach((star) => {
       const top = parseFloat(star.style.top);
       const newTop = top + parseFloat(star.dataset.speed) * CONFIG.STAR_SPEED_MULT;
-      star.style.top = newTop + 'px';
+      const drift = parseFloat(star.dataset.drift || '0');
+      const curLeft = parseFloat(star.style.left);
+      star.style.top = `${newTop}px`;
+      star.style.left = `${Math.max(-20, Math.min(rect.width - 28, curLeft + drift))}px`;
+      const progress = Math.max(0, Math.min(1, newTop / rect.height));
+      const scale = 0.84 + progress * 0.34;
+      const rotate = progress * 24 - 12;
+      star.style.transform = `translateZ(${progress * 16}px) scale(${scale}) rotateX(${rotate}deg)`;
 
-      // 플레이어 충돌 판정
       const sRect = star.getBoundingClientRect();
       const overlapping = !(sRect.right < pRect.left ||
                             sRect.left > pRect.right ||
@@ -125,8 +146,7 @@
         return;
       }
 
-      // 화면 바깥으로 떨어지면 제거
-      if (newTop > rect.height + 60) star.remove();
+      if (newTop > rect.height + 80) star.remove();
     });
   }
 
@@ -138,12 +158,19 @@
     requestAnimationFrame(gameLoop);
   }
 
-  function flashPlayer() {
-    player.style.transform = 'translateX(-50%) scale(1.07)';
-    setTimeout(() => { player.style.transform = 'translateX(-50%)'; }, CONFIG.FLASH_DURATION);
+  function setPlayerTilt(tiltDeg, scale) {
+    player.style.transform = `translateZ(0) rotateY(${tiltDeg}deg) scale(${scale})`;
   }
 
-  // ================== 입력 ==================
+  function flashPlayer() {
+    setPlayerTilt(0, 1.08);
+    player.classList.add('is-catching');
+    setTimeout(() => {
+      player.classList.remove('is-catching');
+      if (!state.keys.left && !state.keys.right) setPlayerTilt(0, 1);
+    }, CONFIG.FLASH_DURATION);
+  }
+
   function bindKeyboardControls() {
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') state.keys.left = true;
@@ -161,6 +188,7 @@
     btn.addEventListener('pointerdown', press);
     btn.addEventListener('pointerup', release);
     btn.addEventListener('pointerleave', release);
+    btn.addEventListener('pointercancel', release);
   }
 
   function bindDragControls() {
@@ -175,17 +203,20 @@
       state.drag.isDragging = false;
       try { gameArea.releasePointerCapture(state.drag.pointerId); } catch (_) {}
       state.drag.pointerId = null;
+      state.keys.left = false;
+      state.keys.right = false;
+      setPlayerTilt(0, 1);
     };
     const onMove = (evt) => {
       if (!state.drag.isDragging || evt.pointerId !== state.drag.pointerId) return;
       const rect = gameArea.getBoundingClientRect();
       const x = evt.clientX - rect.left;
-      const clamped = Math.max(
-        CONFIG.PLAYER_PADDING,
-        Math.min(rect.width - player.clientWidth - CONFIG.PLAYER_PADDING,
-                 x - player.clientWidth / 2)
-      );
-      player.style.left = clamped + 'px';
+      const left = x - player.clientWidth / 2;
+      const prev = player.offsetLeft;
+      setPlayerLeft(left);
+      const next = player.offsetLeft;
+      if (next < prev - 1) setPlayerTilt(-15, 1.03);
+      else if (next > prev + 1) setPlayerTilt(15, 1.03);
     };
 
     player.addEventListener('pointerdown', startDrag);
@@ -207,11 +238,8 @@
     });
   }
 
-  // ================== 초기화 ==================
   function decoratePlayer() {
-    const eye = document.createElement('div');
-    eye.className = 'player-eye';
-    player.appendChild(eye);
+    player.innerHTML = '<div class="ship-shadow"></div><div class="ship-ring"></div><div class="ship-card"><span class="ship-face ship-back"></span><span class="ship-glow"></span><span class="ship-face ship-front"></span></div>';
   }
 
   bindKeyboardControls();
@@ -222,4 +250,7 @@
   gameArea.addEventListener('click', () => gameArea.focus());
   decoratePlayer();
   resetGame();
+  window.addEventListener('resize', () => {
+    if (!state.active) setPlayerLeft(getCenteredLeft());
+  });
 })();
