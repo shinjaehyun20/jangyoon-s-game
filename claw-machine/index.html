@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>🎁 인형뽑기</title>
+  <title>🧸 꿈인형 뽑기</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -119,9 +119,26 @@
       pointer-events: none;
       max-width: 90%;
     }
-    .prize-emoji {
-      font-size: 22px;
+    .prize-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      color: #2a153f;
+      background: linear-gradient(135deg, rgba(255,255,255,0.96), var(--badge-main, #ffd166));
+      border: 2px solid rgba(255,255,255,0.45);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.65);
       animation: popIn 0.35s cubic-bezier(.36,2,.54,.96) forwards;
+    }
+    .prize-badge::before {
+      content: attr(data-icon);
+      font-size: 16px;
+      margin-right: 4px;
     }
     @keyframes popIn {
       from { transform: scale(0) rotate(-20deg); opacity: 0; }
@@ -131,7 +148,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>🎁 인형뽑기</h1>
+  <h1>🧸 꿈인형 뽑기</h1>
   <div class="hud">
     <div class="hud-item">
       <span class="hud-label">뽑은 인형</span>
@@ -159,10 +176,10 @@
 <!-- 시작 오버레이 -->
 <div class="overlay" id="startOverlay">
   <div class="overlay-card">
-    <h2>🎁 인형뽑기</h2>
-    <p>집게가 좌우로 움직여요!<br>
+    <h2>🧸 꿈인형 뽑기</h2>
+    <p>몽실몽실한 꿈인형이 좌우로 기다려요!<br>
        딱 맞을 때 <strong>탭</strong>해서<br>
-       인형 위로 내려보세요 🐻</p>
+       귀여운 친구를 데려와요 ✨</p>
     <button class="btn-start" id="startBtn">시작!</button>
   </div>
 </div>
@@ -193,8 +210,16 @@
     DROP_SPEED    : 10,      // 집게 하강 속도
     RISE_SPEED    : 8,       // 집게 상승 속도
     CATCH_MARGIN  : 28,      // 집게 중심과 인형 중심 허용 거리 (px)
-    PRIZE_EMOJIS  : ['🐻','🐼','🐱','🐶','🐰','🦊','🐸','🐧','🦁','🐯','🐮','🐷'],
   };
+
+  const TOY_THEMES = [
+    { name: 'dream-bear',  label: '꿈곰', icon: '🧸', color: '#f6c89f', accent: '#ff8fb1', ear: 'round', accessory: 'bow', face: 'happy' },
+    { name: 'mint-bunny',  label: '민트토끼', icon: '🐰', color: '#d6f7ef', accent: '#8be9ff', ear: 'long', accessory: 'star', face: 'wink' },
+    { name: 'peach-cat',   label: '복숭냥', icon: '🐱', color: '#ffd7d1', accent: '#ffc36b', ear: 'cat', accessory: 'ribbon', face: 'smile' },
+    { name: 'cloud-puppy', label: '구름강쥐', icon: '🐶', color: '#eef2ff', accent: '#9b8cff', ear: 'drop', accessory: 'heart', face: 'happy' },
+    { name: 'sun-chick',   label: '햇살삐약', icon: '🐥', color: '#ffe8a3', accent: '#ff9d4d', ear: 'none', accessory: 'flower', face: 'wink' },
+    { name: 'berry-panda', label: '베리판다', icon: '🐼', color: '#f6f6f9', accent: '#ff73b5', ear: 'panda', accessory: 'bow', face: 'smile' },
+  ];
 
   /* ── STATE ── */
   const cv  = document.getElementById('cv');
@@ -211,7 +236,7 @@
     targetY  : 0,        // 인형 위치 Y (drop target)
     score    : 0,
     lives    : CONFIG.TOTAL_TURNS,
-    prizes   : [],       // {x,y,emoji,caught}
+    prizes   : [],       // {x,y,toy,caught}
     caughtIdx: -1,
     level    : 1,
     shakeT   : 0,        // miss 흔들기 타이머
@@ -246,15 +271,16 @@
     const startY  = H * 0.52;
     const spacingY= H * 0.14;
     state.prizes = [];
-    const emojiPool = [...CONFIG.PRIZE_EMOJIS];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const idx = Math.floor(Math.random() * emojiPool.length);
+        const theme = TOY_THEMES[(r * cols + c + Math.floor(Math.random() * TOY_THEMES.length)) % TOY_THEMES.length];
         state.prizes.push({
           x     : cellW * c + cellW / 2,
           y     : startY + r * spacingY,
-          emoji : emojiPool[idx],
+          toy   : theme,
           caught: false,
+          blinkOffset: Math.random() * Math.PI * 2,
+          swayOffset : Math.random() * Math.PI * 2,
         });
       }
     }
@@ -438,25 +464,197 @@
     ctx.restore();
   }
 
+  function drawRoundedRectPath(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+  }
+
+  function drawAccessory(type, accent, time) {
+    ctx.save();
+    ctx.fillStyle = accent;
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 1.2;
+
+    if (type === 'bow') {
+      ctx.beginPath();
+      ctx.ellipse(-9, -14, 7, 5, -0.4, 0, Math.PI * 2);
+      ctx.ellipse( 9, -14, 7, 5,  0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, -14, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === 'ribbon') {
+      ctx.fillRect(-3.5, -24, 7, 14);
+      ctx.beginPath();
+      ctx.moveTo(-7, -10); ctx.lineTo(0, -2); ctx.lineTo(7, -10);
+      ctx.closePath(); ctx.fill();
+    } else if (type === 'star') {
+      ctx.translate(0, -17 + Math.sin(time * 0.006) * 1.5);
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const radius = i % 2 === 0 ? 8 : 3.5;
+        const angle = -Math.PI / 2 + (Math.PI / 5) * i;
+        const px = Math.cos(angle) * radius;
+        const py = Math.sin(angle) * radius;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else if (type === 'heart') {
+      ctx.translate(0, -16);
+      ctx.beginPath();
+      ctx.moveTo(0, 7);
+      ctx.bezierCurveTo(10, -2, 11, -10, 4, -10);
+      ctx.bezierCurveTo(0, -10, -1, -5, 0, -2);
+      ctx.bezierCurveTo(1, -5, 0, -10, -4, -10);
+      ctx.bezierCurveTo(-11, -10, -10, -2, 0, 7);
+      ctx.fill();
+    } else if (type === 'flower') {
+      ctx.translate(0, -16);
+      for (let i = 0; i < 5; i++) {
+        ctx.save();
+        ctx.rotate((Math.PI * 2 / 5) * i);
+        ctx.beginPath();
+        ctx.ellipse(0, -7, 4, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.fillStyle = '#fff3a6';
+      ctx.beginPath();
+      ctx.arc(0, 0, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawToyEars(type, accent) {
+    ctx.save();
+    if (type === 'round' || type === 'panda') {
+      const outer = type === 'panda' ? '#353246' : accent;
+      ctx.fillStyle = outer;
+      ctx.beginPath(); ctx.arc(-16, -17, 11, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc( 16, -17, 11, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = type === 'panda' ? '#f7bfd1' : 'rgba(255,255,255,0.45)';
+      ctx.beginPath(); ctx.arc(-16, -17, 5.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc( 16, -17, 5.5, 0, Math.PI * 2); ctx.fill();
+    } else if (type === 'long') {
+      ctx.fillStyle = accent;
+      ctx.beginPath(); ctx.ellipse(-11, -23, 8, 16, -0.28, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 11, -23, 8, 16,  0.28, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.beginPath(); ctx.ellipse(-11, -22, 3, 10, -0.28, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 11, -22, 3, 10,  0.28, 0, Math.PI * 2); ctx.fill();
+    } else if (type === 'cat') {
+      ctx.fillStyle = accent;
+      ctx.beginPath();
+      ctx.moveTo(-18, -9); ctx.lineTo(-8, -28); ctx.lineTo(-1, -8); ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(18, -9); ctx.lineTo(8, -28); ctx.lineTo(1, -8); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.beginPath();
+      ctx.moveTo(-13, -12); ctx.lineTo(-8, -22); ctx.lineTo(-4, -11); ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(13, -12); ctx.lineTo(8, -22); ctx.lineTo(4, -11); ctx.closePath(); ctx.fill();
+    } else if (type === 'drop') {
+      ctx.fillStyle = accent;
+      ctx.beginPath(); ctx.ellipse(-18, -8, 6, 14, 0.6, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 18, -8, 6, 14, -0.6, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawCuteToy(prize, x, y, carried = false) {
+    const now = Date.now();
+    const toy = prize.toy;
+    const bob = carried ? 0 : Math.sin(now * 0.003 + prize.swayOffset) * 3;
+    const blink = Math.sin(now * 0.004 + prize.blinkOffset) > 0.92 ? 0.18 : 1;
+    const tilt = carried ? 0.03 : Math.sin(now * 0.0023 + prize.swayOffset) * 0.08;
+    const scale = carried ? 0.88 : 0.98 + Math.sin(now * 0.002 + prize.swayOffset) * 0.02;
+    const bodyColor = toy.color;
+    const accent = toy.accent;
+
+    ctx.save();
+    ctx.translate(x, y + bob);
+    ctx.scale(scale, scale);
+    ctx.rotate(tilt);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.26)';
+    ctx.beginPath();
+    ctx.ellipse(0, 28, 24, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    drawToyEars(toy.ear, accent);
+
+    const sideColor = accent;
+    const bodyGrad = ctx.createLinearGradient(-24, -20, 24, 26);
+    bodyGrad.addColorStop(0, '#ffffff');
+    bodyGrad.addColorStop(0.22, bodyColor);
+    bodyGrad.addColorStop(1, sideColor);
+
+    ctx.fillStyle = sideColor;
+    drawRoundedRectPath(-23, -15, 46, 44, 18);
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(0, -4);
+    ctx.fillStyle = bodyGrad;
+    drawRoundedRectPath(-24, -20, 48, 44, 18);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 1.2;
+    drawRoundedRectPath(-24, -24, 48, 48, 18);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.28)';
+    ctx.beginPath();
+    ctx.ellipse(-9, -9, 9, 15, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath(); ctx.ellipse(-8, -4, 3.2, 4.2 * blink, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse( 8, -4, 3.2, 4.2 * blink, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#28233d';
+    ctx.beginPath(); ctx.arc(-8, -4, 1.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc( 8, -4, 1.4, 0, Math.PI * 2); ctx.fill();
+
+    if (toy.face === 'wink') {
+      ctx.strokeStyle = '#2f2847';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(5, -4); ctx.lineTo(11, -4);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = '#f7a6b8';
+    ctx.beginPath(); ctx.arc(-15, 5, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc( 15, 5, 4.5, 0, Math.PI * 2); ctx.fill();
+
+    ctx.strokeStyle = '#2f2847';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-4, 8); ctx.quadraticCurveTo(0, toy.face === 'happy' ? 14 : 11, 4, 8);
+    ctx.stroke();
+
+    ctx.fillStyle = accent;
+    ctx.beginPath(); ctx.arc(-12, 18, 6.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc( 12, 18, 6.2, 0, Math.PI * 2); ctx.fill();
+
+    drawAccessory(toy.accessory, accent, now);
+    ctx.restore();
+  }
+
   function drawPrizes() {
-    const baseFontSize = Math.min(W, H) * 0.09;
     ctx.save();
     state.prizes.forEach((p, i) => {
       if (p.caught) return;
-      // 잡힌 인형이면 따라 올라옴
       if (state.caughtIdx === i && state.phase === 'rising') {
-        ctx.globalAlpha = 1;
-        ctx.font = `${baseFontSize}px serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(p.emoji, state.clawX, state.clawY + state.wireLen + 22);
+        drawCuteToy(p, state.clawX, state.clawY + state.wireLen + 28, true);
       } else {
-        const bounce = Math.sin(Date.now() / 700 + i) * 2.5;
-        ctx.globalAlpha = 1;
-        ctx.font = `${baseFontSize}px serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(p.emoji, p.x, p.y + bounce);
+        drawCuteToy(p, p.x, p.y, false);
       }
     });
     ctx.restore();
@@ -559,7 +757,7 @@
         p.caught = true;
         state.score++;
         updateHUD();
-        addPrizeToTray(p.emoji);
+        addPrizeToTray(p.toy);
         state.caughtIdx = -1;
         spawnParticles(state.clawX, state.clawY, '#c084fc');
       }
@@ -578,10 +776,12 @@
     }
   }
 
-  function addPrizeToTray(emoji) {
+  function addPrizeToTray(toy) {
     const el = document.createElement('span');
-    el.className = 'prize-emoji';
-    el.textContent = emoji;
+    el.className = 'prize-badge';
+    el.dataset.icon = toy.icon;
+    el.textContent = toy.label;
+    el.style.setProperty('--badge-main', toy.accent);
     prizeTray.appendChild(el);
   }
 
@@ -595,15 +795,15 @@
     document.getElementById('finalScore').textContent = state.score;
 
     const msgs = [
-      ['한 마리도 못 뽑았어요 😅', '다시 도전!'],
-      ['아쉽지만 조금 더 연습해요!', '잘 했어요!'],
-      ['잘 했어요! 🎉', '훌륭해요!'],
-      ['대박! 거의 다 뽑았어요! ✨', '최고!'],
-      ['완벽! 전부 다 뽑았어요! 🏆', '👑 챔피언!'],
+      ['한 번 더 도전하면 금방 감 잡아요 🌙', '몽실 연습중'],
+      ['귀여운 인형을 조금 더 모아봐요!', '아쉽지만 귀여워'],
+      ['와! 귀여운 꿈인형을 잘 뽑았어요 🎉', '솜사탕 성공!'],
+      ['대박! 거의 다 데려왔어요 ✨', '인형집 프로!'],
+      ['완벽! 꿈인형 친구들을 전부 모았어요 🏆', '큐티 챔피언!'],
     ];
     const msgIdx = Math.min(Math.floor(state.score / 2), msgs.length - 1);
     const [msg, title] = msgs[msgIdx];
-    document.getElementById('resultMsg').textContent = `인형 ${state.score}마리! ${msg}`;
+    document.getElementById('resultMsg').textContent = `귀염 인형 ${state.score}마리! ${msg}`;
     document.getElementById('endTitle').textContent  = title;
     endOverlay.classList.remove('hidden');
     state.level = state.score >= CONFIG.TOTAL_TURNS - 1 ? state.level + 1 : Math.max(1, state.level - 1);
