@@ -1056,6 +1056,14 @@
     "path": "train-track/index.html"
   },
   {
+    "id": "queue-train",
+    "title": "Queue Train",
+    "title_ko": "큐큐 기차역",
+    "description": "맨 앞 칸을 보고 같은 색 역으로 보내는 자료구조 Queue 놀이 게임",
+    "thumbnail": "queue-train/thumb.svg",
+    "path": "queue-train/index.html"
+  },
+  {
     "id": "slide-puzzle",
     "title": "Slide Puzzle",
     "title_ko": "그림 밀기 퍼즐",

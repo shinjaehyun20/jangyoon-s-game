@@ -99,6 +99,7 @@
 | [🐌 달팽이 경주 (snail-race)](./snail-race) | 달팽이 3마리 중 하나 골라 화면 탭탭탭! 결승선에 1등으로 밀어주는 응원형 레이스 | 어린이/액션 |
 | [🛗 엘리베이터 층 맞추기](./elevator-floor) | 동물 손님이 원하는 층 버튼 탭! 숫자 1~5 인식·매칭 | 어린이 |
 | [☂️ 우산 캐치](./umbrella-catch) | 우산을 좌우로 움직여 사탕·별을 받고 번개·먹구름은 피하는 낙하 게임 | 어린이 |
+| [🚂 큐큐 기차역](./queue-train) | 맨 앞 칸을 보고 같은 색 역으로 보내는 Queue 자료구조 응용 기차 게임 | 학습/인지 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 
@@ -125,6 +126,7 @@ jangyoon-s-game/
 ├── 2048/
 ├── sudoku/
 ├── ubongo/
+├── queue-train/
 ├── balloon-pop/
 ├── number-order/
 ├── bounce-ball/

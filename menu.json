@@ -59,6 +59,11 @@
         "path": "umbrella-catch/index.html"
       },
       {
+        "id": "queue-train",
+        "label": "🚂 큐큐 기차역",
+        "path": "queue-train/index.html"
+      },
+      {
         "id": "dandelion",
         "label": "🌼 민들레 홀씨",
         "path": "dandelion/index.html"

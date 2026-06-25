@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🚂 큐큐 기차역</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">QUEUE · MODEL / VIEW / APP</p>
+        <h1>🚂 큐큐 기차역</h1>
+        <p class="subtitle">맨 앞 칸을 보고 알맞은 역 버튼을 눌러 주세요!</p>
+      </div>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </header>
+
+    <section class="hud" aria-label="게임 정보">
+      <div class="hud-card"><span>점수</span><strong id="score">0</strong></div>
+      <div class="hud-card"><span>콤보</span><strong id="combo">0</strong></div>
+      <div class="hud-card"><span>남은 시간</span><strong id="time">45</strong></div>
+      <div class="hud-card"><span>하트</span><strong id="lives">♥♥♥</strong></div>
+    </section>
+
+    <section class="stage" aria-label="기차역 놀이판">
+      <div class="sky-decor" aria-hidden="true">
+        <span>☁️</span><span>☀️</span><span>☁️</span>
+      </div>
+
+      <div class="track-board">
+        <div class="track loop-track" aria-hidden="true"></div>
+        <div class="track entry-track" aria-hidden="true"></div>
+        <div class="track station-track station-track--red" aria-hidden="true"></div>
+        <div class="track station-track station-track--blue" aria-hidden="true"></div>
+        <div class="track station-track station-track--yellow" aria-hidden="true"></div>
+
+        <div class="engine" id="engine" aria-hidden="true">
+          <span class="engine-face">🚂</span>
+          <div class="engine-smoke"><span>💨</span><span>✨</span></div>
+        </div>
+
+        <div class="queue-slots" id="queueSlots" aria-label="대기 중인 칸"></div>
+
+        <div class="stations" aria-label="도착역 목록">
+          <button class="station-btn station-btn--red" data-color="red" aria-label="빨강역 보내기">
+            <span class="station-emoji">🍎</span>
+            <span class="station-name">빨강역</span>
+          </button>
+          <button class="station-btn station-btn--blue" data-color="blue" aria-label="파랑역 보내기">
+            <span class="station-emoji">🐟</span>
+            <span class="station-name">파랑역</span>
+          </button>
+          <button class="station-btn station-btn--yellow" data-color="yellow" aria-label="노랑역 보내기">
+            <span class="station-emoji">⭐</span>
+            <span class="station-name">노랑역</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="legend" aria-label="놀이 설명">
+      <div class="legend-card">
+        <strong>어떻게 해요?</strong>
+        <p>맨 앞 칸 색과 그림을 보고 같은 색 역으로 보내요. 맞히면 점수 + 콤보, 틀리면 하트가 줄어요.</p>
+      </div>
+      <div class="legend-card status-card">
+        <strong id="message">시작 버튼을 눌러 놀이를 시작해요!</strong>
+      </div>
+    </section>
+  </main>
+
+  <section class="overlay" id="startOverlay" aria-label="시작 안내">
+    <div class="overlay-card">
+      <p class="eyebrow">자료구조 응용 게임</p>
+      <h2>큐큐 기차역</h2>
+      <p>기차 칸이 <strong>줄(Queue)</strong>로 서요.<br>항상 <strong>맨 앞 칸</strong>부터 보내면 돼요!</p>
+      <ul>
+        <li>정적 무대: 선로 · 역 · 대기칸</li>
+        <li>동적 객체: 기관차 · 칸 · 파티클</li>
+        <li>역할 분리: Model / View / App 구조</li>
+      </ul>
+      <button id="startBtn" class="primary-btn">시작! 🚦</button>
+    </div>
+  </section>
+
+  <section class="overlay hidden" id="endOverlay" aria-label="결과 안내">
+    <div class="overlay-card">
+      <p class="eyebrow">놀이 결과</p>
+      <h2 id="endTitle">참 잘했어요!</h2>
+      <div class="result-badge" id="finalScore">0점</div>
+      <p id="endMessage">다시 도전해 볼까요?</p>
+      <button id="restartBtn" class="primary-btn">다시 하기 🔁</button>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
