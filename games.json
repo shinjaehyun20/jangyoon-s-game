@@ -1,5 +1,13 @@
 [
   {
+    "id": "codex-robot-lab",
+    "title": "Codex Robot Lab",
+    "title_ko": "🤖 코덱스 로봇 연구소",
+    "description": "명령 카드를 순서대로 골라 계획→수정→검증→커밋/푸시 파이프라인을 완성해요!",
+    "thumbnail": "codex-robot-lab/thumb.svg",
+    "path": "codex-robot-lab/index.html"
+  },
+  {
     "id": "bowling",
     "title": "Bowling",
     "title_ko": "볼링",

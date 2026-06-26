@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07111f"/><stop offset=".55" stop-color="#152d66"/><stop offset="1" stop-color="#311457"/></linearGradient>
+    <linearGradient id="bot" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".45" stop-color="#7cf7ff"/><stop offset="1" stop-color="#6a78ff"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <g opacity=".18" stroke="#7cf7ff" stroke-width="1"><path d="M0 138h320M0 114h320M0 90h320M0 66h320M40 0v180M80 0v180M120 0v180M160 0v180M200 0v180M240 0v180M280 0v180"/></g>
+  <g transform="translate(40 28)" filter="url(#glow)">
+    <rect x="38" y="8" width="72" height="44" rx="16" fill="url(#bot)" stroke="rgba(255,255,255,.85)" stroke-width="3"/>
+    <line x1="74" y1="8" x2="74" y2="-10" stroke="#7cf7ff" stroke-width="4"/><circle cx="74" cy="-14" r="8" fill="#7cf7ff"/>
+    <circle cx="62" cy="30" r="6" fill="#07111f"/><circle cx="88" cy="30" r="6" fill="#07111f"/>
+    <rect x="24" y="58" width="100" height="64" rx="22" fill="#8b65ff" stroke="rgba(255,255,255,.72)" stroke-width="3"/>
+    <circle cx="74" cy="88" r="18" fill="none" stroke="#7cf7ff" stroke-width="8" stroke-dasharray="18 8"/>
+    <rect x="5" y="70" width="22" height="48" rx="11" fill="#6bdfff"/><rect x="121" y="70" width="22" height="48" rx="11" fill="#6bdfff"/>
+    <rect x="45" y="122" width="18" height="28" rx="9" fill="#6bdfff"/><rect x="86" y="122" width="18" height="28" rx="9" fill="#6bdfff"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="13" fill="#bdfbff" opacity=".95">
+    <rect x="176" y="24" width="112" height="70" rx="12" fill="rgba(0,0,0,.46)" stroke="rgba(124,247,255,.35)"/>
+    <text x="190" y="45">$ plan</text><text x="190" y="63">$ patch</text><text x="190" y="81">$ test ✅</text>
+  </g>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#7cf7ff">코덱스 로봇 연구소</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.58)" letter-spacing="2">CODEX ROBOT LAB</text>
+  </g>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+</svg>

@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "codex-robot-lab",
+        "label": "🤖 코덱스 로봇 연구소",
+        "path": "codex-robot-lab/index.html"
+      },
+      {
         "id": "penalty-kick",
         "label": "⚽ 페널티킥",
         "path": "penalty-kick/index.html"
