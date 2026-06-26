@@ -1,5 +1,13 @@
 [
   {
+    "id": "moon-rocket-math",
+    "title": "Moon Rocket Math",
+    "title_ko": "🌙 달 로켓 연료 계산",
+    "description": "덧셈·뺄셈 정답 연료를 골라 로켓을 달까지 보내는 45초 숫자 게임",
+    "thumbnail": "moon-rocket-math/thumb.svg",
+    "path": "moon-rocket-math/index.html"
+  },
+  {
     "id": "codex-robot-lab",
     "title": "Codex Robot Lab",
     "title_ko": "🤖 코덱스 로봇 연구소",

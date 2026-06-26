@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "moon-rocket-math",
+        "label": "🌙 달 로켓 계산",
+        "path": "moon-rocket-math/index.html"
+      },
+      {
         "id": "codex-robot-lab",
         "label": "🤖 코덱스 로봇 연구소",
         "path": "codex-robot-lab/index.html"
