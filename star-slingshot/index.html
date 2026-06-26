@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>별 새총 쏘기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg1: #1a1442;
+    --bg2: #3b1f6e;
+    --accent: #ffd84d;
+    --accent2: #5ad1ff;
+    --text: #ffffff;
+  }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: #100c2a;
+    color: var(--text);
+    user-select: none;
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 8px 12px 6px; gap: 6px;
+    margin: 0 auto;
+  }
+  h1 {
+    text-align: center;
+    font-size: clamp(20px, 5.5vw, 28px);
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: clamp(15px, 4.4vw, 19px);
+    font-weight: 800;
+  }
+  .hud .item { display: flex; align-items: center; gap: 4px; }
+  #gameArea {
+    flex: 1;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255,255,255,0.10) 0 1px, transparent 2px),
+      radial-gradient(circle at 70% 25%, rgba(255,255,255,0.08) 0 1px, transparent 2px),
+      radial-gradient(circle at 45% 8%, rgba(255,255,255,0.10) 0 1px, transparent 2px),
+      radial-gradient(circle at 85% 12%, rgba(255,255,255,0.07) 0 1px, transparent 2px),
+      linear-gradient(180deg, var(--bg1), var(--bg2));
+    touch-action: none;
+    cursor: crosshair;
+  }
+  #gameCanvas { display: block; width: 100%; height: 100%; }
+  footer {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    padding: 0 4px;
+  }
+  .home-link {
+    color: var(--accent2);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 4px 6px;
+  }
+  .overlay {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(10,8,30,0.82);
+    backdrop-filter: blur(3px);
+    z-index: 10;
+    padding: 20px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    width: 100%; max-width: 340px;
+    background: linear-gradient(160deg, #2a1f5e, #1a1442);
+    border: 2px solid rgba(255,216,77,0.35);
+    border-radius: 22px;
+    padding: 26px 22px 22px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+  .overlay-card h2 {
+    font-size: clamp(22px, 6.5vw, 30px);
+    font-weight: 900;
+    margin-bottom: 12px;
+  }
+  .overlay-card p {
+    font-size: clamp(15px, 4.4vw, 18px);
+    line-height: 1.6;
+    color: rgba(255,255,255,0.92);
+    margin-bottom: 18px;
+  }
+  .result-score {
+    font-size: 54px;
+    font-weight: 900;
+    color: var(--accent);
+    margin: 4px 0 6px;
+    text-shadow: 0 3px 10px rgba(255,216,77,0.4);
+  }
+  .best {
+    font-size: 15px;
+    color: var(--accent2);
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .btn-start {
+    width: 100%;
+    min-height: 56px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #ffe680, var(--accent));
+    color: #4a3400;
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #c79a00;
+    transition: transform 0.06s, box-shadow 0.06s;
+  }
+  .btn-start:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #c79a00;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🌟 별 새총 쏘기</h1>
+    <div class="hud">
+      <div class="item">⭐ <span id="score">0</span></div>
+      <div class="item">🎈 <span id="left">0</span></div>
+      <div class="item">⏱️ <span id="time">60</span></div>
+    </div>
+    <div id="gameArea">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+    <footer>
+      <small>새총을 아래로 쭉 당겼다 놓아요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🌟 별 새총 쏘기</h2>
+      <p>아래 새총을 손가락으로<br><b>쭉 당겼다가 놓으면</b><br>별이 날아가요!<br>풍선을 맞춰서 터뜨려요! 🎈</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">🎉 잘했어요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="best" id="bestScore">최고 기록: 0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    GAME_TIME: 60,          // 초
+    GRAVITY: 0.32,          // 별 낙하 가속도(px/frame^2)
+    POWER: 0.135,           // 당긴 거리 -> 속도 변환 계수
+    MAX_DRAG: 150,          // 당기는 최대 거리(px)
+    MAX_SPEED: 22,          // 별 최대 속도(px/frame) — 터널링 방지
+    SUBSTEP_PX: 8,          // 한 프레임 이동을 이 픽셀 이하 조각으로 쪼개 충돌검사
+    STAR_R: 16,             // 별 반지름
+    BALLOON_R: 26,          // 풍선 반지름
+    MAX_BALLOONS: 6,        // 화면 동시 풍선 수
+    SPAWN_MS: 900,          // 풍선 생성 간격
+    BALLOON_SPEED: 0.35,    // 풍선 떠다니는 기본 속도
+    SLING_Y_RATIO: 0.86,    // 새총 위치(아래에서)
+    POINTS: 10,
+  };
+
+  const COLORS = ['#ff5a8a', '#5ad1ff', '#5affae', '#ffd84d', '#c78aff', '#ff9d5a'];
+
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const area = document.getElementById('gameArea');
+
+  const elScore = document.getElementById('score');
+  const elLeft = document.getElementById('left');
+  const elTime = document.getElementById('time');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const finalScore = document.getElementById('finalScore');
+  const bestScoreEl = document.getElementById('bestScore');
+  const resultMsg = document.getElementById('resultMsg');
+  const endTitle = document.getElementById('endTitle');
+
+  const BEST_KEY = 'star-slingshot_best';
+
+  let W = 0, H = 0, DPR = 1;
+  let slingX = 0, slingY = 0;
+
+  const state = {
+    running: false,
+    score: 0,
+    popped: 0,
+    timeLeft: CONFIG.GAME_TIME,
+    balloons: [],
+    star: null,        // 날아가는 별 1개 (한 번에 하나)
+    sparks: [],        // 터짐 효과
+    dragging: false,
+    dragX: 0, dragY: 0, // 현재 손가락 위치
+  };
+
+  let lastSpawn = 0;
+  let timerId = null;
+  let rafId = null;
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = area.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    slingX = W / 2;
+    slingY = H * CONFIG.SLING_Y_RATIO;
+  }
+  window.addEventListener('resize', resize);
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  function spawnBalloon() {
+    if (state.balloons.length >= CONFIG.MAX_BALLOONS) return;
+    const r = CONFIG.BALLOON_R;
+    state.balloons.push({
+      x: rand(r + 6, W - r - 6),
+      y: rand(r + 10, H * 0.5),
+      vx: (Math.random() < 0.5 ? -1 : 1) * CONFIG.BALLOON_SPEED * rand(0.5, 1.3),
+      vy: CONFIG.BALLOON_SPEED * rand(-0.4, 0.4),
+      r: r,
+      color: COLORS[(Math.random() * COLORS.length) | 0],
+      wob: Math.random() * Math.PI * 2,
+    });
+  }
+
+  function fireStar() {
+    if (state.star) return; // 이미 날아가는 별 있음
+    const dx = slingX - state.dragX;
+    const dy = slingY - state.dragY;
+    const dist = Math.min(Math.hypot(dx, dy), CONFIG.MAX_DRAG);
+    if (dist < 8) return; // 너무 짧으면 발사 안 함
+    const ang = Math.atan2(dy, dx);
+    const speed = Math.min(dist * CONFIG.POWER * 8, CONFIG.MAX_SPEED);
+    state.star = {
+      x: slingX,
+      y: slingY,
+      vx: Math.cos(ang) * speed,
+      vy: Math.sin(ang) * speed,
+      r: CONFIG.STAR_R,
+      life: 0,
+    };
+  }
+
+  function makeSparks(x, y, color) {
+    for (let i = 0; i < 12; i++) {
+      const a = (Math.PI * 2 * i) / 12 + Math.random();
+      const sp = rand(1.5, 4.5);
+      state.sparks.push({
+        x, y,
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp,
+        life: 1,
+        color,
+      });
+    }
+  }
+
+  function update() {
+    // 풍선 이동
+    for (const b of state.balloons) {
+      b.wob += 0.05;
+      b.x += b.vx + Math.sin(b.wob) * 0.25;
+      b.y += b.vy;
+      if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx); }
+      if (b.x > W - b.r) { b.x = W - b.r; b.vx = -Math.abs(b.vx); }
+      if (b.y < b.r) { b.y = b.r; b.vy = Math.abs(b.vy); }
+      if (b.y > H * 0.62) { b.y = H * 0.62; b.vy = -Math.abs(b.vy); }
+    }
+
+    // 별 이동(중력) — substep 으로 쪼개 빠른 별의 터널링 방지
+    if (state.star) {
+      const s = state.star;
+      s.vy += CONFIG.GRAVITY;
+      s.life++;
+      const stepDist = Math.hypot(s.vx, s.vy);
+      const steps = Math.max(1, Math.ceil(stepDist / CONFIG.SUBSTEP_PX));
+      const sx = s.vx / steps, sy = s.vy / steps;
+      let hit = false, gone = false;
+      for (let st = 0; st < steps && !hit; st++) {
+        s.x += sx;
+        s.y += sy;
+        for (let i = state.balloons.length - 1; i >= 0; i--) {
+          const b = state.balloons[i];
+          if (Math.hypot(s.x - b.x, s.y - b.y) < s.r + b.r) {
+            makeSparks(b.x, b.y, b.color);
+            state.balloons.splice(i, 1);
+            state.score += CONFIG.POINTS;
+            state.popped++;
+            elScore.textContent = state.score;
+            elLeft.textContent = state.popped;
+            hit = true; // 별 하나는 한 풍선만
+            break;
+          }
+        }
+        if (s.x < -40 || s.x > W + 40 || s.y > H + 40) { gone = true; break; }
+      }
+      // 충돌했거나 화면 밖이거나 너무 오래되면 제거
+      if (hit || gone || s.life >= 240) {
+        state.star = null;
+      }
+    }
+
+    // 스파크
+    for (let i = state.sparks.length - 1; i >= 0; i--) {
+      const p = state.sparks[i];
+      p.x += p.vx; p.y += p.vy;
+      p.vy += 0.12;
+      p.life -= 0.035;
+      if (p.life <= 0) state.sparks.splice(i, 1);
+    }
+  }
+
+  function drawStarShape(cx, cy, r, color) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const ang = (Math.PI / 5) * i - Math.PI / 2;
+      const rad = i % 2 === 0 ? r : r * 0.45;
+      const px = Math.cos(ang) * rad;
+      const py = Math.sin(ang) * rad;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 14;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // 풍선
+    for (const b of state.balloons) {
+      ctx.beginPath();
+      ctx.ellipse(b.x, b.y, b.r, b.r * 1.15, 0, 0, Math.PI * 2);
+      ctx.fillStyle = b.color;
+      ctx.fill();
+      // 하이라이트
+      ctx.beginPath();
+      ctx.ellipse(b.x - b.r * 0.32, b.y - b.r * 0.4, b.r * 0.28, b.r * 0.4, -0.4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.fill();
+      // 끈
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y + b.r * 1.1);
+      ctx.lineTo(b.x, b.y + b.r * 1.1 + 12);
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // 새총 받침
+    ctx.beginPath();
+    ctx.moveTo(slingX - 22, slingY + 24);
+    ctx.lineTo(slingX - 13, slingY);
+    ctx.moveTo(slingX + 22, slingY + 24);
+    ctx.lineTo(slingX + 13, slingY);
+    ctx.strokeStyle = '#8a5a2b';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(slingX, slingY + 22);
+    ctx.lineTo(slingX, slingY + 50);
+    ctx.strokeStyle = '#8a5a2b';
+    ctx.lineWidth = 9;
+    ctx.stroke();
+
+    // 당기는 중 표시(고무줄 + 조준선 + 대기 별)
+    if (state.dragging && !state.star) {
+      const dx = slingX - state.dragX;
+      const dy = slingY - state.dragY;
+      let dist = Math.hypot(dx, dy);
+      let px = state.dragX, py = state.dragY;
+      if (dist > CONFIG.MAX_DRAG) {
+        const k = CONFIG.MAX_DRAG / dist;
+        px = slingX - dx * k;
+        py = slingY - dy * k;
+        dist = CONFIG.MAX_DRAG;
+      }
+      // 고무줄
+      ctx.beginPath();
+      ctx.moveTo(slingX - 13, slingY);
+      ctx.lineTo(px, py);
+      ctx.lineTo(slingX + 13, slingY);
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      // 조준 점선
+      const ang = Math.atan2(slingY - py, slingX - px);
+      const power = dist * CONFIG.POWER * 8;
+      let tx = slingX, ty = slingY, tvx = Math.cos(ang) * power, tvy = Math.sin(ang) * power;
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      for (let i = 0; i < 26; i++) {
+        tvy += CONFIG.GRAVITY;
+        tx += tvx; ty += tvy;
+        if (ty > H || tx < 0 || tx > W) break;
+        if (i % 2 === 0) {
+          ctx.beginPath();
+          ctx.arc(tx, ty, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      // 대기 별(당긴 위치)
+      drawStarShape(px, py, CONFIG.STAR_R, '#ffd84d');
+    } else if (!state.star) {
+      // 대기 별(새총 위)
+      drawStarShape(slingX, slingY - 4, CONFIG.STAR_R, '#ffd84d');
+    }
+
+    // 날아가는 별
+    if (state.star) {
+      drawStarShape(state.star.x, state.star.y, state.star.r, '#fff1a8');
+    }
+
+    // 스파크
+    for (const p of state.sparks) {
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function loop(ts) {
+    if (!state.running) return;
+    if (!lastSpawn) lastSpawn = ts;
+    if (ts - lastSpawn > CONFIG.SPAWN_MS) {
+      spawnBalloon();
+      lastSpawn = ts;
+    }
+    update();
+    draw();
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function tick() {
+    state.timeLeft--;
+    elTime.textContent = state.timeLeft;
+    if (state.timeLeft <= 0) endGame();
+  }
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  function onDown(e) {
+    if (!state.running || state.star) return;
+    const p = getPos(e);
+    state.dragging = true;
+    state.dragX = p.x;
+    state.dragY = p.y;
+  }
+  function onMove(e) {
+    if (!state.dragging) return;
+    const p = getPos(e);
+    state.dragX = p.x;
+    state.dragY = p.y;
+  }
+  function onUp() {
+    if (!state.dragging) return;
+    state.dragging = false;
+    fireStar();
+  }
+
+  area.addEventListener('pointerdown', onDown);
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onUp);
+
+  function startGame() {
+    resize();
+    state.running = true;
+    state.score = 0;
+    state.popped = 0;
+    state.timeLeft = CONFIG.GAME_TIME;
+    state.balloons = [];
+    state.star = null;
+    state.sparks = [];
+    state.dragging = false;
+    lastSpawn = 0;
+    elScore.textContent = '0';
+    elLeft.textContent = '0';
+    elTime.textContent = CONFIG.GAME_TIME;
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    for (let i = 0; i < 3; i++) spawnBalloon();
+    if (timerId) clearInterval(timerId);
+    timerId = setInterval(tick, 1000);
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function endGame() {
+    state.running = false;
+    if (timerId) { clearInterval(timerId); timerId = null; }
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+
+    let best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+    const isNew = state.score > best;
+    if (isNew) { best = state.score; localStorage.setItem(BEST_KEY, String(best)); }
+
+    finalScore.textContent = state.score;
+    bestScoreEl.textContent = '최고 기록: ' + best + (isNew ? ' 🏆 신기록!' : '');
+    endTitle.textContent = isNew ? '🏆 신기록!' : '🎉 잘했어요!';
+    resultMsg.textContent = '풍선 ' + state.popped + '개를 터뜨렸어요!';
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+
+  // 초기 베스트 표시 준비
+  resize();
+  draw();
+})();
+</script>
+</body>
+</html>

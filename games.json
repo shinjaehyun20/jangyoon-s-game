@@ -1070,5 +1070,21 @@
     "description": "3x3 조각을 밀어 그림·숫자를 순서대로 맞추는 퍼즐",
     "thumbnail": "slide-puzzle/thumb.svg",
     "path": "slide-puzzle/index.html"
+  },
+  {
+    "id": "star-slingshot",
+    "title": "Star Slingshot",
+    "title_ko": "별 새총 쏘기",
+    "description": "새총을 당겨 별을 발사해 풍선을 맞히는 조준 게임",
+    "thumbnail": "star-slingshot/thumb.svg",
+    "path": "star-slingshot/index.html"
+  },
+  {
+    "id": "tower-rings",
+    "title": "Tower Rings",
+    "title_ko": "도넛 탑 옮기기",
+    "description": "하노이 탑 7살 버전 — 도넛을 규칙대로 옮기는 논리 퍼즐",
+    "thumbnail": "tower-rings/thumb.svg",
+    "path": "tower-rings/index.html"
   }
 ]

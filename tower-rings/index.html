@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🍩 도넛 탑 옮기기</title>
+  <style>
+    :root {
+      --bg: #1a2238;
+      --bg2: #2a3a66;
+      --accent: #ffcd3c;
+      --text: #ffffff;
+      --peg: #6b5b95;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(160deg, var(--bg) 0%, var(--bg2) 100%);
+      color: var(--text);
+      -webkit-user-select: none; user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: clamp(20px, 5.5vw, 28px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hud {
+      display: flex; justify-content: space-around; align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+    }
+    .hud .val { color: var(--accent); }
+    #gameArea {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 10px 4px 0;
+      min-height: 0;
+    }
+    .peg {
+      position: relative;
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 8px;
+      cursor: pointer;
+      border-radius: 16px;
+      transition: background 0.15s;
+    }
+    .peg::before {
+      content: "";
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 12px; height: 78%;
+      background: var(--peg);
+      border-radius: 8px;
+      z-index: 0;
+    }
+    .peg::after {
+      content: "";
+      position: absolute;
+      bottom: -4px; left: 50%;
+      transform: translateX(-50%);
+      width: 96%; height: 12px;
+      background: var(--peg);
+      border-radius: 8px;
+      z-index: 0;
+    }
+    .peg.selected { background: rgba(255,205,60,0.18); }
+    .peg.selected::before { background: var(--accent); }
+    .ring {
+      position: relative;
+      z-index: 1;
+      height: 30px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.35), inset 0 2px 4px rgba(255,255,255,0.35);
+      transition: transform 0.12s;
+    }
+    .ring.lifted {
+      transform: translateY(-10px) scale(1.04);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+    }
+    .ring.r1 { width: 42%; background: #ff6b6b; }
+    .ring.r2 { width: 58%; background: #4ecdc4; }
+    .ring.r3 { width: 74%; background: #ffd166; }
+    .ring.r4 { width: 90%; background: #c77dff; }
+    .peg-label {
+      position: absolute;
+      bottom: -2px;
+      font-size: 22px;
+      z-index: 2;
+    }
+    footer {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.75);
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 6px 8px;
+      min-height: 32px;
+      display: inline-flex; align-items: center;
+    }
+    .btn-row { display: flex; gap: 8px; }
+    .mini-btn {
+      background: rgba(255,255,255,0.14);
+      color: var(--text);
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      min-height: 40px;
+      cursor: pointer;
+    }
+    .mini-btn:active { transform: scale(0.95); }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,16,32,0.86);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      z-index: 50;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, #2a3a66, #1a2238);
+      border: 2px solid rgba(255,205,60,0.4);
+      border-radius: 24px;
+      padding: 26px 22px;
+      text-align: center;
+      max-width: 340px; width: 100%;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 {
+      font-size: 24px; font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      font-size: 16px; line-height: 1.6;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 6px;
+    }
+    .rule-hi { color: var(--accent); font-weight: 800; }
+    .result-score {
+      font-size: 46px; font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0;
+    }
+    .btn-start {
+      margin-top: 16px;
+      background: var(--accent);
+      color: #1a2238;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 28px;
+      font-size: 20px; font-weight: 900;
+      min-height: 56px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #d9a800;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: 0 3px 0 #d9a800; }
+    .level-pick { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+    .lv-btn {
+      background: rgba(255,255,255,0.12);
+      color: var(--text);
+      border: 2px solid transparent;
+      border-radius: 14px;
+      padding: 10px 0;
+      flex: 1;
+      font-size: 15px; font-weight: 800;
+      min-height: 50px;
+      cursor: pointer;
+    }
+    .lv-btn.active { border-color: var(--accent); background: rgba(255,205,60,0.2); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍩 도넛 탑 옮기기</h1>
+
+    <div class="hud">
+      <div>옮긴 횟수 <span class="val" id="moves">0</span></div>
+      <div>최소 <span class="val" id="best">-</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="peg" data-peg="0"><span class="peg-label">🟢</span></div>
+      <div class="peg" data-peg="1"><span class="peg-label">🔵</span></div>
+      <div class="peg" data-peg="2"><span class="peg-label">🔴</span></div>
+    </div>
+
+    <footer>
+      <small>큰 도넛은 작은 도넛 위에 못 올라가요</small>
+      <div class="btn-row">
+        <button class="mini-btn" id="resetBtn">다시</button>
+        <a class="home-link" href="../index.html">← 홈</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍩 도넛 탑 옮기기</h2>
+      <p>도넛을 모두 <span class="rule-hi">🔴 빨강 기둥</span>으로 옮겨요!</p>
+      <p><span class="rule-hi">큰 도넛</span>은 <span class="rule-hi">작은 도넛</span> 위에 못 올라가요.</p>
+      <div class="level-pick" id="levelPick">
+        <button class="lv-btn active" data-rings="3">쉬움<br>도넛 3개</button>
+        <button class="lv-btn" data-rings="4">보통<br>도넛 4개</button>
+      </div>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 성공!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      ringCount: 3,           // 현재 라운드의 도넛 개수
+      pegCount: 3,
+      sourcePeg: 0,
+      targetPeg: 2,
+    };
+
+    // state
+    const state = {
+      pegs: [[], [], []],     // 각 기둥의 도넛 스택 (아래→위, 큰 수=큰 도넛)
+      moves: 0,
+      selected: null,         // 현재 들고 있는 기둥 index 또는 null
+      ringCount: 3,
+      finished: false,
+    };
+
+    const els = {
+      area: document.getElementById('gameArea'),
+      pegs: Array.from(document.querySelectorAll('.peg')),
+      moves: document.getElementById('moves'),
+      best: document.getElementById('best'),
+      startOverlay: document.getElementById('startOverlay'),
+      endOverlay: document.getElementById('endOverlay'),
+      startBtn: document.getElementById('startBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      finalScore: document.getElementById('finalScore'),
+      resultMsg: document.getElementById('resultMsg'),
+      levelPick: document.getElementById('levelPick'),
+      lvBtns: Array.from(document.querySelectorAll('.lv-btn')),
+    };
+
+    function bestKey() { return 'tower-rings_best_' + state.ringCount; }
+    function minMoves(n) { return Math.pow(2, n) - 1; }
+
+    function loadBest() {
+      const v = localStorage.getItem(bestKey());
+      els.best.textContent = v ? v : '-';
+    }
+    function saveBest(moves) {
+      const prev = localStorage.getItem(bestKey());
+      if (!prev || moves < parseInt(prev, 10)) {
+        localStorage.setItem(bestKey(), String(moves));
+      }
+      loadBest();
+    }
+
+    function setup(ringCount) {
+      state.ringCount = ringCount;
+      state.pegs = [[], [], []];
+      // source 기둥에 큰 도넛(n)부터 작은 도넛(1)까지 쌓기 (아래가 가장 큼)
+      for (let size = ringCount; size >= 1; size--) {
+        state.pegs[CONFIG.sourcePeg].push(size);
+      }
+      state.moves = 0;
+      state.selected = null;
+      state.finished = false;
+      els.moves.textContent = '0';
+      loadBest();
+      render();
+    }
+
+    function render() {
+      els.pegs.forEach((pegEl, pi) => {
+        // 기존 ring 제거 (label은 유지)
+        Array.from(pegEl.querySelectorAll('.ring')).forEach(r => r.remove());
+        pegEl.classList.toggle('selected', state.selected === pi);
+        const stack = state.pegs[pi];
+        // 위에서부터 그려야 위가 작은 도넛이 보이도록: DOM은 위→아래(컬럼 reverse 정렬)
+        // gameArea는 flex-end 정렬이라 먼저 추가된 게 위로 감 → 위(작은) 먼저
+        for (let i = stack.length - 1; i >= 0; i--) {
+          const size = stack[i];
+          const ring = document.createElement('div');
+          ring.className = 'ring r' + size;
+          const topIndex = stack.length - 1;
+          if (state.selected === pi && i === topIndex) {
+            ring.classList.add('lifted');
+          }
+          pegEl.appendChild(ring);
+        }
+      });
+    }
+
+    function topOf(pi) {
+      const s = state.pegs[pi];
+      return s.length ? s[s.length - 1] : Infinity; // 비었으면 무한대(아무거나 올림)
+    }
+
+    function onPeg(pi) {
+      if (state.finished) return;
+      if (state.selected === null) {
+        // 도넛 들기 — 빈 기둥이면 무시
+        if (state.pegs[pi].length === 0) return;
+        state.selected = pi;
+        render();
+        return;
+      }
+      // 이미 들고 있음
+      if (state.selected === pi) {
+        // 같은 기둥 다시 터치 → 내려놓기(취소)
+        state.selected = null;
+        render();
+        return;
+      }
+      // 다른 기둥에 놓기 시도
+      const moving = topOf(state.selected);
+      const dest = topOf(pi);
+      if (moving < dest) {
+        // 유효 이동: 작은 게 큰 것 위로
+        state.pegs[pi].push(state.pegs[state.selected].pop());
+        state.selected = null;
+        state.moves++;
+        els.moves.textContent = String(state.moves);
+        render();
+        checkWin();
+      } else {
+        // 무효 이동(큰 도넛을 작은 도넛 위로) → 그냥 선택 해제, 흔들림 피드백
+        shake(els.pegs[pi]);
+        state.selected = null;
+        render();
+      }
+    }
+
+    function shake(el) {
+      el.animate(
+        [
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-6px)' },
+          { transform: 'translateX(6px)' },
+          { transform: 'translateX(0)' },
+        ],
+        { duration: 220 }
+      );
+    }
+
+    function checkWin() {
+      if (state.pegs[CONFIG.targetPeg].length === state.ringCount) {
+        state.finished = true;
+        const min = minMoves(state.ringCount);
+        saveBest(state.moves);
+        els.finalScore.textContent = state.moves + '번';
+        let msg;
+        if (state.moves === min) {
+          msg = '와! 최소 횟수로 완벽하게 옮겼어요! 🌟';
+        } else if (state.moves <= min + 3) {
+          msg = '정말 잘했어요! (최소 ' + min + '번)';
+        } else {
+          msg = '도넛 탑 완성! (최소 ' + min + '번에 도전!)';
+        }
+        els.resultMsg.textContent = msg;
+        setTimeout(() => els.endOverlay.classList.remove('hidden'), 350);
+      }
+    }
+
+    // 이벤트: 포인터 통일
+    els.pegs.forEach((pegEl) => {
+      pegEl.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        onPeg(parseInt(pegEl.dataset.peg, 10));
+      });
+    });
+
+    els.lvBtns.forEach((b) => {
+      b.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        els.lvBtns.forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        CONFIG.ringCount = parseInt(b.dataset.rings, 10);
+      });
+    });
+
+    els.startBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      els.startOverlay.classList.add('hidden');
+      els.endOverlay.classList.add('hidden');
+      setup(CONFIG.ringCount);
+    });
+
+    els.restartBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      els.endOverlay.classList.add('hidden');
+      els.startOverlay.classList.remove('hidden');
+    });
+
+    els.resetBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      setup(state.ringCount);
+    });
+
+    // expose for headless test
+    window.__towerRings = { state, setup, onPeg, minMoves, CONFIG };
+  })();
+  </script>
+</body>
+</html>

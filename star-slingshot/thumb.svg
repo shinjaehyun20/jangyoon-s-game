@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1442"/>
+      <stop offset="1" stop-color="#3b1f6e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff1a8"/>
+      <stop offset="1" stop-color="#ffd84d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#sky)"/>
+
+  <!-- 배경 별가루 -->
+  <g fill="#ffffff">
+    <circle cx="40" cy="28" r="1.4" opacity="0.8"/>
+    <circle cx="110" cy="18" r="1.1" opacity="0.6"/>
+    <circle cx="200" cy="34" r="1.5" opacity="0.7"/>
+    <circle cx="270" cy="22" r="1.2" opacity="0.6"/>
+    <circle cx="150" cy="55" r="1.1" opacity="0.5"/>
+    <circle cx="60" cy="70" r="1.0" opacity="0.5"/>
+  </g>
+
+  <!-- 풍선들 -->
+  <g>
+    <ellipse cx="210" cy="58" rx="20" ry="23" fill="#ff5a8a"/>
+    <ellipse cx="203" cy="50" rx="6" ry="9" fill="#ffffff" opacity="0.45"/>
+    <line x1="210" y1="80" x2="210" y2="96" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5"/>
+
+    <ellipse cx="255" cy="92" rx="16" ry="19" fill="#5ad1ff"/>
+    <ellipse cx="250" cy="86" rx="5" ry="7" fill="#ffffff" opacity="0.45"/>
+
+    <ellipse cx="150" cy="42" rx="14" ry="17" fill="#5affae"/>
+    <ellipse cx="146" cy="37" rx="4" ry="6" fill="#ffffff" opacity="0.45"/>
+  </g>
+
+  <!-- 조준 점선 -->
+  <g fill="#ffffff" opacity="0.5">
+    <circle cx="80" cy="120" r="2.2"/>
+    <circle cx="108" cy="100" r="2.2"/>
+    <circle cx="138" cy="84" r="2.2"/>
+    <circle cx="170" cy="72" r="2.2"/>
+  </g>
+
+  <!-- 날아가는 별 + 글로우 -->
+  <circle cx="64" cy="132" r="22" fill="url(#glow)"/>
+  <path d="M64 116 l4.7 9.5 10.5 1.5 -7.6 7.4 1.8 10.5 -9.4 -4.9 -9.4 4.9 1.8 -10.5 -7.6 -7.4 10.5 -1.5z"
+        fill="#ffd84d"/>
+
+  <!-- 새총 -->
+  <g stroke="#8a5a2b" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M44 168 L40 150"/>
+    <path d="M44 168 L52 150"/>
+  </g>
+  <rect x="41" y="166" width="6" height="14" rx="2" fill="#8a5a2b"/>
+
+  <!-- 타이틀 -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd84d">별 새총 쏘기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">STAR SLINGSHOT</text>
+  </g>
+
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+</svg>
