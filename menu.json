@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "bubble-snow-rescue",
+        "label": "🫧 눈방울 구조대",
+        "path": "bubble-snow-rescue/index.html"
+      },
+      {
         "id": "moon-rocket-math",
         "label": "🌙 달 로켓 계산",
         "path": "moon-rocket-math/index.html"

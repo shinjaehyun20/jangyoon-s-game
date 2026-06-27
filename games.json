@@ -1,5 +1,13 @@
 [
   {
+    "id": "bubble-snow-rescue",
+    "title": "Bubble Snow Rescue",
+    "title_ko": "🫧 눈방울 구조대",
+    "description": "조이스틱으로 움직여 눈방울을 쏘고 5스테이지를 클리어해요!",
+    "thumbnail": "bubble-snow-rescue/thumb.svg",
+    "path": "bubble-snow-rescue/index.html"
+  },
+  {
     "id": "moon-rocket-math",
     "title": "Moon Rocket Math",
     "title_ko": "🌙 달 로켓 연료 계산",

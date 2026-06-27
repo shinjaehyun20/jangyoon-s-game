@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="눈방울 구조대 썸네일">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#baf3ff"/>
+      <stop offset="0.55" stop-color="#5cc6ff"/>
+      <stop offset="1" stop-color="#1c6fc9"/>
+    </linearGradient>
+    <radialGradient id="bubble" cx="35%" cy="25%" r="70%">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0.38" stop-color="#dffbff" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#42baff" stop-opacity=".55"/>
+    </radialGradient>
+    <radialGradient id="snow" cx="35%" cy="25%" r="70%">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0.62" stop-color="#eafcff"/>
+      <stop offset="1" stop-color="#91ddff"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#0b4f9a" flood-opacity=".28"/>
+    </filter>
+  </defs>
+  <rect width="320" height="180" rx="22" fill="url(#bg)"/>
+  <circle cx="260" cy="28" r="38" fill="rgba(255,255,255,.25)"/>
+  <path d="M0 132 C45 105 78 148 124 122 C174 94 205 142 320 104 L320 180 L0 180 Z" fill="rgba(255,255,255,.78)"/>
+  <path d="M0 150 C66 128 103 164 160 144 C218 124 250 155 320 130 L320 180 L0 180 Z" fill="rgba(227,250,255,.9)"/>
+  <g filter="url(#shadow)">
+    <ellipse cx="78" cy="135" rx="38" ry="9" fill="rgba(20,60,120,.18)"/>
+    <g transform="translate(78 92)">
+      <rect x="-18" y="-2" width="36" height="45" rx="18" fill="#28a9f2"/>
+      <circle cx="0" cy="-16" r="20" fill="#ffd2a4"/>
+      <ellipse cx="-8" cy="-24" rx="7" ry="4" fill="rgba(255,255,255,.6)" transform="rotate(-25)"/>
+      <circle cx="-7" cy="-17" r="2.5" fill="#14325c"/>
+      <circle cx="8" cy="-17" r="2.5" fill="#14325c"/>
+      <path d="M-7 -9 Q0 -3 8 -9" fill="none" stroke="#14325c" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="19" cy="4" r="8" fill="#fff"/>
+      <circle cx="-19" cy="4" r="8" fill="#fff"/>
+    </g>
+    <circle cx="140" cy="73" r="25" fill="url(#bubble)" stroke="white" stroke-width="3"/>
+    <ellipse cx="132" cy="64" rx="7" ry="4" fill="white" opacity=".9" transform="rotate(-30 132 64)"/>
+    <g transform="translate(190 97)">
+      <ellipse cx="0" cy="37" rx="32" ry="8" fill="rgba(20,60,120,.18)"/>
+      <circle cx="0" cy="0" r="32" fill="url(#snow)" stroke="rgba(255,255,255,.9)" stroke-width="3"/>
+      <path d="M-18 -5 Q0 13 18 -5" fill="none" stroke="#54aee9" stroke-width="5" opacity=".5" stroke-linecap="round"/>
+      <circle cx="-11" cy="-10" r="3" fill="#69bfea" opacity=".55"/>
+      <circle cx="14" cy="6" r="3" fill="#69bfea" opacity=".45"/>
+    </g>
+    <g transform="translate(235 80)">
+      <rect x="-18" y="-18" width="36" height="36" rx="14" fill="#ff82cc"/>
+      <circle cx="-7" cy="-3" r="2.4" fill="#14325c"/>
+      <circle cx="8" cy="-3" r="2.4" fill="#14325c"/>
+      <path d="M-7 7 Q0 12 8 7" fill="none" stroke="#14325c" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffffff" stroke="#1475c8" stroke-width="3" paint-order="stroke">눈방울 구조대</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,.76)" letter-spacing="2">BUBBLE SNOW RESCUE</text>
+  </g>
+  <rect x="0.5" y="0.5" width="319" height="179" rx="21.5" fill="none" stroke="rgba(255,255,255,0.28)"/>
+</svg>
