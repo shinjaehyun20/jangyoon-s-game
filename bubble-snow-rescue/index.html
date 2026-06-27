@@ -280,7 +280,7 @@
         platforms:[[0,456,720,44],[80,356,180,24],[460,356,180,24],[250,256,220,24],[50,166,160,22],[510,166,160,22]],
         spawns:[[350,216]] }
     ];
-    const input = { left:false, right:false, up:false, down:false, fire:false, jump:false, joyX:0, joyY:0 };
+    const input = { left:false, right:false, up:false, down:false, fire:false, jump:false, joyX:0, joyY:0, joyJumpHeld:false };
     let DPR = 1, scale = 1, raf = 0, last = 0;
     let state;
 
@@ -390,9 +390,10 @@
       p.vx = desired * CONFIG.playerSpeed;
       if(stage().ice && p.onGround) p.vx *= 1.15;
       if(Math.abs(desired) > .1){ p.dir = desired > 0 ? 1 : -1; p.walk += .18; }
-      if((input.jump || input.up || input.joyY < -.68) && p.onGround){
+      if(input.jump && p.onGround){
         p.vy = CONFIG.jump; p.onGround = false; input.jump = false; beep(520,.08,'triangle',.045);
       }
+      input.jump = false;
       if(input.fire && p.shootCd <= 0){ shootBubble(); p.shootCd = 22; input.fire = false; }
       p.shootCd--; p.inv = Math.max(0, p.inv-1);
       p.x += p.vx; solidAt(p,false);
@@ -638,12 +639,15 @@
       const len=Math.hypot(dx,dy)||1;
       if(len>max){ dx=dx/len*max; dy=dy/len*max; }
       input.joyX=dx/max; input.joyY=dy/max;
-      input.left=input.joyX < -.32; input.right=input.joyX > .32; input.up=input.joyY < -.68;
+      input.left=input.joyX < -.32; input.right=input.joyX > .32;
+      const wantsJump = input.joyY < -.48;
+      if(wantsJump && !input.joyJumpHeld){ input.jump = true; input.joyJumpHeld = true; }
+      if(input.joyY > -.28) input.joyJumpHeld = false;
       stick.style.transform='translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px))';
     }
-    joystick.addEventListener('pointerdown', e=>{ joyId=e.pointerId; joyRect=joystick.getBoundingClientRect(); joystick.setPointerCapture(e.pointerId); joyMove(e); });
+    joystick.addEventListener('pointerdown', e=>{ joyId=e.pointerId; joyRect=joystick.getBoundingClientRect(); try{ joystick.setPointerCapture(e.pointerId); }catch(_e){} joyMove(e); });
     joystick.addEventListener('pointermove', joyMove);
-    function joyEnd(e){ if(joyId!==e.pointerId) return; joyId=null; input.joyX=0; input.joyY=0; input.left=false; input.right=false; input.up=false; stick.style.transform='translate(-50%,-50%)'; }
+    function joyEnd(e){ if(joyId!==e.pointerId) return; joyId=null; input.joyX=0; input.joyY=0; input.joyJumpHeld=false; input.left=false; input.right=false; stick.style.transform='translate(-50%,-50%)'; }
     joystick.addEventListener('pointerup', joyEnd); joystick.addEventListener('pointercancel', joyEnd);
     function bindButton(btn, onDown, onUp){
       btn.addEventListener('pointerdown', e=>{ e.preventDefault(); btn.classList.add('pressed'); try{ btn.setPointerCapture(e.pointerId); }catch(_e){} onDown(); });
@@ -651,10 +655,10 @@
       btn.addEventListener('pointerup', end); btn.addEventListener('pointercancel', end); btn.addEventListener('lostpointercapture', end);
     }
     bindButton(btnBubble, ()=>{ input.fire=true; });
-    bindButton(btnJump, ()=>{ input.jump=true; input.up=true; }, ()=>{ input.up=false; });
+    bindButton(btnJump, ()=>{ input.jump=true; }, null);
 
     resize(); state = makeState(); loadStage(0); render(); syncHud();
-    window.__BUBBLE_SNOW_TEST__ = { CONFIG, STAGES, startGame, getState:()=>state };
+    window.__BUBBLE_SNOW_TEST__ = { CONFIG, STAGES, startGame, getState:()=>state, getInput:()=>input, tick:update };
   })();
   </script>
 </body>
