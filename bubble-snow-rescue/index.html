@@ -257,8 +257,8 @@
     const CONFIG = {
       W: 720, H: 500,
       gravity: 0.52,
-      playerSpeed: 3.1,
-      jump: -10.8,
+      playerSpeed: 3.45,
+      jump: -11.8,
       bubbleSpeed: 6.8,
       storageBest: 'bubble-snow-rescue_bestStage',
       storageScore: 'bubble-snow-rescue_bestScore'
@@ -277,10 +277,10 @@
         platforms:[[0,456,720,44],[30,370,155,22],[245,328,155,22],[530,370,155,22],[160,230,160,22],[410,210,170,22],[285,130,150,20]],
         spawns:[[100,330],[320,288],[600,330],[480,170]], stars:[[360,94]] },
       { name:'말랑 보스 눈사람', bg:'#bcecff', enemies:1, boss:true,
-        platforms:[[0,456,720,44],[80,356,180,24],[460,356,180,24],[250,256,220,24],[50,166,160,22],[510,166,160,22]],
-        spawns:[[350,216]] }
+        platforms:[[0,456,720,44],[72,366,230,24],[418,366,230,24],[245,286,230,24],[86,204,210,22],[424,204,210,22],[268,126,184,20]],
+        spawns:[[350,246]] }
     ];
-    const input = { left:false, right:false, up:false, down:false, fire:false, jump:false, joyX:0, joyY:0, joyJumpHeld:false };
+    const input = { left:false, right:false, up:false, down:false, fire:false, jump:false, joyX:0, joyY:0, joyJumpHeld:false, joyJumpCd:0 };
     let DPR = 1, scale = 1, raf = 0, last = 0;
     let state;
 
@@ -394,9 +394,10 @@
         p.vy = CONFIG.jump; p.onGround = false; input.jump = false; beep(520,.08,'triangle',.045);
       }
       input.jump = false;
+      input.joyJumpCd = Math.max(0, input.joyJumpCd-1);
       if(input.fire && p.shootCd <= 0){ shootBubble(); p.shootCd = 22; input.fire = false; }
       p.shootCd--; p.inv = Math.max(0, p.inv-1);
-      p.x += p.vx; solidAt(p,false);
+      p.x += p.vx;
       p.vy += CONFIG.gravity; p.vy = Math.min(12, p.vy);
       p.onGround = false; p.y += p.vy; solidAt(p,true);
       if(p.x < 8) p.x = 8; if(p.x+p.w > CONFIG.W-8) p.x = CONFIG.W-8-p.w;
@@ -642,12 +643,13 @@
       input.left=input.joyX < -.32; input.right=input.joyX > .32;
       const wantsJump = input.joyY < -.48;
       if(wantsJump && !input.joyJumpHeld){ input.jump = true; input.joyJumpHeld = true; }
+      if(wantsJump && input.joyJumpHeld && state && state.player.onGround && input.joyJumpCd <= 0){ input.jump = true; input.joyJumpCd = 14; }
       if(input.joyY > -.28) input.joyJumpHeld = false;
       stick.style.transform='translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px))';
     }
     joystick.addEventListener('pointerdown', e=>{ joyId=e.pointerId; joyRect=joystick.getBoundingClientRect(); try{ joystick.setPointerCapture(e.pointerId); }catch(_e){} joyMove(e); });
     joystick.addEventListener('pointermove', joyMove);
-    function joyEnd(e){ if(joyId!==e.pointerId) return; joyId=null; input.joyX=0; input.joyY=0; input.joyJumpHeld=false; input.left=false; input.right=false; stick.style.transform='translate(-50%,-50%)'; }
+    function joyEnd(e){ if(joyId!==e.pointerId) return; joyId=null; input.joyX=0; input.joyY=0; input.joyJumpHeld=false; input.joyJumpCd=0; input.left=false; input.right=false; stick.style.transform='translate(-50%,-50%)'; }
     joystick.addEventListener('pointerup', joyEnd); joystick.addEventListener('pointercancel', joyEnd);
     function bindButton(btn, onDown, onUp){
       btn.addEventListener('pointerdown', e=>{ e.preventDefault(); btn.classList.add('pressed'); try{ btn.setPointerCapture(e.pointerId); }catch(_e){} onDown(); });
