@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>케이크 꾸미기</title>
+  <style>
+    :root {
+      --bg: #fff0f6;
+      --accent: #ff6b9d;
+      --gold: #ffb347;
+      --text: #4a2040;
+      --card: #fff5fa;
+      --border: #ffcce0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 8px 12px 6px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      text-align: center;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 6px 14px;
+      font-size: clamp(12px, 3.2vw, 16px);
+      font-weight: 700;
+    }
+    .hud-val { color: var(--accent); }
+    .hud-combo { color: #ff9f43; }
+
+    /* 레시피 바 */
+    #recipeBar {
+      width: 100%;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px; padding: 6px 10px;
+      display: flex; align-items: center; gap: 6px;
+      flex-wrap: wrap; min-height: 52px;
+    }
+    .recipe-label {
+      font-size: 11px; color: rgba(100,60,80,0.55);
+      margin-right: 4px; white-space: nowrap;
+    }
+    .recipe-slot {
+      font-size: clamp(18px, 5vw, 26px);
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      background: #fff0f8;
+      border: 2px solid var(--border);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .recipe-slot.done {
+      border-color: var(--accent);
+      background: #ffe0ef;
+    }
+
+    /* 케이크 영역 */
+    #cakeZone {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    #cakeBase {
+      position: relative;
+      width: min(200px, 50vw);
+      display: flex; flex-direction: column; align-items: center;
+    }
+    #cakeBody {
+      width: 100%;
+      background: linear-gradient(180deg, #ffe0ef 0%, #ffb6d6 60%, #ff85b3 100%);
+      border-radius: 16px 16px 24px 24px;
+      padding: 14px 10px 10px;
+      min-height: min(120px, 30vw);
+      position: relative;
+      box-shadow: 0 6px 20px rgba(255,107,157,0.22);
+      border: 2px solid #ffcce0;
+    }
+    #cakeTop {
+      width: 110%;
+      height: 22px;
+      margin-left: -5%;
+      background: linear-gradient(90deg, #fff0f6 0%, #ffe4f1 50%, #fff0f6 100%);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      border: 2px solid #ffcce0;
+      border-bottom: none;
+      position: absolute;
+      top: -14px; left: 0;
+    }
+    #toppingLayer {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 4px;
+      min-height: 40px;
+    }
+    .placed-ing {
+      font-size: clamp(18px, 5vw, 26px);
+      animation: popIn 0.3s cubic-bezier(.4,1.8,.6,1) both;
+    }
+    @keyframes popIn {
+      from { transform: scale(0) rotate(-20deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg);  opacity: 1; }
+    }
+
+    /* 팔레트 */
+    #palette {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 8px;
+      padding: 4px 0;
+    }
+    .ing-btn {
+      min-width: clamp(52px, 14vw, 70px);
+      min-height: 56px;
+      padding: 4px 6px;
+      border-radius: 14px;
+      background: var(--card);
+      border: 2px solid var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: clamp(22px, 6vw, 30px);
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-user-select: none; user-select: none;
+      transition: transform 0.1s, background 0.1s;
+      position: relative;
+    }
+    .ing-btn:active { transform: scale(0.88); background: #ffd6eb; }
+    .ing-btn.wrong { animation: shake 0.35s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      60%      { transform: translateX(6px); }
+    }
+    .ing-btn .ing-name {
+      font-size: 9px;
+      color: rgba(100,60,80,0.6);
+      margin-top: 2px;
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: rgba(100,60,80,0.45); padding: 0 2px;
+    }
+    .home-link {
+      color: rgba(100,60,80,0.55); text-decoration: none;
+      font-size: 12px; padding: 4px 8px;
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(255,180,210,0.65);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #fff5fa;
+      border: 2px solid var(--accent);
+      border-radius: 24px; padding: 28px 24px;
+      max-width: 320px; width: 90%;
+      text-align: center; display: flex;
+      flex-direction: column; gap: 12px;
+      box-shadow: 0 12px 40px rgba(255,107,157,0.2);
+    }
+    .overlay-card h2 { font-size: clamp(20px, 6vw, 28px); color: var(--accent); }
+    .overlay-card p { font-size: 14px; color: rgba(100,60,80,0.8); line-height: 1.6; }
+    .result-score { font-size: 58px; font-weight: 900; color: var(--accent); line-height: 1.1; }
+    .result-sub { font-size: 13px; color: rgba(100,60,80,0.6); }
+    .best-tag { font-size: 17px; font-weight: 700; color: var(--gold); }
+    .btn-start {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 14px;
+      padding: 14px 32px; font-size: 18px;
+      font-weight: 700; cursor: pointer;
+      min-height: 52px; width: 100%;
+      touch-action: manipulation;
+      box-shadow: 0 4px 14px rgba(255,107,157,0.35);
+    }
+    .btn-start:active { opacity: 0.85; }
+
+    /* 타이머 경고 */
+    .timer-warn { color: #ff4757 !important; }
+
+    /* 완성 축하 애니메이션 */
+    @keyframes cakeBounce {
+      0%,100% { transform: scale(1) translateY(0); }
+      40%      { transform: scale(1.12) translateY(-12px); }
+      70%      { transform: scale(1.05) translateY(-6px); }
+    }
+    .cake-celebrate { animation: cakeBounce 0.5s ease-out; }
+
+    @keyframes confettiPop {
+      0%   { opacity: 1; transform: translate(-50%,-50%) scale(0.2); }
+      100% { opacity: 0; transform: translate(-50%,-50%) scale(2.5); }
+    }
+    .confetti-pop {
+      position: fixed; pointer-events: none; z-index: 200;
+      font-size: 32px;
+      animation: confettiPop 0.65s ease-out forwards;
+    }
+
+    /* 실패 오버레이 (잘못된 탭) */
+    #failFlash {
+      position: fixed; inset: 0;
+      background: rgba(255,71,87,0.22);
+      pointer-events: none; z-index: 150;
+      opacity: 0; transition: opacity 0.1s;
+    }
+    #failFlash.active { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>&#127874; 케이크 꾸미기</h1>
+
+    <div class="hud">
+      <div>&#127874; <span class="hud-val" id="cakeCountEl">0</span> / <span class="hud-val">10</span></div>
+      <div>&#9201; <span class="hud-val" id="timerEl">60</span>초</div>
+      <div>&#128293; <span class="hud-combo" id="comboEl">x1</span></div>
+    </div>
+
+    <div id="recipeBar"></div>
+
+    <div id="cakeZone">
+      <div id="cakeBase">
+        <div style="position:relative">
+          <div id="cakeTop"></div>
+          <div id="cakeBody">
+            <div id="toppingLayer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="palette"></div>
+
+    <footer>
+      <small>레시피 순서대로 재료를 탭하세요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div id="failFlash"></div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>&#127874; 케이크 꾸미기</h2>
+      <p>레시피를 보고 재료를 <strong>순서대로</strong> 탭하세요!<br>케이크 10개를 완성하면 클리어!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 종료 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">&#127874; 완성!</h2>
+      <div class="result-score" id="finalCount">0</div>
+      <div class="result-sub">개 완성</div>
+      <div class="best-tag" id="bestTag"></div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var GAME_SEC = 60;
+    var GOAL = 10;
+    var LS_KEY = 'cake-decor_best';
+
+    /* 모든 재료 풀 */
+    var ALL_INGS = [
+      { id: 'strawberry', emoji: '🍓', name: '딸기' },
+      { id: 'icecream',   emoji: '🍦', name: '아이스크림' },
+      { id: 'choco',      emoji: '🍫', name: '초코' },
+      { id: 'blueberry',  emoji: '🫐', name: '블루베리' },
+      { id: 'grape',      emoji: '🍇', name: '포도' },
+      { id: 'orange',     emoji: '🍊', name: '오렌지' },
+      { id: 'candle',     emoji: '🕯', name: '초' },
+      { id: 'star',       emoji: '⭐', name: '별' },
+      { id: 'party',      emoji: '🎉', name: '파티' },
+      { id: 'rainbow',    emoji: '🌈', name: '무지개' },
+      { id: 'cherry',     emoji: '🍒', name: '체리' },
+      { id: 'honey',      emoji: '🍯', name: '꿀' },
+      { id: 'macaroon',   emoji: '🧁', name: '마카롱' },
+      { id: 'lemon',      emoji: '🍋', name: '레몬' },
+    ];
+
+    /* 10종 케이크 레시피 (이름 + 재료 순서) */
+    var CAKES = [
+      { name: '딸기케이크',  recipe: ['strawberry','icecream','choco'] },
+      { name: '초코케이크',  recipe: ['choco','choco','blueberry'] },
+      { name: '과일케이크',  recipe: ['grape','orange','strawberry'] },
+      { name: '생일케이크',  recipe: ['candle','star','party'] },
+      { name: '무지개케이크',recipe: ['rainbow','icecream','star'] },
+      { name: '체리케이크',  recipe: ['cherry','icecream','cherry'] },
+      { name: '꿀케이크',    recipe: ['honey','strawberry','macaroon'] },
+      { name: '레몬케이크',  recipe: ['lemon','icecream','choco'] },
+      { name: '마카롱케이크',recipe: ['macaroon','macaroon','star'] },
+      { name: '파티케이크',  recipe: ['party','rainbow','candle'] },
+    ];
+
+    /* 팔레트에 노출할 재료 (8개 고정) */
+    var PALETTE_IDS = [
+      'strawberry','icecream','choco','blueberry',
+      'grape','orange','candle','star',
+      'party','rainbow','cherry','honey',
+      'macaroon','lemon'
+    ];
+    /* 실제 사용할 8개: 현재 케이크 레시피 재료 포함 보장 방식으로 동적 선정 */
+
+    var ing = {};
+    ALL_INGS.forEach(function(x){ ing[x.id] = x; });
+
+    var state = {
+      running: false,
+      cakeCount: 0,
+      timeLeft: GAME_SEC,
+      combo: 1,
+      cakeIdx: 0,           /* 현재 레시피 인덱스 */
+      recipe: [],
+      nextIdx: 0,           /* 다음에 눌러야 할 재료 인덱스 */
+      timer: null,
+      placed: [],           /* 현재 케이크에 올린 재료 */
+    };
+
+    function el(id){ return document.getElementById(id); }
+
+    var cakeCountEl = el('cakeCountEl');
+    var timerEl     = el('timerEl');
+    var comboEl     = el('comboEl');
+    var recipeBar   = el('recipeBar');
+    var toppingLayer= el('toppingLayer');
+    var cakeBase    = el('cakeBase');
+    var palette     = el('palette');
+    var startOverlay= el('startOverlay');
+    var endOverlay  = el('endOverlay');
+    var failFlash   = el('failFlash');
+    var finalCount  = el('finalCount');
+    var resultMsg   = el('resultMsg');
+    var bestTag     = el('bestTag');
+    var endTitle    = el('endTitle');
+
+    /* 팔레트 버튼 생성 (전체 재료, 화면에 8개만 노출) */
+    var btnMap = {};
+    ALL_INGS.forEach(function(x){
+      var btn = document.createElement('div');
+      btn.className = 'ing-btn';
+      btn.dataset.id = x.id;
+      btn.innerHTML =
+        '<span>' + x.emoji + '</span>' +
+        '<span class="ing-name">' + x.name + '</span>';
+      btn.style.display = 'none';
+      palette.appendChild(btn);
+      btnMap[x.id] = btn;
+    });
+
+    function getPaletteSet(recipe) {
+      /* 레시피 재료 중복 제거 */
+      var needed = [];
+      recipe.forEach(function(id){
+        if (needed.indexOf(id) === -1) needed.push(id);
+      });
+      /* 나머지를 PALETTE_IDS 순서에서 채워 8개 만들기 */
+      var pool = PALETTE_IDS.filter(function(id){ return needed.indexOf(id) === -1; });
+      /* 셔플 */
+      for (var i = pool.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+      }
+      var extras = pool.slice(0, Math.max(0, 8 - needed.length));
+      var combined = needed.concat(extras);
+      /* 최대 8개 */
+      combined = combined.slice(0, 8);
+      /* 셔플 */
+      for (var i = combined.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = combined[i]; combined[i] = combined[j]; combined[j] = tmp;
+      }
+      return combined;
+    }
+
+    function showPalette(ids) {
+      ALL_INGS.forEach(function(x){ btnMap[x.id].style.display = 'none'; });
+      ids.forEach(function(id){ if (btnMap[id]) btnMap[id].style.display = 'flex'; });
+    }
+
+    function renderRecipe() {
+      while (recipeBar.firstChild) recipeBar.removeChild(recipeBar.firstChild);
+      var lbl = document.createElement('span');
+      lbl.className = 'recipe-label';
+      lbl.textContent = '레시피:';
+      recipeBar.appendChild(lbl);
+
+      state.recipe.forEach(function(id, idx) {
+        var item = ing[id];
+        var slot = document.createElement('div');
+        slot.className = 'recipe-slot' + (idx < state.nextIdx ? ' done' : '');
+        slot.textContent = item ? item.emoji : '?';
+        recipeBar.appendChild(slot);
+      });
+
+      /* 케이크 이름 */
+      var nameEl = document.createElement('span');
+      nameEl.style.cssText = 'font-size:10px;color:rgba(100,60,80,0.5);margin-left:auto;white-space:nowrap;';
+      nameEl.textContent = CAKES[state.cakeIdx] ? CAKES[state.cakeIdx].name : '';
+      recipeBar.appendChild(nameEl);
+    }
+
+    function renderToppings() {
+      while (toppingLayer.firstChild) toppingLayer.removeChild(toppingLayer.firstChild);
+      state.placed.forEach(function(id) {
+        var item = ing[id];
+        var t = document.createElement('span');
+        t.className = 'placed-ing';
+        t.textContent = item ? item.emoji : '';
+        toppingLayer.appendChild(t);
+      });
+    }
+
+    function nextCake() {
+      state.cakeIdx = state.cakeCount % CAKES.length;
+      var cake = CAKES[state.cakeIdx];
+      state.recipe = cake.recipe.slice();
+      state.nextIdx = 0;
+      state.placed = [];
+      var paletteIds = getPaletteSet(state.recipe);
+      showPalette(paletteIds);
+      renderRecipe();
+      renderToppings();
+    }
+
+    /* 버튼 탭 */
+    palette.addEventListener('click', function(e) {
+      if (!state.running) return;
+      var btn = e.target.closest('.ing-btn');
+      if (!btn || btn.style.display === 'none') return;
+      var id = btn.dataset.id;
+      handleTap(id, btn);
+    });
+
+    function handleTap(id, btn) {
+      var expected = state.recipe[state.nextIdx];
+
+      if (id !== expected) {
+        /* 틀림 */
+        triggerFail(btn);
+        return;
+      }
+
+      /* 맞음 */
+      state.placed.push(id);
+      state.nextIdx++;
+      renderRecipe();
+      renderToppings();
+      spawnConfetti();
+
+      if (state.nextIdx >= state.recipe.length) {
+        completeCake();
+      }
+    }
+
+    function triggerFail(btn) {
+      /* 실패: 진행 리셋 */
+      state.nextIdx = 0;
+      state.placed = [];
+      state.combo = 1;
+      comboEl.textContent = 'x1';
+      renderRecipe();
+      renderToppings();
+
+      /* 시각 피드백 */
+      failFlash.classList.add('active');
+      setTimeout(function(){ failFlash.classList.remove('active'); }, 220);
+
+      if (btn) {
+        btn.classList.remove('wrong');
+        void btn.offsetWidth;
+        btn.classList.add('wrong');
+        setTimeout(function(){ btn.classList.remove('wrong'); }, 400);
+      }
+    }
+
+    function completeCake() {
+      state.cakeCount++;
+      if (state.combo < 8) state.combo++;
+      cakeCountEl.textContent = state.cakeCount;
+      comboEl.textContent = 'x' + state.combo;
+
+      cakeBase.classList.remove('cake-celebrate');
+      void cakeBase.offsetWidth;
+      cakeBase.classList.add('cake-celebrate');
+
+      if (state.cakeCount >= GOAL) {
+        setTimeout(endGame, 400);
+        return;
+      }
+      setTimeout(nextCake, 500);
+    }
+
+    function spawnConfetti() {
+      var emojis = ['✨','🌸','💖','⭐','🎀'];
+      var e = document.createElement('div');
+      e.className = 'confetti-pop';
+      e.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      var x = 30 + Math.random() * 40;
+      var y = 20 + Math.random() * 60;
+      e.style.left = x + '%';
+      e.style.top  = y + '%';
+      document.body.appendChild(e);
+      setTimeout(function(){ if(e.parentNode) e.parentNode.removeChild(e); }, 750);
+    }
+
+    function startTimer() {
+      state.timer = setInterval(function(){
+        state.timeLeft--;
+        timerEl.textContent = state.timeLeft;
+        if (state.timeLeft <= 10) timerEl.classList.add('timer-warn');
+        if (state.timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function startGame() {
+      state.running = true;
+      state.cakeCount = 0;
+      state.timeLeft = GAME_SEC;
+      state.combo = 1;
+      state.cakeIdx = 0;
+      state.placed = [];
+      state.nextIdx = 0;
+      timerEl.textContent = GAME_SEC;
+      timerEl.classList.remove('timer-warn');
+      cakeCountEl.textContent = '0';
+      comboEl.textContent = 'x1';
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      nextCake();
+      startTimer();
+    }
+
+    function endGame() {
+      clearInterval(state.timer);
+      state.running = false;
+
+      var best = parseInt(localStorage.getItem(LS_KEY) || '0', 10);
+      var isNew = state.cakeCount > best;
+      if (isNew) localStorage.setItem(LS_KEY, String(state.cakeCount));
+
+      finalCount.textContent = state.cakeCount;
+
+      while (bestTag.firstChild) bestTag.removeChild(bestTag.firstChild);
+      if (isNew && state.cakeCount > 0) {
+        bestTag.textContent = '🏆 새 최고 기록!';
+      } else if (best > 0) {
+        bestTag.textContent = '최고 기록: ' + best + '개';
+      }
+
+      if (state.cakeCount >= GOAL) {
+        endTitle.textContent = '🎉 클리어!';
+        resultMsg.textContent = '케이크 10개 완성! 대단해요! 🎂';
+      } else {
+        endTitle.textContent = '⏰ 시간 종료!';
+        resultMsg.textContent = '케이크 ' + state.cakeCount + '개 완성! 더 빠르게 도전해봐요!';
+      }
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    el('startBtn').addEventListener('click', startGame);
+    el('restartBtn').addEventListener('click', startGame);
+
+  })();
+  </script>
+</body>
+</html>

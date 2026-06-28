@@ -14,6 +14,16 @@
         "path": "moon-rocket-math/index.html"
       },
       {
+        "id": "ocean-cleanup",
+        "label": "🌊 바다 청소부",
+        "path": "ocean-cleanup/index.html"
+      },
+      {
+        "id": "cake-decor",
+        "label": "🎂 케이크 꾸미기",
+        "path": "cake-decor/index.html"
+      },
+      {
         "id": "codex-robot-lab",
         "label": "🤖 코덱스 로봇 연구소",
         "path": "codex-robot-lab/index.html"

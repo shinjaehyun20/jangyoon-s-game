@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <!-- Dark ocean gradient background -->
+    <linearGradient id="oceanBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a2744"/>
+      <stop offset="55%" stop-color="#1565c0"/>
+      <stop offset="100%" stop-color="#0a3d70"/>
+    </linearGradient>
+    <!-- Teal glow for accent elements -->
+    <radialGradient id="glowCenter" cx="50%" cy="55%" r="38%">
+      <stop offset="0%" stop-color="#4dd0e1" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#0a2744" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Star glow -->
+    <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd54f" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ffd54f" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Filter for shadow/glow -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#4dd0e1" flood-opacity="0.5" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="textShadow" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="320" height="180" fill="url(#oceanBg)" rx="12"/>
+
+  <!-- Center glow -->
+  <rect width="320" height="180" fill="url(#glowCenter)" rx="12"/>
+
+  <!-- Wave lines (subtle) -->
+  <g opacity="0.07" stroke="#4dd0e1" stroke-width="1.5" fill="none">
+    <path d="M0,42 Q40,36 80,42 Q120,48 160,42 Q200,36 240,42 Q280,48 320,42"/>
+    <path d="M0,70 Q40,64 80,70 Q120,76 160,70 Q200,64 240,70 Q280,76 320,70"/>
+    <path d="M0,100 Q40,94 80,100 Q120,106 160,100 Q200,94 240,100 Q280,106 320,100"/>
+    <path d="M0,130 Q40,124 80,130 Q120,136 160,130 Q200,124 240,130 Q280,136 320,130"/>
+  </g>
+
+  <!-- Seafloor bar -->
+  <rect x="0" y="162" width="320" height="18" fill="#071e3a" rx="0"/>
+
+  <!-- Seaweed (simple shapes) -->
+  <g opacity="0.5">
+    <ellipse cx="18" cy="163" rx="4" ry="10" fill="#2e7d32" transform="rotate(-12,18,163)"/>
+    <ellipse cx="22" cy="160" rx="3" ry="8" fill="#388e3c" transform="rotate(8,22,160)"/>
+    <ellipse cx="72" cy="164" rx="4" ry="9" fill="#2e7d32" transform="rotate(-8,72,164)"/>
+    <ellipse cx="76" cy="161" rx="3" ry="7" fill="#388e3c" transform="rotate(10,76,161)"/>
+    <ellipse cx="248" cy="163" rx="4" ry="10" fill="#2e7d32" transform="rotate(10,248,163)"/>
+    <ellipse cx="252" cy="160" rx="3" ry="8" fill="#388e3c" transform="rotate(-8,252,160)"/>
+    <ellipse cx="296" cy="164" rx="4" ry="9" fill="#2e7d32" transform="rotate(-10,296,164)"/>
+  </g>
+
+  <!-- Submarine (center, dominant) -->
+  <g filter="url(#glow)" transform="translate(120,72)">
+    <text font-size="52" text-anchor="middle" dominant-baseline="middle" x="40" y="24">🚢</text>
+  </g>
+
+  <!-- Trash objects scattered around submarine -->
+  <!-- Bottle top-left -->
+  <text x="46" y="56" font-size="26" text-anchor="middle" dominant-baseline="middle" opacity="0.9">🍶</text>
+  <!-- Can top-right -->
+  <text x="230" y="50" font-size="24" text-anchor="middle" dominant-baseline="middle" opacity="0.9">🥫</text>
+  <!-- Bag bottom-left -->
+  <text x="54" y="118" font-size="22" text-anchor="middle" dominant-baseline="middle" opacity="0.85">🛍</text>
+  <!-- Star (gold, right) -->
+  <g>
+    <circle cx="256" cy="110" r="16" fill="url(#starGlow)"/>
+    <text x="256" y="112" font-size="22" text-anchor="middle" dominant-baseline="middle">⭐</text>
+  </g>
+  <!-- Fish (avoiding) -->
+  <text x="46" y="140" font-size="20" text-anchor="middle" dominant-baseline="middle" opacity="0.8">🐟</text>
+  <text x="268" y="140" font-size="18" text-anchor="middle" dominant-baseline="middle" opacity="0.75" transform="scale(-1,1) translate(-536,0)">🐟</text>
+
+  <!-- Bubble particles -->
+  <g opacity="0.35" fill="none" stroke="#4dd0e1">
+    <circle cx="100" cy="30" r="4" stroke-width="1.2"/>
+    <circle cx="115" cy="18" r="2.5" stroke-width="1"/>
+    <circle cx="190" cy="28" r="3" stroke-width="1.1"/>
+    <circle cx="205" cy="15" r="2" stroke-width="1"/>
+    <circle cx="145" cy="10" r="3.5" stroke-width="1.2"/>
+    <circle cx="76" cy="88" r="2" stroke-width="0.9"/>
+    <circle cx="244" cy="82" r="2.5" stroke-width="1"/>
+  </g>
+
+  <!-- Decorative teal border -->
+  <rect x="2" y="2" width="316" height="176" rx="11" fill="none" stroke="#4dd0e1" stroke-width="1.5" opacity="0.2"/>
+
+  <!-- Korean title: 바다 청소부 -->
+  <text
+    x="160" y="153"
+    font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif"
+    font-size="15"
+    font-weight="700"
+    fill="#ffffff"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    filter="url(#textShadow)"
+    letter-spacing="2"
+  >바다 청소부</text>
+
+  <!-- English subtitle -->
+  <text
+    x="160" y="169"
+    font-family="'Segoe UI','Arial',sans-serif"
+    font-size="9"
+    font-weight="600"
+    fill="#4dd0e1"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    letter-spacing="3"
+    opacity="0.85"
+  >OCEAN CLEANUP</text>
+</svg>

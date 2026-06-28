@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>🌊 바다 청소부</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: linear-gradient(180deg, #0a2744 0%, #1565c0 60%, #0a3d70 100%);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* NAV */
+  .top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 100;
+    background: rgba(10,39,68,0.7);
+    backdrop-filter: blur(6px);
+  }
+  .top-nav a {
+    color: #4dd0e1;
+    text-decoration: none;
+    font-size: 13px;
+    opacity: 0.85;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .top-nav a:hover { opacity: 1; }
+  .top-nav .sep { color: #4dd0e1; opacity: 0.4; }
+  .top-nav .current { color: #fff; font-size: 13px; opacity: 0.9; }
+
+  /* CANVAS */
+  #gameCanvas {
+    display: block;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    touch-action: none;
+    cursor: grab;
+    max-width: 100vw;
+    max-height: calc(100dvh - 50px);
+  }
+  #gameCanvas:active { cursor: grabbing; }
+
+  /* HUD */
+  #hud {
+    position: fixed;
+    top: 46px; left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 6px 16px;
+    pointer-events: none;
+    z-index: 50;
+  }
+  .hud-item {
+    background: rgba(10,39,68,0.75);
+    border: 1px solid rgba(77,208,225,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hud-item .label { color: #4dd0e1; font-size: 11px; font-weight: 500; }
+
+  /* OVERLAYS */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10,39,68,0.88);
+    backdrop-filter: blur(10px);
+    z-index: 200;
+    padding: 24px;
+    gap: 20px;
+    text-align: center;
+  }
+  .overlay h1 {
+    font-size: clamp(26px, 6vw, 48px);
+    color: #fff;
+    line-height: 1.2;
+  }
+  .overlay h1 .wave { color: #4dd0e1; }
+  .overlay p {
+    color: rgba(255,255,255,0.75);
+    font-size: clamp(13px, 3vw, 16px);
+    line-height: 1.6;
+    max-width: 340px;
+  }
+  .overlay .instructions {
+    background: rgba(77,208,225,0.08);
+    border: 1px solid rgba(77,208,225,0.2);
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: left;
+    max-width: 340px;
+    width: 100%;
+  }
+  .overlay .instructions li {
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    line-height: 1.8;
+    list-style: none;
+    padding-left: 4px;
+  }
+  .btn {
+    background: linear-gradient(135deg, #0097a7, #00bcd4);
+    border: none;
+    border-radius: 50px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 14px 40px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 20px rgba(0,188,212,0.4);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,188,212,0.5); }
+  .btn:active { transform: translateY(0); }
+
+  .result-score {
+    font-size: clamp(48px, 12vw, 80px);
+    font-weight: 800;
+    color: #4dd0e1;
+    line-height: 1;
+  }
+  .result-best {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+  }
+  .result-best span { color: #ffd54f; font-weight: 700; }
+  .result-title { font-size: clamp(18px, 4vw, 26px); color: #fff; font-weight: 700; }
+
+  /* Bubbles bg animation */
+  .bubbles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .bubble {
+    position: absolute;
+    bottom: -60px;
+    border-radius: 50%;
+    background: rgba(77,208,225,0.08);
+    border: 1px solid rgba(77,208,225,0.12);
+    animation: rise linear infinite;
+  }
+  @keyframes rise {
+    to { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background bubbles -->
+<div class="bubbles" id="bubbles"></div>
+
+<!-- Nav -->
+<nav class="top-nav">
+  <a href="../index.html">🏠 홈</a>
+  <span class="sep">›</span>
+  <span class="current">🌊 바다 청소부</span>
+</nav>
+
+<!-- Canvas -->
+<canvas id="gameCanvas"></canvas>
+
+<!-- HUD (shown during game) -->
+<div id="hud" style="display:none;">
+  <div class="hud-item"><span class="label">점수</span><span id="scoreDisplay">0</span></div>
+  <div class="hud-item"><span class="label">시간</span><span id="timerDisplay">40</span>초</div>
+  <div class="hud-item"><span id="livesDisplay">❤️❤️❤️</span></div>
+</div>
+
+<!-- Start Overlay -->
+<div class="overlay" id="startOverlay">
+  <h1><span class="wave">🌊</span> 바다 청소부</h1>
+  <p>드래그로 잠수함을 조종하며<br>쓰레기를 수거하세요! 40초 타임어택</p>
+  <ul class="instructions">
+    <li>🍶 병 / 🥫 캔 / 🛍 비닐 — 수거 시 +10점</li>
+    <li>⭐ 황금별 — 수거 시 +30점</li>
+    <li>🐟 물고기 — 충돌 시 목숨 -1 (총 3개)</li>
+  </ul>
+  <button class="btn" id="startBtn">▶ 시작하기</button>
+</div>
+
+<!-- Result Overlay -->
+<div class="overlay" id="resultOverlay" style="display:none;">
+  <div class="result-title" id="resultTitle">🎉 게임 종료!</div>
+  <div class="result-score" id="finalScore">0</div>
+  <div class="result-best">최고기록: <span id="bestScore">0</span>점</div>
+  <button class="btn" id="restartBtn">🔄 다시하기</button>
+  <a href="../index.html" style="color:#4dd0e1;font-size:14px;margin-top:-8px;">← 홈으로</a>
+</div>
+
+<script>
+// ============================================================
+// SETUP
+// ============================================================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const GAME_DURATION = 40;
+const TRASH_INTERVAL = 1500;
+const FISH_INTERVAL = 2000;
+const SUB_RADIUS = 28;
+const TRASH_RADIUS = 18;
+const FISH_RADIUS = 20;
+const GOLD_STAR_CHANCE = 0.05;
+
+let W, H;
+function resize() {
+  const maxW = Math.min(window.innerWidth, 480);
+  const maxH = Math.min(window.innerHeight - 50, 700);
+  const ar = 9 / 16;
+  if (maxW / maxH > ar) {
+    H = maxH; W = Math.floor(H * ar);
+  } else {
+    W = maxW; H = Math.floor(W / ar);
+  }
+  canvas.width = W;
+  canvas.height = H;
+}
+resize();
+window.addEventListener('resize', () => { resize(); });
+
+// ============================================================
+// BACKGROUND BUBBLES
+// ============================================================
+(function makeBubbles() {
+  const container = document.getElementById('bubbles');
+  for (let i = 0; i < 18; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 20 + Math.random() * 60;
+    b.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      animation-duration:${8 + Math.random()*14}s;
+      animation-delay:${Math.random()*12}s;
+      opacity:${0.3 + Math.random()*0.4};
+    `;
+    container.appendChild(b);
+  }
+})();
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let state = 'idle'; // idle | playing | gameover
+let score = 0;
+let lives = 3;
+let timeLeft = GAME_DURATION;
+let timerInterval = null;
+let trashInterval = null;
+let fishInterval = null;
+let lastTime = 0;
+let bestScore = parseInt(localStorage.getItem('ocean-cleanup_best') || '0');
+
+const sub = { x: 0, y: 0, targetX: 0, targetY: 0, dragging: false };
+const trashes = [];
+const fishes = [];
+
+const TRASH_TYPES = [
+  { emoji: '🍶', label: '병' },
+  { emoji: '🥫', label: '캔' },
+  { emoji: '🛍', label: '비닐' },
+];
+
+// ============================================================
+// POINTER CONTROLS
+// ============================================================
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * (canvas.width / rect.width),
+    y: (clientY - rect.top) * (canvas.height / rect.height)
+  };
+}
+
+canvas.addEventListener('pointerdown', e => {
+  if (state !== 'playing') return;
+  sub.dragging = true;
+  const p = getPos(e);
+  sub.targetX = p.x;
+  sub.targetY = p.y;
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove', e => {
+  if (!sub.dragging || state !== 'playing') return;
+  const p = getPos(e);
+  sub.targetX = p.x;
+  sub.targetY = p.y;
+});
+canvas.addEventListener('pointerup', () => { sub.dragging = false; });
+canvas.addEventListener('pointercancel', () => { sub.dragging = false; });
+
+// ============================================================
+// SPAWN
+// ============================================================
+function spawnTrash() {
+  const isGold = Math.random() < GOLD_STAR_CHANCE;
+  const type = isGold ? { emoji: '⭐', label: '별' } : TRASH_TYPES[Math.floor(Math.random() * TRASH_TYPES.length)];
+  trashes.push({
+    x: TRASH_RADIUS + Math.random() * (W - TRASH_RADIUS * 2),
+    y: -TRASH_RADIUS,
+    vx: (Math.random() - 0.5) * 1.2,
+    vy: 0.6 + Math.random() * 0.8,
+    emoji: type.emoji,
+    isGold,
+    points: isGold ? 30 : 10,
+    life: 1,
+  });
+}
+
+function spawnFish() {
+  const fromLeft = Math.random() < 0.5;
+  fishes.push({
+    x: fromLeft ? -FISH_RADIUS : W + FISH_RADIUS,
+    y: 60 + Math.random() * (H - 120),
+    vx: fromLeft ? (1.5 + Math.random()) : -(1.5 + Math.random()),
+    vy: (Math.random() - 0.5) * 0.6,
+    emoji: '🐟',
+    flip: !fromLeft,
+  });
+}
+
+// ============================================================
+// COLLISION
+// ============================================================
+function dist(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function checkCollisions() {
+  // Trash
+  for (let i = trashes.length - 1; i >= 0; i--) {
+    const t = trashes[i];
+    if (dist(sub, t) < SUB_RADIUS + TRASH_RADIUS - 4) {
+      score += t.points;
+      trashes.splice(i, 1);
+      updateHUD();
+      showFloatingText(t.x, t.y, `+${t.points}`, t.isGold ? '#ffd54f' : '#80deea');
+    }
+  }
+  // Fish
+  for (let i = fishes.length - 1; i >= 0; i--) {
+    const f = fishes[i];
+    if (dist(sub, f) < SUB_RADIUS + FISH_RADIUS - 8) {
+      lives = Math.max(0, lives - 1);
+      fishes.splice(i, 1);
+      updateHUD();
+      showFloatingText(sub.x, sub.y - 30, '-1 ❤️', '#ef9a9a');
+      if (lives <= 0) endGame();
+    }
+  }
+}
+
+// ============================================================
+// FLOATING TEXT
+// ============================================================
+const floatTexts = [];
+function showFloatingText(x, y, text, color) {
+  floatTexts.push({ x, y, text, color, alpha: 1, vy: -1.5, ttl: 60 });
+}
+
+// ============================================================
+// HUD
+// ============================================================
+function updateHUD() {
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('timerDisplay').textContent = timeLeft;
+  const hearts = '❤️'.repeat(lives) + '🖤'.repeat(Math.max(0, 3 - lives));
+  document.getElementById('livesDisplay').textContent = hearts;
+}
+
+// ============================================================
+// GAME LOOP
+// ============================================================
+function update(dt) {
+  // Submarine smooth follow
+  const speed = 0.12;
+  sub.x += (sub.targetX - sub.x) * speed * Math.min(dt / 16, 3);
+  sub.y += (sub.targetY - sub.y) * speed * Math.min(dt / 16, 3);
+  sub.x = Math.max(SUB_RADIUS, Math.min(W - SUB_RADIUS, sub.x));
+  sub.y = Math.max(SUB_RADIUS, Math.min(H - SUB_RADIUS, sub.y));
+
+  // Trash movement
+  for (let i = trashes.length - 1; i >= 0; i--) {
+    const t = trashes[i];
+    t.x += t.vx;
+    t.y += t.vy;
+    t.x += Math.sin(Date.now() * 0.001 + i) * 0.3;
+    if (t.x < TRASH_RADIUS || t.x > W - TRASH_RADIUS) t.vx *= -1;
+    if (t.y > H + TRASH_RADIUS * 2) trashes.splice(i, 1);
+  }
+
+  // Fish movement
+  for (let i = fishes.length - 1; i >= 0; i--) {
+    const f = fishes[i];
+    f.x += f.vx;
+    f.y += f.vy;
+    f.y += Math.sin(Date.now() * 0.0015 + i * 1.7) * 0.4;
+    if (f.x < -80 || f.x > W + 80) fishes.splice(i, 1);
+  }
+
+  // Float texts
+  for (let i = floatTexts.length - 1; i >= 0; i--) {
+    const ft = floatTexts[i];
+    ft.y += ft.vy;
+    ft.ttl--;
+    ft.alpha = ft.ttl / 60;
+    if (ft.ttl <= 0) floatTexts.splice(i, 1);
+  }
+
+  checkCollisions();
+}
+
+function drawBackground() {
+  // Ocean gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0a2744');
+  grad.addColorStop(0.5, '#1565c0');
+  grad.addColorStop(1, '#0a3d70');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle wave lines
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  for (let y = 40; y < H; y += 60) {
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 4) {
+      const wy = y + Math.sin((x + Date.now() * 0.3) * 0.015) * 6;
+      x === 0 ? ctx.moveTo(x, wy) : ctx.lineTo(x, wy);
+    }
+    ctx.strokeStyle = '#4dd0e1';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Seafloor
+  ctx.fillStyle = '#0a2744';
+  ctx.fillRect(0, H - 24, W, 24);
+  // seaweed
+  for (let sx = 20; sx < W; sx += 45) {
+    ctx.save();
+    ctx.font = '18px serif';
+    ctx.globalAlpha = 0.55;
+    ctx.fillText('🌿', sx + Math.sin(Date.now() * 0.002 + sx) * 3, H - 6);
+    ctx.restore();
+  }
+}
+
+function drawEmoji(emoji, x, y, size, flipX) {
+  ctx.save();
+  ctx.font = `${size}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  if (flipX) {
+    ctx.scale(-1, 1);
+    ctx.fillText(emoji, -x, y);
+  } else {
+    ctx.fillText(emoji, x, y);
+  }
+  ctx.restore();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  drawBackground();
+
+  // Draw trash
+  for (const t of trashes) {
+    // glow for gold
+    if (t.isGold) {
+      ctx.save();
+      ctx.shadowColor = '#ffd54f';
+      ctx.shadowBlur = 16;
+    }
+    drawEmoji(t.emoji, t.x, t.y, TRASH_RADIUS * 1.8);
+    if (t.isGold) ctx.restore();
+  }
+
+  // Draw fish
+  for (const f of fishes) {
+    drawEmoji(f.emoji, f.x, f.y, FISH_RADIUS * 1.9, f.flip);
+  }
+
+  // Draw submarine
+  ctx.save();
+  ctx.shadowColor = '#4dd0e1';
+  ctx.shadowBlur = 20;
+  drawEmoji('🚢', sub.x, sub.y, SUB_RADIUS * 2.1);
+  ctx.restore();
+
+  // Float texts
+  for (const ft of floatTexts) {
+    ctx.save();
+    ctx.globalAlpha = ft.alpha;
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = ft.color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(ft.text, ft.x, ft.y);
+    ctx.restore();
+  }
+}
+
+let rafId;
+function gameLoop(ts) {
+  if (state !== 'playing') return;
+  const dt = ts - (lastTime || ts);
+  lastTime = ts;
+  update(dt);
+  draw();
+  rafId = requestAnimationFrame(gameLoop);
+}
+
+// ============================================================
+// GAME FLOW
+// ============================================================
+function startGame() {
+  score = 0;
+  lives = 3;
+  timeLeft = GAME_DURATION;
+  trashes.length = 0;
+  fishes.length = 0;
+  floatTexts.length = 0;
+
+  sub.x = W / 2;
+  sub.y = H / 2;
+  sub.targetX = W / 2;
+  sub.targetY = H / 2;
+
+  document.getElementById('startOverlay').style.display = 'none';
+  document.getElementById('resultOverlay').style.display = 'none';
+  document.getElementById('hud').style.display = 'flex';
+
+  updateHUD();
+  state = 'playing';
+
+  // Timer
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateHUD();
+    if (timeLeft <= 0) endGame();
+  }, 1000);
+
+  // Spawners
+  trashInterval = setInterval(spawnTrash, TRASH_INTERVAL);
+  fishInterval = setInterval(spawnFish, FISH_INTERVAL);
+  spawnTrash();
+  spawnFish();
+
+  lastTime = 0;
+  rafId = requestAnimationFrame(gameLoop);
+}
+
+function endGame() {
+  state = 'gameover';
+  clearInterval(timerInterval);
+  clearInterval(trashInterval);
+  clearInterval(fishInterval);
+  cancelAnimationFrame(rafId);
+
+  if (score > bestScore) {
+    bestScore = score;
+    localStorage.setItem('ocean-cleanup_best', bestScore);
+  }
+
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('bestScore').textContent = bestScore;
+
+  const title = lives <= 0
+    ? '💀 목숨이 다했어요!'
+    : score >= 200 ? '🏆 바다의 영웅!' : score >= 100 ? '🎉 훌륭해요!' : '🌊 수고했어요!';
+  document.getElementById('resultTitle').textContent = title;
+
+  // Final draw with score overlay
+  draw();
+  document.getElementById('resultOverlay').style.display = 'flex';
+}
+
+// ============================================================
+// BUTTONS
+// ============================================================
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('restartBtn').addEventListener('click', startGame);
+
+// ============================================================
+// IDLE ANIMATION
+// ============================================================
+sub.x = W / 2;
+sub.y = H / 2;
+sub.targetX = W / 2;
+sub.targetY = H / 2;
+
+function idleLoop(ts) {
+  if (state !== 'idle') return;
+  draw();
+  // gentle bob for sub in idle
+  sub.y = H / 2 + Math.sin(ts * 0.001) * 12;
+  requestAnimationFrame(idleLoop);
+}
+requestAnimationFrame(idleLoop);
+</script>
+</body>
+</html>

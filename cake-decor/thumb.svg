@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#ffe0f0"/>
+      <stop offset="55%"  stop-color="#ffc2df"/>
+      <stop offset="100%" stop-color="#ffb3d6"/>
+    </linearGradient>
+    <radialGradient id="cakeGrad" cx="45%" cy="35%" r="65%">
+      <stop offset="0%"   stop-color="#fff0f8"/>
+      <stop offset="60%"  stop-color="#ffcce0"/>
+      <stop offset="100%" stop-color="#ff9dc0"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#fff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect width="320" height="180" fill="url(#glow)"/>
+  <!-- 테두리 -->
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,107,157,0.18)" stroke-width="1"/>
+
+  <!-- 케이크 몸체 -->
+  <!-- 크림 레이어 (위) -->
+  <ellipse cx="108" cy="58" rx="52" ry="13" fill="#fff5fa" stroke="#ffcce0" stroke-width="1.2"/>
+  <!-- 케이크 본체 -->
+  <rect x="56" y="58" width="104" height="68" rx="10" fill="url(#cakeGrad)" stroke="#ffb6d6" stroke-width="1.5"/>
+  <!-- 케이크 레이어 구분선 -->
+  <line x1="56" y1="92" x2="160" y2="92" stroke="#ffcce0" stroke-width="1.2" opacity="0.7"/>
+  <!-- 크림 장식 (하단) -->
+  <ellipse cx="108" cy="126" rx="52" ry="10" fill="#fff0f8" stroke="#ffcce0" stroke-width="1"/>
+
+  <!-- 토핑 이모지들 -->
+  <text x="108" y="55" font-size="18" text-anchor="middle" dominant-baseline="middle">🍓</text>
+  <text x="78"  y="78" font-size="15" text-anchor="middle" dominant-baseline="middle">🍫</text>
+  <text x="136" y="78" font-size="15" text-anchor="middle" dominant-baseline="middle">🍦</text>
+  <text x="90"  y="108" font-size="14" text-anchor="middle" dominant-baseline="middle">⭐</text>
+  <text x="126" y="108" font-size="14" text-anchor="middle" dominant-baseline="middle">🎉</text>
+  <text x="108" y="130" font-size="13" text-anchor="middle" dominant-baseline="middle">🌸</text>
+
+  <!-- 촛불 -->
+  <text x="90"  y="44" font-size="14" text-anchor="middle" dominant-baseline="middle">🕯</text>
+  <text x="108" y="40" font-size="14" text-anchor="middle" dominant-baseline="middle">🕯</text>
+  <text x="126" y="44" font-size="14" text-anchor="middle" dominant-baseline="middle">🕯</text>
+
+  <!-- 팔레트 힌트 바 -->
+  <rect x="18" y="152" width="175" height="22" rx="8" fill="rgba(255,107,157,0.13)" stroke="rgba(255,107,157,0.22)" stroke-width="1"/>
+  <text x="28"  y="166" font-size="13">🍓</text>
+  <text x="52"  y="166" font-size="13">🍫</text>
+  <text x="76"  y="166" font-size="13">🍦</text>
+  <text x="100" y="166" font-size="13">🎉</text>
+  <text x="124" y="166" font-size="13">⭐</text>
+  <text x="148" y="166" font-size="13">🌈</text>
+
+  <!-- 우하단 타이틀 -->
+  <g font-family="'Apple SD Gothic Neo','Noto Sans KR',sans-serif">
+    <text x="302" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#ff6b9d">케이크 꾸미기</text>
+    <text x="302" y="166" text-anchor="end" font-size="9"  font-weight="500" fill="rgba(180,80,120,0.5)" letter-spacing="2">CAKE DECOR</text>
+  </g>
+</svg>

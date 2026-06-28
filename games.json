@@ -1110,5 +1110,21 @@
     "description": "하노이 탑 7살 버전 — 도넛을 규칙대로 옮기는 논리 퍼즐",
     "thumbnail": "tower-rings/thumb.svg",
     "path": "tower-rings/index.html"
+  },
+  {
+    "id": "ocean-cleanup",
+    "title": "Ocean Cleanup",
+    "title_ko": "🌊 바다 청소부",
+    "description": "잠수함을 드래그해 바닷속 쓰레기를 모으고 물고기는 피하세요! 40초 환경 도전",
+    "thumbnail": "ocean-cleanup/thumb.svg",
+    "path": "ocean-cleanup/index.html"
+  },
+  {
+    "id": "cake-decor",
+    "title": "Cake Decor",
+    "title_ko": "🎂 케이크 꾸미기",
+    "description": "레시피대로 케이크에 크림·과일·초코를 올려 완성! 10가지 케이크 도전",
+    "thumbnail": "cake-decor/thumb.svg",
+    "path": "cake-decor/index.html"
   }
 ]
