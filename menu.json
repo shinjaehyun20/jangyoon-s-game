@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "rainbow-rail-builder",
+        "label": "🌈 무지개 레일 빌더",
+        "path": "rainbow-rail-builder/index.html"
+      },
+      {
         "id": "bubble-snow-rescue",
         "label": "🫧 눈방울 구조대",
         "path": "bubble-snow-rescue/index.html"

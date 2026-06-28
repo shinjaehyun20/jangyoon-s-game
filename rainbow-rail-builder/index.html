@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🌈 무지개 레일 빌더</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg1: #14213d;
+      --bg2: #35246f;
+      --card: rgba(255,255,255,.14);
+      --line: rgba(255,255,255,.24);
+      --text: #fff8e8;
+      --accent: #ffd166;
+      --pink: #ff6bcb;
+      --blue: #4cc9f0;
+      --green: #95f985;
+      --tile: #fff8e8;
+      --tileSide: #d9b987;
+    }
+    html, body {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(255, 209, 102, .32), transparent 27%),
+        radial-gradient(circle at 82% 10%, rgba(76, 201, 240, .3), transparent 26%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+    }
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      pointer-events: none;
+      border-radius: 999px;
+      filter: blur(1px);
+      opacity: .55;
+      animation: floaty 7s ease-in-out infinite;
+    }
+    body::before { width: 140px; height: 140px; left: -30px; bottom: 10%; background: rgba(255, 107, 203, .28); }
+    body::after { width: 180px; height: 180px; right: -58px; top: 22%; background: rgba(149, 249, 133, .22); animation-delay: -2s; }
+    .wrap {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      margin: 0 auto;
+      padding: 10px 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    h1 {
+      font-size: clamp(20px, 5.6vw, 28px);
+      line-height: 1;
+      text-shadow: 0 3px 0 rgba(0,0,0,.2);
+      letter-spacing: -.03em;
+    }
+    .badge {
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(0,0,0,.24);
+      border: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .hud-card {
+      min-height: 48px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 8px 18px rgba(0,0,0,.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+    }
+    .hud-card span { font-size: 10px; opacity: .82; font-weight: 800; }
+    .hud-card strong { font-size: 16px; color: var(--accent); }
+    .game-stage {
+      flex: 1;
+      min-height: 0;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,.22);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.04)),
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.22), transparent 60%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 18px 34px rgba(0,0,0,.22);
+      position: relative;
+      overflow: hidden;
+      perspective: 900px;
+      display: flex;
+      flex-direction: column;
+      padding: 9px;
+    }
+    .skyline {
+      height: 34px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 6px;
+      font-size: 20px;
+      text-shadow: 0 4px 10px rgba(0,0,0,.25);
+    }
+    .board-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 5px 2px 7px;
+    }
+    .board {
+      width: min(100%, calc(100dvh - 240px));
+      max-width: 416px;
+      aspect-ratio: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 7px;
+      padding: 8px;
+      border-radius: 24px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: inset 0 0 35px rgba(0,0,0,.22), 0 16px 30px rgba(0,0,0,.18);
+      position: relative;
+    }
+    .tile {
+      position: relative;
+      border: 0;
+      border-radius: 18px;
+      background: linear-gradient(160deg, #fff9e7, #f4dca4 65%, #cf9850);
+      color: #3a245b;
+      box-shadow: 0 8px 0 #9d6b3a, 0 13px 18px rgba(0,0,0,.23), inset 0 2px 0 rgba(255,255,255,.85);
+      transform-style: preserve-3d;
+      transform: translateY(-2px) rotateX(5deg);
+      touch-action: manipulation;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .tile:active { transform: translateY(3px) rotateX(0deg); box-shadow: 0 3px 0 #9d6b3a, 0 8px 12px rgba(0,0,0,.24), inset 0 2px 0 rgba(255,255,255,.75); }
+    .tile.locked { cursor: default; filter: saturate(1.08); }
+    .tile.locked.start { background: linear-gradient(160deg, #baffc9, #56d08a 70%, #288b6c); }
+    .tile.locked.goal { background: linear-gradient(160deg, #ffe1f4, #ff7cc8 70%, #b93284); }
+    .tile::before, .tile::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      transform-origin: center;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+    .tile::before {
+      width: 72%; height: 22%;
+      background: linear-gradient(90deg, #ff5b8f, #ffd166, #5df5a5, #4cc9f0, #b77cff);
+      box-shadow: 0 2px 0 rgba(0,0,0,.22), inset 0 2px 2px rgba(255,255,255,.6);
+      transform: translate(-50%, -50%) rotate(var(--rot));
+    }
+    .tile.curve::after {
+      width: 52%; height: 52%;
+      border: 11px solid transparent;
+      border-top-color: #ffd166;
+      border-right-color: #4cc9f0;
+      transform: translate(-50%, -50%) rotate(var(--rot));
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.25);
+    }
+    .tile.curve::before { display: none; }
+    .tile.cross::before { height: 18%; }
+    .tile.cross::after {
+      width: 72%; height: 18%;
+      background: linear-gradient(90deg, #4cc9f0, #b77cff, #ff5b8f, #ffd166);
+      box-shadow: 0 2px 0 rgba(0,0,0,.18), inset 0 2px 2px rgba(255,255,255,.55);
+      transform: translate(-50%, -50%) rotate(calc(var(--rot) + 90deg));
+    }
+    .tile.ok { outline: 3px solid rgba(149,249,133,.88); animation: pulseOk .75s ease-in-out infinite alternate; }
+    .tile .icon {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: clamp(18px, 6vw, 30px);
+      z-index: 2;
+      filter: drop-shadow(0 3px 3px rgba(0,0,0,.25));
+    }
+    .tile .tiny {
+      position: absolute;
+      bottom: 5px; right: 7px;
+      font-size: 11px;
+      font-weight: 900;
+      opacity: .75;
+      z-index: 3;
+    }
+    .train {
+      position: absolute;
+      width: calc((100% - 16px - 21px) / 4 * .68);
+      aspect-ratio: 1;
+      border-radius: 20px 20px 15px 15px;
+      display: grid;
+      place-items: center;
+      font-size: clamp(20px, 8vw, 34px);
+      z-index: 9;
+      filter: drop-shadow(0 10px 8px rgba(0,0,0,.33));
+      transform: translate(-50%, -50%) scale(.98);
+      transition: left .28s ease, top .28s ease, transform .28s ease;
+      pointer-events: none;
+    }
+    .train.run { animation: trainBob .28s ease-in-out infinite alternate; }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    button.action {
+      min-height: 48px;
+      border: 0;
+      border-radius: 17px;
+      font-size: 15px;
+      font-weight: 1000;
+      color: #3a245b;
+      background: linear-gradient(180deg, #fff7cc, #ffd166);
+      box-shadow: 0 6px 0 #bf7b2f, 0 12px 18px rgba(0,0,0,.22);
+      touch-action: manipulation;
+    }
+    button.action.secondary { background: linear-gradient(180deg, #d8fbff, #73e0ff); box-shadow: 0 6px 0 #2893b4, 0 12px 18px rgba(0,0,0,.2); }
+    button.action:active { transform: translateY(4px); box-shadow: 0 2px 0 #8b5d31, 0 7px 12px rgba(0,0,0,.24); }
+    .message {
+      min-height: 28px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 900;
+      color: #fff4bf;
+      text-shadow: 0 2px 5px rgba(0,0,0,.25);
+    }
+    footer {
+      min-height: 31px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      opacity: .9;
+    }
+    .home-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 900;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.2);
+      white-space: nowrap;
+    }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: radial-gradient(circle at 50% 35%, rgba(255,255,255,.2), rgba(5,12,33,.72));
+      backdrop-filter: blur(8px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      width: min(100%, 420px);
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,.28);
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.1)), linear-gradient(145deg, #243b80, #622d92);
+      box-shadow: 0 24px 50px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.3);
+      padding: 24px 18px;
+      text-align: center;
+      display: grid;
+      gap: 14px;
+    }
+    .overlay-card h2 { font-size: clamp(25px, 8vw, 36px); text-shadow: 0 4px 0 rgba(0,0,0,.2); }
+    .overlay-card p { line-height: 1.55; font-weight: 800; opacity: .94; }
+    .big-score { font-size: 42px; font-weight: 1000; color: var(--accent); text-shadow: 0 4px 0 rgba(0,0,0,.2); }
+    .btn-start {
+      border: 0;
+      min-height: 56px;
+      border-radius: 19px;
+      background: linear-gradient(180deg, #a7ff83, #38d66b);
+      color: #14351f;
+      font-size: 20px;
+      font-weight: 1000;
+      box-shadow: 0 8px 0 #1d8b47, 0 15px 25px rgba(0,0,0,.24);
+    }
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 18px;
+      border-radius: 4px;
+      pointer-events: none;
+      animation: pop 850ms ease-out forwards;
+      z-index: 20;
+    }
+    @keyframes pop { from { opacity: 1; transform: translate(0,0) rotate(0); } to { opacity: 0; transform: translate(var(--x), var(--y)) rotate(270deg); } }
+    @keyframes floaty { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-14px) scale(1.05); } }
+    @keyframes pulseOk { from { filter: brightness(1); } to { filter: brightness(1.17); } }
+    @keyframes trainBob { from { margin-top: 0; } to { margin-top: -7px; } }
+    @media (max-height: 620px) {
+      .hud-card { min-height: 40px; }
+      .skyline { height: 24px; }
+      .controls button.action { min-height: 42px; }
+      footer { display: none; }
+      .board { gap: 5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🌈 무지개 레일 빌더</h1>
+      <div class="badge">BEST <span id="bestScore">0</span></div>
+    </header>
+
+    <div class="hud" aria-label="게임 상태">
+      <div class="hud-card"><span>레벨</span><strong id="levelText">1</strong></div>
+      <div class="hud-card"><span>점수</span><strong id="scoreText">0</strong></div>
+      <div class="hud-card"><span>회전</span><strong id="moveText">0</strong></div>
+      <div class="hud-card"><span>별</span><strong id="starText">☆☆☆</strong></div>
+    </div>
+
+    <section class="game-stage" id="gameArea">
+      <div class="skyline"><span>🚉 출발역</span><span>🎁 선물역</span></div>
+      <div class="board-wrap">
+        <div class="board" id="board" aria-label="레일 퍼즐판"></div>
+        <div class="train" id="train" aria-hidden="true">🚂</div>
+      </div>
+      <div class="message" id="message">레일을 돌려 출발역과 선물역을 이어 주세요!</div>
+      <div class="controls">
+        <button class="action" id="runBtn" type="button">🚂 기차 출발</button>
+        <button class="action secondary" id="resetBtn" type="button">↺ 다시 배치</button>
+      </div>
+    </section>
+
+    <footer>
+      <small>타일을 탭하면 레일이 90도씩 돌아가요.</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🌈 무지개 레일 빌더</h2>
+      <p>레일 타일을 탭해서 돌리고, 🚂 기차가 🎁 선물역까지 가도록 길을 이어 주세요.</p>
+      <p>5개 레벨을 모두 클리어하면 장윤이 레일 기사!</p>
+      <button class="btn-start" id="startBtn" type="button">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">🎉 도착!</h2>
+      <div class="big-score" id="finalScore">0</div>
+      <p id="resultMsg">무지개 레일 완성!</p>
+      <button class="btn-start" id="restartBtn" type="button">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const SIZE = 4;
+    const STORAGE_KEY = 'rainbow-rail-builder_best';
+    const DIRS = { N: [-1, 0], E: [0, 1], S: [1, 0], W: [0, -1] };
+    const OPP = { N: 'S', E: 'W', S: 'N', W: 'E' };
+    const ROTATE = { N: 'E', E: 'S', S: 'W', W: 'N' };
+    const TYPE_CONNECTIONS = {
+      straight: [['W', 'E'], ['N', 'S']],
+      curve: [['N', 'E'], ['E', 'S'], ['S', 'W'], ['W', 'N']],
+      cross: [['N', 'E', 'S', 'W']]
+    };
+    const LEVELS = [
+      {
+        start: [3, 0], goal: [0, 3], entry: 'E', exit: 'W',
+        tiles: [
+          ['curve', 'straight', 'curve', 'straight'],
+          ['straight', 'curve', 'straight', 'curve'],
+          ['curve', 'straight', 'curve', 'straight'],
+          ['straight', 'curve', 'straight', 'curve']
+        ],
+        solution: [1, 0, 1, 0, 0, 1, 0, 2, 3, 0, 1, 0, 0, 3, 0, 2],
+        scramble: [2, 1, 2, 0, 1, 2, 1, 3, 0, 1, 2, 0, 0, 0, 1, 3]
+      },
+      {
+        start: [0, 0], goal: [3, 3], entry: 'S', exit: 'N',
+        tiles: [
+          ['straight', 'curve', 'straight', 'curve'],
+          ['curve', 'straight', 'cross', 'straight'],
+          ['straight', 'curve', 'straight', 'curve'],
+          ['curve', 'straight', 'curve', 'straight']
+        ],
+        solution: [1, 1, 0, 2, 0, 1, 0, 1, 1, 3, 1, 0, 0, 0, 3, 1],
+        scramble: [0, 2, 1, 3, 1, 0, 0, 0, 0, 0, 2, 1, 1, 1, 0, 0]
+      },
+      {
+        start: [1, 0], goal: [2, 3], entry: 'E', exit: 'W',
+        tiles: [
+          ['curve', 'straight', 'curve', 'straight'],
+          ['straight', 'curve', 'curve', 'straight'],
+          ['curve', 'straight', 'curve', 'straight'],
+          ['straight', 'curve', 'straight', 'curve']
+        ],
+        solution: [0, 1, 2, 0, 0, 1, 2, 1, 1, 0, 3, 0, 1, 2, 1, 0],
+        scramble: [1, 0, 3, 1, 1, 2, 3, 0, 2, 1, 0, 1, 0, 3, 0, 1]
+      },
+      {
+        start: [3, 1], goal: [0, 2], entry: 'N', exit: 'S',
+        tiles: [
+          ['straight', 'curve', 'straight', 'curve'],
+          ['curve', 'cross', 'curve', 'straight'],
+          ['straight', 'curve', 'straight', 'curve'],
+          ['curve', 'straight', 'curve', 'straight']
+        ],
+        solution: [0, 1, 1, 2, 0, 0, 2, 1, 1, 0, 1, 0, 2, 1, 3, 1],
+        scramble: [1, 2, 0, 3, 1, 0, 3, 0, 0, 1, 2, 1, 3, 0, 0, 0]
+      },
+      {
+        start: [0, 1], goal: [3, 2], entry: 'S', exit: 'N',
+        tiles: [
+          ['curve', 'straight', 'curve', 'straight'],
+          ['straight', 'curve', 'cross', 'curve'],
+          ['curve', 'straight', 'curve', 'straight'],
+          ['straight', 'curve', 'straight', 'curve']
+        ],
+        solution: [0, 1, 2, 0, 1, 1, 0, 2, 0, 0, 3, 1, 1, 0, 1, 2],
+        scramble: [1, 0, 3, 1, 0, 2, 0, 3, 1, 1, 0, 0, 0, 1, 0, 3]
+      }
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    const board = $('board');
+    const train = $('train');
+    const message = $('message');
+    const levelText = $('levelText');
+    const scoreText = $('scoreText');
+    const moveText = $('moveText');
+    const starText = $('starText');
+    const bestScore = $('bestScore');
+    const startOverlay = $('startOverlay');
+    const endOverlay = $('endOverlay');
+    const finalScore = $('finalScore');
+    const resultMsg = $('resultMsg');
+    const endTitle = $('endTitle');
+
+    const state = { level: 0, score: 0, moves: 0, rotations: [], running: false, solved: [] };
+
+    function loadBest() {
+      bestScore.textContent = String(Number(localStorage.getItem(STORAGE_KEY) || 0));
+    }
+
+    function cellIndex(r, c) { return r * SIZE + c; }
+    function inBounds(r, c) { return r >= 0 && c >= 0 && r < SIZE && c < SIZE; }
+    function getLevel() { return LEVELS[state.level]; }
+
+    function connections(type, rotation) {
+      const base = TYPE_CONNECTIONS[type][type === 'cross' ? 0 : rotation % TYPE_CONNECTIONS[type].length];
+      return new Set(base);
+    }
+
+    function tileAt(r, c) {
+      const lv = getLevel();
+      return lv.tiles[r][c];
+    }
+
+    function cellCenter(r, c) {
+      const rect = board.getBoundingClientRect();
+      const gap = 7;
+      const pad = 8;
+      const size = (rect.width - pad * 2 - gap * 3) / 4;
+      return {
+        left: pad + c * (size + gap) + size / 2,
+        top: pad + r * (size + gap) + size / 2
+      };
+    }
+
+    function setTrain(r, c, dir) {
+      const pos = cellCenter(r, c);
+      train.style.left = pos.left + 'px';
+      train.style.top = pos.top + 'px';
+      const deg = dir === 'E' ? 0 : dir === 'S' ? 90 : dir === 'W' ? 180 : -90;
+      train.style.transform = `translate(-50%, -50%) rotate(${deg}deg) scale(.98)`;
+    }
+
+    function render() {
+      const lv = getLevel();
+      board.innerHTML = '';
+      state.solved = tracePath(false).path.map(([r, c]) => cellIndex(r, c));
+      for (let r = 0; r < SIZE; r += 1) {
+        for (let c = 0; c < SIZE; c += 1) {
+          const i = cellIndex(r, c);
+          const type = lv.tiles[r][c];
+          const tile = document.createElement('button');
+          tile.type = 'button';
+          tile.className = `tile ${type}`;
+          tile.style.setProperty('--rot', (state.rotations[i] * 90) + 'deg');
+          tile.setAttribute('aria-label', `${r + 1}행 ${c + 1}열 레일 돌리기`);
+          if (state.solved.includes(i)) tile.classList.add('ok');
+          if (r === lv.start[0] && c === lv.start[1]) {
+            tile.classList.add('locked', 'start');
+            tile.innerHTML = '<span class="icon">🚉</span><span class="tiny">START</span>';
+          } else if (r === lv.goal[0] && c === lv.goal[1]) {
+            tile.classList.add('locked', 'goal');
+            tile.innerHTML = '<span class="icon">🎁</span><span class="tiny">GOAL</span>';
+          } else {
+            tile.innerHTML = '<span class="tiny">↻</span>';
+          }
+          tile.addEventListener('pointerdown', (event) => {
+            event.preventDefault();
+            if (state.running) return;
+            rotateTile(i);
+          });
+          board.appendChild(tile);
+        }
+      }
+      levelText.textContent = String(state.level + 1);
+      scoreText.textContent = String(state.score);
+      moveText.textContent = String(state.moves);
+      starText.textContent = starsForMoves(state.moves, false);
+      setTrain(lv.start[0], lv.start[1], lv.entry);
+    }
+
+    function starsForMoves(moves, solved) {
+      if (!solved) return '☆☆☆';
+      const target = 8 + state.level * 2;
+      if (moves <= target) return '★★★';
+      if (moves <= target + 4) return '★★☆';
+      return '★☆☆';
+    }
+
+    function rotateTile(index) {
+      state.rotations[index] = (state.rotations[index] + 1) % 4;
+      state.moves += 1;
+      message.textContent = '좋아요! 이제 기차를 출발시켜 볼까요?';
+      render();
+    }
+
+    function tracePath(useCurrent) {
+      const lv = getLevel();
+      const rotations = useCurrent ? state.rotations : lv.solution;
+      let r = lv.start[0];
+      let c = lv.start[1];
+      let dir = lv.entry;
+      const path = [[r, c]];
+      const seen = new Set([`${r},${c},${dir}`]);
+      for (let step = 0; step < 24; step += 1) {
+        const type = tileAt(r, c);
+        const cons = connections(type, rotations[cellIndex(r, c)]);
+        if (!cons.has(dir)) return { ok: false, path, fail: '끊어진 레일이 있어요!' };
+        let nextDir = null;
+        for (const candidate of cons) {
+          if (candidate !== OPP[dir]) { nextDir = candidate; break; }
+        }
+        if (!nextDir && cons.has(OPP[dir])) nextDir = OPP[dir];
+        if (!nextDir) return { ok: false, path, fail: '기차가 길을 못 찾았어요!' };
+        const [dr, dc] = DIRS[nextDir];
+        const nr = r + dr;
+        const nc = c + dc;
+        if (!inBounds(nr, nc)) return { ok: false, path, fail: '레일이 판 밖으로 나갔어요!' };
+        r = nr; c = nc; dir = OPP[nextDir];
+        path.push([r, c]);
+        if (r === lv.goal[0] && c === lv.goal[1]) {
+          const goalCons = connections(tileAt(r, c), rotations[cellIndex(r, c)]);
+          return { ok: goalCons.has(lv.exit), path, fail: goalCons.has(lv.exit) ? '' : '선물역 입구 방향이 달라요!' };
+        }
+        const key = `${r},${c},${dir}`;
+        if (seen.has(key)) return { ok: false, path, fail: '레일이 빙글빙글 돌아요!' };
+        seen.add(key);
+      }
+      return { ok: false, path, fail: '길이 너무 길어요!' };
+    }
+
+    function startLevel(level) {
+      state.level = level;
+      const lv = getLevel();
+      state.moves = 0;
+      state.rotations = lv.scramble.slice();
+      state.running = false;
+      message.textContent = '레일을 돌려 출발역과 선물역을 이어 주세요!';
+      render();
+    }
+
+    function newGame() {
+      state.level = 0;
+      state.score = 0;
+      startLevel(0);
+      updateHud();
+    }
+
+    function updateHud() {
+      scoreText.textContent = String(state.score);
+      levelText.textContent = String(state.level + 1);
+      moveText.textContent = String(state.moves);
+    }
+
+    function runTrain() {
+      if (state.running) return;
+      const result = tracePath(true);
+      state.solved = result.path.map(([r, c]) => cellIndex(r, c));
+      render();
+      if (!result.ok) {
+        message.textContent = '앗! ' + result.fail + ' 초록색으로 빛나는 곳까지는 연결됐어요.';
+        wobbleBoard();
+        return;
+      }
+      state.running = true;
+      message.textContent = '출발! 무지개 기차가 달려가요!';
+      train.classList.add('run');
+      animatePath(result.path, 0);
+    }
+
+    function animatePath(path, index) {
+      const [r, c] = path[index];
+      const next = path[index + 1];
+      const dir = next ? directionBetween([r, c], next) : getLevel().exit;
+      setTrain(r, c, dir);
+      if (index < path.length - 1) {
+        setTimeout(() => animatePath(path, index + 1), 330);
+      } else {
+        setTimeout(clearLevel, 400);
+      }
+    }
+
+    function directionBetween(a, b) {
+      const dr = b[0] - a[0];
+      const dc = b[1] - a[1];
+      if (dr === -1) return 'N';
+      if (dr === 1) return 'S';
+      if (dc === -1) return 'W';
+      return 'E';
+    }
+
+    function clearLevel() {
+      train.classList.remove('run');
+      state.running = false;
+      const starTextValue = starsForMoves(state.moves, true);
+      const starScore = starTextValue === '★★★' ? 120 : starTextValue === '★★☆' ? 90 : 60;
+      const bonus = Math.max(0, 30 - state.moves) * 2;
+      state.score += starScore + bonus + state.level * 25;
+      starText.textContent = starTextValue;
+      scoreText.textContent = String(state.score);
+      burstConfetti();
+      if (state.level >= LEVELS.length - 1) {
+        finishGame();
+      } else {
+        message.textContent = `레벨 ${state.level + 1} 도착! 다음 선물역으로 가요.`;
+        setTimeout(() => startLevel(state.level + 1), 950);
+      }
+    }
+
+    function finishGame() {
+      const best = Number(localStorage.getItem(STORAGE_KEY) || 0);
+      if (state.score > best) localStorage.setItem(STORAGE_KEY, String(state.score));
+      loadBest();
+      endTitle.textContent = '🎉 레일 기사 성공!';
+      finalScore.textContent = String(state.score);
+      resultMsg.textContent = state.score > best ? '새 최고기록이에요! 무지개 선물을 모두 배달했어요.' : '무지개 선물을 모두 배달했어요!';
+      setTimeout(() => endOverlay.classList.remove('hidden'), 900);
+    }
+
+    function wobbleBoard() {
+      board.animate([
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(-8px)' },
+        { transform: 'translateX(8px)' },
+        { transform: 'translateX(0)' }
+      ], { duration: 260, easing: 'ease-in-out' });
+    }
+
+    function burstConfetti() {
+      const rect = board.getBoundingClientRect();
+      for (let i = 0; i < 24; i += 1) {
+        const p = document.createElement('span');
+        p.className = 'confetti';
+        p.style.left = (rect.left + rect.width / 2) + 'px';
+        p.style.top = (rect.top + rect.height / 2) + 'px';
+        p.style.background = ['#ffd166', '#ff6bcb', '#4cc9f0', '#95f985', '#b77cff'][i % 5];
+        p.style.setProperty('--x', (Math.cos(i / 24 * Math.PI * 2) * (70 + i * 2)) + 'px');
+        p.style.setProperty('--y', (Math.sin(i / 24 * Math.PI * 2) * (70 + i * 2)) + 'px');
+        document.body.appendChild(p);
+        p.addEventListener('animationend', () => p.remove(), { once: true });
+      }
+    }
+
+    $('startBtn').addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      startOverlay.classList.add('hidden');
+      newGame();
+    });
+    $('restartBtn').addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      endOverlay.classList.add('hidden');
+      newGame();
+    });
+    $('runBtn').addEventListener('pointerdown', (event) => { event.preventDefault(); runTrain(); });
+    $('resetBtn').addEventListener('pointerdown', (event) => { event.preventDefault(); startLevel(state.level); });
+    window.addEventListener('resize', () => {
+      const lv = getLevel();
+      setTrain(lv.start[0], lv.start[1], lv.entry);
+    });
+
+    loadBest();
+    startLevel(0);
+  })();
+  </script>
+</body>
+</html>
