@@ -1,70 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-labelledby="title desc">
-  <title id="title">무지개 레일 빌더</title>
-  <desc id="desc">무지개 레일을 돌려 기차가 선물역까지 가는 퍼즐 게임 썸네일</desc>
+  <title id="title">무지개 레일 공방</title>
+  <desc id="desc">손가락으로 직접 레일을 그려 기차를 보내는 어린이 게임 썸네일</desc>
   <defs>
-    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#14213d"/>
-      <stop offset="0.52" stop-color="#35246f"/>
-      <stop offset="1" stop-color="#7b2cbf"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101a3d"/>
+      <stop offset="0.55" stop-color="#3b1c71"/>
+      <stop offset="1" stop-color="#6c2f90"/>
     </linearGradient>
-    <linearGradient id="rail" x1="0" x2="1">
+    <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#ff5b8f"/>
       <stop offset="0.25" stop-color="#ffd166"/>
-      <stop offset="0.52" stop-color="#95f985"/>
-      <stop offset="0.76" stop-color="#4cc9f0"/>
+      <stop offset="0.5" stop-color="#95f985"/>
+      <stop offset="0.75" stop-color="#4cc9f0"/>
       <stop offset="1" stop-color="#b77cff"/>
     </linearGradient>
     <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="0.35"/>
+      <feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#000" flood-opacity=".35"/>
     </filter>
   </defs>
-  <rect width="320" height="180" rx="22" fill="url(#bg)"/>
-  <circle cx="46" cy="36" r="44" fill="#ffd166" opacity="0.22"/>
-  <circle cx="276" cy="44" r="56" fill="#4cc9f0" opacity="0.2"/>
-  <circle cx="250" cy="150" r="52" fill="#ff6bcb" opacity="0.16"/>
-
-  <g filter="url(#shadow)" transform="translate(24 20)">
-    <rect x="0" y="0" width="146" height="118" rx="22" fill="rgba(0,0,0,0.23)" stroke="rgba(255,255,255,0.22)"/>
-    <g transform="translate(12 12)">
-      <g>
-        <rect x="0" y="0" width="34" height="34" rx="10" fill="#fff4c7"/>
-        <path d="M7 17H27" stroke="url(#rail)" stroke-width="8" stroke-linecap="round"/>
-      </g>
-      <g transform="translate(44 0)">
-        <rect x="0" y="0" width="34" height="34" rx="10" fill="#fff4c7"/>
-        <path d="M17 7V27" stroke="url(#rail)" stroke-width="8" stroke-linecap="round"/>
-      </g>
-      <g transform="translate(88 0)">
-        <rect x="0" y="0" width="34" height="34" rx="10" fill="#ffe1f4"/>
-        <text x="17" y="24" text-anchor="middle" font-size="21">🎁</text>
-      </g>
-      <g transform="translate(0 44)">
-        <rect x="0" y="0" width="34" height="34" rx="10" fill="#baffc9"/>
-        <text x="17" y="24" text-anchor="middle" font-size="20">🚉</text>
-      </g>
-      <g transform="translate(44 44)">
-        <rect x="0" y="0" width="34" height="34" rx="10" fill="#fff4c7"/>
-        <path d="M8 27Q8 8 27 8" fill="none" stroke="url(#rail)" stroke-width="8" stroke-linecap="round"/>
-      </g>
-      <g transform="translate(88 44)">
-        <rect x="0" y="0" width="34" height="34" rx="10" fill="#fff4c7"/>
-        <path d="M7 17H27" stroke="url(#rail)" stroke-width="8" stroke-linecap="round"/>
-        <path d="M17 7V27" stroke="url(#rail)" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
-      </g>
-    </g>
+  <rect width="320" height="180" rx="24" fill="url(#bg)"/>
+  <circle cx="44" cy="31" r="44" fill="#ffd166" opacity=".24"/>
+  <circle cx="276" cy="42" r="52" fill="#4cc9f0" opacity=".18"/>
+  <g opacity=".17" stroke="#fff" stroke-width="1">
+    <path d="M20 52H300M20 84H300M20 116H300M20 148H300M48 24V158M88 24V158M128 24V158M168 24V158M208 24V158M248 24V158"/>
   </g>
-
   <g filter="url(#shadow)">
-    <ellipse cx="214" cy="126" rx="54" ry="15" fill="#000" opacity="0.28"/>
-    <text x="213" y="115" text-anchor="middle" font-size="58">🚂</text>
-    <path d="M173 78C191 47 232 46 252 76" fill="none" stroke="url(#rail)" stroke-width="13" stroke-linecap="round" opacity="0.9"/>
-    <circle cx="173" cy="78" r="8" fill="#95f985"/>
-    <circle cx="252" cy="76" r="8" fill="#ff6bcb"/>
+    <rect x="39" y="46" width="44" height="44" rx="14" fill="#45ce82"/>
+    <text x="61" y="76" text-anchor="middle" font-size="25">🚉</text>
+    <rect x="238" y="92" width="44" height="44" rx="14" fill="#ff76c6"/>
+    <text x="260" y="122" text-anchor="middle" font-size="25">🎁</text>
+    <rect x="119" y="39" width="42" height="42" rx="13" fill="#83e7ff"/>
+    <text x="140" y="68" text-anchor="middle" font-size="24">⭐</text>
+    <rect x="164" y="84" width="42" height="42" rx="13" fill="#83e7ff"/>
+    <text x="185" y="113" text-anchor="middle" font-size="24">🎈</text>
+    <path d="M61 68 C92 68 92 62 120 62 C148 62 150 105 184 105 C215 105 225 114 260 114" fill="none" stroke="#5c3715" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>
+    <path d="M61 68 C92 68 92 62 120 62 C148 62 150 105 184 105 C215 105 225 114 260 114" fill="none" stroke="url(#rail)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="85" y="112" font-size="34" transform="rotate(-8 85 112)">☝️</text>
+    <text x="214" y="91" font-size="29" transform="rotate(10 214 91)">🚂</text>
   </g>
-
-  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
-    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd166">무지개 레일</text>
-    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,0.64)" letter-spacing="2">RAIL BUILDER</text>
+  <g font-family="Pretendard, Noto Sans KR, sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd166">무지개 레일 공방</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,.6)" letter-spacing="2">DRAW YOUR OWN RAIL</text>
   </g>
-  <rect x="0.5" y="0.5" width="319" height="179" rx="22" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" rx="23.5" fill="none" stroke="rgba(255,255,255,.1)"/>
 </svg>

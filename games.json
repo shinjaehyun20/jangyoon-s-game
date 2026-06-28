@@ -1,9 +1,9 @@
 [
   {
     "id": "rainbow-rail-builder",
-    "title": "Rainbow Rail Builder",
-    "title_ko": "🌈 무지개 레일 빌더",
-    "description": "레일 타일을 돌려 무지개 기차가 선물역까지 가도록 길을 잇는 5레벨 퍼즐",
+    "title": "Rainbow Rail Workshop",
+    "title_ko": "🌈 무지개 레일 공방",
+    "description": "빈 판에 손가락으로 레일을 직접 그려 미션역을 순서대로 잇는 5레벨 드로잉 퍼즐",
     "thumbnail": "rainbow-rail-builder/thumb.svg",
     "path": "rainbow-rail-builder/index.html"
   },

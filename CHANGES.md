@@ -1,9 +1,9 @@
 # 변경 이력
 
-## 2026-06-28 — 무지개 레일 빌더 (rainbow-rail-builder)
-- 레일 타일을 탭해 90도씩 돌리고 출발역에서 선물역까지 기차 길을 완성하는 5레벨 인지 퍼즐 추가.
-- OpenGame식 분류/GDD/검증 프로토콜을 실제 게임 산출물로 연결해 `grid_logic` 유형의 단일 HTML 게임으로 구현.
-- 모바일 우선 4×4 보드, 시작/종료 오버레이, localStorage 최고기록(`rainbow-rail-builder_best`), 외부 의존성 없는 SVG 썸네일 포함.
+## 2026-06-28 — 무지개 레일 공방 (rainbow-rail-builder)
+- 빈 5×5 판에 손가락으로 직접 레일을 그려 미션 스티커를 순서대로 지나가는 5레벨 드로잉 퍼즐로 전면 개편.
+- 기존 회전 타일 퍼즐과 겹치지 않도록 `draw_to_connect` 체감으로 변경: 출발역에서 목표역까지 직접 경로를 그린 뒤 기차가 따라 달림.
+- 모바일 우선 5×5 드로잉 보드, 미션 스티커 순서 검증, 시작/종료 오버레이, localStorage 최고기록(`rainbow-rail-builder_best`), 외부 의존성 없는 SVG 썸네일 포함.
 
 ## 2026-06-27 — 눈방울 구조대 (bubble-snow-rescue)
 - Bubble Bobble/Snow Bros 감성을 장윤이용으로 순화한 신규 5스테이지 2.5D 액션 퍼즐 추가.
