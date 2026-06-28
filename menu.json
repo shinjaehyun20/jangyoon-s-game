@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "firetruck-rescue",
+        "label": "🚒 소방차 출동",
+        "path": "firetruck-rescue/index.html"
+      },
+      {
+        "id": "star-trace-number",
+        "label": "⭐ 별 잇기 숫자놀이",
+        "path": "star-trace-number/index.html"
+      },
+      {
         "id": "rainbow-rail-builder",
         "label": "🌈 무지개 레일 공방",
         "path": "rainbow-rail-builder/index.html"

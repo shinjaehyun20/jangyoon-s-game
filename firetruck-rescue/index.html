@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🚒 소방차 출동</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg1: #ffe8b0;
+      --bg2: #ffd06b;
+      --accent: #ff5252;
+      --water: #36b3ff;
+      --text: #4a2c00;
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', -apple-system, sans-serif;
+      -webkit-user-select: none; user-select: none;
+      background: #ffd06b;
+    }
+    .wrap {
+      position: relative;
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      margin: 0 auto;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+      overflow: hidden;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      color: var(--accent);
+      text-shadow: 0 2px 0 #fff, 0 3px 6px rgba(0,0,0,.12);
+      font-weight: 900;
+      letter-spacing: -.5px;
+    }
+    /* HUD */
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.55);
+      border-radius: 14px;
+      padding: 8px 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08) inset, 0 1px 0 #fff;
+    }
+    .hud .cell { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .hud .label { font-size: 11px; color: #a06a1a; font-weight: 700; }
+    .hud .value { font-size: 22px; font-weight: 900; color: var(--text); line-height: 1.1; }
+    .hud .cell.round .value { color: var(--accent); }
+    /* 시간 게이지 */
+    .timebar-wrap {
+      height: 12px; border-radius: 8px;
+      background: rgba(255,255,255,0.5);
+      overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.12) inset;
+    }
+    .timebar {
+      height: 100%; width: 100%;
+      background: linear-gradient(90deg, #6dd400, #ffd400, #ff5252);
+      border-radius: 8px;
+      transform-origin: left center;
+      transition: transform .25s linear;
+    }
+    /* 게임 영역 */
+    #gameArea {
+      position: relative;
+      flex: 1;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(255,255,255,.45), transparent 40%),
+        linear-gradient(180deg, #bfe9ff 0%, #8fd3ff 55%, #6ec8a8 55%, #5bbf97 100%);
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,.12);
+      touch-action: none;
+    }
+    /* 도시 실루엣 */
+    .city {
+      position: absolute; left: 0; right: 0; bottom: 30%;
+      height: 32%;
+      display: flex; align-items: flex-end; justify-content: space-around;
+      padding: 0 6px; opacity: .9; pointer-events: none;
+    }
+    .bld { width: 13%; background: #7a8fb0; border-radius: 4px 4px 0 0; position: relative; box-shadow: 0 0 0 2px rgba(255,255,255,.15) inset; }
+    .bld::before {
+      content: ""; position: absolute; inset: 6px; border-radius: 2px;
+      background-image:
+        radial-gradient(circle, #ffe27a 1.5px, transparent 2px);
+      background-size: 10px 12px; opacity: .8;
+    }
+    .bld:nth-child(1){ height: 60%; }
+    .bld:nth-child(2){ height: 88%; }
+    .bld:nth-child(3){ height: 72%; }
+    .bld:nth-child(4){ height: 100%; }
+    .bld:nth-child(5){ height: 78%; }
+    .bld:nth-child(6){ height: 55%; }
+    /* 소방차 */
+    .truck {
+      position: absolute; left: 10px; bottom: 8px;
+      font-size: 38px; pointer-events: none;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,.25));
+      animation: truckBob 1.6s ease-in-out infinite;
+    }
+    @keyframes truckBob { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-3px) } }
+
+    /* 불 */
+    .fire {
+      position: absolute;
+      width: 64px; height: 64px;
+      margin-left: -32px; margin-top: -32px;
+      font-size: 46px; line-height: 64px; text-align: center;
+      cursor: pointer;
+      animation: firePop .28s cubic-bezier(.2,1.4,.5,1) , fireFlick .5s ease-in-out infinite alternate;
+      will-change: transform;
+      touch-action: none;
+    }
+    @keyframes firePop { from{ transform: scale(0) rotate(-20deg); } to{ transform: scale(1) rotate(0); } }
+    @keyframes fireFlick { from{ filter: drop-shadow(0 0 6px #ff8a00) hue-rotate(0deg); } to{ filter: drop-shadow(0 0 14px #ff3d00) hue-rotate(-8deg); transform: scale(1.06); } }
+    .fire.out { animation: fireOut .35s ease forwards; pointer-events: none; }
+    @keyframes fireOut { to{ transform: scale(1.6); opacity: 0; } }
+
+    /* 물 스플래시 / 파티클 */
+    .splash {
+      position: absolute; font-size: 26px; pointer-events: none;
+      margin-left: -13px; margin-top: -13px;
+      animation: splashGo .55s ease-out forwards;
+    }
+    @keyframes splashGo {
+      0%{ transform: translate(0,0) scale(.5); opacity: 1; }
+      100%{ transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0; }
+    }
+    .pts {
+      position: absolute; font-weight: 900; font-size: 22px; color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,.4); pointer-events: none;
+      margin-left: -12px; margin-top: -12px;
+      animation: ptsGo .8s ease-out forwards;
+    }
+    @keyframes ptsGo { 0%{ transform: translateY(0); opacity:1 } 100%{ transform: translateY(-46px); opacity:0 } }
+
+    /* footer */
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 2px 4px;
+    }
+    footer small { color: #8a5a10; font-size: 13px; font-weight: 600; }
+    .home-link {
+      text-decoration: none; color: #fff; background: var(--accent);
+      padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 800;
+      min-height: 36px; display: inline-flex; align-items: center;
+      box-shadow: 0 3px 0 #c33;
+    }
+    .home-link:active { transform: translateY(2px); box-shadow: 0 1px 0 #c33; }
+
+    /* 오버레이 */
+    .overlay {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(40,20,0,.45); backdrop-filter: blur(2px);
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #fff; border-radius: 24px;
+      padding: 26px 22px; max-width: 320px; width: 100%;
+      text-align: center;
+      box-shadow: 0 12px 36px rgba(0,0,0,.3);
+      animation: cardIn .3s cubic-bezier(.2,1.3,.5,1);
+    }
+    @keyframes cardIn { from{ transform: scale(.8); opacity:0 } to{ transform: scale(1); opacity:1 } }
+    .overlay-card .big { font-size: 56px; line-height: 1; margin-bottom: 6px; animation: truckBob 1.4s ease-in-out infinite; }
+    .overlay-card h2 { font-size: 26px; color: var(--accent); margin-bottom: 10px; font-weight: 900; }
+    .overlay-card p { font-size: 16px; color: #5a4a2a; line-height: 1.5; margin-bottom: 18px; }
+    .result-score { font-size: 50px; font-weight: 900; color: var(--accent); margin: 4px 0; }
+    .result-sub { font-size: 14px; color: #8a6a3a; margin-bottom: 16px; }
+    .btn-start {
+      border: none; cursor: pointer;
+      background: linear-gradient(180deg, #ff6b6b, #ff3d3d);
+      color: #fff; font-size: 22px; font-weight: 900;
+      padding: 0 30px; min-height: 56px; border-radius: 30px;
+      box-shadow: 0 5px 0 #c62828; font-family: inherit;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: 0 2px 0 #c62828; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🚒 소방차 출동</h1>
+
+    <div class="hud">
+      <div class="cell"><span class="label">점수</span><span class="value" id="scoreVal">0</span></div>
+      <div class="cell round"><span class="label">라운드</span><span class="value" id="roundVal">1</span></div>
+      <div class="cell"><span class="label">최고</span><span class="value" id="bestVal">0</span></div>
+    </div>
+
+    <div class="timebar-wrap"><div class="timebar" id="timebar"></div></div>
+
+    <div id="gameArea">
+      <div class="city">
+        <div class="bld"></div><div class="bld"></div><div class="bld"></div>
+        <div class="bld"></div><div class="bld"></div><div class="bld"></div>
+      </div>
+      <div class="truck">🚒</div>
+    </div>
+
+    <footer>
+      <small>🔥 불을 콕! 눌러서 꺼요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+
+    <!-- 시작 오버레이 -->
+    <div class="overlay" id="startOverlay">
+      <div class="overlay-card">
+        <div class="big">🚒</div>
+        <h2>소방차 출동!</h2>
+        <p>불(🔥)이 나타나면<br>손가락으로 <b>콕콕</b> 눌러서<br>물💧을 뿌려 꺼주세요!</p>
+        <button class="btn-start" id="startBtn">출동! 🚨</button>
+      </div>
+    </div>
+
+    <!-- 결과 오버레이 -->
+    <div class="overlay hidden" id="endOverlay">
+      <div class="overlay-card">
+        <div class="big">🎉</div>
+        <h2 id="endTitle">잘했어요!</h2>
+        <div class="result-score" id="finalScore">0</div>
+        <p class="result-sub" id="resultMsg">불을 모두 껐어요!</p>
+        <button class="btn-start" id="restartBtn">또 하기! 🚒</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var CONFIG = {
+      ROUND_TIME: 22,          // 한 판 시간(초)
+      TICK: 100,               // 게이지/스폰 틱(ms)
+      BASE_SPAWN_MS: 1100,     // 라운드1 불 생성 간격(ms)
+      SPAWN_MIN_MS: 480,       // 최저 생성 간격
+      SPAWN_DECAY: 90,         // 라운드마다 줄어드는 간격(ms)
+      FIRE_LIFE_MS: 3200,      // 불이 저절로 사라지는(놓치는) 시간 — 실패 페널티 없음
+      ROUND_GOAL_BASE: 8,      // 라운드1 목표 끄기 수
+      ROUND_GOAL_STEP: 3,      // 라운드마다 목표 증가
+      POINT: 10,
+      EDGE: 40                 // 가장자리 여백(px)
+    };
+
+    var praise = ['멋져요! 🚒', '대단해요! 💪', '용감한 소방관! 🚨', '최고예요! ⭐', '슈웅~ 물대포! 💦'];
+
+    var area = document.getElementById('gameArea');
+    var scoreVal = document.getElementById('scoreVal');
+    var roundVal = document.getElementById('roundVal');
+    var bestVal = document.getElementById('bestVal');
+    var timebar = document.getElementById('timebar');
+    var startOverlay = document.getElementById('startOverlay');
+    var endOverlay = document.getElementById('endOverlay');
+    var startBtn = document.getElementById('startBtn');
+    var restartBtn = document.getElementById('restartBtn');
+    var finalScore = document.getElementById('finalScore');
+    var resultMsg = document.getElementById('resultMsg');
+    var endTitle = document.getElementById('endTitle');
+
+    var BEST_KEY = 'firetruck-rescue_best';
+
+    var state = {
+      running: false,
+      score: 0,
+      round: 1,
+      cleared: 0,           // 이번 라운드에서 끈 불 개수
+      goal: CONFIG.ROUND_GOAL_BASE,
+      timeLeft: CONFIG.ROUND_TIME,
+      lastSpawn: 0,
+      spawnMs: CONFIG.BASE_SPAWN_MS,
+      fires: [],
+      timer: null
+    };
+
+    var best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0;
+    bestVal.textContent = best;
+
+    /* ── 효과음 (WebAudio, 외부 파일 없음) ── */
+    var actx = null;
+    function audio() {
+      if (!actx) {
+        try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
+        catch (e) { actx = null; }
+      }
+      return actx;
+    }
+    function beep(freq, dur, type, vol) {
+      var ac = audio(); if (!ac) return;
+      try {
+        var o = ac.createOscillator(), g = ac.createGain();
+        o.type = type || 'sine';
+        o.frequency.setValueAtTime(freq, ac.currentTime);
+        o.frequency.exponentialRampToValueAtTime(Math.max(80, freq * 0.6), ac.currentTime + dur);
+        g.gain.setValueAtTime(vol || 0.18, ac.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + dur);
+        o.connect(g); g.connect(ac.destination);
+        o.start(); o.stop(ac.currentTime + dur);
+      } catch (e) {}
+    }
+    function splashSound() { beep(620, 0.18, 'triangle', 0.2); beep(320, 0.22, 'sine', 0.12); }
+    function roundSound() { beep(523, 0.12, 'square', 0.15); setTimeout(function(){ beep(784, 0.18, 'square', 0.15); }, 120); }
+    function winSound() {
+      var notes = [523, 659, 784, 1046];
+      notes.forEach(function (n, i) { setTimeout(function () { beep(n, 0.2, 'triangle', 0.18); }, i * 140); });
+    }
+
+    /* ── 헬퍼 ── */
+    function rand(min, max) { return min + Math.random() * (max - min); }
+
+    function spawnFire() {
+      var w = area.clientWidth, h = area.clientHeight;
+      var x = rand(CONFIG.EDGE, w - CONFIG.EDGE);
+      var y = rand(CONFIG.EDGE, h - CONFIG.EDGE - 20); // 바닥 소방차 영역 살짝 피함
+      var el = document.createElement('div');
+      el.className = 'fire';
+      el.textContent = '🔥';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+
+      var rec = { el: el, born: Date.now(), done: false };
+
+      function extinguish(ev) {
+        if (rec.done || !state.running) return;
+        rec.done = true;
+        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+        el.classList.add('out');
+        splashSound();
+        spawnSplash(x, y);
+        floatPoints(x, y, '+' + CONFIG.POINT);
+        state.score += CONFIG.POINT;
+        state.cleared += 1;
+        scoreVal.textContent = state.score;
+        setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 360);
+        removeFromList(rec);
+        checkRound();
+      }
+      el.addEventListener('pointerdown', extinguish);
+
+      area.appendChild(el);
+      state.fires.push(rec);
+    }
+
+    function removeFromList(rec) {
+      var i = state.fires.indexOf(rec);
+      if (i >= 0) state.fires.splice(i, 1);
+    }
+
+    function spawnSplash(x, y) {
+      for (var i = 0; i < 6; i++) {
+        var s = document.createElement('div');
+        s.className = 'splash';
+        s.textContent = '💧';
+        s.style.left = x + 'px';
+        s.style.top = y + 'px';
+        var ang = (Math.PI * 2 / 6) * i + rand(-0.3, 0.3);
+        var dist = rand(34, 60);
+        s.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+        s.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
+        area.appendChild(s);
+        (function (node) { setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, 600); })(s);
+      }
+    }
+
+    function floatPoints(x, y, txt) {
+      var p = document.createElement('div');
+      p.className = 'pts';
+      p.textContent = txt;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      area.appendChild(p);
+      setTimeout(function () { if (p.parentNode) p.parentNode.removeChild(p); }, 800);
+    }
+
+    /* 놓친 불은 살짝 작아지며 조용히 사라짐 — 벌점 없음(좌절 방지) */
+    function expireOldFires(now) {
+      for (var i = state.fires.length - 1; i >= 0; i--) {
+        var rec = state.fires[i];
+        if (!rec.done && now - rec.born > CONFIG.FIRE_LIFE_MS) {
+          rec.done = true;
+          rec.el.classList.add('out');
+          (function (el) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 360); })(rec.el);
+          state.fires.splice(i, 1);
+        }
+      }
+    }
+
+    function clearAllFires() {
+      state.fires.forEach(function (rec) { if (rec.el.parentNode) rec.el.parentNode.removeChild(rec.el); });
+      state.fires = [];
+    }
+
+    function checkRound() {
+      if (state.cleared >= state.goal) {
+        nextRound();
+      }
+    }
+
+    function nextRound() {
+      state.round += 1;
+      state.cleared = 0;
+      state.goal = CONFIG.ROUND_GOAL_BASE + (state.round - 1) * CONFIG.ROUND_GOAL_STEP;
+      state.timeLeft = CONFIG.ROUND_TIME;
+      state.spawnMs = Math.max(CONFIG.SPAWN_MIN_MS, CONFIG.BASE_SPAWN_MS - (state.round - 1) * CONFIG.SPAWN_DECAY);
+      roundVal.textContent = state.round;
+      roundSound();
+      // 라운드 전환 격려 점수 텍스트
+      floatPoints(area.clientWidth / 2, area.clientHeight / 2, '라운드 ' + state.round + '! 🚒');
+    }
+
+    function tick() {
+      if (!state.running) return;
+      var now = Date.now();
+
+      state.timeLeft -= CONFIG.TICK / 1000;
+      var ratio = Math.max(0, state.timeLeft / CONFIG.ROUND_TIME);
+      timebar.style.transform = 'scaleX(' + ratio + ')';
+
+      if (now - state.lastSpawn > state.spawnMs) {
+        spawnFire();
+        state.lastSpawn = now;
+      }
+      expireOldFires(now);
+
+      if (state.timeLeft <= 0) {
+        endGame();
+      }
+    }
+
+    function startGame() {
+      audio(); // 사용자 제스처에서 오디오 컨텍스트 깨우기
+      state.running = true;
+      state.score = 0;
+      state.round = 1;
+      state.cleared = 0;
+      state.goal = CONFIG.ROUND_GOAL_BASE;
+      state.timeLeft = CONFIG.ROUND_TIME;
+      state.spawnMs = CONFIG.BASE_SPAWN_MS;
+      state.lastSpawn = Date.now() - state.spawnMs; // 즉시 첫 불
+      clearAllFires();
+
+      scoreVal.textContent = '0';
+      roundVal.textContent = '1';
+      timebar.style.transform = 'scaleX(1)';
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      if (state.timer) clearInterval(state.timer);
+      state.timer = setInterval(tick, CONFIG.TICK);
+    }
+
+    function endGame() {
+      state.running = false;
+      if (state.timer) { clearInterval(state.timer); state.timer = null; }
+      clearAllFires();
+      winSound();
+
+      if (state.score > best) {
+        best = state.score;
+        localStorage.setItem(BEST_KEY, String(best));
+        bestVal.textContent = best;
+        endTitle.textContent = '🏆 신기록!';
+        resultMsg.textContent = '와! 최고 기록이에요!';
+      } else {
+        endTitle.textContent = praise[Math.floor(Math.random() * praise.length)];
+        resultMsg.textContent = '불을 ' + (state.score / CONFIG.POINT) + '번 껐어요! 💦';
+      }
+      finalScore.textContent = state.score;
+      endOverlay.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('pointerdown', function (e) { e.preventDefault(); startGame(); });
+    restartBtn.addEventListener('pointerdown', function (e) { e.preventDefault(); startGame(); });
+
+    // 빈 곳 탭은 무시(스크롤·확대 방지)
+    area.addEventListener('pointerdown', function (e) { e.preventDefault(); }, { passive: false });
+  })();
+  </script>
+</body>
+</html>

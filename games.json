@@ -1134,5 +1134,21 @@
     "description": "레시피대로 케이크에 크림·과일·초코를 올려 완성! 10가지 케이크 도전",
     "thumbnail": "cake-decor/thumb.svg",
     "path": "cake-decor/index.html"
+  },
+  {
+    "id": "firetruck-rescue",
+    "title": "Firetruck Rescue",
+    "title_ko": "🚒 소방차 출동",
+    "description": "불(🔥)을 탭하면 물줄기로 꺼져요! 라운드마다 빨라지는 불 끄기 도전",
+    "thumbnail": "firetruck-rescue/thumb.svg",
+    "path": "firetruck-rescue/index.html"
+  },
+  {
+    "id": "star-trace-number",
+    "title": "Star Trace Number",
+    "title_ko": "⭐ 별 잇기 숫자놀이",
+    "description": "1번부터 순서대로 별을 탭해 별자리를 완성! 1~10 숫자 학습 5단계",
+    "thumbnail": "star-trace-number/thumb.svg",
+    "path": "star-trace-number/index.html"
   }
 ]

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>별 잇기 숫자놀이</title>
+  <style>
+    :root {
+      --bg1: #1a1140;
+      --bg2: #2d1f6b;
+      --accent: #ffd95a;
+      --accent2: #7ee0ff;
+      --pink: #ff9ad5;
+      --text: #ffffff;
+      --hud-bg: rgba(255,255,255,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: radial-gradient(circle at 30% 15%, var(--bg2) 0%, var(--bg1) 70%);
+      color: var(--text);
+      user-select: none; -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      font-weight: 900;
+      text-align: center;
+      text-shadow: 0 0 14px rgba(255,217,90,0.5);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: var(--hud-bg);
+      border-radius: 14px;
+      padding: 8px 12px;
+      flex-shrink: 0;
+    }
+    .hud-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .hud-label { font-size: 11px; opacity: 0.7; }
+    .hud-value { font-size: 22px; font-weight: 900; color: var(--accent); }
+    .hud-value.next { color: var(--accent2); }
+
+    #gameWrap {
+      flex: 1;
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1.5px 1.5px at 85% 20%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,0.6), transparent),
+        rgba(0,0,0,0.18);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.35);
+    }
+    #board { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+    .toast {
+      position: absolute; left: 50%; top: 16px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.55);
+      padding: 7px 16px; border-radius: 999px;
+      font-size: 14px; font-weight: 700;
+      opacity: 0; transition: opacity 0.25s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0; padding: 0 4px;
+    }
+    footer small { font-size: 12px; opacity: 0.75; }
+    .home-link {
+      font-size: 13px; font-weight: 700;
+      color: var(--accent2); text-decoration: none;
+      background: var(--hud-bg);
+      padding: 8px 12px; border-radius: 10px;
+      min-height: 36px; display: flex; align-items: center;
+    }
+
+    .overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(12,8,40,0.82);
+      backdrop-filter: blur(3px);
+      z-index: 20;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      width: 88%; max-width: 360px;
+      background: linear-gradient(160deg, #322a78, #1d1550);
+      border: 2px solid rgba(255,217,90,0.35);
+      border-radius: 22px;
+      padding: 26px 22px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: 26px; font-weight: 900; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; line-height: 1.6; opacity: 0.92; margin-bottom: 8px; }
+    .result-emoji { font-size: 56px; margin-bottom: 6px; }
+    .result-score { font-size: 40px; font-weight: 900; color: var(--accent); margin: 6px 0; }
+    .btn-start {
+      margin-top: 16px;
+      width: 100%;
+      min-height: 56px;
+      font-size: 22px; font-weight: 900;
+      color: #2d1f6b;
+      background: linear-gradient(135deg, var(--accent), #ffc107);
+      border: none; border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #d49a00;
+      transition: transform 0.08s, box-shadow 0.08s;
+    }
+    .btn-start:active { transform: translateY(4px); box-shadow: 0 2px 0 #d49a00; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>⭐ 별 잇기 숫자놀이</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">단계</span>
+        <span class="hud-value" id="hudLevel">1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">다음 별</span>
+        <span class="hud-value next" id="hudNext">1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">완성</span>
+        <span class="hud-value" id="hudDone">0</span>
+      </div>
+    </div>
+
+    <div id="gameWrap">
+      <canvas id="board"></canvas>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <footer>
+      <small id="hint">1번 별부터 순서대로 콕콕 눌러봐!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <div class="result-emoji">🌟</div>
+      <h2>별 잇기 숫자놀이</h2>
+      <p>1, 2, 3... 숫자 순서대로<br>별을 콕콕 누르면<br>반짝이는 그림이 완성돼요!</p>
+      <button class="btn-start" id="startBtn">시작! ✨</button>
+    </div>
+  </div>
+
+  <!-- 결과(별자리 완성) 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <div class="result-emoji" id="endEmoji">🎉</div>
+      <h2 id="endTitle">완성했어요!</h2>
+      <p id="endName">멋진 별자리예요</p>
+      <div class="result-score" id="endScore">0개 완성</div>
+      <button class="btn-start" id="nextBtn">다음 별자리 ➡️</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var CONFIG = {
+      STAR_R: 22,          // 별 터치 반경(px)
+      STAR_GLOW: 34,       // 별 빛 반경
+      HINT_PULSE: 1100,    // 다음 별 펄스 주기(ms)
+      WRONG_SHAKE: 360,    // 틀렸을 때 흔들림(ms)
+      PARTICLES: 46,       // 완성 파티클 개수
+      LS_KEY: 'star-trace-number_best'
+    };
+
+    // 별자리 정의: 정규화 좌표(0~1). 순서대로 1번 = 첫 점.
+    // 별 개수: 5 -> 7 -> 9 -> 6 -> 8 (1~10 범위 학습)
+    var LEVELS = [
+      { name: '🏠 작은 집', emoji: '🏠', pts: [
+        [0.50,0.20],[0.78,0.45],[0.78,0.80],[0.22,0.80],[0.22,0.45]
+      ]},
+      { name: '🐟 헤엄치는 물고기', emoji: '🐟', pts: [
+        [0.20,0.50],[0.45,0.30],[0.70,0.40],[0.85,0.50],[0.70,0.60],[0.45,0.70],[0.55,0.50]
+      ]},
+      { name: '🌟 반짝 큰별', emoji: '🌟', pts: [
+        [0.50,0.14],[0.61,0.40],[0.88,0.40],[0.66,0.58],[0.74,0.85],[0.50,0.68],[0.26,0.85],[0.34,0.58],[0.12,0.40]
+      ]},
+      { name: '🐻 아기곰', emoji: '🐻', pts: [
+        [0.30,0.30],[0.45,0.22],[0.62,0.30],[0.70,0.55],[0.50,0.78],[0.28,0.55]
+      ]},
+      { name: '🚀 로켓', emoji: '🚀', pts: [
+        [0.50,0.14],[0.62,0.32],[0.62,0.62],[0.74,0.80],[0.50,0.72],[0.26,0.80],[0.38,0.62],[0.38,0.32]
+      ]}
+    ];
+
+    var canvas = document.getElementById('board');
+    var ctx = canvas.getContext('2d');
+    var hudLevel = document.getElementById('hudLevel');
+    var hudNext = document.getElementById('hudNext');
+    var hudDone = document.getElementById('hudDone');
+    var hintEl = document.getElementById('hint');
+    var toastEl = document.getElementById('toast');
+    var startOverlay = document.getElementById('startOverlay');
+    var endOverlay = document.getElementById('endOverlay');
+
+    var W = 0, H = 0, DPR = 1;
+    var state = {
+      level: 0,
+      stars: [],       // {x,y,num,lit}
+      next: 1,          // 다음에 눌러야 할 숫자
+      done: 0,          // 완성한 별자리 수
+      shakeUntil: 0,
+      shakeMag: 0,
+      particles: [],
+      sparkles: [],     // 빛나는 선 위 반짝임
+      running: false
+    };
+
+    function resize() {
+      var rect = canvas.getBoundingClientRect();
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = rect.width; H = rect.height;
+      canvas.width = Math.round(W * DPR);
+      canvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    window.addEventListener('resize', resize);
+
+    // ── 사운드 (WebAudio, 외부 의존성 0) ──
+    var actx = null;
+    function audio() {
+      if (!actx) {
+        try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
+        catch (e) { actx = null; }
+      }
+      return actx;
+    }
+    function beep(freq, dur, type, vol) {
+      var a = audio(); if (!a) return;
+      var o = a.createOscillator(), g = a.createGain();
+      o.type = type || 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(vol || 0.18, a.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + (dur || 0.18));
+      o.connect(g); g.connect(a.destination);
+      o.start(); o.stop(a.currentTime + (dur || 0.18));
+    }
+    function sndCorrect(n) { beep(440 + n * 60, 0.16, 'triangle', 0.2); }
+    function sndWrong() { beep(150, 0.22, 'sawtooth', 0.16); }
+    function sndWin() {
+      [523, 659, 784, 1047].forEach(function (f, i) {
+        setTimeout(function () { beep(f, 0.22, 'triangle', 0.2); }, i * 110);
+      });
+    }
+
+    function loadLevel(idx) {
+      state.level = idx % LEVELS.length;
+      var lv = LEVELS[state.level];
+      var rect = canvas.getBoundingClientRect();
+      var w = rect.width, h = rect.height;
+      var padX = w * 0.10, padY = h * 0.12;
+      state.stars = lv.pts.map(function (p, i) {
+        return {
+          x: padX + p[0] * (w - padX * 2),
+          y: padY + p[1] * (h - padY * 2),
+          num: i + 1,
+          lit: false
+        };
+      });
+      state.next = 1;
+      state.particles = [];
+      state.sparkles = [];
+      hudLevel.textContent = state.level + 1;
+      hudDone.textContent = state.done;
+      hudNext.textContent = '1';
+      hintEl.textContent = '1번 별부터 순서대로 콕콕 눌러봐!';
+    }
+
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastEl._t);
+      toastEl._t = setTimeout(function () { toastEl.classList.remove('show'); }, 900);
+    }
+
+    function onPoint(clientX, clientY) {
+      if (!state.running) return;
+      var rect = canvas.getBoundingClientRect();
+      var px = clientX - rect.left, py = clientY - rect.top;
+      var target = state.stars[state.next - 1];
+      if (!target) return;
+      // 가장 가까운 별이 정답 별이면서 반경 안인지
+      var hit = null, hitDist = 1e9;
+      for (var i = 0; i < state.stars.length; i++) {
+        var s = state.stars[i];
+        var d = Math.hypot(px - s.x, py - s.y);
+        if (d < CONFIG.STAR_R + 14 && d < hitDist) { hit = s; hitDist = d; }
+      }
+      if (!hit) return;
+      if (hit.num === state.next) {
+        hit.lit = true;
+        sndCorrect(state.next);
+        spawnSparkle(hit.x, hit.y);
+        state.next++;
+        if (state.next > state.stars.length) {
+          finishLevel();
+        } else {
+          hudNext.textContent = state.next;
+          showToast('좋아! 다음은 ' + state.next + '번');
+        }
+      } else {
+        // 틀림: 흔들림 + 부드러운 안내 (좌절 없는 톤)
+        sndWrong();
+        state.shakeUntil = performance.now() + CONFIG.WRONG_SHAKE;
+        state.shakeMag = 8;
+        showToast('앗! ' + state.next + '번 별을 찾아봐 😊');
+      }
+    }
+
+    function spawnSparkle(x, y) {
+      for (var i = 0; i < 8; i++) {
+        var a = Math.random() * Math.PI * 2, sp = 0.6 + Math.random() * 1.8;
+        state.sparkles.push({
+          x: x, y: y,
+          vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+          life: 1, hue: 48 + Math.random() * 30
+        });
+      }
+    }
+
+    function finishLevel() {
+      state.done++;
+      hudDone.textContent = state.done;
+      sndWin();
+      // 완성 파티클 폭죽
+      var rect = canvas.getBoundingClientRect();
+      var cx = rect.width / 2, cy = rect.height / 2;
+      for (var i = 0; i < CONFIG.PARTICLES; i++) {
+        var a = Math.random() * Math.PI * 2, sp = 1 + Math.random() * 4.5;
+        state.particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1,
+          life: 1, hue: Math.random() * 360, size: 2 + Math.random() * 4
+        });
+      }
+      var best = +(localStorage.getItem(CONFIG.LS_KEY) || 0);
+      if (state.done > best) { localStorage.setItem(CONFIG.LS_KEY, state.done); }
+      var lv = LEVELS[state.level];
+      setTimeout(function () {
+        document.getElementById('endEmoji').textContent = lv.emoji;
+        document.getElementById('endTitle').textContent = '완성했어요!';
+        document.getElementById('endName').textContent = lv.name + ' 별자리 완성! 🎊';
+        document.getElementById('endScore').textContent = state.done + '개 별자리 완성';
+        endOverlay.classList.remove('hidden');
+      }, 950);
+    }
+
+    // ── 렌더 루프 ──
+    function draw(now) {
+      ctx.clearRect(0, 0, W, H);
+
+      var dx = 0, dy = 0;
+      if (now < state.shakeUntil) {
+        var m = state.shakeMag;
+        dx = (Math.random() - 0.5) * m;
+        dy = (Math.random() - 0.5) * m;
+      }
+      ctx.save();
+      ctx.translate(dx, dy);
+
+      // 1) 이어진 선 (빛나는 선)
+      var litStars = state.stars.filter(function (s) { return s.lit; });
+      if (litStars.length >= 2) {
+        ctx.lineWidth = 3.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        var grad = ctx.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, '#ffe98a');
+        grad.addColorStop(0.5, '#7ee0ff');
+        grad.addColorStop(1, '#ff9ad5');
+        ctx.strokeStyle = grad;
+        ctx.shadowColor = 'rgba(255,225,130,0.9)';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.moveTo(litStars[0].x, litStars[0].y);
+        for (var i = 1; i < litStars.length; i++) ctx.lineTo(litStars[i].x, litStars[i].y);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      // 2) 별 그리기
+      for (var j = 0; j < state.stars.length; j++) {
+        drawStar(state.stars[j], now);
+      }
+
+      // 3) 반짝임(별 터치 이펙트)
+      for (var k = state.sparkles.length - 1; k >= 0; k--) {
+        var sp = state.sparkles[k];
+        sp.x += sp.vx; sp.y += sp.vy; sp.life -= 0.04;
+        if (sp.life <= 0) { state.sparkles.splice(k, 1); continue; }
+        ctx.globalAlpha = Math.max(sp.life, 0);
+        ctx.fillStyle = 'hsl(' + sp.hue + ',100%,75%)';
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // 4) 완성 파티클
+      for (var p = state.particles.length - 1; p >= 0; p--) {
+        var pt = state.particles[p];
+        pt.x += pt.vx; pt.y += pt.vy; pt.vy += 0.08; pt.life -= 0.012;
+        if (pt.life <= 0) { state.particles.splice(p, 1); continue; }
+        ctx.globalAlpha = Math.max(pt.life, 0);
+        ctx.fillStyle = 'hsl(' + pt.hue + ',95%,68%)';
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
+      requestAnimationFrame(draw);
+    }
+
+    function drawStar(s, now) {
+      var isNext = (s.num === state.next) && !s.lit;
+      var pulse = isNext ? (1 + 0.18 * Math.sin(now / CONFIG.HINT_PULSE * Math.PI * 2)) : 1;
+      var R = (s.lit ? 16 : 14) * pulse;
+
+      // 빛무리
+      var glowR = (s.lit ? CONFIG.STAR_GLOW : (isNext ? 30 : 18)) * pulse;
+      var g = ctx.createRadialGradient(s.x, s.y, 1, s.x, s.y, glowR);
+      if (s.lit) { g.addColorStop(0, 'rgba(255,235,150,0.95)'); g.addColorStop(1, 'rgba(255,235,150,0)'); }
+      else if (isNext) { g.addColorStop(0, 'rgba(126,224,255,0.85)'); g.addColorStop(1, 'rgba(126,224,255,0)'); }
+      else { g.addColorStop(0, 'rgba(255,255,255,0.35)'); g.addColorStop(1, 'rgba(255,255,255,0)'); }
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 별 본체 (5각 별)
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.beginPath();
+      for (var i = 0; i < 10; i++) {
+        var ang = -Math.PI / 2 + i * Math.PI / 5;
+        var rr = (i % 2 === 0) ? R : R * 0.45;
+        var xx = Math.cos(ang) * rr, yy = Math.sin(ang) * rr;
+        if (i === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+      }
+      ctx.closePath();
+      ctx.fillStyle = s.lit ? '#ffe98a' : (isNext ? '#bfefff' : 'rgba(255,255,255,0.55)');
+      ctx.fill();
+      ctx.restore();
+
+      // 숫자 라벨
+      ctx.fillStyle = s.lit ? '#3a2a00' : (isNext ? '#0b3a4a' : '#1a1140');
+      ctx.font = '900 ' + Math.round(R * 0.95) + 'px "Noto Sans KR", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(s.num), s.x, s.y + 0.5);
+    }
+
+    // ── 입력: pointer 통일 ──
+    canvas.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      onPoint(e.clientX, e.clientY);
+    }, { passive: false });
+
+    // ── 게임 흐름 ──
+    function startGame() {
+      audio(); // 사용자 제스처에서 오디오 깨우기
+      resize();
+      state.done = 0;
+      state.level = 0;
+      loadLevel(0);
+      state.running = true;
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+    }
+    function nextLevel() {
+      resize();
+      loadLevel(state.level + 1);
+      state.running = true;
+      endOverlay.classList.add('hidden');
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('nextBtn').addEventListener('click', nextLevel);
+
+    // 초기화
+    resize();
+    requestAnimationFrame(draw);
+  })();
+  </script>
+</body>
+</html>
