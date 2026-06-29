@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>두더지 텃밭</title>
+  <style>
+    :root {
+      --sky: #87CEEB;
+      --grass: #5CB85C;
+      --dirt: #A0522D;
+      --hole-dark: #3B1E08;
+      --accent: #FFD700;
+      --text-dark: #3B2A1A;
+      --btn-green: #4CAF50;
+      --btn-orange: #FF8C00;
+      --card-bg: rgba(255,255,255,0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(180deg, #87CEEB 0%, #B0E0A0 50%, #8B6340 100%);
+      display: flex; align-items: center; justify-content: center;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap {
+      width: 100%; max-width: 420px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 0;
+      position: relative;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px 6px;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(4px);
+      border-bottom: 2px solid rgba(255,255,255,0.3);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .hdr-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 4px 12px;
+      min-width: 64px;
+    }
+    .hdr-score .label {
+      font-size: 10px;
+      color: #3B2A1A;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .hdr-score .value {
+      font-size: 26px;
+      font-weight: 900;
+      color: #2E7D32;
+      line-height: 1;
+    }
+    .hdr-score .value.red { color: #C62828; }
+    .timer-ring {
+      position: relative;
+      width: 62px; height: 62px;
+      flex-shrink: 0;
+    }
+    .timer-ring svg { width: 62px; height: 62px; transform: rotate(-90deg); }
+    .timer-ring circle {
+      fill: none;
+      stroke-width: 5;
+      stroke-linecap: round;
+      cx: 31; cy: 31; r: 26;
+    }
+    .timer-ring .bg-ring  { stroke: rgba(0,0,0,0.15); }
+    .timer-ring .fg-ring  { stroke: #FF6F00; transition: stroke-dashoffset 0.9s linear; }
+    .timer-ring .txt {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900; color: #3B2A1A;
+    }
+    .lives { display: flex; gap: 3px; align-items: center; }
+    .heart { font-size: 24px; transition: transform 0.2s; }
+    .heart.lost { filter: grayscale(1); transform: scale(0.7); }
+
+    /* ── GARDEN / GRID ── */
+    .garden {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 10px 6px;
+      gap: 8px;
+    }
+    .crop-bar {
+      display: flex; gap: 14px; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 5px 18px;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .crop-bar span { position: relative; }
+    .crop-bar span::after {
+      content: attr(data-count);
+      position: absolute; bottom: -4px; right: -8px;
+      font-size: 11px; font-weight: 900;
+      background: #FFD700;
+      color: #3B2A1A;
+      border-radius: 20px;
+      padding: 0 4px;
+      line-height: 1.4;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+    }
+    .cell {
+      position: relative;
+      aspect-ratio: 1;
+      display: flex; align-items: flex-end; justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    /* dirt / hole */
+    .cell-bg {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 55%;
+      background: radial-gradient(ellipse 80% 60% at 50% 80%, #6D3B1F 0%, #3B1E08 100%);
+      border-radius: 50% 50% 4px 4px;
+    }
+    /* mole or crop graphic */
+    .cell-icon {
+      position: absolute;
+      bottom: 20%;
+      font-size: 44px;
+      line-height: 1;
+      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), opacity 0.12s;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));
+      pointer-events: none;
+      z-index: 2;
+    }
+    .cell-icon.hidden { transform: translateY(110%); opacity: 0; }
+    .cell-icon.visible { transform: translateY(0); opacity: 1; }
+    /* tap flash */
+    .cell-flash {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(255,255,200,0.6);
+      transform: scale(0);
+      pointer-events: none;
+      z-index: 5;
+    }
+    .cell-flash.pop {
+      animation: pop-flash 0.3s ease-out forwards;
+    }
+    @keyframes pop-flash {
+      0%   { transform: scale(0); opacity: 1; }
+      80%  { transform: scale(1.3); opacity: 0.6; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    /* score pop */
+    .score-pop {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      font-size: 22px; font-weight: 900;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      pointer-events: none;
+      z-index: 10;
+      animation: float-up 0.7s ease-out forwards;
+    }
+    @keyframes float-up {
+      0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+    }
+
+    /* ── OVERLAY (start / gameover) ── */
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(30,15,5,0.75);
+      backdrop-filter: blur(6px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px;
+      z-index: 20;
+      padding: 24px;
+      transition: opacity 0.3s;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 24px;
+      padding: 28px 32px;
+      text-align: center;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .overlay-title { font-size: 38px; margin-bottom: 4px; }
+    .overlay-sub   { font-size: 17px; font-weight: 700; color: #3B2A1A; margin-bottom: 14px; line-height: 1.4; }
+    .overlay-score { font-size: 52px; font-weight: 900; color: #2E7D32; line-height: 1; }
+    .overlay-score-label { font-size: 13px; color: #777; margin-bottom: 20px; }
+    .btn {
+      display: block; width: 100%;
+      padding: 15px;
+      border: none; border-radius: 50px;
+      font-size: 20px; font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .btn:active { transform: scale(0.96); box-shadow: none; }
+    .btn-start  { background: linear-gradient(135deg, #4CAF50, #2E7D32); box-shadow: 0 4px 14px rgba(46,125,50,0.45); }
+    .btn-retry  { background: linear-gradient(135deg, #FF8C00, #E65100); box-shadow: 0 4px 14px rgba(230,81,0,0.4); }
+    .btn-home   { background: rgba(0,0,0,0.08); color: #555; font-size: 16px; box-shadow: none; margin-top: 2px; }
+    .badge { font-size: 28px; }
+
+    /* ── COMBO banner ── */
+    .combo-banner {
+      position: absolute;
+      top: 80px; left: 50%; transform: translateX(-50%) scale(0);
+      background: linear-gradient(135deg, #FF6F00, #FFD600);
+      color: #3B2A1A;
+      font-size: 18px; font-weight: 900;
+      border-radius: 30px;
+      padding: 6px 22px;
+      z-index: 15;
+      white-space: nowrap;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .combo-banner.show { transform: translateX(-50%) scale(1); }
+  </style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-score">
+      <span class="label">점수</span>
+      <span class="value" id="score-disp">0</span>
+    </div>
+
+    <div class="timer-ring" id="timer-ring">
+      <svg viewBox="0 0 62 62">
+        <circle class="bg-ring" cx="31" cy="31" r="26"/>
+        <circle class="fg-ring" id="timer-arc" cx="31" cy="31" r="26"
+                stroke-dasharray="163.4" stroke-dashoffset="0"/>
+      </svg>
+      <div class="txt" id="timer-txt">45</div>
+    </div>
+
+    <div class="hdr-score">
+      <span class="label">놓침</span>
+      <span class="value red" id="miss-disp">0</span>
+    </div>
+
+    <div class="lives" id="lives-disp">
+      <span class="heart" id="h1">❤️</span>
+      <span class="heart" id="h2">❤️</span>
+      <span class="heart" id="h3">❤️</span>
+    </div>
+  </div>
+
+  <!-- GARDEN -->
+  <div class="garden">
+    <!-- saved crop count -->
+    <div class="crop-bar">
+      <span data-count="0" id="carrot-cnt">🥕</span>
+      <span data-count="0" id="turnip-cnt">🟣</span>
+      <span data-count="0" id="cabbage-cnt">🥬</span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- COMBO BANNER -->
+  <div class="combo-banner" id="combo-banner">🔥 콤보!</div>
+
+  <!-- START OVERLAY -->
+  <div class="overlay" id="overlay-start">
+    <div class="overlay-card">
+      <div class="overlay-title">🥕 두더지 텃밭</div>
+      <div class="overlay-sub">두더지가 텃밭 채소를 훔쳐가요!<br>올라오는 두더지를 탭해서 채소를 지켜줘요 🌱</div>
+      <div style="font-size:42px; margin: 10px 0;">🐾🌿🐾</div>
+      <button class="btn btn-start" id="btn-start">시작하기 🌱</button>
+    </div>
+  </div>
+
+  <!-- GAME-OVER OVERLAY -->
+  <div class="overlay hidden" id="overlay-end">
+    <div class="overlay-card">
+      <div class="overlay-title" id="end-emoji">🌻</div>
+      <div class="overlay-sub" id="end-msg">잘했어요!</div>
+      <div class="overlay-score" id="end-score">0</div>
+      <div class="overlay-score-label">점수</div>
+      <button class="btn btn-retry" id="btn-retry">다시하기 🔄</button>
+      <button class="btn btn-home" id="btn-home">홈으로 🏠</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── CONSTANTS ───────────────────────────────────────────────
+const COLS        = 3;
+const ROWS        = 3;
+const TOTAL_CELLS = COLS * ROWS;
+const GAME_SECS   = 45;
+const MAX_LIVES   = 3;
+const CIRC        = 2 * Math.PI * 26;   // svg ring circumference
+
+const CROPS = ['🥕','🟣','🥬'];          // carrot / turnip / cabbage
+const MOLE  = '🦫';                      // friendly mole
+
+// timing: moles appear faster as game progresses
+function peekDuration(elapsed) {
+  if (elapsed < 10) return 2200;
+  if (elapsed < 25) return 1700;
+  return 1300;
+}
+function spawnInterval(elapsed) {
+  if (elapsed < 10) return 1800;
+  if (elapsed < 25) return 1400;
+  return 1050;
+}
+
+// ─── STATE ───────────────────────────────────────────────────
+let score = 0, misses = 0, lives = MAX_LIVES, combo = 0;
+let elapsed = 0, running = false;
+let cells = [];
+let spawnTimer = null, tickTimer = null, countdownTimer = null;
+
+const cropCounts = { '🥕': 0, '🟣': 0, '🥬': 0 };
+
+// ─── DOM REFS ─────────────────────────────────────────────────
+const gridEl       = document.getElementById('grid');
+const scoreDisp    = document.getElementById('score-disp');
+const missDisp     = document.getElementById('miss-disp');
+const timerTxt     = document.getElementById('timer-txt');
+const timerArc     = document.getElementById('timer-arc');
+const liveEls      = [document.getElementById('h1'), document.getElementById('h2'), document.getElementById('h3')];
+const carrotCnt    = document.getElementById('carrot-cnt');
+const turnipCnt    = document.getElementById('turnip-cnt');
+const cabbageCnt   = document.getElementById('cabbage-cnt');
+const comboBanner  = document.getElementById('combo-banner');
+const overlayStart = document.getElementById('overlay-start');
+const overlayEnd   = document.getElementById('overlay-end');
+const endEmoji     = document.getElementById('end-emoji');
+const endMsg       = document.getElementById('end-msg');
+const endScore     = document.getElementById('end-score');
+
+// ─── AUDIO (WebAudio) ─────────────────────────────────────────
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type = 'sine', gain = 0.4) {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const g   = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    g.gain.setValueAtTime(gain, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(); osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+function sfxHit()  { playTone(880, 0.12, 'triangle', 0.5); setTimeout(() => playTone(1200, 0.1, 'triangle', 0.3), 60); }
+function sfxMiss() { playTone(200, 0.25, 'sawtooth', 0.35); }
+function sfxCombo(){ playTone(1046, 0.08); setTimeout(() => playTone(1318, 0.08), 80); setTimeout(() => playTone(1568, 0.12), 160); }
+function sfxEnd()  { [523,587,659,784].forEach((f,i) => setTimeout(() => playTone(f, 0.18), i*110)); }
+
+// ─── BUILD GRID ───────────────────────────────────────────────
+function buildGrid() {
+  gridEl.innerHTML = '';
+  cells = [];
+  for (let i = 0; i < TOTAL_CELLS; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.innerHTML = `
+      <div class="cell-bg"></div>
+      <div class="cell-icon hidden" data-idx="${i}"></div>
+      <div class="cell-flash"></div>
+    `;
+    cell.addEventListener('pointerdown', () => onTap(i));
+    gridEl.appendChild(cell);
+    cells.push({
+      el:     cell,
+      icon:   cell.querySelector('.cell-icon'),
+      flash:  cell.querySelector('.cell-flash'),
+      active: false,
+      isMole: false,
+      content: '',
+      timer:  null,
+    });
+  }
+}
+
+// ─── SPAWN ────────────────────────────────────────────────────
+function spawnOne() {
+  // find idle cells
+  const idle = cells.filter(c => !c.active).map((_,i) => i)
+    .filter(i => !cells[i].active);
+  const idleIdx = [];
+  cells.forEach((c, i) => { if (!c.active) idleIdx.push(i); });
+
+  if (idleIdx.length === 0) return;
+  const idx = idleIdx[Math.floor(Math.random() * idleIdx.length)];
+  const c = cells[idx];
+
+  // 30% mole, 70% crop
+  const isMole = Math.random() < 0.30;
+  const content = isMole ? MOLE : CROPS[Math.floor(Math.random() * CROPS.length)];
+  c.isMole   = isMole;
+  c.content  = content;
+  c.active   = true;
+
+  c.icon.textContent = content;
+  c.icon.classList.remove('hidden');
+  c.icon.classList.add('visible');
+
+  const dur = peekDuration(elapsed);
+  c.timer = setTimeout(() => {
+    if (!c.active) return;
+    // mole escaped → lose a life
+    if (c.isMole) loseLife();
+    else {
+      // crop snatched → count as miss
+      recordMiss();
+    }
+    hideCell(idx);
+  }, dur);
+}
+
+function hideCell(idx) {
+  const c = cells[idx];
+  if (!c.active) return;
+  clearTimeout(c.timer);
+  c.active = false;
+  c.icon.classList.remove('visible');
+  c.icon.classList.add('hidden');
+}
+
+// ─── TAP ──────────────────────────────────────────────────────
+function onTap(idx) {
+  if (!running) return;
+  const c = cells[idx];
+  if (!c.active) return;
+
+  // flash effect
+  c.flash.classList.remove('pop');
+  void c.flash.offsetWidth; // reflow
+  c.flash.classList.add('pop');
+
+  if (c.isMole) {
+    // HIT
+    clearTimeout(c.timer);
+    c.active = false;
+    hideCell(idx);
+    addScore(1, idx);
+    sfxHit();
+    combo++;
+    if (combo >= 3) {
+      sfxCombo();
+      showCombo();
+    }
+  } else {
+    // tapped a crop — gentle penalty (miss++, no life loss)
+    recordMiss();
+    combo = 0;
+    sfxMiss();
+    hideCell(idx);
+  }
+}
+
+function addScore(pts, cellIdx) {
+  const bonus = combo >= 5 ? 3 : combo >= 3 ? 2 : 1;
+  const total  = pts * bonus;
+  score += total;
+  scoreDisp.textContent = score;
+
+  // score pop
+  const pop = document.createElement('div');
+  pop.className = 'score-pop';
+  pop.textContent = '+' + total;
+  cells[cellIdx].el.appendChild(pop);
+  pop.addEventListener('animationend', () => pop.remove());
+}
+
+function recordMiss() {
+  misses++;
+  missDisp.textContent = misses;
+}
+
+function loseLife() {
+  if (lives <= 0) return;
+  lives--;
+  sfxMiss();
+  const h = liveEls[lives];
+  if (h) h.classList.add('lost');
+  if (lives <= 0) endGame();
+}
+
+function showCombo() {
+  comboBanner.textContent = combo >= 5 ? `🔥 ${combo}콤보!! +3배` : `✨ ${combo}콤보! +2배`;
+  comboBanner.classList.add('show');
+  clearTimeout(comboBanner._t);
+  comboBanner._t = setTimeout(() => comboBanner.classList.remove('show'), 1200);
+}
+
+// ─── TIMER / LOOP ────────────────────────────────────────────
+function startTick() {
+  let remaining = GAME_SECS;
+  timerTxt.textContent = remaining;
+  timerArc.style.strokeDashoffset = 0;
+
+  countdownTimer = setInterval(() => {
+    remaining--;
+    elapsed = GAME_SECS - remaining;
+    timerTxt.textContent = remaining;
+    // arc: shrinks from full (0) to empty (CIRC)
+    const frac = remaining / GAME_SECS;
+    timerArc.style.strokeDashoffset = CIRC * (1 - frac);
+    if (remaining <= 0) {
+      clearInterval(countdownTimer);
+      endGame();
+    }
+  }, 1000);
+}
+
+function startSpawn() {
+  const doSpawn = () => {
+    if (!running) return;
+    spawnOne();
+    const interval = spawnInterval(elapsed);
+    spawnTimer = setTimeout(doSpawn, interval);
+  };
+  spawnTimer = setTimeout(doSpawn, 600);
+}
+
+// ─── CROP COUNTS (update when cell is shown as crop that escapes or is tapped) ──
+// For now track mole-hits contributing to crop-saved count
+// reuse cropCounts
+function updateCropBar() {
+  carrotCnt.dataset.count = cropCounts['🥕'] || 0;
+  turnipCnt.dataset.count = cropCounts['🟣'] || 0;
+  cabbageCnt.dataset.count = cropCounts['🥬'] || 0;
+}
+
+// override addScore to also track saved crops
+const _origAddScore = addScore;
+// (we already handle it inline via combo; just count from MOLE hits)
+// We'll increment crop counts differently: after each mole hit, pick a random crop to "save"
+function addScoreAndCrop(pts, cellIdx) {
+  addScore(pts, cellIdx);
+  const savedCrop = CROPS[Math.floor(Math.random() * CROPS.length)];
+  cropCounts[savedCrop] = (cropCounts[savedCrop] || 0) + 1;
+  updateCropBar();
+}
+
+// patch onTap to use addScoreAndCrop
+function onTapFixed(idx) {
+  if (!running) return;
+  const c = cells[idx];
+  if (!c.active) return;
+
+  c.flash.classList.remove('pop');
+  void c.flash.offsetWidth;
+  c.flash.classList.add('pop');
+
+  if (c.isMole) {
+    clearTimeout(c.timer);
+    c.active = false;
+    hideCell(idx);
+    addScoreAndCrop(1, idx);
+    sfxHit();
+    combo++;
+    if (combo >= 3) { sfxCombo(); showCombo(); }
+  } else {
+    recordMiss();
+    combo = 0;
+    sfxMiss();
+    hideCell(idx);
+  }
+}
+
+// ─── GAME FLOW ────────────────────────────────────────────────
+function startGame() {
+  score = 0; misses = 0; lives = MAX_LIVES; combo = 0; elapsed = 0;
+  cropCounts['🥕'] = 0; cropCounts['🟣'] = 0; cropCounts['🥬'] = 0;
+  scoreDisp.textContent = '0';
+  missDisp.textContent = '0';
+  liveEls.forEach(h => h.classList.remove('lost'));
+  updateCropBar();
+  comboBanner.classList.remove('show');
+  overlayStart.classList.add('hidden');
+  overlayEnd.classList.add('hidden');
+  buildGrid();
+
+  // re-wire tap to fixed version
+  cells.forEach((c, idx) => {
+    c.el.addEventListener('pointerdown', () => onTapFixed(idx));
+  });
+  // remove duplicate listeners (the original added in buildGrid)
+  // Cleanest: rebuild with single listener binding
+  // Rebuild grid cleanly
+  gridEl.innerHTML = '';
+  cells = [];
+  for (let i = 0; i < TOTAL_CELLS; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.innerHTML = `
+      <div class="cell-bg"></div>
+      <div class="cell-icon hidden"></div>
+      <div class="cell-flash"></div>
+    `;
+    cell.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      onTapFixed(i);
+    }, { passive: false });
+    gridEl.appendChild(cell);
+    cells.push({
+      el:      cell,
+      icon:    cell.querySelector('.cell-icon'),
+      flash:   cell.querySelector('.cell-flash'),
+      active:  false,
+      isMole:  false,
+      content: '',
+      timer:   null,
+    });
+  }
+
+  running = true;
+  startTick();
+  startSpawn();
+}
+
+function endGame() {
+  running = false;
+  clearTimeout(spawnTimer);
+  clearInterval(countdownTimer);
+  cells.forEach((_, i) => hideCell(i));
+  sfxEnd();
+
+  endScore.textContent = score;
+  if (lives <= 0) {
+    endEmoji.textContent = '😅';
+    endMsg.textContent = '두더지가 너무 많았어요!\n다시 한번 도전해봐요!';
+  } else if (score >= 20) {
+    endEmoji.textContent = '🏆';
+    endMsg.textContent = '대단해요! 채소를 다 지켰어요!';
+  } else if (score >= 10) {
+    endEmoji.textContent = '🌟';
+    endMsg.textContent = '잘했어요! 텃밭 지킴이!';
+  } else {
+    endEmoji.textContent = '🌱';
+    endMsg.textContent = '좋아요! 더 잘할 수 있어요!';
+  }
+  overlayEnd.classList.remove('hidden');
+}
+
+// ─── BUTTONS ──────────────────────────────────────────────────
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-retry').addEventListener('click', startGame);
+document.getElementById('btn-home').addEventListener('click', () => {
+  const parent = window.location.pathname.replace(/\/[^/]+\/[^/]+$/, '/');
+  window.location.href = parent + 'index.html';
+});
+</script>
+</body>
+</html>

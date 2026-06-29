@@ -1,5 +1,13 @@
 [
   {
+    "id": "mole-garden",
+    "title": "Mole Garden",
+    "title_ko": "🥕 두더지 텃밭",
+    "description": "두더지가 올라오면 탭해서 당근·무·양배추를 지켜요! 콤보 보너스 + 45초 도전",
+    "thumbnail": "mole-garden/thumb.svg",
+    "path": "mole-garden/index.html"
+  },
+  {
     "id": "rainbow-rail-builder",
     "title": "Rainbow Rail Workshop",
     "title_ko": "🌈 무지개 레일 공방",
@@ -1150,5 +1158,13 @@
     "description": "1번부터 순서대로 별을 탭해 별자리를 완성! 1~10 숫자 학습 5단계",
     "thumbnail": "star-trace-number/thumb.svg",
     "path": "star-trace-number/index.html"
+  },
+  {
+    "id": "star-stacker",
+    "title": "Star Stacker",
+    "title_ko": "⭐ 별 쌓기 밤하늘 탑",
+    "description": "화면 위를 좌우로 움직이는 별을 탭하면 아래로 떨어져 쌓여요! 잘 맞추면 높이 점수 상승, 밤하늘 별 탑 만들기",
+    "thumbnail": "star-stacker/thumb.svg",
+    "path": "star-stacker/index.html"
   }
 ]
