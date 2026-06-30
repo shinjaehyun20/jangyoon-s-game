@@ -1,5 +1,13 @@
 [
   {
+    "id": "penguin-fish-toss",
+    "title": "Penguin Fish Toss",
+    "title_ko": "🐧 펭귄 물고기 던지기",
+    "description": "헤엄치는 물고기를 탭해서 펭귄이 먹이를 던져 잡아요! 60초 안에 최대한 많이!",
+    "thumbnail": "penguin-fish-toss/thumb.svg",
+    "path": "penguin-fish-toss/index.html"
+  },
+  {
     "id": "mole-garden",
     "title": "Mole Garden",
     "title_ko": "🥕 두더지 텃밭",
@@ -1166,5 +1174,13 @@
     "description": "화면 위를 좌우로 움직이는 별을 탭하면 아래로 떨어져 쌓여요! 잘 맞추면 높이 점수 상승, 밤하늘 별 탑 만들기",
     "thumbnail": "star-stacker/thumb.svg",
     "path": "star-stacker/index.html"
+  },
+  {
+    "id": "color-train-match",
+    "title": "Color Train Match",
+    "title_ko": "🚂 색깔 기차 잇기",
+    "description": "기차 색깔과 같은 칸을 탭해서 칙칙폭폭 기차를 길게 연결해요! 레벨이 오를수록 색도 많아져요",
+    "thumbnail": "color-train-match/thumb.svg",
+    "path": "color-train-match/index.html"
   }
 ]

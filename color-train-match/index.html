@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>색깔 기차 잇기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: #1a1a2e;
+    font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+    overflow: hidden;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+  }
+
+  /* ── Header ── */
+  #header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px 8px;
+    background: linear-gradient(180deg,#16213e 0%,transparent 100%);
+  }
+  #score-box {
+    background: rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 6px 16px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  #level-box {
+    color: #ffd700;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  #lives {
+    font-size: 22px;
+    letter-spacing: 2px;
+  }
+
+  /* ── Train display ── */
+  #train-area {
+    width: 100%;
+    padding: 6px 12px;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .train-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .engine {
+    font-size: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    flex-shrink: 0;
+  }
+  .train-car {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 3px solid rgba(255,255,255,0.4);
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .train-car.filled { border-color: rgba(255,255,255,0.8); }
+  .train-car.pulse {
+    animation: car-pop 0.3s ease;
+  }
+  @keyframes car-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  /* ── Divider ── */
+  #divider {
+    width: 90%;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 1px;
+    margin: 4px 0;
+  }
+
+  /* ── Card grid ── */
+  #card-area {
+    flex: 1;
+    width: 100%;
+    display: grid;
+    gap: 10px;
+    padding: 10px 14px 10px;
+    overflow: hidden;
+  }
+
+  .color-card {
+    border-radius: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    border: 4px solid rgba(255,255,255,0.3);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  .color-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+    border-radius: 14px 14px 0 0;
+    pointer-events: none;
+  }
+  .color-card:active { transform: scale(0.93); }
+  .color-card.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.6), 0 4px 12px rgba(0,0,0,0.4);
+    transform: scale(1.06);
+  }
+  .color-card.wrong-shake {
+    animation: shake 0.35s ease;
+  }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)}
+    60%{transform:translateX(-5px)}
+    80%{transform:translateX(5px)}
+  }
+  .color-card.matched {
+    animation: matched-pop 0.4s ease forwards;
+  }
+  @keyframes matched-pop {
+    0%{transform:scale(1)}
+    40%{transform:scale(1.18)}
+    70%{transform:scale(0.95)}
+    100%{transform:scale(1); opacity:0.4;}
+  }
+
+  /* ── Target indicator ── */
+  #target-area {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 6px 0 4px;
+  }
+  #target-label {
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+  }
+  #target-display {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 3px solid rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    transition: all 0.2s ease;
+  }
+  #arrow-hint {
+    color: rgba(255,255,255,0.5);
+    font-size: 20px;
+    animation: bounce-arrow 1.2s ease-in-out infinite;
+  }
+  @keyframes bounce-arrow {
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-4px)}
+  }
+
+  /* ── Overlay screens ── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,30,0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    z-index: 100;
+    padding: 24px;
+  }
+  .overlay h1 { color: #fff; font-size: 32px; text-align: center; line-height: 1.3; }
+  .overlay .big-emoji { font-size: 64px; }
+  .overlay .sub { color: rgba(255,255,255,0.7); font-size: 16px; text-align: center; }
+  .overlay .score-display { color: #ffd700; font-size: 28px; font-weight: 700; }
+
+  .btn {
+    background: linear-gradient(135deg, #e94560, #0f3460);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 16px 40px;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    transition: transform 0.12s ease;
+    font-family: inherit;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn.green {
+    background: linear-gradient(135deg, #00c851, #007e33);
+  }
+
+  /* ── Particles ── */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    font-size: 24px;
+    z-index: 200;
+    animation: particle-fly 0.8s ease-out forwards;
+  }
+  @keyframes particle-fly {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-90px) scale(0.3); opacity: 0; }
+  }
+
+  /* ── Level up flash ── */
+  #level-flash {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  #level-flash.show { opacity: 1; }
+
+  /* ── Progress bar ── */
+  #progress-bar-wrap {
+    width: 90%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 2px 0 0;
+  }
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #ff6b6b);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div id="header">
+  <div id="score-box">점수: <span id="score-val">0</span></div>
+  <div id="level-box">레벨 <span id="level-val">1</span></div>
+  <div id="lives">❤️❤️❤️</div>
+</div>
+
+<!-- Progress -->
+<div id="progress-bar-wrap">
+  <div id="progress-bar"></div>
+</div>
+
+<!-- Train display -->
+<div id="train-area"></div>
+
+<div id="divider"></div>
+
+<!-- Target indicator -->
+<div id="target-area">
+  <div id="target-label">기차 색깔:</div>
+  <div id="target-display"></div>
+  <div id="arrow-hint">👇</div>
+</div>
+
+<!-- Card grid -->
+<div id="card-area"></div>
+
+<!-- Level flash -->
+<div id="level-flash"></div>
+
+<!-- Start screen -->
+<div class="overlay" id="start-screen">
+  <div class="big-emoji">🚂</div>
+  <h1>색깔 기차 잇기</h1>
+  <div class="sub">같은 색 칸을 눌러서<br>기차를 길게 만들어요!</div>
+  <button class="btn green" onclick="startGame()">출발! 🚀</button>
+</div>
+
+<!-- Game over screen -->
+<div class="overlay hidden" id="gameover-screen">
+  <div class="big-emoji">😢</div>
+  <h1>기차가 멈췄어요!</h1>
+  <div class="score-display">점수: <span id="final-score">0</span></div>
+  <div class="sub" id="gameover-msg"></div>
+  <button class="btn" onclick="startGame()">🔄 다시하기</button>
+</div>
+
+<!-- Level clear screen -->
+<div class="overlay hidden" id="levelclear-screen">
+  <div class="big-emoji">🎉</div>
+  <h1>레벨 통과!</h1>
+  <div class="score-display">점수: <span id="clear-score">0</span></div>
+  <button class="btn green" onclick="nextLevel()">다음 레벨 ➡️</button>
+</div>
+
+<script>
+/* ─────────────── Audio ─────────────── */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+function getActx() {
+  if (!actx) actx = new AudioCtx();
+  return actx;
+}
+function beep(freq, dur, type='sine', vol=0.25) {
+  try {
+    const ctx = getActx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+function playMatch() {
+  beep(440, 0.08, 'square', 0.2);
+  setTimeout(() => beep(660, 0.12, 'square', 0.2), 80);
+  setTimeout(() => beep(880, 0.18, 'sine', 0.3), 170);
+}
+function playWrong() {
+  beep(180, 0.15, 'sawtooth', 0.15);
+  setTimeout(() => beep(140, 0.2, 'sawtooth', 0.1), 120);
+}
+function playChugChug() {
+  beep(120, 0.06, 'square', 0.1);
+  setTimeout(() => beep(100, 0.06, 'square', 0.08), 80);
+}
+function playLevelUp() {
+  [523,659,784,1047].forEach((f, i) => setTimeout(() => beep(f, 0.15, 'sine', 0.3), i*100));
+}
+function playGameOver() {
+  [400,300,200].forEach((f, i) => setTimeout(() => beep(f, 0.2, 'sawtooth', 0.2), i*150));
+}
+
+/* ─────────────── Color definitions ─────────────── */
+const COLORS = [
+  { id:'red',    bg:'#ff4757', emoji:'🔴', name:'빨강' },
+  { id:'orange', bg:'#ff7f50', emoji:'🟠', name:'주황' },
+  { id:'yellow', bg:'#ffd700', emoji:'🟡', name:'노랑' },
+  { id:'green',  bg:'#2ed573', emoji:'🟢', name:'초록' },
+  { id:'blue',   bg:'#1e90ff', emoji:'🔵', name:'파랑' },
+  { id:'purple', bg:'#a55eea', emoji:'🟣', name:'보라' },
+  { id:'pink',   bg:'#ff6b9d', emoji:'🩷', name:'분홍' },
+  { id:'sky',    bg:'#70d7ff', emoji:'🩵', name:'하늘' },
+];
+
+/* ─────────────── Game state ─────────────── */
+let score = 0;
+let level = 1;
+let lives = 3;
+let trains = [];         // [{colorId, cars:[{filled}], target: colorId}]
+let cards = [];          // [{colorId}]
+let gridCols = 3;
+let gridRows = 3;
+let matchGoal = 6;       // how many matches to clear level
+let matchCount = 0;
+let selectedCard = null;
+let busy = false;
+
+/* ─────────────── Helpers ─────────────── */
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* ─────────────── Level config ─────────────── */
+function getLevelConfig(lv) {
+  const numColors = Math.min(3 + Math.floor(lv / 2), 6);
+  const numTrains = lv <= 2 ? 1 : 2;
+  const carsPerTrain = 4 + Math.floor(lv / 3);
+  const gridSize = lv <= 2 ? [3, 3] : lv <= 4 ? [3, 4] : [4, 4];
+  const goal = 4 + lv * 2;
+  return { numColors, numTrains, carsPerTrain, gridSize, goal };
+}
+
+/* ─────────────── Init game ─────────────── */
+function startGame() {
+  score = 0; level = 1; lives = 3;
+  matchCount = 0;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('gameover-screen').classList.add('hidden');
+  document.getElementById('levelclear-screen').classList.add('hidden');
+  initLevel();
+}
+
+function initLevel() {
+  matchCount = 0;
+  busy = false;
+  selectedCard = null;
+  const cfg = getLevelConfig(level);
+  gridCols = cfg.gridSize[0];
+  gridRows = cfg.gridSize[1];
+  matchGoal = cfg.goal;
+
+  // Pick active colors
+  const activeColors = shuffle([...COLORS]).slice(0, cfg.numColors);
+
+  // Build trains
+  trains = [];
+  for (let t = 0; t < cfg.numTrains; t++) {
+    const col = pick(activeColors);
+    trains.push({
+      colorId: col.id,
+      color: col,
+      cars: Array.from({length: cfg.carsPerTrain}, () => ({ filled: false })),
+      filled: 0,
+    });
+  }
+
+  // Build card pool: ensure each train color appears multiple times + distractors
+  const cardPool = [];
+  trains.forEach(tr => {
+    for (let i = 0; i < 4; i++) cardPool.push(tr.colorId);
+  });
+  const totalCards = gridCols * gridRows;
+  while (cardPool.length < totalCards) {
+    cardPool.push(pick(activeColors).id);
+  }
+  shuffle(cardPool);
+  cards = cardPool.slice(0, totalCards).map(cid => ({
+    colorId: cid,
+    color: COLORS.find(c => c.id === cid),
+    matched: false,
+  }));
+
+  updateHUD();
+  renderTrains();
+  renderCards();
+  updateProgress();
+}
+
+/* ─────────────── HUD ─────────────── */
+function updateHUD() {
+  document.getElementById('score-val').textContent = score;
+  document.getElementById('level-val').textContent = level;
+  const hearts = ['❤️', '❤️', '❤️'].slice(0, lives).join('') + '🖤'.repeat(Math.max(0, 3 - lives));
+  document.getElementById('lives').textContent = hearts;
+}
+function updateProgress() {
+  const pct = Math.min(100, Math.round(matchCount / matchGoal * 100));
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+/* ─────────────── Render trains ─────────────── */
+function renderTrains() {
+  const area = document.getElementById('train-area');
+  area.innerHTML = '';
+  trains.forEach((tr, ti) => {
+    const row = document.createElement('div');
+    row.className = 'train-row';
+    // Engine
+    const eng = document.createElement('div');
+    eng.className = 'engine';
+    eng.textContent = '🚂';
+    row.appendChild(eng);
+    // Cars
+    tr.cars.forEach((car, ci) => {
+      const el = document.createElement('div');
+      el.className = 'train-car' + (car.filled ? ' filled' : '');
+      el.id = `car-${ti}-${ci}`;
+      if (car.filled) {
+        el.style.background = tr.color.bg;
+        el.textContent = tr.color.emoji;
+      } else {
+        el.style.background = 'rgba(255,255,255,0.07)';
+      }
+      row.appendChild(el);
+    });
+    area.appendChild(row);
+
+    // Target display
+    const tgt = document.getElementById('target-display');
+    // Show first unfilled train's color (simplification for multi-train)
+    const firstActive = trains.find(t => t.filled < t.cars.length) || trains[0];
+    tgt.style.background = firstActive.color.bg;
+    tgt.textContent = firstActive.color.emoji;
+  });
+}
+
+/* ─────────────── Render cards ─────────────── */
+function renderCards() {
+  const area = document.getElementById('card-area');
+  area.style.gridTemplateColumns = `repeat(${gridCols}, 1fr)`;
+  area.style.gridTemplateRows = `repeat(${gridRows}, 1fr)`;
+  area.innerHTML = '';
+
+  cards.forEach((card, idx) => {
+    const el = document.createElement('div');
+    el.className = 'color-card';
+    el.id = `card-${idx}`;
+    el.style.background = `linear-gradient(145deg, ${card.color.bg}, ${darken(card.color.bg, 25)})`;
+    el.textContent = card.color.emoji;
+    if (card.matched) {
+      el.style.opacity = '0.25';
+      el.style.pointerEvents = 'none';
+    }
+    el.addEventListener('pointerdown', () => handleCardTap(idx));
+    area.appendChild(el);
+  });
+}
+
+function darken(hex, pct) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.max(0, ((n>>16)&255) - pct);
+  const g = Math.max(0, ((n>>8)&255) - pct);
+  const b = Math.max(0, (n&255) - pct);
+  return `rgb(${r},${g},${b})`;
+}
+
+/* ─────────────── Card tap ─────────────── */
+function handleCardTap(idx) {
+  if (busy) return;
+  const card = cards[idx];
+  if (card.matched) return;
+  getActx(); // unlock audio
+
+  const el = document.getElementById(`card-${idx}`);
+
+  // Find which train needs this color
+  const matchTrain = trains.find(tr =>
+    tr.colorId === card.colorId && tr.filled < tr.cars.length
+  );
+
+  if (matchTrain) {
+    // Correct!
+    el.classList.add('matched');
+    playMatch();
+
+    // Fill next car on train
+    const carIdx = matchTrain.filled;
+    matchTrain.cars[carIdx].filled = true;
+    matchTrain.filled++;
+
+    card.matched = true;
+    score += 10 + (level - 1) * 5;
+    matchCount++;
+
+    // Animate car
+    setTimeout(() => {
+      const carEl = document.getElementById(`car-${trains.indexOf(matchTrain)}-${carIdx}`);
+      if (carEl) {
+        carEl.classList.add('filled', 'pulse');
+        carEl.style.background = matchTrain.color.bg;
+        carEl.textContent = matchTrain.color.emoji;
+      }
+      playChugChug();
+    }, 220);
+
+    // Particles
+    spawnParticles(el, matchTrain.color.emoji);
+
+    // Check: train full?
+    if (matchTrain.filled >= matchTrain.cars.length) {
+      setTimeout(() => refillTrain(matchTrain), 400);
+    }
+
+    updateHUD();
+    updateProgress();
+
+    // Check level clear
+    if (matchCount >= matchGoal) {
+      busy = true;
+      setTimeout(() => showLevelClear(), 500);
+      return;
+    }
+
+    // Replenish card
+    setTimeout(() => replenishCard(idx), 400);
+  } else {
+    // Wrong
+    el.classList.add('wrong-shake');
+    el.addEventListener('animationend', () => el.classList.remove('wrong-shake'), {once: true});
+    playWrong();
+    lives = Math.max(0, lives - 1);
+    updateHUD();
+    if (lives <= 0) {
+      busy = true;
+      setTimeout(() => showGameOver('하트가 다 없어졌어요 😢'), 400);
+    }
+  }
+}
+
+/* ─────────────── Refill train (loop) ─────────────── */
+function refillTrain(tr) {
+  tr.cars.forEach(c => c.filled = false);
+  tr.filled = 0;
+  // Optionally change color for variety
+  const cfg = getLevelConfig(level);
+  const activeColors = shuffle([...COLORS]).slice(0, cfg.numColors);
+  const newColor = pick(activeColors);
+  tr.colorId = newColor.id;
+  tr.color = newColor;
+  renderTrains();
+  // Inject new card for this color
+  replenishCardsForColor(newColor.id, 2);
+}
+
+function replenishCard(idx) {
+  // Replace matched card with a random unmatched color from active trains
+  const activeTrains = trains.filter(t => t.filled < t.cars.length);
+  if (activeTrains.length === 0) return;
+  // Weighted: 60% chance same train color, 40% random
+  const useMatch = Math.random() < 0.6;
+  const newColor = useMatch ? pick(activeTrains).color : pick(COLORS);
+  cards[idx] = { colorId: newColor.id, color: newColor, matched: false };
+  const el = document.getElementById(`card-${idx}`);
+  if (el) {
+    el.style.background = `linear-gradient(145deg, ${newColor.bg}, ${darken(newColor.bg, 25)})`;
+    el.textContent = newColor.emoji;
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+    el.classList.remove('matched');
+    el.style.animation = 'car-pop 0.3s ease';
+    setTimeout(() => el.style.animation = '', 300);
+  }
+}
+
+function replenishCardsForColor(colorId, count) {
+  const color = COLORS.find(c => c.id === colorId);
+  let replaced = 0;
+  for (let i = 0; i < cards.length && replaced < count; i++) {
+    if (cards[i].matched) {
+      cards[i] = { colorId, color, matched: false };
+      replaced++;
+    }
+  }
+  renderCards();
+}
+
+/* ─────────────── Particles ─────────────── */
+function spawnParticles(el, emoji) {
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  for (let i = 0; i < 5; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = emoji;
+    p.style.left = (cx + rand(-30, 30)) + 'px';
+    p.style.top = cy + 'px';
+    p.style.animationDelay = (i * 60) + 'ms';
+    document.body.appendChild(p);
+    p.addEventListener('animationend', () => p.remove());
+  }
+}
+
+/* ─────────────── Level clear / Game over ─────────────── */
+function showLevelClear() {
+  playLevelUp();
+  flashLevel();
+  document.getElementById('clear-score').textContent = score;
+  document.getElementById('levelclear-screen').classList.remove('hidden');
+}
+function nextLevel() {
+  level++;
+  document.getElementById('levelclear-screen').classList.add('hidden');
+  initLevel();
+}
+function showGameOver(msg) {
+  playGameOver();
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('gameover-msg').textContent = msg;
+  document.getElementById('gameover-screen').classList.remove('hidden');
+}
+function flashLevel() {
+  const el = document.getElementById('level-flash');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 300);
+}
+
+/* ─────────────── Start ─────────────── */
+// Prevent scroll bounce
+document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+</script>
+</body>
+</html>

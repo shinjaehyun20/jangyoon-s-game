@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>펭귄 물고기 던지기</title>
+  <style>
+    :root {
+      --sky: #b3e5fc;
+      --ice: #e0f7fa;
+      --water: #0277bd;
+      --water-dark: #01579b;
+      --snow: #e3f2fd;
+      --text: #01579b;
+      --btn: #ff6f00;
+      --btn-hover: #e65100;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--sky);
+      user-select: none;
+    }
+    #game-wrap {
+      width: 100%; max-width: 480px; height: 100vh; height: 100dvh;
+      margin: 0 auto;
+      display: flex; flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* HUD */
+    #hud {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 16px 6px;
+      background: rgba(255,255,255,0.5);
+      border-bottom: 2px solid rgba(1,87,189,0.2);
+      z-index: 20;
+      flex-shrink: 0;
+    }
+    #score-box {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900; color: var(--text);
+    }
+    #timer-box {
+      font-size: clamp(14px, 4vw, 20px);
+      font-weight: 700; color: #e65100;
+      background: rgba(255,255,255,0.7);
+      padding: 2px 10px; border-radius: 20px;
+    }
+    #miss-box {
+      font-size: clamp(14px, 4vw, 20px);
+    }
+
+    /* Sky / cloud area */
+    #sky-area {
+      flex: 0 0 18%;
+      position: relative;
+      background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 100%);
+    }
+    .cloud {
+      position: absolute;
+      font-size: clamp(24px, 7vw, 40px);
+      opacity: 0.8;
+      animation: cloud-drift 14s linear infinite;
+    }
+    @keyframes cloud-drift {
+      from { transform: translateX(-80px); }
+      to   { transform: translateX(calc(100vw + 80px)); }
+    }
+
+    /* Fish lane */
+    #fish-area {
+      flex: 0 0 30%;
+      position: relative;
+      background: linear-gradient(180deg, #e1f5fe 0%, #b3e5fc 100%);
+      overflow: hidden;
+    }
+    .fish {
+      position: absolute;
+      font-size: clamp(30px, 9vw, 52px);
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      transition: opacity 0.15s;
+      will-change: transform;
+      z-index: 5;
+    }
+    .fish.caught { opacity: 0; pointer-events: none; }
+
+    /* Ice shelf */
+    #ice-shelf {
+      flex: 0 0 6%;
+      background: linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%);
+      border-top: 3px solid #80deea;
+      border-bottom: 3px solid #4dd0e1;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Penguin + throw zone */
+    #penguin-area {
+      flex: 1;
+      background: linear-gradient(180deg, #b2ebf2 0%, #80deea 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    #penguin {
+      position: absolute;
+      bottom: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(52px, 16vw, 88px);
+      z-index: 10;
+      transition: transform 0.08s ease-out;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    }
+    #penguin.throw-left  { transform: translateX(-50%) scaleX(-1) rotate(-12deg); }
+    #penguin.throw-right { transform: translateX(-50%) rotate(12deg); }
+
+    /* Throw projectile */
+    .projectile {
+      position: absolute;
+      font-size: clamp(18px, 5.5vw, 32px);
+      z-index: 15;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    /* Particles */
+    .particle {
+      position: absolute;
+      font-size: clamp(14px, 4vw, 22px);
+      pointer-events: none;
+      z-index: 20;
+      animation: particle-burst 0.7s ease-out forwards;
+    }
+    @keyframes particle-burst {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); }
+    }
+
+    /* Score float */
+    .score-float {
+      position: absolute;
+      font-size: clamp(20px, 6vw, 34px);
+      font-weight: 900;
+      color: #ff6f00;
+      pointer-events: none;
+      z-index: 25;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      animation: float-up 0.9s ease-out forwards;
+    }
+    @keyframes float-up {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      60%  { opacity: 1; transform: translateY(-50px) scale(1.2); }
+      100% { opacity: 0; transform: translateY(-90px) scale(0.8); }
+    }
+
+    /* Tap hint */
+    #tap-hint {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(13px, 3.5vw, 18px);
+      color: rgba(1,87,189,0.6);
+      font-weight: 600;
+      text-align: center;
+      pointer-events: none;
+      animation: hint-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes hint-pulse {
+      0%,100% { opacity: 0.5; }
+      50%      { opacity: 1; }
+    }
+
+    /* Screens */
+    .screen {
+      position: absolute; inset: 0;
+      z-index: 50;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 20px;
+      padding: 24px;
+      text-align: center;
+    }
+    #start-screen { background: rgba(179,229,252,0.97); }
+    #over-screen  { background: rgba(224,247,250,0.97); display: none; }
+
+    .screen-title {
+      font-size: clamp(36px, 11vw, 62px);
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+    }
+    .screen-sub {
+      font-size: clamp(17px, 5vw, 26px);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .screen-score {
+      font-size: clamp(28px, 8vw, 46px);
+      font-weight: 900;
+      color: #e65100;
+    }
+    .btn {
+      padding: 16px 40px;
+      font-size: clamp(18px, 5.5vw, 26px);
+      font-weight: 900;
+      border: none; border-radius: 50px;
+      background: var(--btn); color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 0 var(--btn-hover);
+      transition: transform 0.1s, box-shadow 0.1s;
+      touch-action: manipulation;
+      min-width: 180px;
+    }
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 var(--btn-hover);
+    }
+
+    /* Ripple on penguin tap */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      border: 3px solid rgba(1,87,189,0.4);
+      pointer-events: none;
+      animation: ripple-out 0.5s ease-out forwards;
+    }
+    @keyframes ripple-out {
+      0%   { width: 10px; height: 10px; opacity: 1; margin: -5px; }
+      100% { width: 120px; height: 120px; opacity: 0; margin: -60px; }
+    }
+  </style>
+</head>
+<body>
+<div id="game-wrap">
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="score-box">🐟 0</div>
+    <div id="timer-box">⏱ 60</div>
+    <div id="miss-box">❌❌❌</div>
+  </div>
+
+  <!-- Sky -->
+  <div id="sky-area">
+    <span class="cloud" style="top:20%; animation-delay:-2s; animation-duration:16s;">☁️</span>
+    <span class="cloud" style="top:50%; animation-delay:-7s; animation-duration:20s; font-size:clamp(16px,5vw,28px);">☁️</span>
+    <span class="cloud" style="top:10%; animation-delay:-11s; animation-duration:13s;">☁️</span>
+  </div>
+
+  <!-- Fish lane -->
+  <div id="fish-area"></div>
+
+  <!-- Ice shelf -->
+  <div id="ice-shelf"></div>
+
+  <!-- Penguin + tap zone -->
+  <div id="penguin-area">
+    <div id="penguin">🐧</div>
+    <div id="tap-hint">탭해서 물고기를 잡아요!</div>
+  </div>
+
+  <!-- Start screen -->
+  <div id="start-screen" class="screen">
+    <div class="screen-title">🐧</div>
+    <div class="screen-sub">펭귄 물고기 던지기!</div>
+    <div class="screen-sub" style="font-size:clamp(14px,4vw,20px); color:#555;">
+      헤엄치는 물고기를 잡아봐요<br>탭하면 펭귄이 먹이를 던져요
+    </div>
+    <button class="btn" id="start-btn">시작!</button>
+  </div>
+
+  <!-- Over screen -->
+  <div id="over-screen" class="screen">
+    <div class="screen-title">🎉</div>
+    <div class="screen-sub">끝났어요!</div>
+    <div class="screen-score" id="final-score">0마리</div>
+    <button class="btn" id="retry-btn">다시하기!</button>
+  </div>
+
+</div>
+
+<script>
+/* ── State ───────────────────────────────────────────────── */
+const DURATION   = 60;   // seconds
+const MAX_MISSES = 3;
+const FISH_TYPES = ['🐟','🐠','🐡','🦐','🦑'];
+const PARTICLE_SET = ['⭐','✨','💫','❄️','🌊'];
+
+let score     = 0;
+let misses    = 0;
+let timeLeft  = DURATION;
+let running   = false;
+let timerID   = null;
+let spawnID   = null;
+let activeFish = [];   // { el, x, speed, dir }
+let frameID   = null;
+
+/* ── DOM refs ────────────────────────────────────────────── */
+const scoreBox   = document.getElementById('score-box');
+const timerBox   = document.getElementById('timer-box');
+const missBox    = document.getElementById('miss-box');
+const fishArea   = document.getElementById('fish-area');
+const penguinEl  = document.getElementById('penguin');
+const penguinArea= document.getElementById('penguin-area');
+const tapHint    = document.getElementById('tap-hint');
+const startScreen= document.getElementById('start-screen');
+const overScreen = document.getElementById('over-screen');
+const finalScore = document.getElementById('final-score');
+const startBtn   = document.getElementById('start-btn');
+const retryBtn   = document.getElementById('retry-btn');
+const gameWrap   = document.getElementById('game-wrap');
+
+/* ── WebAudio SFX ────────────────────────────────────────── */
+let ctx = null;
+function ensureCtx() {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === 'suspended') ctx.resume();
+}
+function beep(freq, type='sine', dur=0.12, vol=0.35, delay=0) {
+  ensureCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+  osc.start(ctx.currentTime + delay);
+  osc.stop(ctx.currentTime + delay + dur + 0.01);
+}
+function sfxCatch() {
+  beep(600,'sine',0.07,0.3);
+  beep(900,'sine',0.07,0.3,0.07);
+  beep(1200,'sine',0.1,0.3,0.14);
+}
+function sfxMiss() {
+  beep(200,'square',0.15,0.25);
+  beep(150,'square',0.12,0.2,0.12);
+}
+function sfxThrow() {
+  beep(400,'sawtooth',0.07,0.15);
+}
+function sfxGameOver() {
+  beep(300,'sine',0.1,0.3);
+  beep(250,'sine',0.1,0.3,0.12);
+  beep(200,'sine',0.18,0.3,0.24);
+}
+function sfxStart() {
+  beep(500,'sine',0.07,0.2);
+  beep(650,'sine',0.07,0.2,0.1);
+  beep(800,'sine',0.1,0.2,0.2);
+}
+
+/* ── Helpers ─────────────────────────────────────────────── */
+function rand(a,b){ return a + Math.random()*(b-a); }
+function randInt(a,b){ return Math.floor(rand(a,b+1)); }
+
+function updateHUD() {
+  scoreBox.textContent = '🐟 ' + score;
+  timerBox.textContent = '⏱ ' + timeLeft;
+  const hearts = Array(MAX_MISSES).fill(null)
+    .map((_,i) => i < (MAX_MISSES - misses) ? '❤️' : '🖤').join('');
+  missBox.textContent = hearts;
+}
+
+/* ── Fish ────────────────────────────────────────────────── */
+function spawnFish() {
+  if (!running) return;
+  const areaW = fishArea.offsetWidth;
+  const dir   = Math.random() < 0.5 ? 1 : -1; // 1=left→right, -1=right→left
+  const speed = rand(38, 90); // px/s
+  const el    = document.createElement('div');
+  el.className = 'fish';
+  el.textContent = FISH_TYPES[randInt(0, FISH_TYPES.length-1)];
+  // flip fish sprite to match movement direction
+  el.style.transform = dir === 1
+    ? 'translateY(-50%)'
+    : 'translateY(-50%) scaleX(-1)';
+
+  const startX = dir === 1 ? -70 : areaW + 10;
+  el.style.left = startX + 'px';
+  fishArea.appendChild(el);
+
+  const obj = { el, x: startX, speed, dir };
+  activeFish.push(obj);
+
+  // big touch target via click/touch on fish itself
+  el.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    if (!running) return;
+    catchFish(obj);
+  });
+}
+
+function removeFish(obj) {
+  obj.el.remove();
+  activeFish = activeFish.filter(f => f !== obj);
+}
+
+function catchFish(obj) {
+  if (obj.caught) return;
+  obj.caught = true;
+  obj.el.classList.add('caught');
+  score++;
+  updateHUD();
+  sfxCatch();
+  spawnParticles(obj.el);
+  spawnScoreFloat(obj.el);
+  setTimeout(() => removeFish(obj), 200);
+}
+
+/* ── Fish movement loop ──────────────────────────────────── */
+let lastTs = null;
+function gameLoop(ts) {
+  if (!running) return;
+  const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.1) : 0;
+  lastTs = ts;
+  const areaW = fishArea.offsetWidth;
+
+  activeFish.forEach(obj => {
+    if (obj.caught) return;
+    obj.x += obj.speed * obj.dir * dt;
+    obj.el.style.left = obj.x + 'px';
+    // fish exits screen → miss
+    if ((obj.dir === 1 && obj.x > areaW + 80) ||
+        (obj.dir === -1 && obj.x < -80)) {
+      if (!obj.caught && !obj.exited) {
+        obj.exited = true;
+        misses++;
+        updateHUD();
+        sfxMiss();
+        shakeWrap();
+        removeFish(obj);
+        if (misses >= MAX_MISSES) endGame();
+      }
+    }
+  });
+
+  frameID = requestAnimationFrame(gameLoop);
+}
+
+/* ── Throw (tap anywhere in penguin area or whole screen) ── */
+function onScreenTap(e) {
+  if (!running) return;
+  // Ignore taps on buttons
+  if (e.target.classList.contains('btn')) return;
+  ensureCtx();
+
+  const rect    = fishArea.getBoundingClientRect();
+  const penRect = penguinEl.getBoundingClientRect();
+  const tapX    = e.clientX ?? (e.touches && e.touches[0].clientX) ?? penRect.left + penRect.width/2;
+
+  // Determine closest fish to throw direction
+  const fishAreaMidX = rect.left + rect.width / 2;
+  const throwRight   = tapX >= fishAreaMidX;
+
+  // Penguin animation
+  penguinEl.classList.remove('throw-left','throw-right');
+  void penguinEl.offsetWidth;
+  penguinEl.classList.add(throwRight ? 'throw-right' : 'throw-left');
+  setTimeout(() => penguinEl.classList.remove('throw-left','throw-right'), 300);
+
+  sfxThrow();
+  launchProjectile(throwRight);
+  tapHint.style.display = 'none';
+
+  // Ripple feedback
+  spawnRipple(tapX, e.clientY);
+}
+
+function launchProjectile(goRight) {
+  const penRect = penguinEl.getBoundingClientRect();
+  const wrapRect= gameWrap.getBoundingClientRect();
+  const fishRect= fishArea.getBoundingClientRect();
+
+  const proj = document.createElement('div');
+  proj.className = 'projectile';
+  proj.textContent = '🐟';
+
+  // Start position relative to gameWrap
+  const startX = penRect.left - wrapRect.left + penRect.width/2 - 12;
+  const startY = penRect.top  - wrapRect.top  + penRect.height/2 - 12;
+  proj.style.left = startX + 'px';
+  proj.style.top  = startY + 'px';
+  gameWrap.appendChild(proj);
+
+  // Target Y center of fish area
+  const targetY = (fishRect.top - wrapRect.top) + fishRect.height/2;
+  const targetX = goRight
+    ? (fishRect.left - wrapRect.left + fishRect.width * 0.75)
+    : (fishRect.left - wrapRect.left + fishRect.width * 0.25);
+
+  const dx = targetX - startX;
+  const dy = targetY - startY;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const travelMs = Math.max(180, Math.min(350, dist * 1.2));
+
+  let start = null;
+  function animProj(ts) {
+    if (!start) start = ts;
+    const t = Math.min((ts - start) / travelMs, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    proj.style.left = (startX + dx * ease) + 'px';
+    proj.style.top  = (startY + dy * ease) + 'px';
+    if (t < 1) {
+      requestAnimationFrame(animProj);
+    } else {
+      proj.remove();
+      // Hit-test: find nearest uncaught fish in the correct half
+      checkHit(goRight);
+    }
+  }
+  requestAnimationFrame(animProj);
+}
+
+function checkHit(goRight) {
+  if (!running) return;
+  const areaW   = fishArea.offsetWidth;
+  const midX    = areaW / 2;
+  const inZone  = activeFish.filter(f => !f.caught && !f.exited &&
+    (goRight ? f.x + 30 >= midX : f.x + 30 < midX));
+  if (inZone.length === 0) return; // miss, no penalty (kid-friendly)
+  // Catch the nearest one
+  inZone.sort((a,b) => Math.abs(a.x - (goRight ? areaW*0.75 : areaW*0.25)) -
+                       Math.abs(b.x - (goRight ? areaW*0.75 : areaW*0.25)));
+  catchFish(inZone[0]);
+}
+
+/* ── VFX ─────────────────────────────────────────────────── */
+function spawnParticles(fishEl) {
+  const rect    = fishEl.getBoundingClientRect();
+  const wrapRect= gameWrap.getBoundingClientRect();
+  const cx = rect.left - wrapRect.left + rect.width/2;
+  const cy = rect.top  - wrapRect.top  + rect.height/2;
+  for (let i=0; i<6; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = PARTICLE_SET[randInt(0, PARTICLE_SET.length-1)];
+    const angle = (i/6)*Math.PI*2 + rand(-0.3,0.3);
+    const dist  = rand(30,70);
+    p.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle)*dist + 'px');
+    p.style.left = cx + 'px'; p.style.top = cy + 'px';
+    gameWrap.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  }
+}
+function spawnScoreFloat(fishEl) {
+  const rect    = fishEl.getBoundingClientRect();
+  const wrapRect= gameWrap.getBoundingClientRect();
+  const sf = document.createElement('div');
+  sf.className = 'score-float';
+  sf.textContent = '+1 🎉';
+  sf.style.left = (rect.left - wrapRect.left + rect.width/2 - 24) + 'px';
+  sf.style.top  = (rect.top  - wrapRect.top  - 10) + 'px';
+  gameWrap.appendChild(sf);
+  setTimeout(() => sf.remove(), 950);
+}
+function spawnRipple(x, y) {
+  const wrapRect = gameWrap.getBoundingClientRect();
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  r.style.left = (x - wrapRect.left) + 'px';
+  r.style.top  = (y - wrapRect.top)  + 'px';
+  gameWrap.appendChild(r);
+  setTimeout(() => r.remove(), 550);
+}
+function shakeWrap() {
+  gameWrap.style.animation = 'none';
+  void gameWrap.offsetWidth;
+  const kf = [
+    {transform:'translateX(0)'},{transform:'translateX(-7px)'},
+    {transform:'translateX(7px)'},{transform:'translateX(-5px)'},
+    {transform:'translateX(5px)'},{transform:'translateX(0)'}
+  ];
+  gameWrap.animate(kf, {duration:320, easing:'ease-out'});
+}
+
+/* ── Timer ───────────────────────────────────────────────── */
+function tickTimer() {
+  if (!running) return;
+  timeLeft--;
+  updateHUD();
+  if (timeLeft <= 0) endGame();
+}
+
+/* ── Spawn schedule ──────────────────────────────────────── */
+let spawnInterval = 2200;
+function scheduleSpawn() {
+  if (!running) return;
+  const delay = Math.max(800, spawnInterval - (DURATION - timeLeft) * 18);
+  spawnID = setTimeout(() => {
+    spawnFish();
+    scheduleSpawn();
+  }, delay);
+}
+
+/* ── Game lifecycle ──────────────────────────────────────── */
+function startGame() {
+  score    = 0; misses   = 0;
+  timeLeft = DURATION;
+  running  = true;
+  lastTs   = null;
+  activeFish.forEach(f => f.el.remove());
+  activeFish = [];
+  tapHint.style.display = '';
+  startScreen.style.display = 'none';
+  overScreen.style.display  = 'none';
+  updateHUD();
+  sfxStart();
+  timerID = setInterval(tickTimer, 1000);
+  scheduleSpawn();
+  frameID = requestAnimationFrame(gameLoop);
+}
+
+function endGame() {
+  running = false;
+  clearInterval(timerID);
+  clearTimeout(spawnID);
+  cancelAnimationFrame(frameID);
+  activeFish.forEach(f => f.el.remove());
+  activeFish = [];
+  sfxGameOver();
+  finalScore.textContent = score + '마리 잡았어요!';
+  overScreen.style.display = 'flex';
+}
+
+/* ── Events ──────────────────────────────────────────────── */
+startBtn.addEventListener('pointerdown', () => startGame());
+retryBtn.addEventListener('pointerdown', () => startGame());
+gameWrap.addEventListener('pointerdown', onScreenTap);
+// Prevent double-fire on fish taps
+fishArea.addEventListener('pointerdown', (e) => e.stopPropagation(), true);
+
+// Show start screen
+startScreen.style.display = 'flex';
+updateHUD();
+</script>
+</body>
+</html>
