@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "frog-tongue-catch",
+        "label": "🐸 개구리 파리 잡기",
+        "path": "frog-tongue-catch/index.html"
+      },
+      {
+        "id": "sushi-conveyor",
+        "label": "🍣 회전초밥 주문받기",
+        "path": "sushi-conveyor/index.html"
+      },
+      {
         "id": "firetruck-rescue",
         "label": "🚒 소방차 출동",
         "path": "firetruck-rescue/index.html"

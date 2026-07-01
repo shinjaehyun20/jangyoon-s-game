@@ -1182,5 +1182,21 @@
     "description": "기차 색깔과 같은 칸을 탭해서 칙칙폭폭 기차를 길게 연결해요! 레벨이 오를수록 색도 많아져요",
     "thumbnail": "color-train-match/thumb.svg",
     "path": "color-train-match/index.html"
+  },
+  {
+    "id": "frog-tongue-catch",
+    "title": "Frog Tongue Catch",
+    "title_ko": "🐸 개구리 파리 잡기",
+    "description": "날아다니는 곤충을 탭하면 개구리 혀가 뻗어 잡아먹어요! 벌은 감점, 40초 도전",
+    "thumbnail": "frog-tongue-catch/thumb.svg",
+    "path": "frog-tongue-catch/index.html"
+  },
+  {
+    "id": "sushi-conveyor",
+    "title": "Sushi Conveyor",
+    "title_ko": "🍣 회전초밥 주문받기",
+    "description": "손님 주문과 같은 초밥이 벨트로 올 때 탭! 콤보 보너스, 50초 도전",
+    "thumbnail": "sushi-conveyor/thumb.svg",
+    "path": "sushi-conveyor/index.html"
   }
 ]

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🍣 회전초밥 주문받기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg1: #2b1a12;
+      --bg2: #4a2f1e;
+      --belt: #3b6ea5;
+      --accent: #ffcf4d;
+      --text: #ffffff;
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg1);
+    }
+    .wrap {
+      position: relative;
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: var(--text);
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .hud .val { color: var(--accent); }
+
+    /* order card */
+    #orderBar {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: linear-gradient(160deg,#5a3a24,#3a2416);
+      border: 2px solid rgba(255,207,77,0.4);
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: var(--text);
+    }
+    #orderBar .cust { font-size: 34px; }
+    #orderBar .wantLabel { font-size: 13px; color: rgba(255,255,255,0.85); }
+    #orderBar .want {
+      font-size: 40px;
+      line-height: 1;
+      animation: bob 1s ease-in-out infinite;
+    }
+    @keyframes bob { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+
+    #gameArea {
+      position: relative;
+      flex: 1;
+      border-radius: 16px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.35);
+      touch-action: none;
+    }
+    /* conveyor belt band in the middle */
+    #belt {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 96px;
+      background:
+        repeating-linear-gradient(90deg,#3b6ea5 0 26px,#345f8f 26px 52px);
+      border-top: 4px solid #2a4d72;
+      border-bottom: 4px solid #2a4d72;
+      box-shadow: inset 0 6px 12px rgba(0,0,0,0.3);
+    }
+    #beltTrack {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 96px;
+      pointer-events: none;
+    }
+    .plate {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 40%, #ffffff, #e6ecf2 70%, #c4ced8);
+      border: 3px solid #ffffff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.35);
+      pointer-events: auto;
+      will-change: transform;
+    }
+    .plate.hit { animation: hitAnim 0.35s ease forwards; }
+    @keyframes hitAnim {
+      0% { transform: translate(-50%,-50%) scale(1); }
+      50% { transform: translate(-50%,-50%) scale(1.35); }
+      100% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+    }
+    .plate.wrong { animation: wrongAnim 0.4s ease; }
+    @keyframes wrongAnim {
+      0%,100% { transform: translate(-50%,-50%) rotate(0); }
+      25% { transform: translate(-50%,-50%) rotate(-12deg); }
+      75% { transform: translate(-50%,-50%) rotate(12deg); }
+    }
+    .float {
+      position: absolute;
+      font-weight: 900;
+      font-size: 22px;
+      z-index: 6;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      animation: rise 0.7s ease forwards;
+    }
+    @keyframes rise {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-40px); opacity: 0; }
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      color: rgba(255,255,255,0.85);
+      font-size: 13px;
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      background: rgba(0,0,0,0.25);
+      padding: 8px 12px;
+      border-radius: 10px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(30,16,8,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 20;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg,#5a3a24,#2b1a12);
+      border: 2px solid rgba(255,207,77,0.45);
+      border-radius: 20px;
+      padding: 26px 22px;
+      text-align: center;
+      color: var(--text);
+      max-width: 340px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; line-height: 1.6; margin-bottom: 18px; color: rgba(255,255,255,0.9); }
+    .result-score { font-size: 46px; font-weight: 900; color: var(--accent); margin: 6px 0; }
+    .btn-start {
+      background: var(--accent);
+      color: #3a2416; border: none;
+      font-size: 20px; font-weight: 900;
+      padding: 14px 34px;
+      border-radius: 30px;
+      min-height: 44px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #c9a300;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: 0 3px 0 #c9a300; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍣 회전초밥 주문받기</h1>
+
+    <div class="hud">
+      <div>점수 <span class="val" id="scoreVal">0</span></div>
+      <div>시간 <span class="val" id="timeVal">50</span></div>
+      <div>최고 <span class="val" id="bestVal">0</span></div>
+    </div>
+
+    <div id="orderBar">
+      <span class="cust" id="custEmoji">🧒</span>
+      <span class="wantLabel">주문:</span>
+      <span class="want" id="wantEmoji">🍣</span>
+    </div>
+
+    <div id="gameArea">
+      <div id="belt"></div>
+      <div id="beltTrack"></div>
+    </div>
+
+    <footer>
+      <small>주문한 초밥이 벨트로 지나갈 때 탭! 🍣</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍣 회전초밥 주문받기</h2>
+      <p>손님이 주문한 초밥이<br>회전 벨트에 지나가요.<br>주문과 <b>똑같은 초밥</b>을 탭하면 정답!<br>다른 걸 탭하면 감점이에요.<br>50초 안에 많이 맞혀요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 수고했어요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_TIME: 50,
+      FOODS: ['🍣','🍤','🍙','🍥','🍡','🍧','🥟','🍰'],
+      CUSTOMERS: ['🧒','👧','👦','🐱','🐶','🐰','🐼','👶'],
+      PLATE_GAP: 76,        // px spacing between plates on the belt
+      SPEED_START: 0.06,    // px per ms
+      SPEED_MAX: 0.13,
+      POINT_GOOD: 12,
+      POINT_BAD: -6,
+      COMBO_BONUS: 4,
+      BEST_KEY: 'sushi-conveyor_best'
+    };
+
+    const gameArea = document.getElementById('gameArea');
+    const beltTrack = document.getElementById('beltTrack');
+    const scoreVal = document.getElementById('scoreVal');
+    const timeVal = document.getElementById('timeVal');
+    const bestVal = document.getElementById('bestVal');
+    const custEmoji = document.getElementById('custEmoji');
+    const wantEmoji = document.getElementById('wantEmoji');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+
+    const state = {
+      running: false,
+      score: 0,
+      timeLeft: CONFIG.GAME_TIME,
+      best: 0,
+      combo: 0,
+      want: '🍣',
+      plates: [],
+      lastSpawnX: 0,
+      speed: CONFIG.SPEED_START,
+      raf: null,
+      lastTs: 0,
+      tickTimer: null
+    };
+
+    function loadBest() {
+      const v = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+      state.best = isNaN(v) ? 0 : v;
+      bestVal.textContent = state.best;
+    }
+    function saveBest() {
+      if (state.score > state.best) {
+        state.best = state.score;
+        localStorage.setItem(CONFIG.BEST_KEY, String(state.best));
+      }
+    }
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function newOrder() {
+      state.want = pick(CONFIG.FOODS);
+      wantEmoji.textContent = state.want;
+      custEmoji.textContent = pick(CONFIG.CUSTOMERS);
+    }
+
+    function makePlate(x) {
+      // Bias so the wanted food appears often enough (~40%)
+      let food;
+      if (Math.random() < 0.4) {
+        food = state.want;
+      } else {
+        food = pick(CONFIG.FOODS);
+      }
+      const el = document.createElement('div');
+      el.className = 'plate';
+      el.textContent = food;
+
+      const plate = { el, food, x: x, alive: true };
+      el.style.left = x + 'px';
+
+      el.addEventListener('pointerdown', function (ev) {
+        ev.preventDefault();
+        tapPlate(plate);
+      });
+
+      beltTrack.appendChild(el);
+      state.plates.push(plate);
+      return plate;
+    }
+
+    function floatText(x, txt, good) {
+      const f = document.createElement('div');
+      f.className = 'float';
+      f.textContent = txt;
+      f.style.left = x + 'px';
+      f.style.top = '50%';
+      f.style.color = good ? 'var(--accent)' : '#ff8a8a';
+      gameArea.appendChild(f);
+      setTimeout(function () { f.remove(); }, 700);
+    }
+
+    function tapPlate(plate) {
+      if (!plate.alive || !state.running) return;
+
+      if (plate.food === state.want) {
+        plate.alive = false;
+        state.combo++;
+        const bonus = Math.min(state.combo - 1, 5) * CONFIG.COMBO_BONUS;
+        const gained = CONFIG.POINT_GOOD + bonus;
+        state.score += gained;
+        scoreVal.textContent = state.score;
+        floatText(plate.x, '+' + gained, true);
+        plate.el.classList.add('hit');
+        setTimeout((function (p) { return function () { removePlate(p); }; })(plate), 340);
+        newOrder();
+      } else {
+        // wrong food
+        state.combo = 0;
+        state.score = Math.max(0, state.score + CONFIG.POINT_BAD);
+        scoreVal.textContent = state.score;
+        floatText(plate.x, CONFIG.POINT_BAD, false);
+        plate.el.classList.remove('wrong');
+        // force reflow to restart animation
+        void plate.el.offsetWidth;
+        plate.el.classList.add('wrong');
+      }
+    }
+
+    function removePlate(plate) {
+      const i = state.plates.indexOf(plate);
+      if (i >= 0) state.plates.splice(i, 1);
+      if (plate.el && plate.el.parentNode) plate.el.parentNode.removeChild(plate.el);
+    }
+
+    function areaW() { return gameArea.clientWidth; }
+
+    function loop(ts) {
+      if (!state.running) return;
+      const dt = state.lastTs ? (ts - state.lastTs) : 16;
+      state.lastTs = ts;
+      const w = areaW();
+
+      // move plates left to right
+      for (let i = state.plates.length - 1; i >= 0; i--) {
+        const p = state.plates[i];
+        p.x += state.speed * dt;
+        p.el.style.left = p.x + 'px';
+        if (p.x > w + 50) {
+          removePlate(p);
+        }
+      }
+
+      // spawn new plates from the left edge as spacing allows
+      if (state.plates.length === 0 || state.lastSpawnX >= CONFIG.PLATE_GAP) {
+        makePlate(-40);
+        state.lastSpawnX = 0;
+      }
+      state.lastSpawnX += state.speed * dt;
+
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function tick() {
+      if (!state.running) return;
+      state.timeLeft--;
+      timeVal.textContent = state.timeLeft;
+      // speed up gradually
+      const progress = 1 - (state.timeLeft / CONFIG.GAME_TIME);
+      state.speed = CONFIG.SPEED_START + (CONFIG.SPEED_MAX - CONFIG.SPEED_START) * progress;
+      if (state.timeLeft <= 0) endGame();
+    }
+
+    function clearPlates() {
+      state.plates.forEach(function (p) {
+        if (p.el && p.el.parentNode) p.el.parentNode.removeChild(p.el);
+      });
+      state.plates = [];
+    }
+
+    function startGame() {
+      clearPlates();
+      state.running = true;
+      state.score = 0;
+      state.combo = 0;
+      state.timeLeft = CONFIG.GAME_TIME;
+      state.speed = CONFIG.SPEED_START;
+      state.lastSpawnX = CONFIG.PLATE_GAP;
+      state.lastTs = 0;
+      scoreVal.textContent = '0';
+      timeVal.textContent = state.timeLeft;
+      newOrder();
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      clearInterval(state.tickTimer);
+      state.tickTimer = setInterval(tick, 1000);
+      cancelAnimationFrame(state.raf);
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(state.tickTimer);
+      cancelAnimationFrame(state.raf);
+      clearPlates();
+
+      saveBest();
+      bestVal.textContent = state.best;
+      finalScore.textContent = state.score;
+
+      let msg;
+      if (state.score >= 260) msg = '🏆 최고의 초밥 요리사!';
+      else if (state.score >= 160) msg = '👍 아주 빠른 손이에요!';
+      else if (state.score >= 80) msg = '😊 좋아요, 더 도전!';
+      else msg = '🍣 다시 해볼까요?';
+      resultMsg.textContent = msg;
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    loadBest();
+  })();
+  </script>
+</body>
+</html>

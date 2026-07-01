@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="ftcBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a8f63"/>
+      <stop offset="0.55" stop-color="#1c6b4a"/>
+      <stop offset="1" stop-color="#0f3d2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#ftcBg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <!-- ground -->
+  <rect x="0" y="140" width="320" height="40" fill="#0c3728"/>
+  <rect x="0" y="138" width="320" height="3" fill="rgba(255,255,255,0.15)"/>
+
+  <!-- flying bugs -->
+  <text x="70" y="55" font-size="26">🪰</text>
+  <text x="150" y="42" font-size="26">🦋</text>
+  <text x="40" y="98" font-size="24">🐞</text>
+
+  <!-- tongue from frog to a bug -->
+  <line x1="118" y1="150" x2="82" y2="60" stroke="#ff6f8f" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="82" cy="60" r="8" fill="#ff6f8f"/>
+
+  <!-- frog -->
+  <text x="98" y="168" font-size="52">🐸</text>
+
+  <!-- lily -->
+  <text x="255" y="170" font-size="30">🪷</text>
+
+  <!-- title -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="118" text-anchor="end" font-size="22" font-weight="900" fill="#ffe14d">파리 잡기</text>
+    <text x="296" y="136" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">FROG TONGUE</text>
+  </g>
+</svg>
