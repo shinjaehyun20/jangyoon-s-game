@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐞 무당벌레 잎사귀 건너기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg1: #0a3d5c;
+      --bg2: #145e8a;
+      --accent: #ffd23f;
+      --text: #ffffff;
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg1);
+    }
+    .wrap {
+      position: relative;
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: var(--text);
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .hud .val { color: var(--accent); }
+    #gameArea {
+      position: relative;
+      flex: 1;
+      border-radius: 16px;
+      overflow: hidden;
+      background: radial-gradient(120% 80% at 50% 0%, #1c7fae 0%, var(--bg2) 55%, var(--bg1) 100%);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.35);
+      touch-action: none;
+    }
+    .leaf {
+      position: absolute;
+      font-size: 40px;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 3px 3px rgba(0,0,0,0.35));
+      transition: transform 0.15s ease;
+    }
+    .leaf.sink {
+      animation: sinkdown 0.5s ease forwards;
+    }
+    @keyframes sinkdown {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -20%) scale(0.6); opacity: 0; }
+    }
+    #ladybug {
+      position: absolute;
+      font-size: 40px;
+      z-index: 5;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
+      transition: left 0.22s cubic-bezier(.34,1.4,.64,1), top 0.22s cubic-bezier(.34,1.4,.64,1);
+    }
+    #ladybug.jump { transform: translate(-50%, -70%) scale(1.15) rotate(-8deg); }
+    #ladybug.fall {
+      transition: top 0.5s ease, opacity 0.5s ease;
+      opacity: 0;
+    }
+    .ripple {
+      position: absolute;
+      width: 10px; height: 10px;
+      border: 3px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: ripple 0.6s ease forwards;
+      pointer-events: none;
+    }
+    @keyframes ripple {
+      0% { width: 10px; height: 10px; opacity: 1; }
+      100% { width: 70px; height: 70px; opacity: 0; }
+    }
+    .float {
+      position: absolute;
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 20px;
+      z-index: 6;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      animation: rise 0.7s ease forwards;
+      transform: translate(-50%, 0);
+    }
+    @keyframes rise {
+      0% { transform: translate(-50%, 0); opacity: 1; }
+      100% { transform: translate(-50%, -40px); opacity: 0; }
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      color: rgba(255,255,255,0.85);
+      font-size: 13px;
+    }
+    .home-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      background: rgba(0,0,0,0.25);
+      padding: 8px 12px;
+      border-radius: 10px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(6,20,32,0.82);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 20;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, #145e8a, #0a3d5c);
+      border: 2px solid rgba(255,210,63,0.4);
+      border-radius: 20px;
+      padding: 26px 22px;
+      text-align: center;
+      color: var(--text);
+      max-width: 340px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; line-height: 1.6; margin-bottom: 18px; color: rgba(255,255,255,0.9); }
+    .result-score { font-size: 46px; font-weight: 900; color: var(--accent); margin: 6px 0; }
+    .btn-start {
+      background: var(--accent);
+      color: #123; border: none;
+      font-size: 20px; font-weight: 900;
+      padding: 14px 34px;
+      border-radius: 30px;
+      min-height: 44px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #c9a800;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: 0 3px 0 #c9a800; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🐞 무당벌레 잎사귀 건너기</h1>
+
+    <div class="hud">
+      <div>점수 <span class="val" id="scoreVal">0</span></div>
+      <div>목숨 <span class="val" id="livesVal">3</span></div>
+      <div>최고 <span class="val" id="bestVal">0</span></div>
+    </div>
+
+    <div id="gameArea"></div>
+
+    <footer>
+      <small>다음 반짝이는 잎사귀를 탭하면 무당벌레가 폴짝 뛰어요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🐞 무당벌레 잎사귀 건너기</h2>
+      <p>연못 위에 떠 있는 잎사귀를<br>순서대로 탭하면 무당벌레가<br>폴짝폴짝 건너가요!<br>다른 잎사귀를 탭하면 목숨이 하나 줄어요.<br>목숨 3개 안에서 최대한 멀리 가봐요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 잘 건넜어요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      START_LIVES: 3,
+      LEAF_COUNT: 3,          // number of leaves visible at once (current + 2 upcoming)
+      MIN_GAP_Y: 70,          // min vertical spacing between leaves (px, scaled)
+      MAX_GAP_Y: 130,
+      POINT_PER_HOP: 10,
+      BEST_KEY: 'ladybug-leaf-hop_best'
+    };
+
+    const gameArea = document.getElementById('gameArea');
+    const scoreVal = document.getElementById('scoreVal');
+    const livesVal = document.getElementById('livesVal');
+    const bestVal = document.getElementById('bestVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+
+    const state = {
+      running: false,
+      score: 0,
+      lives: CONFIG.START_LIVES,
+      best: 0,
+      leaves: [],
+      currentIndex: 0,
+      ladybugEl: null,
+      nextLeafId: 0
+    };
+
+    function loadBest() {
+      const v = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+      state.best = isNaN(v) ? 0 : v;
+      bestVal.textContent = state.best;
+    }
+
+    function saveBest() {
+      if (state.score > state.best) {
+        state.best = state.score;
+        localStorage.setItem(CONFIG.BEST_KEY, String(state.best));
+      }
+    }
+
+    function rand(min, max) { return Math.random() * (max - min) + min; }
+
+    function areaSize() {
+      return { w: gameArea.clientWidth, h: gameArea.clientHeight };
+    }
+
+    function floatText(x, y, txt, good) {
+      const f = document.createElement('div');
+      f.className = 'float';
+      f.textContent = txt;
+      f.style.left = x + 'px';
+      f.style.top = y + 'px';
+      f.style.color = good ? 'var(--accent)' : '#ff8a8a';
+      gameArea.appendChild(f);
+      setTimeout(function () { f.remove(); }, 700);
+    }
+
+    function ripple(x, y) {
+      const r = document.createElement('div');
+      r.className = 'ripple';
+      r.style.left = x + 'px';
+      r.style.top = y + 'px';
+      gameArea.appendChild(r);
+      setTimeout(function () { r.remove(); }, 620);
+    }
+
+    function makeLeaf(y, active) {
+      const { w } = areaSize();
+      const x = rand(w * 0.18, w * 0.82);
+      const el = document.createElement('div');
+      el.className = 'leaf';
+      el.textContent = '🍃';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.filter = active
+        ? 'drop-shadow(0 0 10px rgba(255,210,63,0.9)) drop-shadow(0 3px 3px rgba(0,0,0,0.35))'
+        : 'drop-shadow(0 3px 3px rgba(0,0,0,0.35))';
+      gameArea.insertBefore(el, gameArea.firstChild);
+
+      const id = state.nextLeafId++;
+      const leaf = { id, el, x, y };
+      el.addEventListener('pointerdown', function (ev) {
+        ev.preventDefault();
+        onLeafTap(leaf);
+      });
+      return leaf;
+    }
+
+    function setActiveHighlight() {
+      state.leaves.forEach(function (leaf, i) {
+        leaf.el.style.filter = (i === state.currentIndex)
+          ? 'drop-shadow(0 0 10px rgba(255,210,63,0.9)) drop-shadow(0 3px 3px rgba(0,0,0,0.35))'
+          : 'drop-shadow(0 3px 3px rgba(0,0,0,0.35))';
+      });
+    }
+
+    function positionLadybug(leaf, animate) {
+      if (!state.ladybugEl) return;
+      state.ladybugEl.style.left = leaf.x + 'px';
+      state.ladybugEl.style.top = leaf.y + 'px';
+      if (animate) {
+        state.ladybugEl.classList.add('jump');
+        setTimeout(function () {
+          if (state.ladybugEl) state.ladybugEl.classList.remove('jump');
+        }, 220);
+      }
+    }
+
+    function pushNewLeaf() {
+      const { h } = areaSize();
+      const last = state.leaves[state.leaves.length - 1];
+      const gap = rand(CONFIG.MIN_GAP_Y, CONFIG.MAX_GAP_Y);
+      let y = last.y - gap;
+      if (y < h * 0.12) {
+        // recycle from bottom (endless upward scroll feel without actual scroll)
+        y = h * 0.85 + rand(0, 20);
+      }
+      const leaf = makeLeaf(y, false);
+      state.leaves.push(leaf);
+    }
+
+    function onLeafTap(leaf) {
+      if (!state.running) return;
+      const idx = state.leaves.indexOf(leaf);
+      if (idx === state.currentIndex) {
+        // correct hop
+        state.score += CONFIG.POINT_PER_HOP;
+        scoreVal.textContent = state.score;
+        floatText(leaf.x - 6, leaf.y - 10, '+' + CONFIG.POINT_PER_HOP, true);
+        positionLadybug(leaf, true);
+
+        // sink the old leaves behind (before currentIndex), advance
+        const oldLeaf = state.leaves.shift(); // remove the one we just left behind is actually leaves[0]
+        // Note: leaves[0] is the one ladybug just left; sink it
+        if (oldLeaf && oldLeaf !== leaf) {
+          oldLeaf.el.classList.add('sink');
+          setTimeout(function () {
+            if (oldLeaf.el.parentNode) oldLeaf.el.parentNode.removeChild(oldLeaf.el);
+          }, 500);
+        }
+        state.currentIndex = 0; // after shift, current leaf is now at index 0
+        pushNewLeaf();
+        setActiveHighlight();
+      } else if (idx > state.currentIndex) {
+        // tapped a future leaf out of order — treat as miss
+        loseLife(leaf);
+      } else {
+        // tapped a leaf already passed — ignore
+      }
+    }
+
+    function loseLife(leaf) {
+      state.lives--;
+      livesVal.textContent = Math.max(0, state.lives);
+      ripple(leaf.x, leaf.y);
+      floatText(leaf.x - 10, leaf.y - 10, '풍덩!', false);
+      if (state.lives <= 0) {
+        setTimeout(endGame, 400);
+      }
+    }
+
+    function clearLeaves() {
+      state.leaves.forEach(function (l) {
+        if (l.el.parentNode) l.el.parentNode.removeChild(l.el);
+      });
+      state.leaves = [];
+    }
+
+    function startGame() {
+      clearLeaves();
+      if (state.ladybugEl && state.ladybugEl.parentNode) {
+        state.ladybugEl.parentNode.removeChild(state.ladybugEl);
+      }
+      state.running = true;
+      state.score = 0;
+      state.lives = CONFIG.START_LIVES;
+      state.currentIndex = 0;
+      scoreVal.textContent = '0';
+      livesVal.textContent = state.lives;
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      const { h } = areaSize();
+      // build initial leaves from bottom to top
+      const startY = h * 0.82;
+      let y = startY;
+      for (let i = 0; i < CONFIG.LEAF_COUNT + 2; i++) {
+        const leaf = makeLeaf(y, i === 0);
+        state.leaves.push(leaf);
+        y -= rand(CONFIG.MIN_GAP_Y, CONFIG.MAX_GAP_Y);
+      }
+
+      const ladybug = document.createElement('div');
+      ladybug.id = 'ladybug';
+      ladybug.textContent = '🐞';
+      gameArea.appendChild(ladybug);
+      state.ladybugEl = ladybug;
+      positionLadybug(state.leaves[0], false);
+      setActiveHighlight();
+    }
+
+    function endGame() {
+      state.running = false;
+      saveBest();
+      bestVal.textContent = state.best;
+      finalScore.textContent = state.score;
+
+      let msg;
+      if (state.score >= 150) msg = '🏆 최고의 잎사귀 챔피언!';
+      else if (state.score >= 90) msg = '👍 정말 잘 건넜어요!';
+      else if (state.score >= 40) msg = '😊 좋아요, 더 도전해봐요!';
+      else msg = '🐞 다시 해볼까요?';
+      resultMsg.textContent = msg;
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    loadBest();
+  })();
+  </script>
+</body>
+</html>

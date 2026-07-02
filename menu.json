@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "hamster-wheel-run",
+        "label": "🐹 햄스터 쳇바퀴 달리기",
+        "path": "hamster-wheel-run/index.html"
+      },
+      {
+        "id": "ladybug-leaf-hop",
+        "label": "🐞 무당벌레 잎사귀 건너기",
+        "path": "ladybug-leaf-hop/index.html"
+      },
+      {
         "id": "frog-tongue-catch",
         "label": "🐸 개구리 파리 잡기",
         "path": "frog-tongue-catch/index.html"

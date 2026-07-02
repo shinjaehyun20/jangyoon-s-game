@@ -1198,5 +1198,21 @@
     "description": "손님 주문과 같은 초밥이 벨트로 올 때 탭! 콤보 보너스, 50초 도전",
     "thumbnail": "sushi-conveyor/thumb.svg",
     "path": "sushi-conveyor/index.html"
+  },
+  {
+    "id": "hamster-wheel-run",
+    "title": "Hamster Wheel Run",
+    "title_ko": "🐹 햄스터 쳇바퀴 달리기",
+    "description": "빠르게 탭해서 쳇바퀴를 굴려요! 도토리 탭하면 보너스, 30초 도전",
+    "thumbnail": "hamster-wheel-run/thumb.svg",
+    "path": "hamster-wheel-run/index.html"
+  },
+  {
+    "id": "ladybug-leaf-hop",
+    "title": "Ladybug Leaf Hop",
+    "title_ko": "🐞 무당벌레 잎사귀 건너기",
+    "description": "반짝이는 잎사귀를 순서대로 탭해 폴짝폴짝 건너기! 목숨 3개",
+    "thumbnail": "ladybug-leaf-hop/thumb.svg",
+    "path": "ladybug-leaf-hop/index.html"
   }
 ]

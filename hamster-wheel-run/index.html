@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🐹 햄스터 쳇바퀴 달리기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg1: #fff3d6;
+      --bg2: #ffd98a;
+      --accent: #ff8c3b;
+      --text: #5a3a1a;
+    }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg1);
+    }
+    .wrap {
+      position: relative;
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: var(--text);
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.55);
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .hud .val { color: var(--accent); }
+    #gameArea {
+      position: relative;
+      flex: 1;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #ffe6ad 0%, var(--bg2) 100%);
+      box-shadow: inset 0 0 40px rgba(150,100,30,0.18);
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #wheel {
+      position: relative;
+      width: 62%;
+      aspect-ratio: 1 / 1;
+      max-height: 60%;
+      border-radius: 50%;
+      border: 10px solid #c98a3a;
+      background:
+        repeating-conic-gradient(#e8ac5a 0deg 15deg, #d9944a 15deg 30deg);
+      box-shadow: 0 8px 0 rgba(120,70,20,0.35), inset 0 0 0 6px #fff3d6;
+      transition: transform 0.05s linear;
+    }
+    #hamster {
+      position: absolute;
+      left: 50%; top: 62%;
+      transform: translate(-50%, -50%);
+      font-size: 15vw;
+      max-font-size: 64px;
+      z-index: 5;
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.25));
+    }
+    #hamster.bounce { animation: bounce 0.15s ease; }
+    @keyframes bounce {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -58%) scale(1.08); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+    #track {
+      position: absolute;
+      left: 0; right: 0; bottom: 10%;
+      height: 14%;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .acorn {
+      position: absolute;
+      font-size: 26px;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));
+      animation: rollby linear forwards;
+    }
+    @keyframes rollby {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-120vw); }
+    }
+    .speedline {
+      position: absolute;
+      height: 4px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 4px;
+      animation: speedmove linear forwards;
+    }
+    @keyframes speedmove {
+      0% { transform: translateX(120%); opacity: 0.9; }
+      100% { transform: translateX(-220%); opacity: 0; }
+    }
+    .float {
+      position: absolute;
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 20px;
+      z-index: 6;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(255,255,255,0.7);
+      animation: rise 0.7s ease forwards;
+    }
+    @keyframes rise {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-40px); opacity: 0; }
+    }
+    #tapHint {
+      position: absolute;
+      bottom: 3%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 14px;
+      background: rgba(255,255,255,0.7);
+      padding: 6px 14px;
+      border-radius: 20px;
+      pointer-events: none;
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .home-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      background: var(--accent);
+      padding: 8px 12px;
+      border-radius: 10px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(90,58,26,0.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 20;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(160deg, #fff3d6, #ffd98a);
+      border: 2px solid rgba(255,140,59,0.5);
+      border-radius: 20px;
+      padding: 26px 22px;
+      text-align: center;
+      color: var(--text);
+      max-width: 340px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; line-height: 1.6; margin-bottom: 18px; }
+    .result-score { font-size: 46px; font-weight: 900; color: var(--accent); margin: 6px 0; }
+    .btn-start {
+      background: var(--accent);
+      color: #fff; border: none;
+      font-size: 20px; font-weight: 900;
+      padding: 14px 34px;
+      border-radius: 30px;
+      min-height: 44px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #c9631a;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: 0 3px 0 #c9631a; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🐹 햄스터 쳇바퀴 달리기</h1>
+
+    <div class="hud">
+      <div>거리 <span class="val" id="scoreVal">0</span>m</div>
+      <div>시간 <span class="val" id="timeVal">30</span></div>
+      <div>최고 <span class="val" id="bestVal">0</span>m</div>
+    </div>
+
+    <div id="gameArea">
+      <div id="wheel">
+        <div id="hamster">🐹</div>
+      </div>
+      <div id="track"></div>
+      <div id="tapHint">빠르게 탭! 탭! 탭!</div>
+    </div>
+
+    <footer>
+      <small>화면을 빠르게 탭해서 쳇바퀴를 굴려요! 도토리 보너스 🌰</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🐹 햄스터 쳇바퀴 달리기</h2>
+      <p>화면을 빠르게 콩콩 탭해서<br>햄스터 쳇바퀴를 힘차게 굴려요!<br>🌰 도토리가 지나갈 때 계속 탭하면<br>보너스 거리를 더 받아요.<br>30초 동안 최대한 멀리 달려봐요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 잘 달렸어요!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      GAME_TIME: 30,
+      TAP_DISTANCE: 1,       // meters per tap
+      SPIN_PER_TAP: 26,      // deg rotation per tap
+      DECAY_PER_TICK: 0.92,  // wheel speed decay per 100ms
+      ACORN_MIN: 900,
+      ACORN_MAX: 1700,
+      ACORN_BONUS: 5,
+      BEST_KEY: 'hamster-wheel-run_best'
+    };
+
+    const gameArea = document.getElementById('gameArea');
+    const wheel = document.getElementById('wheel');
+    const hamster = document.getElementById('hamster');
+    const track = document.getElementById('track');
+    const scoreVal = document.getElementById('scoreVal');
+    const timeVal = document.getElementById('timeVal');
+    const bestVal = document.getElementById('bestVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const finalScore = document.getElementById('finalScore');
+    const resultMsg = document.getElementById('resultMsg');
+    const tapHint = document.getElementById('tapHint');
+
+    const state = {
+      running: false,
+      distance: 0,
+      timeLeft: CONFIG.GAME_TIME,
+      best: 0,
+      rotation: 0,
+      speed: 0,
+      tickTimer: null,
+      decayTimer: null,
+      acornTimer: null,
+      raf: null
+    };
+
+    function loadBest() {
+      const v = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+      state.best = isNaN(v) ? 0 : v;
+      bestVal.textContent = state.best;
+    }
+
+    function saveBest() {
+      if (state.distance > state.best) {
+        state.best = state.distance;
+        localStorage.setItem(CONFIG.BEST_KEY, String(state.best));
+      }
+    }
+
+    function rand(min, max) { return Math.random() * (max - min) + min; }
+
+    function floatText(txt, good) {
+      const f = document.createElement('div');
+      f.className = 'float';
+      f.textContent = txt;
+      f.style.left = (gameArea.clientWidth / 2 - 20) + 'px';
+      f.style.top = (gameArea.clientHeight * 0.22) + 'px';
+      f.style.color = good ? 'var(--accent)' : '#c0392b';
+      gameArea.appendChild(f);
+      setTimeout(function () { f.remove(); }, 700);
+    }
+
+    function spawnSpeedline() {
+      if (!state.running) return;
+      const line = document.createElement('div');
+      line.className = 'speedline';
+      line.style.width = rand(30, 70) + 'px';
+      line.style.top = rand(10, 90) + '%';
+      line.style.animationDuration = Math.max(0.25, 0.8 - state.speed * 0.03) + 's';
+      wheel.appendChild(line);
+      setTimeout(function () { line.remove(); }, 900);
+    }
+
+    let activeAcorn = null;
+
+    function spawnAcorn() {
+      if (!state.running) return;
+      const el = document.createElement('div');
+      el.className = 'acorn';
+      el.textContent = '🌰';
+      el.style.bottom = '0';
+      el.style.animationDuration = '2.2s';
+      track.appendChild(el);
+      activeAcorn = { el, collected: false, born: performance.now() };
+      const acornRef = activeAcorn;
+
+      el.addEventListener('pointerdown', function (ev) {
+        ev.preventDefault();
+        if (acornRef.collected) return;
+        acornRef.collected = true;
+        state.distance += CONFIG.ACORN_BONUS;
+        scoreVal.textContent = state.distance;
+        floatText('+' + CONFIG.ACORN_BONUS + 'm 🌰', true);
+        el.style.transition = 'transform 0.2s, opacity 0.2s';
+        el.style.transform += ' scale(1.6)';
+        el.style.opacity = '0';
+      });
+
+      setTimeout(function () {
+        if (el.parentNode) el.parentNode.removeChild(el);
+        if (activeAcorn === acornRef) activeAcorn = null;
+        scheduleAcorn();
+      }, 2300);
+    }
+
+    function scheduleAcorn() {
+      if (!state.running) return;
+      clearTimeout(state.acornTimer);
+      state.acornTimer = setTimeout(spawnAcorn, rand(CONFIG.ACORN_MIN, CONFIG.ACORN_MAX));
+    }
+
+    function onTap(ev) {
+      if (!state.running) return;
+      ev.preventDefault();
+      state.speed = Math.min(state.speed + 3.2, 22);
+      state.distance += CONFIG.TAP_DISTANCE;
+      scoreVal.textContent = state.distance;
+      hamster.classList.remove('bounce');
+      void hamster.offsetWidth;
+      hamster.classList.add('bounce');
+      tapHint.style.opacity = '0';
+      spawnSpeedline();
+    }
+
+    function loop() {
+      if (!state.running) return;
+      state.rotation += state.speed;
+      wheel.style.transform = 'rotate(' + state.rotation + 'deg)';
+      state.raf = requestAnimationFrame(loop);
+    }
+
+    function decayTick() {
+      if (!state.running) return;
+      state.speed *= CONFIG.DECAY_PER_TICK;
+      if (state.speed < 0.15) state.speed = 0;
+      if (state.speed < 1) tapHint.style.opacity = '1';
+    }
+
+    function tick() {
+      if (!state.running) return;
+      state.timeLeft--;
+      timeVal.textContent = state.timeLeft;
+      if (state.timeLeft <= 0) endGame();
+    }
+
+    function clearAcorns() {
+      track.innerHTML = '';
+      activeAcorn = null;
+    }
+
+    function startGame() {
+      clearAcorns();
+      state.running = true;
+      state.distance = 0;
+      state.timeLeft = CONFIG.GAME_TIME;
+      state.rotation = 0;
+      state.speed = 0;
+      scoreVal.textContent = '0';
+      timeVal.textContent = state.timeLeft;
+      tapHint.style.opacity = '1';
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      clearInterval(state.tickTimer);
+      state.tickTimer = setInterval(tick, 1000);
+      clearInterval(state.decayTimer);
+      state.decayTimer = setInterval(decayTick, 100);
+      cancelAnimationFrame(state.raf);
+      state.raf = requestAnimationFrame(loop);
+      scheduleAcorn();
+    }
+
+    function endGame() {
+      state.running = false;
+      clearInterval(state.tickTimer);
+      clearInterval(state.decayTimer);
+      clearTimeout(state.acornTimer);
+      cancelAnimationFrame(state.raf);
+      clearAcorns();
+
+      saveBest();
+      bestVal.textContent = state.best;
+      finalScore.textContent = state.distance + 'm';
+
+      let msg;
+      if (state.distance >= 140) msg = '🏆 최고의 달리기 챔피언!';
+      else if (state.distance >= 90) msg = '👍 아주 빠르게 달렸어요!';
+      else if (state.distance >= 50) msg = '😊 좋아요, 더 빨리 탭해봐요!';
+      else msg = '🐹 다시 도전해볼까요?';
+      resultMsg.textContent = msg;
+
+      endOverlay.classList.remove('hidden');
+    }
+
+    gameArea.addEventListener('pointerdown', onTap);
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    loadBest();
+  })();
+  </script>
+</body>
+</html>

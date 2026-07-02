@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c7fae"/>
+      <stop offset="100%" stop-color="#0a3d5c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <text x="60" y="140" font-size="34">🍃</text>
+  <text x="110" y="105" font-size="34">🍃</text>
+  <text x="150" y="65" font-size="34">🍃</text>
+  <text x="120" y="90" font-size="44">🐞</text>
+  <circle cx="60" cy="150" r="14" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffd23f">무당벌레 잎사귀 건너기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">LADYBUG LEAF HOP</text>
+  </g>
+</svg>
