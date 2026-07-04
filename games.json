@@ -1,5 +1,21 @@
 [
   {
+    "id": "tunnel-dash",
+    "title": "Tunnel Dash",
+    "title_ko": "🌀 터널 달리기",
+    "description": "3D 터널을 달리며 좌우로 장애물 피하고 보석 모으기! 30초 도전",
+    "thumbnail": "tunnel-dash/thumb.svg",
+    "path": "tunnel-dash/index.html"
+  },
+  {
+    "id": "diving-board-jump",
+    "title": "Diving Board Jump",
+    "title_ko": "🤿 다이빙대 점프",
+    "description": "타이밍 맞춰 점프! 물결 링 중앙에 정확히 착수하면 고득점, 5회 도전",
+    "thumbnail": "diving-board-jump/thumb.svg",
+    "path": "diving-board-jump/index.html"
+  },
+  {
     "id": "penguin-fish-toss",
     "title": "Penguin Fish Toss",
     "title_ko": "🐧 펭귄 물고기 던지기",

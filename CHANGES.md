@@ -1,5 +1,12 @@
 # 변경 이력
 
+## 2026-07-04 — 터널 달리기 (tunnel-dash) · 다이빙대 점프 (diving-board-jump)
+
+- **오늘 특이사항**: Hermes 커밋 `80be45f`(runner-game/space-catcher 3D 스프라이트)에서 실측한 CSS 3D 기법을 신규 게임 2종에 적용 — WebGL/three.js 없이 `perspective` + `transform-style: preserve-3d` + `translateZ()` 레이어 분리만으로 원근·깊이감 구현.
+- **tunnel-dash** — `#gameArea`에 `perspective: 620px`, 터널 링 4개가 `translateZ(-900px)→translateZ(220px)` 애니메이션으로 화면을 향해 다가오는 터널 러너. 좌우 3레인 이동(버튼/탭/화살표키)으로 장애물(🪨, translateZ 큐브형 정면+측면 레이어)은 피하고 보석(💎)은 획득. 30초 타임어택, localStorage 최고점(`tunnel-dash_best`). 캐릭터는 runner-game과 동일한 그림자(translateZ -24px)+측면(translateZ -8px)+정면(translateZ 16px) 레이어 카드 기법 재사용.
+- **diving-board-jump** — 다이빙대에서 좌우로 ping-pong 스윕하는 물결 링에 타이밍 맞춰 점프하는 게임. 수면은 `rotateX(72deg) translateZ(10px)`로 원근 바닥(space-catcher의 `ship-ring` 기법과 동일 계열)을, 낙하 시 다이버는 `translateZ` 증가+scale 확대로 카메라에 가까워지는 착시를 구현. 착수 정확도(스윕 중앙과의 거리)로 100/70/40/15점 차등, 5회 도전, localStorage 최고점(`diving-board-jump_best`).
+- 각 단일 HTML + SVG 썸네일(320x180, 우하단 타이틀 규격), 이미지 자산은 게임 폴더 자체 보유(외부 의존성 0건). 굿모닝 07-04 PHASE 4 자동 제작.
+
 ## 2026-07-03 — 햄스터 쳇바퀴 달리기 (hamster-wheel-run) · 무당벌레 잎사귀 건너기 (ladybug-leaf-hop)
 
 - **hamster-wheel-run** — 화면을 빠르게 탭할수록 쳇바퀴가 회전하고 거리가 쌓이는 탭 스피드 게임. 지나가는 도토리(🌰)를 탭하면 보너스 거리, 탭을 멈추면 자연 감속, 30초 타임어택, localStorage 최고 거리. 기존 반사류(bounce-ball 등)와 달리 연속 탭 리듬 유지가 핵심 메커니즘.

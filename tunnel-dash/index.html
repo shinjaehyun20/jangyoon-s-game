@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>터널 달리기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: #050815;
+    color: #fff;
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    color: #7dd3fc;
+    text-shadow: 0 0 14px rgba(125,211,252,0.4);
+  }
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  #gameArea {
+    position: relative;
+    flex: 1;
+    border-radius: 18px;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 42%, #182a52 0%, #0a1226 55%, #030612 100%);
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+    perspective: 620px;
+    perspective-origin: 50% 42%;
+    touch-action: none;
+    outline: none;
+  }
+  /* 터널 링: preserve-3d 공간에서 translateZ로 깊이를 부여, 애니메이션으로 카메라를 향해 다가오게 함 */
+  .tunnel-stage {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+  .tunnel-ring {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 300px;
+    height: 300px;
+    margin: -150px 0 0 -150px;
+    border-radius: 50%;
+    border: 10px solid rgba(125,211,252,0.55);
+    box-shadow: 0 0 24px rgba(125,211,252,0.35), inset 0 0 24px rgba(125,211,252,0.25);
+    transform-style: preserve-3d;
+    animation: ringApproach 2.6s linear infinite;
+  }
+  .tunnel-ring:nth-child(2) { animation-delay: -0.65s; border-color: rgba(255,209,102,0.5); box-shadow:0 0 24px rgba(255,209,102,0.3), inset 0 0 24px rgba(255,209,102,0.2); }
+  .tunnel-ring:nth-child(3) { animation-delay: -1.3s; }
+  .tunnel-ring:nth-child(4) { animation-delay: -1.95s; border-color: rgba(255,209,102,0.5); box-shadow:0 0 24px rgba(255,209,102,0.3), inset 0 0 24px rgba(255,209,102,0.2); }
+  @keyframes ringApproach {
+    0%   { transform: translateZ(-900px) scale(0.25); opacity: 0; }
+    12%  { opacity: 1; }
+    100% { transform: translateZ(220px) scale(2.1); opacity: 0; }
+  }
+  .lane-line {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, rgba(125,211,252,0.35), transparent);
+  }
+  .lane-line.l1 { left: 25%; } .lane-line.l2 { left: 50%; } .lane-line.l3 { left: 75%; }
+
+  /* 플레이어: 레이어 분리(그림자/측면/정면/글로우) + translateZ 깊이 — Hermes 3D 기법 */
+  .runner {
+    position: absolute;
+    bottom: 14%;
+    width: 66px;
+    height: 82px;
+    left: 50%;
+    transform: translateX(-50%);
+    transform-style: preserve-3d;
+    transition: left 0.16s ease-out;
+    will-change: left, transform;
+  }
+  .runner-shadow {
+    position: absolute;
+    left: 8px; right: 8px; bottom: -6px;
+    height: 14px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(0,0,0,0.5), transparent 72%);
+    filter: blur(5px);
+    transform: translateZ(-24px);
+  }
+  .runner-card {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+    animation: bob 0.55s ease-in-out infinite;
+  }
+  .runner-face, .runner-side {
+    position: absolute; inset: 0;
+    border-radius: 20px;
+    background: url('images/jangyoon.PNG') center/cover no-repeat, linear-gradient(160deg,#7dd3fc,#4d9de0);
+  }
+  .runner-face {
+    transform: translateZ(16px);
+    box-shadow: 0 14px 22px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.2), 0 0 16px rgba(125,211,252,0.3);
+  }
+  .runner-side {
+    inset: 6px 6px 4px;
+    transform: translateZ(-8px) scale(0.94);
+    opacity: 0.3;
+    filter: brightness(0.65) blur(1px);
+  }
+  @keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-6px);} }
+
+  /* 장애물: 큐브형 3D (6면 중 정면/측면만 노출해도 preserve-3d 깊이가 남) */
+  .obstacle {
+    position: absolute;
+    width: 58px; height: 58px;
+    transform-style: preserve-3d;
+    will-change: transform, top;
+  }
+  .obs-shadow {
+    position: absolute; left: 10px; right: 10px; bottom: -4px; height: 10px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(0,0,0,0.5), transparent 74%);
+    filter: blur(4px);
+    transform: translateZ(-16px);
+  }
+  .obs-face {
+    position: absolute; inset: 0;
+    border-radius: 14px;
+    background: linear-gradient(160deg, #ff6b6b, #c0392b);
+    box-shadow: 0 10px 18px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.15);
+    transform: translateZ(14px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .obs-side {
+    position: absolute; inset: 5px 5px 3px;
+    border-radius: 12px;
+    opacity: 0.32;
+    filter: brightness(0.6);
+    background: linear-gradient(160deg, #ff6b6b, #c0392b);
+    transform: translateZ(-8px) scale(0.94);
+  }
+  .gem .obs-face { background: linear-gradient(160deg, #ffd166, #f39c12); }
+  .gem .obs-side { background: linear-gradient(160deg, #ffd166, #f39c12); }
+
+  .lane-controls {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 10px 0;
+  }
+  .lane-controls button {
+    width: 74px; height: 74px;
+    border-radius: 50%;
+    border: 2px solid #7dd3fc;
+    background: rgba(125,211,252,0.14);
+    color: #7dd3fc;
+    font-size: 26px;
+    cursor: pointer;
+  }
+  .lane-controls button:active { background: rgba(125,211,252,0.3); transform: scale(0.95); }
+
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(3,6,18,0.82);
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: rgba(20,32,60,0.95);
+    border-radius: 18px;
+    padding: 24px 28px;
+    text-align: center;
+    max-width: 320px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  }
+  .overlay-card h2 { color: #7dd3fc; margin-bottom: 10px; font-size: 22px; }
+  .overlay-card p { color: #cfe3ff; font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+  .btn-start {
+    min-height: 44px;
+    padding: 10px 26px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#7dd3fc,#4d9de0);
+    color: #05203a;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .result-score { font-size: 40px; font-weight: 900; color: #ffd166; margin: 8px 0; }
+  footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #9fb5d5; }
+  .home-link { color: #7dd3fc; text-decoration: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .tunnel-ring, .runner-card { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌀 터널 달리기</h1>
+  <div class="hud">
+    <div>점수: <span id="score">0</span></div>
+    <div>최고: <span id="best">0</span></div>
+    <div>시간: <span id="timeLeft">30</span>초</div>
+  </div>
+
+  <div id="gameArea" tabindex="0">
+    <div class="tunnel-stage" id="tunnelStage">
+      <div class="tunnel-ring"></div>
+      <div class="tunnel-ring"></div>
+      <div class="tunnel-ring"></div>
+      <div class="tunnel-ring"></div>
+      <div class="lane-line l1"></div>
+      <div class="lane-line l2"></div>
+      <div class="lane-line l3"></div>
+      <div class="runner" id="runner">
+        <div class="runner-shadow"></div>
+        <div class="runner-card">
+          <div class="runner-side"></div>
+          <div class="runner-face"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="startOverlay">
+      <div class="overlay-card">
+        <h2>🌀 터널 달리기</h2>
+        <p>좌우로 움직여 빨간 장애물을 피하고<br>노란 보석💎을 모으세요!<br>30초 동안 최대한 많이!</p>
+        <button class="btn-start" id="startBtn">시작!</button>
+      </div>
+    </div>
+    <div class="overlay hidden" id="endOverlay">
+      <div class="overlay-card">
+        <h2>🎉 게임 종료!</h2>
+        <div class="result-score" id="finalScore">0</div>
+        <p id="resultMsg"></p>
+        <button class="btn-start" id="restartBtn">다시 하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="lane-controls">
+    <button id="leftBtn">◀</button>
+    <button id="rightBtn">▶</button>
+  </div>
+
+  <footer>
+    <small>좌우 버튼 또는 화면 탭으로 이동</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const CONFIG = {
+    DURATION: 30,
+    LANES: [25, 50, 75], // percent
+    SPAWN_INTERVAL: 780,
+    OBJ_FALL_MS: 1400,
+    GEM_CHANCE: 0.38
+  };
+
+  const runner = document.getElementById('runner');
+  const stage = document.getElementById('tunnelStage');
+  const gameArea = document.getElementById('gameArea');
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const timeEl = document.getElementById('timeLeft');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl = document.getElementById('resultMsg');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const leftBtn = document.getElementById('leftBtn');
+  const rightBtn = document.getElementById('rightBtn');
+
+  const BEST_KEY = 'tunnel-dash_best';
+  let state = {
+    lane: 1,
+    score: 0,
+    timeLeft: CONFIG.DURATION,
+    running: false,
+    spawnTimer: null,
+    tickTimer: null,
+    objects: []
+  };
+
+  bestEl.textContent = localStorage.getItem(BEST_KEY) || '0';
+
+  function setLane(idx) {
+    state.lane = Math.max(0, Math.min(2, idx));
+    runner.style.left = CONFIG.LANES[state.lane] + '%';
+  }
+  setLane(1);
+
+  function spawnObject() {
+    const lane = Math.floor(Math.random() * 3);
+    const isGem = Math.random() < CONFIG.GEM_CHANCE;
+    const el = document.createElement('div');
+    el.className = 'obstacle' + (isGem ? ' gem' : '');
+    el.style.left = CONFIG.LANES[lane] + '%';
+    el.style.top = '-10%';
+    el.style.transform = 'translateX(-50%) translateZ(-500px) scale(0.3)';
+    el.innerHTML =
+      '<div class="obs-shadow"></div>' +
+      '<div class="obs-side"></div>' +
+      '<div class="obs-face">' + (isGem ? '💎' : '🪨') + '</div>';
+    stage.appendChild(el);
+
+    const start = performance.now();
+    const obj = { el, lane, isGem, start, resolved: false };
+    state.objects.push(obj);
+
+    requestAnimationFrame(function step(now) {
+      if (!state.running) { return; }
+      const t = Math.min(1, (now - obj.start) / CONFIG.OBJ_FALL_MS);
+      const z = -500 + t * 560; // -500 -> 60 (다가오는 느낌)
+      const scale = 0.3 + t * 0.95;
+      const topPct = -10 + t * 78;
+      el.style.top = topPct + '%';
+      el.style.transform = 'translateX(-50%) translateZ(' + z + 'px) scale(' + scale.toFixed(2) + ')';
+
+      if (!obj.resolved && t > 0.82 && t < 0.98 && obj.lane === state.lane) {
+        obj.resolved = true;
+        if (obj.isGem) {
+          addScore(10);
+          flashRunner('#ffd166');
+        } else {
+          addScore(-5);
+          flashRunner('#ff6b6b');
+        }
+        el.remove();
+        state.objects = state.objects.filter(function (o) { return o !== obj; });
+        return;
+      }
+
+      if (t >= 1) {
+        el.remove();
+        state.objects = state.objects.filter(function (o) { return o !== obj; });
+        return;
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  function flashRunner(color) {
+    runner.style.filter = 'drop-shadow(0 0 14px ' + color + ')';
+    setTimeout(function () { runner.style.filter = ''; }, 200);
+  }
+
+  function addScore(delta) {
+    state.score = Math.max(0, state.score + delta);
+    scoreEl.textContent = state.score;
+    scoreEl.classList.remove('hidden');
+  }
+
+  function startGame() {
+    state.score = 0;
+    state.timeLeft = CONFIG.DURATION;
+    state.running = true;
+    state.objects.forEach(function (o) { o.el.remove(); });
+    state.objects = [];
+    scoreEl.textContent = '0';
+    timeEl.textContent = state.timeLeft;
+    setLane(1);
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+
+    state.spawnTimer = setInterval(spawnObject, CONFIG.SPAWN_INTERVAL);
+    state.tickTimer = setInterval(function () {
+      state.timeLeft -= 1;
+      timeEl.textContent = state.timeLeft;
+      if (state.timeLeft <= 0) { endGame(); }
+    }, 1000);
+    gameArea.focus();
+  }
+
+  function endGame() {
+    state.running = false;
+    clearInterval(state.spawnTimer);
+    clearInterval(state.tickTimer);
+    const best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+    if (state.score > best) {
+      localStorage.setItem(BEST_KEY, String(state.score));
+      bestEl.textContent = state.score;
+      resultMsgEl.textContent = '🎉 최고 기록 경신!';
+    } else {
+      resultMsgEl.textContent = '최고 기록: ' + best;
+    }
+    finalScoreEl.textContent = state.score;
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+  leftBtn.addEventListener('pointerdown', function (e) { e.preventDefault(); if (state.running) setLane(state.lane - 1); });
+  rightBtn.addEventListener('pointerdown', function (e) { e.preventDefault(); if (state.running) setLane(state.lane + 1); });
+
+  gameArea.addEventListener('pointerdown', function (e) {
+    if (!state.running) return;
+    const rect = gameArea.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width / 2) { setLane(state.lane - 1); } else { setLane(state.lane + 1); }
+  });
+
+  window.addEventListener('keydown', function (e) {
+    if (!state.running) return;
+    if (e.key === 'ArrowLeft') setLane(state.lane - 1);
+    if (e.key === 'ArrowRight') setLane(state.lane + 1);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>다이빙대 점프</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: #04263d;
+    color: #fff;
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    color: #7dd3fc;
+    text-shadow: 0 0 14px rgba(125,211,252,0.4);
+  }
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  #gameArea {
+    position: relative;
+    flex: 1;
+    border-radius: 18px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #bfe9ff 0%, #6fc6ea 30%, #1c7fae 55%, #0c4f74 78%, #062f47 100%);
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.3);
+    perspective: 900px;
+    perspective-origin: 50% 30%;
+    touch-action: none;
+    outline: none;
+  }
+  .pool-surface {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 46%;
+    transform-style: preserve-3d;
+  }
+  /* 수면: rotateX로 원근 바닥면 연출 (space-catcher 유사 원근 기법) */
+  .pool-water {
+    position: absolute;
+    left: 50%; bottom: 6%;
+    width: 130%;
+    height: 60%;
+    margin-left: -65%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.35), rgba(56,150,196,0.55) 45%, rgba(10,60,90,0.75) 100%);
+    transform: rotateX(72deg) translateZ(10px);
+    box-shadow: 0 0 40px rgba(125,211,252,0.4);
+    animation: ripple 3.4s ease-in-out infinite;
+  }
+  @keyframes ripple { 0%,100%{ filter:brightness(1);} 50%{ filter:brightness(1.15);} }
+
+  .board-tower {
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    width: 96px;
+    height: 30%;
+    margin-left: -48px;
+    background: linear-gradient(180deg, #e8e8e8, #b6b6b6);
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .board-plank {
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    width: 150px;
+    height: 14px;
+    margin-left: -20px;
+    background: linear-gradient(180deg, #ffd166, #e0a838);
+    border-radius: 6px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+  }
+
+  /* 다이버: 레이어(그림자+정면+측면) + translateZ 깊이. 낙하 시 translateZ 로 카메라에 가까워지는 착시 */
+  .diver {
+    position: absolute;
+    top: 16%;
+    left: 50%;
+    width: 60px;
+    height: 76px;
+    margin-left: 40px;
+    transform-style: preserve-3d;
+    transition: top 0.05s linear, left 0.12s ease-out;
+    will-change: top, transform;
+  }
+  .diver-shadow {
+    position: absolute;
+    left: 8px; right: 8px; bottom: -8px;
+    height: 12px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(0,0,0,0.4), transparent 72%);
+    filter: blur(4px);
+    transform: translateZ(-20px);
+  }
+  .diver-card {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+    animation: sway 1.2s ease-in-out infinite;
+  }
+  .diver-face, .diver-side {
+    position: absolute; inset: 0;
+    border-radius: 18px;
+    background: url('images/jangyoon.PNG') center/cover no-repeat, linear-gradient(160deg,#ffd166,#f39c12);
+  }
+  .diver-face {
+    transform: translateZ(15px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.2);
+  }
+  .diver-side {
+    inset: 6px 6px 4px;
+    transform: translateZ(-8px) scale(0.94);
+    opacity: 0.3;
+    filter: brightness(0.65) blur(1px);
+  }
+  @keyframes sway { 0%,100%{ transform: rotateZ(-3deg);} 50%{ transform: rotateZ(3deg);} }
+
+  .ring-target {
+    position: absolute;
+    width: 74px; height: 26px;
+    border-radius: 50%;
+    border: 6px solid rgba(255,255,255,0.65);
+    box-shadow: 0 0 18px rgba(255,255,255,0.4);
+    transform-style: preserve-3d;
+  }
+
+  .splash {
+    position: absolute;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .splash span {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.8);
+    animation: splashOut 0.5s ease-out forwards;
+  }
+  @keyframes splashOut { 0%{ transform:scale(0.2); opacity:1;} 100%{ transform:scale(1.6); opacity:0;} }
+
+  .jump-controls { display:flex; justify-content:center; padding:10px 0; }
+  #jumpBtn {
+    min-height: 60px;
+    padding: 12px 46px;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(135deg,#7dd3fc,#4d9de0);
+    color: #05203a;
+    font-weight: 800;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(125,211,252,0.3);
+  }
+  #jumpBtn:active { transform: scale(0.96); }
+
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(3,20,32,0.82);
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: rgba(10,45,66,0.95);
+    border-radius: 18px;
+    padding: 24px 28px;
+    text-align: center;
+    max-width: 320px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  }
+  .overlay-card h2 { color: #7dd3fc; margin-bottom: 10px; font-size: 22px; }
+  .overlay-card p { color: #cfe3ff; font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+  .btn-start {
+    min-height: 44px;
+    padding: 10px 26px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#7dd3fc,#4d9de0);
+    color: #05203a;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .result-score { font-size: 40px; font-weight: 900; color: #ffd166; margin: 8px 0; }
+  footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #bcd6ff; }
+  .home-link { color: #7dd3fc; text-decoration: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .diver-card, .pool-water { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🤿 다이빙대 점프</h1>
+  <div class="hud">
+    <div>점수: <span id="score">0</span></div>
+    <div>최고: <span id="best">0</span></div>
+    <div>남은 다이빙: <span id="jumpsLeft">5</span></div>
+  </div>
+
+  <div id="gameArea" tabindex="0">
+    <div class="pool-surface">
+      <div class="pool-water"></div>
+    </div>
+    <div class="board-tower"></div>
+    <div class="board-plank"></div>
+    <div class="ring-target" id="ringTarget"></div>
+    <div class="diver" id="diver">
+      <div class="diver-shadow"></div>
+      <div class="diver-card">
+        <div class="diver-side"></div>
+        <div class="diver-face"></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="startOverlay">
+      <div class="overlay-card">
+        <h2>🤿 다이빙대 점프</h2>
+        <p>물결 링이 다이빙대 아래 위치에 왔을 때<br>점프 버튼을 눌러 착수하세요!<br>정확할수록 높은 점수, 총 5번 도전</p>
+        <button class="btn-start" id="startBtn">시작!</button>
+      </div>
+    </div>
+    <div class="overlay hidden" id="endOverlay">
+      <div class="overlay-card">
+        <h2>🎉 다이빙 완료!</h2>
+        <div class="result-score" id="finalScore">0</div>
+        <p id="resultMsg"></p>
+        <button class="btn-start" id="restartBtn">다시 하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="jump-controls">
+    <button id="jumpBtn">점프!</button>
+  </div>
+
+  <footer>
+    <small>타이밍 맞춰 점프 버튼 탭</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const CONFIG = {
+    TOTAL_JUMPS: 5,
+    RING_SWEEP_MS: 1600,
+    FALL_MS: 620
+  };
+
+  const diver = document.getElementById('diver');
+  const gameArea = document.getElementById('gameArea');
+  const ringTarget = document.getElementById('ringTarget');
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const jumpsLeftEl = document.getElementById('jumpsLeft');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl = document.getElementById('resultMsg');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const jumpBtn = document.getElementById('jumpBtn');
+
+  const BEST_KEY = 'diving-board-jump_best';
+  let state = {
+    score: 0,
+    jumpsLeft: CONFIG.TOTAL_JUMPS,
+    running: false,
+    diving: false,
+    sweepStart: 0,
+    sweepFrame: null
+  };
+
+  bestEl.textContent = localStorage.getItem(BEST_KEY) || '0';
+
+  function positionRing(pct) {
+    // pct: 0(left) ~ 1(right) across pool width band
+    const areaRect = gameArea.getBoundingClientRect();
+    const bandLeft = areaRect.width * 0.18;
+    const bandWidth = areaRect.width * 0.64;
+    ringTarget.style.left = (bandLeft + bandWidth * pct - 37) + 'px';
+    ringTarget.style.bottom = '10%';
+  }
+
+  function sweepRing(ts) {
+    if (!state.running || state.diving) return;
+    if (!state.sweepStart) state.sweepStart = ts;
+    const elapsed = (ts - state.sweepStart) % (CONFIG.RING_SWEEP_MS * 2);
+    const t = elapsed / CONFIG.RING_SWEEP_MS;
+    const pct = t <= 1 ? t : 2 - t; // ping-pong 0->1->0
+    positionRing(pct);
+    state.currentPct = pct;
+    state.sweepFrame = requestAnimationFrame(sweepRing);
+  }
+
+  function doJump() {
+    if (!state.running || state.diving || state.jumpsLeft <= 0) return;
+    state.diving = true;
+    cancelAnimationFrame(state.sweepFrame);
+
+    const targetPct = state.currentPct != null ? state.currentPct : 0.5;
+    const areaRect = gameArea.getBoundingClientRect();
+    const bandLeft = areaRect.width * 0.18;
+    const bandWidth = areaRect.width * 0.64;
+    const targetLeftPx = bandLeft + bandWidth * targetPct;
+    diver.style.left = targetLeftPx + 'px';
+    diver.style.marginLeft = '-30px';
+
+    const startTime = performance.now();
+    function fallStep(now) {
+      const t = Math.min(1, (now - startTime) / CONFIG.FALL_MS);
+      const topPct = 16 + t * 62;
+      const z = t * 60;
+      diver.style.top = topPct + '%';
+      diver.style.transform = 'translateZ(' + z + 'px) scale(' + (1 + t * 0.5).toFixed(2) + ')';
+      if (t < 1) {
+        requestAnimationFrame(fallStep);
+      } else {
+        landDiver(targetPct);
+      }
+    }
+    requestAnimationFrame(fallStep);
+  }
+
+  function landDiver(targetPct) {
+    // 링 중앙(0.5 근처 목표는 없음 — 착수 시점의 링 자체 위치가 목표) : 정확도는 스윕 중앙(0.5)에서의 거리로 계산
+    const distFromCenter = Math.abs(targetPct - 0.5) * 2; // 0 = 완벽, 1 = 가장자리
+    let points = 0;
+    let msg = '';
+    if (distFromCenter < 0.08) { points = 100; msg = '💯 퍼펙트 입수!'; }
+    else if (distFromCenter < 0.22) { points = 70; msg = '👍 훌륭해요!'; }
+    else if (distFromCenter < 0.45) { points = 40; msg = '🙂 괜찮아요!'; }
+    else { points = 15; msg = '💦 풍덩!'; }
+
+    state.score += points;
+    scoreEl.textContent = state.score;
+    showSplash();
+    flashMsg(msg);
+
+    state.jumpsLeft -= 1;
+    jumpsLeftEl.textContent = state.jumpsLeft;
+
+    setTimeout(function () {
+      diver.style.top = '16%';
+      diver.style.left = '50%';
+      diver.style.marginLeft = '40px';
+      diver.style.transform = 'translateZ(0) scale(1)';
+      state.diving = false;
+      if (state.jumpsLeft <= 0) {
+        endGame();
+      } else {
+        state.sweepStart = 0;
+        state.sweepFrame = requestAnimationFrame(sweepRing);
+      }
+    }, 500);
+  }
+
+  function showSplash() {
+    const s = document.createElement('div');
+    s.className = 'splash';
+    const rect = ringTarget.getBoundingClientRect();
+    const areaRect = gameArea.getBoundingClientRect();
+    s.style.left = (rect.left - areaRect.left - 45 + rect.width / 2) + 'px';
+    s.style.bottom = '4%';
+    s.innerHTML = '<span></span>';
+    gameArea.appendChild(s);
+    setTimeout(function () { s.remove(); }, 500);
+  }
+
+  let msgTimer = null;
+  function flashMsg(text) {
+    clearTimeout(msgTimer);
+    let el = document.getElementById('floatMsg');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'floatMsg';
+      el.style.position = 'absolute';
+      el.style.top = '40%';
+      el.style.left = '50%';
+      el.style.transform = 'translate(-50%,-50%)';
+      el.style.fontSize = '20px';
+      el.style.fontWeight = '800';
+      el.style.textShadow = '0 2px 8px rgba(0,0,0,0.5)';
+      el.style.pointerEvents = 'none';
+      gameArea.appendChild(el);
+    }
+    el.textContent = text;
+    el.style.opacity = '1';
+    msgTimer = setTimeout(function () { el.style.opacity = '0'; }, 700);
+  }
+
+  function startGame() {
+    state.score = 0;
+    state.jumpsLeft = CONFIG.TOTAL_JUMPS;
+    state.running = true;
+    state.diving = false;
+    state.sweepStart = 0;
+    scoreEl.textContent = '0';
+    jumpsLeftEl.textContent = state.jumpsLeft;
+    diver.style.top = '16%';
+    diver.style.left = '50%';
+    diver.style.marginLeft = '40px';
+    diver.style.transform = 'translateZ(0) scale(1)';
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    state.sweepFrame = requestAnimationFrame(sweepRing);
+    gameArea.focus();
+  }
+
+  function endGame() {
+    state.running = false;
+    cancelAnimationFrame(state.sweepFrame);
+    const best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+    if (state.score > best) {
+      localStorage.setItem(BEST_KEY, String(state.score));
+      bestEl.textContent = state.score;
+      resultMsgEl.textContent = '🎉 최고 기록 경신!';
+    } else {
+      resultMsgEl.textContent = '최고 기록: ' + best;
+    }
+    finalScoreEl.textContent = state.score;
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+  jumpBtn.addEventListener('pointerdown', function (e) { e.preventDefault(); doJump(); });
+  window.addEventListener('keydown', function (e) {
+    if (e.code === 'Space') { e.preventDefault(); doJump(); }
+  });
+})();
+</script>
+</body>
+</html>

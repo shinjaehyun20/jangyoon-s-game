@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "tunnel-dash",
+        "label": "🌀 터널 달리기",
+        "path": "tunnel-dash/index.html"
+      },
+      {
+        "id": "diving-board-jump",
+        "label": "🤿 다이빙대 점프",
+        "path": "diving-board-jump/index.html"
+      },
+      {
         "id": "hamster-wheel-run",
         "label": "🐹 햄스터 쳇바퀴 달리기",
         "path": "hamster-wheel-run/index.html"

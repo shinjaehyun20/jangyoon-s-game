@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="diveBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#bfe9ff"/>
+      <stop offset="45%" stop-color="#1c7fae"/>
+      <stop offset="100%" stop-color="#062f47"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#diveBg)"/>
+  <rect x="120" y="20" width="20" height="50" fill="#e0e0e0"/>
+  <rect x="90" y="66" width="80" height="10" rx="4" fill="#ffd166"/>
+  <circle cx="150" cy="50" r="12" fill="#ffd166"/>
+  <rect x="144" y="60" width="12" height="18" rx="4" fill="#7dd3fc"/>
+  <ellipse cx="180" cy="150" rx="90" ry="18" fill="#ffffff" opacity="0.28"/>
+  <ellipse cx="180" cy="150" rx="46" ry="9" fill="#ffffff" opacity="0.5" stroke="#ffffff" stroke-width="3"/>
+  <text x="24" y="34" font-family="'Pretendard','Noto Sans KR',sans-serif" font-size="26">🤿</text>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#083a55">다이빙대 점프</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(8,58,85,0.6)" letter-spacing="2">DIVING BOARD JUMP</text>
+  </g>
+</svg>
