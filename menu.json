@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "monster-park",
+        "label": "🎯 몬스터 파크",
+        "path": "monster-park/index.html"
+      },
+      {
         "id": "tunnel-dash",
         "label": "🌀 터널 달리기",
         "path": "tunnel-dash/index.html"

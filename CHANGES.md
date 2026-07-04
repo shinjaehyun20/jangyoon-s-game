@@ -1,5 +1,10 @@
 # 변경 이력
 
+## 2026-07-05 — 몬스터 파크 (monster-park)
+
+- **monster-park** — 공원에 나타나는 몬스터를 탭해서 포획하는 수집형 게임. 12종 몬스터를 등장 확률 가중치(희귀할수록 낮음, `weight` 필드)로 랜덤 스폰(`SPAWN_INTERVAL_MS: 850`, 최대 5마리 동시 등장, 생존시간 1.4~2.4초), 탭하면 포획 애니메이션(pop) + 도감(dex) 등록. 같은 몬스터 3마리 모으면 레벨업(`LEVEL_UP_COUNT: 3`), 12종 완전 수집이 목표. 45초 타임어택(`ROUND_SECONDS: 45`), localStorage에 도감 진행도(`monster-park_dex`)와 최고 포획 수(`monster-park_best`) 저장.
+- 단일 HTML + SVG 썸네일(320x180, 우하단 타이틀 규격), 이모지 기반이라 이미지 자산 없음(외부 의존성 0건).
+
 ## 2026-07-04 — 터널 달리기 (tunnel-dash) · 다이빙대 점프 (diving-board-jump)
 
 - **오늘 특이사항**: Hermes 커밋 `80be45f`(runner-game/space-catcher 3D 스프라이트)에서 실측한 CSS 3D 기법을 신규 게임 2종에 적용 — WebGL/three.js 없이 `perspective` + `transform-style: preserve-3d` + `translateZ()` 레이어 분리만으로 원근·깊이감 구현.

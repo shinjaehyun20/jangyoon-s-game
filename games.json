@@ -1,5 +1,13 @@
 [
   {
+    "id": "monster-park",
+    "title": "Monster Park",
+    "title_ko": "🎯 몬스터 파크",
+    "description": "공원에 나타나는 몬스터를 탭해서 포획! 도감 12종 수집 + 레벨업, 45초 도전",
+    "thumbnail": "monster-park/thumb.svg",
+    "path": "monster-park/index.html"
+  },
+  {
     "id": "tunnel-dash",
     "title": "Tunnel Dash",
     "title_ko": "🌀 터널 달리기",

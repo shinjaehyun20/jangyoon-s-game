@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>몬스터 파크</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(180deg, #8fd3f4 0%, #a8e6a3 55%, #7fcf7a 100%);
+    user-select: none; -webkit-user-select: none;
+  }
+  :root {
+    --bg: #8fd3f4;
+    --accent: #ff6f61;
+    --text: #26332b;
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px;
+    gap: 6px;
+    margin: 0 auto;
+    position: relative;
+  }
+  h1 {
+    font-size: clamp(18px, 5.5vw, 24px);
+    color: var(--text);
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  /* HUD */
+  .hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.55);
+    border-radius: 12px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .hud .hud-item { display: flex; align-items: center; gap: 4px; }
+  .hud .val { color: var(--accent); }
+
+  /* Game area */
+  #gameArea {
+    flex: 1;
+    position: relative;
+    background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.35), transparent 60%);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 3px solid rgba(255,255,255,0.5);
+  }
+  .monster {
+    position: absolute;
+    width: 58px; height: 58px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.65);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.08s;
+    will-change: left, top;
+  }
+  .monster.hit {
+    animation: pop 0.35s ease forwards;
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.35); filter: brightness(1.3); }
+    100% { transform: scale(0); opacity: 0; }
+  }
+  .catch-ring {
+    position: absolute;
+    width: 70px; height: 70px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: ring 0.4s ease forwards;
+  }
+  @keyframes ring {
+    0% { transform: scale(0.3); opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  .float-text {
+    position: absolute;
+    font-size: 16px;
+    font-weight: 900;
+    color: #ffd93d;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    pointer-events: none;
+    animation: floatUp 0.7s ease forwards;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-40px); opacity: 0; }
+  }
+
+  /* Pokedex strip */
+  #dexStrip {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+    padding: 5px 6px;
+  }
+  .dex-slot {
+    flex: 0 0 auto;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    background: rgba(0,0,0,0.12);
+    filter: grayscale(1) brightness(0.7);
+    position: relative;
+  }
+  .dex-slot.owned {
+    background: rgba(255,255,255,0.85);
+    filter: none;
+  }
+  .dex-slot .lvbadge {
+    position: absolute;
+    bottom: -3px; right: -3px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    border-radius: 6px;
+    padding: 0 3px;
+    line-height: 12px;
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text);
+    padding: 2px 4px;
+  }
+  .home-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 700;
+    background: rgba(255,255,255,0.6);
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+
+  /* Overlays */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 30, 25, 0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 20;
+    padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: #fffef7;
+    border-radius: 20px;
+    padding: 22px 20px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .overlay-card h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .overlay-card p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .btn-start {
+    min-height: 44px;
+    font-size: 16px;
+    font-weight: 900;
+    color: #fff;
+    background: linear-gradient(135deg, #ff8a65, #ff6f61);
+    border: none;
+    border-radius: 12px;
+    padding: 10px 26px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255,111,97,0.4);
+  }
+  .btn-start:active { transform: scale(0.96); }
+  .result-score {
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--accent);
+    margin: 6px 0;
+  }
+  .result-sub {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 6px;
+  }
+  .new-catch-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin: 10px 0;
+    max-height: 100px;
+    overflow-y: auto;
+  }
+  .new-catch-item {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: #fff3d6;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    border: 2px solid #ffd93d;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎯 몬스터 파크</h1>
+
+  <div class="hud">
+    <div class="hud-item">⏱ <span class="val" id="timeVal">45</span>초</div>
+    <div class="hud-item">✅ 포획 <span class="val" id="catchVal">0</span></div>
+    <div class="hud-item">📖 도감 <span class="val" id="dexVal">0</span>/12</div>
+  </div>
+
+  <div id="gameArea"></div>
+
+  <div id="dexStrip"></div>
+
+  <footer>
+    <small>몬스터를 탭해서 포획하세요!</small>
+    <a class="home-link" href="../../index.html">← 홈으로</a>
+  </footer>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🎯 몬스터 파크</h2>
+      <p>공원에 나타난 몬스터를<br>손가락으로 톡톡 터치해서 포획하세요!<br>같은 몬스터 3마리를 모으면 레벨업!<br>12종을 모두 모아 도감을 완성해봐요.</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 시간 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div class="result-sub" id="resultMsg"></div>
+      <div class="new-catch-list" id="newCatchList"></div>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    ROUND_SECONDS: 45,
+    SPAWN_INTERVAL_MS: 850,
+    MAX_ON_SCREEN: 5,
+    MIN_LIFETIME_MS: 1400,
+    MAX_LIFETIME_MS: 2400,
+    MONSTER_SIZE: 58,
+    LEVEL_UP_COUNT: 3,
+    STORAGE_KEY: 'monster-park_dex',
+    BEST_KEY: 'monster-park_best'
+  };
+
+  // 12종 몬스터: id, 이모지, 이름, 등장확률 가중치(희귀할수록 낮음)
+  const MONSTERS = [
+    { id: 'slime',   emoji: '🟢', name: '초록 슬라임', weight: 20 },
+    { id: 'bunny',   emoji: '🐰', name: '토끼몽',       weight: 18 },
+    { id: 'chick',   emoji: '🐥', name: '병아리몽',     weight: 18 },
+    { id: 'cat',     emoji: '🐱', name: '고양몽',       weight: 15 },
+    { id: 'frog',    emoji: '🐸', name: '개구몽',       weight: 14 },
+    { id: 'bear',    emoji: '🐻', name: '곰돌몽',       weight: 12 },
+    { id: 'fox',     emoji: '🦊', name: '여우몽',       weight: 10 },
+    { id: 'panda',   emoji: '🐼', name: '판다몽',       weight: 9  },
+    { id: 'penguin', emoji: '🐧', name: '펭귄몽',       weight: 8  },
+    { id: 'dragon',  emoji: '🐲', name: '아기용몽',     weight: 5  },
+    { id: 'unicorn', emoji: '🦄', name: '유니콘몽',     weight: 3  },
+    { id: 'star',    emoji: '⭐', name: '별빛몽',       weight: 2  }
+  ];
+
+  const gameArea = document.getElementById('gameArea');
+  const timeValEl = document.getElementById('timeVal');
+  const catchValEl = document.getElementById('catchVal');
+  const dexValEl = document.getElementById('dexVal');
+  const dexStripEl = document.getElementById('dexStrip');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl = document.getElementById('resultMsg');
+  const newCatchListEl = document.getElementById('newCatchList');
+
+  const state = {
+    running: false,
+    timeLeft: CONFIG.ROUND_SECONDS,
+    catchCount: 0,
+    activeMonsters: new Map(), // el -> monsterDef
+    spawnTimer: null,
+    tickTimer: null,
+    newlyCaughtThisRound: new Set()
+  };
+
+  function loadDex() {
+    try {
+      const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+      if (!raw) return {};
+      return JSON.parse(raw);
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveDex(dex) {
+    try {
+      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(dex));
+    } catch (e) { /* ignore quota errors */ }
+  }
+
+  function loadBest() {
+    const v = parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+    return isNaN(v) ? 0 : v;
+  }
+
+  function saveBest(score) {
+    const best = loadBest();
+    if (score > best) {
+      try { localStorage.setItem(CONFIG.BEST_KEY, String(score)); } catch (e) { /* ignore */ }
+      return true;
+    }
+    return false;
+  }
+
+  let dex = loadDex(); // { slime: { count: 2, level: 1 }, ... }
+
+  function renderDexStrip() {
+    dexStripEl.innerHTML = '';
+    let ownedCount = 0;
+    MONSTERS.forEach(function (m) {
+      const entry = dex[m.id];
+      const slot = document.createElement('div');
+      slot.className = 'dex-slot' + (entry ? ' owned' : '');
+      slot.textContent = m.emoji;
+      if (entry) {
+        ownedCount++;
+        const badge = document.createElement('span');
+        badge.className = 'lvbadge';
+        badge.textContent = 'Lv' + entry.level;
+        slot.appendChild(badge);
+      }
+      dexStripEl.appendChild(slot);
+    });
+    dexValEl.textContent = String(ownedCount);
+  }
+
+  function weightedPick() {
+    const total = MONSTERS.reduce(function (sum, m) { return sum + m.weight; }, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < MONSTERS.length; i++) {
+      r -= MONSTERS[i].weight;
+      if (r <= 0) return MONSTERS[i];
+    }
+    return MONSTERS[0];
+  }
+
+  function spawnMonster() {
+    if (!state.running) return;
+    if (state.activeMonsters.size >= CONFIG.MAX_ON_SCREEN) return;
+
+    const areaRect = gameArea.getBoundingClientRect();
+    const maxX = Math.max(0, areaRect.width - CONFIG.MONSTER_SIZE);
+    const maxY = Math.max(0, areaRect.height - CONFIG.MONSTER_SIZE);
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    const def = weightedPick();
+    const el = document.createElement('div');
+    el.className = 'monster';
+    el.textContent = def.emoji;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+
+    const lifetime = CONFIG.MIN_LIFETIME_MS + Math.random() * (CONFIG.MAX_LIFETIME_MS - CONFIG.MIN_LIFETIME_MS);
+    const escapeTimer = setTimeout(function () {
+      removeMonster(el);
+    }, lifetime);
+
+    el.addEventListener('pointerdown', function (ev) {
+      ev.preventDefault();
+      catchMonster(el, def, escapeTimer);
+    });
+
+    state.activeMonsters.set(el, { def: def, escapeTimer: escapeTimer });
+    gameArea.appendChild(el);
+  }
+
+  function removeMonster(el) {
+    const info = state.activeMonsters.get(el);
+    if (!info) return;
+    clearTimeout(info.escapeTimer);
+    state.activeMonsters.delete(el);
+    if (el.parentNode) el.parentNode.removeChild(el);
+  }
+
+  function spawnRing(x, y) {
+    const ring = document.createElement('div');
+    ring.className = 'catch-ring';
+    ring.style.left = (x - 35) + 'px';
+    ring.style.top = (y - 35) + 'px';
+    gameArea.appendChild(ring);
+    setTimeout(function () {
+      if (ring.parentNode) ring.parentNode.removeChild(ring);
+    }, 450);
+  }
+
+  function spawnFloatText(x, y, text) {
+    const el = document.createElement('div');
+    el.className = 'float-text';
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    gameArea.appendChild(el);
+    setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 750);
+  }
+
+  function catchMonster(el, def, escapeTimer) {
+    if (!state.running) return;
+    if (!state.activeMonsters.has(el)) return; // already caught/escaped
+
+    clearTimeout(escapeTimer);
+    state.activeMonsters.delete(el);
+
+    const rect = el.getBoundingClientRect();
+    const areaRect = gameArea.getBoundingClientRect();
+    const cx = rect.left - areaRect.left + rect.width / 2;
+    const cy = rect.top - areaRect.top + rect.height / 2;
+
+    el.classList.add('hit');
+    spawnRing(cx, cy);
+
+    // dex 갱신
+    if (!dex[def.id]) {
+      dex[def.id] = { count: 1, level: 1 };
+      state.newlyCaughtThisRound.add(def.id);
+      spawnFloatText(cx, cy - 10, '신규 발견!');
+    } else {
+      dex[def.id].count += 1;
+      if (dex[def.id].count >= CONFIG.LEVEL_UP_COUNT) {
+        dex[def.id].count = 0;
+        dex[def.id].level += 1;
+        spawnFloatText(cx, cy - 10, 'Lv UP!');
+      } else {
+        spawnFloatText(cx, cy - 10, '+1');
+      }
+    }
+    saveDex(dex);
+    renderDexStrip();
+
+    state.catchCount += 1;
+    catchValEl.textContent = String(state.catchCount);
+
+    setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 350);
+  }
+
+  function tick() {
+    state.timeLeft -= 1;
+    timeValEl.textContent = String(Math.max(0, state.timeLeft));
+    if (state.timeLeft <= 0) {
+      endRound();
+    }
+  }
+
+  function clearBoard() {
+    state.activeMonsters.forEach(function (info, el) {
+      clearTimeout(info.escapeTimer);
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+    state.activeMonsters.clear();
+  }
+
+  function startRound() {
+    state.running = true;
+    state.timeLeft = CONFIG.ROUND_SECONDS;
+    state.catchCount = 0;
+    state.newlyCaughtThisRound = new Set();
+    clearBoard();
+
+    timeValEl.textContent = String(state.timeLeft);
+    catchValEl.textContent = '0';
+
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+
+    state.spawnTimer = setInterval(spawnMonster, CONFIG.SPAWN_INTERVAL_MS);
+    state.tickTimer = setInterval(tick, 1000);
+
+    // 즉시 1마리 스폰
+    spawnMonster();
+  }
+
+  function endRound() {
+    state.running = false;
+    clearInterval(state.spawnTimer);
+    clearInterval(state.tickTimer);
+    clearBoard();
+
+    const isNewBest = saveBest(state.catchCount);
+    finalScoreEl.textContent = state.catchCount + '마리';
+    resultMsgEl.textContent = isNewBest
+      ? '🏆 최고 기록 갱신! (최고: ' + loadBest() + '마리)'
+      : '최고 기록: ' + loadBest() + '마리';
+
+    newCatchListEl.innerHTML = '';
+    if (state.newlyCaughtThisRound.size > 0) {
+      state.newlyCaughtThisRound.forEach(function (id) {
+        const def = MONSTERS.find(function (m) { return m.id === id; });
+        if (!def) return;
+        const item = document.createElement('div');
+        item.className = 'new-catch-item';
+        item.textContent = def.emoji;
+        newCatchListEl.appendChild(item);
+      });
+    } else {
+      const noneMsg = document.createElement('div');
+      noneMsg.style.fontSize = '12px';
+      noneMsg.style.color = '#999';
+      noneMsg.textContent = '이번엔 신규 몬스터가 없었어요';
+      newCatchListEl.appendChild(noneMsg);
+    }
+
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('pointerdown', function (ev) {
+    ev.preventDefault();
+    startRound();
+  });
+  restartBtn.addEventListener('pointerdown', function (ev) {
+    ev.preventDefault();
+    startRound();
+  });
+
+  // 초기 렌더
+  renderDexStrip();
+})();
+</script>
+</body>
+</html>

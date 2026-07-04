@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8fd3f4"/>
+      <stop offset="55%" stop-color="#a8e6a3"/>
+      <stop offset="100%" stop-color="#5fb85a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="35%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect width="320" height="180" fill="url(#glow)"/>
+  <circle cx="90" cy="95" r="46" fill="rgba(255,255,255,0.55)"/>
+  <text x="90" y="112" text-anchor="middle" font-size="50">🟢</text>
+  <text x="150" y="58" font-size="30">🐰</text>
+  <text x="188" y="132" font-size="26">🦊</text>
+  <text x="228" y="52" font-size="22">🦄</text>
+  <text x="242" y="102" font-size="24">⭐</text>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.35)"/>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ff6f61">몬스터 파크</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(38,51,43,0.6)" letter-spacing="2">MONSTER PARK</text>
+  </g>
+</svg>
