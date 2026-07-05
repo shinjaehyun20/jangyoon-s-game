@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ec8f2"/>
+      <stop offset="55%" stop-color="#a9dcf5"/>
+      <stop offset="100%" stop-color="#d7f0ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="30%" cy="25%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect width="320" height="180" fill="url(#glow)"/>
+  <text x="60" y="60" font-size="34" opacity="0.7">☁️</text>
+  <text x="230" y="45" font-size="26" opacity="0.6">☁️</text>
+  <text x="100" y="110" font-size="56">✈️</text>
+  <text x="200" y="90" font-size="26">⭐</text>
+  <text x="235" y="130" font-size="30">🌩️</text>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.4)"/>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#0d6ba8">종이비행기 날리기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(30,60,90,0.6)" letter-spacing="2">PAPER AIRPLANE FLY</text>
+  </g>
+</svg>

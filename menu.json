@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "cat-teaser-play",
+        "label": "🧶 고양이 낚싯대 놀이",
+        "path": "cat-teaser-play/index.html"
+      },
+      {
+        "id": "paper-airplane-fly",
+        "label": "✈️ 종이비행기 날리기",
+        "path": "paper-airplane-fly/index.html"
+      },
+      {
         "id": "monster-park",
         "label": "🎯 몬스터 파크",
         "path": "monster-park/index.html"

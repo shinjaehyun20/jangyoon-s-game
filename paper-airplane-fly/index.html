@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>종이비행기 날리기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: #0d2b4e;
+    color: #fff;
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    color: #bfe6ff;
+    text-shadow: 0 0 14px rgba(191,230,255,0.4);
+  }
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-weight: 700;
+    font-size: 13px;
+    gap: 4px;
+  }
+  #gameArea {
+    position: relative;
+    flex: 1;
+    border-radius: 18px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #7ec8f2 0%, #a9dcf5 45%, #d7f0ff 100%);
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.15);
+    perspective: 650px;
+    touch-action: none;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* 배경 장식 구름 (충돌 없음, 원근 패럴랙스 느낌) */
+  .bg-cloud {
+    position: absolute;
+    font-size: 40px;
+    opacity: 0.55;
+    pointer-events: none;
+    filter: blur(0.3px);
+    animation: drift linear infinite;
+    transform: translateZ(-220px) scale(1.3);
+  }
+  .bg-cloud.c1 { top: 10%; left: 10%; animation-duration: 26s; }
+  .bg-cloud.c2 { top: 55%; left: 60%; animation-duration: 34s; font-size: 52px; }
+  .bg-cloud.c3 { top: 30%; left: 75%; animation-duration: 20s; font-size: 30px; }
+  @keyframes drift { from { transform: translateZ(-220px) scale(1.3) translateX(0); } to { transform: translateZ(-220px) scale(1.3) translateX(-40px); } }
+
+  /* 종이비행기: 레이어 분리(그림자+본체) + 이동은 JS translate/rotate 로 처리 */
+  .plane {
+    position: absolute;
+    left: 0; top: 0;
+    width: 64px; height: 44px;
+    margin: -22px 0 0 -32px;
+    transform-style: preserve-3d;
+    will-change: transform;
+    z-index: 3;
+  }
+  .plane-shadow {
+    position: absolute;
+    left: 10px; right: 10px; top: 34px;
+    height: 10px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(0,0,0,0.18), transparent 72%);
+    filter: blur(3px);
+    transform: translateZ(-16px);
+  }
+  .plane-emoji {
+    position: absolute; inset: 0;
+    font-size: 42px;
+    display: flex; align-items: center; justify-content: center;
+    transform: translateZ(14px);
+    filter: drop-shadow(0 6px 6px rgba(0,0,0,0.2));
+  }
+
+  .obj {
+    position: absolute;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .obj.star { width: 34px; height: 34px; margin: -17px 0 0 -17px; font-size: 30px; animation: spin 2.4s linear infinite; }
+  .obj.storm { width: 50px; height: 50px; margin: -25px 0 0 -25px; font-size: 42px; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .obj.pop { animation: popOut 0.3s forwards; }
+  @keyframes popOut { to { opacity: 0; transform: scale(1.8); } }
+
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(10,30,55,0.75);
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: rgba(15,45,80,0.95);
+    border-radius: 18px;
+    padding: 24px 28px;
+    text-align: center;
+    max-width: 320px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  }
+  .overlay-card h2 { color: #bfe6ff; margin-bottom: 10px; font-size: 22px; }
+  .overlay-card p { color: #dff2ff; font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+  .btn-start {
+    min-height: 44px;
+    padding: 10px 26px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#bfe6ff,#6fb7e8);
+    color: #063054;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .result-score { font-size: 40px; font-weight: 900; color: #ffd166; margin: 8px 0; }
+  footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #cfe9ff; }
+  .home-link { color: #bfe6ff; text-decoration: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-cloud, .obj.star { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>✈️ 종이비행기 날리기</h1>
+  <div class="hud">
+    <div>점수: <span id="score">0</span></div>
+    <div>최고: <span id="best">0</span></div>
+    <div>목숨: <span id="lives">❤️❤️❤️</span></div>
+    <div>시간: <span id="timeLeft">40</span>초</div>
+  </div>
+
+  <div id="gameArea" tabindex="0">
+    <div class="bg-cloud c1">☁️</div>
+    <div class="bg-cloud c2">☁️</div>
+    <div class="bg-cloud c3">☁️</div>
+    <div class="plane" id="plane">
+      <div class="plane-shadow"></div>
+      <div class="plane-emoji">✈️</div>
+    </div>
+
+    <div class="overlay" id="startOverlay">
+      <div class="overlay-card">
+        <h2>✈️ 종이비행기 날리기</h2>
+        <p>화면을 톡톡 터치하면<br>비행기가 위로 날아올라요!<br>⭐별은 모으고 🌩️먹구름은 피하세요.<br>40초 동안 최대한 멀리 날아보세요!</p>
+        <button class="btn-start" id="startBtn">시작!</button>
+      </div>
+    </div>
+    <div class="overlay hidden" id="endOverlay">
+      <div class="overlay-card">
+        <h2>🎉 게임 종료!</h2>
+        <div class="result-score" id="finalScore">0</div>
+        <p id="resultMsg"></p>
+        <button class="btn-start" id="restartBtn">다시 하기</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <small>화면을 톡톡 터치해서 날아올라요</small>
+    <a class="home-link" href="../index.html">← 홈으로</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const CONFIG = {
+    DURATION: 40,
+    GRAVITY: 1300,
+    FLAP_VELOCITY: -370,
+    MAX_FALL_SPEED: 480,
+    SPAWN_INTERVAL_MS: 1250,
+    OBJECT_SPEED: 150,
+    STAR_CHANCE: 0.45,
+    LIVES: 3,
+    PLANE_X_RATIO: 0.24
+  };
+
+  const gameArea = document.getElementById('gameArea');
+  const planeEl = document.getElementById('plane');
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const livesEl = document.getElementById('lives');
+  const timeEl = document.getElementById('timeLeft');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl = document.getElementById('resultMsg');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+
+  const BEST_KEY = 'paper-airplane-fly_best';
+  bestEl.textContent = localStorage.getItem(BEST_KEY) || '0';
+
+  let state = null;
+  let lastTime = 0;
+
+  function heartsText(lives) {
+    return '❤️'.repeat(Math.max(0, lives)) + '🤍'.repeat(Math.max(0, CONFIG.LIVES - lives));
+  }
+
+  function addScore(delta) {
+    state.score = Math.max(0, state.score + delta);
+    scoreEl.textContent = state.score;
+  }
+
+  function spawnObject() {
+    const h = gameArea.clientHeight;
+    const isStar = Math.random() < CONFIG.STAR_CHANCE;
+    const el = document.createElement('div');
+    el.className = 'obj ' + (isStar ? 'star' : 'storm');
+    el.textContent = isStar ? '⭐' : '🌩️';
+    const y = 30 + Math.random() * (h - 60);
+    const x = gameArea.clientWidth + 40;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    gameArea.appendChild(el);
+    state.objects.push({ el: el, x: x, y: y, isStar: isStar, resolved: false });
+  }
+
+  function removeObject(o) {
+    state.objects = state.objects.filter(function (item) { return item !== o; });
+    if (o.el.parentNode) o.el.parentNode.removeChild(o.el);
+  }
+
+  function resolveHit(o) {
+    o.resolved = true;
+    o.el.classList.add('pop');
+    if (o.isStar) {
+      addScore(10);
+    } else {
+      loseLife();
+    }
+    setTimeout(function () { removeObject(o); }, 320);
+  }
+
+  function loseLife() {
+    state.lives -= 1;
+    livesEl.textContent = heartsText(state.lives);
+    if (state.lives <= 0) endGame();
+  }
+
+  function loop(now) {
+    if (!state.running) return;
+    const dt = Math.min(0.04, (now - lastTime) / 1000);
+    lastTime = now;
+
+    state.velocityY = Math.min(CONFIG.MAX_FALL_SPEED, state.velocityY + CONFIG.GRAVITY * dt);
+    state.planeY += state.velocityY * dt;
+    const h = gameArea.clientHeight;
+    if (state.planeY < 22) { state.planeY = 22; if (state.velocityY < 0) state.velocityY = 0; }
+    if (state.planeY > h - 22) { state.planeY = h - 22; if (state.velocityY > 0) state.velocityY = 0; }
+
+    const tilt = Math.max(-32, Math.min(42, state.velocityY / 11));
+    planeEl.style.transform = 'translate(' + state.planeX + 'px,' + state.planeY + 'px) rotate(' + tilt.toFixed(1) + 'deg)';
+
+    state.objects.slice().forEach(function (o) {
+      if (o.resolved) { return; }
+      o.x -= CONFIG.OBJECT_SPEED * dt;
+      o.el.style.left = o.x + 'px';
+      const dx = o.x - state.planeX;
+      const dy = o.y - state.planeY;
+      const hitRadius = o.isStar ? 30 : 34;
+      if (Math.abs(dx) < hitRadius && Math.abs(dy) < hitRadius) {
+        resolveHit(o);
+        return;
+      }
+      if (o.x < -50) { removeObject(o); }
+    });
+
+    requestAnimationFrame(loop);
+  }
+
+  function flap() {
+    if (!state || !state.running) return;
+    state.velocityY = CONFIG.FLAP_VELOCITY;
+  }
+
+  function startGame() {
+    document.querySelectorAll('.obj').forEach(function (el) { el.remove(); });
+    state = {
+      running: true,
+      score: 0,
+      lives: CONFIG.LIVES,
+      timeLeft: CONFIG.DURATION,
+      planeX: gameArea.clientWidth * CONFIG.PLANE_X_RATIO,
+      planeY: gameArea.clientHeight / 2,
+      velocityY: 0,
+      objects: [],
+      spawnTimer: null,
+      tickTimer: null
+    };
+    scoreEl.textContent = '0';
+    livesEl.textContent = heartsText(state.lives);
+    timeEl.textContent = state.timeLeft;
+    planeEl.style.transform = 'translate(' + state.planeX + 'px,' + state.planeY + 'px) rotate(0deg)';
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+
+    state.spawnTimer = setInterval(function () { if (state.running) spawnObject(); }, CONFIG.SPAWN_INTERVAL_MS);
+    state.tickTimer = setInterval(function () {
+      state.timeLeft -= 1;
+      timeEl.textContent = state.timeLeft;
+      if (state.timeLeft <= 0) endGame();
+    }, 1000);
+
+    lastTime = performance.now();
+    gameArea.focus();
+    requestAnimationFrame(loop);
+  }
+
+  function endGame() {
+    if (!state.running) return;
+    state.running = false;
+    clearInterval(state.spawnTimer);
+    clearInterval(state.tickTimer);
+    const best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+    if (state.score > best) {
+      localStorage.setItem(BEST_KEY, String(state.score));
+      bestEl.textContent = state.score;
+      resultMsgEl.textContent = '🎉 최고 기록 경신!';
+    } else {
+      resultMsgEl.textContent = '최고 기록: ' + best;
+    }
+    finalScoreEl.textContent = state.score;
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+  gameArea.addEventListener('pointerdown', function (e) { e.preventDefault(); flap(); });
+  window.addEventListener('keydown', function (e) {
+    if (e.code === 'Space') flap();
+  });
+})();
+</script>
+</body>
+</html>

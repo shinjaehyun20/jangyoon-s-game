@@ -1,5 +1,21 @@
 [
   {
+    "id": "cat-teaser-play",
+    "title": "Cat Teaser Play",
+    "title_ko": "🧶 고양이 낚싯대 놀이",
+    "description": "드래그로 깃털을 움직여 고양이를 실뭉치로 이끄는 놀이, 40초 도전",
+    "thumbnail": "cat-teaser-play/thumb.svg",
+    "path": "cat-teaser-play/index.html"
+  },
+  {
+    "id": "paper-airplane-fly",
+    "title": "Paper Airplane Fly",
+    "title_ko": "✈️ 종이비행기 날리기",
+    "description": "톡톡 터치로 날아올라 별은 모으고 먹구름은 피하는 비행 게임, 40초 도전",
+    "thumbnail": "paper-airplane-fly/thumb.svg",
+    "path": "paper-airplane-fly/index.html"
+  },
+  {
     "id": "monster-park",
     "title": "Monster Park",
     "title_ko": "🎯 몬스터 파크",

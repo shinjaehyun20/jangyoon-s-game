@@ -1,5 +1,12 @@
 # 변경 이력
 
+## 2026-07-06 — 고양이 낚싯대 놀이 (cat-teaser-play) · 종이비행기 날리기 (paper-airplane-fly)
+
+- **cat-teaser-play** — 화면을 드래그해 깃털(🪶)을 움직이면 고양이(🐱)가 lerp 추적(`CAT_LERP: 0.09`, dt 정규화)으로 따라와 실뭉치(🧶)를 낚아채는 드래그 유도 게임. 실뭉치는 최대 2개 동시 등장(`MAX_YARN: 2`), 포획 반경 32px, `YARN_LIFETIME_MS: 5000` 안에 못 잡으면 fade-out 후 재등장. 40초 타임어택, localStorage 최고점(`cat-teaser-play_best`). CSS `perspective`+`rotateX` 원근 방바닥(diving-board-jump 기법 재사용)과 그림자+본체 레이어 분리 3D 카드.
+- **paper-airplane-fly** — 화면을 톡톡 터치할 때마다 `FLAP_VELOCITY: -370`의 상승 임펄스를 받고 중력(`GRAVITY: 1300`)으로 자연히 하강하는 플랩 물리 비행 게임. ⭐별(`STAR_CHANCE: 0.45`)은 +10점, 🌩️먹구름은 목숨 감소(`LIVES: 3`, 실패해도 계속 진행하는 7살 친화 톤). 비행기는 수직 속도에 비례해 기울어지는 회전 피드백(`tilt = velocityY/11`), 배경 장식 구름은 `translateZ(-220px)` 패럴랙스. 40초 도전, localStorage 최고점(`paper-airplane-fly_best`).
+- 두 게임 모두 Playwright iPhone 12 viewport(390×664) 검증: 스크롤 없음·시작 오버레이 표시·home-link 존재·핵심 메커니즘(고양이 포획/비행기 flap+충돌) 런타임 에러 0건 확인.
+- 각 단일 HTML + SVG 썸네일(320x180, 우하단 타이틀 규격), 외부 의존성 0건. 굿모닝 07-06 PHASE 4 자동 제작.
+
 ## 2026-07-05 — 몬스터 파크 (monster-park)
 
 - **monster-park** — 공원에 나타나는 몬스터를 탭해서 포획하는 수집형 게임. 12종 몬스터를 등장 확률 가중치(희귀할수록 낮음, `weight` 필드)로 랜덤 스폰(`SPAWN_INTERVAL_MS: 850`, 최대 5마리 동시 등장, 생존시간 1.4~2.4초), 탭하면 포획 애니메이션(pop) + 도감(dex) 등록. 같은 몬스터 3마리 모으면 레벨업(`LEVEL_UP_COUNT: 3`), 12종 완전 수집이 목표. 45초 타임어택(`ROUND_SECONDS: 45`), localStorage에 도감 진행도(`monster-park_dex`)와 최고 포획 수(`monster-park_best`) 저장.
