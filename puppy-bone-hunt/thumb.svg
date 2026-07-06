@@ -1,0 +1,18 @@
+<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a3d28"/>
+      <stop offset="100%" stop-color="#3d2b1f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg2)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <circle cx="70" cy="95" r="55" fill="rgba(0,0,0,0.15)"/>
+  <text x="45" y="110" font-size="46">🐶</text>
+  <text x="120" y="70" font-size="28">⛰️</text>
+  <text x="150" y="130" font-size="30">🦴</text>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#f5b942">강아지 뼈다귀 찾기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">PUPPY BONE HUNT</text>
+  </g>
+</svg>
