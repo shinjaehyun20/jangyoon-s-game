@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "rubber-duck-bath",
+        "label": "🦆 오리 목욕 놀이",
+        "path": "rubber-duck-bath/index.html"
+      },
+      {
+        "id": "puppy-bone-hunt",
+        "label": "🐶 강아지 뼈다귀 찾기",
+        "path": "puppy-bone-hunt/index.html"
+      },
+      {
         "id": "cat-teaser-play",
         "label": "🧶 고양이 낚싯대 놀이",
         "path": "cat-teaser-play/index.html"

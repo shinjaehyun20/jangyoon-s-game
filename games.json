@@ -1254,5 +1254,21 @@
     "description": "반짝이는 잎사귀를 순서대로 탭해 폴짝폴짝 건너기! 목숨 3개",
     "thumbnail": "ladybug-leaf-hop/thumb.svg",
     "path": "ladybug-leaf-hop/index.html"
+  },
+  {
+    "id": "rubber-duck-bath",
+    "title": "Rubber Duck Bath",
+    "title_ko": "오리 목욕 놀이",
+    "description": "욕조 오리 콕 눌러 점수 모으기, 황금오리 5점",
+    "thumbnail": "rubber-duck-bath/thumb.svg",
+    "path": "rubber-duck-bath/index.html"
+  },
+  {
+    "id": "puppy-bone-hunt",
+    "title": "Puppy Bone Hunt",
+    "title_ko": "강아지 뼈다귀 찾기",
+    "description": "흙더미 파서 숨은 뼈다귀 찾기, 두더지 피하기",
+    "thumbnail": "puppy-bone-hunt/thumb.svg",
+    "path": "puppy-bone-hunt/index.html"
   }
 ]
