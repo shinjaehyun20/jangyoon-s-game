@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "archery-balloon",
+        "label": "🏹 화살 풍선 맞추기",
+        "path": "archery-balloon/index.html"
+      },
+      {
+        "id": "soap-bubble-catch",
+        "label": "🫧 비눗방울 잡기",
+        "path": "soap-bubble-catch/index.html"
+      },
+      {
         "id": "rubber-duck-bath",
         "label": "🦆 오리 목욕 놀이",
         "path": "rubber-duck-bath/index.html"

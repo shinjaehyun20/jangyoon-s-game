@@ -1270,5 +1270,21 @@
     "description": "흙더미 파서 숨은 뼈다귀 찾기, 두더지 피하기",
     "thumbnail": "puppy-bone-hunt/thumb.svg",
     "path": "puppy-bone-hunt/index.html"
+  },
+  {
+    "id": "archery-balloon",
+    "title": "Archery Balloon",
+    "title_ko": "🏹 화살 풍선 맞추기",
+    "description": "드래그로 활 당겨 풍선 명중! 폭탄 피하고 황금풍선 노려요, 화살 8발",
+    "thumbnail": "archery-balloon/thumb.svg",
+    "path": "archery-balloon/index.html"
+  },
+  {
+    "id": "soap-bubble-catch",
+    "title": "Soap Bubble Catch",
+    "title_ko": "🫧 비눗방울 잡기",
+    "description": "드래그로 채집망을 움직여 비눗방울 잡기! 작을수록 고득점, 무지개 방울은 왕대박, 40초 도전",
+    "thumbnail": "soap-bubble-catch/thumb.svg",
+    "path": "soap-bubble-catch/index.html"
   }
 ]
