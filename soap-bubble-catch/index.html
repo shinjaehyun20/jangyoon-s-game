@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🫧 비눗방울 잡기</title>
+  <style>
+    :root {
+      --bg: #0d3b5c;
+      --accent: #7fdfff;
+      --accent2: #ffd166;
+      --text: #ffffff;
+      --card: rgba(255,255,255,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 6px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(127,223,255,0.5);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 8px 16px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    #game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    #canvas {
+      width: 100%;
+      max-width: 400px;
+      touch-action: none;
+      border-radius: 16px;
+    }
+    .tap-hint {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      text-align: center;
+      margin-top: 8px;
+    }
+    .combo-flash {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--accent2);
+      text-shadow: 0 0 12px var(--accent2);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+      white-space: nowrap;
+    }
+    .combo-flash.show { opacity: 1; }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      padding: 0 2px;
+    }
+    .home-link { color: var(--accent); text-decoration: none; font-weight: 700; }
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #114a70 0%, #06263c 100%);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 10px; }
+    .overlay-card p { font-size: 14px; color: rgba(255,255,255,0.75); margin-bottom: 18px; line-height: 1.7; }
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent), #3fa9d4);
+      border: none; border-radius: 14px;
+      color: #06263c; font-size: 18px; font-weight: 900;
+      padding: 14px 36px; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(127,223,255,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.94); }
+    .result-score {
+      font-size: 52px; font-weight: 900;
+      color: var(--accent);
+      margin: 8px 0;
+    }
+    #bestMsg { font-size: 13px; color: var(--accent2); margin: 4px 0 12px; min-height: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🫧 비눗방울 잡기</h1>
+    <div class="hud">
+      <span>⭐ <span id="score">0</span></span>
+      <span>⏱ <span id="timer">40</span>s</span>
+      <span>🔥 <span id="combo">0</span> 콤보</span>
+    </div>
+    <div id="game-area">
+      <canvas id="canvas"></canvas>
+      <div class="combo-flash" id="comboFlash">NICE!</div>
+      <div class="tap-hint">손가락으로 채집망을 드래그해요!</div>
+    </div>
+    <footer>
+      <small>드래그로 채집망 이동!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🫧 비눗방울 잡기</h2>
+      <p>손가락으로 채집망을 드래그해서<br>둥둥 떠오르는 비눗방울을 잡아요!<br><br>작은 방울일수록 고득점!<br>무지개 방울은 왕대박 보너스!<br>40초 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <div id="bestMsg"></div>
+      <p id="resultMsg">훌륭해요!</p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      totalTime: 40,
+      netRadius: 34,
+      bubbleMinR: 12,
+      bubbleMaxR: 30,
+      spawnInterval: 55,
+      rainbowChance: 0.08,
+    };
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const $ = id => document.getElementById(id);
+
+    let W, H;
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = canvas.width = Math.min(rect.width, 400);
+      H = canvas.height = Math.min(rect.height * 0.86, 520);
+    }
+
+    let state = {
+      score: 0,
+      combo: 0,
+      timeLeft: CONFIG.totalTime,
+      running: false,
+      bubbles: [],
+      netX: 0,
+      netY: 0,
+      particles: [],
+      frame: 0,
+      intervalId: null,
+      animId: null,
+      comboTimer: null,
+    };
+
+    function updateHUD() {
+      $('score').textContent = state.score;
+      $('timer').textContent = state.timeLeft;
+      $('combo').textContent = state.combo;
+    }
+
+    function spawnBubble() {
+      const isRainbow = Math.random() < CONFIG.rainbowChance;
+      const r = isRainbow
+        ? CONFIG.bubbleMinR + 4
+        : CONFIG.bubbleMinR + Math.random() * (CONFIG.bubbleMaxR - CONFIG.bubbleMinR);
+      state.bubbles.push({
+        x: 30 + Math.random() * (W - 60),
+        y: H + r,
+        r,
+        vy: -(0.9 + Math.random() * 1.4) * (CONFIG.bubbleMaxR / (r + 8)),
+        wob: Math.random() * Math.PI * 2,
+        wobSpeed: 0.03 + Math.random() * 0.03,
+        isRainbow,
+        popped: false,
+        alpha: 1,
+      });
+    }
+
+    function drawBg() {
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#1a6a99');
+      grad.addColorStop(1, '#06263c');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+      // sun glow
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.beginPath();
+      ctx.arc(W * 0.8, 40, 50, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawBubble(b) {
+      ctx.globalAlpha = b.alpha;
+      const wobX = b.x + Math.sin(b.wob) * 6;
+      if (b.isRainbow) {
+        const grad = ctx.createLinearGradient(wobX - b.r, b.y - b.r, wobX + b.r, b.y + b.r);
+        grad.addColorStop(0, '#ff6fd8');
+        grad.addColorStop(0.33, '#ffd166');
+        grad.addColorStop(0.66, '#56c870');
+        grad.addColorStop(1, '#4fc3f7');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 3;
+      } else {
+        ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+        ctx.lineWidth = 2;
+      }
+      ctx.beginPath();
+      ctx.arc(wobX, b.y, b.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.10)';
+      ctx.fill();
+      ctx.stroke();
+      // highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.beginPath();
+      ctx.arc(wobX - b.r * 0.35, b.y - b.r * 0.35, b.r * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    function drawNet() {
+      const nx = state.netX, ny = state.netY;
+      // handle
+      ctx.strokeStyle = '#a86a3a';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(nx, ny + CONFIG.netRadius);
+      ctx.lineTo(nx, ny + CONFIG.netRadius + 46);
+      ctx.stroke();
+      // ring
+      ctx.strokeStyle = '#e0c060';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(nx, ny, CONFIG.netRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      // mesh
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 1;
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.moveTo(nx + i * CONFIG.netRadius * 0.4, ny - CONFIG.netRadius * 0.85);
+        ctx.lineTo(nx + i * CONFIG.netRadius * 0.4, ny + CONFIG.netRadius * 0.85);
+        ctx.stroke();
+      }
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.moveTo(nx - CONFIG.netRadius * 0.85, ny + i * CONFIG.netRadius * 0.4);
+        ctx.lineTo(nx + CONFIG.netRadius * 0.85, ny + i * CONFIG.netRadius * 0.4);
+        ctx.stroke();
+      }
+    }
+
+    function spawnParticles(x, y, count) {
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 1.5 + Math.random() * 3;
+        state.particles.push({
+          x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+          life: 1,
+        });
+      }
+    }
+
+    function updateParticles() {
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.life -= 0.045;
+        if (p.life <= 0) state.particles.splice(i, 1);
+      }
+    }
+
+    function drawParticles() {
+      state.particles.forEach(p => {
+        ctx.globalAlpha = Math.max(p.life, 0);
+        ctx.fillStyle = '#bfe9ff';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function showCombo(text) {
+      const el = $('comboFlash');
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(state.comboTimer);
+      state.comboTimer = setTimeout(() => el.classList.remove('show'), 650);
+    }
+
+    function updateBubbles() {
+      for (let i = state.bubbles.length - 1; i >= 0; i--) {
+        const b = state.bubbles[i];
+        if (b.popped) {
+          b.alpha -= 0.08;
+          if (b.alpha <= 0) state.bubbles.splice(i, 1);
+          continue;
+        }
+        b.y += b.vy;
+        b.wob += b.wobSpeed;
+        if (b.y < -b.r - 10) { state.combo = 0; updateHUD(); state.bubbles.splice(i, 1); continue; }
+
+        const dist = Math.hypot(state.netX - b.x, state.netY - b.y);
+        if (dist < CONFIG.netRadius * 0.75 + b.r * 0.4) {
+          b.popped = true;
+          const sizeBonus = Math.round((CONFIG.bubbleMaxR - b.r) * 1.2);
+          const pts = b.isRainbow ? 60 : Math.max(8, 10 + sizeBonus) + state.combo * 2;
+          state.score += pts;
+          state.combo++;
+          spawnParticles(b.x, b.y, b.isRainbow ? 18 : 8);
+          showCombo(b.isRainbow ? `무지개 방울! +${pts}점 🌈` : (state.combo >= 4 ? `${state.combo} 콤보! +${pts}점 🎊` : `+${pts}점 ✨`));
+          updateHUD();
+        }
+      }
+    }
+
+    function gameLoop() {
+      if (!state.running) return;
+      state.frame++;
+      drawBg();
+      if (state.frame % CONFIG.spawnInterval === 0 && state.bubbles.length < 9) spawnBubble();
+      updateBubbles();
+      state.bubbles.forEach(drawBubble);
+      updateParticles();
+      drawParticles();
+      drawNet();
+      state.animId = requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      clearInterval(state.intervalId);
+      cancelAnimationFrame(state.animId);
+      resize();
+      state = {
+        score: 0, combo: 0, timeLeft: CONFIG.totalTime,
+        running: true, bubbles: [], netX: W / 2, netY: H / 2,
+        particles: [], frame: 0, intervalId: null, animId: null, comboTimer: null,
+      };
+      updateHUD();
+      for (let i = 0; i < 3; i++) spawnBubble();
+
+      state.intervalId = setInterval(() => {
+        state.timeLeft -= 1;
+        updateHUD();
+        if (state.timeLeft <= 0) {
+          clearInterval(state.intervalId);
+          endGame();
+        }
+      }, 1000);
+
+      $('startOverlay').classList.add('hidden');
+      $('endOverlay').classList.add('hidden');
+      gameLoop();
+    }
+
+    function endGame() {
+      state.running = false;
+      cancelAnimationFrame(state.animId);
+      const best = parseInt(localStorage.getItem('soap-bubble-catch_best') || '0', 10);
+      const isNew = state.score > best;
+      if (isNew) localStorage.setItem('soap-bubble-catch_best', state.score);
+      $('finalScore').textContent = state.score + '점';
+      $('bestMsg').textContent = isNew ? '🏆 최고 기록 갱신!' : `최고 기록: ${Math.max(best, state.score)}점`;
+      const msgs = ['방울 요정! 🫧', '멋진 손놀림! ✨', '최고의 채집꾼! 🥇'];
+      $('resultMsg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      $('endOverlay').classList.remove('hidden');
+    }
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const scaleY = H / rect.height;
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
+      };
+    }
+
+    let dragging = false;
+    canvas.addEventListener('pointerdown', (e) => {
+      if (!state.running) return;
+      e.preventDefault();
+      dragging = true;
+      const pos = getPos(e);
+      state.netX = pos.x;
+      state.netY = pos.y;
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging || !state.running) return;
+      const pos = getPos(e);
+      state.netX = Math.max(CONFIG.netRadius, Math.min(W - CONFIG.netRadius, pos.x));
+      state.netY = Math.max(CONFIG.netRadius, Math.min(H - CONFIG.netRadius - 40, pos.y));
+    });
+    window.addEventListener('pointerup', () => { dragging = false; });
+
+    $('startBtn').addEventListener('pointerdown', startGame);
+    $('restartBtn').addEventListener('pointerdown', startGame);
+    window.addEventListener('resize', () => { if (state.running) resize(); });
+    resize();
+    state.netX = W / 2;
+    state.netY = H / 2;
+  })();
+  </script>
+</body>
+</html>
