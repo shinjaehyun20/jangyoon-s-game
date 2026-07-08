@@ -3,6 +3,16 @@
     "id": "kids",
     "label": "어린이 추천",
     "items": [
+            {
+              "id": "jegi-kick",
+              "label": "🪁 제기차기",
+              "path": "jegi-kick/index.html"
+            },
+            {
+              "id": "top-spin-duel",
+              "label": "🪀 팽이 돌리기 대결",
+              "path": "top-spin-duel/index.html"
+            },
       {
         "id": "archery-balloon",
         "label": "🏹 화살 풍선 맞추기",

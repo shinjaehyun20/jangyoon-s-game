@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <radialGradient id="floor" cx="50%" cy="55%" r="60%">
+      <stop offset="0%" stop-color="#8a5a34"/>
+      <stop offset="100%" stop-color="#3d2b1f"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="#241a10"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <ellipse cx="160" cy="104" rx="128" ry="58" fill="url(#floor)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <!-- my top -->
+  <g transform="translate(100,100) rotate(-8)">
+    <polygon points="0,-30 22,12 -22,12" fill="#e63946"/>
+    <polygon points="-14,-6 14,-6 9,12 -9,12" fill="#f1faee"/>
+    <circle cx="0" cy="14" r="3.5" fill="#2b2b2b"/>
+  </g>
+  <!-- opp top -->
+  <g transform="translate(190,96) rotate(10)">
+    <polygon points="0,-30 22,12 -22,12" fill="#457b9d"/>
+    <polygon points="-14,-6 14,-6 9,12 -9,12" fill="#f1faee"/>
+    <circle cx="0" cy="14" r="3.5" fill="#2b2b2b"/>
+  </g>
+  <!-- motion lines -->
+  <path d="M 75 90 A 30 30 0 0 1 75 130" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <path d="M 215 78 A 26 26 0 0 0 215 118" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <!-- Title -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="20" font-weight="900" fill="#ffd166">팽이 돌리기 대결</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.6)" letter-spacing="2">TOP SPIN DUEL</text>
+  </g>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ec9f0"/>
+      <stop offset="55%" stop-color="#ffd7a8"/>
+      <stop offset="55%" stop-color="#8a5a34"/>
+      <stop offset="100%" stop-color="#6b4426"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <circle cx="264" cy="28" r="20" fill="rgba(255,255,255,0.35)"/>
+  <!-- character -->
+  <ellipse cx="110" cy="128" rx="20" ry="6" fill="rgba(0,0,0,0.22)"/>
+  <text x="110" y="122" font-size="38" text-anchor="middle">🧒</text>
+  <!-- jegi with tassle -->
+  <g transform="translate(150,58) rotate(-12)">
+    <line x1="0" y1="0" x2="-10" y2="20" stroke="#e63946" stroke-width="3" stroke-linecap="round"/>
+    <line x1="0" y1="0" x2="-3" y2="22" stroke="#f4a261" stroke-width="3" stroke-linecap="round"/>
+    <line x1="0" y1="0" x2="4" y2="22" stroke="#2a9d8f" stroke-width="3" stroke-linecap="round"/>
+    <line x1="0" y1="0" x2="11" y2="20" stroke="#e9c46a" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="0" cy="0" r="8" fill="#f1faee" stroke="#1d3557" stroke-width="1.5"/>
+  </g>
+  <!-- motion arc -->
+  <path d="M 110 100 Q 130 40 150 58" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="4 5"/>
+  <!-- Title -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#e63946">제기차기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.7)" letter-spacing="2">JEGI KICK</text>
+  </g>
+</svg>

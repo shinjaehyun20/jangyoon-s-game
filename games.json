@@ -1286,5 +1286,21 @@
     "description": "드래그로 채집망을 움직여 비눗방울 잡기! 작을수록 고득점, 무지개 방울은 왕대박, 40초 도전",
     "thumbnail": "soap-bubble-catch/thumb.svg",
     "path": "soap-bubble-catch/index.html"
+  },
+  {
+    "id": "jegi-kick",
+    "title": "Jegi Kick",
+    "title_ko": "🪁 제기차기",
+    "description": "드래그로 이동해 떨어지는 제기를 발밑에서 차올리는 전통놀이 리듬 게임. 연속 기록 도전",
+    "thumbnail": "jegi-kick/thumb.svg",
+    "path": "jegi-kick/index.html"
+  },
+  {
+    "id": "top-spin-duel",
+    "title": "Top Spin Duel",
+    "title_ko": "🪀 팽이 돌리기 대결",
+    "description": "탭탭탭 파워 충전 후 상대 팽이와 회전력 대결! 부스트 3회, 5판 승부",
+    "thumbnail": "top-spin-duel/thumb.svg",
+    "path": "top-spin-duel/index.html"
   }
 ]
