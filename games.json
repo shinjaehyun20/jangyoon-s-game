@@ -1310,5 +1310,13 @@
     "description": "딱지를 힘차게 아래로 스와이프해 상대 딱지를 뒤집는 전통놀이, 5판 도전",
     "thumbnail": "ddakji-flip/thumb.svg",
     "path": "ddakji-flip/index.html"
+  },
+  {
+    "id": "scale-balance",
+    "title": "Scale Balance",
+    "title_ko": "⚖️ 저울 균형 맞추기",
+    "description": "숫자 블록을 저울에 드래그해 목표 숫자와 균형을 맞추는 덧셈 퍼즐, 5레벨",
+    "thumbnail": "scale-balance/thumb.svg",
+    "path": "scale-balance/index.html"
   }
 ]

@@ -9,6 +9,11 @@
               "path": "ddakji-flip/index.html"
             },
             {
+              "id": "scale-balance",
+              "label": "⚖️ 저울 균형 맞추기",
+              "path": "scale-balance/index.html"
+            },
+            {
               "id": "jegi-kick",
               "label": "🪁 제기차기",
               "path": "jegi-kick/index.html"

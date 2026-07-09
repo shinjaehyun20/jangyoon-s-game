@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>저울 균형 맞추기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #eef3fb;
+    --panel: #ffffff;
+    --accent: #ff8c42;
+    --accent2: #4a8fe7;
+    --text: #23324a;
+  }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(180deg, #cfe0f7 0%, var(--bg) 100%);
+    color: var(--text);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    color: var(--text);
+  }
+  .hud {
+    display: flex; flex-direction: row; align-items: center; justify-content: space-around;
+    background: rgba(255,255,255,0.65);
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .hud span.value { color: var(--accent2); font-size: 16px; margin-left: 4px; }
+
+  #gameArea {
+    flex: 1;
+    display: flex; flex-direction: column;
+    min-height: 0;
+    gap: 6px;
+  }
+
+  .msg-line {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    min-height: 20px;
+    color: var(--accent2);
+  }
+
+  .scale-stage {
+    flex: 1;
+    display: flex; align-items: flex-end; justify-content: center;
+    min-height: 0;
+    position: relative;
+  }
+  .stand {
+    position: relative;
+    width: 90%;
+    max-width: 380px;
+    height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  }
+  .pole {
+    width: 10px;
+    flex: 1;
+    max-height: 60%;
+    background: linear-gradient(180deg, #8a6a4a, #5c4327);
+    border-radius: 6px 6px 0 0;
+  }
+  .base {
+    width: 46%;
+    height: 10px;
+    background: #5c4327;
+    border-radius: 6px;
+  }
+  .beam-pivot {
+    position: absolute;
+    top: 34%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 22px; height: 22px;
+    background: #5c4327;
+    border-radius: 50%;
+    z-index: 3;
+    box-shadow: 0 2px 4px rgba(0,0,0,.3);
+  }
+  .beam {
+    position: absolute;
+    top: 34%;
+    left: 50%;
+    width: 82%;
+    height: 10px;
+    background: linear-gradient(180deg, #b98b5e, #8a6a4a);
+    border-radius: 6px;
+    transform: translate(-50%, -50%) rotate(0deg);
+    transition: transform .35s cubic-bezier(.4,1.4,.5,1);
+    transform-origin: center center;
+    z-index: 2;
+  }
+  .pan-hang {
+    position: absolute;
+    top: 34%;
+    width: 4px;
+    background: #8a6a4a;
+  }
+  .pan {
+    position: absolute;
+    width: 96px; min-height: 66px;
+    background: var(--panel);
+    border-radius: 14px;
+    box-shadow: 0 6px 14px rgba(0,0,0,.18);
+    display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px;
+    padding: 6px;
+    justify-content: center;
+    border: 3px solid #d8c8b0;
+  }
+  .pan.left { left: 8%; }
+  .pan.right { right: 8%; }
+  .pan.drop-hover { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(255,140,66,.3); }
+
+  .target-badge {
+    width: 100%;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--accent2);
+  }
+  .target-label { font-size: 11px; font-weight: 700; opacity: .7; }
+
+  .block {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900;
+    color: #fff;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,.2);
+    user-select: none;
+  }
+  .block.placed { cursor: pointer; }
+
+  .tray {
+    background: rgba(255,255,255,.6);
+    border-radius: 14px;
+    padding: 8px;
+    display: flex; gap: 8px;
+    overflow-x: auto;
+    min-height: 60px;
+    align-items: center;
+  }
+  .tray .block {
+    width: 46px; height: 46px;
+    font-size: 20px;
+    touch-action: none;
+    flex-shrink: 0;
+  }
+
+  .drag-clone {
+    position: fixed;
+    width: 46px; height: 46px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900;
+    color: #fff;
+    pointer-events: none;
+    z-index: 50;
+    box-shadow: 0 8px 16px rgba(0,0,0,.3);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  footer {
+    display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    font-size: 12px;
+  }
+  .home-link { color: var(--accent2); text-decoration: none; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(20,30,50,.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: var(--panel);
+    border-radius: 18px;
+    padding: 26px 22px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    color: var(--text);
+  }
+  .overlay-card h2 { font-size: 22px; margin-bottom: 10px; }
+  .overlay-card p { font-size: 14px; line-height: 1.5; margin-bottom: 16px; opacity: .85; }
+  .result-score { font-size: 40px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+  .btn-start {
+    min-height: 44px;
+    padding: 10px 26px;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent2);
+    color: #fff;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>⚖️ 저울 균형 맞추기</h1>
+
+    <div class="hud">
+      <div>레벨 <span class="value" id="levelLabel">1/5</span></div>
+      <div>최고기록 <span class="value" id="bestLabel">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="msg-line" id="msgLine">숫자 블록을 저울 오른쪽에 끌어다 넣어 균형을 맞춰요!</div>
+
+      <div class="scale-stage">
+        <div class="stand">
+          <div class="beam-pivot"></div>
+          <div class="beam" id="beam">
+            <div class="pan-hang" id="hangLeft" style="left:9%;height:26px;top:-26px;"></div>
+            <div class="pan-hang" id="hangRight" style="right:9%;height:26px;top:-26px;"></div>
+          </div>
+          <div class="pan left" id="panLeft" style="top:12%;">
+            <div class="target-label">목표</div>
+            <div class="target-badge" id="targetBadge">5</div>
+          </div>
+          <div class="pan right" id="panRight" style="top:12%;"></div>
+          <div class="pole"></div>
+          <div class="base"></div>
+        </div>
+      </div>
+
+      <div class="tray" id="tray"></div>
+    </div>
+
+    <footer>
+      <small>정확히 딱 맞으면 다음 레벨!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>⚖️ 저울 균형 맞추기</h2>
+      <p>숫자 블록을 오른쪽 저울판에 끌어다 놓아서<br>왼쪽 목표 숫자와 똑같이 만들어요!<br>너무 무거우면 블록을 다시 탭해서 빼낼 수 있어요. 5레벨 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">5/5</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      BEST_KEY: 'scale-balance_best',
+      LEVELS: [
+        { target: 5,  blocks: [2, 3, 1, 4] },
+        { target: 8,  blocks: [3, 5, 2, 1, 6] },
+        { target: 10, blocks: [4, 6, 2, 5, 3] },
+        { target: 13, blocks: [5, 8, 3, 2, 7] },
+        { target: 15, blocks: [6, 9, 4, 3, 8] }
+      ],
+      COLORS: ['#ff8c42', '#4a8fe7', '#5fbf6f', '#c25fd6', '#e0c93f', '#e0596b']
+    };
+
+    const els = {
+      levelLabel: document.getElementById('levelLabel'),
+      best: document.getElementById('bestLabel'),
+      msg: document.getElementById('msgLine'),
+      beam: document.getElementById('beam'),
+      panRight: document.getElementById('panRight'),
+      targetBadge: document.getElementById('targetBadge'),
+      tray: document.getElementById('tray'),
+      startOverlay: document.getElementById('startOverlay'),
+      endOverlay: document.getElementById('endOverlay'),
+      startBtn: document.getElementById('startBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      finalScore: document.getElementById('finalScore'),
+      resultMsg: document.getElementById('resultMsg')
+    };
+
+    const state = {
+      level: 0,
+      rightSum: 0,
+      locked: true
+    };
+
+    function getBest() {
+      return parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+    }
+    function setBest(v) {
+      if (v > getBest()) localStorage.setItem(CONFIG.BEST_KEY, String(v));
+    }
+
+    function colorFor(v) {
+      return CONFIG.COLORS[v % CONFIG.COLORS.length];
+    }
+
+    function updateHUD() {
+      els.levelLabel.textContent = (state.level + 1) + '/' + CONFIG.LEVELS.length;
+      els.best.textContent = getBest();
+    }
+
+    function updateBeam() {
+      const target = CONFIG.LEVELS[state.level].target;
+      const diff = state.rightSum - target;
+      const deg = Math.max(-24, Math.min(24, diff * 6));
+      els.beam.style.transform = 'translate(-50%, -50%) rotate(' + deg + 'deg)';
+    }
+
+    function removeFromPan(blockEl, value) {
+      if (state.locked) return;
+      blockEl.remove();
+      state.rightSum -= value;
+      updateBeam();
+      els.msg.textContent = '블록을 다시 뺐어요. 다시 담아보세요!';
+    }
+
+    function addToPan(value) {
+      if (state.locked) return;
+      const b = document.createElement('div');
+      b.className = 'block placed';
+      b.textContent = value;
+      b.style.background = colorFor(value);
+      b.addEventListener('click', () => removeFromPan(b, value));
+      els.panRight.appendChild(b);
+      state.rightSum += value;
+      updateBeam();
+      checkResult();
+    }
+
+    function checkResult() {
+      const target = CONFIG.LEVELS[state.level].target;
+      if (state.rightSum === target) {
+        state.locked = true;
+        els.msg.textContent = '딱 맞았어요! 균형 성공 ⚖️✨';
+        els.beam.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+        setTimeout(nextLevel, 1100);
+      } else if (state.rightSum > target) {
+        els.msg.textContent = '너무 무거워요! 블록을 탭해서 빼볼까요?';
+      } else {
+        els.msg.textContent = '조금 더 채워볼까요?';
+      }
+    }
+
+    function buildTray() {
+      els.tray.innerHTML = '';
+      const lvl = CONFIG.LEVELS[state.level];
+      lvl.blocks.forEach((value, idx) => {
+        const b = document.createElement('div');
+        b.className = 'block';
+        b.textContent = value;
+        b.style.background = colorFor(value);
+        b.dataset.value = value;
+        b.dataset.idx = idx;
+        attachDrag(b, value);
+        els.tray.appendChild(b);
+      });
+    }
+
+    function attachDrag(sourceEl, value) {
+      let clone = null;
+      let dragging = false;
+
+      function onDown(e) {
+        if (state.locked) return;
+        dragging = true;
+        sourceEl.style.visibility = 'hidden';
+        clone = document.createElement('div');
+        clone.className = 'drag-clone';
+        clone.textContent = value;
+        clone.style.background = colorFor(value);
+        clone.style.left = e.clientX + 'px';
+        clone.style.top = e.clientY + 'px';
+        document.body.appendChild(clone);
+      }
+      function onMove(e) {
+        if (!dragging || !clone) return;
+        clone.style.left = e.clientX + 'px';
+        clone.style.top = e.clientY + 'px';
+        const rect = els.panRight.getBoundingClientRect();
+        const over = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+        els.panRight.classList.toggle('drop-hover', over);
+      }
+      function onUp(e) {
+        if (!dragging) return;
+        dragging = false;
+        const rect = els.panRight.getBoundingClientRect();
+        const over = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+        els.panRight.classList.remove('drop-hover');
+        if (clone) { clone.remove(); clone = null; }
+        if (over) {
+          sourceEl.remove();
+          addToPan(value);
+        } else {
+          sourceEl.style.visibility = 'visible';
+        }
+      }
+
+      sourceEl.addEventListener('pointerdown', onDown);
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+    }
+
+    function resetLevelBoard() {
+      state.rightSum = 0;
+      els.panRight.innerHTML = '';
+      els.beam.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+      els.targetBadge.textContent = CONFIG.LEVELS[state.level].target;
+      els.msg.textContent = '숫자 블록을 저울 오른쪽에 끌어다 넣어 균형을 맞춰요!';
+      buildTray();
+      state.locked = false;
+      updateHUD();
+    }
+
+    function nextLevel() {
+      state.level++;
+      if (state.level >= CONFIG.LEVELS.length) {
+        endGame();
+        return;
+      }
+      resetLevelBoard();
+    }
+
+    function endGame() {
+      state.locked = true;
+      setBest(CONFIG.LEVELS.length);
+      els.finalScore.textContent = CONFIG.LEVELS.length + '/' + CONFIG.LEVELS.length;
+      els.resultMsg.textContent = '5레벨을 모두 완성했어요! 저울 박사님이네요 ⚖️👑';
+      els.endOverlay.classList.remove('hidden');
+    }
+
+    function startGame() {
+      state.level = 0;
+      els.startOverlay.classList.add('hidden');
+      els.endOverlay.classList.add('hidden');
+      resetLevelBoard();
+    }
+
+    els.startBtn.addEventListener('click', startGame);
+    els.restartBtn.addEventListener('click', startGame);
+
+    els.best.textContent = getBest();
+  })();
+  </script>
+</body>
+</html>
