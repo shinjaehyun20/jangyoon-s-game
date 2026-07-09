@@ -1302,5 +1302,13 @@
     "description": "탭탭탭 파워 충전 후 상대 팽이와 회전력 대결! 부스트 3회, 5판 승부",
     "thumbnail": "top-spin-duel/thumb.svg",
     "path": "top-spin-duel/index.html"
+  },
+  {
+    "id": "ddakji-flip",
+    "title": "Ddakji Flip",
+    "title_ko": "🎴 딱지치기",
+    "description": "딱지를 힘차게 아래로 스와이프해 상대 딱지를 뒤집는 전통놀이, 5판 도전",
+    "thumbnail": "ddakji-flip/thumb.svg",
+    "path": "ddakji-flip/index.html"
   }
 ]

@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "ddakji-flip",
+              "label": "🎴 딱지치기",
+              "path": "ddakji-flip/index.html"
+            },
+            {
               "id": "jegi-kick",
               "label": "🪁 제기차기",
               "path": "jegi-kick/index.html"
