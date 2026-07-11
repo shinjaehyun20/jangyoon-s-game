@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "jump-rope-rhythm",
+              "label": "🪢 줄넘기 놀이",
+              "path": "jump-rope-rhythm/index.html"
+            },
+            {
+              "id": "stone-balance-walk",
+              "label": "🪨 비석치기 걷기",
+              "path": "stone-balance-walk/index.html"
+            },
+            {
               "id": "ddakji-flip",
               "label": "🎴 딱지치기",
               "path": "ddakji-flip/index.html"

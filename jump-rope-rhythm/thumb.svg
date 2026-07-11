@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1976d2"/>
+      <stop offset="100%" stop-color="#0a2f61"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bgGrad)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <circle cx="46" cy="34" r="16" fill="#ffeb3b" opacity="0.9"/>
+  <text x="230" y="40" font-size="22" opacity="0.85">☁️</text>
+  <text x="266" y="60" font-size="16" opacity="0.6">☁️</text>
+
+  <rect x="40" y="70" width="180" height="9" rx="4" fill="#ffffff"/>
+  <rect x="40" y="70" width="180" height="9" rx="4" fill="url(#stripe)"/>
+  <defs>
+    <pattern id="stripe" width="24" height="9" patternUnits="userSpaceOnUse">
+      <rect width="12" height="9" fill="#e53935"/>
+      <rect x="12" width="12" height="9" fill="#ffffff"/>
+    </pattern>
+  </defs>
+  <rect x="40" y="70" width="180" height="9" rx="4" fill="url(#stripe)"/>
+
+  <rect x="34" y="118" width="196" height="26" rx="12" fill="none" stroke="#ffeb3b" stroke-width="3" stroke-dasharray="6 5" opacity="0.9"/>
+  <text x="118" y="140" font-size="46" text-anchor="middle">🧒</text>
+
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffeb3b">줄넘기 놀이</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">JUMP ROPE RHYTHM</text>
+  </g>
+</svg>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>비석치기 걷기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  :root {
+    --bg: #234a3d;
+    --bg2: #0f2620;
+    --accent: #f2c94c;
+    --danger: #e5573b;
+    --safe: #6fcf7a;
+    --text: #ffffff;
+  }
+  body {
+    background: linear-gradient(180deg, #3c6e57 0%, var(--bg) 55%, var(--bg2) 100%);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(0,0,0,.5);
+  }
+  .hud {
+    display: flex; flex-direction: row; align-items: center; justify-content: space-around;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .hud span.value { color: var(--accent); font-size: 16px; margin-left: 4px; }
+
+  #gameArea {
+    flex: 1;
+    position: relative;
+    display: flex; flex-direction: column;
+    min-height: 0;
+    gap: 8px;
+  }
+
+  .msg-line {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    min-height: 22px;
+    text-shadow: 0 2px 4px rgba(0,0,0,.5);
+  }
+
+  .scene {
+    flex: 1;
+    min-height: 0;
+    display: flex; flex-direction: column;
+    gap: 8px;
+    background: rgba(255,255,255,.06);
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.1);
+  }
+
+  .balance-track {
+    position: relative;
+    height: 30px;
+    border-radius: 16px;
+    background: linear-gradient(90deg, var(--danger) 0%, rgba(255,255,255,.14) 24%, var(--safe) 50%, rgba(255,255,255,.14) 76%, var(--danger) 100%);
+    box-shadow: inset 0 0 8px rgba(0,0,0,.5);
+    flex-shrink: 0;
+  }
+  .balance-marker {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(242,201,76,.8), 0 0 0 3px rgba(255,255,255,.5);
+    transform: translate(-50%, -50%);
+    transition: left .03s linear;
+  }
+
+  .character-stage {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .character {
+    position: relative;
+    font-size: 58px;
+    filter: drop-shadow(0 6px 4px rgba(0,0,0,.35));
+    transition: transform .1s;
+  }
+  .character.cheer { animation: cheerAnim .6s ease; }
+  @keyframes cheerAnim {
+    0%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-14px); }
+  }
+  .character.oops { animation: oopsAnim .5s ease; }
+  @keyframes oopsAnim {
+    0%, 100% { transform: rotate(0deg); }
+    30% { transform: rotate(-10deg); }
+    60% { transform: rotate(8deg); }
+  }
+  .stone {
+    position: absolute;
+    top: -30px; left: 50%;
+    font-size: 34px;
+    transform: translateX(-50%) rotate(0deg);
+    transition: transform .05s linear, top .3s ease, opacity .3s ease;
+  }
+  .stone.falling {
+    top: 60px;
+    opacity: 0;
+    transform: translateX(-50%) rotate(70deg);
+  }
+
+  .progress-track {
+    height: 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.14);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), #fff2b8);
+    transition: width .05s linear;
+  }
+
+  .tap-zones {
+    display: flex; flex-direction: row; gap: 10px;
+    flex-shrink: 0;
+  }
+  .tap-btn {
+    flex: 1;
+    min-height: 56px;
+    border-radius: 14px;
+    border: none;
+    background: rgba(255,255,255,.16);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    touch-action: manipulation;
+  }
+  .tap-btn:active { background: rgba(255,255,255,.32); }
+
+  footer {
+    display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    font-size: 12px;
+  }
+  .home-link { color: var(--accent); text-decoration: none; min-height: 44px; display: flex; align-items: center; }
+
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.72);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: linear-gradient(160deg, #2c5c47, #0f2620);
+    border-radius: 18px;
+    padding: 26px 22px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,.6), inset 0 0 0 2px rgba(242,201,76,.4);
+  }
+  .overlay-card h2 { font-size: 22px; margin-bottom: 10px; }
+  .overlay-card p { font-size: 14px; line-height: 1.5; margin-bottom: 16px; opacity: .9; }
+  .result-score { font-size: 40px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+  .btn-start {
+    min-height: 44px;
+    padding: 10px 26px;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #3a2400;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🪨 비석치기 걷기</h1>
+
+    <div class="hud">
+      <div>라운드 <span class="value" id="roundLabel">1/5</span></div>
+      <div>성공 <span class="value" id="successLabel">0</span></div>
+      <div>최고 <span class="value" id="bestLabel">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="msg-line" id="msgLine">좌우로 톡톡 눌러 균형을 맞춰요!</div>
+
+      <div class="scene">
+        <div class="balance-track">
+          <div class="balance-marker" id="balanceMarker"></div>
+        </div>
+
+        <div class="character-stage">
+          <div class="character" id="character">
+            🧍
+            <div class="stone" id="stone">🪨</div>
+          </div>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="tap-zones">
+        <button class="tap-btn" id="tapLeft">⬅️ 왼쪽 톡</button>
+        <button class="tap-btn" id="tapRight">오른쪽 톡 ➡️</button>
+      </div>
+    </div>
+
+    <footer>
+      <small>돌이 기우는 반대쪽 버튼을 톡톡 눌러 균형 잡기!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🪨 비석치기 걷기</h2>
+      <p>머리 위 돌이 좌우로 기울어요!<br>돌이 기우는 반대쪽 버튼을 톡톡 눌러<br>균형을 잡으며 목표까지 걸어가요. 5판 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0/5</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      ROUNDS: 5,
+      DURATIONS: [7000, 7500, 8000, 8500, 9000],
+      DRIFT: [0.55, 0.72, 0.9, 1.08, 1.28],
+      NUDGE: 10,
+      FAIL_THRESHOLD: 100,
+      TILT_CLAMP: 140,
+      RESULT_DELAY: 1200,
+      BEST_KEY: 'stone-balance-walk_best'
+    };
+
+    const els = {
+      round: document.getElementById('roundLabel'),
+      success: document.getElementById('successLabel'),
+      best: document.getElementById('bestLabel'),
+      msg: document.getElementById('msgLine'),
+      marker: document.getElementById('balanceMarker'),
+      character: document.getElementById('character'),
+      stone: document.getElementById('stone'),
+      progressFill: document.getElementById('progressFill'),
+      tapLeft: document.getElementById('tapLeft'),
+      tapRight: document.getElementById('tapRight'),
+      startOverlay: document.getElementById('startOverlay'),
+      endOverlay: document.getElementById('endOverlay'),
+      startBtn: document.getElementById('startBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      finalScore: document.getElementById('finalScore'),
+      resultMsg: document.getElementById('resultMsg')
+    };
+
+    const state = {
+      running: false,
+      round: 0,
+      success: 0,
+      tilt: 0,
+      elapsed: 0,
+      resolved: false,
+      lastT: 0
+    };
+
+    function getBest() {
+      return parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+    }
+    function setBest(v) {
+      if (v > getBest()) localStorage.setItem(CONFIG.BEST_KEY, String(v));
+    }
+
+    function updateHUD() {
+      els.round.textContent = (state.round + 1) + '/' + CONFIG.ROUNDS;
+      els.success.textContent = state.success;
+      els.best.textContent = getBest();
+    }
+
+    function updateVisual() {
+      const percent = ((state.tilt + CONFIG.TILT_CLAMP) / (CONFIG.TILT_CLAMP * 2)) * 100;
+      els.marker.style.left = Math.max(0, Math.min(100, percent)) + '%';
+      const deg = Math.max(-34, Math.min(34, state.tilt * 0.28));
+      els.stone.style.transform = 'translateX(-50%) rotate(' + deg + 'deg)';
+      const duration = CONFIG.DURATIONS[state.round];
+      const progress = Math.min(100, (state.elapsed / duration) * 100);
+      els.progressFill.style.width = progress + '%';
+    }
+
+    function resetRoundState() {
+      state.tilt = 0;
+      state.elapsed = 0;
+      state.resolved = false;
+      state.lastT = 0;
+      els.character.classList.remove('cheer', 'oops');
+      els.stone.classList.remove('falling');
+      els.msg.textContent = '좌우로 톡톡 눌러 균형을 맞춰요!';
+      updateHUD();
+      updateVisual();
+    }
+
+    function startGame() {
+      els.startOverlay.classList.add('hidden');
+      els.endOverlay.classList.add('hidden');
+      state.running = true;
+      state.round = 0;
+      state.success = 0;
+      resetRoundState();
+      requestAnimationFrame(loop);
+    }
+
+    function resolveRound(success) {
+      state.resolved = true;
+      if (success) {
+        state.success++;
+        els.msg.textContent = '명당 도착! 성공 🎉';
+        els.character.classList.add('cheer');
+      } else {
+        els.msg.textContent = '돌이 떨어졌어요! 다음 판에 도전해요';
+        els.stone.classList.add('falling');
+        els.character.classList.add('oops');
+      }
+      updateHUD();
+      setTimeout(nextRound, CONFIG.RESULT_DELAY);
+    }
+
+    function nextRound() {
+      state.round++;
+      if (state.round >= CONFIG.ROUNDS) {
+        endGame();
+        return;
+      }
+      resetRoundState();
+    }
+
+    function endGame() {
+      state.running = false;
+      setBest(state.success);
+      els.finalScore.textContent = state.success + '/' + CONFIG.ROUNDS;
+      els.resultMsg.textContent = state.success >= 4
+        ? '비석치기 고수네요! 정말 잘했어요 👑'
+        : (state.success >= 2 ? '멋져요! 균형 감각이 늘고 있어요!' : '재밌었죠? 한 번 더 도전해봐요!');
+      els.endOverlay.classList.remove('hidden');
+    }
+
+    function loop(t) {
+      if (!state.running) return;
+      const dt = state.lastT ? (t - state.lastT) : 16.67;
+      state.lastT = t;
+
+      if (!state.resolved) {
+        state.tilt += (Math.random() * 2 - 1) * CONFIG.DRIFT[state.round] * (dt / 16.67);
+        if (state.tilt > CONFIG.TILT_CLAMP) state.tilt = CONFIG.TILT_CLAMP;
+        if (state.tilt < -CONFIG.TILT_CLAMP) state.tilt = -CONFIG.TILT_CLAMP;
+        state.elapsed += dt;
+        updateVisual();
+
+        if (Math.abs(state.tilt) >= CONFIG.FAIL_THRESHOLD) {
+          resolveRound(false);
+        } else if (state.elapsed >= CONFIG.DURATIONS[state.round]) {
+          resolveRound(true);
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+
+    function nudge(amount) {
+      if (!state.running || state.resolved) return;
+      state.tilt += amount;
+    }
+
+    els.tapLeft.addEventListener('pointerdown', () => nudge(-CONFIG.NUDGE));
+    els.tapRight.addEventListener('pointerdown', () => nudge(CONFIG.NUDGE));
+    els.startBtn.addEventListener('click', startGame);
+    els.restartBtn.addEventListener('click', startGame);
+
+    els.best.textContent = getBest();
+  })();
+  </script>
+</body>
+</html>

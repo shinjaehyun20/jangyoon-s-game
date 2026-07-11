@@ -1318,5 +1318,21 @@
     "description": "숫자 블록을 저울에 드래그해 목표 숫자와 균형을 맞추는 덧셈 퍼즐, 5레벨",
     "thumbnail": "scale-balance/thumb.svg",
     "path": "scale-balance/index.html"
+  },
+  {
+    "id": "jump-rope-rhythm",
+    "title": "Jump Rope Rhythm",
+    "title_ko": "🪢 줄넘기 놀이",
+    "description": "돌아가는 줄이 발밑에 올 때 딱 맞춰 탭! 콤보를 쌓는 리듬 타이밍 게임",
+    "thumbnail": "jump-rope-rhythm/thumb.svg",
+    "path": "jump-rope-rhythm/index.html"
+  },
+  {
+    "id": "stone-balance-walk",
+    "title": "Stone Balance Walk",
+    "title_ko": "🪨 비석치기 걷기",
+    "description": "머리 위 돌 균형을 좌우 탭으로 맞추며 목표까지 걸어가는 전통놀이, 5판 도전",
+    "thumbnail": "stone-balance-walk/thumb.svg",
+    "path": "stone-balance-walk/index.html"
   }
 ]

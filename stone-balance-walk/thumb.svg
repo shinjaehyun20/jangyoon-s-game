@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3c6e57"/>
+      <stop offset="100%" stop-color="#0f2620"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bgGrad2)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <rect x="34" y="40" width="140" height="16" rx="8" fill="#e5573b" opacity="0.55"/>
+  <rect x="104" y="40" width="70" height="16" rx="8" fill="#6fcf7a" opacity="0.7"/>
+  <circle cx="120" cy="48" r="9" fill="#f2c94c" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+
+  <text x="105" y="128" font-size="52" text-anchor="middle">🧍</text>
+  <text x="118" y="86" font-size="30" text-anchor="middle" transform="rotate(-8 118 86)">🪨</text>
+
+  <rect x="40" y="150" width="150" height="8" rx="4" fill="rgba(255,255,255,0.18)"/>
+  <rect x="40" y="150" width="95" height="8" rx="4" fill="#f2c94c"/>
+
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#f2c94c">비석치기 걷기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">STONE BALANCE WALK</text>
+  </g>
+</svg>
