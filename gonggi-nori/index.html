@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>공기놀이</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  :root {
+    --bg: #6b4226;
+    --bg2: #3d2412;
+    --accent: #f2a24c;
+    --danger: #e5573b;
+    --safe: #7bc47f;
+    --text: #fff5e6;
+  }
+  body {
+    background: linear-gradient(180deg, #8a5a34 0%, var(--bg) 55%, var(--bg2) 100%);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(0,0,0,.5);
+  }
+  .hud {
+    display: flex; flex-direction: row; align-items: center; justify-content: space-around;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .hud span.value { color: var(--accent); font-size: 16px; margin-left: 4px; }
+
+  #gameArea {
+    flex: 1;
+    position: relative;
+    display: flex; flex-direction: column;
+    min-height: 0;
+    gap: 8px;
+  }
+
+  .msg-line {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    min-height: 22px;
+    text-shadow: 0 2px 4px rgba(0,0,0,.5);
+  }
+
+  .scene {
+    flex: 1;
+    min-height: 0;
+    display: flex; flex-direction: column;
+    gap: 8px;
+    background: rgba(255,255,255,.06);
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.1);
+  }
+
+  .toss-zone {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .flight-stone {
+    position: absolute;
+    bottom: 46px; left: 50%;
+    font-size: 40px;
+    transform: translate(-50%, 0);
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,.4));
+  }
+  .hand-zone {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    font-size: 50px;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,.35));
+  }
+  .hand-zone.cheer { animation: cheerAnim .6s ease; }
+  @keyframes cheerAnim {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(-10px); }
+  }
+  .hand-zone.oops { animation: oopsAnim .5s ease; }
+  @keyframes oopsAnim {
+    0%, 100% { transform: translateX(-50%) rotate(0deg); }
+    30% { transform: translateX(-50%) rotate(-8deg); }
+    60% { transform: translateX(-50%) rotate(6deg); }
+  }
+
+  .progress-track {
+    height: 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.14);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), #ffe0ad);
+    transition: width .03s linear;
+  }
+
+  .ground-row {
+    display: flex; flex-direction: row; justify-content: center;
+    gap: 10px;
+    flex-shrink: 0;
+    min-height: 46px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .gstone {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, #c98a4a, #7a4c22 70%, #4a2c11 100%);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.25), 0 3px 5px rgba(0,0,0,.4);
+    transition: transform .18s ease, opacity .18s ease;
+  }
+  .gstone.collected {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  .catch-btn {
+    flex-shrink: 0;
+    min-height: 56px;
+    border-radius: 14px;
+    border: none;
+    background: rgba(255,255,255,.16);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+    touch-action: manipulation;
+  }
+  .catch-btn.ready {
+    background: var(--accent);
+    color: #3a2400;
+    animation: readyPulse .5s ease infinite;
+  }
+  @keyframes readyPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(242,162,76,.6); }
+    50% { transform: scale(1.05); box-shadow: 0 0 16px rgba(242,162,76,.9); }
+  }
+
+  footer {
+    display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    font-size: 12px;
+  }
+  .home-link { color: var(--accent); text-decoration: none; min-height: 44px; display: flex; align-items: center; }
+
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.72);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: linear-gradient(160deg, #5a3a20, #2a1a0c);
+    border-radius: 18px;
+    padding: 26px 22px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,.6), inset 0 0 0 2px rgba(242,162,76,.4);
+  }
+  .overlay-card h2 { font-size: 22px; margin-bottom: 10px; }
+  .overlay-card p { font-size: 14px; line-height: 1.5; margin-bottom: 16px; opacity: .9; }
+  .result-score { font-size: 40px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+  .btn-start {
+    min-height: 44px;
+    padding: 10px 26px;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #3a2400;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🪨 공기놀이</h1>
+
+    <div class="hud">
+      <div>라운드 <span class="value" id="roundLabel">1/5</span></div>
+      <div>성공 <span class="value" id="successLabel">0</span></div>
+      <div>최고 <span class="value" id="bestLabel">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="msg-line" id="msgLine">바닥 공기알을 다 모으고 돌이 손에 닿으면 잡기!</div>
+
+      <div class="scene">
+        <div class="toss-zone">
+          <div class="flight-stone" id="flightStone">🪨</div>
+          <div class="hand-zone" id="handZone">🤲</div>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="ground-row" id="groundRow"></div>
+
+        <button class="catch-btn" id="catchBtn">잡기!</button>
+      </div>
+    </div>
+
+    <footer>
+      <small>바닥 알을 다 모으고, 돌이 손에 닿는 순간 [잡기]!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🪨 공기놀이</h2>
+      <p>돌 하나를 하늘 위로 톡 던져요!<br>돌이 떨어지는 동안 바닥의 공기알을<br>모두 톡톡 터치해서 모으고,<br>돌이 손에 닿는 순간 [잡기]를 탭하세요!<br>라운드마다 알이 하나씩 늘어나요. 5판 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0/5</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      ROUNDS: 5,
+      STONES_PER_ROUND: [1, 2, 3, 4, 5],
+      FLIGHT_MS: [3200, 2900, 2600, 2300, 2000],
+      CATCH_WINDOW_MS: [700, 600, 500, 420, 350],
+      APEX_PX: 130,
+      RESULT_DELAY: 1200,
+      BEST_KEY: 'gonggi-nori_best'
+    };
+
+    const els = {
+      round: document.getElementById('roundLabel'),
+      success: document.getElementById('successLabel'),
+      best: document.getElementById('bestLabel'),
+      msg: document.getElementById('msgLine'),
+      flightStone: document.getElementById('flightStone'),
+      handZone: document.getElementById('handZone'),
+      progressFill: document.getElementById('progressFill'),
+      groundRow: document.getElementById('groundRow'),
+      catchBtn: document.getElementById('catchBtn'),
+      startOverlay: document.getElementById('startOverlay'),
+      endOverlay: document.getElementById('endOverlay'),
+      startBtn: document.getElementById('startBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      finalScore: document.getElementById('finalScore'),
+      resultMsg: document.getElementById('resultMsg')
+    };
+
+    const state = {
+      running: false,
+      round: 0,
+      success: 0,
+      elapsed: 0,
+      collected: 0,
+      ready: false,
+      resolved: false,
+      lastT: 0
+    };
+
+    function getBest() {
+      return parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+    }
+    function setBest(v) {
+      if (v > getBest()) localStorage.setItem(CONFIG.BEST_KEY, String(v));
+    }
+
+    function updateHUD() {
+      els.round.textContent = (state.round + 1) + '/' + CONFIG.ROUNDS;
+      els.success.textContent = state.success;
+      els.best.textContent = getBest();
+    }
+
+    function buildGroundStones(count) {
+      els.groundRow.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const d = document.createElement('div');
+        d.className = 'gstone';
+        d.dataset.index = String(i);
+        d.addEventListener('pointerdown', onGroundTap);
+        els.groundRow.appendChild(d);
+      }
+    }
+
+    function onGroundTap(e) {
+      if (!state.running || state.resolved) return;
+      const el = e.currentTarget;
+      if (el.classList.contains('collected')) return;
+      el.classList.add('collected');
+      state.collected++;
+      const total = CONFIG.STONES_PER_ROUND[state.round];
+      if (!state.resolved) {
+        els.msg.textContent = '모은 알: ' + state.collected + '/' + total;
+      }
+    }
+
+    function updateVisual() {
+      const duration = CONFIG.FLIGHT_MS[state.round];
+      const p = Math.min(1, state.elapsed / duration);
+      const lift = -4 * CONFIG.APEX_PX * p * (1 - p);
+      const rot = (p - 0.5) * 50;
+      els.flightStone.style.transform = 'translate(-50%, ' + lift + 'px) rotate(' + rot + 'deg)';
+      els.progressFill.style.width = (p * 100) + '%';
+
+      const readyStart = duration - CONFIG.CATCH_WINDOW_MS[state.round];
+      if (!state.resolved) {
+        if (state.elapsed >= readyStart && !state.ready) {
+          state.ready = true;
+          els.catchBtn.classList.add('ready');
+          els.msg.textContent = '지금이야! 잡기!!';
+        }
+      }
+    }
+
+    function resetRoundState() {
+      state.elapsed = 0;
+      state.collected = 0;
+      state.ready = false;
+      state.resolved = false;
+      state.lastT = 0;
+      els.handZone.classList.remove('cheer', 'oops');
+      els.catchBtn.classList.remove('ready');
+      els.flightStone.style.transform = 'translate(-50%, 0px) rotate(0deg)';
+      els.progressFill.style.width = '0%';
+      const total = CONFIG.STONES_PER_ROUND[state.round];
+      buildGroundStones(total);
+      els.msg.textContent = total === 1
+        ? '바닥 알 1개를 모으고 돌을 잡아요!'
+        : '바닥 알 ' + total + '개를 다 모으고 돌을 잡아요!';
+      updateHUD();
+    }
+
+    function startGame() {
+      els.startOverlay.classList.add('hidden');
+      els.endOverlay.classList.add('hidden');
+      state.running = true;
+      state.round = 0;
+      state.success = 0;
+      resetRoundState();
+      requestAnimationFrame(loop);
+    }
+
+    function resolveRound(success, msg) {
+      state.resolved = true;
+      if (success) {
+        state.success++;
+        els.msg.textContent = msg || '잡았어요! 성공 🎉';
+        els.handZone.classList.add('cheer');
+      } else {
+        els.msg.textContent = msg || '앗, 놓쳤어요!';
+        els.handZone.classList.add('oops');
+      }
+      updateHUD();
+      setTimeout(nextRound, CONFIG.RESULT_DELAY);
+    }
+
+    function nextRound() {
+      state.round++;
+      if (state.round >= CONFIG.ROUNDS) {
+        endGame();
+        return;
+      }
+      resetRoundState();
+    }
+
+    function endGame() {
+      state.running = false;
+      setBest(state.success);
+      els.finalScore.textContent = state.success + '/' + CONFIG.ROUNDS;
+      els.resultMsg.textContent = state.success >= 4
+        ? '공기놀이 고수네요! 손놀림이 정말 빨라요 👑'
+        : (state.success >= 2 ? '잘했어요! 점점 손이 빨라지고 있어요!' : '재밌었죠? 한 번 더 도전해봐요!');
+      els.endOverlay.classList.remove('hidden');
+    }
+
+    function loop(t) {
+      if (!state.running) return;
+      const dt = state.lastT ? (t - state.lastT) : 16.67;
+      state.lastT = t;
+
+      if (!state.resolved) {
+        state.elapsed += dt;
+        updateVisual();
+        if (state.elapsed >= CONFIG.FLIGHT_MS[state.round]) {
+          resolveRound(false, '앗, 놓쳤어요!');
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+
+    function handleCatch() {
+      if (!state.running || state.resolved) return;
+      if (!state.ready) return;
+      const total = CONFIG.STONES_PER_ROUND[state.round];
+      const success = state.collected === total;
+      resolveRound(success, success ? '잡았어요! 성공 🎉' : '돌은 잡았지만 알을 다 못 모았어요');
+    }
+
+    els.catchBtn.addEventListener('pointerdown', handleCatch);
+    els.startBtn.addEventListener('click', startGame);
+    els.restartBtn.addEventListener('click', startGame);
+
+    els.best.textContent = getBest();
+  })();
+  </script>
+</body>
+</html>

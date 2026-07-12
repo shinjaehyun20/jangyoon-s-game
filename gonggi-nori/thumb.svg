@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bgGradGN" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a5a34"/>
+      <stop offset="100%" stop-color="#3d2412"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bgGradGN)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <text x="118" y="128" font-size="54" text-anchor="middle">🤲</text>
+  <text x="128" y="80" font-size="28" text-anchor="middle" transform="rotate(12 128 80)">🪨</text>
+
+  <circle cx="52" cy="146" r="10" fill="#7a4c22" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <circle cx="76" cy="150" r="10" fill="#7a4c22" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <circle cx="176" cy="150" r="10" fill="#7a4c22" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+
+  <rect x="40" y="160" width="150" height="8" rx="4" fill="rgba(255,255,255,0.18)"/>
+  <rect x="40" y="160" width="98" height="8" rx="4" fill="#f2a24c"/>
+
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#f2a24c">공기놀이</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">GONGGI NORI</text>
+  </g>
+</svg>

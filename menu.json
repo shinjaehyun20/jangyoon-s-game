@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "gonggi-nori",
+              "label": "🪨 공기놀이",
+              "path": "gonggi-nori/index.html"
+            },
+            {
               "id": "jump-rope-rhythm",
               "label": "🪢 줄넘기 놀이",
               "path": "jump-rope-rhythm/index.html"

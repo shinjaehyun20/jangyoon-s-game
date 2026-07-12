@@ -1334,5 +1334,13 @@
     "description": "머리 위 돌 균형을 좌우 탭으로 맞추며 목표까지 걸어가는 전통놀이, 5판 도전",
     "thumbnail": "stone-balance-walk/thumb.svg",
     "path": "stone-balance-walk/index.html"
+  },
+  {
+    "id": "gonggi-nori",
+    "title": "Gonggi Nori",
+    "title_ko": "🪨 공기놀이",
+    "description": "떨어지는 돌 잡기 전 바닥 알을 모으는 전통놀이, 알 개수 늘어나는 5판 도전",
+    "thumbnail": "gonggi-nori/thumb.svg",
+    "path": "gonggi-nori/index.html"
   }
 ]
