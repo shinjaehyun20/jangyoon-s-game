@@ -1342,5 +1342,13 @@
     "description": "떨어지는 돌 잡기 전 바닥 알을 모으는 전통놀이, 알 개수 늘어나는 5판 도전",
     "thumbnail": "gonggi-nori/thumb.svg",
     "path": "gonggi-nori/index.html"
+  },
+  {
+    "id": "sabangchigi-hop",
+    "title": "Sabangchigi Hop",
+    "title_ko": "👣 사방치기 콩콩",
+    "description": "목표 칸에 던지고 그 칸만 피해 순서대로 콩콩 밟는 전통놀이, 5판 도전",
+    "thumbnail": "sabangchigi-hop/thumb.svg",
+    "path": "sabangchigi-hop/index.html"
   }
 ]

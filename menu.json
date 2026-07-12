@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "sabangchigi-hop",
+              "label": "👣 사방치기 콩콩",
+              "path": "sabangchigi-hop/index.html"
+            },
+            {
               "id": "gonggi-nori",
               "label": "🪨 공기놀이",
               "path": "gonggi-nori/index.html"

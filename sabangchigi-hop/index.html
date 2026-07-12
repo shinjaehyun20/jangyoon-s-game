@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>사방치기 콩콩</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  :root {
+    --bg: #2b5470;
+    --bg2: #12293b;
+    --accent: #f2c94c;
+    --danger: #e5573b;
+    --safe: #7bc47f;
+    --text: #ffffff;
+  }
+  body {
+    background: linear-gradient(180deg, #3f7898 0%, var(--bg) 55%, var(--bg2) 100%);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(0,0,0,.5);
+  }
+  .hud {
+    display: flex; flex-direction: row; align-items: center; justify-content: space-around;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .hud span.value { color: var(--accent); font-size: 16px; margin-left: 4px; }
+
+  #gameArea {
+    flex: 1;
+    position: relative;
+    display: flex; flex-direction: column;
+    min-height: 0;
+    gap: 8px;
+  }
+
+  .msg-line {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    min-height: 22px;
+    text-shadow: 0 2px 4px rgba(0,0,0,.5);
+  }
+
+  .scene {
+    flex: 1;
+    min-height: 0;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(255,255,255,.06);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.1);
+  }
+
+  /* ── 조준(던지기) 단계 ── */
+  .aim-panel.hidden, .hop-panel.hidden { display: none; }
+
+  .gauge {
+    position: relative;
+    display: flex; flex-direction: row;
+    height: 54px;
+    border-radius: 12px;
+    overflow: visible;
+  }
+  .gauge-seg {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.1);
+    margin-right: 2px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    position: relative;
+  }
+  .gauge-seg:last-child { margin-right: 0; }
+  .gauge-seg.target-seg {
+    background: rgba(242,201,76,.35);
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+  .gauge-marker {
+    position: absolute;
+    top: -8px; bottom: -8px;
+    width: 6px;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(255,255,255,.9);
+    left: 0%;
+    transform: translateX(-50%);
+  }
+  .throw-btn {
+    min-height: 56px;
+    border-radius: 14px;
+    border: none;
+    background: var(--accent);
+    color: #3a2400;
+    font-size: 17px;
+    font-weight: 800;
+    touch-action: manipulation;
+  }
+  .tries-label {
+    text-align: center;
+    font-size: 13px;
+    opacity: .85;
+  }
+
+  /* ── 콩콩(홉) 단계 ── */
+  .board-row {
+    display: flex; flex-direction: row;
+    gap: 6px;
+  }
+  .tile {
+    flex: 1;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    background: rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    position: relative;
+    transition: transform .12s ease, background .15s ease;
+  }
+  .tile.stone-tile {
+    background: rgba(229,87,59,.35);
+    box-shadow: inset 0 0 0 2px var(--danger);
+  }
+  .tile.active {
+    background: rgba(123,196,127,.4);
+    box-shadow: inset 0 0 0 2px var(--safe);
+    animation: tileGlow .6s ease infinite;
+  }
+  @keyframes tileGlow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  .tile.done {
+    background: rgba(255,255,255,.05);
+    opacity: .5;
+  }
+  .tile.shake { animation: shakeAnim .3s ease; }
+  @keyframes shakeAnim {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .hopper {
+    text-align: center;
+    font-size: 34px;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,.35));
+  }
+
+  footer {
+    display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    font-size: 12px;
+  }
+  .home-link { color: var(--accent); text-decoration: none; min-height: 44px; display: flex; align-items: center; }
+
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.72);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: linear-gradient(160deg, #2c5a78, #12293b);
+    border-radius: 18px;
+    padding: 26px 22px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,.6), inset 0 0 0 2px rgba(242,201,76,.4);
+  }
+  .overlay-card h2 { font-size: 22px; margin-bottom: 10px; }
+  .overlay-card p { font-size: 14px; line-height: 1.5; margin-bottom: 16px; opacity: .9; }
+  .result-score { font-size: 40px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+  .btn-start {
+    min-height: 44px;
+    padding: 10px 26px;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #3a2400;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>👣 사방치기 콩콩</h1>
+
+    <div class="hud">
+      <div>라운드 <span class="value" id="roundLabel">1/5</span></div>
+      <div>성공 <span class="value" id="successLabel">0</span></div>
+      <div>최고 <span class="value" id="bestLabel">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="msg-line" id="msgLine">마커가 목표 칸에 있을 때 던지기를 탭하세요!</div>
+
+      <div class="scene">
+        <div class="aim-panel" id="aimPanel">
+          <div class="gauge" id="gauge">
+            <div class="gauge-marker" id="gaugeMarker"></div>
+          </div>
+          <div class="tries-label" id="triesLabel">남은 기회 3</div>
+          <button class="throw-btn" id="throwBtn">던지기!</button>
+        </div>
+
+        <div class="hop-panel hidden" id="hopPanel">
+          <div class="hopper" id="hopper">🧒</div>
+          <div class="board-row" id="boardRow"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <small>목표 칸에 던지고, 그 칸만 피해서 순서대로 콩콩!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>👣 사방치기 콩콩</h2>
+      <p>마커가 목표 칸 위에 있을 때<br>[던지기]를 탭해서 돌을 놓아요!<br>그 다음 목표 칸만 피해서<br>남은 칸들을 순서대로 콩콩 밟아요.<br>목표 칸을 밟으면 실패! 5판 도전!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0/5</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const CONFIG = {
+      ROUNDS: 5,
+      BOARD_LEN: 6,
+      TARGETS: [1, 2, 3, 4, 5],
+      MARKER_PERIOD_MS: [1400, 1250, 1100, 950, 800],
+      MAX_TRIES: 3,
+      TAP_TIME_MS: [1800, 1600, 1400, 1200, 1000],
+      RESULT_DELAY: 1200,
+      BEST_KEY: 'sabangchigi-hop_best'
+    };
+
+    const els = {
+      round: document.getElementById('roundLabel'),
+      success: document.getElementById('successLabel'),
+      best: document.getElementById('bestLabel'),
+      msg: document.getElementById('msgLine'),
+      aimPanel: document.getElementById('aimPanel'),
+      gauge: document.getElementById('gauge'),
+      gaugeMarker: document.getElementById('gaugeMarker'),
+      triesLabel: document.getElementById('triesLabel'),
+      throwBtn: document.getElementById('throwBtn'),
+      hopPanel: document.getElementById('hopPanel'),
+      hopper: document.getElementById('hopper'),
+      boardRow: document.getElementById('boardRow'),
+      startOverlay: document.getElementById('startOverlay'),
+      endOverlay: document.getElementById('endOverlay'),
+      startBtn: document.getElementById('startBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      finalScore: document.getElementById('finalScore'),
+      resultMsg: document.getElementById('resultMsg')
+    };
+
+    const state = {
+      running: false,
+      round: 0,
+      success: 0,
+      phase: 'aim',
+      triesLeft: CONFIG.MAX_TRIES,
+      markerElapsed: 0,
+      hopSequence: [],
+      hopIndex: 0,
+      tapElapsed: 0,
+      resolved: false,
+      lastT: 0
+    };
+
+    function getBest() {
+      return parseInt(localStorage.getItem(CONFIG.BEST_KEY) || '0', 10);
+    }
+    function setBest(v) {
+      if (v > getBest()) localStorage.setItem(CONFIG.BEST_KEY, String(v));
+    }
+
+    function updateHUD() {
+      els.round.textContent = (state.round + 1) + '/' + CONFIG.ROUNDS;
+      els.success.textContent = state.success;
+      els.best.textContent = getBest();
+    }
+
+    function buildGauge(target) {
+      els.gauge.querySelectorAll('.gauge-seg').forEach(function (n) { n.remove(); });
+      for (let i = 1; i <= CONFIG.BOARD_LEN; i++) {
+        const seg = document.createElement('div');
+        seg.className = 'gauge-seg' + (i === target ? ' target-seg' : '');
+        seg.textContent = (i === target) ? (i + ' 🪨') : String(i);
+        els.gauge.insertBefore(seg, els.gaugeMarker);
+      }
+    }
+
+    function buildHopSequence(target) {
+      const seq = [];
+      for (let i = 1; i <= CONFIG.BOARD_LEN; i++) {
+        if (i !== target) seq.push(i);
+      }
+      return seq;
+    }
+
+    function buildBoard(target, nextTile) {
+      els.boardRow.innerHTML = '';
+      for (let i = 1; i <= CONFIG.BOARD_LEN; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'tile' + (i === target ? ' stone-tile' : '') + (i === nextTile ? ' active' : '');
+        tile.textContent = (i === target) ? '🪨' : String(i);
+        tile.dataset.num = String(i);
+        tile.addEventListener('pointerdown', onTileTap);
+        els.boardRow.appendChild(tile);
+      }
+    }
+
+    function showAimUI() {
+      els.aimPanel.classList.remove('hidden');
+      els.hopPanel.classList.add('hidden');
+    }
+    function showHopUI() {
+      els.aimPanel.classList.add('hidden');
+      els.hopPanel.classList.remove('hidden');
+    }
+
+    function resetRoundState() {
+      state.phase = 'aim';
+      state.triesLeft = CONFIG.MAX_TRIES;
+      state.markerElapsed = 0;
+      state.hopIndex = 0;
+      state.tapElapsed = 0;
+      state.resolved = false;
+      state.lastT = 0;
+
+      const target = CONFIG.TARGETS[state.round];
+      buildGauge(target);
+      els.triesLabel.textContent = '남은 기회 ' + state.triesLeft;
+      els.msg.textContent = '이번 목표: ' + target + '번 칸! 마커가 그 칸에 있을 때 던지기!';
+      showAimUI();
+      updateHUD();
+    }
+
+    function startGame() {
+      els.startOverlay.classList.add('hidden');
+      els.endOverlay.classList.add('hidden');
+      state.running = true;
+      state.round = 0;
+      state.success = 0;
+      resetRoundState();
+      requestAnimationFrame(loop);
+    }
+
+    function startHopPhase() {
+      state.phase = 'hop';
+      state.tapElapsed = 0;
+      state.hopIndex = 0;
+      const target = CONFIG.TARGETS[state.round];
+      state.hopSequence = buildHopSequence(target);
+      buildBoard(target, state.hopSequence[0]);
+      els.msg.textContent = '순서대로 칸을 콩콩! ' + target + '번 칸은 피해요!';
+      showHopUI();
+    }
+
+    function onTileTap(e) {
+      if (state.phase !== 'hop' || !state.running || state.resolved) return;
+      const num = parseInt(e.currentTarget.dataset.num, 10);
+      const target = CONFIG.TARGETS[state.round];
+
+      if (num === target) {
+        resolveRound(false, '앗! 목표 칸을 밟았어요!');
+        return;
+      }
+      const expected = state.hopSequence[state.hopIndex];
+      if (num === expected) {
+        e.currentTarget.classList.remove('active');
+        e.currentTarget.classList.add('done');
+        state.hopIndex++;
+        state.tapElapsed = 0;
+        if (state.hopIndex >= state.hopSequence.length) {
+          resolveRound(true, '성공! 사뿐사뿐 콩콩! 🎉');
+        } else {
+          const nextNum = state.hopSequence[state.hopIndex];
+          const nextTile = els.boardRow.querySelector('[data-num="' + nextNum + '"]');
+          if (nextTile) nextTile.classList.add('active');
+        }
+      } else {
+        e.currentTarget.classList.add('shake');
+        setTimeout(function () { e.currentTarget.classList.remove('shake'); }, 300);
+      }
+    }
+
+    function throwAttempt() {
+      if (state.phase !== 'aim' || !state.running || state.resolved) return;
+      const period = CONFIG.MARKER_PERIOD_MS[state.round];
+      const frac = (state.markerElapsed % (2 * period)) / period;
+      const pos = frac <= 1 ? frac : (2 - frac);
+      const segment = Math.min(CONFIG.BOARD_LEN - 1, Math.floor(pos * CONFIG.BOARD_LEN));
+      const targetSegment = CONFIG.TARGETS[state.round] - 1;
+
+      if (segment === targetSegment) {
+        startHopPhase();
+      } else {
+        state.triesLeft--;
+        if (state.triesLeft <= 0) {
+          resolveRound(false, '이번 판은 통과! 다음 목표에 도전해요');
+        } else {
+          els.triesLabel.textContent = '남은 기회 ' + state.triesLeft;
+          els.msg.textContent = '아깝다! 다시 던지기 (' + state.triesLeft + '번 남음)';
+        }
+      }
+    }
+
+    function resolveRound(success, msg) {
+      state.resolved = true;
+      if (success) state.success++;
+      els.msg.textContent = msg;
+      updateHUD();
+      setTimeout(nextRound, CONFIG.RESULT_DELAY);
+    }
+
+    function nextRound() {
+      state.round++;
+      if (state.round >= CONFIG.ROUNDS) {
+        endGame();
+        return;
+      }
+      resetRoundState();
+    }
+
+    function endGame() {
+      state.running = false;
+      setBest(state.success);
+      els.finalScore.textContent = state.success + '/' + CONFIG.ROUNDS;
+      els.resultMsg.textContent = state.success >= 4
+        ? '사방치기 고수네요! 발놀림이 정말 가벼워요 👑'
+        : (state.success >= 2 ? '잘했어요! 균형 감각이 늘고 있어요!' : '재밌었죠? 한 번 더 도전해봐요!');
+      els.endOverlay.classList.remove('hidden');
+    }
+
+    function loop(t) {
+      if (!state.running) return;
+      const dt = state.lastT ? (t - state.lastT) : 16.67;
+      state.lastT = t;
+
+      if (!state.resolved) {
+        if (state.phase === 'aim') {
+          state.markerElapsed += dt;
+          const period = CONFIG.MARKER_PERIOD_MS[state.round];
+          const frac = (state.markerElapsed % (2 * period)) / period;
+          const pos = frac <= 1 ? frac : (2 - frac);
+          els.gaugeMarker.style.left = (pos * 100) + '%';
+        } else if (state.phase === 'hop') {
+          state.tapElapsed += dt;
+          if (state.tapElapsed >= CONFIG.TAP_TIME_MS[state.round]) {
+            resolveRound(false, '너무 늦었어요! 다음 판에 도전!');
+          }
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+
+    els.throwBtn.addEventListener('pointerdown', throwAttempt);
+    els.startBtn.addEventListener('click', startGame);
+    els.restartBtn.addEventListener('click', startGame);
+
+    els.best.textContent = getBest();
+  })();
+  </script>
+</body>
+</html>
