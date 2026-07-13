@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "paper-boat-sail",
+              "label": "⛵ 종이배 항해",
+              "path": "paper-boat-sail/index.html"
+            },
+            {
+              "id": "bear-tooth-brush",
+              "label": "🪥 곰돌이 이 닦기",
+              "path": "bear-tooth-brush/index.html"
+            },
+            {
               "id": "sabangchigi-hop",
               "label": "👣 사방치기 콩콩",
               "path": "sabangchigi-hop/index.html"

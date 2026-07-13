@@ -1344,6 +1344,22 @@
     "path": "gonggi-nori/index.html"
   },
   {
+    "id": "paper-boat-sail",
+    "title": "Paper Boat Sail",
+    "title_ko": "⛵ 종이배 항해",
+    "description": "좌우로 종이배를 조종해 별을 모으고 바위를 피하는 강물 항해 게임",
+    "thumbnail": "paper-boat-sail/thumb.svg",
+    "path": "paper-boat-sail/index.html"
+  },
+  {
+    "id": "bear-tooth-brush",
+    "title": "Bear Tooth Brush",
+    "title_ko": "🪥 곰돌이 이 닦기",
+    "description": "드래그로 곰돌이의 이를 깨끗이 닦는 5판 생활 습관 게임",
+    "thumbnail": "bear-tooth-brush/thumb.svg",
+    "path": "bear-tooth-brush/index.html"
+  },
+  {
     "id": "sabangchigi-hop",
     "title": "Sabangchigi Hop",
     "title_ko": "👣 사방치기 콩콩",
