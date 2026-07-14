@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "shadow-puppet",
+              "label": "🐇 그림자 손놀이",
+              "path": "shadow-puppet/index.html"
+            },
+            {
+              "id": "seed-sprout-race",
+              "label": "🌱 씨앗 새싹 달리기",
+              "path": "seed-sprout-race/index.html"
+            },
+            {
               "id": "paper-boat-sail",
               "label": "⛵ 종이배 항해",
               "path": "paper-boat-sail/index.html"

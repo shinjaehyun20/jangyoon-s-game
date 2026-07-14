@@ -1,5 +1,21 @@
 [
   {
+    "id": "shadow-puppet",
+    "title": "Shadow Puppet",
+    "title_ko": "🐇 그림자 손놀이",
+    "description": "빛나는 동물 그림자 순서를 기억해 같은 순서로 탭하는 5막 기억 공연",
+    "thumbnail": "shadow-puppet/thumb.svg",
+    "path": "shadow-puppet/index.html"
+  },
+  {
+    "id": "seed-sprout-race",
+    "title": "Seed Sprout Race",
+    "title_ko": "🌱 씨앗 새싹 달리기",
+    "description": "표시된 물과 햇빛 버튼을 빠르게 골라 40초 동안 꽃을 피우는 새싹 게임",
+    "thumbnail": "seed-sprout-race/thumb.svg",
+    "path": "seed-sprout-race/index.html"
+  },
+  {
     "id": "cat-teaser-play",
     "title": "Cat Teaser Play",
     "title_ko": "🧶 고양이 낚싯대 놀이",
