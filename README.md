@@ -1,10 +1,32 @@
-# 장윤이 게임 모음 (Jangyoon's Games)
+# 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-장윤이를 위한 웹 기반 미니게임 모음. 각 게임은 순수 HTML/CSS/JavaScript로 작성되어 있으며, 외부 의존성 없이 GitHub Pages에서 바로 동작한다.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 171개.
 
-🔗 **배포 주소**: <https://shinjaehyun20.github.io/jangyoon-s-game/>
+[![Games](https://img.shields.io/badge/games-171-6C5CE7)](games.json)
+[![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
+[![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+[![171개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+
+**[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
+
+| 골라 시작하기 | 대표 경험 | 입력 방식 |
+| --- | --- | --- |
+| 모험·액션 | 터널 달리기, 종이비행기, 미니골프 | 탭 · 스와이프 |
+| 학습·인지 | 한글, 숫자, 기억, 순서 | 키보드 · 선택 |
+| 만들기·창의 | 케이크, 레일, 색칠 | 드래그 · 그리기 |
+| 전통놀이 | 딱지치기, 공기놀이, 제기차기 | 타이밍 · 균형 |
+
+각 게임은 독립된 순수 HTML/CSS/JavaScript 페이지입니다. 루트 카탈로그는 `games.json`을 읽어 썸네일 카드와 검색 가능한 시작 경로를 제공합니다.
+
+![실제 게임 카탈로그 화면](docs/assets/product-preview.png)
 
 ## 게임 목록
+
+<details>
+<summary><strong>전체 171개 게임 목록 펼치기</strong></summary>
+
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -133,6 +155,8 @@
 | [🚂 큐큐 기차역](./queue-train) | 맨 앞 칸을 보고 같은 색 역으로 보내는 Queue 자료구조 응용 기차 게임 | 학습/인지 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
+
+</details>
 
 ## 프로젝트 구조
 
