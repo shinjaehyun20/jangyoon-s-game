@@ -1,14 +1,5 @@
 # 변경 이력
 
-## 2026-07-15 — 장윤이 꼬마마을 (jangyoon-little-town)
-
-- OpenAI Developers Showcase의 MiniTown에서 `구역을 배치하고 살아나는 마을을 관찰하는 즐거움`을 추출해, 7살 장윤이용 90초 2.5D 마을 놀이로 재기획.
-- 집·가게·공원 3종을 빈 등각 타일에 탭해서 배치하면 2.6초 건설 단계를 거치고, 건물 주변 빈 칸에 도로가 자동 생성됨.
-- 완성된 집과 가게·공원 사이를 주민과 동물 친구가 자동으로 오가며, 24초 낮밤 순환에 따라 밤하늘·창문·불빛이 따뜻하게 변화함.
-- `🔎 구경` 모드에서 건물을 탭해 역할을 살펴보고, 집 3·가게 2·공원 1 균형 목표와 행복·주민·마을별 점수를 통해 성취감을 제공.
-- 기존 `vegetable-garden`의 반복 파종·급수·수확 관리, `castle-builder`의 탭 타이밍 적층과 달리 **tap-to-zone-and-watch** 관찰형 샌드박스가 주 동사.
-- 단일 HTML + SVG 썸네일, 외부 의존성 없음, localStorage 최고점(`jangyoon-little-town_best`) 저장.
-
 ## 2026-07-06 — 고양이 낚싯대 놀이 (cat-teaser-play) · 종이비행기 날리기 (paper-airplane-fly)
 
 - **cat-teaser-play** — 화면을 드래그해 깃털(🪶)을 움직이면 고양이(🐱)가 lerp 추적(`CAT_LERP: 0.09`, dt 정규화)으로 따라와 실뭉치(🧶)를 낚아채는 드래그 유도 게임. 실뭉치는 최대 2개 동시 등장(`MAX_YARN: 2`), 포획 반경 32px, `YARN_LIFETIME_MS: 5000` 안에 못 잡으면 fade-out 후 재등장. 40초 타임어택, localStorage 최고점(`cat-teaser-play_best`). CSS `perspective`+`rotateX` 원근 방바닥(diving-board-jump 기법 재사용)과 그림자+본체 레이어 분리 3D 카드.

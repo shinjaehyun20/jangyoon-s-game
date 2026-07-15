@@ -1,13 +1,5 @@
 [
   {
-    "id": "jangyoon-little-town",
-    "title": "Jangyoon Little Town",
-    "title_ko": "🏡 장윤이 꼬마마을",
-    "description": "집·가게·공원을 놓으면 자동 도로와 주민 일과, 따뜻한 낮밤이 살아나는 2.5D 마을 놀이",
-    "thumbnail": "jangyoon-little-town/thumb.svg",
-    "path": "jangyoon-little-town/index.html"
-  },
-  {
     "id": "shadow-puppet",
     "title": "Shadow Puppet",
     "title_ko": "🐇 그림자 손놀이",

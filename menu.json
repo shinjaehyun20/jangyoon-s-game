@@ -4,11 +4,6 @@
     "label": "어린이 추천",
     "items": [
             {
-              "id": "jangyoon-little-town",
-              "label": "🏡 장윤이 꼬마마을",
-              "path": "jangyoon-little-town/index.html"
-            },
-            {
               "id": "shadow-puppet",
               "label": "🐇 그림자 손놀이",
               "path": "shadow-puppet/index.html"
