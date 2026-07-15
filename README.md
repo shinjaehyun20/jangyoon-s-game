@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 171개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 175개.
 
-[![Games](https://img.shields.io/badge/games-171-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-175-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![171개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![175개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -30,6 +30,8 @@
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🥪 샌드위치 주문 (sandwich-order)](./sandwich-order) | 주문표의 재료 순서를 기억해 45초 동안 샌드위치를 완성. 틀리면 현재 주문만 다시 시작하고 localStorage 최고 완성 수 저장 | 어린이/기억·생활학습 |
+| [🧺 빨래 색깔 분류 (laundry-sort)](./laundry-sort) | 옷 색과 같은 바구니를 골라 40초 동안 빨래를 정리. 오답 감점 없이 색 인지 반복, localStorage 최고 정리 수 저장 | 어린이/색인지·생활학습 |
 | [🐇 그림자 손놀이 (shadow-puppet)](./shadow-puppet) | 토끼·새·강아지 그림자가 빛나는 순서를 기억한 뒤 같은 순서로 탭하는 5막 기억 공연. 막마다 순서가 3개에서 7개로 늘고, 틀려도 다시 보여주는 좌절 방지 설계, localStorage 최고점 | 어린이/기억·순서 |
 | [🌱 씨앗 새싹 달리기 (seed-sprout-race)](./seed-sprout-race) | 화면에 표시된 물·햇빛 버튼을 빠르게 골라 성장 게이지를 채우고 40초 동안 여러 꽃을 피우는 큐 반응 게임. 오답은 한 단계만 후퇴, localStorage 최고 꽃 기록 | 어린이/반응·생활학습 |
 | [⛵ 종이배 항해 (paper-boat-sail)](./paper-boat-sail) | 좌우 버튼을 꾹 눌러 종이배를 조종하며 강문을 통과하고 별을 모으는 40초 항해 게임. 바위에 닿으면 다음 항해로 다시 도전, localStorage 최고 별 기록 | 어린이/조향·반사 |
@@ -324,6 +326,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-07)
+
+- **🥪 샌드위치 주문 · 🧺 빨래 색깔 분류 추가 (2026-07-16)** — 샌드위치 주문은 주문표의 재료를 왼쪽부터 기억해 조립하는 45초 순서 기억 게임으로, 기존 요리 게임과 달리 시퀀스 회상이 핵심입니다. 빨래 색깔 분류는 옷 색과 같은 바구니를 고르는 40초 생활 학습 게임으로, 오답 감점 없이 색 인지를 반복합니다. 두 게임 모두 단일 HTML, SVG 썸네일, 외부 의존성 0건, Pointer Events, localStorage 최고기록을 포함합니다.
 
 - **🐇 그림자 손놀이 · 🌱 씨앗 새싹 달리기 추가 (2026-07-15)** — 그림자 손놀이는 토끼·새·강아지의 점등 순서를 기억해 같은 순서로 재현하는 5막 기억 공연으로, 기존 shadow-match의 단일 그림자 식별과 달리 길어지는 시퀀스 회상이 핵심입니다. 씨앗 새싹 달리기는 화면의 물·햇빛 큐에 맞는 버튼을 빠르게 골라 40초 동안 여러 꽃을 피우는 반응 레이스로, vegetable-garden의 자유 재배와 달리 시간제한·즉시 큐 판정·반복 성장 루프를 사용합니다. 두 게임 모두 단일 HTML, SVG 썸네일, 외부 의존성 0건, Pointer Events, localStorage 최고기록을 포함합니다.
 

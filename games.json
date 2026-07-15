@@ -1,5 +1,21 @@
 [
   {
+    "id": "sandwich-order",
+    "title": "Sandwich Order",
+    "title_ko": "🥪 샌드위치 주문",
+    "description": "주문표의 재료 순서를 기억해 45초 동안 샌드위치를 완성하는 순서 기억 게임",
+    "thumbnail": "sandwich-order/thumb.svg",
+    "path": "sandwich-order/index.html"
+  },
+  {
+    "id": "laundry-sort",
+    "title": "Laundry Color Sort",
+    "title_ko": "🧺 빨래 색깔 분류",
+    "description": "옷 색을 보고 같은 색 바구니를 골라 40초 동안 빨래를 정리하는 생활 학습 게임",
+    "thumbnail": "laundry-sort/thumb.svg",
+    "path": "laundry-sort/index.html"
+  },
+  {
     "id": "shadow-puppet",
     "title": "Shadow Puppet",
     "title_ko": "🐇 그림자 손놀이",

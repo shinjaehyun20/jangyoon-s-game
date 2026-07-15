@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "sandwich-order",
+              "label": "🥪 샌드위치 주문",
+              "path": "sandwich-order/index.html"
+            },
+            {
+              "id": "laundry-sort",
+              "label": "🧺 빨래 색깔 분류",
+              "path": "laundry-sort/index.html"
+            },
+            {
               "id": "shadow-puppet",
               "label": "🐇 그림자 손놀이",
               "path": "shadow-puppet/index.html"
