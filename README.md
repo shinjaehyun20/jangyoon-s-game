@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 171개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 174개.
 
-[![Games](https://img.shields.io/badge/games-171-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-174-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![171개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![174개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 171개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 174개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🏡 장윤이 꼬마마을 (jangyoon-little-town)](./jangyoon-little-town) | 집·가게·공원을 탭해 배치하면 건설 단계·자동 도로·주민 이동·낮밤 불빛이 스스로 살아나는 90초 2.5D 관찰형 마을 놀이 | 어린이/창의·관찰 |
 | [🐇 그림자 손놀이 (shadow-puppet)](./shadow-puppet) | 토끼·새·강아지 그림자가 빛나는 순서를 기억한 뒤 같은 순서로 탭하는 5막 기억 공연. 막마다 순서가 3개에서 7개로 늘고, 틀려도 다시 보여주는 좌절 방지 설계, localStorage 최고점 | 어린이/기억·순서 |
 | [🌱 씨앗 새싹 달리기 (seed-sprout-race)](./seed-sprout-race) | 화면에 표시된 물·햇빛 버튼을 빠르게 골라 성장 게이지를 채우고 40초 동안 여러 꽃을 피우는 큐 반응 게임. 오답은 한 단계만 후퇴, localStorage 최고 꽃 기록 | 어린이/반응·생활학습 |
 | [⛵ 종이배 항해 (paper-boat-sail)](./paper-boat-sail) | 좌우 버튼을 꾹 눌러 종이배를 조종하며 강문을 통과하고 별을 모으는 40초 항해 게임. 바위에 닿으면 다음 항해로 다시 도전, localStorage 최고 별 기록 | 어린이/조향·반사 |
@@ -325,6 +326,7 @@ VS Code `Live Server` 확장을 써도 된다.
 
 ## 최근 변경사항 (2026-07)
 
+- **🏡 장윤이 꼬마마을 추가 (2026-07-15)** — OpenAI MiniTown의 `구역 배치 후 살아나는 마을 관찰`을 7살용 단일 HTML 게임으로 재해석. 집·가게·공원을 탭해 놓으면 건설 단계, 주변 자동 도로, 주민 통근, 낮밤 순환과 야간 불빛이 이어집니다. 기존 채소 텃밭의 반복 성장 관리나 성 쌓기의 타이밍 적층과 달리 `tap-to-zone-and-watch`가 핵심입니다.
 - **🐇 그림자 손놀이 · 🌱 씨앗 새싹 달리기 추가 (2026-07-15)** — 그림자 손놀이는 토끼·새·강아지의 점등 순서를 기억해 같은 순서로 재현하는 5막 기억 공연으로, 기존 shadow-match의 단일 그림자 식별과 달리 길어지는 시퀀스 회상이 핵심입니다. 씨앗 새싹 달리기는 화면의 물·햇빛 큐에 맞는 버튼을 빠르게 골라 40초 동안 여러 꽃을 피우는 반응 레이스로, vegetable-garden의 자유 재배와 달리 시간제한·즉시 큐 판정·반복 성장 루프를 사용합니다. 두 게임 모두 단일 HTML, SVG 썸네일, 외부 의존성 0건, Pointer Events, localStorage 최고기록을 포함합니다.
 
 - **⛵ 종이배 항해 · 🪥 곰돌이 이 닦기 추가 (2026-07-14)** — 종이배 항해는 좌우 버튼 홀드로 종이배를 조향해 내려오는 강문을 통과하고 별을 모으는 40초 강물 항해(바위 충돌 시 즉시 안전한 재도전)로, 기존 car-race의 차선 전환과 달리 연속 조향·상하 스크롤 장애물 판정을 사용합니다. 곰돌이 이 닦기는 치아를 드래그로 세 번씩 문질러 반짝이게 만든 뒤 5판을 완성하는 생활 습관 놀이로, color-fill의 탭 채우기와 달리 드래그 누적 제스처가 핵심입니다. 두 게임 모두 단일 HTML, SVG 썸네일, 외부 의존성 0건, localStorage 최고기록을 포함합니다.

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>🏡 장윤이 꼬마마을</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--ink:#20362d;--cream:#fff9e7;--green:#67b56b;--yellow:#ffd166;--blue:#74b9ff;--coral:#ff7f6e}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation;font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#c9ecff;color:var(--ink);user-select:none}
+body.night{background:#17284b;color:#eef6ff}
+.wrap{width:100%;max-width:520px;height:100vh;height:100dvh;margin:0 auto;padding:7px 9px 6px;display:flex;flex-direction:column;gap:6px;position:relative}
+.topline{display:flex;align-items:center;justify-content:space-between;min-height:32px}
+h1{font-size:clamp(18px,5vw,25px);line-height:1;letter-spacing:-.04em;text-shadow:0 2px 0 rgba(255,255,255,.65)}
+body.night h1{text-shadow:0 2px 8px rgba(255,214,102,.35)}
+.home-link{min-width:52px;min-height:32px;padding:6px 9px;border-radius:11px;background:rgba(255,255,255,.76);color:#244034;text-decoration:none;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(42,91,65,.14)}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.hud-item{background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.8);border-radius:12px;padding:5px 3px;text-align:center;box-shadow:0 2px 0 rgba(49,102,76,.12);font-size:11px;font-weight:800;color:#385347;line-height:1.12}
+.hud-item b{display:block;color:#234b37;font-size:15px;margin-top:2px;font-variant-numeric:tabular-nums}
+#world{position:relative;flex:1;min-height:0;border-radius:20px;overflow:hidden;background:linear-gradient(#9edcff 0 47%,#bde58e 47% 100%);border:3px solid rgba(255,255,255,.72);box-shadow:inset 0 -18px 30px rgba(45,101,56,.16),0 5px 12px rgba(48,93,71,.18);touch-action:none;isolation:isolate}
+#world.night{background:linear-gradient(#19325d 0 47%,#466b55 47% 100%);border-color:rgba(175,205,255,.35)}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#toast{position:absolute;top:10px;left:50%;transform:translate(-50%,-12px);padding:7px 13px;border-radius:999px;background:rgba(27,55,43,.88);color:#fff;font-size:12px;font-weight:900;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap;z-index:5}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#infoCard{position:absolute;left:10px;right:10px;bottom:9px;background:rgba(255,251,230,.94);border:2px solid rgba(255,255,255,.85);border-radius:15px;padding:8px 11px;color:#294438;font-size:12px;font-weight:800;line-height:1.35;box-shadow:0 4px 12px rgba(31,65,49,.18);opacity:0;transform:translateY(8px);pointer-events:none;transition:.18s;z-index:4}
+#infoCard.show{opacity:1;transform:translateY(0)}
+.toolbar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.tool{min-height:50px;border:0;border-radius:14px;background:#fffdf3;color:#385347;font-size:11px;font-weight:900;box-shadow:0 3px 0 #b5cdb8;display:flex;flex-direction:column;gap:1px;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.tool .ico{font-size:21px;line-height:1}.tool.selected{background:#fff0a8;outline:3px solid #ffb84d;transform:translateY(-1px)}.tool:active{transform:translateY(2px);box-shadow:0 1px 0 #b5cdb8}.tool .cost{font-size:9px;color:#728478}.tool[data-tool="explore"]{background:#eaf5ff}.tool[data-tool="explore"].selected{background:#cde9ff;outline-color:#4da3ff}
+.goal{display:flex;align-items:center;gap:7px;padding:3px 4px;font-size:11px;font-weight:800;min-height:18px}.goal-track{height:7px;flex:1;background:rgba(255,255,255,.65);border-radius:8px;overflow:hidden}.goal-fill{height:100%;width:0;background:linear-gradient(90deg,#ffb84d,#62c879);border-radius:8px;transition:width .3s}
+footer{display:flex;justify-content:space-between;align-items:center;min-height:14px;font-size:10px;color:#4c695c;padding:0 3px}body.night footer{color:#cfe1ef}
+.overlay{position:fixed;inset:0;background:rgba(25,43,55,.64);display:flex;align-items:center;justify-content:center;z-index:20;padding:18px}.overlay.hidden{display:none}.card{width:min(350px,94vw);background:var(--cream);border-radius:24px;padding:22px 20px 18px;text-align:center;color:var(--ink);box-shadow:0 22px 60px rgba(16,32,42,.36);border:3px solid rgba(255,255,255,.92)}.card h2{font-size:25px;letter-spacing:-.04em;margin-bottom:7px}.card .lead{font-size:14px;line-height:1.55;color:#506b5d;margin-bottom:12px}.steps{display:grid;gap:6px;text-align:left;margin:10px 0 14px}.step{background:#eef6df;border-radius:12px;padding:7px 10px;font-size:12px;font-weight:800}.btn{width:100%;min-height:50px;border:0;border-radius:15px;background:linear-gradient(135deg,#66c570,#43a96b);color:#fff;font-size:17px;font-weight:900;box-shadow:0 4px 0 #2f7950;cursor:pointer}.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #2f7950}.result{font-size:40px;font-weight:1000;color:#f29f37;margin:4px 0}.badge{display:inline-block;padding:5px 10px;border-radius:999px;background:#fff0a7;color:#71551c;font-size:12px;font-weight:900;margin-bottom:8px}
+@media(max-height:620px){.wrap{padding:4px 7px 3px;gap:4px}.topline{min-height:27px}.home-link{min-height:28px}.hud-item{padding:3px 2px}.hud-item b{font-size:13px}.tool{min-height:44px}.tool .ico{font-size:18px}.goal{min-height:13px}.card{padding:16px}.steps{margin:7px 0 10px;gap:4px}.step{padding:5px 8px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topline"><h1>🏡 장윤이 꼬마마을</h1><a class="home-link" href="../index.html">← 홈</a></div>
+  <div class="hud">
+    <div class="hud-item">🪙 마을별<b id="coins">12</b></div>
+    <div class="hud-item">😊 행복<b id="happy">0</b></div>
+    <div class="hud-item">👧 주민<b id="people">0</b></div>
+    <div class="hud-item" id="clockBox"><span id="phase">☀️ 낮</span><b id="time">90</b></div>
+  </div>
+  <div id="world">
+    <canvas id="canvas" aria-label="장윤이 꼬마마을 건설판"></canvas>
+    <div id="toast" role="status"></div>
+    <div id="infoCard"></div>
+  </div>
+  <div class="toolbar" aria-label="건물 선택">
+    <button class="tool selected" data-tool="home"><span class="ico">🏠</span><span>집</span><span class="cost">별 2개</span></button>
+    <button class="tool" data-tool="shop"><span class="ico">🍎</span><span>가게</span><span class="cost">별 3개</span></button>
+    <button class="tool" data-tool="park"><span class="ico">🌳</span><span>공원</span><span class="cost">별 2개</span></button>
+    <button class="tool" data-tool="explore"><span class="ico">🔎</span><span>구경</span><span class="cost">마을 보기</span></button>
+  </div>
+  <div class="goal"><span id="goalText">목표: 집 3 · 가게 2 · 공원 1</span><div class="goal-track"><div class="goal-fill" id="goalFill"></div></div></div>
+  <footer><small>빈 땅을 탭하면 건설! 구경 모드에서 건물을 살펴봐요.</small><span>자동 도로 · 낮밤</span></footer>
+</div>
+
+<div class="overlay" id="startOverlay">
+ <div class="card">
+  <div class="badge">MiniTown에서 착안한 7살용 마을 놀이</div>
+  <h2>🏡 장윤이 꼬마마을</h2>
+  <p class="lead">집·가게·공원을 놓으면 길이 생기고<br>주민들이 하루 일과를 시작해요!</p>
+  <div class="steps">
+   <div class="step">1️⃣ 아래에서 건물을 고르고 빈 땅을 탭</div>
+   <div class="step">2️⃣ 집 3 · 가게 2 · 공원 1을 만들어 목표 달성</div>
+   <div class="step">3️⃣ 🔎 구경 모드로 주민과 불빛 관찰</div>
+  </div>
+  <button class="btn" id="startBtn">마을 만들기!</button>
+ </div>
+</div>
+<div class="overlay hidden" id="endOverlay">
+ <div class="card">
+  <h2>🎉 꼬마마을 완성!</h2>
+  <div class="result" id="finalScore">0</div>
+  <p class="lead" id="resultMsg"></p>
+  <button class="btn" id="restartBtn">새 마을 만들기</button>
+ </div>
+</div>
+<script>
+(function(){
+'use strict';
+const CONFIG={ROWS:5,COLS:5,DURATION:90,START_COINS:12,CYCLE_SECONDS:24,BUILD_SECONDS:2.6,COST:{home:2,shop:3,park:2},GOAL:{home:3,shop:2,park:1},BEST_KEY:'jangyoon-little-town_best'};
+const TYPES={home:{emoji:'🏠',name:'포근한 집',color:'#f59f80'},shop:{emoji:'🍎',name:'사과 가게',color:'#ffd166'},park:{emoji:'🌳',name:'초록 공원',color:'#73c56d'}};
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),world=document.getElementById('world');
+const ui={coins:document.getElementById('coins'),happy:document.getElementById('happy'),people:document.getElementById('people'),time:document.getElementById('time'),phase:document.getElementById('phase'),toast:document.getElementById('toast'),info:document.getElementById('infoCard'),goalText:document.getElementById('goalText'),goalFill:document.getElementById('goalFill'),start:document.getElementById('startOverlay'),end:document.getElementById('endOverlay'),final:document.getElementById('finalScore'),msg:document.getElementById('resultMsg')};
+let state,raf,last=0,timerId,toastId,infoId,layout={};
+function freshState(){return{running:false,coins:CONFIG.START_COINS,happy:0,time:CONFIG.DURATION,elapsed:0,tool:'home',tiles:Array.from({length:CONFIG.ROWS},()=>Array(CONFIG.COLS).fill(null)),people:[],sparkles:[],won:false,best:Number(localStorage.getItem(CONFIG.BEST_KEY)||0)}}
+function resize(){const r=world.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(r.width*d));canvas.height=Math.max(1,Math.round(r.height*d));canvas.style.width=r.width+'px';canvas.style.height=r.height+'px';ctx.setTransform(d,0,0,d,0,0);layout.w=r.width;layout.h=r.height;layout.tw=Math.min(r.width/(CONFIG.COLS+1.3),74);layout.th=layout.tw*.50;layout.ox=r.width/2;layout.oy=Math.max(66,r.height*.23);draw()}
+function iso(row,col){return{x:layout.ox+(col-row)*layout.tw/2,y:layout.oy+(col+row)*layout.th/2}}
+function diamond(x,y,w,h,fill,stroke){ctx.beginPath();ctx.moveTo(x,y-h/2);ctx.lineTo(x+w/2,y);ctx.lineTo(x,y+h/2);ctx.lineTo(x-w/2,y);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
+function roundRect(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill()}
+function isNight(){const phase=(state.elapsed%CONFIG.CYCLE_SECONDS)/CONFIG.CYCLE_SECONDS;return phase>.53}
+function sky(){const night=isNight();const grad=ctx.createLinearGradient(0,0,0,layout.h);if(night){grad.addColorStop(0,'#13254b');grad.addColorStop(.55,'#294b68');grad.addColorStop(1,'#4f765b')}else{grad.addColorStop(0,'#8fd5ff');grad.addColorStop(.48,'#d9f2ff');grad.addColorStop(1,'#a9d77a')}ctx.fillStyle=grad;ctx.fillRect(0,0,layout.w,layout.h);if(night){ctx.fillStyle='rgba(255,246,190,.9)';for(let i=0;i<22;i++){const x=(i*83%Math.max(1,layout.w)),y=12+(i*47%Math.max(40,layout.h*.35));ctx.beginPath();ctx.arc(x,y,1+(i%3)*.35,0,Math.PI*2);ctx.fill()}ctx.font='28px sans-serif';ctx.fillText('🌙',layout.w-48,42)}else{ctx.font='30px sans-serif';ctx.fillText('☀️',layout.w-48,42);ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(60,38,35,12,0,0,Math.PI*2);ctx.ellipse(92,42,26,10,0,0,Math.PI*2);ctx.fill()}}
+function occupied(r,c){return r>=0&&c>=0&&r<CONFIG.ROWS&&c<CONFIG.COLS&&state.tiles[r][c]}
+function drawRoads(){for(let r=0;r<CONFIG.ROWS;r++)for(let c=0;c<CONFIG.COLS;c++){if(occupied(r,c))continue;const near=occupied(r-1,c)||occupied(r+1,c)||occupied(r,c-1)||occupied(r,c+1);if(!near)continue;const p=iso(r,c);diamond(p.x,p.y,layout.tw-2,layout.th-2,isNight()?'#54605e':'#cfbc8f','#ae9e79');ctx.strokeStyle=isNight()?'rgba(255,220,128,.75)':'rgba(255,255,255,.72)';ctx.setLineDash([5,6]);ctx.beginPath();ctx.moveTo(p.x-layout.tw*.22,p.y);ctx.lineTo(p.x+layout.tw*.22,p.y);ctx.stroke();ctx.setLineDash([])}}
+function drawBuilding(r,c,tile){const p=iso(r,c),night=isNight(),age=Math.min(1,(state.elapsed-tile.born)/CONFIG.BUILD_SECONDS);diamond(p.x,p.y,layout.tw-3,layout.th-3,night?'#537053':'#79b963','#487d4c');if(age<1){const h=8+age*24;roundRect(p.x-17,p.y-h,34,h,5,'#d89b58');ctx.strokeStyle='#fff3bc';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p.x-20,p.y-h+5);ctx.lineTo(p.x+20,p.y-h+5);ctx.stroke();ctx.font='18px sans-serif';ctx.textAlign='center';ctx.fillText('🔨',p.x,p.y-h-4);return}
+if(tile.type==='park'){ctx.fillStyle='rgba(21,55,34,.25)';ctx.beginPath();ctx.ellipse(p.x,p.y+8,20,7,0,0,Math.PI*2);ctx.fill();ctx.font=Math.max(27,layout.tw*.48)+'px sans-serif';ctx.textAlign='center';ctx.fillText('🌳',p.x,p.y+3);ctx.font='14px sans-serif';ctx.fillText(tile.variant?'🛝':'🌼',p.x+15,p.y+9);return}
+const h=tile.type==='home'?29:25,w=tile.type==='home'?36:42;ctx.fillStyle='rgba(25,44,33,.25)';ctx.beginPath();ctx.ellipse(p.x,p.y+9,w*.55,7,0,0,Math.PI*2);ctx.fill();roundRect(p.x-w/2,p.y-h,w,h,5,tile.type==='home'?'#ffe1c8':'#ffe38a');ctx.fillStyle=tile.type==='home'?'#d76d59':'#ff8b4d';ctx.beginPath();ctx.moveTo(p.x-w*.6,p.y-h+3);ctx.lineTo(p.x,p.y-h-18);ctx.lineTo(p.x+w*.6,p.y-h+3);ctx.closePath();ctx.fill();ctx.fillStyle=night?'#ffd76b':'#87c7e8';for(const dx of[-w*.24,w*.14]){roundRect(p.x+dx,p.y-h+8,8,9,2,ctx.fillStyle)}if(tile.type==='shop'){ctx.font='15px sans-serif';ctx.textAlign='center';ctx.fillText('🍎',p.x,p.y-5)}else{ctx.fillStyle='#845136';roundRect(p.x-4,p.y-13,8,13,2,ctx.fillStyle)}if(night){ctx.shadowColor='#ffd76b';ctx.shadowBlur=12;ctx.fillStyle='rgba(255,215,107,.22)';ctx.fillRect(p.x-w/2,p.y-h,w,h);ctx.shadowBlur=0}}
+function drawResidents(){for(const a of state.people){const from=iso(a.from.r,a.from.c),to=iso(a.to.r,a.to.c),t=(Math.sin(state.elapsed*a.speed+a.phase)+1)/2,x=from.x+(to.x-from.x)*t,y=from.y+(to.y-from.y)*t-8;ctx.fillStyle='rgba(28,49,38,.25)';ctx.beginPath();ctx.ellipse(x,y+7,6,2.5,0,0,Math.PI*2);ctx.fill();ctx.font='15px sans-serif';ctx.textAlign='center';ctx.fillText(a.emoji,x,y+4)}}
+function drawSparkles(dt){for(const s of state.sparkles){s.life-=dt;s.y-=dt*16;ctx.globalAlpha=Math.max(0,s.life);ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(s.x,s.y,2+s.life*2,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;state.sparkles=state.sparkles.filter(s=>s.life>0)}
+function draw(dt=0){if(!state)return;sky();drawRoads();for(let sum=0;sum<CONFIG.ROWS+CONFIG.COLS-1;sum++)for(let r=0;r<CONFIG.ROWS;r++){const c=sum-r;if(c<0||c>=CONFIG.COLS)continue;const p=iso(r,c),tile=state.tiles[r][c];if(tile)drawBuilding(r,c,tile);else diamond(p.x,p.y,layout.tw-3,layout.th-3,isNight()?'#47624e':'#8bc56c','rgba(49,97,54,.35)')}drawResidents();drawSparkles(dt)}
+function pickCell(x,y){let best=null,dist=Infinity;for(let r=0;r<CONFIG.ROWS;r++)for(let c=0;c<CONFIG.COLS;c++){const p=iso(r,c),dx=Math.abs(x-p.x)/(layout.tw/2),dy=Math.abs(y-p.y)/(layout.th/2),d=dx+dy;if(d<=1&&d<dist){best={r,c};dist=d}}return best}
+function counts(){const out={home:0,shop:0,park:0};state.tiles.flat().forEach(t=>{if(t)out[t.type]++});return out}
+function completedBuildings(){return state.tiles.flat().filter(t=>t&&state.elapsed-t.born>=CONFIG.BUILD_SECONDS)}
+function recalc(){const c=counts(),built=completedBuildings(),homes=built.filter(t=>t.type==='home').length,shops=built.filter(t=>t.type==='shop').length,parks=built.filter(t=>t.type==='park').length;state.happy=Math.min(100,homes*12+shops*14+parks*18+Math.min(homes,shops)*5+Math.min(homes,parks)*4);const targetPeople=Math.min(8,homes*2,shops+parks+homes);const coords=[];for(let r=0;r<CONFIG.ROWS;r++)for(let col=0;col<CONFIG.COLS;col++)if(state.tiles[r][col]&&state.elapsed-state.tiles[r][col].born>=CONFIG.BUILD_SECONDS)coords.push({r,c:col,type:state.tiles[r][col].type});while(state.people.length<targetPeople&&coords.length>1){const homesAt=coords.filter(x=>x.type==='home'),dest=coords.filter(x=>x.type!=='home');if(!homesAt.length||!dest.length)break;state.people.push({from:homesAt[state.people.length%homesAt.length],to:dest[state.people.length%dest.length],emoji:['🧒','👧','🐶','🐱'][state.people.length%4],phase:state.people.length*1.3,speed:.65+state.people.length*.06})}
+const done=Object.keys(CONFIG.GOAL).every(k=>c[k]>=CONFIG.GOAL[k]);const progress=Object.keys(CONFIG.GOAL).reduce((n,k)=>n+Math.min(c[k],CONFIG.GOAL[k]),0)/Object.values(CONFIG.GOAL).reduce((a,b)=>a+b,0);ui.goalFill.style.width=(progress*100)+'%';ui.goalText.textContent=done?'🎉 목표 달성! 이제 마을을 구경해요':'목표: 집 '+c.home+'/3 · 가게 '+c.shop+'/2 · 공원 '+c.park+'/1';if(done&&!state.won){state.won=true;state.coins+=4;toast('목표 달성! 마을별 +4 ⭐')}ui.coins.textContent=state.coins;ui.happy.textContent=state.happy;ui.people.textContent=state.people.length}
+function build(cell){if(!state.running)return;const existing=state.tiles[cell.r][cell.c];if(state.tool==='explore'){inspect(cell);return}if(existing){inspect(cell);return}const cost=CONFIG.COST[state.tool];if(state.coins<cost){toast('마을별이 부족해요! 완성된 건물이 별을 벌어요');return}state.coins-=cost;state.tiles[cell.r][cell.c]={type:state.tool,born:state.elapsed,variant:Math.random()>.5};const p=iso(cell.r,cell.c);for(let i=0;i<12;i++)state.sparkles.push({x:p.x+(Math.random()-.5)*28,y:p.y-5,color:['#fff','#ffd166','#79d783'][i%3],life:.6+Math.random()*.5});toast(TYPES[state.tool].emoji+' '+TYPES[state.tool].name+' 건설 시작!');recalc();draw()}
+function inspect(cell){const t=state.tiles[cell.r][cell.c];if(!t){toast('빈 땅이에요. 건물을 골라 만들어봐요!');return}const age=Math.min(1,(state.elapsed-t.born)/CONFIG.BUILD_SECONDS),desc=t.type==='home'?'주민들이 쉬고 하루를 시작하는 포근한 집':t.type==='shop'?'주민들이 과일을 사고 만나는 활기찬 가게':'친구들이 산책하고 행복을 채우는 초록 공원';ui.info.textContent=TYPES[t.type].emoji+' '+TYPES[t.type].name+' · '+(age<1?'건설 중 '+Math.round(age*100)+'%':desc);ui.info.classList.add('show');clearTimeout(infoId);infoId=setTimeout(()=>ui.info.classList.remove('show'),2300)}
+function toast(msg){ui.toast.textContent=msg;ui.toast.classList.add('show');clearTimeout(toastId);toastId=setTimeout(()=>ui.toast.classList.remove('show'),1600)}
+function setTool(tool){state.tool=tool;document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('selected',b.dataset.tool===tool));toast(tool==='explore'?'구경 모드: 건물을 탭해 살펴봐요':TYPES[tool].emoji+' '+TYPES[tool].name+' 선택')}
+function pointer(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();const p=pointer(e),cell=pickCell(p.x,p.y);if(cell)build(cell)});
+document.querySelectorAll('.tool').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
+function tick(ts){if(!state.running)return;const dt=Math.min(.04,(ts-last)/1000||0);last=ts;state.elapsed+=dt;const night=isNight();world.classList.toggle('night',night);document.body.classList.toggle('night',night);ui.phase.textContent=night?'🌙 밤':'☀️ 낮';ui.time.textContent=Math.max(0,Math.ceil(state.time));draw(dt);raf=requestAnimationFrame(tick)}
+function second(){if(!state.running)return;state.time-=1;recalc();if(Math.floor(state.elapsed)%5===0&&completedBuildings().length){state.coins=Math.min(30,state.coins+1);toast('살아있는 마을이 마을별 +1 ⭐') }if(state.time<=0)finish()}
+function start(){cancelAnimationFrame(raf);clearInterval(timerId);state=freshState();state.running=true;ui.start.classList.add('hidden');ui.end.classList.add('hidden');ui.info.classList.remove('show');setTool('home');recalc();resize();last=performance.now();raf=requestAnimationFrame(tick);timerId=setInterval(second,1000);toast('집부터 만들어 볼까요? 🏠')}
+function finish(){if(!state.running)return;state.running=false;clearInterval(timerId);cancelAnimationFrame(raf);const score=state.happy+state.people.length*5+state.coins;const best=Math.max(state.best,score);localStorage.setItem(CONFIG.BEST_KEY,String(best));ui.final.textContent=score+'점';ui.msg.textContent=(state.won?'목표를 달성한 멋진 마을이에요! ':'다음에는 집·가게·공원을 골고루 지어봐요! ')+'주민 '+state.people.length+'명 · 행복 '+state.happy+' · 최고 '+best+'점';ui.end.classList.remove('hidden')}
+document.getElementById('startBtn').addEventListener('click',start);document.getElementById('restartBtn').addEventListener('click',start);window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,120));
+state=freshState();resize();
+window.__MINITOWN_TEST__={start,finish,getState:()=>({running:state.running,coins:state.coins,happy:state.happy,time:state.time,tool:state.tool,counts:counts(),people:state.people.length}),place:(type,r,c)=>{state.tool=type;build({r,c});recalc()},cycle:()=>{state.elapsed+=CONFIG.CYCLE_SECONDS*.6;draw();return isNight()}};
+})();
+</script>
+</body>
+</html>
