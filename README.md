@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 175개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 177개.
 
-[![Games](https://img.shields.io/badge/games-175-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-177-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![175개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![177개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 171개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 177개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [⏰ 시계 바늘 맞추기 (clock-hands)](./clock-hands) | 시·분 버튼으로 아날로그 시계 바늘을 목표 시간에 맞추는 60초 학습 게임. 5분 단위 조작, 오답 감점 없는 힌트, localStorage 최고 정답 수 저장 | 어린이/시간·생활학습 |
+| [🎭 패턴 퍼레이드 (pattern-parade)](./pattern-parade) | 동물 이모지가 번갈아·두 번씩·세 친구 순서로 반복되는 규칙을 보고 빈칸을 고르는 50초 패턴 게임. 오답 때 정답을 함께 보여주고 localStorage 최고 정답 수 저장 | 어린이/규칙·인지 |
 | [🥪 샌드위치 주문 (sandwich-order)](./sandwich-order) | 주문표의 재료 순서를 기억해 45초 동안 샌드위치를 완성. 틀리면 현재 주문만 다시 시작하고 localStorage 최고 완성 수 저장 | 어린이/기억·생활학습 |
 | [🧺 빨래 색깔 분류 (laundry-sort)](./laundry-sort) | 옷 색과 같은 바구니를 골라 40초 동안 빨래를 정리. 오답 감점 없이 색 인지 반복, localStorage 최고 정리 수 저장 | 어린이/색인지·생활학습 |
 | [🐇 그림자 손놀이 (shadow-puppet)](./shadow-puppet) | 토끼·새·강아지 그림자가 빛나는 순서를 기억한 뒤 같은 순서로 탭하는 5막 기억 공연. 막마다 순서가 3개에서 7개로 늘고, 틀려도 다시 보여주는 좌절 방지 설계, localStorage 최고점 | 어린이/기억·순서 |
@@ -326,6 +328,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-07)
+
+- **⏰ 시계 바늘 맞추기 · 🎭 패턴 퍼레이드 추가 (2026-07-17)** — 시계 바늘 맞추기는 시·분 버튼으로 아날로그 바늘을 움직여 목표 시간을 만드는 60초 생활 학습 게임으로, 기존 숫자 퀴즈와 달리 시간 표현과 바늘 각도를 함께 익힙니다. 패턴 퍼레이드는 보이는 동물 배열의 빈칸을 논리로 찾는 50초 규칙 게임으로, 기존 memory-sequence의 숨겨진 순서 회상이 아니라 공개된 반복 규칙 추론이 핵심입니다. 두 게임 모두 단일 HTML, SVG 썸네일, Pointer Events, 오답 감점 없는 피드백, localStorage 최고기록, 외부 의존성 0건을 포함합니다.
 
 - **🥪 샌드위치 주문 · 🧺 빨래 색깔 분류 추가 (2026-07-16)** — 샌드위치 주문은 주문표의 재료를 왼쪽부터 기억해 조립하는 45초 순서 기억 게임으로, 기존 요리 게임과 달리 시퀀스 회상이 핵심입니다. 빨래 색깔 분류는 옷 색과 같은 바구니를 고르는 40초 생활 학습 게임으로, 오답 감점 없이 색 인지를 반복합니다. 두 게임 모두 단일 HTML, SVG 썸네일, 외부 의존성 0건, Pointer Events, localStorage 최고기록을 포함합니다.
 

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "clock-hands",
+              "label": "⏰ 시계 바늘 맞추기",
+              "path": "clock-hands/index.html"
+            },
+            {
+              "id": "pattern-parade",
+              "label": "🎭 패턴 퍼레이드",
+              "path": "pattern-parade/index.html"
+            },
+            {
               "id": "sandwich-order",
               "label": "🥪 샌드위치 주문",
               "path": "sandwich-order/index.html"

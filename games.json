@@ -1,5 +1,21 @@
 [
   {
+    "id": "clock-hands",
+    "title": "Clock Hands",
+    "title_ko": "⏰ 시계 바늘 맞추기",
+    "description": "시·분 버튼으로 목표 시간을 맞추는 60초 시계 학습",
+    "thumbnail": "clock-hands/thumb.svg",
+    "path": "clock-hands/index.html"
+  },
+  {
+    "id": "pattern-parade",
+    "title": "Pattern Parade",
+    "title_ko": "🎭 패턴 퍼레이드",
+    "description": "반복되는 동물 규칙의 빈칸을 찾는 50초 패턴 놀이",
+    "thumbnail": "pattern-parade/thumb.svg",
+    "path": "pattern-parade/index.html"
+  },
+  {
     "id": "sandwich-order",
     "title": "Sandwich Order",
     "title_ko": "🥪 샌드위치 주문",
