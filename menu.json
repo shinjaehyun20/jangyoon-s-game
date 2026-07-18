@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
             {
+              "id": "recycle-rescue",
+              "label": "♻️ 분리수거 구조대",
+              "path": "recycle-rescue/index.html"
+            },
+            {
+              "id": "moon-phase-quest",
+              "label": "🌙 달빛 순서 탐험",
+              "path": "moon-phase-quest/index.html"
+            },
+            {
               "id": "clock-hands",
               "label": "⏰ 시계 바늘 맞추기",
               "path": "clock-hands/index.html"

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>분리수거 구조대</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root { --bg:#09233b; --panel:#123b57; --accent:#68f0ae; --text:#fff; --warn:#ffd166; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html,body { height:100vh; height:100dvh; overflow:hidden; touch-action:manipulation; font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif; background:radial-gradient(circle at 50% 0,#195b72,var(--bg) 64%); color:var(--text); }
+    button { font:inherit; }
+    .wrap { width:100%; max-width:480px; height:100vh; height:100dvh; display:flex; flex-direction:column; padding:9px 12px 7px; gap:7px; margin:0 auto; }
+    h1 { font-size:clamp(20px,5.5vw,28px); text-align:center; letter-spacing:-1px; }
+    .hud { display:flex; justify-content:space-around; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:7px; font-weight:800; font-size:14px; }
+    .hud b { color:var(--accent); font-size:18px; }
+    #gameArea { position:relative; flex:1; min-height:0; overflow:hidden; border-radius:18px; background:linear-gradient(#b9eeff 0 42%,#6abb72 42% 100%); box-shadow:inset 0 0 0 2px rgba(255,255,255,.22); touch-action:none; }
+    .cloud { position:absolute; font-size:28px; opacity:.75; animation:float 9s linear infinite; }
+    .cloud.two { top:17%; animation-duration:12s; animation-delay:-6s; }
+    @keyframes float { from{left:-50px} to{left:105%} }
+    #item { position:absolute; left:50%; top:20%; width:82px; height:82px; transform:translate(-50%,-50%); border:0; border-radius:50%; background:rgba(255,255,255,.95); box-shadow:0 7px 0 rgba(0,0,0,.13),0 12px 22px rgba(0,0,0,.18); display:grid; place-items:center; font-size:45px; cursor:grab; touch-action:none; z-index:3; transition:box-shadow .15s; }
+    #item.dragging { cursor:grabbing; box-shadow:0 3px 0 rgba(0,0,0,.12),0 7px 16px rgba(0,0,0,.2); }
+    .guide { position:absolute; top:4px; left:0; right:0; text-align:center; color:#123b57; font-weight:900; font-size:14px; text-shadow:0 1px white; }
+    .bins { position:absolute; left:7px; right:7px; bottom:9px; display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+    .bin { min-height:94px; border:3px solid rgba(255,255,255,.55); border-radius:15px 15px 9px 9px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; color:#fff; font-weight:900; font-size:12px; text-shadow:0 1px 2px rgba(0,0,0,.45); transition:transform .16s,filter .16s; }
+    .bin span { font-size:31px; }
+    .bin.paper { background:#2889dc; } .bin.plastic { background:#ee9b22; } .bin.can { background:#6b75cb; }
+    .bin.hot { transform:translateY(-8px) scale(1.04); filter:brightness(1.25); }
+    #feedback { position:absolute; left:50%; top:43%; transform:translate(-50%,-50%) scale(.7); padding:9px 16px; border-radius:20px; background:rgba(9,35,59,.86); font-size:20px; font-weight:900; opacity:0; pointer-events:none; z-index:5; }
+    #feedback.show { animation:pop .65s ease; }
+    @keyframes pop { 0%{opacity:0;transform:translate(-50%,-50%) scale(.6)} 25%,70%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0} }
+    footer { display:flex; justify-content:space-between; align-items:center; min-height:25px; font-size:12px; opacity:.88; }
+    .home-link { color:#bafbd8; font-weight:800; text-decoration:none; min-height:24px; display:flex; align-items:center; }
+    .overlay { position:fixed; inset:0; z-index:20; display:grid; place-items:center; padding:18px; background:rgba(3,17,31,.8); backdrop-filter:blur(5px); }
+    .overlay.hidden { display:none; }
+    .overlay-card { width:min(100%,390px); padding:25px 20px; border-radius:24px; text-align:center; background:linear-gradient(145deg,#174d69,#0d2d49); border:2px solid rgba(255,255,255,.18); box-shadow:0 18px 50px rgba(0,0,0,.35); }
+    .overlay-card h2 { font-size:28px; margin-bottom:10px; } .overlay-card p { line-height:1.6; margin:8px 0; }
+    .how { display:flex; justify-content:center; gap:13px; font-size:28px; margin:13px 0; }
+    .result-score { font-size:48px; color:var(--accent); font-weight:1000; }
+    .btn-start { width:100%; min-height:52px; margin-top:14px; border:0; border-radius:16px; color:#08263a; background:linear-gradient(135deg,var(--accent),#d5ffe9); font-weight:1000; font-size:20px; box-shadow:0 6px 0 #2b9b69; cursor:pointer; }
+    .btn-start:active { transform:translateY(4px); box-shadow:0 2px 0 #2b9b69; }
+    @media (max-height:600px) { .bin{min-height:78px}.bin span{font-size:25px} #item{width:68px;height:68px;font-size:38px}.overlay-card{padding:18px} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>♻️ 분리수거 구조대</h1>
+    <div class="hud"><span>점수 <b id="score">0</b></span><span>연속 <b id="combo">0</b></span><span>시간 <b id="time">40</b></span></div>
+    <section id="gameArea" aria-label="분리수거 게임 영역">
+      <div class="guide">물건을 알맞은 통으로 끌어 주세요!</div><div class="cloud">☁️</div><div class="cloud two">☁️</div>
+      <button id="item" aria-label="분류할 물건">📰</button>
+      <div id="feedback" aria-live="polite"></div>
+      <div class="bins">
+        <div class="bin paper" data-kind="paper"><span>📦</span>종이</div>
+        <div class="bin plastic" data-kind="plastic"><span>🧴</span>플라스틱</div>
+        <div class="bin can" data-kind="can"><span>🥫</span>캔</div>
+      </div>
+    </section>
+    <footer><small>끌어서 쏙! 지구가 깨끗해져요.</small><a class="home-link" href="../index.html">← 홈으로</a></footer>
+  </main>
+  <div class="overlay" id="startOverlay"><div class="overlay-card"><h2>♻️ 분리수거 구조대</h2><p>물건을 손가락으로 끌어<br>알맞은 분리수거 통에 넣어요.</p><div class="how">📰 → 📦</div><p>틀려도 감점 없이 다시 도전!</p><button class="btn-start" id="startBtn">시작!</button></div></div>
+  <div class="overlay hidden" id="endOverlay"><div class="overlay-card"><h2>🌍 지구가 반짝!</h2><div class="result-score" id="finalScore">0점</div><p id="resultMsg"></p><button class="btn-start" id="restartBtn">다시 하기</button></div></div>
+  <script>
+  (function(){
+    'use strict';
+    const CONFIG={duration:40,bestKey:'recycle-rescue_best',items:{paper:['📰','📦','📒','✉️'],plastic:['🧴','🥤','🧼','🪥'],can:['🥫','🧃','🍲','🛢️']}};
+    const area=document.getElementById('gameArea'),item=document.getElementById('item'),bins=[...document.querySelectorAll('.bin')];
+    const scoreEl=document.getElementById('score'),comboEl=document.getElementById('combo'),timeEl=document.getElementById('time'),feedback=document.getElementById('feedback');
+    let state={running:false,score:0,combo:0,time:CONFIG.duration,kind:'paper',drag:false,offsetX:0,offsetY:0,timer:null};
+    function showFeedback(text){feedback.textContent=text;feedback.classList.remove('show');void feedback.offsetWidth;feedback.classList.add('show');}
+    function placeItem(){const kinds=Object.keys(CONFIG.items);state.kind=kinds[Math.floor(Math.random()*kinds.length)];const list=CONFIG.items[state.kind];item.textContent=list[Math.floor(Math.random()*list.length)];item.style.left=(28+Math.random()*44)+'%';item.style.top=(17+Math.random()*19)+'%';item.style.transform='translate(-50%,-50%)';}
+    function setHud(){scoreEl.textContent=state.score;comboEl.textContent=state.combo;timeEl.textContent=state.time;}
+    function resetPosition(){item.style.transition='left .22s,top .22s';placeItem();setTimeout(()=>item.style.transition='',240);}
+    function pointerPos(e){const r=area.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+    item.addEventListener('pointerdown',e=>{if(!state.running)return;state.drag=true;item.setPointerCapture(e.pointerId);item.classList.add('dragging');const p=pointerPos(e),r=item.getBoundingClientRect(),a=area.getBoundingClientRect();state.offsetX=p.x-(r.left-a.left+r.width/2);state.offsetY=p.y-(r.top-a.top+r.height/2);});
+    item.addEventListener('pointermove',e=>{if(!state.drag)return;const p=pointerPos(e),x=p.x-state.offsetX,y=p.y-state.offsetY;item.style.left=x+'px';item.style.top=y+'px';item.style.transform='translate(-50%,-50%)';bins.forEach(b=>{const r=b.getBoundingClientRect();b.classList.toggle('hot',e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom);});});
+    function drop(e){if(!state.drag)return;state.drag=false;item.classList.remove('dragging');let hit=null;bins.forEach(b=>{b.classList.remove('hot');const r=b.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)hit=b.dataset.kind;});if(!hit){resetPosition();return;}if(hit===state.kind){state.combo++;state.score+=10+Math.min(state.combo-1,5)*2;showFeedback(state.combo>=3?'✨ 연속 '+state.combo+'번!':'✅ 잘했어!');placeItem();}else{state.combo=0;showFeedback('💡 다른 통에 넣어 볼까?');resetPosition();}setHud();}
+    item.addEventListener('pointerup',drop);item.addEventListener('pointercancel',drop);
+    function start(){clearInterval(state.timer);state={...state,running:true,score:0,combo:0,time:CONFIG.duration,drag:false,timer:null};setHud();placeItem();document.getElementById('startOverlay').classList.add('hidden');document.getElementById('endOverlay').classList.add('hidden');state.timer=setInterval(()=>{state.time--;setHud();if(state.time<=0)end();},1000);}
+    function end(){clearInterval(state.timer);state.running=false;const old=Number(localStorage.getItem(CONFIG.bestKey)||0),best=Math.max(old,state.score);localStorage.setItem(CONFIG.bestKey,String(best));document.getElementById('finalScore').textContent=state.score+'점';document.getElementById('resultMsg').textContent=(state.score>=150?'분리수거 박사님! 🌟':'지구를 깨끗하게 만들었어요!')+' 최고 '+best+'점';document.getElementById('endOverlay').classList.remove('hidden');}
+    document.getElementById('startBtn').addEventListener('pointerdown',start);document.getElementById('restartBtn').addEventListener('pointerdown',start);placeItem();
+  })();
+  </script>
+</body>
+</html>

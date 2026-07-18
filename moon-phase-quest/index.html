@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>달빛 순서 탐험</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root { --bg:#070b28; --panel:#151a4e; --accent:#ffe071; --text:#fff; --violet:#a99cff; }
+    *{box-sizing:border-box;margin:0;padding:0} html,body{height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation;font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:radial-gradient(circle at 50% 15%,#2a3478,var(--bg) 67%);color:var(--text)} button{font:inherit}
+    .wrap{width:100%;max-width:480px;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:9px 12px 7px;gap:7px;margin:0 auto} h1{font-size:clamp(20px,5.5vw,28px);text-align:center;letter-spacing:-1px}
+    .hud{display:flex;justify-content:space-around;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:7px;font-weight:800;font-size:14px}.hud b{color:var(--accent);font-size:18px}
+    #gameArea{position:relative;flex:1;min-height:0;overflow:hidden;border-radius:18px;background:linear-gradient(#101640,#222968);box-shadow:inset 0 0 0 2px rgba(255,255,255,.13);padding:15px 10px 12px;display:flex;flex-direction:column;align-items:center;touch-action:none}
+    .stars{position:absolute;inset:0;background-image:radial-gradient(circle,#fff 1px,transparent 1.5px);background-size:39px 43px;opacity:.35;pointer-events:none}.prompt{z-index:1;text-align:center;font-weight:900;font-size:16px;line-height:1.45;min-height:47px}.prompt strong{color:var(--accent)}
+    #slots{z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;margin:9px 0 14px}.slot{height:68px;border:2px dashed rgba(255,255,255,.28);border-radius:15px;display:grid;place-items:center;font-size:35px;background:rgba(255,255,255,.05)}.slot.filled{border-style:solid;border-color:var(--accent);background:rgba(255,224,113,.13);animation:land .22s ease}@keyframes land{50%{transform:scale(1.1)}}
+    #choices{z-index:1;display:grid;grid-template-columns:repeat(2,1fr);gap:9px;width:100%;margin:auto 0}.moon-btn{min-height:72px;border:2px solid rgba(255,255,255,.18);border-radius:18px;background:linear-gradient(145deg,#303988,#171d57);color:white;font-size:38px;box-shadow:0 5px 0 #080d30;cursor:pointer;touch-action:manipulation}.moon-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #080d30}.moon-btn.used{opacity:.25;pointer-events:none}.moon-btn.wrong{animation:shake .35s ease}@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}
+    #feedback{z-index:3;position:absolute;left:50%;bottom:12px;transform:translateX(-50%);padding:8px 14px;border-radius:18px;background:rgba(5,9,35,.9);font-size:15px;font-weight:900;opacity:0;white-space:nowrap;pointer-events:none}#feedback.show{animation:fade .8s ease}@keyframes fade{15%,72%{opacity:1}100%{opacity:0}}
+    footer{display:flex;justify-content:space-between;align-items:center;min-height:25px;font-size:12px;opacity:.88}.home-link{color:#d8d4ff;font-weight:800;text-decoration:none;min-height:24px;display:flex;align-items:center}
+    .overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px;background:rgba(2,4,20,.84);backdrop-filter:blur(5px)}.overlay.hidden{display:none}.overlay-card{width:min(100%,390px);padding:25px 20px;border-radius:24px;text-align:center;background:linear-gradient(145deg,#293274,#10153f);border:2px solid rgba(255,255,255,.18);box-shadow:0 18px 50px rgba(0,0,0,.4)}.overlay-card h2{font-size:28px;margin-bottom:10px}.overlay-card p{line-height:1.6;margin:8px 0}.demo{font-size:31px;letter-spacing:4px;margin:13px 0}.result-score{font-size:48px;color:var(--accent);font-weight:1000}.btn-start{width:100%;min-height:52px;margin-top:14px;border:0;border-radius:16px;color:#171b4d;background:linear-gradient(135deg,var(--accent),#fff5c4);font-weight:1000;font-size:20px;box-shadow:0 6px 0 #b99c38;cursor:pointer}.btn-start:active{transform:translateY(4px);box-shadow:0 2px 0 #b99c38}
+    @media(max-height:600px){.slot{height:52px;font-size:27px}.moon-btn{min-height:57px;font-size:31px}.overlay-card{padding:18px}}
+  </style>
+</head>
+<body>
+  <main class="wrap"><h1>🌙 달빛 순서 탐험</h1><div class="hud"><span>단계 <b id="round">1/5</b></span><span>별 <b id="score">0</b></span><span>최고 <b id="best">0</b></span></div>
+    <section id="gameArea" aria-label="달 모양 순서 게임"><div class="stars"></div><p class="prompt">가느다란 달부터 <strong>점점 밝아지는 순서</strong>로 눌러요!</p><div id="slots"></div><div id="choices"></div><div id="feedback" aria-live="polite"></div></section>
+    <footer><small>달은 매일 조금씩 모양이 달라져요.</small><a class="home-link" href="../index.html">← 홈으로</a></footer></main>
+  <div class="overlay" id="startOverlay"><div class="overlay-card"><h2>🌙 달빛 순서 탐험</h2><p>섞여 있는 달을 눌러<br>가느다란 달부터 보름달까지 이어요.</p><div class="demo">🌑 🌒 🌓 🌕</div><p>틀려도 별은 줄지 않아요!</p><button class="btn-start" id="startBtn">시작!</button></div></div>
+  <div class="overlay hidden" id="endOverlay"><div class="overlay-card"><h2>🚀 달 탐험 완료!</h2><div class="result-score" id="finalScore">0⭐</div><p id="resultMsg"></p><button class="btn-start" id="restartBtn">다시 하기</button></div></div>
+  <script>
+  (function(){
+    'use strict';
+    const CONFIG={rounds:5,bestKey:'moon-phase-quest_best',sets:[['🌑','🌒','🌓','🌕'],['🌒','🌓','🌔','🌕'],['🌑','🌒','🌔','🌕'],['🌑','🌓','🌔','🌕'],['🌒','🌓','🌔','🌕']]};
+    const slots=document.getElementById('slots'),choices=document.getElementById('choices'),roundEl=document.getElementById('round'),scoreEl=document.getElementById('score'),bestEl=document.getElementById('best'),feedback=document.getElementById('feedback');let state={running:false,round:0,step:0,score:0,sequence:[]};
+    function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+    function say(text){feedback.textContent=text;feedback.classList.remove('show');void feedback.offsetWidth;feedback.classList.add('show');}
+    function hud(){roundEl.textContent=Math.min(state.round+1,CONFIG.rounds)+'/5';scoreEl.textContent=state.score;bestEl.textContent=Number(localStorage.getItem(CONFIG.bestKey)||0);}
+    function renderRound(){state.step=0;state.sequence=CONFIG.sets[state.round];slots.innerHTML=state.sequence.map(()=>'<div class="slot">?</div>').join('');choices.innerHTML='';shuffle(state.sequence).forEach((moon,i)=>{const b=document.createElement('button');b.className='moon-btn';b.textContent=moon;b.dataset.moon=moon;b.setAttribute('aria-label',moon+' 달 모양');b.addEventListener('pointerdown',()=>choose(b));choices.appendChild(b);});hud();}
+    function choose(btn){if(!state.running||btn.classList.contains('used'))return;const expected=state.sequence[state.step];if(btn.dataset.moon!==expected){btn.classList.remove('wrong');void btn.offsetWidth;btn.classList.add('wrong');say('💡 더 어두운 달부터 찾아볼까?');return;}btn.classList.add('used');const slot=slots.children[state.step];slot.textContent=expected;slot.classList.add('filled');state.step++;state.score+=10;hud();if(state.step===state.sequence.length){state.score+=10;hud();say('⭐ 달 순서 완성!');setTimeout(()=>{state.round++;state.round>=CONFIG.rounds?end():renderRound();},850);}}
+    function start(){state={running:true,round:0,step:0,score:0,sequence:[]};document.getElementById('startOverlay').classList.add('hidden');document.getElementById('endOverlay').classList.add('hidden');renderRound();}
+    function end(){state.running=false;const old=Number(localStorage.getItem(CONFIG.bestKey)||0),best=Math.max(old,state.score);localStorage.setItem(CONFIG.bestKey,String(best));document.getElementById('finalScore').textContent=state.score+'⭐';document.getElementById('resultMsg').textContent='달의 변화를 모두 찾았어요! 최고 '+best+'⭐';document.getElementById('endOverlay').classList.remove('hidden');}
+    document.getElementById('startBtn').addEventListener('pointerdown',start);document.getElementById('restartBtn').addEventListener('pointerdown',start);hud();
+  })();
+  </script>
+</body>
+</html>

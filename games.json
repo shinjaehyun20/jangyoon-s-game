@@ -1,5 +1,21 @@
 [
   {
+    "id": "recycle-rescue",
+    "title": "Recycle Rescue",
+    "title_ko": "♻️ 분리수거 구조대",
+    "description": "물건을 알맞은 통으로 끌어 넣는 40초 환경 학습",
+    "thumbnail": "recycle-rescue/thumb.svg",
+    "path": "recycle-rescue/index.html"
+  },
+  {
+    "id": "moon-phase-quest",
+    "title": "Moon Phase Quest",
+    "title_ko": "🌙 달빛 순서 탐험",
+    "description": "달 모양을 어두운 순서부터 이어 보는 5단계 우주 학습",
+    "thumbnail": "moon-phase-quest/thumb.svg",
+    "path": "moon-phase-quest/index.html"
+  },
+  {
     "id": "clock-hands",
     "title": "Clock Hands",
     "title_ko": "⏰ 시계 바늘 맞추기",
