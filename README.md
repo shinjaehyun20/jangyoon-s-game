@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 177개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 181개.
 
-[![Games](https://img.shields.io/badge/games-177-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-181-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![177개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![181개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 179개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 181개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🥋 태권도 품새 리듬 (taekwondo-poomsae)](./taekwondo-poomsae) | 표시된 지르기·앞차기·막기·서기 동작을 45초 동안 맞추는 리듬 수련. 연속 정답 콤보와 localStorage 최고점 저장 | 어린이/운동·반응 |
+| [🎣 받침 낚시왕 (batchim-fishing)](./batchim-fishing) | 낱말을 소리 내어 읽고 알맞은 받침을 골라 물고기 10마리를 잡는 한글 놀이. 연속 정답 별 보너스와 localStorage 최고별 저장 | 학습/한글·받침 |
 | [♻️ 분리수거 구조대 (recycle-rescue)](./recycle-rescue) | 종이·플라스틱·캔 물건을 알맞은 통으로 직접 끌어 넣는 40초 환경 학습. 오답 감점 없이 재도전하고 연속 분류 보너스와 localStorage 최고점을 저장 | 어린이/환경·드래그 |
 | [🌙 달빛 순서 탐험 (moon-phase-quest)](./moon-phase-quest) | 섞인 네 가지 달 모양을 어두운 달부터 밝은 달까지 복원하는 5단계 우주 학습. 오답 감점 없이 달의 변화를 반복하고 localStorage 최고 별 수를 저장 | 어린이/우주·순서 |
 | [⏰ 시계 바늘 맞추기 (clock-hands)](./clock-hands) | 시·분 버튼으로 아날로그 시계 바늘을 목표 시간에 맞추는 60초 학습 게임. 5분 단위 조작, 오답 감점 없는 힌트, localStorage 최고 정답 수 저장 | 어린이/시간·생활학습 |
@@ -330,6 +332,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-07)
+
+- **🥋 태권도 품새 리듬 · 🎣 받침 낚시왕 추가 (2026-07-20)** — 태권도 품새 리듬은 표시된 네 동작을 빠르게 맞추는 운동·반응 게임으로 장윤이의 태권도 관심을 반영했습니다. 받침 낚시왕은 낱말의 마지막 소리를 듣고 받침을 고르는 한글 학습 게임입니다. 두 게임 모두 단일 HTML, SVG 썸네일, Pointer Events, 44px 이상 터치 버튼, 오답 무감점 피드백, localStorage 최고기록, 외부 의존성 0건을 포함합니다.
 
 - **♻️ 분리수거 구조대 · 🌙 달빛 순서 탐험 추가 (2026-07-18)** — 분리수거 구조대는 물건을 종이·플라스틱·캔 통으로 직접 드래그하는 40초 환경 학습으로, 기존 laundry-sort의 색상 버튼 선택과 달리 생활 폐기물의 재질 판단과 공간 드롭이 핵심입니다. 달빛 순서 탐험은 네 가지 달 모양을 어두운 달부터 밝은 달까지 5단계로 복원하는 우주 학습으로, pattern-parade의 공개 반복 규칙 추론과 달리 자연 현상의 밝기 변화를 순서화합니다. 두 게임 모두 단일 HTML, SVG 썸네일, Pointer Events, 오답 무감점 피드백, localStorage 최고기록, 외부 의존성 0건을 포함합니다.
 

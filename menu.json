@@ -3,6 +3,16 @@
     "id": "kids",
     "label": "어린이 추천",
     "items": [
+      {
+        "id": "taekwondo-poomsae",
+        "label": "🥋 태권도 품새 리듬",
+        "path": "taekwondo-poomsae/index.html"
+      },
+      {
+        "id": "batchim-fishing",
+        "label": "🎣 받침 낚시왕",
+        "path": "batchim-fishing/index.html"
+      },
             {
               "id": "recycle-rescue",
               "label": "♻️ 분리수거 구조대",

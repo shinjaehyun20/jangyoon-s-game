@@ -1,5 +1,21 @@
 [
   {
+    "id": "taekwondo-poomsae",
+    "title": "Taekwondo Poomsae Rhythm",
+    "title_ko": "🥋 태권도 품새 리듬",
+    "description": "표시된 지르기·앞차기·막기·서기 동작을 맞추는 45초 리듬 수련",
+    "thumbnail": "taekwondo-poomsae/thumb.svg",
+    "path": "taekwondo-poomsae/index.html"
+  },
+  {
+    "id": "batchim-fishing",
+    "title": "Batchim Fishing",
+    "title_ko": "🎣 받침 낚시왕",
+    "description": "낱말을 소리 내어 읽고 알맞은 받침을 골라 물고기 10마리를 잡는 한글 놀이",
+    "thumbnail": "batchim-fishing/thumb.svg",
+    "path": "batchim-fishing/index.html"
+  },
+  {
     "id": "recycle-rescue",
     "title": "Recycle Rescue",
     "title_ko": "♻️ 분리수거 구조대",

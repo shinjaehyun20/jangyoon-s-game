@@ -1,5 +1,11 @@
 # 변경 이력
 
+## 2026-07-20 — 태권도 품새 리듬 · 받침 낚시왕
+
+- **taekwondo-poomsae** — 표시된 `지르기/앞차기/막기/서기` 동작을 45초 동안 맞추는 반응·리듬 수련. 연속 정답 콤보, 오답 무감점, localStorage 최고점 저장.
+- **batchim-fishing** — `고□→공`처럼 낱말을 소리 내어 읽고 알맞은 받침을 고르는 10라운드 한글 놀이. 정답을 고르면 물고기가 낚이는 시각 피드백, 연속 정답 별 보너스, localStorage 최고별 저장.
+- 두 게임 모두 모바일 터치 우선 단일 HTML, 외부 의존성 없음, 시작/종료 오버레이와 44px 이상 터치 버튼 포함.
+
 ## 2026-07-06 — 고양이 낚싯대 놀이 (cat-teaser-play) · 종이비행기 날리기 (paper-airplane-fly)
 
 - **cat-teaser-play** — 화면을 드래그해 깃털(🪶)을 움직이면 고양이(🐱)가 lerp 추적(`CAT_LERP: 0.09`, dt 정규화)으로 따라와 실뭉치(🧶)를 낚아채는 드래그 유도 게임. 실뭉치는 최대 2개 동시 등장(`MAX_YARN: 2`), 포획 반경 32px, `YARN_LIFETIME_MS: 5000` 안에 못 잡으면 fade-out 후 재등장. 40초 타임어택, localStorage 최고점(`cat-teaser-play_best`). CSS `perspective`+`rotateX` 원근 방바닥(diving-board-jump 기법 재사용)과 그림자+본체 레이어 분리 3D 카드.
