@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "planet-orbit-park",
+        "label": "🪐 행성 궤도 주차",
+        "path": "planet-orbit-park/index.html"
+      },
+      {
+        "id": "train-ticket-stamp",
+        "label": "🎟️ 기차표 도장 찍기",
+        "path": "train-ticket-stamp/index.html"
+      },
+      {
         "id": "taekwondo-poomsae",
         "label": "🥋 태권도 품새 리듬",
         "path": "taekwondo-poomsae/index.html"
@@ -13,96 +23,96 @@
         "label": "🎣 받침 낚시왕",
         "path": "batchim-fishing/index.html"
       },
-            {
-              "id": "recycle-rescue",
-              "label": "♻️ 분리수거 구조대",
-              "path": "recycle-rescue/index.html"
-            },
-            {
-              "id": "moon-phase-quest",
-              "label": "🌙 달빛 순서 탐험",
-              "path": "moon-phase-quest/index.html"
-            },
-            {
-              "id": "clock-hands",
-              "label": "⏰ 시계 바늘 맞추기",
-              "path": "clock-hands/index.html"
-            },
-            {
-              "id": "pattern-parade",
-              "label": "🎭 패턴 퍼레이드",
-              "path": "pattern-parade/index.html"
-            },
-            {
-              "id": "sandwich-order",
-              "label": "🥪 샌드위치 주문",
-              "path": "sandwich-order/index.html"
-            },
-            {
-              "id": "laundry-sort",
-              "label": "🧺 빨래 색깔 분류",
-              "path": "laundry-sort/index.html"
-            },
-            {
-              "id": "shadow-puppet",
-              "label": "🐇 그림자 손놀이",
-              "path": "shadow-puppet/index.html"
-            },
-            {
-              "id": "seed-sprout-race",
-              "label": "🌱 씨앗 새싹 달리기",
-              "path": "seed-sprout-race/index.html"
-            },
-            {
-              "id": "paper-boat-sail",
-              "label": "⛵ 종이배 항해",
-              "path": "paper-boat-sail/index.html"
-            },
-            {
-              "id": "bear-tooth-brush",
-              "label": "🪥 곰돌이 이 닦기",
-              "path": "bear-tooth-brush/index.html"
-            },
-            {
-              "id": "sabangchigi-hop",
-              "label": "👣 사방치기 콩콩",
-              "path": "sabangchigi-hop/index.html"
-            },
-            {
-              "id": "gonggi-nori",
-              "label": "🪨 공기놀이",
-              "path": "gonggi-nori/index.html"
-            },
-            {
-              "id": "jump-rope-rhythm",
-              "label": "🪢 줄넘기 놀이",
-              "path": "jump-rope-rhythm/index.html"
-            },
-            {
-              "id": "stone-balance-walk",
-              "label": "🪨 비석치기 걷기",
-              "path": "stone-balance-walk/index.html"
-            },
-            {
-              "id": "ddakji-flip",
-              "label": "🎴 딱지치기",
-              "path": "ddakji-flip/index.html"
-            },
-            {
-              "id": "scale-balance",
-              "label": "⚖️ 저울 균형 맞추기",
-              "path": "scale-balance/index.html"
-            },
-            {
-              "id": "jegi-kick",
-              "label": "🪁 제기차기",
-              "path": "jegi-kick/index.html"
-            },
-            {
-              "id": "top-spin-duel",
-              "label": "🪀 팽이 돌리기 대결",
-              "path": "top-spin-duel/index.html"
-            },
+      {
+        "id": "recycle-rescue",
+        "label": "♻️ 분리수거 구조대",
+        "path": "recycle-rescue/index.html"
+      },
+      {
+        "id": "moon-phase-quest",
+        "label": "🌙 달빛 순서 탐험",
+        "path": "moon-phase-quest/index.html"
+      },
+      {
+        "id": "clock-hands",
+        "label": "⏰ 시계 바늘 맞추기",
+        "path": "clock-hands/index.html"
+      },
+      {
+        "id": "pattern-parade",
+        "label": "🎭 패턴 퍼레이드",
+        "path": "pattern-parade/index.html"
+      },
+      {
+        "id": "sandwich-order",
+        "label": "🥪 샌드위치 주문",
+        "path": "sandwich-order/index.html"
+      },
+      {
+        "id": "laundry-sort",
+        "label": "🧺 빨래 색깔 분류",
+        "path": "laundry-sort/index.html"
+      },
+      {
+        "id": "shadow-puppet",
+        "label": "🐇 그림자 손놀이",
+        "path": "shadow-puppet/index.html"
+      },
+      {
+        "id": "seed-sprout-race",
+        "label": "🌱 씨앗 새싹 달리기",
+        "path": "seed-sprout-race/index.html"
+      },
+      {
+        "id": "paper-boat-sail",
+        "label": "⛵ 종이배 항해",
+        "path": "paper-boat-sail/index.html"
+      },
+      {
+        "id": "bear-tooth-brush",
+        "label": "🪥 곰돌이 이 닦기",
+        "path": "bear-tooth-brush/index.html"
+      },
+      {
+        "id": "sabangchigi-hop",
+        "label": "👣 사방치기 콩콩",
+        "path": "sabangchigi-hop/index.html"
+      },
+      {
+        "id": "gonggi-nori",
+        "label": "🪨 공기놀이",
+        "path": "gonggi-nori/index.html"
+      },
+      {
+        "id": "jump-rope-rhythm",
+        "label": "🪢 줄넘기 놀이",
+        "path": "jump-rope-rhythm/index.html"
+      },
+      {
+        "id": "stone-balance-walk",
+        "label": "🪨 비석치기 걷기",
+        "path": "stone-balance-walk/index.html"
+      },
+      {
+        "id": "ddakji-flip",
+        "label": "🎴 딱지치기",
+        "path": "ddakji-flip/index.html"
+      },
+      {
+        "id": "scale-balance",
+        "label": "⚖️ 저울 균형 맞추기",
+        "path": "scale-balance/index.html"
+      },
+      {
+        "id": "jegi-kick",
+        "label": "🪁 제기차기",
+        "path": "jegi-kick/index.html"
+      },
+      {
+        "id": "top-spin-duel",
+        "label": "🪀 팽이 돌리기 대결",
+        "path": "top-spin-duel/index.html"
+      },
       {
         "id": "archery-balloon",
         "label": "🏹 화살 풍선 맞추기",

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🪐 행성 궤도 주차</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    :root{--bg:#0c1337;--card:rgba(255,255,255,.12);--accent:#78f5ff;--good:#a7f070;--warn:#ffd166;--text:#fff}
+    html,body{width:100%;height:100vh;height:100dvh;overflow:hidden;touch-action:none;font-family:'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;background:radial-gradient(circle at 50% 0%,#24358b 0%,var(--bg) 58%,#050716 100%);color:var(--text)}
+    .wrap{width:100%;max-width:480px;height:100vh;height:100dvh;margin:0 auto;padding:10px 12px 8px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+    h1{font-size:clamp(21px,5.8vw,29px);text-align:center;text-shadow:0 3px 12px #000}
+    .hud{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.hud b{display:block;font-size:clamp(17px,5vw,24px)}.hud span{background:var(--card);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:8px 5px;text-align:center;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+    #gameArea{position:relative;flex:1;min-height:0;border-radius:26px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 0 40px rgba(120,245,255,.08);perspective:850px;touch-action:none}
+    .stars{position:absolute;inset:0;background-image:radial-gradient(circle,#fff 1px,transparent 1.8px),radial-gradient(circle,#9be7ff 1px,transparent 1.8px);background-size:54px 54px,78px 78px;background-position:8px 10px,34px 42px;opacity:.5;animation:drift 12s linear infinite}@keyframes drift{to{transform:translateY(54px)}}
+    .orbit-stage{position:absolute;left:50%;top:50%;width:min(78vw,350px);height:min(78vw,350px);transform:translate(-50%,-50%) rotateX(54deg);transform-style:preserve-3d;border-radius:50%;border:3px dashed rgba(255,255,255,.28);box-shadow:0 0 36px rgba(120,245,255,.18)}
+    .orbit-zone{position:absolute;left:50%;top:50%;width:40%;height:40%;border-radius:50%;transform:translate(-50%,-50%);background:conic-gradient(from var(--zone,20deg),transparent 0 312deg,rgba(167,240,112,.72) 312deg 356deg,transparent 356deg);filter:drop-shadow(0 0 14px rgba(167,240,112,.8));opacity:.9}
+    .planet{position:absolute;left:50%;top:50%;width:86px;height:86px;border-radius:50%;transform:translate(-50%,-50%) translateZ(22px);display:grid;place-items:center;font-size:50px;background:radial-gradient(circle at 35% 25%,#b3f8ff,#3954c9 50%,#172052 100%);box-shadow:0 18px 35px rgba(0,0,0,.45), inset -16px -16px 20px rgba(0,0,0,.25)}
+    .moon{position:absolute;left:50%;top:50%;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:32px;background:radial-gradient(circle at 30% 30%,#fff8c9,#ffc857 65%,#f08a4b);box-shadow:0 10px 20px rgba(0,0,0,.42),0 0 20px rgba(255,209,102,.55);transform:translate(-50%,-50%) translate(var(--mx,130px),var(--my,0)) translateZ(45px);transition:filter .16s}.moon.good{filter:drop-shadow(0 0 18px #a7f070) saturate(1.4)}
+    .hand{position:absolute;left:50%;top:50%;width:4px;height:42%;background:linear-gradient(var(--accent),transparent);transform-origin:50% 0;transform:translate(-50%,0) rotate(var(--ang,0deg));opacity:.55}
+    .panel{position:absolute;left:12px;right:12px;bottom:12px;border-radius:20px;background:rgba(5,7,22,.72);border:1px solid rgba(255,255,255,.15);padding:10px;text-align:center;font-weight:800}.big{font-size:clamp(15px,4.2vw,18px);color:#bdfbff}.hint{font-size:12px;color:rgba(255,255,255,.78);margin-top:4px}
+    footer{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.8)}.home-link{color:#fff;text-decoration:none;background:rgba(255,255,255,.16);padding:9px 12px;border-radius:14px;min-height:44px;display:inline-flex;align-items:center}
+    .overlay{position:fixed;inset:0;display:grid;place-items:center;background:rgba(3,5,18,.72);backdrop-filter:blur(8px);z-index:20;padding:18px}.overlay.hidden{display:none}.overlay-card{width:min(92vw,380px);border-radius:28px;padding:24px 18px;text-align:center;background:linear-gradient(160deg,#ffffff,#dffbff);color:#10204e;box-shadow:0 22px 70px rgba(0,0,0,.35)}.overlay-card h2{font-size:28px;margin-bottom:8px}.overlay-card p{line-height:1.5;margin:8px 0}.btn-start{border:0;border-radius:18px;min-height:54px;padding:0 24px;margin-top:12px;background:linear-gradient(135deg,#6157ff,#25c2ff);color:#fff;font-weight:900;font-size:18px;box-shadow:0 10px 0 #27307a;cursor:pointer}.btn-start:active{transform:translateY(4px);box-shadow:0 6px 0 #27307a}.result-score{font-size:42px;font-weight:1000;color:#27307a}
+    @media (prefers-reduced-motion:reduce){.stars{animation:none}.moon,.hand{transition:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🪐 행성 궤도 주차</h1>
+    <div class="hud"><span>성공<b id="score">0</b></span><span>라운드<b id="round">1/7</b></span><span>최고<b id="best">0</b></span></div>
+    <div id="gameArea" aria-label="손가락을 둥글게 돌려 달을 초록 궤도 구역에 주차하는 게임">
+      <div class="stars"></div><div class="orbit-stage"><div id="zone" class="orbit-zone"></div><div class="planet">🌍</div><div id="hand" class="hand"></div><div id="moon" class="moon">🌕</div></div>
+      <div class="panel"><div id="target" class="big">초록빛 주차 구역을 찾아요</div><div class="hint">행성 주변을 드래그하고 손을 떼면 주차!</div></div>
+    </div>
+    <footer><small>핵심 동사: 원형 드래그 후 놓기</small><a class="home-link" href="../index.html">← 홈으로</a></footer>
+  </div>
+  <div class="overlay" id="startOverlay"><div class="overlay-card"><h2>🪐 행성 궤도 주차</h2><p>손가락으로 달을 빙글빙글 돌려 초록 주차 구역에 맞춰요.</p><p>구역 안에서 손을 떼면 별 스티커!</p><button class="btn-start" id="startBtn">시작!</button></div></div>
+  <div class="overlay hidden" id="endOverlay"><div class="overlay-card"><h2>🎉 우주 주차 완료!</h2><div class="result-score" id="finalScore">0</div><p id="resultMsg"></p><button class="btn-start" id="restartBtn">다시 하기</button></div></div>
+  <script>(function(){'use strict';
+    const CONFIG={ROUNDS:7,ZONE_WIDTH:44};
+    const $=id=>document.getElementById(id); const area=$('gameArea'), moon=$('moon'), hand=$('hand'), zone=$('zone');
+    const state={playing:false,round:1,score:0,angle:0,target:25,drag:false,best:Number(localStorage.getItem('planet-orbit-park_best')||0)};
+    $('best').textContent=state.best;
+    function norm(a){return (a%360+360)%360} function diff(a,b){let d=Math.abs(norm(a)-norm(b));return Math.min(d,360-d)}
+    function pointAngle(e){const r=area.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2;return norm(Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI)}
+    function render(){const rad=state.angle*Math.PI/180; const radius=Math.min(area.clientWidth,area.clientHeight)*.29; moon.style.setProperty('--mx',Math.cos(rad)*radius+'px'); moon.style.setProperty('--my',Math.sin(rad)*radius+'px'); hand.style.setProperty('--ang',(state.angle+90)+'deg'); zone.style.setProperty('--zone',(state.target-CONFIG.ZONE_WIDTH/2)+'deg'); moon.classList.toggle('good',diff(state.angle,state.target)<CONFIG.ZONE_WIDTH/2); $('score').textContent=state.score; $('round').textContent=state.round+'/'+CONFIG.ROUNDS; $('target').textContent=moon.classList.contains('good')?'좋아요! 여기서 손을 떼요 ✨':'초록빛 주차 구역을 찾아요';}
+    function nextRound(){state.round++; if(state.round>CONFIG.ROUNDS){end();return} state.target=norm(35+Math.random()*290); state.angle=norm(state.angle+70); render();}
+    function release(){if(!state.playing||!state.drag)return; state.drag=false; const d=diff(state.angle,state.target); if(d<CONFIG.ZONE_WIDTH/2){state.score+= d<10?3:2; $('target').textContent='완벽한 우주 주차! ⭐';} else {$('target').textContent='조금만 더 돌려볼까요?';} setTimeout(nextRound,520);}
+    function start(){state.playing=true;state.round=1;state.score=0;state.angle=0;state.target=40+Math.random()*250;$('startOverlay').classList.add('hidden');$('endOverlay').classList.add('hidden');render();}
+    function end(){state.playing=false;state.best=Math.max(state.best,state.score);localStorage.setItem('planet-orbit-park_best',String(state.best));$('best').textContent=state.best;$('finalScore').textContent=state.score+'점';$('resultMsg').textContent=state.score>=14?'궤도 박사님! 행성이 반짝반짝해요.':'다시 돌리면 더 정확히 주차할 수 있어요.';$('endOverlay').classList.remove('hidden');}
+    area.addEventListener('pointerdown',e=>{if(!state.playing)return;e.preventDefault();state.drag=true;try{area.setPointerCapture(e.pointerId)}catch(_e){} state.angle=pointAngle(e);render();});
+    area.addEventListener('pointermove',e=>{if(!state.drag)return;e.preventDefault();state.angle=pointAngle(e);render();});
+    area.addEventListener('pointerup',release); area.addEventListener('pointercancel',release); $('startBtn').addEventListener('click',start); $('restartBtn').addEventListener('click',start);
+    window.__GAME_TEST__={start, state, setAngle:(a)=>{state.angle=norm(a);render();}, release:()=>{state.drag=true;release();}}; render();
+  })();</script>
+</body>
+</html>

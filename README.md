@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 181개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 183개.
 
-[![Games](https://img.shields.io/badge/games-181-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-183-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![181개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![183개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 181개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 183개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🪐 행성 궤도 주차 (planet-orbit-park)](./planet-orbit-park) | 손가락으로 달을 원형 드래그해 초록 궤도 구역에 주차하는 7라운드 각도 감각 게임. 기존 lighthouse-guide/meteor-shield의 회전 방어·유도와 달리 각도 위치를 직접 맞춘 뒤 손을 떼는 orbit parking 메커니즘, localStorage 최고점 저장 | 어린이/각도·드래그 |
+| [🎟️ 기차표 도장 찍기 (train-ticket-stamp)](./train-ticket-stamp) | 움직이는 기차표의 별표가 가운데 올 때 도장을 꾹 눌렀다 떼는 hold-to-punch 타이밍 게임. 기존 단순 탭 반응과 달리 누르기-떼기 판정과 이동 표적 정렬이 핵심, localStorage 최고점 저장 | 어린이/타이밍·홀드 |
 | [🥋 태권도 품새 리듬 (taekwondo-poomsae)](./taekwondo-poomsae) | 표시된 지르기·앞차기·막기·서기 동작을 45초 동안 맞추는 리듬 수련. 연속 정답 콤보와 localStorage 최고점 저장 | 어린이/운동·반응 |
 | [🎣 받침 낚시왕 (batchim-fishing)](./batchim-fishing) | 낱말을 소리 내어 읽고 알맞은 받침을 골라 물고기 10마리를 잡는 한글 놀이. 연속 정답 별 보너스와 localStorage 최고별 저장 | 학습/한글·받침 |
 | [♻️ 분리수거 구조대 (recycle-rescue)](./recycle-rescue) | 종이·플라스틱·캔 물건을 알맞은 통으로 직접 끌어 넣는 40초 환경 학습. 오답 감점 없이 재도전하고 연속 분류 보너스와 localStorage 최고점을 저장 | 어린이/환경·드래그 |
@@ -332,6 +334,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-07)
+
+- **🪐 행성 궤도 주차 · 🎟️ 기차표 도장 찍기 추가 (2026-07-21)** — 행성 궤도 주차는 달을 원형 드래그해 초록 궤도 구역에 주차한 뒤 손을 떼는 각도 감각 게임으로, 기존 회전·방어류와 달리 orbit parking/릴리즈 판정이 핵심입니다. 기차표 도장 찍기는 움직이는 표의 별표가 가운데 올 때 도장을 꾹 눌렀다 떼는 hold-to-punch 타이밍 게임으로, 단순 탭 반응과 다른 누르기-떼기 조작감을 제공합니다. 두 게임 모두 단일 HTML, SVG 썸네일, Pointer Events, 시작/종료 오버레이, 100dvh/overflow 보호, localStorage 최고기록, 외부 의존성 0건을 포함합니다.
 
 - **🥋 태권도 품새 리듬 · 🎣 받침 낚시왕 추가 (2026-07-20)** — 태권도 품새 리듬은 표시된 네 동작을 빠르게 맞추는 운동·반응 게임으로 장윤이의 태권도 관심을 반영했습니다. 받침 낚시왕은 낱말의 마지막 소리를 듣고 받침을 고르는 한글 학습 게임입니다. 두 게임 모두 단일 HTML, SVG 썸네일, Pointer Events, 44px 이상 터치 버튼, 오답 무감점 피드백, localStorage 최고기록, 외부 의존성 0건을 포함합니다.
 

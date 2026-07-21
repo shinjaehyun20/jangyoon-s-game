@@ -1,5 +1,11 @@
 # 변경 이력
 
+## 2026-07-21 — 행성 궤도 주차 · 기차표 도장 찍기
+
+- **planet-orbit-park** — 손가락으로 달을 원형 드래그해 초록 궤도 구역에 맞춘 뒤 손을 떼는 orbit parking 게임. 7라운드, 각도 오차별 점수, `planet-orbit-park_best` localStorage 최고점 저장. 기존 `lighthouse-guide`/`meteor-shield`의 회전 유도·방어와 달리 목표 각도에 직접 주차 후 릴리즈하는 공간 감각 메커니즘.
+- **train-ticket-stamp** — 이동하는 기차표 스트립에서 별표 표가 가운데 올 때 도장을 꾹 누르고 떼는 hold-to-punch 타이밍 게임. 12장 도전, 거리 오차별 점수, `train-ticket-stamp_best` localStorage 최고점 저장. 기존 단순 탭·스와이프류와 달리 누름 상태 시각 피드백과 릴리즈 판정을 결합.
+- 두 게임 모두 모바일 터치 우선 단일 HTML, 외부 의존성 없음, 시작/종료 오버레이, 홈 링크, Pointer Events, 100dvh/overflow 보호, SVG 썸네일 포함.
+
 ## 2026-07-20 — 태권도 품새 리듬 · 받침 낚시왕
 
 - **taekwondo-poomsae** — 표시된 `지르기/앞차기/막기/서기` 동작을 45초 동안 맞추는 반응·리듬 수련. 연속 정답 콤보, 오답 무감점, localStorage 최고점 저장.

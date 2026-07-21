@@ -1,5 +1,21 @@
 [
   {
+    "id": "planet-orbit-park",
+    "title": "Planet Orbit Park",
+    "title_ko": "🪐 행성 궤도 주차",
+    "description": "손가락으로 달을 원형 드래그해 초록 궤도 구역에 주차하는 7라운드 각도 감각 게임",
+    "thumbnail": "planet-orbit-park/thumb.svg",
+    "path": "planet-orbit-park/index.html"
+  },
+  {
+    "id": "train-ticket-stamp",
+    "title": "Train Ticket Stamp",
+    "title_ko": "🎟️ 기차표 도장 찍기",
+    "description": "움직이는 기차표의 별표가 가운데 올 때 도장을 꾹 눌렀다 떼는 hold-to-punch 타이밍 게임",
+    "thumbnail": "train-ticket-stamp/thumb.svg",
+    "path": "train-ticket-stamp/index.html"
+  },
+  {
     "id": "taekwondo-poomsae",
     "title": "Taekwondo Poomsae Rhythm",
     "title_ko": "🥋 태권도 품새 리듬",
