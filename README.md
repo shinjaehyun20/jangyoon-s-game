@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 183개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 185개.
 
-[![Games](https://img.shields.io/badge/games-183-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-185-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![183개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![185개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 183개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 185개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🩹 반창고 동물병원 (bandage-doctor)](./bandage-doctor) | 다친 동물의 증상 아이콘을 보고 맞는 치료 도구(반창고·체온계·담요·차)를 골라 45초 동안 치료하는 인지 반응 게임. 기존 pet-feed(먹이 주기)와 달리 증상→원인별 도구를 매칭하는 진단 추론이 핵심, 매 환자마다 도구 버튼 위치가 섞여 위치 암기가 아닌 실제 판단을 유도, localStorage 최고점 저장 | 어린이/인지·매칭 |
+| [📮 편지 배달 놀이 (letter-delivery)](./letter-delivery) | 화면 위 편지의 숫자와 같은 번호가 붙은 우체통으로 드래그해 넣는 40초 배달 게임. 기존 recycle-rescue(재질 판단 드래그 분류)와 달리 숫자 인식이 핵심이며, 우체통 3개의 배치가 매 라운드 섞여 매번 다시 찾아야 하는 탐색 요소가 더해짐, localStorage 최고점 저장 | 어린이/숫자·드래그 |
 | [🪐 행성 궤도 주차 (planet-orbit-park)](./planet-orbit-park) | 손가락으로 달을 원형 드래그해 초록 궤도 구역에 주차하는 7라운드 각도 감각 게임. 기존 lighthouse-guide/meteor-shield의 회전 방어·유도와 달리 각도 위치를 직접 맞춘 뒤 손을 떼는 orbit parking 메커니즘, localStorage 최고점 저장 | 어린이/각도·드래그 |
 | [🎟️ 기차표 도장 찍기 (train-ticket-stamp)](./train-ticket-stamp) | 움직이는 기차표의 별표가 가운데 올 때 도장을 꾹 눌렀다 떼는 hold-to-punch 타이밍 게임. 기존 단순 탭 반응과 달리 누르기-떼기 판정과 이동 표적 정렬이 핵심, localStorage 최고점 저장 | 어린이/타이밍·홀드 |
 | [🥋 태권도 품새 리듬 (taekwondo-poomsae)](./taekwondo-poomsae) | 표시된 지르기·앞차기·막기·서기 동작을 45초 동안 맞추는 리듬 수련. 연속 정답 콤보와 localStorage 최고점 저장 | 어린이/운동·반응 |
@@ -334,6 +336,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-07)
+
+- **🩹 반창고 동물병원 · 📮 편지 배달 놀이 추가 (2026-07-22)** — 반창고 동물병원은 다친 동물의 증상 아이콘(상처/열/오한/배탈)을 보고 알맞은 치료 도구를 45초 동안 골라주는 인지 반응 게임으로, 기존 pet-feed의 단순 먹이 주기와 달리 증상-원인 매칭 추론이 핵심이며 매 환자마다 도구 버튼 위치가 섞여 위치 암기를 막습니다. 편지 배달 놀이는 편지의 숫자와 같은 번호의 우체통으로 드래그해 넣는 40초 게임으로, 기존 recycle-rescue의 재질 판단 드래그 분류와 달리 숫자 인식이 핵심이고 우체통 배치가 매 라운드 섞여 재탐색이 필요합니다. 두 게임 모두 단일 HTML, SVG 썸네일, 시작/종료 오버레이, 100dvh/overflow 보호, localStorage 최고기록, 외부 의존성 0건을 포함하며, Playwright 미가용 환경이라 Node vm DOM mock 하네스(gonggi-nori 선례 준용)로 fan-in 후 happy-path 5라운드 + 타이머 만료 전체 실행, 런타임 예외 0건을 확인했습니다.
 
 - **🪐 행성 궤도 주차 · 🎟️ 기차표 도장 찍기 추가 (2026-07-21)** — 행성 궤도 주차는 달을 원형 드래그해 초록 궤도 구역에 주차한 뒤 손을 떼는 각도 감각 게임으로, 기존 회전·방어류와 달리 orbit parking/릴리즈 판정이 핵심입니다. 기차표 도장 찍기는 움직이는 표의 별표가 가운데 올 때 도장을 꾹 눌렀다 떼는 hold-to-punch 타이밍 게임으로, 단순 탭 반응과 다른 누르기-떼기 조작감을 제공합니다. 두 게임 모두 단일 HTML, SVG 썸네일, Pointer Events, 시작/종료 오버레이, 100dvh/overflow 보호, localStorage 최고기록, 외부 의존성 0건을 포함합니다.
 

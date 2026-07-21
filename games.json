@@ -1462,5 +1462,21 @@
     "description": "목표 칸에 던지고 그 칸만 피해 순서대로 콩콩 밟는 전통놀이, 5판 도전",
     "thumbnail": "sabangchigi-hop/thumb.svg",
     "path": "sabangchigi-hop/index.html"
+  },
+  {
+    "id": "bandage-doctor",
+    "title": "Bandage Doctor",
+    "title_ko": "🩹 반창고 동물병원",
+    "description": "증상에 맞는 치료 도구를 골라 다친 동물을 치료하는 45초 반응 게임",
+    "thumbnail": "bandage-doctor/thumb.svg",
+    "path": "bandage-doctor/index.html"
+  },
+  {
+    "id": "letter-delivery",
+    "title": "Letter Delivery",
+    "title_ko": "📮 편지 배달 놀이",
+    "description": "번호가 같은 우체통으로 편지를 끌어다 배달하는 40초 드래그 게임",
+    "thumbnail": "letter-delivery/thumb.svg",
+    "path": "letter-delivery/index.html"
   }
 ]

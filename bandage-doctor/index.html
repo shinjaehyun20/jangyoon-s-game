@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>반창고 동물병원</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #FFE3E3;
+    --accent: #FF6B6B;
+    --accent2: #4ECDC4;
+    --text: #2D2D2D;
+  }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(160deg, var(--bg), #FFF6F6 60%, #FFE9D6);
+    color: var(--text);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    color: #D6336C;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.6);
+  }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.65);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-weight: 700;
+    font-size: clamp(14px, 4vw, 17px);
+  }
+  .hud .time-value.low { color: #E03131; }
+  #gameArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    position: relative;
+    min-height: 0;
+  }
+  .patient-card {
+    background: rgba(255,255,255,0.85);
+    border-radius: 22px;
+    width: min(72vw, 240px);
+    aspect-ratio: 1 / 1;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  .patient-card.shake { animation: shake 0.35s; }
+  .patient-card.heal { animation: heal-pop 0.5s; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+  @keyframes heal-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+  .animal-emoji { font-size: clamp(56px, 20vw, 84px); }
+  .symptom-badge {
+    position: absolute;
+    top: -8px; right: -8px;
+    font-size: clamp(30px, 11vw, 44px);
+    background: #fff;
+    border-radius: 50%;
+    width: 1.5em; height: 1.5em;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    animation: pulse 1.1s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+  .question {
+    font-size: clamp(14px, 4vw, 17px);
+    font-weight: 600;
+    text-align: center;
+    color: #495057;
+  }
+  .remedy-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .remedy-btn {
+    min-height: 64px;
+    border: none;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: transform 0.12s;
+  }
+  .remedy-btn:active { transform: scale(0.93); }
+  .remedy-icon { font-size: clamp(26px, 8vw, 34px); }
+  footer {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px;
+    color: #6c757d;
+  }
+  .home-link { color: #D6336C; text-decoration: none; font-weight: 700; }
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 20;
+    padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 26px 22px;
+    width: min(88vw, 360px);
+    text-align: center;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .overlay-card h2 { font-size: clamp(20px, 6vw, 26px); color: #D6336C; }
+  .overlay-card p { font-size: 14px; color: #495057; line-height: 1.5; }
+  .result-score { font-size: clamp(36px, 12vw, 52px); font-weight: 900; color: #D6336C; }
+  .btn-start {
+    min-height: 48px;
+    border: none;
+    border-radius: 14px;
+    background: #D6336C;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn-start:active { transform: scale(0.97); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🩹 반창고 동물병원</h1>
+
+    <div class="hud">
+      <span>⭐ 치료 <span id="scoreValue">0</span>마리</span>
+      <span>⏱️ <span class="time-value" id="timeValue">45</span>초</span>
+    </div>
+
+    <div id="gameArea">
+      <div class="patient-card" id="patientCard">
+        <span class="animal-emoji" id="animalEmoji">🐶</span>
+        <span class="symptom-badge" id="symptomBadge">🤕</span>
+      </div>
+      <p class="question">어떤 도구로 치료해줄까요?</p>
+      <div class="remedy-row" id="remedyRow"></div>
+    </div>
+
+    <footer>
+      <small>증상에 맞는 도구를 골라보세요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🩹 반창고 동물병원</h2>
+      <p>다친 동물 친구가 찾아와요.<br>증상에 맞는 치료 도구를 45초 동안 골라주세요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 진료 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CONFIG = {
+    DURATION: 45,
+    ANIMALS: ['🐶', '🐱', '🐰', '🐻', '🐼', '🦁', '🐵', '🐧', '🐨', '🐹'],
+    CASES: [
+      { symptom: '🤕', label: '상처', remedy: 'bandage' },
+      { symptom: '🤒', label: '열이 나요', remedy: 'thermo' },
+      { symptom: '🥶', label: '오한이 나요', remedy: 'blanket' },
+      { symptom: '🤢', label: '배가 아파요', remedy: 'tea' }
+    ],
+    REMEDIES: [
+      { id: 'bandage', icon: '🩹', label: '반창고' },
+      { id: 'thermo', icon: '🌡️', label: '체온계' },
+      { id: 'blanket', icon: '🧣', label: '따뜻한 담요' },
+      { id: 'tea', icon: '🍵', label: '따뜻한 차' }
+    ],
+    BEST_KEY: 'bandage-doctor_best'
+  };
+
+  var state = {
+    score: 0,
+    timeLeft: CONFIG.DURATION,
+    timerId: null,
+    running: false,
+    current: null
+  };
+
+  var scoreValue = document.getElementById('scoreValue');
+  var timeValue = document.getElementById('timeValue');
+  var patientCard = document.getElementById('patientCard');
+  var animalEmoji = document.getElementById('animalEmoji');
+  var symptomBadge = document.getElementById('symptomBadge');
+  var remedyRow = document.getElementById('remedyRow');
+  var startOverlay = document.getElementById('startOverlay');
+  var endOverlay = document.getElementById('endOverlay');
+  var finalScore = document.getElementById('finalScore');
+  var resultMsg = document.getElementById('resultMsg');
+  var startBtn = document.getElementById('startBtn');
+  var restartBtn = document.getElementById('restartBtn');
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function renderRemedies() {
+    var order = shuffle(CONFIG.REMEDIES);
+    remedyRow.innerHTML = '';
+    order.forEach(function (r) {
+      var btn = document.createElement('button');
+      btn.className = 'remedy-btn';
+      btn.setAttribute('data-id', r.id);
+      btn.innerHTML = '<span class="remedy-icon">' + r.icon + '</span><span>' + r.label + '</span>';
+      btn.addEventListener('click', function () { onRemedyPick(r.id); });
+      remedyRow.appendChild(btn);
+    });
+  }
+
+  function nextPatient() {
+    state.current = pick(CONFIG.CASES);
+    animalEmoji.textContent = pick(CONFIG.ANIMALS);
+    symptomBadge.textContent = state.current.symptom;
+    renderRemedies();
+  }
+
+  function onRemedyPick(id) {
+    if (!state.running || !state.current) { return; }
+    if (id === state.current.remedy) {
+      state.score += 1;
+      scoreValue.textContent = String(state.score);
+      patientCard.classList.remove('shake');
+      patientCard.classList.add('heal');
+      setTimeout(function () {
+        patientCard.classList.remove('heal');
+        nextPatient();
+      }, 260);
+    } else {
+      patientCard.classList.remove('heal');
+      patientCard.classList.add('shake');
+      setTimeout(function () { patientCard.classList.remove('shake'); }, 350);
+    }
+  }
+
+  function tick() {
+    state.timeLeft -= 1;
+    if (state.timeLeft <= 0) {
+      timeValue.textContent = '0';
+      endGame();
+      return;
+    }
+    timeValue.textContent = String(state.timeLeft);
+    if (state.timeLeft <= 10) {
+      timeValue.classList.add('low');
+    }
+  }
+
+  function startGame() {
+    state.score = 0;
+    state.timeLeft = CONFIG.DURATION;
+    state.running = true;
+    scoreValue.textContent = '0';
+    timeValue.textContent = String(CONFIG.DURATION);
+    timeValue.classList.remove('low');
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    nextPatient();
+    if (state.timerId) { clearInterval(state.timerId); }
+    state.timerId = setInterval(tick, 1000);
+  }
+
+  function endGame() {
+    state.running = false;
+    if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
+    var best = Number(localStorage.getItem(CONFIG.BEST_KEY) || '0');
+    if (state.score > best) {
+      best = state.score;
+      localStorage.setItem(CONFIG.BEST_KEY, String(best));
+    }
+    finalScore.textContent = String(state.score);
+    resultMsg.textContent = '최고 기록: ' + best + '마리';
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+})();
+</script>
+</body>
+</html>

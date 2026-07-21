@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>편지 배달 놀이</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #DCEEFF;
+    --accent: #339AF0;
+    --accent2: #FFD43B;
+    --text: #1B2B3A;
+  }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(160deg, #DCEEFF, #F5FBFF 55%, #FFF6DA);
+    color: var(--text);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    color: #1971C2;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.6);
+  }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.65);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-weight: 700;
+    font-size: clamp(14px, 4vw, 17px);
+  }
+  .hud .time-value.low { color: #E03131; }
+  #gameArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    min-height: 0;
+    padding-top: 6px;
+  }
+  .letter-zone {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 10px;
+    min-height: 0;
+  }
+  .letter {
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    transform: translate(-50%, 0);
+    width: min(30vw, 108px);
+    aspect-ratio: 4 / 3;
+    background: #fff;
+    border-radius: 14px;
+    border: 3px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(28px, 9vw, 40px);
+    font-weight: 900;
+    color: var(--accent);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    transition: left 0.28s ease, top 0.28s ease, opacity 0.28s ease;
+  }
+  .letter.dragging { transition: none; cursor: grabbing; }
+  .letter::before {
+    content: '✉️';
+    position: absolute;
+    top: -14px; left: -10px;
+    font-size: 22px;
+  }
+  .letter.delivered { animation: fly-away 0.35s forwards; }
+  @keyframes fly-away {
+    to { transform: translate(-50%, -40px) scale(0.4); opacity: 0; }
+  }
+  .mailbox-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 8px 4px 4px;
+  }
+  .mailbox {
+    flex: 1;
+    max-width: 120px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 4px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.55);
+    transition: background 0.15s, transform 0.15s;
+  }
+  .mailbox.hover { background: rgba(51,154,240,0.25); transform: scale(1.05); }
+  .mailbox-icon { font-size: clamp(30px, 9vw, 42px); }
+  .mailbox-num {
+    font-size: clamp(16px, 5vw, 20px);
+    font-weight: 900;
+    color: var(--text);
+    background: #fff;
+    border-radius: 999px;
+    padding: 2px 12px;
+  }
+  .question {
+    text-align: center;
+    font-size: clamp(13px, 3.6vw, 16px);
+    font-weight: 600;
+    color: #495057;
+  }
+  footer {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px;
+    color: #6c757d;
+  }
+  .home-link { color: #1971C2; text-decoration: none; font-weight: 700; }
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 20;
+    padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 26px 22px;
+    width: min(88vw, 360px);
+    text-align: center;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .overlay-card h2 { font-size: clamp(20px, 6vw, 26px); color: #1971C2; }
+  .overlay-card p { font-size: 14px; color: #495057; line-height: 1.5; }
+  .result-score { font-size: clamp(36px, 12vw, 52px); font-weight: 900; color: #1971C2; }
+  .btn-start {
+    min-height: 48px;
+    border: none;
+    border-radius: 14px;
+    background: #1971C2;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn-start:active { transform: scale(0.97); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>📮 편지 배달 놀이</h1>
+
+    <div class="hud">
+      <span>✉️ 배달 <span id="scoreValue">0</span>통</span>
+      <span>⏱️ <span class="time-value" id="timeValue">40</span>초</span>
+    </div>
+
+    <div id="gameArea">
+      <p class="question">번호가 같은 우체통으로 편지를 옮겨주세요</p>
+      <div class="letter-zone" id="letterZone">
+        <div class="letter" id="letter">1</div>
+      </div>
+      <div class="mailbox-row" id="mailboxRow"></div>
+    </div>
+
+    <footer>
+      <small>편지를 손가락으로 끌어보세요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>📮 편지 배달 놀이</h2>
+      <p>편지에 적힌 숫자와 같은 번호의<br>우체통으로 끌어다 넣어주세요. 40초!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 배달 완료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CONFIG = {
+    DURATION: 40,
+    BOX_COUNT: 3,
+    NUM_MIN: 1,
+    NUM_MAX: 9,
+    BEST_KEY: 'letter-delivery_best'
+  };
+
+  var state = {
+    score: 0,
+    timeLeft: CONFIG.DURATION,
+    timerId: null,
+    running: false,
+    targetNum: null,
+    dragging: false,
+    homeLeft: 0,
+    homeTop: 0,
+    pointerId: null
+  };
+
+  var scoreValue = document.getElementById('scoreValue');
+  var timeValue = document.getElementById('timeValue');
+  var letterZone = document.getElementById('letterZone');
+  var letter = document.getElementById('letter');
+  var mailboxRow = document.getElementById('mailboxRow');
+  var startOverlay = document.getElementById('startOverlay');
+  var endOverlay = document.getElementById('endOverlay');
+  var finalScore = document.getElementById('finalScore');
+  var resultMsg = document.getElementById('resultMsg');
+  var startBtn = document.getElementById('startBtn');
+  var restartBtn = document.getElementById('restartBtn');
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function pickNumbers() {
+    var pool = [];
+    for (var n = CONFIG.NUM_MIN; n <= CONFIG.NUM_MAX; n++) { pool.push(n); }
+    return shuffle(pool).slice(0, CONFIG.BOX_COUNT);
+  }
+
+  function renderMailboxes(numbers) {
+    mailboxRow.innerHTML = '';
+    numbers.forEach(function (num) {
+      var box = document.createElement('div');
+      box.className = 'mailbox';
+      box.setAttribute('data-num', String(num));
+      box.innerHTML = '<span class="mailbox-icon">📮</span><span class="mailbox-num">' + num + '</span>';
+      mailboxRow.appendChild(box);
+    });
+  }
+
+  function resetLetterPosition() {
+    letter.style.left = '50%';
+    letter.style.top = '14px';
+    letter.style.transform = 'translate(-50%, 0)';
+  }
+
+  function nextRound() {
+    var numbers = pickNumbers();
+    state.targetNum = numbers[randInt(0, numbers.length - 1)];
+    renderMailboxes(shuffle(numbers));
+    letter.textContent = String(state.targetNum);
+    letter.classList.remove('delivered');
+    resetLetterPosition();
+  }
+
+  function getMailboxUnderPoint(x, y) {
+    var boxes = mailboxRow.querySelectorAll('.mailbox');
+    for (var i = 0; i < boxes.length; i++) {
+      var r = boxes[i].getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+        return boxes[i];
+      }
+    }
+    return null;
+  }
+
+  function clearHover() {
+    var boxes = mailboxRow.querySelectorAll('.mailbox.hover');
+    boxes.forEach(function (b) { b.classList.remove('hover'); });
+  }
+
+  function onPointerDown(e) {
+    if (!state.running) { return; }
+    state.dragging = true;
+    state.pointerId = e.pointerId;
+    letter.classList.add('dragging');
+    letter.setPointerCapture(e.pointerId);
+    moveLetterTo(e.clientX, e.clientY);
+  }
+
+  function moveLetterTo(x, y) {
+    var zoneRect = letterZone.getBoundingClientRect();
+    var relLeft = x - zoneRect.left;
+    var relTop = y - zoneRect.top;
+    letter.style.left = relLeft + 'px';
+    letter.style.top = relTop + 'px';
+    letter.style.transform = 'translate(-50%, -50%)';
+  }
+
+  function onPointerMove(e) {
+    if (!state.dragging || e.pointerId !== state.pointerId) { return; }
+    moveLetterTo(e.clientX, e.clientY);
+    clearHover();
+    var box = getMailboxUnderPoint(e.clientX, e.clientY);
+    if (box) { box.classList.add('hover'); }
+  }
+
+  function onPointerUp(e) {
+    if (!state.dragging || e.pointerId !== state.pointerId) { return; }
+    state.dragging = false;
+    letter.classList.remove('dragging');
+    clearHover();
+    var box = getMailboxUnderPoint(e.clientX, e.clientY);
+    if (box && Number(box.getAttribute('data-num')) === state.targetNum) {
+      state.score += 1;
+      scoreValue.textContent = String(state.score);
+      letter.classList.add('delivered');
+      setTimeout(nextRound, 260);
+    } else {
+      resetLetterPosition();
+    }
+  }
+
+  letter.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerUp);
+
+  function tick() {
+    state.timeLeft -= 1;
+    if (state.timeLeft <= 0) {
+      timeValue.textContent = '0';
+      endGame();
+      return;
+    }
+    timeValue.textContent = String(state.timeLeft);
+    if (state.timeLeft <= 10) {
+      timeValue.classList.add('low');
+    }
+  }
+
+  function startGame() {
+    state.score = 0;
+    state.timeLeft = CONFIG.DURATION;
+    state.running = true;
+    scoreValue.textContent = '0';
+    timeValue.textContent = String(CONFIG.DURATION);
+    timeValue.classList.remove('low');
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    nextRound();
+    if (state.timerId) { clearInterval(state.timerId); }
+    state.timerId = setInterval(tick, 1000);
+  }
+
+  function endGame() {
+    state.running = false;
+    if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
+    var best = Number(localStorage.getItem(CONFIG.BEST_KEY) || '0');
+    if (state.score > best) {
+      best = state.score;
+      localStorage.setItem(CONFIG.BEST_KEY, String(best));
+    }
+    finalScore.textContent = String(state.score);
+    resultMsg.textContent = '최고 기록: ' + best + '통';
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+})();
+</script>
+</body>
+</html>

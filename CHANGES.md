@@ -1,5 +1,11 @@
 # 변경 이력
 
+## 2026-07-22 — 반창고 동물병원 · 편지 배달 놀이
+
+- **bandage-doctor** — 다친 동물의 증상 아이콘(🤕/🤒/🥶/🤢)을 보고 알맞은 치료 도구(🩹/🌡️/🧣/🍵)를 45초 동안 골라주는 인지 반응 게임. 매 환자마다 도구 버튼 4개 위치가 셔플되어 위치 암기가 아닌 실제 증상 판별이 필요, 오답 무감점(가벼운 흔들림만), `bandage-doctor_best` localStorage 최고점 저장. 기존 `pet-feed`(단순 먹이 주기)와 달리 증상→원인 매칭 추론이 핵심.
+- **letter-delivery** — 편지에 적힌 숫자와 같은 번호의 우체통으로 드래그해 배달하는 40초 게임. 우체통 3개 중 정답 1개, 배치가 매 라운드 섞여 재탐색 필요, 오답 드롭은 편지가 제자리로 복귀(무감점), `letter-delivery_best` localStorage 최고점 저장. 기존 `recycle-rescue`(재질 판단 드래그 분류, 고정 3통)와 달리 숫자 인식 + 매 라운드 위치 재탐색이 핵심.
+- 두 게임 모두 모바일 터치 우선 단일 HTML, 외부 의존성 없음, 시작/종료 오버레이, 홈 링크, Pointer Events(letter-delivery)/Click(bandage-doctor), 100dvh/overflow 보호, SVG 썸네일 포함. 검증은 Playwright 미가용 환경이라 Node vm DOM mock 하네스(2026-07-13 gonggi-nori 선례 준용, `runtime/audit/2026-07-22/jangyoon-games/verify-harness.js`)로 fan-in 후 fresh 재검증: happy-path 5라운드 전승 + 타이머 만료 종료 오버레이 전환, 런타임 예외 0건.
+
 ## 2026-07-21 — 행성 궤도 주차 · 기차표 도장 찍기
 
 - **planet-orbit-park** — 손가락으로 달을 원형 드래그해 초록 궤도 구역에 맞춘 뒤 손을 떼는 orbit parking 게임. 7라운드, 각도 오차별 점수, `planet-orbit-park_best` localStorage 최고점 저장. 기존 `lighthouse-guide`/`meteor-shield`의 회전 유도·방어와 달리 목표 각도에 직접 주차 후 릴리즈하는 공간 감각 메커니즘.

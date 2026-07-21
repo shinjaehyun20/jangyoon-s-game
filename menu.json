@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "bandage-doctor",
+        "label": "🩹 반창고 동물병원",
+        "path": "bandage-doctor/index.html"
+      },
+      {
+        "id": "letter-delivery",
+        "label": "📮 편지 배달 놀이",
+        "path": "letter-delivery/index.html"
+      },
+      {
         "id": "planet-orbit-park",
         "label": "🪐 행성 궤도 주차",
         "path": "planet-orbit-park/index.html"
