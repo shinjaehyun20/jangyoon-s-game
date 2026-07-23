@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>마음 거울</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}:root{--ink:#41304f;--violet:#8b5cf6;--pink:#ff7ba8;--cream:#fff6df}
+html,body{height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation;font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:linear-gradient(155deg,#efe8ff,#fff3f7 58%,#fff8df);color:var(--ink)}
+.wrap{width:100%;max-width:480px;height:100vh;height:100dvh;margin:auto;padding:10px 12px 8px;display:flex;flex-direction:column;gap:8px}h1{text-align:center;color:#7543c3;font-size:clamp(21px,5.7vw,28px)}
+.hud{display:flex;justify-content:space-between;background:#ffffffbd;border-radius:14px;padding:8px 13px;font-weight:800;font-size:clamp(14px,4vw,17px)}
+.game{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:13px}.scene{width:min(84vw,340px);background:#fff;border-radius:24px;padding:18px 16px;text-align:center;box-shadow:0 10px 26px #4d2c7620;border:3px solid #fff}.scene-icon{font-size:clamp(54px,18vw,76px)}.scene-text{font-size:clamp(17px,4.6vw,21px);line-height:1.45;font-weight:850;margin-top:7px;min-height:58px}.prompt{font-size:13px;color:#725f7f;min-height:20px}
+.faces{width:100%;max-width:400px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.face{min-height:83px;border:0;border-radius:18px;background:#fff;box-shadow:0 5px 13px #4d2c7618;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:13px;font-weight:850;color:var(--ink);cursor:pointer}.face:active{transform:scale(.95)}.face .emo{font-size:clamp(31px,9vw,40px)}.face.good{background:#ddfff0;animation:pop .42s}.face.bad{background:#ffe3eb;animation:shake .35s}@keyframes pop{50%{transform:scale(1.08)}}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+footer{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#756a7d}.home{color:#7543c3;text-decoration:none;font-weight:800}.overlay{position:fixed;inset:0;background:#3a255b80;display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}.overlay.hidden{display:none}.card{width:min(88vw,360px);background:#fff;border-radius:24px;padding:26px 22px;text-align:center;display:flex;flex-direction:column;gap:12px;box-shadow:0 16px 38px #0003}.card h2{color:#7543c3;font-size:25px}.card p{line-height:1.55;color:#725f7f}.big{font-size:48px;font-weight:900;color:#7543c3}.start{min-height:50px;border:0;border-radius:15px;background:#7543c3;color:#fff;font-size:18px;font-weight:900;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap"><h1>🪞 마음 거울</h1><div class="hud"><span>🎬 장면 <span id="roundValue">1</span>/8</span><span>⭐ 별 <span id="scoreValue">0</span></span></div>
+<main class="game"><section class="scene" id="sceneCard"><div class="scene-icon" id="sceneIcon">🎁</div><div class="scene-text" id="sceneText">친구가 생일 선물을 주었어요.</div><p class="prompt" id="prompt">이럴 때 내 마음은 어떨까요?</p></section><div class="faces" id="faces"></div></main>
+<footer><small>마음에 이름을 붙여보아요</small><a class="home" href="../index.html">← 홈으로</a></footer></div>
+<div class="overlay" id="startOverlay"><div class="card"><h2>🪞 마음 거울</h2><p>장면을 보고 주인공의 마음과<br>가장 가까운 표정을 골라주세요.<br>틀려도 다시 생각해 보면 돼요!</p><button class="start" id="startBtn">거울 보기</button></div></div>
+<div class="overlay hidden" id="endOverlay"><div class="card"><h2>💜 마음 탐험 완료!</h2><div class="big" id="finalScore">0⭐</div><p id="resultMsg"></p><button class="start" id="restartBtn">다시 하기</button></div></div>
+<script>
+(function(){'use strict';
+var CONFIG={ROUNDS:8,BEST_KEY:'emotion-mirror_best',EMOTIONS:[
+{id:'happy',icon:'😊',label:'기뻐요'},{id:'sad',icon:'😢',label:'슬퍼요'},{id:'angry',icon:'😠',label:'화나요'},{id:'scared',icon:'😨',label:'무서워요'},{id:'proud',icon:'😌',label:'뿌듯해요'},{id:'surprised',icon:'😮',label:'놀랐어요'}],SCENES:[
+{icon:'🎁',text:'친구가 생일 선물을 주었어요.',answer:'happy',hint:'선물을 받으면 마음이 밝아져요.'},
+{icon:'🧩',text:'어려운 퍼즐을 혼자 끝까지 맞췄어요.',answer:'proud',hint:'끝까지 해낸 나 자신이 자랑스러워요.'},
+{icon:'🍦',text:'먹으려던 아이스크림이 바닥에 떨어졌어요.',answer:'sad',hint:'기대하던 것을 잃어 속상한 마음이에요.'},
+{icon:'⚡',text:'갑자기 아주 큰 천둥 소리가 났어요.',answer:'scared',hint:'갑작스러운 큰 소리에 깜짝 겁이 날 수 있어요.'},
+{icon:'🏰',text:'정성껏 만든 블록 성을 누가 망가뜨렸어요.',answer:'angry',hint:'소중한 것이 망가지면 화가 날 수 있어요.'},
+{icon:'🎉',text:'교실 문을 열었더니 친구들이 깜짝 파티를 열었어요.',answer:'surprised',hint:'예상하지 못한 일이 생겨 눈이 동그래져요.'},
+{icon:'🤝',text:'넘어진 친구를 도와주었더니 고맙다고 했어요.',answer:'proud',hint:'좋은 일을 한 내 마음이 뿌듯해요.'},
+{icon:'🌧️',text:'소풍 가는 날에 비가 많이 왔어요.',answer:'sad',hint:'기다리던 계획이 바뀌어 아쉬운 마음이에요.'},
+{icon:'🐶',text:'길을 걷다 귀여운 강아지가 꼬리를 흔들었어요.',answer:'happy',hint:'반가운 모습을 보면 기분이 좋아져요.'},
+{icon:'🎈',text:'손에 잡고 있던 풍선이 갑자기 펑 터졌어요.',answer:'surprised',hint:'갑자기 생긴 일에 깜짝 놀란 마음이에요.'}
+]};
+var state={round:0,score:0,scenes:[],running:false,current:null,locked:false};var $=function(id){return document.getElementById(id)},roundValue=$('roundValue'),scoreValue=$('scoreValue'),sceneCard=$('sceneCard'),sceneIcon=$('sceneIcon'),sceneText=$('sceneText'),prompt=$('prompt'),faces=$('faces'),startOverlay=$('startOverlay'),endOverlay=$('endOverlay'),finalScore=$('finalScore'),resultMsg=$('resultMsg');
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+// icon/label values come only from the closed local CONFIG constant; no user or network input reaches this markup.
+function renderFaces(){var correct=CONFIG.EMOTIONS.find(function(e){return e.id===state.current.answer});var wrong=shuffle(CONFIG.EMOTIONS.filter(function(e){return e.id!==correct.id})).slice(0,3);var choices=shuffle([correct].concat(wrong));faces.innerHTML='';choices.forEach(function(e){var b=document.createElement('button');b.className='face';b.setAttribute('data-id',e.id);b.innerHTML='<span class="emo">'+e.icon+'</span><span>'+e.label+'</span>';b.addEventListener('click',function(){choose(b,e.id)});faces.appendChild(b)})}
+function showRound(){if(state.round>=CONFIG.ROUNDS){endGame();return}state.current=state.scenes[state.round];state.locked=false;roundValue.textContent=String(state.round+1);sceneIcon.textContent=state.current.icon;sceneText.textContent=state.current.text;prompt.textContent='이럴 때 내 마음은 어떨까요?';renderFaces()}
+function choose(btn,id){if(!state.running||state.locked)return;if(id===state.current.answer){state.locked=true;state.score++;scoreValue.textContent=String(state.score);btn.classList.add('good');prompt.textContent='맞아요! '+state.current.hint;state.round++;setTimeout(showRound,520)}else{btn.classList.add('bad');prompt.textContent='다시 생각해 봐요. '+state.current.hint;setTimeout(function(){btn.classList.remove('bad')},350)}}
+function startGame(){state.round=0;state.score=0;state.scenes=shuffle(CONFIG.SCENES).slice(0,CONFIG.ROUNDS);state.running=true;scoreValue.textContent='0';startOverlay.classList.add('hidden');endOverlay.classList.add('hidden');showRound()}
+function endGame(){state.running=false;var best=Number(localStorage.getItem(CONFIG.BEST_KEY)||'0');if(state.score>best){best=state.score;localStorage.setItem(CONFIG.BEST_KEY,String(best))}finalScore.textContent=String(state.score)+'⭐';resultMsg.textContent='최고 기록: '+best+'개의 마음 별';endOverlay.classList.remove('hidden')}
+$('startBtn').addEventListener('click',startGame);$('restartBtn').addEventListener('click',startGame);
+})();
+</script>
+</body>
+</html>

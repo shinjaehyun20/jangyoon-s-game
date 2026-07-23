@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "weather-outfit",
+        "label": "🌦️ 날씨 옷장 탐험",
+        "path": "weather-outfit/index.html"
+      },
+      {
+        "id": "emotion-mirror",
+        "label": "🪞 마음 거울",
+        "path": "emotion-mirror/index.html"
+      },
+      {
         "id": "bandage-doctor",
         "label": "🩹 반창고 동물병원",
         "path": "bandage-doctor/index.html"

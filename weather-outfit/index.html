@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>날씨 옷장 탐험</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0} :root{--ink:#20314a;--blue:#4385e0;--sun:#ffd166;--mint:#78dbc1}
+html,body{height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation;font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:linear-gradient(160deg,#dff4ff,#fff9dc 64%,#e7fff7);color:var(--ink)}
+.wrap{width:100%;max-width:480px;height:100vh;height:100dvh;margin:0 auto;padding:10px 12px 8px;display:flex;flex-direction:column;gap:8px}
+h1{text-align:center;color:#2069b2;font-size:clamp(21px,5.7vw,28px)}
+.hud{display:flex;justify-content:space-between;align-items:center;background:#ffffffb8;border-radius:14px;padding:8px 13px;font-weight:800;font-size:clamp(14px,4vw,17px)}
+.low{color:#d6336c}.game{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.weather-card{width:min(78vw,300px);background:#ffffffdd;border:3px solid #fff;border-radius:24px;padding:16px;text-align:center;box-shadow:0 10px 24px #416c9a20;position:relative;overflow:hidden}
+.weather-card::after{content:'';position:absolute;inset:auto -45px -65px auto;width:140px;height:140px;border-radius:50%;background:#ffe28a55}
+.weather-icon{font-size:clamp(64px,21vw,90px);line-height:1}.weather-name{font-weight:900;font-size:clamp(20px,5vw,25px);margin-top:4px}.tip{font-size:13px;color:#53677e;min-height:20px}
+.outfits{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;width:100%;max-width:390px}.outfit{min-height:72px;border:0;border-radius:18px;background:#fff;box-shadow:0 5px 13px #20314a18;font-weight:800;color:var(--ink);font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}.outfit:active{transform:scale(.96)}.outfit .ico{font-size:31px}.outfit.good{animation:pop .4s;background:#d9fff0}.outfit.bad{animation:shake .35s;background:#ffe5e5}
+@keyframes pop{50%{transform:scale(1.08)}}@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+footer{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#66788a}.home{color:#2069b2;text-decoration:none;font-weight:800}
+.overlay{position:fixed;inset:0;background:#16304c80;display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}.overlay.hidden{display:none}.card{width:min(88vw,360px);background:#fff;border-radius:24px;padding:26px 22px;text-align:center;display:flex;flex-direction:column;gap:12px;box-shadow:0 16px 38px #0003}.card h2{color:#2069b2;font-size:25px}.card p{line-height:1.55;color:#53677e}.big{font-size:48px;font-weight:900;color:#2069b2}.start{min-height:50px;border:0;border-radius:15px;background:#2069b2;color:white;font-size:18px;font-weight:900;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🌦️ 날씨 옷장 탐험</h1>
+<div class="hud"><span>✨ 준비 <span id="scoreValue">0</span>번</span><span>⏱️ <span id="timeValue">45</span>초</span></div>
+<main class="game">
+<section class="weather-card" id="weatherCard"><div class="weather-icon" id="weatherIcon">☀️</div><div class="weather-name" id="weatherName">맑은 날</div><p class="tip" id="tip">어떤 옷이 알맞을까요?</p></section>
+<div class="outfits" id="outfits"></div>
+</main>
+<footer><small>날씨를 보고 알맞은 옷을 골라요</small><a class="home" href="../index.html">← 홈으로</a></footer>
+</div>
+<div class="overlay" id="startOverlay"><div class="card"><h2>🌦️ 날씨 옷장 탐험</h2><p>날씨를 잘 보고 오늘 입을 옷을 골라주세요.<br>틀려도 괜찮아요. 다시 고르면 돼요!</p><button class="start" id="startBtn">탐험 시작!</button></div></div>
+<div class="overlay hidden" id="endOverlay"><div class="card"><h2>🎉 옷장 정리 완료!</h2><div class="big" id="finalScore">0</div><p id="resultMsg"></p><button class="start" id="restartBtn">다시 하기</button></div></div>
+<script>
+(function(){'use strict';
+var CONFIG={DURATION:45,BEST_KEY:'weather-outfit_best',CASES:[
+{id:'sun',icon:'☀️',name:'햇빛 쨍쨍',correct:'cap',hint:'햇빛을 가려주는 모자가 좋아요.'},
+{id:'rain',icon:'🌧️',name:'비가 주룩주룩',correct:'raincoat',hint:'비에 젖지 않는 우비가 좋아요.'},
+{id:'snow',icon:'🌨️',name:'눈이 펑펑',correct:'coat',hint:'몸을 따뜻하게 감싸는 외투가 좋아요.'},
+{id:'wind',icon:'🌬️',name:'바람이 쌩쌩',correct:'jacket',hint:'바람을 막아주는 재킷이 좋아요.'},
+{id:'hot',icon:'🥵',name:'아주 더운 날',correct:'shorts',hint:'가볍고 시원한 반소매 옷이 좋아요.'},
+{id:'cold',icon:'🥶',name:'아주 추운 날',correct:'scarf',hint:'목을 따뜻하게 감싸는 목도리가 좋아요.'}
+],OUTFITS:[
+{id:'cap',icon:'🧢',label:'햇빛 모자'},{id:'raincoat',icon:'🧥',label:'비옷'},{id:'coat',icon:'🥼',label:'따뜻한 외투'},{id:'jacket',icon:'🧥',label:'바람막이'},{id:'shorts',icon:'👕',label:'반소매 옷'},{id:'scarf',icon:'🧣',label:'목도리'}]};
+var state={score:0,timeLeft:CONFIG.DURATION,running:false,current:null,timer:null,lastId:null};
+var $=function(id){return document.getElementById(id)},scoreValue=$('scoreValue'),timeValue=$('timeValue'),weatherCard=$('weatherCard'),weatherIcon=$('weatherIcon'),weatherName=$('weatherName'),tip=$('tip'),outfits=$('outfits'),startOverlay=$('startOverlay'),endOverlay=$('endOverlay'),finalScore=$('finalScore'),resultMsg=$('resultMsg');
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function pickCase(){var pool=CONFIG.CASES.filter(function(c){return c.id!==state.lastId});return pool[Math.floor(Math.random()*pool.length)]}
+function nextRound(){state.current=pickCase();state.lastId=state.current.id;weatherIcon.textContent=state.current.icon;weatherName.textContent=state.current.name;tip.textContent='어떤 옷이 알맞을까요?';renderOutfits()}
+// icon/label values come only from the closed local CONFIG constant; no user or network input reaches this markup.
+function renderOutfits(){var correct=CONFIG.OUTFITS.find(function(o){return o.id===state.current.correct});var wrong=shuffle(CONFIG.OUTFITS.filter(function(o){return o.id!==correct.id})).slice(0,3);var choices=shuffle([correct].concat(wrong));outfits.innerHTML='';choices.forEach(function(o){var b=document.createElement('button');b.className='outfit';b.setAttribute('data-id',o.id);b.innerHTML='<span class="ico">'+o.icon+'</span><span>'+o.label+'</span>';b.addEventListener('click',function(){choose(b,o.id)});outfits.appendChild(b)})}
+function choose(btn,id){if(!state.running)return;if(id===state.current.correct){state.score++;scoreValue.textContent=String(state.score);btn.classList.add('good');tip.textContent='정답! 날씨 준비 완료 ✨';setTimeout(nextRound,320)}else{btn.classList.add('bad');tip.textContent=state.current.hint;setTimeout(function(){btn.classList.remove('bad')},350)}}
+function tick(){state.timeLeft--;timeValue.textContent=String(Math.max(0,state.timeLeft));if(state.timeLeft<=10)timeValue.classList.add('low');if(state.timeLeft<=0)endGame()}
+function startGame(){state.score=0;state.timeLeft=CONFIG.DURATION;state.running=true;state.lastId=null;scoreValue.textContent='0';timeValue.textContent=String(CONFIG.DURATION);timeValue.classList.remove('low');startOverlay.classList.add('hidden');endOverlay.classList.add('hidden');if(state.timer)clearInterval(state.timer);nextRound();state.timer=setInterval(tick,1000)}
+function endGame(){if(!state.running)return;state.running=false;if(state.timer){clearInterval(state.timer);state.timer=null}var best=Number(localStorage.getItem(CONFIG.BEST_KEY)||'0');if(state.score>best){best=state.score;localStorage.setItem(CONFIG.BEST_KEY,String(best))}finalScore.textContent=String(state.score)+'번';resultMsg.textContent='최고 기록: '+best+'번 준비';endOverlay.classList.remove('hidden')}
+$('startBtn').addEventListener('click',startGame);$('restartBtn').addEventListener('click',startGame);
+})();
+</script>
+</body>
+</html>

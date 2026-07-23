@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 185개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 187개.
 
-[![Games](https://img.shields.io/badge/games-185-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-187-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![185개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![187개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 185개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 187개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🌦️ 날씨 옷장 탐험 (weather-outfit)](./weather-outfit) | 햇빛·비·눈·바람·더위·추위 장면을 보고 알맞은 옷을 고르는 45초 생활 판단 게임. 매 라운드 보기 위치가 섞이고 오답은 감점 없이 날씨 힌트를 보여주며, localStorage 최고 준비 수 저장 | 어린이/생활·날씨 |
+| [🪞 마음 거울 (emotion-mirror)](./emotion-mirror) | 선물·퍼즐·천둥·소풍 등 생활 장면을 읽고 가장 가까운 감정 표정을 고르는 8라운드 사회정서 게임. 오답 시 감정 단서를 주고 재도전하며 localStorage 최고 마음 별 저장 | 어린이/사회정서·감정 |
 | [🩹 반창고 동물병원 (bandage-doctor)](./bandage-doctor) | 다친 동물의 증상 아이콘을 보고 맞는 치료 도구(반창고·체온계·담요·차)를 골라 45초 동안 치료하는 인지 반응 게임. 기존 pet-feed(먹이 주기)와 달리 증상→원인별 도구를 매칭하는 진단 추론이 핵심, 매 환자마다 도구 버튼 위치가 섞여 위치 암기가 아닌 실제 판단을 유도, localStorage 최고점 저장 | 어린이/인지·매칭 |
 | [📮 편지 배달 놀이 (letter-delivery)](./letter-delivery) | 화면 위 편지의 숫자와 같은 번호가 붙은 우체통으로 드래그해 넣는 40초 배달 게임. 기존 recycle-rescue(재질 판단 드래그 분류)와 달리 숫자 인식이 핵심이며, 우체통 3개의 배치가 매 라운드 섞여 매번 다시 찾아야 하는 탐색 요소가 더해짐, localStorage 최고점 저장 | 어린이/숫자·드래그 |
 | [🪐 행성 궤도 주차 (planet-orbit-park)](./planet-orbit-park) | 손가락으로 달을 원형 드래그해 초록 궤도 구역에 주차하는 7라운드 각도 감각 게임. 기존 lighthouse-guide/meteor-shield의 회전 방어·유도와 달리 각도 위치를 직접 맞춘 뒤 손을 떼는 orbit parking 메커니즘, localStorage 최고점 저장 | 어린이/각도·드래그 |

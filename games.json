@@ -1,5 +1,21 @@
 [
   {
+    "id": "weather-outfit",
+    "title": "Weather Outfit Adventure",
+    "title_ko": "🌦️ 날씨 옷장 탐험",
+    "description": "날씨 장면을 보고 알맞은 옷을 골라 45초 동안 생활 판단을 연습하는 무감점 선택 게임",
+    "thumbnail": "weather-outfit/thumb.svg",
+    "path": "weather-outfit/index.html"
+  },
+  {
+    "id": "emotion-mirror",
+    "title": "Emotion Mirror",
+    "title_ko": "🪞 마음 거울",
+    "description": "생활 장면을 읽고 주인공의 감정 표정을 골라 마음 어휘를 익히는 8라운드 사회정서 게임",
+    "thumbnail": "emotion-mirror/thumb.svg",
+    "path": "emotion-mirror/index.html"
+  },
+  {
     "id": "planet-orbit-park",
     "title": "Planet Orbit Park",
     "title_ko": "🪐 행성 궤도 주차",
