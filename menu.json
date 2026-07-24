@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "traffic-light-crossing",
+        "label": "🚦 신호등 안전 건너기",
+        "path": "traffic-light-crossing/index.html"
+      },
+      {
+        "id": "breath-bubble",
+        "label": "🫧 숨결 비눗방울",
+        "path": "breath-bubble/index.html"
+      },
+      {
         "id": "weather-outfit",
         "label": "🌦️ 날씨 옷장 탐험",
         "path": "weather-outfit/index.html"

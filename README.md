@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 187개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 189개.
 
-[![Games](https://img.shields.io/badge/games-187-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-189-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![187개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![189개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 187개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 189개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🚦 신호등 안전 건너기 (traffic-light-crossing)](./traffic-light-crossing) | 빨간불·노란불에는 기다리고 초록불에만 건너기를 누르는 45초 안전 판단 게임. 충동 억제와 생활 안전을 함께 연습하고 localStorage 최고점 저장 | 어린이/생활안전·반응 |
+| [🫧 숨결 비눗방울 (breath-bubble)](./breath-bubble) | 버튼을 꾹 눌러 방울을 키우고 점선 목표 원 크기에서 떼는 8라운드 hold-to-release 게임. 크기 오차별 점수와 localStorage 최고점 저장 | 어린이/호흡·타이밍 |
 | [🌦️ 날씨 옷장 탐험 (weather-outfit)](./weather-outfit) | 햇빛·비·눈·바람·더위·추위 장면을 보고 알맞은 옷을 고르는 45초 생활 판단 게임. 매 라운드 보기 위치가 섞이고 오답은 감점 없이 날씨 힌트를 보여주며, localStorage 최고 준비 수 저장 | 어린이/생활·날씨 |
 | [🪞 마음 거울 (emotion-mirror)](./emotion-mirror) | 선물·퍼즐·천둥·소풍 등 생활 장면을 읽고 가장 가까운 감정 표정을 고르는 8라운드 사회정서 게임. 오답 시 감정 단서를 주고 재도전하며 localStorage 최고 마음 별 저장 | 어린이/사회정서·감정 |
 | [🩹 반창고 동물병원 (bandage-doctor)](./bandage-doctor) | 다친 동물의 증상 아이콘을 보고 맞는 치료 도구(반창고·체온계·담요·차)를 골라 45초 동안 치료하는 인지 반응 게임. 기존 pet-feed(먹이 주기)와 달리 증상→원인별 도구를 매칭하는 진단 추론이 핵심, 매 환자마다 도구 버튼 위치가 섞여 위치 암기가 아닌 실제 판단을 유도, localStorage 최고점 저장 | 어린이/인지·매칭 |
@@ -396,6 +398,10 @@ VS Code `Live Server` 확장을 써도 된다.
 - **자동차 경주 추가 (2026-06-07)** — 3차선 도로에서 ◀▶ 버튼(또는 스와이프)으로 차선을 바꿔 내려오는 적 차량을 피하고 🪙 코인을 먹는 스피드 레이싱. 점수가 오를수록 장애물 생성 간격 단축·속도 증가. runner-game(상하 이동 수집)·traffic-cross(격자 보행)와 달리 차선 전환 + 충돌 회피 + 코인 수집이 동시에 이루어지는 레이싱 메커니즘 특화. localStorage 키: `car-race_best`.
 - **등대 불빛 추가 (2026-06-02)** — 등대를 터치·드래그로 회전시켜 불빛으로 밤바다의 배를 항구로 안내하는 조준 유도 게임. 불빛 부채꼴 안에 배가 들어오면 항구 방향으로 경로가 유도되고, 바위에 충돌하면 목숨 차감. 점수가 오를수록 배 이동 속도 증가. 차분한 네이비·골드 밤바다 색감. meteor-shield(원형 드래그 방패 회전)와 달리 각도 조준이 유도 경로를 바꾸는 능동적 빔 스티어링 메커니즘 특화.
 - **낙엽 잡기 추가 (2026-06-02)** — 바람에 좌우로 흔들리며 떨어지는 낙엽(🍁🍂🍃)을 바구니(🧺)로 받는 가을 테마 캐치 게임. 3초마다 바람 방향이 바뀌며 낙엽의 수평 이동에 영향을 주는 바람 물리 시스템 탑재. 황금잎(✨)을 잡으면 +5점 보너스. 주황/빨강/노랑 가을 색감. fruit-catch(직선 낙하)와 달리 바람 힘 누적으로 경로가 자연스럽게 좌우 흔들리는 물리 드리프트 메커니즘 특화. localStorage 키: `leaf-catch_best`.
+
+## 최근 변경사항 (2026-07)
+
+- **신호등 안전 건너기·숨결 비눗방울 추가 (2026-07-24)** — `wait-then-tap` 생활 안전 판단과 `hold-to-inflate/release` 크기 조절이라는 서로 다른 주 동사로 신규 2종을 추가. 모바일 Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, localStorage 최고기록, 외부 의존성 0건.
 
 ## 최근 변경사항 (2026-05)
 - **엘리베이터 층 맞추기 추가 (2026-06-16)** — 숫자 1~5 인식+매칭 학습, 엘리베이터 이동 애니메이션+WebAudio 효과음, 기존 숫자 순서 게임(number-order)과 달리 공간 매칭 방식

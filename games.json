@@ -1,5 +1,21 @@
 [
   {
+    "id": "traffic-light-crossing",
+    "title": "Traffic Light Crossing",
+    "title_ko": "🚦 신호등 안전 건너기",
+    "description": "빨간불·노란불에는 기다리고 초록불에만 건너기를 누르는 45초 안전 판단 게임",
+    "thumbnail": "traffic-light-crossing/thumb.svg",
+    "path": "traffic-light-crossing/index.html"
+  },
+  {
+    "id": "breath-bubble",
+    "title": "Breath Bubble",
+    "title_ko": "🫧 숨결 비눗방울",
+    "description": "버튼을 꾹 눌러 방울을 키우고 목표 원 크기에서 떼는 8라운드 hold-to-release 게임",
+    "thumbnail": "breath-bubble/thumb.svg",
+    "path": "breath-bubble/index.html"
+  },
+  {
     "id": "weather-outfit",
     "title": "Weather Outfit Adventure",
     "title_ko": "🌦️ 날씨 옷장 탐험",
