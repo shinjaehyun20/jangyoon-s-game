@@ -1510,5 +1510,21 @@
     "description": "번호가 같은 우체통으로 편지를 끌어다 배달하는 40초 드래그 게임",
     "thumbnail": "letter-delivery/thumb.svg",
     "path": "letter-delivery/index.html"
+  },
+  {
+    "id": "clover-find",
+    "title": "Clover Find",
+    "title_ko": "🍀 네잎클로버 찾기",
+    "description": "밭에 숨은 네잎클로버를 찾아라! 오탭 시 시간 감소, 레벨업으로 난이도 상승",
+    "thumbnail": "clover-find/thumb.svg",
+    "path": "clover-find/index.html"
+  },
+  {
+    "id": "teddy-dress",
+    "title": "Teddy Dress",
+    "title_ko": "🧸 곰돌이 옷 입히기",
+    "description": "미션에 맞는 옷을 탭해 곰돌이를 꾸며요! 10라운드 콤보 점수 도전",
+    "thumbnail": "teddy-dress/thumb.svg",
+    "path": "teddy-dress/index.html"
   }
 ]

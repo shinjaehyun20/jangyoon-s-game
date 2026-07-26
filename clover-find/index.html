@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🍀 네잎클로버 찾기</title>
+  <style>
+    :root {
+      --bg: #1a3d1f;
+      --accent: #4caf50;
+      --gold: #ffd700;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(135deg, #1a3d1f 0%, #2d6a32 50%, #1a3d1f 100%);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 28px);
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 8px 16px;
+      font-size: 16px; font-weight: bold;
+    }
+    .hud .timer { color: #ffeb3b; }
+    .hud .score { color: var(--gold); }
+    .hud .best { color: #a5d6a7; font-size: 13px; }
+    #gameArea {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      padding: 4px;
+    }
+    .clover-cell {
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.07);
+      border-radius: 10px;
+      font-size: clamp(22px, 5vw, 32px);
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s;
+      user-select: none;
+      -webkit-user-select: none;
+      border: 2px solid transparent;
+      min-height: 44px;
+    }
+    .clover-cell:active { transform: scale(0.88); }
+    .clover-cell.found {
+      background: rgba(255, 215, 0, 0.25);
+      border-color: var(--gold);
+      animation: sparkle 0.4s ease;
+    }
+    .clover-cell.wrong {
+      background: rgba(244, 67, 54, 0.3);
+      animation: shake 0.3s ease;
+    }
+    @keyframes sparkle {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 2px 0;
+    }
+    footer small { font-size: 12px; opacity: 0.7; }
+    .home-link {
+      color: #a5d6a7; text-decoration: none;
+      font-size: 13px; font-weight: bold;
+      background: rgba(255,255,255,0.1);
+      padding: 6px 12px; border-radius: 8px;
+      min-height: 44px; display: flex; align-items: center;
+    }
+    .overlay {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.75);
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: linear-gradient(135deg, #2d6a32, #1a3d1f);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 30px 24px;
+      text-align: center;
+      max-width: 320px; width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; line-height: 1.6; opacity: 0.9; margin-bottom: 20px; }
+    .result-score { font-size: 48px; font-weight: 900; color: var(--gold); margin: 12px 0; }
+    .btn-start {
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+      color: white; border: none; border-radius: 12px;
+      font-size: 18px; font-weight: bold;
+      padding: 14px 32px; cursor: pointer;
+      min-height: 44px; width: 100%;
+      box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active { transform: scale(0.96); }
+    #levelBadge {
+      display: inline-block;
+      background: var(--accent);
+      color: white; font-weight: bold;
+      padding: 2px 10px; border-radius: 20px;
+      font-size: 13px; margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍀 네잎클로버 찾기</h1>
+
+    <div class="hud">
+      <span class="timer">⏱ <span id="timerDisplay">30</span>초</span>
+      <span class="score">✨ <span id="scoreDisplay">0</span>개</span>
+      <span class="best">최고 <span id="bestDisplay">0</span></span>
+    </div>
+
+    <div id="gameArea"></div>
+
+    <footer>
+      <small>🍀 네잎클로버를 찾아요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍀 네잎클로버<br>찾기</h2>
+      <p>밭에 숨어있는<br><strong>네잎클로버 🍀</strong>를 찾아요!<br>세잎클로버 ☘️ 는 누르면 안 돼요!</p>
+      <div id="levelBadge">⭐ 레벨 1</div>
+      <br><br>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const CONFIG = {
+      GRID_SIZE: 20,        // 총 칸 수 (5×4)
+      TIME_LIMIT: 30,       // 초
+      STORAGE_KEY: 'clover-find_best',
+      LEVELS: [
+        { fourLeaf: 3, cols: 4 },  // 레벨1: 4잎 3개
+        { fourLeaf: 5, cols: 5 },  // 레벨2: 4잎 5개
+        { fourLeaf: 7, cols: 5 },  // 레벨3: 4잎 7개
+      ],
+    };
+
+    const THREE_LEAF = '☘️';
+    const FOUR_LEAF  = '🍀';
+
+    let state = {
+      score: 0, timer: CONFIG.TIME_LIMIT,
+      interval: null, gameActive: false,
+      level: 0, remaining: 0,
+    };
+
+    const $ = id => document.getElementById(id);
+
+    function getBest() { return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0'); }
+    function saveBest(v) { localStorage.setItem(CONFIG.STORAGE_KEY, v); }
+
+    function updateHUD() {
+      $('timerDisplay').textContent = state.timer;
+      $('scoreDisplay').textContent = state.score;
+      $('bestDisplay').textContent = getBest();
+    }
+
+    function buildGrid() {
+      const area = $('gameArea');
+      area.innerHTML = '';
+      const lvl = CONFIG.LEVELS[state.level];
+      const total = lvl.cols * 4; // 5열 4행 or 4열 5행
+      area.style.gridTemplateColumns = `repeat(${lvl.cols}, 1fr)`;
+
+      // 네잎 위치 랜덤 선정
+      const positions = new Set();
+      while (positions.size < lvl.fourLeaf) {
+        positions.add(Math.floor(Math.random() * total));
+      }
+
+      state.remaining = lvl.fourLeaf;
+
+      for (let i = 0; i < total; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'clover-cell';
+        const isFour = positions.has(i);
+        cell.textContent = isFour ? FOUR_LEAF : THREE_LEAF;
+        cell.dataset.four = isFour ? '1' : '0';
+        cell.addEventListener('pointerdown', onCellTap);
+        area.appendChild(cell);
+      }
+    }
+
+    function onCellTap(e) {
+      if (!state.gameActive) return;
+      const cell = e.currentTarget;
+      if (cell.classList.contains('found') || cell.classList.contains('wrong')) return;
+
+      if (cell.dataset.four === '1') {
+        cell.classList.add('found');
+        state.score++;
+        state.remaining--;
+        updateHUD();
+        if (state.remaining === 0) {
+          // 레벨 클리어! 보너스 시간
+          state.timer = Math.min(state.timer + 5, CONFIG.TIME_LIMIT);
+          state.level = Math.min(state.level + 1, CONFIG.LEVELS.length - 1);
+          setTimeout(buildGrid, 400);
+        }
+      } else {
+        cell.classList.add('wrong');
+        state.timer = Math.max(0, state.timer - 2);
+        updateHUD();
+        setTimeout(() => cell.classList.remove('wrong'), 400);
+      }
+    }
+
+    function startGame() {
+      state = { score: 0, timer: CONFIG.TIME_LIMIT, gameActive: true, level: 0, remaining: 0 };
+      $('startOverlay').classList.add('hidden');
+      $('endOverlay').classList.add('hidden');
+      updateHUD();
+      buildGrid();
+      state.interval = setInterval(() => {
+        state.timer--;
+        updateHUD();
+        if (state.timer <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      clearInterval(state.interval);
+      state.gameActive = false;
+      const best = getBest();
+      if (state.score > best) saveBest(state.score);
+      $('finalScore').textContent = state.score + '개';
+      const msgs = [
+        state.score >= 15 ? '🏆 클로버 마스터!' :
+        state.score >= 8  ? '🌟 대단해요!' :
+        state.score >= 3  ? '😊 잘했어요!' : '🌱 다시 해봐요!',
+        `최고 기록: ${Math.max(state.score, best)}개`
+      ];
+      $('resultMsg').textContent = msgs.join(' ');
+      $('endOverlay').classList.remove('hidden');
+    }
+
+    $('startBtn').addEventListener('pointerdown', startGame);
+    $('restartBtn').addEventListener('pointerdown', startGame);
+    updateHUD();
+  })();
+  </script>
+</body>
+</html>
