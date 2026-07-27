@@ -1526,5 +1526,21 @@
     "description": "미션에 맞는 옷을 탭해 곰돌이를 꾸며요! 10라운드 콤보 점수 도전",
     "thumbnail": "teddy-dress/thumb.svg",
     "path": "teddy-dress/index.html"
+  },
+  {
+    "id": "balloon-pop",
+    "title": "Balloon Pop",
+    "title_ko": "🎈 풍선 터트리기",
+    "description": "하늘로 올라가는 알록달록 풍선을 톡톡 터트려요! 별 풍선을 보너스!",
+    "thumbnail": "balloon-pop/thumb.svg",
+    "path": "balloon-pop/index.html"
+  },
+  {
+    "id": "apple-basket",
+    "title": "Apple Basket",
+    "title_ko": "🍎 떨어지는 사과 담기",
+    "description": "바구니를 움직여 맛있는 빨간 사과를 쏙! 폭탄을 피해 점수를 도전해요!",
+    "thumbnail": "apple-basket/thumb.svg",
+    "path": "apple-basket/index.html"
   }
 ]

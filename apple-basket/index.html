@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍎 떨어지는 사과 담기</title>
+  <style>
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      overflow: hidden; font-family: 'Arial Rounded MT Bold', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(180deg, #87CEFA 0%, #E0FFFF 100%);
+    }
+    #game-container {
+      position: relative; width: 100%; height: 100%; max-width: 600px; margin: 0 auto;
+      overflow: hidden; background: linear-gradient(180deg, #A8E6CF 0%, #56C596 80%, #329D6E 100%);
+      box-shadow: 0 0 20px rgba(0,0,0,0.1); touch-action: none;
+    }
+    #header {
+      position: absolute; top: 20px; left: 0; width: 100%; padding: 0 20px;
+      display: flex; justify-content: space-between; align-items: center; z-index: 10;
+    }
+    .badge {
+      background: rgba(255, 255, 255, 0.9); padding: 10px 18px; border-radius: 25px;
+      font-size: 20px; font-weight: bold; color: #333; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    #score-badge { color: #E74C3C; }
+    #life-badge { color: #27AE60; }
+    #basket {
+      position: absolute; bottom: 20px; left: 50%; width: 100px; height: 70px;
+      transform: translateX(-50%); cursor: grab; z-index: 5;
+    }
+    .basket-body {
+      width: 100%; height: 50px; background: #D35400; border-radius: 0 0 25px 25px;
+      border: 4px solid #A04000; position: absolute; bottom: 0;
+      box-shadow: inset 0 -10px 15px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.3);
+      display: flex; justify-content: center; align-items: center; color: #FFF; font-size: 24px;
+    }
+    .basket-handle {
+      width: 80px; height: 35px; border: 6px solid #A04000; border-bottom: none;
+      border-radius: 40px 40px 0 0; position: absolute; top: 0; left: 10px;
+    }
+    .item {
+      position: absolute; font-size: 42px; transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 4;
+    }
+    #overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 100;
+    }
+    .card {
+      background: white; padding: 40px; border-radius: 30px; text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 80%;
+    }
+    h1 { margin: 0 0 15px 0; color: #E74C3C; font-size: 32px; }
+    p { font-size: 18px; color: #555; margin-bottom: 25px; line-height: 1.5; }
+    .btn {
+      background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+      color: white; border: none; padding: 15px 35px; font-size: 20px;
+      font-weight: bold; border-radius: 50px; cursor: pointer;
+      box-shadow: 0 6px 15px rgba(231,76,60,0.4); transition: transform 0.2s;
+    }
+    .btn:active { transform: scale(0.95); }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="header">
+      <div class="badge" id="score-badge">🍎 <span id="score">0</span></div>
+      <div class="badge" id="life-badge">💖 <span id="life">3</span></div>
+    </div>
+    <div id="basket">
+      <div class="basket-handle"></div>
+      <div class="basket-body">🧺</div>
+    </div>
+    <div id="overlay">
+      <div class="card">
+        <h1>🍎 사과 담기</h1>
+        <p>바구니를 좌우로 움직여서<br>맛있는 빨간 사과를 받아내요!<br><strong>💣 폭탄은 피하세요!</strong></p>
+        <button class="btn" onclick="startGame()">게임 시작!</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let score = 0, life = 3, gameInterval, spawnInterval, isPlaying = false;
+    const scoreEl = document.getElementById('score');
+    const lifeEl = document.getElementById('life');
+    const overlay = document.getElementById('overlay');
+    const container = document.getElementById('game-container');
+    const basket = document.getElementById('basket');
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      if (type === 'apple') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      } else {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      }
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (type === 'apple' ? 0.1 : 0.2));
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + (type === 'apple' ? 0.1 : 0.2));
+    }
+
+    // Basket control
+    function moveBasket(clientX) {
+      if (!isPlaying) return;
+      const rect = container.getBoundingClientRect();
+      let x = clientX - rect.left;
+      x = Math.max(50, Math.min(rect.width - 50, x));
+      basket.style.left = `${x}px`;
+    }
+
+    container.addEventListener('mousemove', e => moveBasket(e.clientX));
+    container.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (e.touches.length > 0) moveBasket(e.touches[0].clientX);
+    }, { passive: false });
+
+    function startGame() {
+      score = 0; life = 3; isPlaying = true;
+      scoreEl.textContent = score; lifeEl.textContent = life;
+      overlay.style.display = 'none';
+      document.querySelectorAll('.item').forEach(i => i.remove());
+
+      spawnInterval = setInterval(spawnItem, 600);
+    }
+
+    function spawnItem() {
+      if (!isPlaying) return;
+      const item = document.createElement('div');
+      item.className = 'item';
+      const isBomb = Math.random() < 0.25; // 25% chance of bomb
+      item.textContent = isBomb ? '💣' : (Math.random() < 0.2 ? '🍏' : '🍎');
+      item.dataset.type = isBomb ? 'bomb' : 'apple';
+      
+      const x = Math.random() * (container.clientWidth - 80) + 40;
+      let y = -50;
+      const speed = Math.random() * 3 + 3;
+      
+      item.style.left = `${x}px`;
+      item.style.top = `${y}px`;
+      container.appendChild(item);
+
+      const dropInterval = setInterval(() => {
+        if (!isPlaying) { clearInterval(dropInterval); return; }
+        y += speed;
+        item.style.top = `${y}px`;
+        
+        // Collision detection with basket
+        const bRect = basket.getBoundingClientRect();
+        const iRect = item.getBoundingClientRect();
+        
+        if (iRect.bottom >= bRect.top + 10 && iRect.top <= bRect.top + 30 &&
+            iRect.right >= bRect.left + 15 && iRect.left <= bRect.right - 15) {
+          clearInterval(dropInterval);
+          item.remove();
+          if (item.dataset.type === 'apple') {
+            playSound('apple');
+            score += (item.textContent === '🍏' ? 20 : 10);
+            scoreEl.textContent = score;
+          } else {
+            playSound('bomb');
+            life--;
+            lifeEl.textContent = life;
+            container.style.background = '#FF6B6B';
+            setTimeout(() => container.style.background = '', 150);
+            if (life <= 0) endGame();
+          }
+        } else if (y > container.clientHeight + 50) {
+          clearInterval(dropInterval);
+          item.remove();
+        }
+      }, 20);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(spawnInterval);
+      overlay.style.display = 'flex';
+      overlay.innerHTML = `
+        <div class="card">
+          <h1>😭 게임 오버!</h1>
+          <p>수고했어요! 장윤이가 모은 사과는<br><strong>🍎 총 ${score}점</strong> 입니다!</p>
+          <button class="btn" onclick="startGame()">다시 도전!</button>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
