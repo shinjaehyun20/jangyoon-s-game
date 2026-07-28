@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>🌱 물뿌리개로 식물 키우기</title>
+  <title>🌱 식물 키우기</title>
   <style>
     :root {
-      --bg: #1b3a2b;
-      --accent: #66bb6a;
-      --water: #4fc3f7;
-      --text: #ffffff;
+      --bg-top: #81d4fa;
+      --bg-mid: #aed581;
+      --bg-bottom: #558b2f;
+      --accent: #4caf50;
+      --water: #29b6f6;
+      --text: #1b3a2b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -17,8 +19,8 @@
       overflow: hidden;
       touch-action: manipulation;
       font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-      background: linear-gradient(180deg, #dff3e3 0%, #a8d8b0 45%, #1b3a2b 100%);
-      color: #1b3a2b;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
+      color: var(--text);
     }
     .wrap {
       width: 100%; max-width: 480px;
@@ -26,21 +28,28 @@
       display: flex; flex-direction: column;
       padding: 10px 12px 8px; gap: 8px;
       margin: 0 auto;
+      position: relative;
     }
     h1 {
-      font-size: clamp(20px, 5.5vw, 28px);
+      font-size: clamp(24px, 6vw, 32px);
       text-align: center;
-      text-shadow: 0 2px 8px rgba(255,255,255,0.5);
+      text-shadow: 0 2px 6px rgba(255,255,255,0.8), 0 0 15px rgba(255,255,255,0.5);
+      font-weight: 900;
+      color: #1b5e20;
     }
     .hud {
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(255,255,255,0.55);
-      border-radius: 12px; padding: 8px 16px;
-      font-size: 16px; font-weight: bold;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 16px; padding: 12px 20px;
+      font-size: 16px; font-weight: 800;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      border: 2px solid rgba(255,255,255,0.9);
     }
     .hud .round { color: #2e7d32; }
-    .hud .score { color: #ef6c00; }
-    .hud .best { color: #558b2f; font-size: 13px; }
+    .hud .score { color: #ef6c00; font-size: 18px; }
+    .hud .best { color: #558b2f; font-size: 14px; }
+    
     #gameArea {
       flex: 1;
       position: relative;
@@ -48,112 +57,206 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(76,175,80,0.15) 100%);
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(129,199,132,0.4) 100%);
       overflow: hidden;
-      padding-bottom: 10px;
+      padding-bottom: 20px;
+      box-shadow: inset 0 0 30px rgba(76,175,80,0.2);
+      border: 2px solid rgba(255,255,255,0.5);
     }
+    
+    #sun {
+      position: absolute;
+      top: 10px; right: 15px;
+      font-size: 48px;
+      animation: pulseSun 3s infinite alternate ease-in-out;
+      filter: drop-shadow(0 0 15px rgba(255,235,59,0.8));
+    }
+    @keyframes pulseSun {
+      0% { transform: scale(1) rotate(0deg); }
+      100% { transform: scale(1.15) rotate(15deg); }
+    }
+
+    #wateringCan {
+      position: absolute;
+      top: 30%; right: 10%;
+      font-size: 60px;
+      transform-origin: 20% 80%;
+      transition: transform 0.2s ease-out;
+      z-index: 10;
+      opacity: 0.8;
+      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+    }
+    #wateringCan.pouring {
+      transform: rotate(-35deg) scale(1.1);
+      opacity: 1;
+      filter: drop-shadow(2px 6px 10px rgba(0,0,0,0.3));
+    }
+
+    /* Water drops */
+    .drop {
+      position: absolute;
+      width: 6px; height: 12px;
+      background: var(--water);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.8;
+      z-index: 5;
+    }
+    
+    /* Sparkles */
+    .sparkle {
+      position: absolute;
+      font-size: 24px;
+      pointer-events: none;
+      z-index: 20;
+      animation: pop 0.6s ease-out forwards;
+    }
+    @keyframes pop {
+      0% { transform: scale(0) translateY(0); opacity: 1; }
+      50% { transform: scale(1.5) translateY(-30px); opacity: 1; }
+      100% { transform: scale(1) translateY(-50px); opacity: 0; }
+    }
+
     #plantStage {
-      font-size: clamp(60px, 20vw, 110px);
-      transition: transform 0.25s ease;
+      font-size: clamp(70px, 25vw, 130px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       user-select: none; -webkit-user-select: none;
+      z-index: 15;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.25));
     }
-    #plantStage.grow { animation: growPop 0.35s ease; }
+    #plantStage.grow { animation: growPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
     @keyframes growPop {
-      0% { transform: scale(0.8); }
-      60% { transform: scale(1.2); }
-      100% { transform: scale(1); }
+      0% { transform: scale(0.7) translateY(20px); }
+      50% { transform: scale(1.2) translateY(-10px); }
+      100% { transform: scale(1) translateY(0); }
     }
-    #plantStage.wilt { animation: wiltShake 0.35s ease; filter: grayscale(0.4); }
+    #plantStage.wilt { animation: wiltShake 0.6s ease; filter: grayscale(0.6) sepia(0.3) drop-shadow(0 5px 5px rgba(0,0,0,0.1)); }
     @keyframes wiltShake {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-8deg); }
-      75% { transform: rotate(8deg); }
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      20% { transform: rotate(-12deg) scale(0.9); }
+      40% { transform: rotate(10deg) scale(0.9); }
+      60% { transform: rotate(-8deg) scale(0.85); }
+      80% { transform: rotate(6deg) scale(0.85); }
     }
+    
     .gauge-wrap {
-      width: 88%;
-      max-width: 380px;
-      margin-top: 10px;
+      width: 90%;
+      max-width: 400px;
+      margin-top: 15px;
+      background: rgba(255,255,255,0.7);
+      padding: 10px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .gauge-label {
-      font-size: 13px; font-weight: bold; margin-bottom: 4px;
+      font-size: 15px; font-weight: 900; margin-bottom: 8px;
       display: flex; justify-content: space-between;
-      color: #1b3a2b;
+      color: #1b5e20;
     }
-    .gauge-bar {
-      height: 22px;
-      background: rgba(255,255,255,0.6);
-      border-radius: 11px;
+    
+    /* Target area indicator */
+    .gauge-container {
+      position: relative;
+      height: 28px;
+      background: #e0e0e0;
+      border-radius: 14px;
       overflow: hidden;
-      border: 2px solid rgba(27,58,43,0.25);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .target-zone {
+      position: absolute;
+      height: 100%;
+      background: rgba(102, 187, 106, 0.4);
+      left: 45%; width: 20%;
+      border-left: 2px dashed #2e7d32;
+      border-right: 2px dashed #2e7d32;
+      z-index: 1;
     }
     .gauge-fill {
+      position: absolute;
       height: 100%;
       width: 40%;
-      background: linear-gradient(90deg, #4fc3f7, #29b6f6);
-      transition: width 0.15s ease;
+      background: linear-gradient(90deg, #4fc3f7, #0288d1);
+      box-shadow: inset 0 -2px 5px rgba(0,0,0,0.2), inset 0 2px 5px rgba(255,255,255,0.4);
+      z-index: 2;
+      border-radius: 14px;
+      /* removed transition to make it snappier during requestAnimationFrame */
     }
-    .gauge-fill.danger { background: linear-gradient(90deg, #ef5350, #e53935); }
+    .gauge-fill.danger { background: linear-gradient(90deg, #ff7043, #d84315); }
+    .gauge-fill.perfect { background: linear-gradient(90deg, #66bb6a, #2e7d32); }
+
     #canBtn {
-      margin-top: 14px;
+      margin-top: 16px;
       width: 100%;
-      max-width: 380px;
-      min-height: 56px;
-      background: linear-gradient(135deg, #4fc3f7, #0288d1);
-      color: white; border: none; border-radius: 16px;
-      font-size: 20px; font-weight: bold;
+      max-width: 400px;
+      min-height: 64px;
+      background: linear-gradient(135deg, #29b6f6, #0277bd);
+      color: white; border: none; border-radius: 20px;
+      font-size: 22px; font-weight: 900;
       cursor: pointer;
-      box-shadow: 0 6px 16px rgba(2,136,209,0.4);
-      transition: transform 0.08s;
+      box-shadow: 0 6px 0 #01579b, 0 10px 20px rgba(2,119,189,0.5);
+      transition: all 0.1s;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      position: relative;
     }
-    #canBtn:active { transform: scale(0.95); }
+    #canBtn:active { 
+      transform: translateY(6px); 
+      box-shadow: 0 0 0 #01579b, 0 2px 10px rgba(2,119,189,0.5);
+    }
+    
     footer {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 2px 0;
+      padding: 4px 0;
     }
-    footer small { font-size: 12px; opacity: 0.85; }
+    footer small { font-size: 13px; opacity: 0.9; font-weight: 600; color: #1b5e20; }
     .home-link {
-      color: #1b5e20; text-decoration: none;
-      font-size: 13px; font-weight: bold;
-      background: rgba(255,255,255,0.6);
-      padding: 6px 12px; border-radius: 8px;
+      color: #ffffff; text-decoration: none;
+      font-size: 14px; font-weight: bold;
+      background: #43a047;
+      padding: 8px 16px; border-radius: 12px;
       min-height: 44px; display: flex; align-items: center;
+      box-shadow: 0 4px 8px rgba(27,94,32,0.3);
     }
+    .home-link:active { background: #2e7d32; }
+    
     .overlay {
       position: fixed; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.65);
+      background: rgba(27,58,43,0.8);
+      backdrop-filter: blur(5px);
       z-index: 100;
     }
     .overlay.hidden { display: none; }
     .overlay-card {
-      background: linear-gradient(135deg, #a8d8b0, #dff3e3);
-      border: 2px solid var(--accent);
-      border-radius: 20px;
-      padding: 30px 24px;
+      background: linear-gradient(135deg, #ffffff, #e8f5e9);
+      border: 4px solid var(--accent);
+      border-radius: 24px;
+      padding: 32px 24px;
       text-align: center;
-      max-width: 320px; width: 90%;
+      max-width: 340px; width: 90%;
       color: #1b3a2b;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
     }
-    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
-    .overlay-card p { font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
-    .result-score { font-size: 44px; font-weight: 900; color: #2e7d32; margin: 12px 0; }
+    .overlay-card h2 { font-size: 30px; margin-bottom: 12px; color: #2e7d32; }
+    .overlay-card p { font-size: 16px; line-height: 1.6; margin-bottom: 24px; font-weight: 500; }
+    .result-score { font-size: 56px; font-weight: 900; color: #f57c00; margin: 12px 0; text-shadow: 0 2px 5px rgba(245,124,0,0.3); }
     .btn-start {
-      background: linear-gradient(135deg, #66bb6a, #2e7d32);
-      color: white; border: none; border-radius: 12px;
-      font-size: 18px; font-weight: bold;
-      padding: 14px 32px; cursor: pointer;
-      min-height: 44px; width: 100%;
-      box-shadow: 0 4px 12px rgba(46,125,50,0.4);
-      transition: transform 0.1s;
+      background: linear-gradient(135deg, #66bb6a, #388e3c);
+      color: white; border: none; border-radius: 16px;
+      font-size: 22px; font-weight: 900;
+      padding: 16px 32px; cursor: pointer;
+      min-height: 56px; width: 100%;
+      box-shadow: 0 6px 0 #1b5e20, 0 10px 20px rgba(46,125,50,0.5);
+      transition: all 0.1s;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    .btn-start:active { transform: scale(0.96); }
+    .btn-start:active { transform: translateY(6px); box-shadow: 0 0 0 #1b5e20, 0 2px 10px rgba(46,125,50,0.5); }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>🌱 식물 키우기</h1>
+    <h1>🌱 물뿌리개로 식물 키우기</h1>
 
     <div class="hud">
       <span class="round">🌼 라운드 <span id="roundDisplay">1</span>/<span id="roundTotal">6</span></span>
@@ -162,16 +265,25 @@
     </div>
 
     <div id="gameArea">
+      <div id="sun">☀️</div>
+      <div id="wateringCan">🚰</div>
       <div id="plantStage">🌰</div>
+      
       <div class="gauge-wrap">
-        <div class="gauge-label"><span>💧 물量</span><span id="gaugeText">40%</span></div>
-        <div class="gauge-bar"><div class="gauge-fill" id="gaugeFill"></div></div>
+        <div class="gauge-label">
+          <span>💧 물의 양을 맞춰요!</span>
+          <span id="gaugeText">40%</span>
+        </div>
+        <div class="gauge-container">
+          <div class="target-zone" id="targetZone"></div>
+          <div class="gauge-fill" id="gaugeFill"></div>
+        </div>
       </div>
-      <button id="canBtn">💦 물 주기</button>
+      <button id="canBtn">💦 꾹 눌러서 물 주기</button>
     </div>
 
     <footer>
-      <small>딱 맞게 물을 줘야 쑥쑥 자라요!</small>
+      <small>초록 점선 칸에 물을 딱 맞춰요!</small>
       <a class="home-link" href="../index.html">← 홈으로</a>
     </footer>
   </div>
@@ -179,17 +291,17 @@
   <div class="overlay" id="startOverlay">
     <div class="overlay-card">
       <h2>🌱 식물 키우기</h2>
-      <p><strong>💦 물 주기</strong> 버튼을 눌러서<br>물量 게이지를 목표 구간에 맞춰요!<br>너무 적거나 많으면<br>식물이 시들시들해져요.<br>6라운드 동안 쑥쑥 키워봐요!</p>
-      <button class="btn-start" id="startBtn">시작!</button>
+      <p><strong>💦 물 주기</strong> 버튼을 꾹~ 눌러서<br>물 게이지를 <strong>초록색 칸</strong>에 맞춰요!<br><br>너무 적거나 많으면<br>식물이 시들시들해져요.<br>6라운드 동안 예쁘게 키워봐요!</p>
+      <button class="btn-start" id="startBtn">시작하기!</button>
     </div>
   </div>
 
   <div class="overlay hidden" id="endOverlay">
     <div class="overlay-card">
-      <h2>🎉 게임 종료!</h2>
+      <h2>🎉 정원 가꾸기 끝!</h2>
       <div class="result-score" id="finalScore">0</div>
       <p id="resultMsg"></p>
-      <button class="btn-start" id="restartBtn">다시 하기</button>
+      <button class="btn-start" id="restartBtn">다시 키우기</button>
     </div>
   </div>
 
@@ -199,16 +311,15 @@
     const CONFIG = {
       TOTAL_ROUNDS: 6,
       STORAGE_KEY: 'watering-plant_best',
-      STAGES: ['🌰', '🌱', '🌿', '🪴', '🌻'],
+      STAGES: ['🌰', '🌱', '🌿', '🪴', '🌻', '🌸'],
       TARGET_MIN: 45,
       TARGET_MAX: 65,
-      FILL_SPEED: 1.8, // %/frame while holding
-      DRAIN_ON_RELEASE: false,
+      FILL_SPEED: 0.9, 
     };
 
     let state = {
-      round: 1, score: 0, gauge: 40,
-      stageIndex: 0, filling: false, fillRAF: null,
+      round: 1, score: 0, gauge: 0,
+      stageIndex: 0, filling: false, fillRAF: null, waterRAF: null,
       gameActive: false,
     };
 
@@ -216,7 +327,14 @@
     const plantStage = $('plantStage');
     const gaugeFill = $('gaugeFill');
     const gaugeText = $('gaugeText');
+    const targetZone = $('targetZone');
     const canBtn = $('canBtn');
+    const wateringCan = $('wateringCan');
+    const gameArea = $('gameArea');
+
+    // Dynamic Target Zone Init
+    targetZone.style.left = CONFIG.TARGET_MIN + '%';
+    targetZone.style.width = (CONFIG.TARGET_MAX - CONFIG.TARGET_MIN) + '%';
 
     function getBest() { return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0'); }
     function saveBest(v) { localStorage.setItem(CONFIG.STORAGE_KEY, v); }
@@ -231,31 +349,123 @@
     function updateGauge() {
       const g = Math.max(0, Math.min(100, state.gauge));
       gaugeFill.style.width = g + '%';
-      gaugeText.textContent = Math.round(g) + '%';
+      gaugeText.textContent = Math.floor(g) + '%';
+      
       const inTarget = g >= CONFIG.TARGET_MIN && g <= CONFIG.TARGET_MAX;
-      gaugeFill.classList.toggle('danger', !inTarget && (g < 15 || g > 90));
+      
+      gaugeFill.classList.remove('danger', 'perfect');
+      if (inTarget) {
+        gaugeFill.classList.add('perfect');
+      } else if (g < 15 || g > 85) {
+        gaugeFill.classList.add('danger');
+      }
+    }
+
+    function spawnWaterDrop() {
+      if (!state.filling) return;
+      const drop = document.createElement('div');
+      drop.className = 'drop';
+      
+      const canRect = wateringCan.getBoundingClientRect();
+      const areaRect = gameArea.getBoundingClientRect();
+      
+      const startX = canRect.left - areaRect.left + 15 + (Math.random() * 20);
+      const startY = canRect.bottom - areaRect.top - 20;
+      
+      drop.style.left = startX + 'px';
+      drop.style.top = startY + 'px';
+      gameArea.appendChild(drop);
+      
+      let y = startY;
+      let speed = 8 + Math.random() * 4;
+      
+      function fall() {
+        if (!state.gameActive) { drop.remove(); return; }
+        y += speed;
+        drop.style.top = y + 'px';
+        if (y > areaRect.height - 130) {
+          drop.remove();
+        } else {
+          requestAnimationFrame(fall);
+        }
+      }
+      requestAnimationFrame(fall);
+    }
+    
+    function spawnSparkle(count, isPerfect) {
+      const emojis = isPerfect ? ['✨', '🌟', '💖'] : ['✨', '🎵'];
+      const rect = plantStage.getBoundingClientRect();
+      const areaRect = gameArea.getBoundingClientRect();
+      
+      const cx = rect.left - areaRect.left + (rect.width/2);
+      const cy = rect.top - areaRect.top + (rect.height/2);
+      
+      for(let i=0; i<count; i++) {
+        const sp = document.createElement('div');
+        sp.className = 'sparkle';
+        sp.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        
+        const offsetX = (Math.random() - 0.5) * 120;
+        const offsetY = (Math.random() - 0.5) * 80;
+        
+        sp.style.left = (cx + offsetX - 15) + 'px';
+        sp.style.top = (cy + offsetY - 15) + 'px';
+        
+        gameArea.appendChild(sp);
+        setTimeout(() => sp.remove(), 600);
+      }
     }
 
     function startFill() {
       if (!state.gameActive) return;
       state.filling = true;
-      const tick = () => {
+      wateringCan.classList.add('pouring');
+      
+      let lastTime = performance.now();
+      
+      const tick = (now) => {
         if (!state.filling) return;
-        state.gauge += CONFIG.FILL_SPEED;
+        const dt = now - lastTime;
+        lastTime = now;
+        
+        // frame rate independent growth
+        state.gauge += (CONFIG.FILL_SPEED * dt / 16);
         if (state.gauge > 100) state.gauge = 100;
+        
         updateGauge();
         state.fillRAF = requestAnimationFrame(tick);
       };
       state.fillRAF = requestAnimationFrame(tick);
+      
+      const waterTick = () => {
+        if (!state.filling) return;
+        spawnWaterDrop();
+        setTimeout(waterTick, 40);
+      };
+      waterTick();
     }
 
     function stopFill() {
       state.filling = false;
+      wateringCan.classList.remove('pouring');
       if (state.fillRAF) cancelAnimationFrame(state.fillRAF);
     }
 
     function resetGaugeForRound() {
-      state.gauge = 20 + Math.random() * 15; // 20~35 시작
+      state.gauge = 15 + Math.random() * 15; // 15~30 시작
+      
+      // Randomize target zone slightly each round for more fun
+      const minStart = 35;
+      const maxStart = 75;
+      const newTarget = minStart + Math.random() * (maxStart - minStart);
+      const zoneWidth = 18 + Math.random() * 8; // 18~26 width
+      
+      CONFIG.TARGET_MIN = newTarget;
+      CONFIG.TARGET_MAX = Math.min(100, newTarget + zoneWidth);
+      
+      targetZone.style.left = CONFIG.TARGET_MIN + '%';
+      targetZone.style.width = (CONFIG.TARGET_MAX - CONFIG.TARGET_MIN) + '%';
+      
       updateGauge();
     }
 
@@ -265,41 +475,49 @@
       const inTarget = g >= CONFIG.TARGET_MIN && g <= CONFIG.TARGET_MAX;
       const distance = g < CONFIG.TARGET_MIN ? (CONFIG.TARGET_MIN - g) : (g > CONFIG.TARGET_MAX ? g - CONFIG.TARGET_MAX : 0);
 
+      plantStage.classList.remove('wilt', 'grow');
+      void plantStage.offsetWidth; // trigger reflow
+
       if (inTarget) {
         state.score += 20;
         state.stageIndex = Math.min(state.stageIndex + 1, CONFIG.STAGES.length - 1);
         plantStage.textContent = CONFIG.STAGES[state.stageIndex];
-        plantStage.classList.remove('wilt');
         plantStage.classList.add('grow');
-        setTimeout(() => plantStage.classList.remove('grow'), 350);
-      } else if (distance <= 12) {
-        state.score += 8;
-        plantStage.classList.remove('wilt');
+        spawnSparkle(8, true);
+      } else if (distance <= 10) {
+        state.score += 10;
         plantStage.classList.add('grow');
-        setTimeout(() => plantStage.classList.remove('grow'), 350);
+        spawnSparkle(3, false);
       } else {
-        plantStage.classList.remove('grow');
         plantStage.classList.add('wilt');
-        setTimeout(() => plantStage.classList.remove('wilt'), 350);
+        const sweat = document.createElement('div');
+        sweat.className = 'sparkle';
+        sweat.textContent = '💧';
+        const rect = plantStage.getBoundingClientRect();
+        const areaRect = gameArea.getBoundingClientRect();
+        sweat.style.left = (rect.left - areaRect.left + 10) + 'px';
+        sweat.style.top = (rect.top - areaRect.top + 10) + 'px';
+        gameArea.appendChild(sweat);
+        setTimeout(() => sweat.remove(), 600);
       }
 
       updateHUD();
 
       if (state.round >= CONFIG.TOTAL_ROUNDS) {
-        setTimeout(endGame, 500);
+        setTimeout(endGame, 800);
       } else {
         state.round++;
         setTimeout(() => {
           resetGaugeForRound();
           updateHUD();
-        }, 500);
+        }, 800);
       }
     }
 
     function startGame() {
       stopFill();
       state = {
-        round: 1, score: 0, gauge: 25,
+        round: 1, score: 0, gauge: 20,
         stageIndex: 0, filling: false, fillRAF: null,
         gameActive: true,
       };
@@ -318,12 +536,12 @@
       if (state.score > best) saveBest(state.score);
       $('finalScore').textContent = state.score + '점';
       const msgs = [
-        state.score >= 100 ? '🏆 정원사 마스터!' :
-        state.score >= 70 ? '🌻 활짝 피었어요!' :
-        state.score >= 40 ? '🌿 잘 자랐어요!' : '🌱 다시 키워봐요!',
-        `최고 기록: ${Math.max(state.score, best)}점`
+        state.score >= 110 ? '🏆 신의 손 정원사!' :
+        state.score >= 80 ? '🌻 활짝 피었어요, 예뻐요!' :
+        state.score >= 50 ? '🌿 쑥쑥 잘 자랐어요!' : '🌱 물 조절을 다시 연습해봐요!',
+        `<br><small style="color:#558b2f">최고 기록: ${Math.max(state.score, best)}점</small>`
       ];
-      $('resultMsg').textContent = msgs.join(' ');
+      $('resultMsg').innerHTML = msgs.join('<br>');
       $('endOverlay').classList.remove('hidden');
     }
 
@@ -332,8 +550,7 @@
       startFill();
     });
     canBtn.addEventListener('pointerup', () => {
-      stopFill();
-      judgeRound();
+      if (state.filling) { stopFill(); judgeRound(); }
     });
     canBtn.addEventListener('pointerleave', () => {
       if (state.filling) { stopFill(); judgeRound(); }
@@ -341,11 +558,14 @@
     canBtn.addEventListener('pointercancel', () => {
       if (state.filling) { stopFill(); judgeRound(); }
     });
+    // For context menu block
+    canBtn.addEventListener('contextmenu', e => e.preventDefault());
 
     $('startBtn').addEventListener('pointerdown', startGame);
     $('restartBtn').addEventListener('pointerdown', startGame);
+    
     updateHUD();
-    updateGauge();
+    resetGaugeForRound();
   })();
   </script>
 </body>

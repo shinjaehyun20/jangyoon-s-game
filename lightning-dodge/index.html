@@ -6,7 +6,7 @@
   <title>⚡ 번개 피하기</title>
   <style>
     :root {
-      --bg: #1a1a3d;
+      --bg: #0b0d17;
       --accent: #ffd93d;
       --text: #ffffff;
     }
@@ -16,7 +16,7 @@
       overflow: hidden;
       touch-action: manipulation;
       font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-      background: linear-gradient(180deg, #0d0d26 0%, #2b2b5c 60%, #4a4a8c 100%);
+      background: linear-gradient(180deg, #05060a 0%, #171b30 50%, #2b2f54 100%);
       color: var(--text);
     }
     .wrap {
@@ -25,123 +25,199 @@
       display: flex; flex-direction: column;
       padding: 10px 12px 8px; gap: 8px;
       margin: 0 auto;
+      transition: transform 0.1s ease;
+    }
+    .wrap.shake {
+      animation: screenShake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes screenShake {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      10%, 30%, 50%, 70%, 90% { transform: translate3d(-8px, 4px, 0); }
+      20%, 40%, 60%, 80% { transform: translate3d(8px, -4px, 0); }
     }
     h1 {
-      font-size: clamp(20px, 5.5vw, 28px);
+      font-size: clamp(22px, 6vw, 32px);
       text-align: center;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      text-shadow: 0 0 10px rgba(255,217,61,0.6), 0 2px 8px rgba(0,0,0,0.8);
+      font-weight: 900;
+      letter-spacing: 1px;
     }
     .hud {
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px; padding: 8px 16px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px; padding: 10px 16px;
       font-size: 16px; font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    .hud .time { color: #90caf9; }
-    .hud .score { color: var(--accent); }
+    .hud .time { color: #82b1ff; text-shadow: 0 0 5px #82b1ff; }
+    .hud .score { color: var(--accent); text-shadow: 0 0 5px var(--accent); }
     .hud .best { color: #b0bec5; font-size: 13px; }
+    
     #gameArea {
       flex: 1;
       position: relative;
       overflow: hidden;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(13,13,38,0.4) 0%, rgba(74,74,140,0.25) 100%);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(5,6,10,0.6) 0%, rgba(43,47,84,0.4) 100%);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      border: 1px solid rgba(255,255,255,0.05);
     }
+    /* Rain Effect */
+    .rain {
+      position: absolute;
+      width: 2px;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(130,177,255,0.8));
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      to { transform: translateY(100vh); }
+    }
+
     .lane-guide {
       position: absolute; top: 0; bottom: 0;
-      width: 1px; background: rgba(255,255,255,0.08);
+      width: 1px; background: rgba(255,255,255,0.05);
+      box-shadow: 0 0 5px rgba(255,255,255,0.1);
     }
     .cloud-warn {
-      position: absolute; top: 6px;
-      width: 26.6%; height: 34px;
+      position: absolute; top: 10px;
+      width: 26.6%; height: 40px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
+      font-size: 28px;
       opacity: 0;
       transition: opacity 0.15s;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
-    .cloud-warn.show { opacity: 1; animation: pulseWarn 0.4s ease infinite alternate; }
+    .cloud-warn.show { opacity: 1; animation: pulseWarn 0.3s ease infinite alternate; }
     @keyframes pulseWarn {
-      from { transform: scale(1); }
-      to { transform: scale(1.15); }
+      from { transform: scale(1) translateY(0); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
+      to { transform: scale(1.2) translateY(2px); filter: drop-shadow(0 0 15px rgba(255,0,0,0.6)); }
     }
-    .bolt {
+    
+    .bolt, .coin {
       position: absolute; top: -60px;
       width: 26.6%;
-      font-size: clamp(30px, 8vw, 44px);
       text-align: center;
-      filter: drop-shadow(0 0 6px rgba(255,235,59,0.8));
+      z-index: 10;
+    }
+    .bolt {
+      font-size: clamp(34px, 9vw, 50px);
+      filter: drop-shadow(0 0 12px rgba(255,235,59,1));
+      animation: vibrate 0.1s infinite;
+    }
+    @keyframes vibrate {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      50% { transform: translate(-1px, -1px) rotate(-2deg); }
+      100% { transform: translate(1px, -1px) rotate(2deg); }
     }
     .coin {
-      position: absolute; top: -50px;
-      width: 26.6%;
-      font-size: clamp(24px, 6vw, 34px);
-      text-align: center;
+      font-size: clamp(28px, 7vw, 40px);
+      filter: drop-shadow(0 0 8px rgba(255,217,61,0.8));
+      animation: spin 1s linear infinite;
     }
+    @keyframes spin {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(360deg); }
+    }
+    
     #player {
-      position: absolute; bottom: 10px;
+      position: absolute; bottom: 15px;
       width: 26.6%;
-      font-size: clamp(34px, 9vw, 48px);
+      font-size: clamp(38px, 10vw, 56px);
       text-align: center;
-      transition: left 0.12s ease-out;
+      transition: left 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+      z-index: 20;
     }
+    #player.move-left { animation: tiltLeft 0.15s ease; }
+    #player.move-right { animation: tiltRight 0.15s ease; }
+    @keyframes tiltLeft { 50% { transform: rotate(-20deg) scale(0.9); } }
+    @keyframes tiltRight { 50% { transform: rotate(20deg) scale(0.9); } }
+
+    /* Flash effect for lightning */
     .flash {
       position: absolute; inset: 0;
-      background: rgba(255,255,255,0.9);
+      background: #ffffff;
       opacity: 0;
       pointer-events: none;
+      z-index: 50;
+      mix-blend-mode: overlay;
     }
-    .flash.on { opacity: 1; transition: opacity 0.05s; }
-    .flash.fade { opacity: 0; transition: opacity 0.25s; }
+    .flash.on { opacity: 1; transition: opacity 0.02s; }
+    .flash.fade { opacity: 0; transition: opacity 0.4s ease-out; }
+    
     #touchZones {
       position: absolute; inset: 0;
       display: flex;
+      z-index: 100;
     }
     .zone { flex: 1; }
+    
     footer {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 2px 0;
+      padding: 4px 0;
     }
-    footer small { font-size: 12px; opacity: 0.7; }
+    footer small { font-size: 13px; opacity: 0.8; font-weight: 500; }
     .home-link {
-      color: #90caf9; text-decoration: none;
-      font-size: 13px; font-weight: bold;
+      color: #82b1ff; text-decoration: none;
+      font-size: 14px; font-weight: bold;
       background: rgba(255,255,255,0.1);
-      padding: 6px 12px; border-radius: 8px;
+      padding: 8px 16px; border-radius: 10px;
       min-height: 44px; display: flex; align-items: center;
+      transition: background 0.2s;
     }
+    .home-link:active { background: rgba(255,255,255,0.2); }
+    
     .overlay {
       position: fixed; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.75);
-      z-index: 100;
+      background: rgba(0,0,20,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 200;
     }
     .overlay.hidden { display: none; }
     .overlay-card {
-      background: linear-gradient(135deg, #2b2b5c, #1a1a3d);
+      background: linear-gradient(135deg, #2b2f54, #171b30);
       border: 2px solid var(--accent);
-      border-radius: 20px;
-      padding: 30px 24px;
+      border-radius: 24px;
+      padding: 36px 28px;
       text-align: center;
-      max-width: 320px; width: 90%;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      max-width: 340px; width: 90%;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,217,61,0.2);
     }
-    .overlay-card h2 { font-size: 26px; margin-bottom: 12px; }
-    .overlay-card p { font-size: 15px; line-height: 1.6; opacity: 0.9; margin-bottom: 20px; }
-    .result-score { font-size: 48px; font-weight: 900; color: var(--accent); margin: 12px 0; }
+    .overlay-card h2 { font-size: 28px; margin-bottom: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .overlay-card p { font-size: 16px; line-height: 1.6; opacity: 0.95; margin-bottom: 24px; color: #e2e8f0; }
+    .result-score { font-size: 56px; font-weight: 900; color: var(--accent); margin: 16px 0; text-shadow: 0 0 15px rgba(255,217,61,0.5); }
     .btn-start {
-      background: linear-gradient(135deg, #ffd93d, #ffb300);
-      color: #1a1a3d; border: none; border-radius: 12px;
-      font-size: 18px; font-weight: bold;
-      padding: 14px 32px; cursor: pointer;
-      min-height: 44px; width: 100%;
-      box-shadow: 0 4px 12px rgba(255,217,61,0.4);
-      transition: transform 0.1s;
+      background: linear-gradient(135deg, #ffd93d, #ff9800);
+      color: #1a1a3d; border: none; border-radius: 14px;
+      font-size: 20px; font-weight: 900;
+      padding: 16px 32px; cursor: pointer;
+      min-height: 54px; width: 100%;
+      box-shadow: 0 6px 16px rgba(255,152,0,0.5);
+      transition: transform 0.1s, filter 0.1s;
     }
-    .btn-start:active { transform: scale(0.96); }
+    .btn-start:active { transform: scale(0.95); filter: brightness(0.9); }
+    
+    /* Coin collect particle */
+    .particle {
+      position: absolute;
+      font-size: 20px;
+      pointer-events: none;
+      animation: floatUp 0.8s ease-out forwards;
+      z-index: 30;
+      text-shadow: 0 0 8px rgba(255,217,61,1);
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-60px) scale(1.5); opacity: 0; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap" id="mainWrap">
     <h1>⚡ 번개 피하기</h1>
 
     <div class="hud">
@@ -151,11 +227,17 @@
     </div>
 
     <div id="gameArea">
-      <div class="cloud-warn" id="warn0" style="left:0%"></div>
-      <div class="cloud-warn" id="warn1" style="left:36.7%"></div>
-      <div class="cloud-warn" id="warn2" style="left:73.4%"></div>
+      <!-- Rain drops created via JS -->
+      <div class="lane-guide" style="left: 33.33%"></div>
+      <div class="lane-guide" style="left: 66.66%"></div>
+      
+      <div class="cloud-warn" id="warn0" style="left:0%">☁️</div>
+      <div class="cloud-warn" id="warn1" style="left:36.7%">☁️</div>
+      <div class="cloud-warn" id="warn2" style="left:73.4%">☁️</div>
+      
       <div id="player" style="left:36.7%">🐥</div>
       <div class="flash" id="flash"></div>
+      
       <div id="touchZones">
         <div class="zone" id="zoneLeft"></div>
         <div class="zone" id="zoneMid"></div>
@@ -164,7 +246,7 @@
     </div>
 
     <footer>
-      <small>먹구름 그림자를 보고 미리 피해요!</small>
+      <small>먹구름 ☁️ 이 보이면 번개 ⚡ 가 떨어져요!</small>
       <a class="home-link" href="../index.html">← 홈으로</a>
     </footer>
   </div>
@@ -172,8 +254,8 @@
   <div class="overlay" id="startOverlay">
     <div class="overlay-card">
       <h2>⚡ 번개 피하기</h2>
-      <p>화면을 <strong>왼쪽 / 가운데 / 오른쪽</strong> 탭해서<br>병아리를 옮겨요!<br>먹구름 ☁️ 이 나타나면<br>번개가 떨어질 신호예요!<br>별 ⭐ 은 받으면 점수가 올라가요.</p>
-      <button class="btn-start" id="startBtn">시작!</button>
+      <p>화면의 <strong>왼쪽 / 가운데 / 오른쪽</strong>을 탭해서<br>병아리를 안전한 곳으로 옮기세요!<br><br>먹구름 ☁️ 은 번개 신호예요!<br>떨어지는 별 ⭐ 을 모아 점수를 올려요.</p>
+      <button class="btn-start" id="startBtn">게임 시작!</button>
     </div>
   </div>
 
@@ -182,7 +264,7 @@
       <h2>🎉 게임 종료!</h2>
       <div class="result-score" id="finalScore">0</div>
       <p id="resultMsg"></p>
-      <button class="btn-start" id="restartBtn">다시 하기</button>
+      <button class="btn-start" id="restartBtn">다시 도전하기</button>
     </div>
   </div>
 
@@ -192,12 +274,12 @@
     const CONFIG = {
       TIME_LIMIT: 30,
       STORAGE_KEY: 'lightning-dodge_best',
-      LANE_LEFT: [0, 36.7, 73.4],
-      WARN_MS: 550,        // 먹구름이 보이고 나서 번개가 치기까지 대기시간
-      SPAWN_MS_START: 950, // 초반 스폰 간격
-      SPAWN_MS_MIN: 480,   // 후반 최소 스폰 간격
-      FALL_MS: 1400,        // 낙하 애니메이션 시간(대략, transition 미사용 - JS interval)
-      COIN_CHANCE: 0.32,
+      LANE_LEFT: [3, 36.7, 70], // Adjusted for better centering
+      WARN_MS: 500,        
+      SPAWN_MS_START: 850, 
+      SPAWN_MS_MIN: 400,   
+      FALL_SPEED: 7.5,
+      COIN_CHANCE: 0.35,
     };
 
     let state = {
@@ -211,6 +293,7 @@
     const player = $('player');
     const gameArea = $('gameArea');
     const flash = $('flash');
+    const mainWrap = $('mainWrap');
     const warns = [$('warn0'), $('warn1'), $('warn2')];
 
     function getBest() { return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY) || '0'); }
@@ -223,7 +306,18 @@
     }
 
     function movePlayer(lane) {
-      if (!state.gameActive) return;
+      if (!state.gameActive || state.lane === lane) return;
+      
+      if (lane < state.lane) {
+        player.classList.remove('move-left', 'move-right');
+        void player.offsetWidth; 
+        player.classList.add('move-left');
+      } else {
+        player.classList.remove('move-left', 'move-right');
+        void player.offsetWidth;
+        player.classList.add('move-right');
+      }
+      
       state.lane = lane;
       player.style.left = CONFIG.LANE_LEFT[lane] + '%';
     }
@@ -251,7 +345,6 @@
         return;
       }
 
-      // 번개: 먹구름 경고 -> 낙하
       const warn = warns[lane];
       warn.classList.add('show');
       setTimeout(() => {
@@ -261,18 +354,28 @@
       }, CONFIG.WARN_MS);
     }
 
+    function spawnParticle(x, y, emoji) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = emoji;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      gameArea.appendChild(p);
+      setTimeout(() => p.remove(), 800);
+    }
+
     function dropItem(lane, emoji, type) {
       const el = document.createElement('div');
       el.className = type === 'coin' ? 'coin' : 'bolt';
       el.textContent = emoji;
       el.style.left = CONFIG.LANE_LEFT[lane] + '%';
-      el.style.top = '-50px';
+      el.style.top = '-60px';
       gameArea.appendChild(el);
 
       const areaHeight = gameArea.clientHeight;
-      const groundY = areaHeight - 60;
-      let y = -50;
-      const speed = 6.5;
+      const groundY = areaHeight - 75; // Hitbox tuning
+      let y = -60;
+      let speed = CONFIG.FALL_SPEED + (state.elapsedMs / 10000); // Speed up over time
 
       const fallInterval = setInterval(() => {
         if (!state.gameActive) { clearInterval(fallInterval); el.remove(); return; }
@@ -282,11 +385,20 @@
         if (y >= groundY) {
           clearInterval(fallInterval);
           const hit = (state.lane === lane);
-          if (type === 'bolt' && hit) {
-            triggerHit();
-          } else if (type === 'coin' && hit) {
-            state.score += 5;
-            updateHUD();
+          
+          if (hit) {
+            const rect = player.getBoundingClientRect();
+            const gameRect = gameArea.getBoundingClientRect();
+            const px = rect.left - gameRect.left + (rect.width/2) - 10;
+            const py = rect.top - gameRect.top - 10;
+            
+            if (type === 'bolt') {
+              triggerHit();
+            } else if (type === 'coin') {
+              state.score += 5;
+              updateHUD();
+              spawnParticle(px, py, '+5');
+            }
           }
           el.remove();
         }
@@ -294,23 +406,48 @@
     }
 
     function triggerHit() {
+      // Flash
       flash.classList.add('on');
       setTimeout(() => {
         flash.classList.remove('on');
         flash.classList.add('fade');
-        setTimeout(() => flash.classList.remove('fade'), 250);
+        setTimeout(() => flash.classList.remove('fade'), 400);
       }, 60);
+      
+      // Screen Shake
+      mainWrap.classList.remove('shake');
+      void mainWrap.offsetWidth;
+      mainWrap.classList.add('shake');
+      
       state.score = Math.max(0, state.score - 3);
       state.timer = Math.max(0, state.timer - 2);
+      
+      const rect = player.getBoundingClientRect();
+      const gameRect = gameArea.getBoundingClientRect();
+      spawnParticle(rect.left - gameRect.left + 20, rect.top - gameRect.top - 20, '💥');
+      
       updateHUD();
       if (state.timer <= 0) endGame();
+    }
+
+    function createRain() {
+      const count = 15;
+      for (let i=0; i<count; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain';
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+        drop.style.animationDelay = Math.random() * 2 + 's';
+        gameArea.appendChild(drop);
+      }
     }
 
     function startGame() {
       clearInterval(state.interval);
       clearTimeout(state.spawnTimeout);
-      document.querySelectorAll('.bolt, .coin').forEach(n => n.remove());
+      document.querySelectorAll('.bolt, .coin, .particle').forEach(n => n.remove());
       warns.forEach(w => w.classList.remove('show'));
+      mainWrap.classList.remove('shake');
 
       state = { score: 0, timer: CONFIG.TIME_LIMIT, gameActive: true, lane: 1, elapsedMs: 0, interval: null, spawnTimeout: null };
       movePlayer(1);
@@ -336,12 +473,12 @@
       if (state.score > best) saveBest(state.score);
       $('finalScore').textContent = state.score + '점';
       const msgs = [
-        state.score >= 60 ? '⚡ 번개왕!' :
-        state.score >= 30 ? '🌟 대단해요!' :
-        state.score >= 10 ? '😊 잘했어요!' : '🐣 다시 해봐요!',
+        state.score >= 100 ? '⚡ 전설의 번개 피하기 달인!' :
+        state.score >= 60 ? '🌟 엄청난 반사신경이에요!' :
+        state.score >= 30 ? '😊 참 잘했어요!' : '🐣 조금 더 연습해봐요!',
         `최고 기록: ${Math.max(state.score, best)}점`
       ];
-      $('resultMsg').textContent = msgs.join(' ');
+      $('resultMsg').innerHTML = msgs.join('<br>');
       $('endOverlay').classList.remove('hidden');
     }
 
@@ -350,6 +487,14 @@
     $('zoneRight').addEventListener('pointerdown', () => movePlayer(2));
     $('startBtn').addEventListener('pointerdown', startGame);
     $('restartBtn').addEventListener('pointerdown', startGame);
+    
+    // Setup
+    CONFIG.LANE_LEFT = [4, 37.5, 71]; // Recalculate based on visual alignment
+    warns[0].style.left = '4%';
+    warns[1].style.left = '37.5%';
+    warns[2].style.left = '71%';
+    
+    createRain();
     updateHUD();
   })();
   </script>
