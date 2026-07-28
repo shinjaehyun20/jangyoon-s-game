@@ -1,3 +1,11 @@
+## 2026-07-29
+- 게임 2종 추가: lightning-dodge (⚡ 번개 피하기), watering-plant (🌱 식물 키우기)
+- lightning-dodge — 먹구름 예고 후 번개가 떨어지는 3레인 반사 게임. 위험 신호(구름)를 먼저 보여준 뒤 낙하물이 오는 예고-반응 구조가 기존 rain-dodge/snow-dodge/train-dodge의 즉시 회피형과 다름. 외부 의존성 없음.
+- watering-plant — 물뿌리개 버튼 hold-to-release로 게이지를 목표 구간에 맞추는 6라운드 육성 게임. seed-sprout-race(경주형)와 달리 단계별 성장(씨앗→새싹→꽃) + 과다/과소 급수 판정. 외부 의존성 없음.
+- 두 게임 모두 단일 HTML, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함
+- 총 게임 수 195개 달성 (games.json/menu.json 실측 동치 확인)
+- 부수 보완: menu.json kids 카테고리에서 누락돼 있던 apple-basket(2026-07-28 추가분)을 백필. README 표/최근변경 백필은 범위 밖 별도 필요
+
 ## 2026-07-28
 - 게임 2종 추가: alloon-pop (🎈 풍선 터트리기), pple-basket (🍎 떨어지는 사과 담기)
 - 총 게임 수 193개 달성

@@ -4,6 +4,21 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "lightning-dodge",
+        "label": "⚡ 번개 피하기",
+        "path": "lightning-dodge/index.html"
+      },
+      {
+        "id": "watering-plant",
+        "label": "🌱 식물 키우기",
+        "path": "watering-plant/index.html"
+      },
+      {
+        "id": "apple-basket",
+        "label": "🍎 떨어지는 사과 담기",
+        "path": "apple-basket/index.html"
+      },
+      {
         "id": "traffic-light-crossing",
         "label": "🚦 신호등 안전 건너기",
         "path": "traffic-light-crossing/index.html"

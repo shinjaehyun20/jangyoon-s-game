@@ -1,8 +1,8 @@
 ﻿# 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 193개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 195개.
 
-[![Games](https://img.shields.io/badge/games-193-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-195-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 193개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 195개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
@@ -171,6 +171,8 @@
 | [🛗 엘리베이터 층 맞추기](./elevator-floor) | 동물 손님이 원하는 층 버튼 탭! 숫자 1~5 인식·매칭 | 어린이 |
 | [☂️ 우산 캐치](./umbrella-catch) | 우산을 좌우로 움직여 사탕·별을 받고 번개·먹구름은 피하는 낙하 게임 | 어린이 |
 | [🚂 큐큐 기차역](./queue-train) | 맨 앞 칸을 보고 같은 색 역으로 보내는 Queue 자료구조 응용 기차 게임 | 학습/인지 |
+| [⚡ 번개 피하기 (lightning-dodge)](./lightning-dodge) | 먹구름 신호를 보고 3갈래 길에서 번개를 피하고 별을 모으는 30초 반사 게임 | 반사 |
+| [🌱 식물 키우기 (watering-plant)](./watering-plant) | 물뿌리개로 목표 구간에 딱 맞게 물을 줘서 씨앗을 꽃까지 키우는 6라운드 타이밍 게임 | 인지/타이밍 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 
@@ -340,6 +342,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-07)
+
+- **⚡ 번개 피하기 · 🌱 식물 키우기 추가 (2026-07-29)** — 번개 피하기는 3갈래 길 중 먹구름 예고를 보고 번개를 미리 피하고 별을 모으는 30초 반사 게임으로, 위험 신호(먹구름)를 먼저 보여준 뒤 낙하물이 오는 예고-반응 구조가 기존 rain-dodge·snow-dodge·train-dodge의 즉시 회피와 다릅니다. 식물 키우기는 물뿌리개 버튼을 눌러 목표 구간에 딱 맞게 게이지를 채우는 6라운드 hold-to-release 육성 게임으로, seed-sprout-race의 경주형과 달리 단계별 성장 연출(씨앗→새싹→꽃)과 과다/과소 급수 판정이 핵심입니다. 두 게임 모두 단일 HTML, 외부 의존성 없음, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일을 포함합니다.
 
 - **🍀 네잎클로버 찾기 · 🧸 곰돌이 옷 입히기 추가 (2026-07-27)** — 네잎클로버 찾기는 세잎클로버 밭에서 네잎클로버를 탭으로 찾는 30초 집중력 게임으로, 오탭 시 2초 감소·레벨업마다 보너스 5초와 그리드 밀도 상승이 핵심입니다. 곰돌이 옷 입히기는 미션에 맞는 의상 아이템을 4개 보기 중 고르는 10라운드 인지 매칭 게임으로, 기존 princess-dressup의 자유 드래그와 달리 미션 지시+선택지 매칭 구조이며 연속 정답 콤보 보너스가 있습니다.
 

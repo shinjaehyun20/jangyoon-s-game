@@ -1542,5 +1542,21 @@
     "description": "바구니를 움직여 맛있는 빨간 사과를 쏙! 폭탄을 피해 점수를 도전해요!",
     "thumbnail": "apple-basket/thumb.svg",
     "path": "apple-basket/index.html"
+  },
+  {
+    "id": "lightning-dodge",
+    "title": "Lightning Dodge",
+    "title_ko": "⚡ 번개 피하기",
+    "description": "먹구름 신호를 보고 3갈래 길에서 번개를 피하고 별을 모아요!",
+    "thumbnail": "lightning-dodge/thumb.svg",
+    "path": "lightning-dodge/index.html"
+  },
+  {
+    "id": "watering-plant",
+    "title": "Watering Plant",
+    "title_ko": "🌱 식물 키우기",
+    "description": "물뿌리개로 딱 맞게 물을 줘서 씨앗을 활짝 핀 꽃까지 키워요!",
+    "thumbnail": "watering-plant/thumb.svg",
+    "path": "watering-plant/index.html"
   }
 ]
