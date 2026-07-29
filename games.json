@@ -400,14 +400,6 @@
     "path": "ubongo/index.html"
   },
   {
-    "id": "balloon-pop",
-    "title": "Balloon Pop",
-    "title_ko": "🎈 풍선 터뜨리기",
-    "description": "올라오는 풍선을 터치하고 폭탄은 피하세요! 30초 도전",
-    "thumbnail": "balloon-pop/thumb.svg",
-    "path": "balloon-pop/index.html"
-  },
-  {
     "id": "number-order",
     "title": "Number Order",
     "title_ko": "🔢 숫자 순서 맞추기",

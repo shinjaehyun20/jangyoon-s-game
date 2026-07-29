@@ -1,13 +1,19 @@
+## 2026-07-29 (KNOWN_ISSUES 정합성 수정, nyx)
+- games.json `balloon-pop` 중복 id 해소: 구버전 항목(id 최초 등장, "풍선 터뜨리기"/폭탄 회피 설명, 2026-04-20 추가분)을 제거하고 2026-07-28 갱신본("풍선 터트리기"/별 풍선 보너스, 실제 폴더 index.html과 일치)만 유지. games.json 194→194(중복 제거로 unique count 195→194 표기 정정, 실제 폴더 194개는 불변). menu.json label도 "풍선 터트리기"로 동기화.
+- README.md 게임 표(games.json 순서 SSOT) 143→193행으로 51개 누락분(apple-basket·clover-find·teddy-dress 등) 전량 반영 + 뱃지/상단문구/summary 195→194 실측 정정 + "최근 변경사항" 2026-07-28 항목(balloon-pop·apple-basket) 신규 추가.
+- CHANGES.md 2026-07-28 항목의 제어문자(`\x08`/`\x07`) 제거 — `\x08alloon-pop`→`balloon-pop`, `\x07pple-basket`→`apple-basket` 원문 복원.
+- KNOWN_ISSUES.md 3개 항목 체크·해소일 기재.
+
 ## 2026-07-29
 - 게임 2종 추가: lightning-dodge (⚡ 번개 피하기), watering-plant (🌱 식물 키우기)
 - lightning-dodge — 먹구름 예고 후 번개가 떨어지는 3레인 반사 게임. 위험 신호(구름)를 먼저 보여준 뒤 낙하물이 오는 예고-반응 구조가 기존 rain-dodge/snow-dodge/train-dodge의 즉시 회피형과 다름. 외부 의존성 없음.
 - watering-plant — 물뿌리개 버튼 hold-to-release로 게이지를 목표 구간에 맞추는 6라운드 육성 게임. seed-sprout-race(경주형)와 달리 단계별 성장(씨앗→새싹→꽃) + 과다/과소 급수 판정. 외부 의존성 없음.
 - 두 게임 모두 단일 HTML, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함
-- 총 게임 수 195개 달성 (games.json/menu.json 실측 동치 확인)
-- 부수 보완: menu.json kids 카테고리에서 누락돼 있던 apple-basket(2026-07-28 추가분)을 백필. README 표/최근변경 백필은 범위 밖 별도 필요
+- 총 게임 수 195개 달성 (games.json/menu.json 실측 동치 확인) — **[2026-07-29 정정]** balloon-pop 중복 id가 섞여 있던 카운트였음, 중복 제거 후 실제 194개(games.json unique 실측). 정정 근거는 위 "2026-07-29 (KNOWN_ISSUES 정합성 수정)" 항목 참조
+- 부수 보완: menu.json kids 카테고리에서 누락돼 있던 apple-basket(2026-07-28 추가분)을 백필. README 표/최근변경 백필은 범위 밖 별도 필요 → **[2026-07-29 완료]** 위 항목에서 README 표/최근변경 백필 완료
 
 ## 2026-07-28
-- 게임 2종 추가: alloon-pop (🎈 풍선 터트리기), pple-basket (🍎 떨어지는 사과 담기)
+- 게임 2종 추가: balloon-pop (🎈 풍선 터트리기), apple-basket (🍎 떨어지는 사과 담기)
 - 총 게임 수 193개 달성
 
 ﻿## [2026-07-27]
