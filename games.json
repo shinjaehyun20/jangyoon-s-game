@@ -1550,5 +1550,21 @@
     "description": "물뿌리개로 딱 맞게 물을 줘서 씨앗을 활짝 핀 꽃까지 키워요!",
     "thumbnail": "watering-plant/thumb.svg",
     "path": "watering-plant/index.html"
+  },
+  {
+    "id": "marble-roll",
+    "title": "Marble Maze Roll",
+    "title_ko": "구슬 미로 굴리기",
+    "description": "드래그로 구슬을 굴려 미로 통과",
+    "thumbnail": "marble-roll/thumb.svg",
+    "path": "marble-roll/index.html"
+  },
+  {
+    "id": "domino-chain",
+    "title": "Domino Chain",
+    "title_ko": "도미노 잇기",
+    "description": "순서대로 터치해 도미노 연쇄 넘어뜨리기",
+    "thumbnail": "domino-chain/thumb.svg",
+    "path": "domino-chain/index.html"
   }
 ]

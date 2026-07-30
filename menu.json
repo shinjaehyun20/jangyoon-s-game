@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "marble-roll",
+        "label": "🔮 구슬 미로 굴리기",
+        "path": "marble-roll/index.html"
+      },
+      {
+        "id": "domino-chain",
+        "label": "🁣 도미노 잇기",
+        "path": "domino-chain/index.html"
+      },
+      {
         "id": "lightning-dodge",
         "label": "⚡ 번개 피하기",
         "path": "lightning-dodge/index.html"

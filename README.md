@@ -1,8 +1,8 @@
 ﻿# 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 194개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 196개.
 
-[![Games](https://img.shields.io/badge/games-194-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-196-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 194개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 196개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
@@ -75,6 +75,7 @@
 | [기억력 카드 (memory-match)](./memory-match) | 같은 이모지 카드 두 장을 기억해서 찾아보세요. 쉬움/보통/어려움 | 기억력 |
 | [색깔 맞추기 (color-tap)](./color-tap) | 글자가 어떤 색으로 쓰여있는지 골라요! 내용이 아닌 색깔을! | 인지 |
 | [한글 타이핑 (typing)](./typing) | 한글 단어 타이핑 연습 (스테이지별) | 학습 |
+| [장윤 한글 타이핑 웹 (typing-web)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home) | 한글 단어 타이핑 연습 (외부 GitHub Pages 배포) | 학습 |
 | [자바스크립트 테트리스 (tetris)](./tetris) | 클래식 테트리스 | 퍼즐 |
 | [2048](./2048) | 숫자 합치기 퍼즐 | 퍼즐 |
 | [스도쿠 (sudoku)](./sudoku) | 9×9 숫자 퍼즐, 난이도·타이머·Lives 시스템 | 퍼즐 |
@@ -223,6 +224,8 @@
 | [🍎 떨어지는 사과 담기 (apple-basket)](./apple-basket) | 바구니를 움직여 맛있는 빨간 사과를 쏙! 폭탄을 피해 점수를 도전해요! | 반사 |
 | [⚡ 번개 피하기 (lightning-dodge)](./lightning-dodge) | 먹구름 신호를 보고 3갈래 길에서 번개를 피하고 별을 모으는 30초 반사 게임 | 반사 |
 | [🌱 식물 키우기 (watering-plant)](./watering-plant) | 물뿌리개로 목표 구간에 딱 맞게 물을 줘서 씨앗을 꽃까지 키우는 6라운드 타이밍 게임 | 인지/타이밍 |
+| [🔮 구슬 미로 굴리기 (marble-roll)](./marble-roll) | 화면을 드래그해서 구슬을 굴려 미로 속 별까지 이동! 5라운드, 구멍에 빠지면 처음부터 다시 도전 | 물리/타이밍 |
+| [🁣 도미노 잇기 (domino-chain)](./domino-chain) | 번호가 매겨진 도미노를 순서대로 터치하면 자동으로 연쇄 넘어짐! 라운드마다 도미노 개수 증가(5→8→12개) | 인지/순서 |
 
 외부 링크로 게임 하나 더 포함: [한글 타이핑 (웹 배포)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home)
 
@@ -392,6 +395,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-07)
+
+- **🔮 구슬 미로 굴리기 · 🁣 도미노 잇기 추가 (2026-07-30)** — 구슬 미로 굴리기는 화면을 드래그해 마치 기울인 것처럼 구슬에 힘을 가해 미로 속 별까지 굴려 보내는 5라운드 물리 게임으로, 라운드마다 벽·구멍 개수가 늘고 구멍에 빠지면 즉시 처음부터 재시작합니다. 도미노 잇기는 번호가 매겨진 도미노를 제한시간 안에 1번부터 순서대로 터치하면 시각적 배치 순서(뱀 모양 경로)대로 자동 연쇄 넘어짐 애니메이션이 재생되는 인지·순서 게임으로, 라운드마다 도미노 개수가 5→8→12개로 늘어납니다. 두 게임 모두 단일 HTML, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일, 외부 의존성 0건을 포함합니다. 부수 발견: README 게임 표에서 typing-web(외부 GitHub Pages 배포 게임) 1건 누락을 확인해 함께 보완했습니다.
 
 - **🎈 풍선 터트리기 · 🍎 떨어지는 사과 담기 추가 (2026-07-28)** — 풍선 터트리기는 하늘로 올라가는 알록달록 풍선을 톡톡 터트리는 반사 게임으로, 별 풍선을 맞히면 보너스 점수를 얻습니다. 떨어지는 사과 담기는 바구니를 좌우로 움직여 떨어지는 빨간 사과를 받고 폭탄은 피하는 30초 반사 게임입니다. 두 게임 모두 단일 HTML, 외부 의존성 없음, SVG 썸네일을 포함합니다.
 

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>🔮 구슬 미로 굴리기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: #1a1030;
+    color: #fff;
+  }
+  :root {
+    --bg: #1a1030;
+    --accent: #a78bfa;
+    --accent2: #34d399;
+    --danger: #f87171;
+    --text: #ffffff;
+  }
+  body {
+    background: radial-gradient(circle at 50% 0%, #2e1f52 0%, #1a1030 70%);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .hud {
+    display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .hud span { color: var(--accent2); }
+  #gameArea {
+    flex: 1;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #241a3d;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08);
+    touch-action: none;
+  }
+  #mazeCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    touch-action: none;
+  }
+  footer {
+    display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+  }
+  .home-link {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 14px;
+    padding: 6px 4px;
+  }
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,6,20,0.86);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50;
+    padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: #2b2049;
+    border-radius: 20px;
+    padding: 28px 24px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .overlay-card h2 {
+    font-size: clamp(20px, 6vw, 26px);
+    margin-bottom: 12px;
+  }
+  .overlay-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 20px;
+  }
+  .result-score {
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--accent2);
+    margin: 10px 0;
+  }
+  .btn-start {
+    min-height: 44px;
+    min-width: 140px;
+    font-size: 17px;
+    font-weight: 800;
+    color: #1a1030;
+    background: linear-gradient(180deg, #c4b5fd, #a78bfa);
+    border: none;
+    border-radius: 999px;
+    padding: 10px 28px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(167,139,250,0.4);
+  }
+  .btn-start:active { transform: scale(0.96); }
+  .level-badge {
+    display: inline-block;
+    background: rgba(52,211,153,0.18);
+    color: var(--accent2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🔮 구슬 미로 굴리기</h1>
+
+    <div class="hud">
+      <div>라운드 <span id="roundNow">1</span>/<span id="roundTotal">5</span></div>
+      <div>⏱️ <span id="timeNow">0.0</span>초</div>
+      <div>🏆 최고 <span id="bestScore">-</span></div>
+    </div>
+
+    <div id="gameArea">
+      <canvas id="mazeCanvas"></canvas>
+    </div>
+
+    <footer>
+      <small>화면을 드래그해서 기울여 구슬을 굴려요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🔮 구슬 미로 굴리기</h2>
+      <p>손가락으로 화면을 드래그하면 마치 기울인 것처럼 구슬이 굴러가요.<br>
+      ⭐ 별까지 굴려서 도착하면 성공!<br>
+      ⚫ 까만 구멍에 빠지면 처음부터 다시!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">🎉 게임 종료!</h2>
+      <div class="level-badge" id="endBadge">클리어 5/5</div>
+      <div class="result-score" id="finalScore">0.0초</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    STORAGE_KEY: 'marble-roll_best',
+    TOTAL_ROUNDS: 5,
+    BALL_RADIUS: 11,
+    WALL_THICKNESS: 14,
+    HOLE_RADIUS: 16,
+    GOAL_RADIUS: 16,
+    FRICTION: 0.985,
+    DRAG_FORCE: 0.0022,   // 드래그 거리 -> 가속도 계수
+    MAX_ACCEL: 0.55,
+    MAX_SPEED: 6.5,
+    RESTITUTION: 0.55      // 벽 충돌 반발계수
+  };
+
+  const canvas = document.getElementById('mazeCanvas');
+  const ctx = canvas.getContext('2d');
+  const gameArea = document.getElementById('gameArea');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const roundNowEl = document.getElementById('roundNow');
+  const roundTotalEl = document.getElementById('roundTotal');
+  const timeNowEl = document.getElementById('timeNow');
+  const bestScoreEl = document.getElementById('bestScore');
+  const endTitleEl = document.getElementById('endTitle');
+  const endBadgeEl = document.getElementById('endBadge');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl = document.getElementById('resultMsg');
+
+  roundTotalEl.textContent = CONFIG.TOTAL_ROUNDS;
+
+  let W = 0, H = 0, DPR = 1;
+
+  const state = {
+    running: false,
+    round: 1,
+    startTime: 0,
+    elapsed: 0,
+    rafId: null,
+    ball: { x: 0, y: 0, vx: 0, vy: 0 },
+    walls: [],   // {x,y,w,h} axis-aligned rects (미로 벽)
+    holes: [],   // {x,y}
+    goal: { x: 0, y: 0 },
+    pointer: { active: false, startX: 0, startY: 0, curX: 0, curY: 0 },
+    fallenAnim: 0,
+    won: false
+  };
+
+  // ---------- 최고기록 ----------
+  function loadBest() {
+    try {
+      const v = localStorage.getItem(CONFIG.STORAGE_KEY);
+      return v ? JSON.parse(v) : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(rounds, timeSec) {
+    const cur = loadBest();
+    // 기준: 완주 라운드 수 우선, 동률이면 시간 짧을수록 좋음
+    if (!cur || rounds > cur.rounds || (rounds === cur.rounds && timeSec < cur.time)) {
+      const rec = { rounds: rounds, time: Math.round(timeSec * 10) / 10 };
+      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(rec));
+      return rec;
+    }
+    return cur;
+  }
+  function renderBest() {
+    const b = loadBest();
+    bestScoreEl.textContent = b ? (b.rounds + '라운드/' + b.time + '초') : '-';
+  }
+
+  // ---------- 미로 레벨 생성 (라운드별 난이도 상승) ----------
+  function buildLevel(round) {
+    const walls = [];
+    const holes = [];
+    const t = CONFIG.WALL_THICKNESS;
+
+    // 외곽 테두리
+    walls.push({ x: 0, y: 0, w: W, h: t });
+    walls.push({ x: 0, y: H - t, w: W, h: t });
+    walls.push({ x: 0, y: 0, w: t, h: H });
+    walls.push({ x: W - t, y: 0, w: t, h: H });
+
+    const midY1 = H * 0.32;
+    const midY2 = H * 0.5;
+    const midY3 = H * 0.68;
+
+    // 라운드 1: 단순 지그재그 2벽 + 구멍 1개
+    if (round === 1) {
+      walls.push({ x: 0, y: midY1, w: W * 0.72, h: t });
+      walls.push({ x: W * 0.28, y: midY3, w: W * 0.72, h: t });
+      holes.push({ x: W * 0.5, y: H * 0.5 });
+    }
+    // 라운드 2: 지그재그 3벽 + 구멍 2개
+    else if (round === 2) {
+      walls.push({ x: 0, y: midY1, w: W * 0.68, h: t });
+      walls.push({ x: W * 0.32, y: midY2, w: W * 0.68, h: t });
+      walls.push({ x: 0, y: midY3, w: W * 0.68, h: t });
+      holes.push({ x: W * 0.82, y: H * 0.32 });
+      holes.push({ x: W * 0.18, y: H * 0.68 });
+    }
+    // 라운드 3: 촘촘한 지그재그 4벽 + 구멍 3개
+    else if (round === 3) {
+      const y1 = H * 0.24, y2 = H * 0.42, y3 = H * 0.6, y4 = H * 0.78;
+      walls.push({ x: 0, y: y1, w: W * 0.7, h: t });
+      walls.push({ x: W * 0.3, y: y2, w: W * 0.7, h: t });
+      walls.push({ x: 0, y: y3, w: W * 0.7, h: t });
+      walls.push({ x: W * 0.3, y: y4, w: W * 0.7, h: t });
+      holes.push({ x: W * 0.85, y: (y1 + y2) / 2 });
+      holes.push({ x: W * 0.15, y: (y2 + y3) / 2 });
+      holes.push({ x: W * 0.85, y: (y3 + y4) / 2 });
+    }
+    // 라운드 4: 좁은 통로 + 구멍 4개
+    else if (round === 4) {
+      const y1 = H * 0.2, y2 = H * 0.36, y3 = H * 0.52, y4 = H * 0.68, y5 = H * 0.84;
+      walls.push({ x: 0, y: y1, w: W * 0.75, h: t });
+      walls.push({ x: W * 0.25, y: y2, w: W * 0.75, h: t });
+      walls.push({ x: 0, y: y3, w: W * 0.75, h: t });
+      walls.push({ x: W * 0.25, y: y4, w: W * 0.75, h: t });
+      walls.push({ x: 0, y: y5, w: W * 0.55, h: t });
+      holes.push({ x: W * 0.88, y: (y1 + y2) / 2 });
+      holes.push({ x: W * 0.12, y: (y2 + y3) / 2 });
+      holes.push({ x: W * 0.88, y: (y3 + y4) / 2 });
+      holes.push({ x: W * 0.5, y: (y4 + y5) / 2 });
+    }
+    // 라운드 5: 최고난이도 — 촘촘 6벽 + 구멍 5개 + 중앙 섬 벽
+    else {
+      const y1 = H * 0.18, y2 = H * 0.32, y3 = H * 0.46, y4 = H * 0.6, y5 = H * 0.74, y6 = H * 0.88;
+      walls.push({ x: 0, y: y1, w: W * 0.72, h: t });
+      walls.push({ x: W * 0.28, y: y2, w: W * 0.72, h: t });
+      walls.push({ x: 0, y: y3, w: W * 0.72, h: t });
+      walls.push({ x: W * 0.28, y: y4, w: W * 0.72, h: t });
+      walls.push({ x: 0, y: y5, w: W * 0.72, h: t });
+      walls.push({ x: W * 0.28, y: y6, w: W * 0.55, h: t });
+      holes.push({ x: W * 0.86, y: (y1 + y2) / 2 });
+      holes.push({ x: W * 0.14, y: (y2 + y3) / 2 });
+      holes.push({ x: W * 0.86, y: (y3 + y4) / 2 });
+      holes.push({ x: W * 0.14, y: (y4 + y5) / 2 });
+      holes.push({ x: W * 0.6, y: (y5 + y6) / 2 });
+    }
+
+    state.walls = walls;
+    state.holes = holes;
+    state.ball.x = W * 0.5;
+    state.ball.y = t + CONFIG.BALL_RADIUS + 6;
+    state.ball.vx = 0;
+    state.ball.vy = 0;
+    state.goal.x = W * 0.5;
+    state.goal.y = H - t - CONFIG.GOAL_RADIUS - 6;
+  }
+
+  // ---------- 리사이즈 ----------
+  function resize() {
+    const rect = gameArea.getBoundingClientRect();
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = rect.width;
+    H = rect.height;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (state.walls.length) {
+      buildLevel(state.round);
+    }
+  }
+  window.addEventListener('resize', resize);
+
+  // ---------- 충돌: 원 vs 축정렬 사각형 ----------
+  function circleRectCollide(cx, cy, r, rx, ry, rw, rh) {
+    const nearestX = Math.max(rx, Math.min(cx, rx + rw));
+    const nearestY = Math.max(ry, Math.min(cy, ry + rh));
+    const dx = cx - nearestX;
+    const dy = cy - nearestY;
+    const distSq = dx * dx + dy * dy;
+    if (distSq < r * r) {
+      return { nearestX, nearestY, dx, dy, dist: Math.sqrt(distSq) || 0.0001 };
+    }
+    return null;
+  }
+
+  function resolveWallCollisions() {
+    const b = state.ball;
+    for (let i = 0; i < state.walls.length; i++) {
+      const w = state.walls[i];
+      const hit = circleRectCollide(b.x, b.y, CONFIG.BALL_RADIUS, w.x, w.y, w.w, w.h);
+      if (hit) {
+        const nx = hit.dx / hit.dist;
+        const ny = hit.dy / hit.dist;
+        const overlap = CONFIG.BALL_RADIUS - hit.dist;
+        b.x += nx * overlap;
+        b.y += ny * overlap;
+        const vn = b.vx * nx + b.vy * ny;
+        if (vn < 0) {
+          b.vx -= (1 + CONFIG.RESTITUTION) * vn * nx;
+          b.vy -= (1 + CONFIG.RESTITUTION) * vn * ny;
+        }
+      }
+    }
+  }
+
+  // ---------- 게임 루프 ----------
+  function step(ts) {
+    if (!state.running) return;
+
+    const b = state.ball;
+
+    // 드래그 기울임 -> 가속도
+    if (state.pointer.active) {
+      let ax = (state.pointer.curX - state.pointer.startX) * CONFIG.DRAG_FORCE;
+      let ay = (state.pointer.curY - state.pointer.startY) * CONFIG.DRAG_FORCE;
+      const mag = Math.sqrt(ax * ax + ay * ay);
+      if (mag > CONFIG.MAX_ACCEL) {
+        ax = (ax / mag) * CONFIG.MAX_ACCEL;
+        ay = (ay / mag) * CONFIG.MAX_ACCEL;
+      }
+      b.vx += ax;
+      b.vy += ay;
+    }
+
+    // 마찰
+    b.vx *= CONFIG.FRICTION;
+    b.vy *= CONFIG.FRICTION;
+
+    const speed = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+    if (speed > CONFIG.MAX_SPEED) {
+      b.vx = (b.vx / speed) * CONFIG.MAX_SPEED;
+      b.vy = (b.vy / speed) * CONFIG.MAX_SPEED;
+    }
+
+    b.x += b.vx;
+    b.y += b.vy;
+
+    resolveWallCollisions();
+
+    // 경계 클램프 (외곽벽이 이미 있지만 안전망)
+    const t = CONFIG.WALL_THICKNESS;
+    b.x = Math.max(t + CONFIG.BALL_RADIUS, Math.min(W - t - CONFIG.BALL_RADIUS, b.x));
+    b.y = Math.max(t + CONFIG.BALL_RADIUS, Math.min(H - t - CONFIG.BALL_RADIUS, b.y));
+
+    // 구멍 판정
+    for (let i = 0; i < state.holes.length; i++) {
+      const h = state.holes[i];
+      const dx = b.x - h.x, dy = b.y - h.y;
+      if (Math.sqrt(dx * dx + dy * dy) < CONFIG.HOLE_RADIUS) {
+        onFallInHole();
+        return;
+      }
+    }
+
+    // 목표 판정
+    const gdx = b.x - state.goal.x, gdy = b.y - state.goal.y;
+    if (Math.sqrt(gdx * gdx + gdy * gdy) < CONFIG.GOAL_RADIUS) {
+      onRoundClear();
+      return;
+    }
+
+    state.elapsed = (performance.now() - state.startTime) / 1000;
+    timeNowEl.textContent = state.elapsed.toFixed(1);
+
+    render();
+    state.rafId = requestAnimationFrame(step);
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+
+    // 배경 그리드 느낌
+    ctx.fillStyle = '#241a3d';
+    ctx.fillRect(0, 0, W, H);
+
+    // 벽
+    ctx.fillStyle = '#4c3a86';
+    for (let i = 0; i < state.walls.length; i++) {
+      const w = state.walls[i];
+      ctx.fillRect(w.x, w.y, w.w, w.h);
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < state.walls.length; i++) {
+      const w = state.walls[i];
+      ctx.strokeRect(w.x + 0.5, w.y + 0.5, w.w - 1, w.h - 1);
+    }
+
+    // 구멍
+    for (let i = 0; i < state.holes.length; i++) {
+      const h = state.holes[i];
+      const grad = ctx.createRadialGradient(h.x, h.y, 1, h.x, h.y, CONFIG.HOLE_RADIUS);
+      grad.addColorStop(0, '#000000');
+      grad.addColorStop(1, '#3a1f1f');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(h.x, h.y, CONFIG.HOLE_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 목표 (별)
+    drawStar(state.goal.x, state.goal.y, CONFIG.GOAL_RADIUS * 1.1, '#facc15');
+
+    // 구슬
+    const b = state.ball;
+    const grad2 = ctx.createRadialGradient(b.x - 4, b.y - 4, 1, b.x, b.y, CONFIG.BALL_RADIUS);
+    grad2.addColorStop(0, '#e9d5ff');
+    grad2.addColorStop(1, '#a78bfa');
+    ctx.fillStyle = grad2;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, CONFIG.BALL_RADIUS, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 드래그 방향 표시
+    if (state.pointer.active) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(state.pointer.startX, state.pointer.startY);
+      ctx.lineTo(state.pointer.curX, state.pointer.curY);
+      ctx.stroke();
+    }
+  }
+
+  function drawStar(cx, cy, r, color) {
+    const spikes = 5;
+    const step = Math.PI / spikes;
+    ctx.save();
+    ctx.beginPath();
+    ctx.translate(cx, cy);
+    ctx.rotate(-Math.PI / 2);
+    for (let i = 0; i < spikes * 2; i++) {
+      const rad = (i % 2 === 0) ? r : r * 0.45;
+      const x = Math.cos(i * step) * rad;
+      const y = Math.sin(i * step) * rad;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ---------- 이벤트 처리 ----------
+  function onFallInHole() {
+    state.running = false;
+    cancelAnimationFrame(state.rafId);
+    // 처음부터 재시작 (사양: 함정에 빠지면 처음부터)
+    state.round = 1;
+    endTitleEl.textContent = '⚫ 구멍에 빠졌어요!';
+    endBadgeEl.textContent = '라운드 ' + (state.round) + '부터 다시';
+    finalScoreEl.textContent = state.elapsed.toFixed(1) + '초';
+    resultMsgEl.textContent = '괜찮아요! 다시 도전해봐요.';
+    endOverlay.classList.remove('hidden');
+  }
+
+  function onRoundClear() {
+    state.running = false;
+    cancelAnimationFrame(state.rafId);
+    if (state.round >= CONFIG.TOTAL_ROUNDS) {
+      const rec = saveBest(CONFIG.TOTAL_ROUNDS, state.elapsed);
+      endTitleEl.textContent = '🎉 미로 완전 정복!';
+      endBadgeEl.textContent = '전체 클리어 ' + CONFIG.TOTAL_ROUNDS + '/' + CONFIG.TOTAL_ROUNDS;
+      finalScoreEl.textContent = state.elapsed.toFixed(1) + '초';
+      resultMsgEl.textContent = '최고기록: ' + rec.rounds + '라운드 / ' + rec.time + '초';
+      renderBest();
+      endOverlay.classList.remove('hidden');
+    } else {
+      // 다음 라운드로 자동 진행
+      state.round += 1;
+      roundNowEl.textContent = state.round;
+      buildLevel(state.round);
+      state.startTime = performance.now();
+      state.running = true;
+      render();
+      state.rafId = requestAnimationFrame(step);
+    }
+  }
+
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    state.round = 1;
+    roundNowEl.textContent = state.round;
+    resize();
+    buildLevel(state.round);
+    state.startTime = performance.now();
+    state.elapsed = 0;
+    state.running = true;
+    render();
+    state.rafId = requestAnimationFrame(step);
+  }
+
+  function getLocalPos(e) {
+    const rect = gameArea.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  gameArea.addEventListener('pointerdown', function (e) {
+    if (!state.running) return;
+    e.preventDefault();
+    const p = getLocalPos(e);
+    state.pointer.active = true;
+    state.pointer.startX = p.x;
+    state.pointer.startY = p.y;
+    state.pointer.curX = p.x;
+    state.pointer.curY = p.y;
+    try { gameArea.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+
+  window.addEventListener('pointermove', function (e) {
+    if (!state.pointer.active) return;
+    const p = getLocalPos(e);
+    state.pointer.curX = p.x;
+    state.pointer.curY = p.y;
+  });
+
+  function endDrag() {
+    state.pointer.active = false;
+  }
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+
+  startBtn.addEventListener('pointerup', function (e) {
+    e.preventDefault();
+    startGame();
+  });
+  restartBtn.addEventListener('pointerup', function (e) {
+    e.preventDefault();
+    startGame();
+  });
+
+  renderBest();
+  resize();
+})();
+</script>
+</body>
+</html>

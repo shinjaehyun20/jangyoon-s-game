@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>도미노 잇기</title>
+<style>
+  :root {
+    --bg1: #1e1145;
+    --bg2: #3d1a63;
+    --accent: #ffb703;
+    --accent2: #ff6b6b;
+    --good: #4ade80;
+    --bad: #ff5d5d;
+    --text: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: radial-gradient(ellipse at top, var(--bg2), var(--bg1) 70%);
+    color: var(--text);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+    position: relative;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+  }
+  .hud {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    gap: 6px;
+  }
+  .hud .hud-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .hud .timer-bar-wrap {
+    flex: 1;
+    height: 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0 8px;
+  }
+  .hud .timer-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--good), var(--accent));
+    border-radius: 6px;
+    transition: width 0.1s linear, background 0.3s;
+  }
+  #gameArea {
+    flex: 1;
+    position: relative;
+    background: rgba(0,0,0,0.18);
+    border-radius: 18px;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .domino {
+    position: absolute;
+    width: 34px;
+    height: 58px;
+    background: linear-gradient(160deg, #fff8ec, #e9dcc4);
+    border: 2px solid #7a5c2e;
+    border-radius: 7px;
+    transform-origin: bottom center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 16px;
+    color: #3d2b12;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.35);
+    transition: transform 0.5s cubic-bezier(.36,1.6,.6,1), opacity 0.4s;
+    touch-action: none;
+    user-select: none;
+    z-index: 2;
+  }
+  .domino.placed {
+    background: linear-gradient(160deg, #d7f9df, #a9eab8);
+    border-color: #2f9e52;
+    color: #16532b;
+  }
+  .domino.wrong {
+    background: linear-gradient(160deg, #ffd6d6, #ffb0b0);
+    border-color: #b23a3a;
+    color: #6d1414;
+  }
+  .domino.fallen {
+    transform: rotate(90deg) translateY(6px);
+    opacity: 0.55;
+  }
+  .domino .num-badge {
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    background: var(--accent2);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+  #chainSpark {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff6c8, #ffb703 60%, transparent 75%);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+    transform: translate(-50%, -50%);
+  }
+  footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+  }
+  .home-link {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 10px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 5, 30, 0.86);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    padding: 20px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: linear-gradient(160deg, #2c1a55, #1a0f38);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 22px;
+    padding: 26px 22px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+  .overlay-card h2 {
+    font-size: clamp(20px, 6vw, 26px);
+    margin-bottom: 10px;
+  }
+  .overlay-card p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 16px;
+  }
+  .result-score {
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--accent);
+    margin: 6px 0 12px;
+    text-shadow: 0 2px 8px rgba(255,183,3,0.4);
+  }
+  .btn-start {
+    min-height: 44px;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #2a1300;
+    box-shadow: 0 6px 16px rgba(255,107,107,0.4);
+    cursor: pointer;
+    width: 100%;
+  }
+  .btn-start:active { transform: scale(0.96); }
+  .best-line {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 10px;
+  }
+  .toast {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    font-size: 22px;
+    font-weight: 900;
+    padding: 10px 22px;
+    border-radius: 14px;
+    z-index: 15;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show {
+    animation: toastPop 0.9s ease-out forwards;
+  }
+  @keyframes toastPop {
+    0% { opacity: 0; transform: translate(-50%, -40%) scale(0.6); }
+    20% { opacity: 1; transform: translate(-50%, -60%) scale(1.08); }
+    70% { opacity: 1; transform: translate(-50%, -60%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -80%) scale(0.9); }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🁣 도미노 잇기</h1>
+
+    <div class="hud">
+      <div class="hud-item">🁣 <span id="roundLabel">1</span>라운드</div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar"></div></div>
+      <div class="hud-item">❤️<span id="livesLabel">3</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div id="chainSpark"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <footer>
+      <small>번호 순서대로 도미노를 터치해요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <!-- 시작 오버레이 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🁣 도미노 잇기</h2>
+      <p>번호가 매겨진 도미노를 <b>1번부터 순서대로</b> 톡톡 터치하세요!<br>
+      제한시간 안에 전부 터치하면 자동으로 도미노가 연쇄로 쓰러져요.<br>
+      순서를 틀리면 하트가 줄어들어요. 라운드마다 도미노가 늘어나요!</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+      <div class="best-line">최고 라운드: <span id="bestLabel">0</span></div>
+    </div>
+  </div>
+
+  <!-- 결과 오버레이 -->
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2 id="endTitle">🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    BEST_KEY: 'domino-chain_best',
+    START_COUNT: 5,
+    COUNT_STEP: [5, 8, 12, 12, 12], // round1=5, round2=8, round3+=12
+    TIME_BASE: 20000,      // ms, base time budget
+    TIME_PER_DOMINO: 1500, // extra ms per domino
+    MAX_LIVES: 3,
+    DOMINO_W: 34,
+    DOMINO_H: 58,
+    FALL_STAGGER: 130,     // ms between each domino falling in chain animation
+    CHAIN_SPEED: 0.24      // px/ms spark travel (approx, used for duration calc)
+  };
+
+  const state = {
+    round: 1,
+    lives: CONFIG.MAX_LIVES,
+    dominoCount: CONFIG.START_COUNT,
+    order: [],       // array of domino element indices in placement (visual) order -> maps to required-touch sequence
+    positions: [],   // {x,y,angle} per domino index
+    nextExpected: 1, // next number player must touch
+    timeLimit: 0,
+    timeLeft: 0,
+    timerHandle: null,
+    lastTick: 0,
+    phase: 'idle',   // idle | placing | chaining | success | fail
+    best: 0
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const gameArea = $('gameArea');
+  const timerBar = $('timerBar');
+  const roundLabel = $('roundLabel');
+  const livesLabel = $('livesLabel');
+  const bestLabel = $('bestLabel');
+  const startOverlay = $('startOverlay');
+  const endOverlay = $('endOverlay');
+  const startBtn = $('startBtn');
+  const restartBtn = $('restartBtn');
+  const finalScore = $('finalScore');
+  const resultMsg = $('resultMsg');
+  const endTitle = $('endTitle');
+  const toast = $('toast');
+  const chainSpark = $('chainSpark');
+
+  function loadBest() {
+    try {
+      const v = parseInt(localStorage.getItem(CONFIG.BEST_KEY), 10);
+      return isNaN(v) ? 0 : v;
+    } catch (e) { return 0; }
+  }
+  function saveBest(v) {
+    try { localStorage.setItem(CONFIG.BEST_KEY, String(v)); } catch (e) { /* ignore */ }
+  }
+
+  function showToast(text, color) {
+    toast.textContent = text;
+    toast.style.color = color || '#fff';
+    toast.style.background = 'rgba(0,0,0,0.55)';
+    toast.classList.remove('show');
+    void toast.offsetWidth; // reflow to restart animation
+    toast.classList.add('show');
+  }
+
+  function dominoCountForRound(r) {
+    const idx = Math.min(r - 1, CONFIG.COUNT_STEP.length - 1);
+    return CONFIG.COUNT_STEP[idx];
+  }
+
+  // Generate a smooth winding path of N points inside the game area, evenly spaced, no overlap.
+  function generatePath(n, w, h) {
+    const pad = 40;
+    const points = [];
+    const cols = Math.max(2, Math.ceil(Math.sqrt(n * (w / h))));
+    const rows = Math.ceil(n / cols);
+    const cellW = (w - pad * 2) / cols;
+    const cellH = (h - pad * 2) / rows;
+    let idx = 0;
+    for (let r = 0; r < rows; r++) {
+      const cols_in_row = Math.min(cols, n - idx);
+      for (let c = 0; c < cols_in_row; c++) {
+        const jx = (Math.random() - 0.5) * cellW * 0.35;
+        const jy = (Math.random() - 0.5) * cellH * 0.35;
+        // serpentine order for a natural chain path
+        const cIndex = (r % 2 === 0) ? c : (cols_in_row - 1 - c);
+        points.push({ cx: 0, cy: 0, r, c: cIndex });
+        idx++;
+      }
+    }
+    // Build actual pixel positions in serpentine visiting order
+    const path = [];
+    idx = 0;
+    for (let r = 0; r < rows; r++) {
+      const cols_in_row = Math.min(cols, n - idx);
+      const rowPoints = [];
+      for (let c = 0; c < cols_in_row; c++) {
+        const baseX = pad + cellW * c + cellW / 2;
+        const baseY = pad + cellH * r + cellH / 2;
+        const jx = (Math.random() - 0.5) * cellW * 0.3;
+        const jy = (Math.random() - 0.5) * cellH * 0.3;
+        rowPoints.push({ x: baseX + jx, y: baseY + jy });
+      }
+      if (r % 2 === 1) rowPoints.reverse();
+      path.push(...rowPoints);
+      idx += cols_in_row;
+    }
+    return path.slice(0, n);
+  }
+
+  function computeAngle(p1, p2) {
+    if (!p2) return 0;
+    const dx = p2.x - p1.x, dy = p2.y - p1.y;
+    return Math.atan2(dy, dx) * 180 / Math.PI - 90;
+  }
+
+  function clearBoard() {
+    gameArea.querySelectorAll('.domino').forEach((el) => el.remove());
+  }
+
+  function buildRound() {
+    clearBoard();
+    state.dominoCount = dominoCountForRound(state.round);
+    state.nextExpected = 1;
+    state.phase = 'placing';
+
+    const rect = gameArea.getBoundingClientRect();
+    const w = rect.width, h = rect.height;
+    const path = generatePath(state.dominoCount, w, h);
+    state.positions = path;
+
+    // shuffle displayed numbers (1..N) onto the path positions randomly,
+    // so the touch order (1,2,3...) does not match the visual chain order directly —
+    // this is the "place in correct sequence" puzzle element.
+    const numbers = [];
+    for (let i = 1; i <= state.dominoCount; i++) numbers.push(i);
+    for (let i = numbers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+    }
+
+    path.forEach((pos, i) => {
+      const angle = computeAngle(pos, path[i + 1]);
+      const el = document.createElement('div');
+      el.className = 'domino';
+      el.style.left = (pos.x - CONFIG.DOMINO_W / 2) + 'px';
+      el.style.top = (pos.y - CONFIG.DOMINO_H / 2) + 'px';
+      el.style.transform = 'rotate(' + angle + 'deg)';
+      el.dataset.angle = String(angle);
+      el.dataset.number = String(numbers[i]);
+      el.dataset.chainIndex = String(i);
+      el.dataset.done = '0';
+
+      const badge = document.createElement('div');
+      badge.className = 'num-badge';
+      badge.textContent = numbers[i];
+      el.appendChild(badge);
+
+      el.addEventListener('pointerdown', onDominoTap);
+      gameArea.appendChild(el);
+    });
+
+    // time budget
+    state.timeLimit = CONFIG.TIME_BASE + state.dominoCount * CONFIG.TIME_PER_DOMINO;
+    state.timeLeft = state.timeLimit;
+    roundLabel.textContent = String(state.round);
+    livesLabel.textContent = String(state.lives);
+    startTimer();
+  }
+
+  function startTimer() {
+    stopTimer();
+    state.lastTick = performance.now();
+    state.timerHandle = requestAnimationFrame(tickTimer);
+  }
+  function stopTimer() {
+    if (state.timerHandle) cancelAnimationFrame(state.timerHandle);
+    state.timerHandle = null;
+  }
+  function tickTimer(now) {
+    if (state.phase !== 'placing') return;
+    const dt = now - state.lastTick;
+    state.lastTick = now;
+    state.timeLeft -= dt;
+    const ratio = Math.max(0, state.timeLeft / state.timeLimit);
+    timerBar.style.width = (ratio * 100) + '%';
+    if (ratio < 0.3) {
+      timerBar.style.background = 'linear-gradient(90deg, var(--bad), var(--accent2))';
+    } else {
+      timerBar.style.background = 'linear-gradient(90deg, var(--good), var(--accent))';
+    }
+    if (state.timeLeft <= 0) {
+      failRound('시간이 다 됐어요!');
+      return;
+    }
+    state.timerHandle = requestAnimationFrame(tickTimer);
+  }
+
+  function onDominoTap(e) {
+    e.preventDefault();
+    if (state.phase !== 'placing') return;
+    const el = e.currentTarget;
+    if (el.dataset.done === '1') return;
+    const num = parseInt(el.dataset.number, 10);
+
+    if (num === state.nextExpected) {
+      el.dataset.done = '1';
+      el.classList.add('placed');
+      showToast(num + ' ✓', '#4ade80');
+      state.nextExpected++;
+      if (state.nextExpected > state.dominoCount) {
+        // all placed correctly in order -> auto start chain reaction
+        stopTimer();
+        state.phase = 'chaining';
+        setTimeout(playChainReaction, 350);
+      }
+    } else {
+      // wrong order
+      el.classList.add('wrong');
+      showToast('앗! 순서가 달라요', '#ff5d5d');
+      setTimeout(() => el.classList.remove('wrong'), 400);
+      state.lives--;
+      livesLabel.textContent = String(state.lives);
+      if (state.lives <= 0) {
+        stopTimer();
+        failRound('순서를 너무 많이 틀렸어요!');
+      }
+    }
+  }
+
+  function playChainReaction() {
+    // fall dominoes in chainIndex order (the visual serpentine path order),
+    // which is independent from the number order the player touched them in.
+    const dominoes = Array.from(gameArea.querySelectorAll('.domino'))
+      .sort((a, b) => parseInt(a.dataset.chainIndex, 10) - parseInt(b.dataset.chainIndex, 10));
+
+    dominoes.forEach((el, i) => {
+      setTimeout(() => {
+        el.classList.add('fallen');
+        const rect = el.getBoundingClientRect();
+        const areaRect = gameArea.getBoundingClientRect();
+        chainSpark.style.left = (rect.left - areaRect.left + rect.width / 2) + 'px';
+        chainSpark.style.top = (rect.top - areaRect.top + rect.height / 2) + 'px';
+        chainSpark.style.opacity = '1';
+        setTimeout(() => { chainSpark.style.opacity = '0'; }, CONFIG.FALL_STAGGER * 0.9);
+
+        if (i === dominoes.length - 1) {
+          setTimeout(succeedRound, 500);
+        }
+      }, i * CONFIG.FALL_STAGGER);
+    });
+  }
+
+  function succeedRound() {
+    state.phase = 'success';
+    if (state.round > state.best) {
+      state.best = state.round;
+      saveBest(state.best);
+    }
+    showToast('🎉 성공!', '#ffb703');
+    setTimeout(() => {
+      state.round++;
+      state.lives = CONFIG.MAX_LIVES;
+      buildRound();
+    }, 900);
+  }
+
+  function failRound(msg) {
+    state.phase = 'fail';
+    stopTimer();
+    finalScore.textContent = String(Math.max(0, state.round - 1) + (state.round >= 1 ? '' : ''));
+    // Score = number of rounds fully cleared. If failed on round R, cleared = R-1.
+    const cleared = Math.max(0, state.round - 1);
+    finalScore.textContent = String(cleared);
+    endTitle.textContent = '😵 아쉬워요!';
+    resultMsg.textContent = msg + ' 클리어한 라운드: ' + cleared + '개';
+    if (state.round - 1 > state.best) {
+      state.best = state.round - 1;
+      saveBest(state.best);
+    }
+    bestLabel.textContent = String(loadBest());
+    endOverlay.classList.remove('hidden');
+  }
+
+  function startGame() {
+    state.round = 1;
+    state.lives = CONFIG.MAX_LIVES;
+    state.best = loadBest();
+    bestLabel.textContent = String(state.best);
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    buildRound();
+  }
+
+  startBtn.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    startGame();
+  });
+  restartBtn.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    endOverlay.classList.add('hidden');
+    startGame();
+  });
+
+  // initial best display
+  bestLabel.textContent = String(loadBest());
+})();
+</script>
+</body>
+</html>

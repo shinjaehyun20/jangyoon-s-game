@@ -1,3 +1,12 @@
+## 2026-07-30 (굿모닝 PHASE 4, nyx)
+- 게임 2종 추가: marble-roll (🔮 구슬 미로 굴리기), domino-chain (🁣 도미노 잇기)
+- marble-roll — 화면 드래그로 방향·거리에 비례한 가속도를 구슬에 가해(마찰 0.985, 반발계수 0.55) requestAnimationFrame 물리 루프로 원-사각형 충돌 판정하는 5라운드 미로 게임. 라운드마다 벽 2→6개, 구멍 1→5개로 난이도 상승. 구멍에 빠지면 즉시 라운드 1부터 재시작, 별(목표)에 닿으면 자동으로 다음 라운드 진행. 기존 bounce-ball(농구공 드리블)과 달리 자유 2D 평면 물리 충돌 굴리기가 핵심. 외부 의존성 없음.
+- domino-chain — 화면에 뱀 모양 경로로 배치된 도미노 N개(라운드마다 5→8→12개)에 랜덤 순번이 매겨지고, 제한시간 안에 1번부터 순서대로 터치하면 시각적 배치 순서대로 자동 연쇄 넘어짐 애니메이션이 재생되는 인지·순서 게임. 순서를 틀리면 하트(3개) 감소, 하트 소진 또는 시간 초과 시 실패. 기존 number-order(숫자 순서 맞추기)와 달리 정답 시 물리적 연쇄 반응 애니메이션 보상이 핵심 차별점. 외부 의존성 없음.
+- 두 게임 모두 단일 HTML, Pointer Events(touchstart/mousedown 미사용), 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록(marble-roll_best/domino-chain_best), SVG 썸네일 포함. JS 구문 검증(node --check) PASS, fan-in 재검증(스크롤 없음·오버레이 2개·pointer 이벤트만 사용·localStorage 사용) 실측 확인.
+- games.json 194→196, menu.json kids 카테고리 최상단 2건 추가, README 표/뱃지/summary/최근변경 196 실측 반영.
+- 부수 발견·해소: README.md 게임 표에서 `typing-web`(외부 GitHub Pages 배포 게임, games.json에는 존재하나 로컬 링크 패턴과 달라 누락) 1건 미반영 확인 → 표 193→194행 보완 완료, KNOWN_ISSUES.md 기록.
+- 재검증(이전 결함 3건, 2026-07-29 KNOWN_ISSUES): games.json 중복 id 0건, menu.json 파싱 성공, CHANGES.md 제어문자 오염 없음 — 모두 정상 해소 확인.
+
 ## 2026-07-29 (KNOWN_ISSUES 정합성 수정, nyx)
 - games.json `balloon-pop` 중복 id 해소: 구버전 항목(id 최초 등장, "풍선 터뜨리기"/폭탄 회피 설명, 2026-04-20 추가분)을 제거하고 2026-07-28 갱신본("풍선 터트리기"/별 풍선 보너스, 실제 폴더 index.html과 일치)만 유지. games.json 194→194(중복 제거로 unique count 195→194 표기 정정, 실제 폴더 194개는 불변). menu.json label도 "풍선 터트리기"로 동기화.
 - README.md 게임 표(games.json 순서 SSOT) 143→193행으로 51개 누락분(apple-basket·clover-find·teddy-dress 등) 전량 반영 + 뱃지/상단문구/summary 195→194 실측 정정 + "최근 변경사항" 2026-07-28 항목(balloon-pop·apple-basket) 신규 추가.
