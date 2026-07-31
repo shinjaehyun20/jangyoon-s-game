@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 197개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 198개.
 
-[![Games](https://img.shields.io/badge/games-197-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-198-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![197개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![198개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 197개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 198개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🫧 제미니 우주 방울 팡팡 (gemini-space-bubble)](./gemini-space-bubble) | 무중력 우주로 올라가는 방울을 톡톡 탭해서 40초 동안 구조하는 터치 판단 게임. Web Audio 사운드 효과 및 localStorage 최고점 저장 | 어린이/호흡·터치 |
 | [🌟 제미니 별빛 스파크 (gemini-star-spark)](./gemini-star-spark) | 밤하늘에 나타나는 반짝이는 별과 마법 보석을 탭해 별빛 점수를 모으는 40초 터치 반응 게임. 콤보 보너스와 Web Audio 사운드 효과, localStorage 최고점 저장 | 어린이/반응·터치 |
 | [🚦 신호등 안전 건너기 (traffic-light-crossing)](./traffic-light-crossing) | 빨간불·노란불에는 기다리고 초록불에만 건너기를 누르는 45초 안전 판단 게임. 충동 억제와 생활 안전을 함께 연습하고 localStorage 최고점 저장 | 어린이/생활안전·반응 |
 | [🫧 숨결 비눗방울 (breath-bubble)](./breath-bubble) | 버튼을 꾹 눌러 방울을 키우고 점선 목표 원 크기에서 떼는 8라운드 hold-to-release 게임. 크기 오차별 점수와 localStorage 최고점 저장 | 어린이/호흡·타이밍 |

@@ -1,5 +1,13 @@
 [
   {
+    "id": "gemini-space-bubble",
+    "title": "Gemini Space Bubble Pop",
+    "title_ko": "🫧 제미니 우주 방울 팡팡",
+    "description": "무중력 우주로 올라가는 방울을 톡톡 탭해서 40초 동안 구조하는 터치 판단 게임",
+    "thumbnail": "gemini-space-bubble/thumb.svg",
+    "path": "gemini-space-bubble/index.html"
+  },
+  {
     "id": "gemini-star-spark",
     "title": "Gemini Star Spark",
     "title_ko": "🌟 제미니 별빛 스파크",

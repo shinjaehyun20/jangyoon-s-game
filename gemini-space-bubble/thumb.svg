@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="24" fill="url(#bg)"/>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="70%" r="80%">
+      <stop offset="0%" stop-color="#1c2a4a"/>
+      <stop offset="100%" stop-color="#0a1128"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <circle cx="60" cy="55" r="32" fill="rgba(0,210,255,0.25)" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+  <text x="60" y="65" font-size="34" text-anchor="middle" filter="url(#glow)">🫧</text>
+  <text x="32" y="32" font-size="20">🚀</text>
+  <text x="88" y="88" font-size="20">✨</text>
+</svg>
