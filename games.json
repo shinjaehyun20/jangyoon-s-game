@@ -1,5 +1,13 @@
 [
   {
+    "id": "gemini-star-spark",
+    "title": "Gemini Star Spark",
+    "title_ko": "🌟 제미니 별빛 스파크",
+    "description": "밤하늘에 반짝이는 별과 마법 보석을 탭해 별빛 점수를 모으는 40초 터치 반응 게임",
+    "thumbnail": "gemini-star-spark/thumb.svg",
+    "path": "gemini-star-spark/index.html"
+  },
+  {
     "id": "traffic-light-crossing",
     "title": "Traffic Light Crossing",
     "title_ko": "🚦 신호등 안전 건너기",
