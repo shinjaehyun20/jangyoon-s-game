@@ -360,19 +360,36 @@
 
       for (const axis of ['x', 'y']) {
         const candidate = { x: state.player.x, y: state.player.y };
-        candidate[axis] += axis === 'x' ? stepX : stepY;
+        const delta = axis === 'x' ? stepX : stepY;
+        candidate[axis] += delta;
+
+        // 닫힌 벽에서는 시작점으로 되돌리지 않고 공의 가장자리가 벽에 닿는
+        // 위치까지만 이동한다. 이렇게 해야 드래그 중 순간이동이 없고,
+        // 손가락을 반대로 움직였을 때 같은 드래그로 벽에서 빠져나올 수 있다.
+        const cell = pixelToCell(state.player.x, state.player.y);
+        if (axis === 'x' && delta > 0 && state.maze[cell.r][cell.c].right) {
+          candidate.x = Math.min(candidate.x, (cell.c + 1) * state.cellW - CONFIG.PLAYER_R);
+        } else if (axis === 'x' && delta < 0) {
+          const hasLeftWall = cell.c === 0 || state.maze[cell.r][cell.c - 1].right;
+          if (hasLeftWall) candidate.x = Math.max(candidate.x, cell.c * state.cellW + CONFIG.PLAYER_R);
+        } else if (axis === 'y' && delta > 0 && state.maze[cell.r][cell.c].bottom) {
+          candidate.y = Math.min(candidate.y, (cell.r + 1) * state.cellH - CONFIG.PLAYER_R);
+        } else if (axis === 'y' && delta < 0) {
+          const hasTopWall = cell.r === 0 || state.maze[cell.r - 1][cell.c].bottom;
+          if (hasTopWall) candidate.y = Math.max(candidate.y, cell.r * state.cellH + CONFIG.PLAYER_R);
+        }
+
         candidate.x = Math.max(CONFIG.PLAYER_R, Math.min(canvas.width - CONFIG.PLAYER_R, candidate.x));
         candidate.y = Math.max(CONFIG.PLAYER_R, Math.min(canvas.height - CONFIG.PLAYER_R, candidate.y));
 
         const from = pixelToCell(state.player.x, state.player.y);
         const to = pixelToCell(candidate.x, candidate.y);
         if (from.r !== to.r || from.c !== to.c) {
-          if (!canMove(from.r, from.c, to.r, to.c)) return false;
+          if (!canMove(from.r, from.c, to.r, to.c)) continue;
         }
         state.player = candidate;
       }
     }
-    return true;
   }
 
   canvas.addEventListener('pointerdown', (e) => {
@@ -394,10 +411,7 @@
     const dx = px - lastPointer.px;
     const dy = py - lastPointer.py;
     lastPointer = { px, py };
-    if (!movePlayerBy(dx, dy)) {
-      resetPlayer();
-      endDrag(e);
-    }
+    movePlayerBy(dx, dy);
     draw();
     checkGoal();
   });

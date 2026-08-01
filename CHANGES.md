@@ -3,8 +3,8 @@
 - 게임 2종 추가: `paper-fold-lab`(📄 종이 접기 연구소), `mirror-beam-rescue`(🔦 거울빛 구조대).
 - `paper-fold-lab` — 접기 방향을 고르고 구멍을 찍은 뒤 역순으로 펼쳐 4개·8개 대칭 결과를 확인하는 6라운드 상태 변환 퍼즐. 오답은 감점 없이 힌트를 제공하고 `paper-fold-lab_best`에 최고 별 기록을 저장.
 - `mirror-beam-rescue` — 거울 손잡이를 드래그해 입사각=반사각 경로를 만들고 별을 구조하는 7라운드 퍼즐. 후반에는 거울 2개 경로로 확장하고 `mirror-beam-rescue_best`에 최고점을 저장.
-- `maze-escape` 드래그 버그 수정 — 공 hit-test, 활성 pointer ID, CSS/backing-store 좌표 환산, 작은 이동량 기반 연속 이동, 벽·레벨 전환·`pointercancel`·`lostpointercapture` 공통 종료를 적용해 2px 포인터 이동이 한 셀 중심으로 순간 이동하던 현상을 제거.
-- 세 게임 모두 390×664 Chromium 모바일 QA에서 스크롤·콘솔·페이지 오류 0건. 미로는 빈 영역 드래그 불변, 열린 통로 8px 드래그 시 7px 이동, 셀 스냅 없음 확인.
+- `maze-escape` 드래그 버그 수정 — 공 hit-test, 활성 pointer ID, CSS/backing-store 좌표 환산, 작은 이동량 기반 연속 이동을 적용했다. 후속 실기 재현에서 닫힌 벽 충돌 시 시작점으로 되돌아가던 잔여 순간이동을 확인해, 공 반지름을 고려한 벽 경계 clamp와 동일 드래그 내 반대 방향 복귀로 교체했다. 레벨 전환·`pointercancel`·`lostpointercapture`에서는 드래그를 안전하게 종료한다.
+- 세 게임 모두 390×664 Chromium 모바일 QA에서 스크롤·콘솔·페이지 오류 0건. 미로는 빈 영역 드래그 불변, 열린 통로 8px 연속 추적, 닫힌 벽에서 위치 단조 증가 후 경계 고정, 시작점 snap-back 0건, 벽에서 반대 방향 복귀를 확인.
 - `games.json` 198→200, 고유 ID 200, `menu.json` kids 항목과 README 뱃지·상단문구·summary·목록을 실측 동기화.
 
 ## 2026-07-30 (굿모닝 PHASE 4, nyx)
