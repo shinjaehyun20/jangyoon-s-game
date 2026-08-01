@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-labelledby="title desc">
+  <title id="title">종이 접기 연구소</title><desc id="desc">접힌 종이가 펼쳐지며 대칭 구멍 무늬가 나타나는 게임</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#30265f"/><stop offset=".55" stop-color="#5146a1"/><stop offset="1" stop-color="#1e7990"/></linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffdf4"/><stop offset="1" stop-color="#e9e0ff"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-opacity=".3"/></filter>
+  </defs>
+  <rect width="320" height="180" rx="16" fill="url(#bg)"/>
+  <circle cx="34" cy="30" r="20" fill="#fff" opacity=".06"/><circle cx="282" cy="45" r="32" fill="#fff" opacity=".05"/>
+  <g filter="url(#shadow)">
+    <path d="M45 35h116v104H45z" fill="url(#paper)" stroke="#fff" stroke-width="2"/>
+    <path d="M103 35v104M45 87h116" stroke="#8f7bd9" stroke-width="2" stroke-dasharray="5 5" opacity=".6"/>
+    <path d="M45 35l58 52 58-52" fill="#d8cef7" opacity=".72"/>
+    <path d="M45 139l58-52 58 52" fill="#f4e6ff" opacity=".72"/>
+    <g fill="#ff6f91" stroke="#fff" stroke-width="2">
+      <circle cx="72" cy="61" r="7"/><circle cx="134" cy="61" r="7"/><circle cx="72" cy="113" r="7"/><circle cx="134" cy="113" r="7"/>
+    </g>
+  </g>
+  <path d="M178 56c28-15 46-12 58 1" fill="none" stroke="#7ee4ce" stroke-width="5" stroke-linecap="round"/>
+  <path d="M231 48l11 11-15 5" fill="#7ee4ce"/>
+  <text x="205" y="42" font-size="22" fill="#fff">📄✨</text>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffde72">종이 접기 연구소</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">PAPER FOLD LAB</text>
+  </g>
+  <rect x="0.5" y="0.5" width="319" height="179" rx="15.5" fill="none" stroke="rgba(255,255,255,0.08)"/>
+</svg>

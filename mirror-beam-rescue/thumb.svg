@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="거울빛 구조대 썸네일">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#123f73"/><stop offset="1" stop-color="#041329"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="320" height="180" rx="18" fill="url(#bg)"/>
+  <g fill="#fff" opacity=".34"><circle cx="32" cy="25" r="1.5"/><circle cx="90" cy="45" r="1"/><circle cx="145" cy="20" r="1.5"/><circle cx="242" cy="40" r="1"/><circle cx="292" cy="22" r="1.5"/></g>
+  <g filter="url(#glow)" fill="none" stroke-linecap="round"><path d="M28 115H135L225 50" stroke="#fff36a" stroke-width="8"/><path d="M28 115H135L225 50" stroke="#fff" stroke-width="2"/></g>
+  <g transform="translate(21 115)"><rect x="-8" y="-12" width="25" height="24" rx="4" fill="#344b65"/><path d="M17-10 30-6V6L17 10Z" fill="#70e4ff"/></g>
+  <g transform="translate(135 115) rotate(-36)"><path d="M-38 0H38" stroke="#c9f8ff" stroke-width="10" stroke-linecap="round"/><path d="M-38 0H38" stroke="#57a8c6" stroke-width="3" stroke-linecap="round"/><circle cx="49" r="10" fill="#ffe66d" stroke="#8b6914" stroke-width="3"/></g>
+  <path d="m225 31 5.5 11 12 1.8-8.7 8.5 2 12-10.8-5.7-10.8 5.7 2-12-8.7-8.5 12-1.8Z" fill="#ffe66d" stroke="#fff" stroke-width="2" filter="url(#glow)"/>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif"><text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#62e8ff">거울빛 구조대</text><text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">MIRROR BEAM RESCUE</text></g>
+  <rect x=".5" y=".5" width="319" height="179" rx="17.5" fill="none" stroke="rgba(255,255,255,0.08)"/>
+</svg>

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "paper-fold-lab",
+        "label": "📄 종이 접기 연구소",
+        "path": "paper-fold-lab/index.html"
+      },
+      {
+        "id": "mirror-beam-rescue",
+        "label": "🔦 거울빛 구조대",
+        "path": "mirror-beam-rescue/index.html"
+      },
+      {
         "id": "marble-roll",
         "label": "🔮 구슬 미로 굴리기",
         "path": "marble-roll/index.html"

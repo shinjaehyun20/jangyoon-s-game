@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>종이 접기 연구소</title>
+  <style>
+    :root { --ink:#25304a; --purple:#6857d9; --pink:#ff6f91; --paper:#fffdf5; --mint:#59d9bd; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html, body { width:100%; height:100vh; height:100dvh; overflow:hidden; overscroll-behavior:none; }
+    body { background:linear-gradient(160deg,#e9f7ff 0%,#f4ecff 48%,#fff1da 100%); color:var(--ink); font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif; touch-action:manipulation; }
+    button, a { -webkit-tap-highlight-color:transparent; }
+    .wrap { width:100%; max-width:480px; height:100vh; height:100dvh; margin:0 auto; padding:8px 10px 7px; display:flex; flex-direction:column; gap:6px; }
+    header { display:flex; align-items:center; justify-content:space-between; min-height:34px; }
+    h1 { font-size:clamp(20px,5.5vw,27px); letter-spacing:-1px; }
+    .best { font-size:13px; font-weight:800; color:#655a8d; white-space:nowrap; }
+    .hud { min-height:44px; display:grid; grid-template-columns:1fr 1.2fr 1fr; align-items:center; gap:5px; padding:5px 8px; border:1px solid rgba(104,87,217,.15); border-radius:13px; background:rgba(255,255,255,.72); box-shadow:0 5px 16px rgba(68,55,130,.08); font-size:13px; font-weight:900; text-align:center; }
+    .hud strong { display:block; color:var(--purple); font-size:17px; line-height:18px; }
+    #gameArea { position:relative; flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column; align-items:center; gap:5px; padding:6px 8px; border-radius:18px; background:rgba(255,255,255,.58); border:1px solid rgba(255,255,255,.9); }
+    .mission { width:100%; min-height:45px; display:flex; align-items:center; justify-content:center; gap:7px; text-align:center; font-weight:900; font-size:14px; line-height:1.2; }
+    .target-dots { display:inline-grid; grid-template-columns:repeat(4,5px); gap:3px; }
+    .target-dots i { width:5px; height:5px; border-radius:50%; background:var(--pink); }
+    canvas { display:block; width:min(100%,330px); flex:1; min-height:145px; max-height:280px; border-radius:14px; touch-action:none; }
+    .feedback { min-height:24px; width:100%; display:flex; align-items:center; justify-content:center; border-radius:9px; font-size:14px; font-weight:900; text-align:center; color:#544788; }
+    .feedback.good { color:#147b68; background:#dffaf3; animation:pop .25s ease; }
+    .feedback.hint { color:#b24d69; background:#ffe5ed; animation:shake .25s ease; }
+    .fold-controls { width:100%; display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+    .fold-btn, .action-btn { border:0; min-height:46px; border-radius:12px; font-family:inherit; font-weight:900; font-size:14px; cursor:pointer; box-shadow:0 3px 0 rgba(55,42,120,.18); }
+    .fold-btn { color:#fff; background:linear-gradient(180deg,#8275e9,#6655cf); }
+    .fold-btn:active, .action-btn:active { transform:translateY(2px); box-shadow:none; }
+    .fold-btn:disabled, .action-btn:disabled { opacity:.38; filter:grayscale(.25); transform:none; box-shadow:none; }
+    .action-row { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .action-btn { color:#fff; background:linear-gradient(180deg,#ff88a3,#f35f83); }
+    #unfoldBtn { background:linear-gradient(180deg,#55d9ba,#28b89a); }
+    #nextBtn { display:none; grid-column:1 / -1; background:linear-gradient(180deg,#ffbd45,#f39a2d); }
+    footer { min-height:27px; display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; color:#665e79; }
+    footer small { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    .home-link { min-height:44px; display:flex; align-items:center; padding:0 9px; color:#55469e; font-weight:900; text-decoration:none; white-space:nowrap; }
+    .overlay { position:fixed; z-index:20; inset:0; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(42,36,80,.62); backdrop-filter:blur(5px); }
+    .overlay.hidden { display:none; }
+    .overlay-card { width:min(100%,360px); padding:25px 20px; border-radius:24px; background:#fffdf8; box-shadow:0 18px 50px rgba(29,23,66,.3); text-align:center; }
+    .overlay-card h2 { margin-bottom:12px; font-size:27px; }
+    .overlay-card p { margin:8px 0; line-height:1.55; font-weight:700; }
+    .how { padding:10px; border-radius:13px; background:#f1edff; color:#50458a; }
+    .btn-start { width:100%; min-height:52px; margin-top:14px; border:0; border-radius:15px; background:linear-gradient(180deg,#806ee8,#5e4bc6); color:#fff; font-family:inherit; font-size:19px; font-weight:900; cursor:pointer; box-shadow:0 5px 0 #49399f; }
+    .btn-start:active { transform:translateY(3px); box-shadow:0 2px 0 #49399f; }
+    .result-score { font-size:48px; font-weight:1000; color:var(--pink); }
+    @keyframes pop { 50% { transform:scale(1.04); } }
+    @keyframes shake { 25% { transform:translateX(-4px); } 75% { transform:translateX(4px); } }
+    @media (max-height:620px) { .wrap{padding-top:4px;gap:3px} header{min-height:29px} .hud{min-height:40px} #gameArea{padding:3px 7px;gap:3px}.mission{min-height:35px} canvas{min-height:118px}.fold-btn,.action-btn{min-height:44px}.feedback{min-height:20px;font-size:13px} footer{min-height:22px} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header><h1>📄 종이 접기 연구소</h1><span class="best" id="bestText">최고 ⭐ 0</span></header>
+    <section class="hud" aria-label="게임 상태">
+      <span>라운드<strong id="roundText">1 / 6</strong></span>
+      <span>접기<strong id="foldText">0 / 2</strong></span>
+      <span>별<strong id="scoreText">0 ⭐</strong></span>
+    </section>
+    <section id="gameArea">
+      <div class="mission"><span>목표 무늬</span><span class="target-dots" id="targetDots" aria-hidden="true"></span><span id="targetText">4개 구멍</span></div>
+      <canvas id="paperCanvas" width="660" height="440" aria-label="접는 종이와 구멍 무늬"></canvas>
+      <div class="feedback" id="feedback" role="status" aria-live="polite">화살표를 보고 차례대로 접어 봐!</div>
+      <div class="fold-controls" aria-label="접기 방향">
+        <button class="fold-btn" id="foldLeft" data-dir="left">◀ 왼쪽</button>
+        <button class="fold-btn" id="foldRight" data-dir="right">오른쪽 ▶</button>
+        <button class="fold-btn" id="foldTop" data-dir="top">▲ 위쪽</button>
+        <button class="fold-btn" id="foldBottom" data-dir="bottom">아래쪽 ▼</button>
+      </div>
+      <div class="action-row">
+        <button class="action-btn" id="punchBtn" disabled>📌 구멍 콕!</button>
+        <button class="action-btn" id="unfoldBtn" disabled>✨ 펼치기</button>
+        <button class="action-btn" id="nextBtn">다음 무늬 →</button>
+      </div>
+    </section>
+    <footer><small>틀려도 괜찮아! 힌트를 보고 다시 해봐.</small><a class="home-link" href="../index.html">← 홈으로</a></footer>
+  </main>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>📄 Paper Fold Lab</h2>
+      <p class="how">목표 무늬를 보고 종이를 2~3번 접은 뒤<br>구멍을 콕 찍고 펼쳐 보세요!</p>
+      <p>틀려도 점수는 줄지 않아요 😊</p>
+      <button class="btn-start" id="startBtn">연구 시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 연구 완료!</h2>
+      <div class="result-score" id="finalScore">6 ⭐</div>
+      <p id="resultMsg">대칭 무늬 박사님이 되었어요!</p>
+      <button class="btn-start" id="restartBtn">다시 연구하기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const CONFIG = {
+      storageKey: 'paper-fold-lab_best',
+      levels: [
+        { folds:['left','top'], punch:{x:.72,y:.72}, color:'#ff7699' },
+        { folds:['right','bottom'], punch:{x:.28,y:.28}, color:'#58cdb4' },
+        { folds:['top','left','left'], punch:{x:.88,y:.72}, color:'#7d70df' },
+        { folds:['bottom','right','right'], punch:{x:.12,y:.28}, color:'#ffae3d' },
+        { folds:['left','bottom','top'], punch:{x:.72,y:.38}, color:'#4ab7e8' },
+        { folds:['top','right','left'], punch:{x:.38,y:.72}, color:'#ef70c0' }
+      ],
+      dirLabel: {left:'왼쪽 ◀',right:'오른쪽 ▶',top:'위쪽 ▲',bottom:'아래쪽 ▼'}
+    };
+    const canvas = document.getElementById('paperCanvas');
+    const ctx = canvas.getContext('2d');
+    const el = id => document.getElementById(id);
+    const ui = { round:el('roundText'), folds:el('foldText'), score:el('scoreText'), best:el('bestText'), feedback:el('feedback'), punch:el('punchBtn'), unfold:el('unfoldBtn'), next:el('nextBtn'), targetDots:el('targetDots'), targetText:el('targetText'), start:el('startOverlay'), end:el('endOverlay') };
+    const state = { mode:'start', round:0, score:0, chosen:[], bounds:null, punch:null, holes:[], feedback:'', feedbackType:'', elapsed:0, best:readBest() };
+
+    function readBest() { try { return Number(localStorage.getItem(CONFIG.storageKey)) || 0; } catch (_) { return 0; } }
+    function saveBest() { if (state.score > state.best) { state.best=state.score; try { localStorage.setItem(CONFIG.storageKey,String(state.best)); } catch (_) {} } }
+    function freshBounds() { return {x0:0,y0:0,x1:1,y1:1}; }
+    function foldBounds(b, dir) {
+      const n={x0:b.x0,y0:b.y0,x1:b.x1,y1:b.y1};
+      if (dir==='left') n.x0=(b.x0+b.x1)/2;
+      if (dir==='right') n.x1=(b.x0+b.x1)/2;
+      if (dir==='top') n.y0=(b.y0+b.y1)/2;
+      if (dir==='bottom') n.y1=(b.y0+b.y1)/2;
+      return n;
+    }
+    function holePattern(level) {
+      let b=freshBounds(); const records=[];
+      level.folds.forEach(dir => { const c=(dir==='left'||dir==='right')?(b.x0+b.x1)/2:(b.y0+b.y1)/2; records.push({dir,c}); b=foldBounds(b,dir); });
+      let pts=[{x:level.punch.x,y:level.punch.y}];
+      for (let i=records.length-1;i>=0;i--) { const r=records[i], more=pts.map(p => (r.dir==='left'||r.dir==='right')?{x:2*r.c-p.x,y:p.y}:{x:p.x,y:2*r.c-p.y}); pts=pts.concat(more); }
+      return pts;
+    }
+    function setFeedback(text,type) { state.feedback=text; state.feedbackType=type||''; ui.feedback.textContent=text; ui.feedback.className='feedback '+(type||''); }
+    function arrowHint() { const level=CONFIG.levels[state.round], next=level.folds[state.chosen.length]; return `다음은 ${CONFIG.dirLabel[next]}으로 접어 봐!`; }
+    function resetRound() {
+      const level=CONFIG.levels[state.round]; state.chosen=[]; state.bounds=freshBounds(); state.punch=null; state.holes=[]; state.mode='folding'; state.elapsed=0;
+      ui.punch.disabled=true; ui.unfold.disabled=true; ui.next.style.display='none';
+      document.querySelectorAll('.fold-btn').forEach(b=>b.disabled=false);
+      setFeedback(arrowHint(),''); updateUI(); draw();
+    }
+    function startGame() { state.round=0; state.score=0; ui.start.classList.add('hidden'); ui.end.classList.add('hidden'); resetRound(); }
+    function chooseFold(dir) {
+      if (state.mode!=='folding') return;
+      const level=CONFIG.levels[state.round], expected=level.folds[state.chosen.length];
+      if (dir!==expected) { setFeedback(`앗! ${CONFIG.dirLabel[expected]} 방향을 살펴봐 👀`,'hint'); draw(); return; }
+      state.chosen.push(dir); state.bounds=foldBounds(state.bounds,dir);
+      if (state.chosen.length===level.folds.length) { state.mode='readyPunch'; document.querySelectorAll('.fold-btn').forEach(b=>b.disabled=true); ui.punch.disabled=false; setFeedback('잘 접었어! 빛나는 점에 구멍을 콕!','good'); }
+      else setFeedback(arrowHint(),'good');
+      updateUI(); draw();
+    }
+    function punch() {
+      if (state.mode!=='readyPunch') return;
+      const p=CONFIG.levels[state.round].punch; state.punch={x:p.x,y:p.y}; state.mode='punched'; ui.punch.disabled=true; ui.unfold.disabled=false; setFeedback('구멍 성공! 이제 펼쳐 보자 ✨','good'); draw();
+    }
+    function unfold() {
+      if (state.mode!=='punched') return;
+      state.mode='revealed'; state.holes=holePattern(CONFIG.levels[state.round]); state.score++; saveBest(); ui.unfold.disabled=true; ui.next.style.display='block';
+      setFeedback(`딱 맞았어! 대칭 구멍 ${state.holes.length}개 ⭐`,'good'); updateUI(); draw();
+    }
+    function nextRound() {
+      if (state.mode!=='revealed') return;
+      if (state.round===CONFIG.levels.length-1) { state.mode='end'; ui.end.classList.remove('hidden'); el('finalScore').textContent=`${state.score} ⭐`; el('resultMsg').textContent=state.score===6?'대칭 무늬 박사님이 되었어요!':'멋진 종이 연구였어요!'; return; }
+      state.round++; resetRound();
+    }
+    function updateUI() {
+      const level=CONFIG.levels[state.round]; ui.round.textContent=`${state.round+1} / ${CONFIG.levels.length}`; ui.folds.textContent=`${state.chosen.length} / ${level.folds.length}`; ui.score.textContent=`${state.score} ⭐`; ui.best.textContent=`최고 ⭐ ${state.best}`;
+      const count=holePattern(level).length; ui.targetText.textContent=`${count}개 구멍`; ui.targetDots.innerHTML=''; for(let i=0;i<Math.min(count,8);i++) ui.targetDots.appendChild(document.createElement('i'));
+    }
+    function paperRect() { const pad=42, maxW=canvas.width-pad*2, maxH=canvas.height-pad*2, size=Math.min(maxW,maxH); return {x:(canvas.width-size)/2,y:(canvas.height-size)/2,s:size}; }
+    function map(p,r) { return {x:r.x+p.x*r.s,y:r.y+p.y*r.s}; }
+    function roundRect(x,y,w,h,r) { ctx.beginPath(); ctx.roundRect(x,y,w,h,r); }
+    function drawArrow(dir,r) {
+      const names={left:'◀',right:'▶',top:'▲',bottom:'▼'}, idx=state.chosen.length, level=CONFIG.levels[state.round]; if(state.mode!=='folding') return;
+      ctx.save(); ctx.fillStyle='#5c4bd0'; ctx.font='900 48px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; const pos={left:[r.x-20,r.y+r.s/2],right:[r.x+r.s+20,r.y+r.s/2],top:[r.x+r.s/2,r.y-20],bottom:[r.x+r.s/2,r.y+r.s+20]}[level.folds[idx]]; ctx.fillText(names[level.folds[idx]],pos[0],pos[1]); ctx.restore();
+    }
+    function draw() {
+      const r=paperRect(), level=CONFIG.levels[state.round]||CONFIG.levels[0]; ctx.clearRect(0,0,canvas.width,canvas.height);
+      const g=ctx.createLinearGradient(0,0,canvas.width,canvas.height); g.addColorStop(0,'#dff5ff'); g.addColorStop(1,'#f8e6ff'); ctx.fillStyle=g; roundRect(0,0,canvas.width,canvas.height,28); ctx.fill();
+      ctx.save(); ctx.shadowColor='rgba(55,42,100,.22)'; ctx.shadowBlur=18; ctx.shadowOffsetY=8; ctx.fillStyle='#fffdf6';
+      if (state.mode==='revealed' || state.mode==='start' || state.mode==='end') { roundRect(r.x,r.y,r.s,r.s,9); ctx.fill(); ctx.shadowColor='transparent'; ctx.strokeStyle='#ddcfb2'; ctx.lineWidth=3; ctx.stroke(); }
+      else { const b=state.bounds||freshBounds(), x=r.x+b.x0*r.s,y=r.y+b.y0*r.s,w=(b.x1-b.x0)*r.s,h=(b.y1-b.y0)*r.s; roundRect(x,y,w,h,7); ctx.fill(); ctx.shadowColor='transparent'; ctx.fillStyle='rgba(125,112,223,.10)'; roundRect(x,y,w,h,7);ctx.fill();ctx.strokeStyle='#8e82dd';ctx.lineWidth=4;ctx.setLineDash([10,8]);ctx.stroke();ctx.setLineDash([]); }
+      ctx.restore();
+      if (state.mode==='revealed') {
+        const target=holePattern(level); target.forEach(p=>{const q=map(p,r);ctx.beginPath();ctx.arc(q.x,q.y,14,0,Math.PI*2);ctx.fillStyle='rgba(255,111,145,.18)';ctx.fill();});
+        state.holes.forEach(p=>{const q=map(p,r);ctx.beginPath();ctx.arc(q.x,q.y,9,0,Math.PI*2);ctx.fillStyle=level.color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();});
+        ctx.fillStyle='#3c8d7d';ctx.font='900 27px sans-serif';ctx.textAlign='center';ctx.fillText('목표와 똑같아요! ✓',canvas.width/2,canvas.height-12);
+      } else {
+        const b=state.bounds||freshBounds(); ctx.strokeStyle='rgba(111,94,180,.24)';ctx.lineWidth=2;ctx.setLineDash([6,8]);ctx.beginPath();ctx.moveTo(r.x+(b.x0+b.x1)/2*r.s,r.y+b.y0*r.s);ctx.lineTo(r.x+(b.x0+b.x1)/2*r.s,r.y+b.y1*r.s);ctx.moveTo(r.x+b.x0*r.s,r.y+(b.y0+b.y1)/2*r.s);ctx.lineTo(r.x+b.x1*r.s,r.y+(b.y0+b.y1)/2*r.s);ctx.stroke();ctx.setLineDash([]);
+        if (state.mode==='readyPunch'||state.mode==='punched') { const q=map(level.punch,r);ctx.beginPath();ctx.arc(q.x,q.y,18+Math.sin(state.elapsed/180)*3,0,Math.PI*2);ctx.fillStyle='rgba(255,111,145,.24)';ctx.fill();ctx.beginPath();ctx.arc(q.x,q.y,state.mode==='punched'?9:6,0,Math.PI*2);ctx.fillStyle=level.color;ctx.fill(); }
+        drawArrow('',r);
+      }
+    }
+    document.querySelectorAll('.fold-btn').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();chooseFold(b.dataset.dir);}));
+    ui.punch.addEventListener('pointerdown',e=>{e.preventDefault();punch();}); ui.unfold.addEventListener('pointerdown',e=>{e.preventDefault();unfold();}); ui.next.addEventListener('pointerdown',e=>{e.preventDefault();nextRound();});
+    el('startBtn').addEventListener('pointerdown',e=>{e.preventDefault();startGame();}); el('restartBtn').addEventListener('pointerdown',e=>{e.preventDefault();startGame();});
+    window.addEventListener('resize',draw);
+    window.addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='f'){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); } });
+    window.advanceTime=function(ms){ state.elapsed+=Math.max(0,Number(ms)||0); draw(); };
+    window.render_game_to_text=function(){ const level=CONFIG.levels[state.round]||CONFIG.levels[0]; return JSON.stringify({coordinateSystem:'paper normalized: origin top-left, x right, y down',mode:state.mode,round:state.round+1,totalRounds:CONFIG.levels.length,score:state.score,best:state.best,foldsChosen:state.chosen,foldsNeeded:level.folds.length,nextExpectedFold:state.mode==='folding'?level.folds[state.chosen.length]:null,punch:state.punch,visibleHoleCount:state.holes.length,feedback:state.feedback}); };
+    window.__paperFoldTest={start:startGame,setRound:function(n){state.round=Math.max(0,Math.min(CONFIG.levels.length-1,n));resetRound();},getState:function(){return JSON.parse(window.render_game_to_text());},levels:CONFIG.levels.map(x=>({folds:x.folds.slice(),punch:{x:x.punch.x,y:x.punch.y}}))};
+    updateUI(); draw();
+  })();
+  </script>
+</body>
+</html>

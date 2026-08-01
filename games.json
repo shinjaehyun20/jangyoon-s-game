@@ -1582,5 +1582,21 @@
     "description": "순서대로 터치해 도미노 연쇄 넘어뜨리기",
     "thumbnail": "domino-chain/thumb.svg",
     "path": "domino-chain/index.html"
+  },
+  {
+    "id": "paper-fold-lab",
+    "title": "Paper Fold Lab",
+    "title_ko": "📄 종이 접기 연구소",
+    "description": "접는 방향을 예측하고 구멍을 찍은 뒤 펼쳐 4개·8개 대칭 무늬를 완성해요!",
+    "thumbnail": "paper-fold-lab/thumb.svg",
+    "path": "paper-fold-lab/index.html"
+  },
+  {
+    "id": "mirror-beam-rescue",
+    "title": "Mirror Beam Rescue",
+    "title_ko": "🔦 거울빛 구조대",
+    "description": "거울을 돌려 반사광을 별까지 이어 주는 7단계 빛의 길 퍼즐이에요!",
+    "thumbnail": "mirror-beam-rescue/thumb.svg",
+    "path": "mirror-beam-rescue/index.html"
   }
 ]

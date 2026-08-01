@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#071a38">
+  <title>🔦 거울빛 구조대 | Mirror Beam Rescue</title>
+  <style>
+    :root { --bg:#071a38; --panel:#102b56; --accent:#62e8ff; --gold:#ffe66d; --text:#f7fbff; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html, body { width:100%; height:100vh; height:100dvh; overflow:hidden; overscroll-behavior:none; }
+    body { background:radial-gradient(circle at 50% 15%,#174a7c 0,#071a38 60%); color:var(--text); font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif; touch-action:manipulation; }
+    .wrap { width:100%; max-width:480px; height:100vh; height:100dvh; margin:0 auto; padding:8px 10px 7px; display:flex; flex-direction:column; gap:6px; }
+    h1 { font-size:clamp(20px,5.5vw,27px); text-align:center; line-height:1.15; text-shadow:0 2px 12px #0008; }
+    .hud { min-height:44px; display:flex; align-items:center; justify-content:space-around; gap:5px; padding:5px 8px; border:1px solid #ffffff25; border-radius:13px; background:#ffffff12; font-size:clamp(13px,3.4vw,16px); font-weight:800; }
+    .hud span { white-space:nowrap; }
+    .hud b { color:var(--gold); }
+    #gameArea { position:relative; flex:1; min-height:0; overflow:hidden; border-radius:18px; border:2px solid #ffffff30; background:#05142b; box-shadow:inset 0 0 28px #0008,0 8px 22px #0005; touch-action:none; }
+    canvas { display:block; width:100%; height:100%; touch-action:none; }
+    #message { position:absolute; left:50%; top:9px; transform:translateX(-50%); min-height:32px; max-width:92%; padding:6px 12px; border-radius:999px; background:#06152de8; border:1px solid #ffffff30; font-size:clamp(13px,3.4vw,16px); font-weight:900; text-align:center; white-space:nowrap; pointer-events:none; transition:.16s; }
+    #message.good { color:#8affc1; background:#073d36ed; }
+    #message.hint { color:#fff3a6; background:#513b08ed; }
+    footer { min-height:44px; display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; }
+    footer small { color:#b8d9f5; line-height:1.15; }
+    .home-link { min-width:88px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; color:#fff; background:#ffffff16; border:1px solid #ffffff2b; border-radius:12px; font-weight:800; text-decoration:none; }
+    .overlay { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:18px; background:#020a19d9; backdrop-filter:blur(5px); }
+    .overlay.hidden { display:none; }
+    .card { width:min(92vw,390px); padding:24px 20px; border:2px solid #76eaff66; border-radius:24px; text-align:center; background:linear-gradient(160deg,#183f70,#0a1d3e); box-shadow:0 18px 60px #000a; }
+    .card h2 { font-size:clamp(25px,7vw,34px); margin-bottom:12px; }
+    .card p { font-size:clamp(15px,4.2vw,18px); line-height:1.55; color:#dcefff; }
+    .card .demo { font-size:42px; margin:9px 0; }
+    .btn { width:100%; min-height:54px; margin-top:18px; border:0; border-radius:16px; background:linear-gradient(135deg,#62e8ff,#6affbd); color:#062142; font-size:20px; font-weight:1000; box-shadow:0 6px 0 #2180a1; cursor:pointer; }
+    .btn:active { transform:translateY(3px); box-shadow:0 3px 0 #2180a1; }
+    .result { margin:10px 0; color:var(--gold); font-size:42px; font-weight:1000; }
+    @media (max-height:590px) { .wrap{padding-top:5px;gap:4px} h1{font-size:20px} .hud{min-height:40px} footer{min-height:40px} .home-link{min-height:40px} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>🔦 거울빛 구조대</h1>
+    <div class="hud" aria-label="게임 상태"><span>단계 <b id="roundText">1 / 7</b></span><span>구조 별 <b id="scoreText">0</b> ⭐</span><span>최고 <b id="bestText">0</b></span></div>
+    <section id="gameArea" aria-label="거울빛 퍼즐">
+      <canvas id="gameCanvas"></canvas>
+      <div id="message">거울 손잡이를 돌려 별을 비춰요!</div>
+    </section>
+    <footer><small>💡 노란 손잡이를 드래그해요<br>가까우면 찰칵! 맞춰져요</small><a class="home-link" href="../index.html">← 홈으로</a></footer>
+  </main>
+
+  <div class="overlay" id="startOverlay">
+    <div class="card"><h2>🔦 거울빛 구조대</h2><div class="demo">🔦 ➜ 🪞 ➜ ⭐</div><p>노란 손잡이를 손가락으로 돌려<br>반사된 빛으로 별을 구해 주세요!<br><b>틀려도 점수는 줄지 않아요.</b></p><button class="btn" id="startBtn">구조 시작!</button></div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="card"><h2>🎉 구조 완료!</h2><p>일곱 개의 별이 모두 반짝여요!</p><div class="result" id="finalScore">700 ⭐</div><p id="resultMsg"></p><button class="btn" id="restartBtn">다시 구조하기</button></div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const CONFIG = { W:360, H:430, mirrorHalf:38, handleDist:50, targetR:17, snapRad:12*Math.PI/180, successDelay:650, key:'mirror-beam-rescue_best' };
+    const canvas=document.getElementById('gameCanvas'), ctx=canvas.getContext('2d');
+    const area=document.getElementById('gameArea'), msg=document.getElementById('message');
+    const roundText=document.getElementById('roundText'), scoreText=document.getElementById('scoreText'), bestText=document.getElementById('bestText');
+    const startOverlay=document.getElementById('startOverlay'), endOverlay=document.getElementById('endOverlay');
+    const LEVELS=[
+      {s:[25,315],ms:[[180,315]],t:[180,92]},
+      {s:[25,115],ms:[[170,115]],t:[305,270]},
+      {s:[25,340],ms:[[160,340]],t:[300,150]},
+      {s:[28,220],ms:[[175,220]],t:[295,75]},
+      {s:[25,350],ms:[[135,350],[255,235]],t:[310,90]},
+      {s:[25,105],ms:[[130,105],[245,205]],t:[310,345]},
+      {s:[25,320],ms:[[120,320],[235,205]],t:[315,90]}
+    ];
+    const state={mode:'start',round:0,score:0,best:readBest(),mirrors:[],source:{x:0,y:0},target:{x:0,y:0},beam:[],drag:-1,hint:'',successMs:0,lastHit:false,spark:0};
+
+    function readBest(){ try{return Number(localStorage.getItem(CONFIG.key)||0)||0}catch(e){return 0} }
+    function saveBest(){ try{localStorage.setItem(CONFIG.key,String(state.best))}catch(e){} }
+    function V(a,b){return {x:b[0]-a[0],y:b[1]-a[1]}}
+    function norm(v){const n=Math.hypot(v.x,v.y)||1;return{x:v.x/n,y:v.y/n}}
+    function solutionAngles(level){
+      const pts=[level.s].concat(level.ms,[level.t]), out=[];
+      for(let i=1;i<pts.length-1;i++){
+        const incoming=norm(V(pts[i-1],pts[i])), outgoing=norm(V(pts[i],pts[i+1]));
+        let tangent=norm({x:incoming.x+outgoing.x,y:incoming.y+outgoing.y});
+        out.push(Math.atan2(tangent.y,tangent.x));
+      }
+      return out;
+    }
+    function angleDelta(a,b){let d=(a-b)%Math.PI;if(d>Math.PI/2)d-=Math.PI;if(d<-Math.PI/2)d+=Math.PI;return d}
+    function loadLevel(index){
+      const l=LEVELS[index], sol=solutionAngles(l);
+      state.source={x:l.s[0],y:l.s[1]}; state.target={x:l.t[0],y:l.t[1]};
+      state.mirrors=l.ms.map((p,i)=>({x:p[0],y:p[1],angle:sol[i]+(i%2?-.40:.46),solution:sol[i]}));
+      state.beam=[];state.drag=-1;state.hint='';state.successMs=0;state.lastHit=false;state.spark=0;state.mode='play';
+      setMessage(state.mirrors.length===1?'거울 1개를 돌려 별을 비춰요!':'거울 2개를 차례로 맞춰요!','');
+      updateBeam();updateHud();render();
+    }
+    function updateHud(){roundText.textContent=(state.round+1)+' / 7';scoreText.textContent=state.score;bestText.textContent=state.best}
+    function setMessage(text,type){msg.textContent=text;msg.className=type||''}
+    function raySegment(o,d,m){
+      const ax=m.x-Math.cos(m.angle)*CONFIG.mirrorHalf, ay=m.y-Math.sin(m.angle)*CONFIG.mirrorHalf;
+      const bx=m.x+Math.cos(m.angle)*CONFIG.mirrorHalf, by=m.y+Math.sin(m.angle)*CONFIG.mirrorHalf;
+      const sx=bx-ax,sy=by-ay, qx=ax-o.x,qy=ay-o.y, cross=d.x*sy-d.y*sx;
+      if(Math.abs(cross)<1e-7)return null;
+      const t=(qx*sy-qy*sx)/cross, u=(qx*d.y-qy*d.x)/cross;
+      return t>0.8&&u>=0&&u<=1?{t,x:o.x+d.x*t,y:o.y+d.y*t}:null;
+    }
+    function reflect(d,angle){const tx=Math.cos(angle),ty=Math.sin(angle),dot=d.x*tx+d.y*ty;return{x:2*dot*tx-d.x,y:2*dot*ty-d.y}}
+    function targetRayHit(o,d){
+      const vx=state.target.x-o.x,vy=state.target.y-o.y, t=vx*d.x+vy*d.y;if(t<0)return false;
+      const px=o.x+d.x*t,py=o.y+d.y*t;return Math.hypot(px-state.target.x,py-state.target.y)<=CONFIG.targetR+4;
+    }
+    function boundaryDistance(o,d){let ts=[];if(d.x>0)ts.push((CONFIG.W-o.x)/d.x);if(d.x<0)ts.push((0-o.x)/d.x);if(d.y>0)ts.push((CONFIG.H-o.y)/d.y);if(d.y<0)ts.push((0-o.y)/d.y);return Math.max(1,Math.min.apply(null,ts.filter(v=>v>0)))}
+    function updateBeam(){
+      let o={x:state.source.x,y:state.source.y},d={x:1,y:0},last=-1;state.beam=[{x:o.x,y:o.y}];
+      for(let bounce=0;bounce<state.mirrors.length+1;bounce++){
+        let hit=null,hitI=-1;
+        state.mirrors.forEach((m,i)=>{if(i===last)return;const h=raySegment(o,d,m);if(h&&(!hit||h.t<hit.t)){hit=h;hitI=i}});
+        const edge=boundaryDistance(o,d);
+        if(targetRayHit(o,d)){
+          const tt=(state.target.x-o.x)*d.x+(state.target.y-o.y)*d.y;
+          if(tt<=edge&&(!hit||tt<hit.t)){state.beam.push({x:state.target.x,y:state.target.y});state.lastHit=true;triggerSuccess();return}
+        }
+        if(!hit||hit.t>edge){state.beam.push({x:o.x+d.x*edge,y:o.y+d.y*edge});state.lastHit=false;return}
+        state.beam.push({x:hit.x,y:hit.y});d=reflect(d,state.mirrors[hitI].angle);o={x:hit.x+d.x*.5,y:hit.y+d.y*.5};last=hitI;
+      }
+      const edge=boundaryDistance(o,d);state.beam.push({x:o.x+d.x*edge,y:o.y+d.y*edge});state.lastHit=false;
+    }
+    function triggerSuccess(){if(state.mode!=='play')return;state.mode='success';state.score+=100;state.best=Math.max(state.best,state.score);saveBest();state.successMs=CONFIG.successDelay;state.spark=1;setMessage('별 구조 성공! 반짝반짝! ⭐','good');updateHud()}
+    function advanceRound(){if(state.round>=LEVELS.length-1){state.mode='end';document.getElementById('finalScore').textContent=state.score+' ⭐';document.getElementById('resultMsg').textContent=state.score===700?'완벽한 빛의 구조대장이에요!':'끝까지 멋지게 해냈어요!';endOverlay.classList.remove('hidden');return}state.round++;loadLevel(state.round)}
+    function update(dt){if(state.mode==='success'){state.successMs-=dt*1000;state.spark+=dt*3;if(state.successMs<=0)advanceRound()}}
+
+    function drawStar(x,y,r,fill){ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r:r*.45;const px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr;i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#fff9';ctx.lineWidth=2;ctx.stroke()}
+    function render(){
+      ctx.clearRect(0,0,CONFIG.W,CONFIG.H);const g=ctx.createLinearGradient(0,0,0,CONFIG.H);g.addColorStop(0,'#123d70');g.addColorStop(1,'#041329');ctx.fillStyle=g;ctx.fillRect(0,0,CONFIG.W,CONFIG.H);
+      ctx.globalAlpha=.3;ctx.fillStyle='#fff';for(let i=0;i<28;i++){const x=(i*83%349)+5,y=(i*137%400)+18;ctx.beginPath();ctx.arc(x,y,i%4===0?1.8:1,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+      ctx.lineCap='round';ctx.lineJoin='round';
+      if(state.beam.length>1){ctx.save();ctx.shadowColor='#fff46b';ctx.shadowBlur=17;ctx.strokeStyle='#fff36a';ctx.lineWidth=6;ctx.beginPath();state.beam.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.restore()}
+      ctx.save();ctx.translate(state.source.x,state.source.y);ctx.fillStyle='#2a3c53';ctx.fillRect(-18,-12,25,24);ctx.fillStyle='#79dfff';ctx.beginPath();ctx.moveTo(7,-10);ctx.lineTo(20,-6);ctx.lineTo(20,6);ctx.lineTo(7,10);ctx.closePath();ctx.fill();ctx.restore();
+      state.mirrors.forEach((m,i)=>{ctx.save();ctx.translate(m.x,m.y);ctx.rotate(m.angle);ctx.shadowColor='#6de8ff';ctx.shadowBlur=10;ctx.strokeStyle='#c9f8ff';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(-CONFIG.mirrorHalf,0);ctx.lineTo(CONFIG.mirrorHalf,0);ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#5ca9c5';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#ffe76b';ctx.beginPath();ctx.arc(CONFIG.handleDist,0,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#8b6914';ctx.lineWidth=3;ctx.stroke();ctx.restore();ctx.fillStyle='#fff';ctx.font='900 12px sans-serif';ctx.textAlign='center';ctx.fillText(String(i+1),m.x,m.y+4)});
+      const glow=state.lastHit?7+Math.sin(state.spark*4)*4:0;ctx.save();ctx.shadowColor='#ffe66d';ctx.shadowBlur=glow+10;drawStar(state.target.x,state.target.y,CONFIG.targetR,state.lastHit?'#fff8a6':'#ffcb43');ctx.restore();
+      if(state.mode==='success'){ctx.fillStyle='#fff';for(let i=0;i<12;i++){const a=i*Math.PI/6+state.spark,r=28+(i%3)*7;ctx.beginPath();ctx.arc(state.target.x+Math.cos(a)*r,state.target.y+Math.sin(a)*r,2.5,0,Math.PI*2);ctx.fill()}}
+    }
+    function resize(){const rect=area.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(rect.width*dpr));canvas.height=Math.max(1,Math.round(rect.height*dpr));ctx.setTransform(canvas.width/CONFIG.W,0,0,canvas.height/CONFIG.H,0,0);render()}
+    function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*CONFIG.W/r.width,y:(e.clientY-r.top)*CONFIG.H/r.height}}
+    function closestHandle(p){let best=-1,dist=30;state.mirrors.forEach((m,i)=>{const x=m.x+Math.cos(m.angle)*CONFIG.handleDist,y=m.y+Math.sin(m.angle)*CONFIG.handleDist,d=Math.hypot(p.x-x,p.y-y);if(d<dist){dist=d;best=i}});return best}
+    canvas.addEventListener('pointerdown',e=>{if(state.mode!=='play')return;const p=point(e),i=closestHandle(p);if(i>=0){state.drag=i;canvas.setPointerCapture(e.pointerId);e.preventDefault()}});
+    canvas.addEventListener('pointermove',e=>{if(state.drag<0||state.mode!=='play')return;const p=point(e),m=state.mirrors[state.drag];m.angle=Math.atan2(p.y-m.y,p.x-m.x);updateBeam();render();e.preventDefault()});
+    function finishDrag(){if(state.drag<0)return;const m=state.mirrors[state.drag];if(Math.abs(angleDelta(m.angle,m.solution))<=CONFIG.snapRad){m.angle=m.solution;setMessage('찰칵! 정답 근처라 딱 맞췄어요!','good')}state.drag=-1;updateBeam();if(state.mode==='play'){state.hint='빛이 별을 지나갔어요. 손잡이를 조금씩 돌려 봐요!';setMessage(state.hint,'hint')}render()}
+    canvas.addEventListener('pointerup',finishDrag);canvas.addEventListener('pointercancel',finishDrag);
+    document.getElementById('startBtn').addEventListener('click',()=>{startOverlay.classList.add('hidden');state.round=0;state.score=0;loadLevel(0)});
+    document.getElementById('restartBtn').addEventListener('click',()=>{endOverlay.classList.add('hidden');state.round=0;state.score=0;loadLevel(0)});
+    window.addEventListener('resize',resize);window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}});
+    function frame(t){const last=frame.last||t;frame.last=t;update(Math.min(50,t-last)/1000);render();requestAnimationFrame(frame)}
+    window.render_game_to_text=()=>JSON.stringify({coordinateSystem:'canvas 360x430; origin top-left; +x right, +y down; angles radians',mode:state.mode,round:state.round+1,totalRounds:7,score:state.score,best:state.best,source:state.source,target:state.target,mirrors:state.mirrors.map((m,i)=>({id:i+1,x:m.x,y:m.y,angle:+m.angle.toFixed(4),handle:{x:+(m.x+Math.cos(m.angle)*CONFIG.handleDist).toFixed(1),y:+(m.y+Math.sin(m.angle)*CONFIG.handleDist).toFixed(1)}})),beam:state.beam.map(p=>({x:+p.x.toFixed(1),y:+p.y.toFixed(1)})),targetHit:state.lastHit,hint:state.hint});
+    window.advanceTime=ms=>{const n=Math.max(1,Math.ceil(ms/(1000/60)));for(let i=0;i<n;i++)update(1/60);render();return window.render_game_to_text()};
+    window.__mirrorBeamTest={
+      start(){startOverlay.classList.add('hidden');state.round=0;state.score=0;loadLevel(0);return window.render_game_to_text()},
+      setRound(n){state.round=Math.max(0,Math.min(6,n-1));loadLevel(state.round);return window.render_game_to_text()},
+      solveMirror(i){const m=state.mirrors[i];m.angle=m.solution;updateBeam();render();return window.render_game_to_text()},
+      miss(){const before=state.score;state.mirrors[0].angle=state.mirrors[0].solution+.7;updateBeam();state.hint='빛이 별을 지나갔어요. 손잡이를 조금씩 돌려 봐요!';setMessage(state.hint,'hint');render();return{before,after:state.score,hint:state.hint,hit:state.lastHit}},
+      reflection(d,a){const r=reflect(d,a);return{x:r.x,y:r.y,length:Math.hypot(r.x,r.y),dot:d.x*r.x+d.y*r.y}},
+      solutions(){return state.mirrors.map(m=>m.solution)}
+    };
+    bestText.textContent=state.best;resize();requestAnimationFrame(frame);
+  })();
+  </script>
+</body>
+</html>

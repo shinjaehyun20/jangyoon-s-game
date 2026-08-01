@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 198개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 200개.
 
-[![Games](https://img.shields.io/badge/games-198-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-200-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![198개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![200개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 198개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 200개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [📄 종이 접기 연구소 (paper-fold-lab)](./paper-fold-lab) | 접는 방향을 예측한 뒤 구멍을 찍고 펼쳐 4개·8개 대칭 무늬를 완성하는 6라운드 상태 변환 퍼즐. 오답 감점 없이 힌트를 주고 localStorage 최고 별 기록 저장 | 어린이/공간·대칭 |
+| [🔦 거울빛 구조대 (mirror-beam-rescue)](./mirror-beam-rescue) | 거울 손잡이를 드래그해 입사각과 반사각을 맞추고 별까지 빛의 길을 잇는 7라운드 반사 기하 퍼즐. 1개 거울에서 2개 거울로 확장하고 localStorage 최고점 저장 | 어린이/과학·드래그 |
 | [🫧 제미니 우주 방울 팡팡 (gemini-space-bubble)](./gemini-space-bubble) | 무중력 우주로 올라가는 방울을 톡톡 탭해서 40초 동안 구조하는 터치 판단 게임. Web Audio 사운드 효과 및 localStorage 최고점 저장 | 어린이/호흡·터치 |
 | [🌟 제미니 별빛 스파크 (gemini-star-spark)](./gemini-star-spark) | 밤하늘에 나타나는 반짝이는 별과 마법 보석을 탭해 별빛 점수를 모으는 40초 터치 반응 게임. 콤보 보너스와 Web Audio 사운드 효과, localStorage 최고점 저장 | 어린이/반응·터치 |
 | [🚦 신호등 안전 건너기 (traffic-light-crossing)](./traffic-light-crossing) | 빨간불·노란불에는 기다리고 초록불에만 건너기를 누르는 45초 안전 판단 게임. 충동 억제와 생활 안전을 함께 연습하고 localStorage 최고점 저장 | 어린이/생활안전·반응 |
@@ -395,6 +397,10 @@ VS Code `Live Server` 확장을 써도 된다.
 - **외부 의존성 없음** — CDN 스크립트 로드 없음 (일부 게임의 배경 이미지 제외)
 - **API 사용**: `fetch`, `Canvas 2D`, `Pointer Events`, `localStorage`, `ResizeObserver`
 - **호스팅**: GitHub Pages (정적)
+
+## 최근 변경사항 (2026-08)
+
+- **📄 종이 접기 연구소 · 🔦 거울빛 구조대 추가 및 미로 탈출 드래그 수정 (2026-08-01)** — 종이 접기 연구소는 접기 순서에 따른 좌표 변환을 예측해 4개·8개 대칭 무늬를 만드는 6라운드 퍼즐이고, 거울빛 구조대는 거울을 직접 드래그해 반사광을 별까지 잇는 7라운드 공간 추론 게임입니다. 미로 탈출은 공을 누르지 않은 드래그를 무시하고, 포인터 이동량을 연속적으로 따라가며, 벽 충돌·레벨 전환·pointer cancel에서 드래그를 종료하도록 수정해 셀 중심으로 튀던 현상을 제거했습니다. 카탈로그는 `games.json` 실측 200개로 동기화했습니다.
 
 ## 최근 변경사항 (2026-07)
 
