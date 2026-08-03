@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>자전거 균형 타기</title>
+<style>
+  :root {
+    --bg: #16324f;
+    --accent: #ffb703;
+    --text: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: manipulation;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(180deg, #1d4e73 0%, #16324f 55%, #0e2338 100%);
+    color: var(--text);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(20px, 5.5vw, 28px);
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .hud {
+    display: flex; flex-direction: row; justify-content: space-between;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .hud span.value { color: var(--accent); }
+  #gameArea {
+    flex: 1;
+    position: relative;
+    background: rgba(255,255,255,0.06);
+    border-radius: 16px;
+    overflow: hidden;
+    touch-action: none;
+  }
+  #road {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 30%;
+    background: repeating-linear-gradient(90deg, #3a3a3a 0 40px, #454545 40px 80px);
+    border-top: 4px dashed rgba(255,255,255,0.35);
+  }
+  #balanceTrack {
+    position: absolute;
+    left: 50%; top: 14px;
+    transform: translateX(-50%);
+    width: 82%;
+    height: 20px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  #safeZone {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 41%; width: 18%;
+    background: rgba(46, 204, 113, 0.55);
+    border-radius: 10px;
+  }
+  #balanceMarker {
+    position: absolute;
+    top: -3px;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(255,183,3,0.8);
+    left: 50%;
+    transform: translateX(-50%);
+    transition: left 0.05s linear;
+  }
+  #cyclist {
+    position: absolute;
+    bottom: 30%;
+    left: 50%;
+    width: 96px; height: 110px;
+    transform: translateX(-50%) rotate(0deg);
+    transition: transform 0.08s linear;
+  }
+  #cyclist svg { width: 100%; height: 100%; display: block; }
+  #pedalBtn {
+    position: absolute;
+    right: 16px; bottom: 16px;
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #16324f;
+    font-weight: 900;
+    font-size: 15px;
+    border: none;
+    box-shadow: 0 4px 0 #c98f00;
+    user-select: none;
+  }
+  #pedalBtn:active { box-shadow: 0 1px 0 #c98f00; transform: translateY(3px); }
+  #distFill {
+    position: absolute;
+    left: 0; bottom: 0; top: 0;
+    width: 0%;
+    background: rgba(255,183,3,0.25);
+  }
+  footer {
+    display: flex; flex-direction: row; justify-content: space-between;
+    font-size: 12px;
+    opacity: 0.85;
+  }
+  .home-link { color: #fff; text-decoration: none; font-weight: 700; }
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,20,35,0.86);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 20;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: #1d4e73;
+    border-radius: 20px;
+    padding: 26px 24px;
+    text-align: center;
+    max-width: 340px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .overlay-card h2 { font-size: 22px; margin-bottom: 12px; }
+  .overlay-card p { font-size: 14px; line-height: 1.6; margin-bottom: 16px; opacity: 0.9; }
+  .btn-start {
+    min-height: 44px;
+    padding: 10px 28px;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #16324f;
+    box-shadow: 0 4px 0 #c98f00;
+  }
+  .btn-start:active { transform: translateY(3px); box-shadow: 0 1px 0 #c98f00; }
+  .result-score { font-size: 40px; font-weight: 900; color: var(--accent); margin: 8px 0; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🚲 자전거 균형 타기</h1>
+
+    <div class="hud">
+      <div>거리 <span class="value" id="hudDist">0</span>m</div>
+      <div>최고 <span class="value" id="hudBest">0</span>m</div>
+    </div>
+
+    <div id="gameArea">
+      <div id="distFill"></div>
+      <div id="balanceTrack">
+        <div id="safeZone"></div>
+        <div id="balanceMarker"></div>
+      </div>
+      <div id="cyclist">
+        <svg viewBox="0 0 96 110">
+          <circle cx="24" cy="86" r="16" fill="none" stroke="#fff" stroke-width="4"/>
+          <circle cx="72" cy="86" r="16" fill="none" stroke="#fff" stroke-width="4"/>
+          <line x1="24" y1="86" x2="48" y2="52" stroke="#ffb703" stroke-width="5" stroke-linecap="round"/>
+          <line x1="48" y1="52" x2="72" y2="86" stroke="#ffb703" stroke-width="5" stroke-linecap="round"/>
+          <line x1="24" y1="86" x2="60" y2="70" stroke="#ffb703" stroke-width="5" stroke-linecap="round"/>
+          <line x1="60" y1="70" x2="72" y2="86" stroke="#ffb703" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="48" cy="52" r="4" fill="#fff"/>
+          <circle cx="50" cy="30" r="12" fill="#ffe4c4"/>
+          <path d="M40 26 Q50 14 60 26 L58 30 Q50 22 42 30 Z" fill="#e63946"/>
+          <line x1="48" y1="52" x2="42" y2="70" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div id="road"></div>
+      <button id="pedalBtn">🚴 밟기!</button>
+    </div>
+
+    <footer>
+      <small>가운데(초록존) 유지하며 페달 버튼 연타!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🚲 자전거 균형 타기</h2>
+      <p>화면을 좌우로 드래그해서 자전거 균형을 초록 구역에 맞추고,<br>오른쪽 페달 버튼을 계속 눌러 앞으로 나아가요!<br>균형이 무너지면 넘어져요.</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 도착!</h2>
+      <div class="result-score" id="finalScore">0m</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CONFIG = {
+    trackWidthPct: 82,
+    safeZoneWidthPct: 18,
+    tiltDriftPerSec: 26,     // 균형이 표류하는 속도(%/s)
+    tiltDragSensitivity: 0.35,
+    pedalBoostDist: 2.2,      // 페달 1회당 전진 거리(m)
+    passiveDecayPerSec: 0,    // 페달 안 밟아도 감속 없음(정지)
+    fallGraceMs: 550,         // 초록존 벗어난 뒤 넘어지기까지 유예
+    maxTiltRotateDeg: 26,
+  };
+
+  const gameArea = document.getElementById('gameArea');
+  const balanceTrack = document.getElementById('balanceTrack');
+  const balanceMarker = document.getElementById('balanceMarker');
+  const cyclist = document.getElementById('cyclist');
+  const distFill = document.getElementById('distFill');
+  const pedalBtn = document.getElementById('pedalBtn');
+  const hudDist = document.getElementById('hudDist');
+  const hudBest = document.getElementById('hudBest');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const finalScore = document.getElementById('finalScore');
+  const resultMsg = document.getElementById('resultMsg');
+
+  const BEST_KEY = 'bicycle-balance_best';
+
+  const state = {
+    running: false,
+    tilt: 50,        // 0~100, 50이 중앙
+    drift: 0,          // -1 or 1, 랜덤 표류 방향
+    driftTimer: 0,
+    dragging: false,
+    lastDragX: 0,
+    dist: 0,
+    outsideSince: 0,
+    lastTs: 0,
+    raf: null,
+  };
+
+  function safeMin() { return 50 - CONFIG.safeZoneWidthPct / 2; }
+  function safeMax() { return 50 + CONFIG.safeZoneWidthPct / 2; }
+
+  function loadBest() {
+    try {
+      const v = parseFloat(localStorage.getItem(BEST_KEY) || '0');
+      return isNaN(v) ? 0 : v;
+    } catch (e) { return 0; }
+  }
+  function saveBest(v) {
+    try { localStorage.setItem(BEST_KEY, String(v)); } catch (e) {}
+  }
+
+  hudBest.textContent = Math.floor(loadBest());
+
+  function resetState() {
+    state.tilt = 50;
+    state.drift = Math.random() < 0.5 ? -1 : 1;
+    state.driftTimer = 0;
+    state.dist = 0;
+    state.outsideSince = 0;
+    state.lastTs = 0;
+    updateVisual();
+    hudDist.textContent = '0';
+  }
+
+  function updateVisual() {
+    balanceMarker.style.left = state.tilt + '%';
+    const rot = ((state.tilt - 50) / 50) * CONFIG.maxTiltRotateDeg;
+    cyclist.style.transform = `translateX(-50%) rotate(${rot}deg)`;
+    distFill.style.width = Math.min(100, (state.dist / 300) * 100) + '%';
+  }
+
+  function tick(ts) {
+    if (!state.running) return;
+    if (!state.lastTs) state.lastTs = ts;
+    const dt = Math.min(0.05, (ts - state.lastTs) / 1000);
+    state.lastTs = ts;
+
+    // 랜덤 표류: 일정 간격마다 방향 전환
+    state.driftTimer -= dt;
+    if (state.driftTimer <= 0) {
+      state.drift = Math.random() < 0.5 ? -1 : 1;
+      state.driftTimer = 0.6 + Math.random() * 0.8;
+    }
+    state.tilt += state.drift * CONFIG.tiltDriftPerSec * dt;
+    state.tilt = Math.max(2, Math.min(98, state.tilt));
+
+    const inSafe = state.tilt >= safeMin() && state.tilt <= safeMax();
+    if (!inSafe) {
+      state.outsideSince += dt * 1000;
+      if (state.outsideSince >= CONFIG.fallGraceMs) {
+        endGame(false);
+        return;
+      }
+    } else {
+      state.outsideSince = 0;
+    }
+
+    updateVisual();
+    hudDist.textContent = Math.floor(state.dist);
+
+    if (state.dist >= 300) {
+      endGame(true);
+      return;
+    }
+
+    state.raf = requestAnimationFrame(tick);
+  }
+
+  function applyDrag(clientX) {
+    const rect = balanceTrack.getBoundingClientRect();
+    const pct = ((clientX - rect.left) / rect.width) * 100;
+    const clamped = Math.max(2, Math.min(98, pct));
+    // 부드럽게 근접 (즉시 스냅 아님 — 아이 손 떨림 완화)
+    state.tilt += (clamped - state.tilt) * CONFIG.tiltDragSensitivity;
+  }
+
+  gameArea.addEventListener('pointerdown', (e) => {
+    if (!state.running) return;
+    state.dragging = true;
+    applyDrag(e.clientX);
+  });
+  window.addEventListener('pointermove', (e) => {
+    if (!state.running || !state.dragging) return;
+    applyDrag(e.clientX);
+  });
+  window.addEventListener('pointerup', () => { state.dragging = false; });
+  window.addEventListener('pointercancel', () => { state.dragging = false; });
+
+  pedalBtn.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    if (!state.running) return;
+    state.dist += CONFIG.pedalBoostDist;
+  });
+
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    resetState();
+    state.running = true;
+    state.raf = requestAnimationFrame(tick);
+  }
+
+  function endGame(success) {
+    state.running = false;
+    if (state.raf) cancelAnimationFrame(state.raf);
+    const distFinal = Math.floor(state.dist);
+    const best = loadBest();
+    if (distFinal > best) saveBest(distFinal);
+    hudBest.textContent = Math.floor(loadBest());
+    finalScore.textContent = distFinal + 'm';
+    resultMsg.textContent = success
+      ? '와! 균형을 잘 잡고 끝까지 달렸어요!'
+      : '균형이 흔들려 넘어졌어요. 다시 도전해봐요!';
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('pointerdown', startGame);
+  restartBtn.addEventListener('pointerdown', startGame);
+
+  resetState();
+})();
+</script>
+</body>
+</html>

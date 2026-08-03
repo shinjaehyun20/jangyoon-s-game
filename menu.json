@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "bicycle-balance",
+        "label": "🚲 자전거 균형 타기",
+        "path": "bicycle-balance/index.html"
+      },
+      {
+        "id": "fridge-sort",
+        "label": "🧊 냉장고 정리하기",
+        "path": "fridge-sort/index.html"
+      },
+      {
         "id": "rocket-sequence-launch",
         "label": "🚀 로켓 순서 발사",
         "path": "rocket-sequence-launch/index.html"

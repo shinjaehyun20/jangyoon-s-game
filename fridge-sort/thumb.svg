@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eaf6ff"/>
+      <stop offset="100%" stop-color="#c9e8fb"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg2)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.4)"/>
+
+  <!-- 냉장고 본체 -->
+  <rect x="20" y="18" width="90" height="130" rx="10" fill="#ffffff" stroke="#bcdff5" stroke-width="3"/>
+  <line x1="20" y1="70" x2="110" y2="70" stroke="#bcdff5" stroke-width="3"/>
+  <circle cx="98" cy="45" r="4" fill="#4fc3f7"/>
+  <circle cx="98" cy="105" r="4" fill="#4fc3f7"/>
+
+  <!-- 화살표 -->
+  <path d="M120 82 L150 82 M142 74 L150 82 L142 90" fill="none" stroke="#e07a1f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 3칸 (냉장/냉동/실온) -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif" font-weight="800">
+    <rect x="160" y="30" width="48" height="42" rx="10" fill="#d0ecff"/>
+    <text x="184" y="57" text-anchor="middle" font-size="22">🧊</text>
+
+    <rect x="160" y="78" width="48" height="42" rx="10" fill="#e3f2ff"/>
+    <text x="184" y="105" text-anchor="middle" font-size="22">❄️</text>
+
+    <rect x="160" y="126" width="48" height="42" rx="10" fill="#fff3d6"/>
+    <text x="184" y="153" text-anchor="middle" font-size="22">🌡️</text>
+  </g>
+
+  <!-- 떠다니는 음식 -->
+  <text x="228" y="60" font-size="26">🍎</text>
+  <text x="252" y="100" font-size="26">🥛</text>
+  <text x="224" y="140" font-size="26">🍦</text>
+
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#14608a">냉장고 정리하기</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(20,96,138,0.55)" letter-spacing="2">FRIDGE SORT</text>
+  </g>
+</svg>

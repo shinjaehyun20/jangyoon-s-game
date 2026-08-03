@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 202개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 204개.
 
-[![Games](https://img.shields.io/badge/games-202-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-204-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![202개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![204개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 202개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 204개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🚲 자전거 균형 타기 (bicycle-balance)](./bicycle-balance) | 균형 맞추며 페달 밟아 멀리 달리기 | 어린이/균형·타이밍 |
+| [🧊 냉장고 정리하기 (fridge-sort)](./fridge-sort) | 음식을 냉장·냉동·실온에 드래그 분류 | 어린이/생활인지 |
 | [🚀 로켓 순서 발사 (rocket-sequence-launch)](./rocket-sequence-launch) | 관제사가 보여주는 그림 명령을 기억하고 같은 순서로 눌러 6라운드 로켓을 발사해요! | 어린이/인지·순서 |
 | [🐾 그림자 발자국 탐정 (shadow-trail-match)](./shadow-trail-match) | 발자국 단서와 흐릿한 그림자를 보고 숨어 있는 동물을 찾는 8라운드 관찰 놀이예요! | 어린이/인지·순서 |
 | [📄 종이 접기 연구소 (paper-fold-lab)](./paper-fold-lab) | 접는 방향을 예측한 뒤 구멍을 찍고 펼쳐 4개·8개 대칭 무늬를 완성하는 6라운드 상태 변환 퍼즐. 오답 감점 없이 힌트를 주고 localStorage 최고 별 기록 저장 | 어린이/공간·대칭 |
@@ -401,6 +403,10 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-08)
+
+- **🚲 자전거 균형 타기 · 🧊 냉장고 정리하기 추가 (2026-08-04)** — 자전거 균형 타기는 화면 드래그로 균형 마커를 초록 구역에 맞추고 페달 버튼을 연타해 앞으로 나아가는 실시간 균형 유지 게임으로, 기존 balance-tower(정적 블록 쌓기)·stone-balance-walk(교차 버튼 균형)와 달리 지속적으로 표류하는 균형점을 계속 재조정해야 하는 실시간 밸런스가 핵심입니다. 냉장고 정리하기는 음식 아이템을 냉장·냉동·실온 3칸에 드래그로 분류하는 생활 인지 게임으로, 기존 recycle-rescue(재질 분류)·laundry-sort(색깔 분류)와 달리 "보관 온도" 판단 기준과 아무 칸에나 치우면 되는 상한 음식 등장이 차별점입니다. 두 게임 모두 단일 HTML, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일, 외부 의존성 0건을 포함합니다. 부수 발견: README "최근 변경사항 (2026-08)" 섹션에 2026-08-03 rocket-sequence-launch·shadow-trail-match 추가 항목이 누락돼 있어 함께 보완했습니다.
+
+- **🚀 로켓 순서 발사 · 🐾 그림자 발자국 탐정 추가 (2026-08-03)** — 로켓 순서 발사는 관제사가 보여주는 그림 명령(⛽/⭐/🌙/🌱) 순서를 기억하고 같은 순서로 눌러 6라운드 로켓을 발사하는 순서 기억 게임으로, 오답 시 감점 후 같은 패턴을 다시 보여주고 최고 별 기록을 저장합니다. 그림자 발자국 탐정은 발자국 단서와 흐릿한 동물 그림자를 보고 4개 보기 중 정답 동물을 고르는 8라운드 관찰 놀이로, 연속 정답 보너스와 최고점을 저장합니다. 두 게임 모두 단일 HTML, 외부 의존성 없음, 모바일 터치 우선, 시작·종료 오버레이, 홈 링크, SVG 썸네일을 포함합니다.
 
 - **📄 종이 접기 연구소 · 🔦 거울빛 구조대 추가 및 미로 탈출 드래그 수정 (2026-08-01)** — 종이 접기 연구소는 접기 순서에 따른 좌표 변환을 예측해 4개·8개 대칭 무늬를 만드는 6라운드 퍼즐이고, 거울빛 구조대는 거울을 직접 드래그해 반사광을 별까지 잇는 7라운드 공간 추론 게임입니다. 미로 탈출은 공을 누르지 않은 드래그를 무시하고 포인터 이동량을 연속적으로 따라가며, 닫힌 벽에서는 시작점으로 되돌아가지 않고 공 반지름을 고려한 벽 경계에 멈추도록 수정했습니다. 레벨 전환·pointer cancel에서는 드래그 상태를 안전하게 종료합니다. 카탈로그는 `games.json` 실측 200개로 동기화했습니다.
 

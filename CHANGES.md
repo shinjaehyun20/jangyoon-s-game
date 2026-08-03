@@ -1,3 +1,12 @@
+## 2026-08-04 (일일 게임 제작, nyx)
+
+- 게임 2종 추가: `bicycle-balance`(🚲 자전거 균형 타기), `fridge-sort`(🧊 냉장고 정리하기).
+- `bicycle-balance` — 화면을 드래그해 균형 트랙의 마커를 초록 안전구역에 맞추고, 오른쪽 페달 버튼을 계속 눌러 앞으로 나아가는 실시간 균형 유지 게임. 균형점이 랜덤 방향으로 계속 표류하므로 지속적으로 재조정해야 하며, 안전구역을 550ms 이상 벗어나면 넘어짐. 기존 `balance-tower`(정적 블록 쌓기 타이밍)·`stone-balance-walk`(좌우 교차 버튼 균형)와 달리 연속적인 실시간 밸런스 조정이 핵심 차별점. 300m 도달 시 성공, `bicycle-balance_best`에 최고 거리 저장.
+- `fridge-sort` — 냉장고 아이템(사과·우유·아이스크림 등)을 손가락으로 드래그해 냉장·냉동·실온 3칸 중 알맞은 칸에 넣는 40초 생활 인지 게임. 15% 확률로 등장하는 상한 음식은 어떤 칸에 넣어도 정답 처리(치우는 게 목표). 기존 `recycle-rescue`(재질별 분리수거)·`laundry-sort`(색깔별 분류)와 달리 "보관 온도"라는 새 분류 기준과 상한 음식 회피 요소가 차별점. 연속 정답 3개마다 보너스 점수, `fridge-sort_best`에 최고 점수 저장.
+- 두 게임 모두 단일 HTML, 외부 의존성 없음, Pointer Events(pointerdown/move/up만 사용, touchstart/mousedown 미사용), 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함. JS 구문 검증(node --check) PASS.
+- `games.json` 202→204, 고유 ID 204(중복 0건), `menu.json` kids 카테고리 최상단에 신규 2건 배치. README 뱃지·상단문구·게임 표·최근변경 섹션을 실측 204로 동기화.
+- 부수 발견·해소: README.md "최근 변경사항 (2026-08)" 섹션에 2026-08-03 rocket-sequence-launch·shadow-trail-match 추가 항목이 누락돼 있어 함께 보완(CHANGES.md에는 기록됐으나 README에 미반영 상태였음).
+
 ## 2026-08-03 (굿모닝 wrapper, Codex)
 
 - 게임 2종 추가: `rocket-sequence-launch`(🚀 로켓 순서 발사), `shadow-trail-match`(🐾 그림자 발자국 탐정).
