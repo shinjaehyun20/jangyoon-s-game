@@ -1598,5 +1598,21 @@
     "description": "거울을 돌려 반사광을 별까지 이어 주는 7단계 빛의 길 퍼즐이에요!",
     "thumbnail": "mirror-beam-rescue/thumb.svg",
     "path": "mirror-beam-rescue/index.html"
+  },
+  {
+    "id": "rocket-sequence-launch",
+    "title": "Rocket Sequence Launch",
+    "title_ko": "🚀 로켓 순서 발사",
+    "description": "관제사가 보여주는 그림 명령을 기억하고 같은 순서로 눌러 6라운드 로켓을 발사해요!",
+    "thumbnail": "rocket-sequence-launch/thumb.svg",
+    "path": "rocket-sequence-launch/index.html"
+  },
+  {
+    "id": "shadow-trail-match",
+    "title": "Shadow Trail Detective",
+    "title_ko": "🐾 그림자 발자국 탐정",
+    "description": "발자국 단서와 흐릿한 그림자를 보고 숨어 있는 동물을 찾는 8라운드 관찰 놀이예요!",
+    "thumbnail": "shadow-trail-match/thumb.svg",
+    "path": "shadow-trail-match/index.html"
   }
 ]

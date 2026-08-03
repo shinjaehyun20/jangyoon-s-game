@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E🚀%3C/text%3E%3C/svg%3E" />
+  <title>로켓 순서 발사</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1f2937;
+      --muted: #607083;
+      --sky: #dff5ff;
+      --panel: rgba(255,255,255,.92);
+      --blue: #2563eb;
+      --green: #10b981;
+      --orange: #f97316;
+      --pink: #ec4899;
+      --shadow: 0 18px 40px rgba(31,41,55,.16);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; min-height: 100%; overflow: hidden; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: linear-gradient(#9ddcff 0%, #f9f7d9 64%, #b7efc5 100%); }
+    body { touch-action: manipulation; }
+    .game {
+      position: relative;
+      width: min(100vw, 520px);
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: 12px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+    }
+    header, .panel, .controls { background: var(--panel); border: 2px solid rgba(255,255,255,.75); border-radius: 18px; box-shadow: var(--shadow); }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; }
+    h1 { margin: 0; font-size: clamp(1.1rem, 4.5vw, 1.6rem); }
+    .home { color: var(--blue); font-weight: 800; text-decoration: none; white-space: nowrap; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .stat { padding: 8px; border-radius: 14px; background: #f8fafc; text-align: center; font-weight: 800; font-size: .92rem; }
+    .stat small { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; }
+    .panel { position: relative; overflow: hidden; min-height: 310px; display: grid; grid-template-rows: auto 1fr auto; padding: 12px; }
+    .hint { margin: 0; min-height: 48px; color: var(--muted); font-weight: 800; text-align: center; line-height: 1.35; }
+    .stage { position: relative; display: grid; place-items: end center; min-height: 210px; }
+    .stars { position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(#fff 1.5px, transparent 2px); background-size: 44px 36px; opacity: .55; }
+    .rocket {
+      position: relative;
+      width: 92px;
+      height: 150px;
+      transform: translateY(var(--lift, 0));
+      transition: transform .45s cubic-bezier(.2,.8,.2,1);
+      filter: drop-shadow(0 14px 12px rgba(30,64,175,.2));
+    }
+    .rocket::before { content: "🚀"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 5rem; transform: rotate(-35deg); }
+    .flame { position: absolute; left: 37px; bottom: -22px; width: 22px; height: 44px; border-radius: 50% 50% 60% 60%; background: linear-gradient(#fff176, #fb923c, #ef4444); opacity: 0; transform-origin: top; }
+    .rocket.firing .flame { opacity: 1; animation: burn .18s infinite alternate; }
+    @keyframes burn { from { transform: scaleY(.8); } to { transform: scaleY(1.25); } }
+    .sequence { display: flex; justify-content: center; gap: 8px; min-height: 46px; flex-wrap: wrap; }
+    .chip { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 14px; background: #fff; border: 2px solid #dbeafe; font-size: 1.45rem; box-shadow: 0 6px 12px rgba(37,99,235,.12); }
+    .chip.flash { animation: pop .45s ease; }
+    @keyframes pop { 50% { transform: scale(1.18); background: #fef3c7; } }
+    .controls { padding: 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    button { min-height: 58px; border: 0; border-radius: 16px; color: white; font-size: 1.55rem; font-weight: 900; box-shadow: 0 8px 0 rgba(0,0,0,.12); touch-action: manipulation; }
+    button:active { transform: translateY(3px); box-shadow: 0 5px 0 rgba(0,0,0,.12); }
+    button[data-cmd="fuel"] { background: var(--orange); }
+    button[data-cmd="star"] { background: var(--pink); }
+    button[data-cmd="moon"] { background: var(--blue); }
+    button[data-cmd="leaf"] { background: var(--green); }
+    button:disabled { filter: grayscale(.6); opacity: .6; }
+    .overlay { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 16px; background: rgba(227,245,255,.86); backdrop-filter: blur(4px); }
+    .card { width: min(100%, 360px); padding: 22px; border-radius: 22px; background: white; box-shadow: var(--shadow); text-align: center; }
+    .card h2 { margin: 0 0 10px; font-size: 1.7rem; }
+    .card p { margin: 0 0 16px; color: var(--muted); font-weight: 700; line-height: 1.45; }
+    .primary { width: 100%; background: var(--blue); font-size: 1.12rem; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main class="game" aria-label="로켓 순서 발사 게임">
+    <header>
+      <h1>🚀 로켓 순서 발사</h1>
+      <a class="home" href="../">🏠 게임 목록으로</a>
+    </header>
+
+    <section class="panel">
+      <div class="stats">
+        <div class="stat"><small>라운드</small><span id="round">1</span>/6</div>
+        <div class="stat"><small>별점</small><span id="score">0</span></div>
+        <div class="stat"><small>최고</small><span id="best">0</span></div>
+      </div>
+      <p class="hint" id="hint">반짝이는 명령을 기억한 뒤 같은 순서로 눌러요.</p>
+      <div class="stage">
+        <div class="stars"></div>
+        <div id="rocket" class="rocket" aria-hidden="true"><div class="flame"></div></div>
+      </div>
+      <div class="sequence" id="sequence" aria-label="입력한 명령"></div>
+    </section>
+
+    <section class="controls" aria-label="명령 버튼">
+      <button data-cmd="fuel" aria-label="연료">⛽</button>
+      <button data-cmd="star" aria-label="별">⭐</button>
+      <button data-cmd="moon" aria-label="달">🌙</button>
+      <button data-cmd="leaf" aria-label="새싹">🌱</button>
+    </section>
+
+    <div id="overlay" class="overlay">
+      <div class="card">
+        <h2>명령 순서 기억!</h2>
+        <p>로켓 관제사가 보여주는 그림 순서를 보고, 같은 순서로 버튼을 눌러 발사해요.</p>
+        <button id="start" class="primary">시작하기</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const cmds = ["fuel", "star", "moon", "leaf"];
+      const emoji = { fuel: "⛽", star: "⭐", moon: "🌙", leaf: "🌱" };
+      const roundEl = document.getElementById("round");
+      const scoreEl = document.getElementById("score");
+      const bestEl = document.getElementById("best");
+      const hintEl = document.getElementById("hint");
+      const seqEl = document.getElementById("sequence");
+      const rocket = document.getElementById("rocket");
+      const overlay = document.getElementById("overlay");
+      const start = document.getElementById("start");
+      const buttons = [...document.querySelectorAll("button[data-cmd]")];
+      const bestKey = "rocket-sequence-launch_best";
+      let round = 1;
+      let score = 0;
+      let pattern = [];
+      let input = [];
+      let accepting = false;
+      bestEl.textContent = localStorage.getItem(bestKey) || "0";
+
+      function drawSequence(items, flashIndex = -1) {
+        seqEl.innerHTML = "";
+        items.forEach((cmd, index) => {
+          const chip = document.createElement("span");
+          chip.className = "chip" + (index === flashIndex ? " flash" : "");
+          chip.textContent = emoji[cmd];
+          seqEl.appendChild(chip);
+        });
+      }
+
+      function setButtons(enabled) {
+        buttons.forEach(btn => btn.disabled = !enabled);
+      }
+
+      function addStep() {
+        pattern.push(cmds[Math.floor(Math.random() * cmds.length)]);
+      }
+
+      async function showPattern() {
+        accepting = false;
+        setButtons(false);
+        input = [];
+        hintEl.textContent = "잘 보고 기억해요...";
+        drawSequence(pattern);
+        for (let i = 0; i < pattern.length; i += 1) {
+          await wait(520);
+          drawSequence(pattern, i);
+          await wait(420);
+          drawSequence(pattern);
+        }
+        hintEl.textContent = "이제 같은 순서로 눌러요.";
+        accepting = true;
+        setButtons(true);
+      }
+
+      function wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      function launch() {
+        rocket.classList.add("firing");
+        rocket.style.setProperty("--lift", "-60px");
+        setTimeout(() => {
+          rocket.classList.remove("firing");
+          rocket.style.setProperty("--lift", "0");
+        }, 700);
+      }
+
+      function update() {
+        roundEl.textContent = round;
+        scoreEl.textContent = score;
+      }
+
+      function finish() {
+        accepting = false;
+        setButtons(false);
+        const best = Math.max(Number(localStorage.getItem(bestKey) || 0), score);
+        localStorage.setItem(bestKey, String(best));
+        bestEl.textContent = best;
+        overlay.innerHTML = `<div class="card"><h2>발사 성공!</h2><p>${score}별을 모았어요. 최고 기록은 ${best}별이에요.</p><button class="primary" id="again">다시하기</button><a class="home" href="../">🏠 게임 목록으로</a></div>`;
+        overlay.classList.remove("hidden");
+        document.getElementById("again").addEventListener("click", begin);
+      }
+
+      function miss() {
+        accepting = false;
+        score = Math.max(0, score - 2);
+        update();
+        hintEl.textContent = "괜찮아요. 순서를 한 번 더 보여줄게요.";
+        drawSequence(input);
+        setTimeout(showPattern, 750);
+      }
+
+      function handle(cmd) {
+        if (!accepting) return;
+        input.push(cmd);
+        drawSequence(input);
+        const index = input.length - 1;
+        if (cmd !== pattern[index]) {
+          miss();
+          return;
+        }
+        score += 2;
+        update();
+        if (input.length === pattern.length) {
+          launch();
+          if (round >= 6) {
+            setTimeout(finish, 850);
+          } else {
+            round += 1;
+            addStep();
+            update();
+            setTimeout(showPattern, 850);
+          }
+        }
+      }
+
+      function begin() {
+        round = 1;
+        score = 0;
+        pattern = [];
+        overlay.classList.add("hidden");
+        addStep();
+        addStep();
+        update();
+        showPattern();
+      }
+
+      buttons.forEach(btn => btn.addEventListener("click", () => handle(btn.dataset.cmd)));
+      start.addEventListener("click", begin);
+      setButtons(false);
+    })();
+  </script>
+</body>
+</html>

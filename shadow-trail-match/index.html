@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E🐾%3C/text%3E%3C/svg%3E" />
+  <title>그림자 발자국 탐정</title>
+  <style>
+    :root {
+      --ink: #203047;
+      --muted: #667085;
+      --cream: #fff8df;
+      --panel: rgba(255,255,255,.94);
+      --line: #d7e3f4;
+      --green: #16a34a;
+      --blue: #2563eb;
+      --red: #ef4444;
+      --shadow: 0 16px 36px rgba(32,48,71,.16);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; min-height: 100%; overflow: hidden; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: linear-gradient(180deg, #bfe8ff, #fff4c2 52%, #c7f2d2); }
+    body { touch-action: manipulation; }
+    .game { position: relative; width: min(100vw, 520px); min-height: 100dvh; margin: 0 auto; padding: 12px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 10px; }
+    header, .stats, .board, .choices { background: var(--panel); border: 2px solid rgba(255,255,255,.75); border-radius: 18px; box-shadow: var(--shadow); }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; }
+    h1 { margin: 0; font-size: clamp(1.08rem, 4.4vw, 1.55rem); }
+    .home { color: var(--blue); font-weight: 900; text-decoration: none; white-space: nowrap; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 8px; }
+    .stat { min-height: 48px; display: grid; place-items: center; border-radius: 14px; background: #f8fafc; font-weight: 900; }
+    .stat small { color: var(--muted); font-size: .68rem; display: block; font-weight: 800; }
+    .board { position: relative; overflow: hidden; min-height: 318px; padding: 12px; display: grid; grid-template-rows: auto 1fr auto; }
+    .prompt { margin: 0; min-height: 44px; color: var(--muted); text-align: center; font-weight: 850; line-height: 1.35; }
+    .trail { position: relative; margin: 6px auto; width: min(100%, 390px); min-height: 198px; border-radius: 22px; background: linear-gradient(#f8fcff, #edf9ff); border: 2px dashed var(--line); overflow: hidden; }
+    .footprint { position: absolute; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: white; font-size: 1.55rem; box-shadow: 0 8px 16px rgba(37,99,235,.12); animation: step .55s ease both; }
+    @keyframes step { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .shadow-animal { width: 110px; height: 90px; margin: 0 auto; display: grid; place-items: center; border-radius: 50% 50% 44% 44%; background: #1f2937; color: white; font-size: 3.2rem; filter: brightness(.12); box-shadow: inset 0 -12px 0 rgba(0,0,0,.22), 0 12px 22px rgba(31,41,55,.2); }
+    .message { min-height: 28px; margin: 0; text-align: center; font-weight: 900; }
+    .choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 10px; }
+    button.choice, .primary { min-height: 58px; border: 0; border-radius: 16px; font-size: 1.4rem; font-weight: 900; color: var(--ink); background: #ffffff; box-shadow: 0 8px 0 rgba(0,0,0,.12); }
+    button.choice:active, .primary:active { transform: translateY(3px); box-shadow: 0 5px 0 rgba(0,0,0,.12); }
+    button.choice.correct { background: #bbf7d0; color: #14532d; }
+    button.choice.wrong { background: #fecaca; color: #7f1d1d; }
+    .overlay { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 16px; background: rgba(247,252,255,.86); backdrop-filter: blur(4px); }
+    .card { width: min(100%, 360px); padding: 22px; border-radius: 22px; background: white; box-shadow: var(--shadow); text-align: center; }
+    .card h2 { margin: 0 0 10px; font-size: 1.65rem; }
+    .card p { margin: 0 0 16px; color: var(--muted); font-weight: 750; line-height: 1.45; }
+    .primary { width: 100%; color: white; background: var(--blue); font-size: 1.12rem; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main class="game" aria-label="그림자 발자국 탐정 게임">
+    <header>
+      <h1>🐾 그림자 발자국 탐정</h1>
+      <a class="home" href="../">🏠 게임 목록으로</a>
+    </header>
+    <section class="stats">
+      <div class="stat"><small>라운드</small><span id="round">1</span>/8</div>
+      <div class="stat"><small>점수</small><span id="score">0</span></div>
+      <div class="stat"><small>연속</small><span id="combo">0</span></div>
+      <div class="stat"><small>최고</small><span id="best">0</span></div>
+    </section>
+    <section class="board">
+      <p class="prompt" id="prompt">발자국을 보고 어떤 동물 그림자인지 골라요.</p>
+      <div class="trail" id="trail" aria-label="발자국 단서"></div>
+      <div class="shadow-animal" id="shadow" aria-hidden="true">🐶</div>
+      <p class="message" id="message"></p>
+    </section>
+    <section class="choices" id="choices" aria-label="동물 선택"></section>
+    <div id="overlay" class="overlay">
+      <div class="card">
+        <h2>발자국 탐정 출동!</h2>
+        <p>길 위의 발자국 모양과 흐릿한 그림자를 보고 숨어 있는 동물을 찾아요.</p>
+        <button id="start" class="primary">시작하기</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const animals = [
+        { id: "dog", name: "강아지", emoji: "🐶", foot: "🐾" },
+        { id: "cat", name: "고양이", emoji: "🐱", foot: "🐾" },
+        { id: "duck", name: "오리", emoji: "🦆", foot: "👣" },
+        { id: "frog", name: "개구리", emoji: "🐸", foot: "🟢" },
+        { id: "rabbit", name: "토끼", emoji: "🐰", foot: "⋮" },
+        { id: "bear", name: "곰", emoji: "🐻", foot: "●" },
+        { id: "penguin", name: "펭귄", emoji: "🐧", foot: "▴" },
+        { id: "mouse", name: "생쥐", emoji: "🐭", foot: "·" }
+      ];
+      const roundEl = document.getElementById("round");
+      const scoreEl = document.getElementById("score");
+      const comboEl = document.getElementById("combo");
+      const bestEl = document.getElementById("best");
+      const promptEl = document.getElementById("prompt");
+      const trailEl = document.getElementById("trail");
+      const shadowEl = document.getElementById("shadow");
+      const messageEl = document.getElementById("message");
+      const choicesEl = document.getElementById("choices");
+      const overlay = document.getElementById("overlay");
+      const start = document.getElementById("start");
+      const bestKey = "shadow-trail-match_best";
+      let round = 1;
+      let score = 0;
+      let combo = 0;
+      let answer = animals[0];
+      let locked = false;
+      bestEl.textContent = localStorage.getItem(bestKey) || "0";
+
+      function sample(pool, count) {
+        const copy = [...pool].sort(() => Math.random() - .5);
+        return copy.slice(0, count);
+      }
+
+      function update() {
+        roundEl.textContent = round;
+        scoreEl.textContent = score;
+        comboEl.textContent = combo;
+      }
+
+      function drawTrail(animal) {
+        trailEl.innerHTML = "";
+        const points = [[22,70],[58,44],[96,74],[134,48],[174,80],[214,54],[254,84],[302,58]];
+        points.forEach(([x, y], i) => {
+          const fp = document.createElement("span");
+          fp.className = "footprint";
+          fp.style.left = `${x}px`;
+          fp.style.top = `${y}px`;
+          fp.style.animationDelay = `${i * 70}ms`;
+          fp.textContent = animal.foot;
+          trailEl.appendChild(fp);
+        });
+      }
+
+      function makeRound() {
+        locked = false;
+        messageEl.textContent = "";
+        answer = animals[Math.floor(Math.random() * animals.length)];
+        shadowEl.textContent = answer.emoji;
+        drawTrail(answer);
+        const options = sample(animals.filter(a => a.id !== answer.id), 3);
+        options.push(answer);
+        options.sort(() => Math.random() - .5);
+        choicesEl.innerHTML = "";
+        options.forEach(animal => {
+          const btn = document.createElement("button");
+          btn.className = "choice";
+          btn.type = "button";
+          btn.textContent = `${animal.emoji} ${animal.name}`;
+          btn.addEventListener("click", () => choose(btn, animal));
+          choicesEl.appendChild(btn);
+        });
+        promptEl.textContent = `${round}번째 단서: 발자국을 따라가 봐요.`;
+        update();
+      }
+
+      function choose(btn, animal) {
+        if (locked) return;
+        locked = true;
+        if (animal.id === answer.id) {
+          combo += 1;
+          score += 5 + combo;
+          btn.classList.add("correct");
+          messageEl.textContent = `정답! ${answer.name}였어요.`;
+        } else {
+          combo = 0;
+          score = Math.max(0, score - 2);
+          btn.classList.add("wrong");
+          [...choicesEl.children].forEach(child => {
+            if (child.textContent.includes(answer.name)) child.classList.add("correct");
+          });
+          messageEl.textContent = `다시 관찰해요. 정답은 ${answer.name}!`;
+        }
+        update();
+        if (round >= 8) {
+          setTimeout(finish, 900);
+        } else {
+          round += 1;
+          setTimeout(makeRound, 900);
+        }
+      }
+
+      function finish() {
+        const best = Math.max(Number(localStorage.getItem(bestKey) || 0), score);
+        localStorage.setItem(bestKey, String(best));
+        bestEl.textContent = best;
+        overlay.innerHTML = `<div class="card"><h2>탐정 기록 완료!</h2><p>${score}점을 얻었어요. 최고 기록은 ${best}점이에요.</p><button class="primary" id="again">다시하기</button><a class="home" href="../">🏠 게임 목록으로</a></div>`;
+        overlay.classList.remove("hidden");
+        document.getElementById("again").addEventListener("click", begin);
+      }
+
+      function begin() {
+        round = 1;
+        score = 0;
+        combo = 0;
+        overlay.classList.add("hidden");
+        makeRound();
+      }
+
+      start.addEventListener("click", begin);
+      update();
+    })();
+  </script>
+</body>
+</html>

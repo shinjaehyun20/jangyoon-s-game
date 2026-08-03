@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-label="로켓 순서 발사 썸네일">
+  <rect width="320" height="180" rx="22" fill="#dff5ff"/>
+  <circle cx="250" cy="42" r="18" fill="#fff7ad"/>
+  <g fill="#ffffff" opacity=".9">
+    <circle cx="50" cy="42" r="3"/><circle cx="92" cy="28" r="2.5"/><circle cx="138" cy="54" r="3"/><circle cx="204" cy="30" r="2.5"/>
+  </g>
+  <path d="M74 144c22-28 136-30 172 0" fill="#b7efc5"/>
+  <text x="160" y="72" text-anchor="middle" font-size="56">🚀</text>
+  <g font-size="25">
+    <rect x="50" y="105" width="42" height="42" rx="13" fill="#f97316"/><text x="71" y="134" text-anchor="middle">⛽</text>
+    <rect x="105" y="105" width="42" height="42" rx="13" fill="#ec4899"/><text x="126" y="134" text-anchor="middle">⭐</text>
+    <rect x="160" y="105" width="42" height="42" rx="13" fill="#2563eb"/><text x="181" y="134" text-anchor="middle">🌙</text>
+    <rect x="215" y="105" width="42" height="42" rx="13" fill="#10b981"/><text x="236" y="134" text-anchor="middle">🌱</text>
+  </g>
+  <text x="300" y="164" text-anchor="end" font-family="system-ui, sans-serif" font-size="16" font-weight="800" fill="#1f2937">로켓 순서 발사</text>
+</svg>

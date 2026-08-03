@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "rocket-sequence-launch",
+        "label": "🚀 로켓 순서 발사",
+        "path": "rocket-sequence-launch/index.html"
+      },
+      {
+        "id": "shadow-trail-match",
+        "label": "🐾 그림자 발자국 탐정",
+        "path": "shadow-trail-match/index.html"
+      },
+      {
         "id": "paper-fold-lab",
         "label": "📄 종이 접기 연구소",
         "path": "paper-fold-lab/index.html"

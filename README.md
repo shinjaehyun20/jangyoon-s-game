@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 200개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 202개.
 
-[![Games](https://img.shields.io/badge/games-200-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-202-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![200개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![202개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 200개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 202개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🚀 로켓 순서 발사 (rocket-sequence-launch)](./rocket-sequence-launch) | 관제사가 보여주는 그림 명령을 기억하고 같은 순서로 눌러 6라운드 로켓을 발사해요! | 어린이/인지·순서 |
+| [🐾 그림자 발자국 탐정 (shadow-trail-match)](./shadow-trail-match) | 발자국 단서와 흐릿한 그림자를 보고 숨어 있는 동물을 찾는 8라운드 관찰 놀이예요! | 어린이/인지·순서 |
 | [📄 종이 접기 연구소 (paper-fold-lab)](./paper-fold-lab) | 접는 방향을 예측한 뒤 구멍을 찍고 펼쳐 4개·8개 대칭 무늬를 완성하는 6라운드 상태 변환 퍼즐. 오답 감점 없이 힌트를 주고 localStorage 최고 별 기록 저장 | 어린이/공간·대칭 |
 | [🔦 거울빛 구조대 (mirror-beam-rescue)](./mirror-beam-rescue) | 거울 손잡이를 드래그해 입사각과 반사각을 맞추고 별까지 빛의 길을 잇는 7라운드 반사 기하 퍼즐. 1개 거울에서 2개 거울로 확장하고 localStorage 최고점 저장 | 어린이/과학·드래그 |
 | [🫧 제미니 우주 방울 팡팡 (gemini-space-bubble)](./gemini-space-bubble) | 무중력 우주로 올라가는 방울을 톡톡 탭해서 40초 동안 구조하는 터치 판단 게임. Web Audio 사운드 효과 및 localStorage 최고점 저장 | 어린이/호흡·터치 |

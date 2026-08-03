@@ -1,3 +1,11 @@
+## 2026-08-03 (굿모닝 wrapper, Codex)
+
+- 게임 2종 추가: `rocket-sequence-launch`(🚀 로켓 순서 발사), `shadow-trail-match`(🐾 그림자 발자국 탐정).
+- `rocket-sequence-launch` — 관제사가 보여주는 그림 명령(⛽/⭐/🌙/🌱) 순서를 기억하고 같은 순서로 눌러 6라운드 로켓을 발사하는 순서 기억 게임. 오답은 감점 후 같은 패턴을 다시 보여주고 `rocket-sequence-launch_best`에 최고 별 기록을 저장.
+- `shadow-trail-match` — 발자국 단서와 흐릿한 동물 그림자를 보고 4개 보기 중 정답 동물을 고르는 8라운드 관찰 놀이. 연속 정답 보너스와 `shadow-trail-match_best` 최고점 저장.
+- 두 게임 모두 단일 HTML, 외부 의존성 없음, 모바일 터치 우선, 시작/종료 오버레이, 홈 링크, SVG 썸네일 포함.
+- `games.json` 200→202, 고유 ID 202, `menu.json` kids 항목과 README 뱃지·상단문구·summary·목록을 실측 동기화.
+
 ## 2026-08-01 (굿모닝 wrapper, Codex)
 
 - 게임 2종 추가: `paper-fold-lab`(📄 종이 접기 연구소), `mirror-beam-rescue`(🔦 거울빛 구조대).
