@@ -1,8 +1,8 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 204개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 206개.
 
-[![Games](https://img.shields.io/badge/games-204-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-206-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 204개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 206개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🚀 우주 쓰레기 청소부 (space-garbage-collector)](./space-garbage-collector) | 30초 동안 우주 쓰레기를 모으고 운석을 피하세요! | 액션/반사 |
+| [📦 색깔 상자 쌓기 (color-box-stack)](./color-box-stack) | 화면을 터치해서 움직이는 상자를 떨어뜨려 높이 쌓아보세요! | 타이밍/퍼즐 |
 | [🚲 자전거 균형 타기 (bicycle-balance)](./bicycle-balance) | 균형 맞추며 페달 밟아 멀리 달리기 | 어린이/균형·타이밍 |
 | [🧊 냉장고 정리하기 (fridge-sort)](./fridge-sort) | 음식을 냉장·냉동·실온에 드래그 분류 | 어린이/생활인지 |
 | [🚀 로켓 순서 발사 (rocket-sequence-launch)](./rocket-sequence-launch) | 관제사가 보여주는 그림 명령을 기억하고 같은 순서로 눌러 6라운드 로켓을 발사해요! | 어린이/인지·순서 |

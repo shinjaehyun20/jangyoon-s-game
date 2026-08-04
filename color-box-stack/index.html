@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>색깔 상자 쌓기</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #f7cac9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      touch-action: none;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #header {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      z-index: 10;
+    }
+    #platform {
+      position: absolute;
+      bottom: 0;
+      width: 200px;
+      height: 50px;
+      background-color: #92a8d1;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 10px 10px 0 0;
+    }
+    .box {
+      position: absolute;
+      width: 100px;
+      height: 50px;
+      border-radius: 5px;
+      border: 2px solid #333;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    #moving-box {
+      top: 50px;
+    }
+    #start-screen, #game-over {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255,255,255,0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 30;
+      color: #333;
+    }
+    #game-over {
+      display: none;
+    }
+    h1 { font-size: 36px; margin-bottom: 10px; text-align: center; }
+    p { font-size: 20px; margin-bottom: 20px; text-align: center; }
+    button {
+      padding: 15px 30px;
+      font-size: 24px;
+      background-color: #034f84;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <h1>색깔 상자 쌓기 📦</h1>
+    <p>화면을 터치해서 움직이는 상자를 떨어뜨려 높이 쌓아보세요!</p>
+    <button id="start-btn">시작하기</button>
+  </div>
+  
+  <div id="game-container">
+    <div id="header">
+      <div>점수: <span id="score">0</span></div>
+    </div>
+    <div id="platform"></div>
+    <div id="moving-box" class="box" style="display:none; background-color: #f7786b;"></div>
+  </div>
+
+  <div id="game-over">
+    <h1>앗, 무너졌어요!</h1>
+    <p>최고 높이: <span id="final-score">0</span>층</p>
+    <button id="restart-btn">다시 하기</button>
+  </div>
+
+  <script>
+    const container = document.getElementById('game-container');
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over');
+    const movingBox = document.getElementById('moving-box');
+    const scoreEl = document.getElementById('score');
+    const finalScoreEl = document.getElementById('final-score');
+    
+    let score = 0;
+    let isPlaying = false;
+    let boxX = 0;
+    let boxDirection = 1;
+    let boxSpeed = 5;
+    let animationId;
+    let stackedBoxes = [];
+    
+    const colors = ['#f7786b', '#91a8d0', '#034f84', '#f6e8ea', '#b1cbbb', '#eea29a', '#c94c4c'];
+    
+    function updateMovingBox() {
+      if (!isPlaying) return;
+      
+      const containerWidth = container.clientWidth;
+      const boxWidth = 100;
+      
+      boxX += boxSpeed * boxDirection;
+      
+      if (boxX <= 0) {
+        boxX = 0;
+        boxDirection = 1;
+      } else if (boxX + boxWidth >= containerWidth) {
+        boxX = containerWidth - boxWidth;
+        boxDirection = -1;
+      }
+      
+      movingBox.style.left = boxX + 'px';
+      
+      animationId = requestAnimationFrame(updateMovingBox);
+    }
+    
+    function dropBox() {
+      if (!isPlaying) return;
+      
+      cancelAnimationFrame(animationId);
+      
+      const newBox = document.createElement('div');
+      newBox.className = 'box';
+      newBox.style.backgroundColor = movingBox.style.backgroundColor;
+      newBox.style.left = boxX + 'px';
+      
+      const targetY = container.clientHeight - 50 - ((score + 1) * 50);
+      newBox.style.top = movingBox.style.top;
+      container.appendChild(newBox);
+      
+      movingBox.style.display = 'none';
+      
+      // Fall animation
+      let currentY = 50;
+      const fallInterval = setInterval(() => {
+        currentY += 20;
+        newBox.style.top = currentY + 'px';
+        
+        if (currentY >= targetY) {
+          clearInterval(fallInterval);
+          newBox.style.top = targetY + 'px';
+          
+          checkStack(newBox);
+        }
+      }, 20);
+    }
+    
+    function checkStack(newBox) {
+      const boxRect = newBox.getBoundingClientRect();
+      let prevRect;
+      
+      if (stackedBoxes.length === 0) {
+        prevRect = document.getElementById('platform').getBoundingClientRect();
+      } else {
+        prevRect = stackedBoxes[stackedBoxes.length - 1].getBoundingClientRect();
+      }
+      
+      // Check overlap
+      if (boxRect.right < prevRect.left || boxRect.left > prevRect.right) {
+        // Missed
+        endGame();
+      } else {
+        // Stacked
+        stackedBoxes.push(newBox);
+        score++;
+        scoreEl.innerText = score;
+        
+        boxSpeed += 0.5;
+        
+        spawnNextBox();
+      }
+    }
+    
+    function spawnNextBox() {
+      movingBox.style.display = 'flex';
+      movingBox.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      movingBox.style.top = '50px';
+      boxX = Math.random() * (container.clientWidth - 100);
+      
+      // Move camera down (by moving everything else up) if stack is too high
+      if (score * 50 > container.clientHeight / 2) {
+        const offset = (score * 50) - (container.clientHeight / 2) + 100;
+        document.getElementById('platform').style.bottom = -offset + 'px';
+        stackedBoxes.forEach((box, index) => {
+          box.style.top = (container.clientHeight - 50 - ((index + 1) * 50) + offset) + 'px';
+        });
+      }
+      
+      updateMovingBox();
+    }
+    
+    function startGame() {
+      startScreen.style.display = 'none';
+      gameOverScreen.style.display = 'none';
+      
+      stackedBoxes.forEach(box => box.remove());
+      stackedBoxes = [];
+      score = 0;
+      boxSpeed = 5;
+      scoreEl.innerText = score;
+      document.getElementById('platform').style.bottom = '0px';
+      
+      isPlaying = true;
+      spawnNextBox();
+    }
+    
+    function endGame() {
+      isPlaying = false;
+      finalScoreEl.innerText = score;
+      gameOverScreen.style.display = 'flex';
+    }
+    
+    document.getElementById('start-btn').addEventListener('click', startGame);
+    document.getElementById('restart-btn').addEventListener('click', startGame);
+    
+    container.addEventListener('mousedown', dropBox);
+    container.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      dropBox();
+    }, {passive: false});
+  </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>우주 쓰레기 청소부</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0b0c10;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      touch-action: none;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #header {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 10;
+    }
+    #player {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      background-color: transparent;
+      font-size: 48px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+    }
+    .item {
+      position: absolute;
+      font-size: 40px;
+      user-select: none;
+    }
+    #game-over {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      display: none;
+      z-index: 20;
+    }
+    #game-over h1 { font-size: 48px; margin-bottom: 10px; }
+    #game-over p { font-size: 24px; margin-bottom: 20px; }
+    #restart-btn {
+      padding: 15px 30px;
+      font-size: 24px;
+      background-color: #45a29e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #start-screen {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #0b0c10;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 30;
+    }
+    #start-btn {
+      padding: 15px 30px;
+      font-size: 24px;
+      background-color: #45a29e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <h1>우주 쓰레기 청소부 🚀</h1>
+    <p>30초 동안 우주 쓰레기(🛢️, 🛰️)를 모으고 운석(☄️)을 피하세요!</p>
+    <button id="start-btn">시작하기</button>
+  </div>
+  <div id="game-container">
+    <div id="header">
+      <div>점수: <span id="score">0</span></div>
+      <div>시간: <span id="time">30</span></div>
+    </div>
+    <div id="player">🚀</div>
+    <div id="game-over">
+      <h1>시간 종료!</h1>
+      <p>최종 점수: <span id="final-score">0</span></p>
+      <button id="restart-btn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+    const player = document.getElementById('player');
+    const container = document.getElementById('game-container');
+    const scoreEl = document.getElementById('score');
+    const timeEl = document.getElementById('time');
+    const gameOverScreen = document.getElementById('game-over');
+    const startScreen = document.getElementById('start-screen');
+    const finalScoreEl = document.getElementById('final-score');
+    
+    let score = 0;
+    let timeLeft = 30;
+    let gameInterval, itemInterval;
+    let isPlaying = false;
+    let items = [];
+    
+    // Player movement
+    let isDragging = false;
+    
+    function setPlayerX(clientX) {
+      const rect = container.getBoundingClientRect();
+      let x = clientX - rect.left;
+      x = Math.max(30, Math.min(x, rect.width - 30));
+      player.style.left = x + 'px';
+    }
+
+    container.addEventListener('touchstart', e => {
+      isDragging = true;
+      setPlayerX(e.touches[0].clientX);
+    }, {passive: false});
+    container.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      setPlayerX(e.touches[0].clientX);
+    }, {passive: false});
+    container.addEventListener('touchend', () => isDragging = false);
+    container.addEventListener('mousedown', e => {
+      isDragging = true;
+      setPlayerX(e.clientX);
+    });
+    container.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      setPlayerX(e.clientX);
+    });
+    container.addEventListener('mouseup', () => isDragging = false);
+    container.addEventListener('mouseleave', () => isDragging = false);
+
+    function createItem() {
+      if (!isPlaying) return;
+      const types = [
+        { char: '🛢️', type: 'good', points: 10 },
+        { char: '🛰️', type: 'good', points: 10 },
+        { char: '☄️', type: 'bad', points: -10 }
+      ];
+      const type = types[Math.floor(Math.random() * types.length)];
+      const el = document.createElement('div');
+      el.className = 'item';
+      el.innerText = type.char;
+      el.dataset.type = type.type;
+      el.dataset.points = type.points;
+      
+      const x = Math.random() * (container.clientWidth - 40);
+      el.style.left = x + 'px';
+      el.style.top = '-50px';
+      container.appendChild(el);
+      items.push({ el, y: -50, speed: Math.random() * 3 + 3 });
+    }
+
+    function update() {
+      if (!isPlaying) return;
+      const playerRect = player.getBoundingClientRect();
+      
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.y += item.speed;
+        item.el.style.top = item.y + 'px';
+        
+        const itemRect = item.el.getBoundingClientRect();
+        
+        // Collision
+        if (
+          itemRect.bottom >= playerRect.top &&
+          itemRect.top <= playerRect.bottom &&
+          itemRect.right >= playerRect.left &&
+          itemRect.left <= playerRect.right
+        ) {
+          score += parseInt(item.el.dataset.points);
+          scoreEl.innerText = score;
+          item.el.remove();
+          items.splice(i, 1);
+          continue;
+        }
+        
+        // Out of bounds
+        if (item.y > container.clientHeight) {
+          if (item.el.dataset.type === 'good') {
+            score = Math.max(0, score - 5);
+            scoreEl.innerText = score;
+          }
+          item.el.remove();
+          items.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(update);
+    }
+
+    function startGame() {
+      startScreen.style.display = 'none';
+      gameOverScreen.style.display = 'none';
+      score = 0;
+      timeLeft = 30;
+      scoreEl.innerText = score;
+      timeEl.innerText = timeLeft;
+      isPlaying = true;
+      items.forEach(i => i.el.remove());
+      items = [];
+      
+      itemInterval = setInterval(createItem, 800);
+      gameInterval = setInterval(() => {
+        timeLeft--;
+        timeEl.innerText = timeLeft;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+      
+      requestAnimationFrame(update);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(itemInterval);
+      clearInterval(gameInterval);
+      finalScoreEl.innerText = score;
+      gameOverScreen.style.display = 'flex';
+    }
+
+    document.getElementById('start-btn').addEventListener('click', startGame);
+    document.getElementById('restart-btn').addEventListener('click', startGame);
+  </script>
+</body>
+</html>

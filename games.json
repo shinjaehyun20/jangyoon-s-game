@@ -1,5 +1,21 @@
 [
   {
+    "id": "space-garbage-collector",
+    "title": "Space Garbage Collector",
+    "title_ko": "🚀 우주 쓰레기 청소부",
+    "description": "30초 동안 우주 쓰레기를 모으고 운석을 피하세요!",
+    "thumbnail": "space-garbage-collector/thumb.svg",
+    "path": "space-garbage-collector/index.html"
+  },
+  {
+    "id": "color-box-stack",
+    "title": "Color Box Stack",
+    "title_ko": "📦 색깔 상자 쌓기",
+    "description": "화면을 터치해서 움직이는 상자를 떨어뜨려 높이 쌓아보세요!",
+    "thumbnail": "color-box-stack/thumb.svg",
+    "path": "color-box-stack/index.html"
+  },
+  {
     "id": "gemini-space-bubble",
     "title": "Gemini Space Bubble Pop",
     "title_ko": "🫧 제미니 우주 방울 팡팡",

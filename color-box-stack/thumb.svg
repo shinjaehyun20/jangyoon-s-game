@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <rect width="320" height="180" fill="#2c3e50" />
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+  <rect x="135" y="100" width="50" height="25" fill="#f7786b" rx="2" />
+  <rect x="120" y="70" width="50" height="25" fill="#91a8d0" rx="2" />
+  <rect x="145" y="40" width="50" height="25" fill="#b1cbbb" rx="2" />
+  <text x="160" y="140" fill="white" font-size="22" font-weight="bold" font-family="'Pretendard', 'Noto Sans KR', sans-serif" text-anchor="middle">색깔 상자 쌓기</text>
+  <text x="160" y="160" fill="#aaaaaa" font-size="10" font-family="'Pretendard', 'Noto Sans KR', sans-serif" letter-spacing="2" text-anchor="middle">COLOR BOX STACK</text>
+</svg>
