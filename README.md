@@ -1,8 +1,8 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 208개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 210개.
 
-[![Games](https://img.shields.io/badge/games-208-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-210-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 208개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 210개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🔍 숨은 그림 찾기 챌린지 (hidden-object-hunt)](./games/hidden-object-hunt) | 그림 속에 숨겨진 5개의 물건을 찾아 탭하세요! | 관찰/퍼즐 |
+| [🎵 리듬 터치 타임 (rhythm-touch-beat)](./games/rhythm-touch-beat) | 원형 박자 링이 축소되어 겹칠 때 탭! 리듬감 퍼즐 | 리듬/반응 |
 | [🎨 색깔 기억 챌린지 (color-memory-challenge)](./color-memory-challenge) | 색깔 패턴을 기억하고 같은 순서로 탭해보세요! | 기억/인지 |
 | [🐾 동물 소리 퀴즈 (animal-sound-quiz)](./animal-sound-quiz) | 동물 이모지를 보고 이름과 울음소리를 맞혀보세요! | 학습/퀴즈 |
 | [🚀 우주 쓰레기 청소부 (space-garbage-collector)](./space-garbage-collector) | 30초 동안 우주 쓰레기를 모으고 운석을 피하세요! | 액션/반사 |

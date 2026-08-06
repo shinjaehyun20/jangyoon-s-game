@@ -1,5 +1,21 @@
 [
   {
+    "id": "hidden-object-hunt",
+    "title": "Hidden Object Hunt",
+    "title_ko": "🔍 숨은 그림 찾기 챌린지",
+    "description": "그림 속에 숨겨진 5개의 물건을 찾아 탭하세요! 45초 안에 모두 찾아내는 관찰력 퍼즐.",
+    "thumbnail": "hidden-object-hunt/thumb.svg",
+    "path": "hidden-object-hunt/index.html"
+  },
+  {
+    "id": "rhythm-touch-beat",
+    "title": "Rhythm Touch Beat",
+    "title_ko": "🎵 리듬 터치 타임",
+    "description": "동그란 박자 링이 작아져 노란 원에 닿는 순간 탭! 콤보를 이어가며 리듬감을 키워봐요.",
+    "thumbnail": "rhythm-touch-beat/thumb.svg",
+    "path": "rhythm-touch-beat/index.html"
+  },
+  {
     "id": "color-memory-challenge",
     "title": "Color Memory Challenge",
     "title_ko": "🎨 색깔 기억 챌린지",
