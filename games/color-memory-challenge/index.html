@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>🎨 색깔 기억 챌린지</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(135deg, #1a0533 0%, #2d1b69 50%, #11294f 100%);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    #game-wrap {
+      width: min(420px, 100vw);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    h1 {
+      font-size: clamp(1.3rem, 5vw, 1.8rem);
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+
+    #status-bar {
+      display: flex;
+      gap: 20px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 6px 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #message {
+      font-size: clamp(1rem, 4vw, 1.25rem);
+      font-weight: 800;
+      min-height: 2em;
+      text-align: center;
+      color: #ffd166;
+      text-shadow: 0 0 12px rgba(255,209,102,0.6);
+    }
+
+    #sequence-display {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+
+    .color-pad {
+      aspect-ratio: 1;
+      border-radius: 18px;
+      border: 3px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: transform 0.08s, filter 0.08s, border-color 0.1s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .color-pad::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background 0.1s;
+      border-radius: inherit;
+    }
+
+    .color-pad.lit::after {
+      background: rgba(255,255,255,0.45);
+    }
+
+    .color-pad:active, .color-pad.pressed {
+      transform: scale(0.93);
+      filter: brightness(1.3);
+      border-color: rgba(255,255,255,0.8);
+    }
+
+    .color-pad.wrong {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+
+    #progress-bar-wrap {
+      width: 100%;
+      height: 10px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #06d6a0, #3dc9ff);
+      border-radius: 99px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    #start-btn, #restart-btn {
+      background: linear-gradient(135deg, #ff6b9d, #ffd166);
+      border: none;
+      border-radius: 99px;
+      padding: 14px 40px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #1a0533;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255,107,157,0.4);
+      transition: transform 0.1s, box-shadow 0.1s;
+      letter-spacing: 0.5px;
+    }
+
+    #start-btn:active, #restart-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 10px rgba(255,107,157,0.3);
+    }
+
+    #level-stars {
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+    }
+
+    .hidden { display: none !important; }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,5,30,0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    #overlay h2 {
+      font-size: clamp(1.5rem, 6vw, 2.2rem);
+      text-align: center;
+    }
+
+    #overlay p {
+      font-size: 1.1rem;
+      color: #d7d5ec;
+      text-align: center;
+    }
+
+    #final-score {
+      font-size: clamp(2.5rem, 10vw, 4rem);
+      font-weight: 900;
+      color: #ffd166;
+      text-shadow: 0 0 20px rgba(255,209,102,0.7);
+    }
+
+    .emoji-big {
+      font-size: clamp(3rem, 12vw, 5rem);
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay">
+  <div class="emoji-big">🎨</div>
+  <h2>색깔 기억 챌린지</h2>
+  <p>색깔 패턴을 잘 보고 기억한 뒤<br>같은 순서로 탭해봐!</p>
+  <button id="start-btn" onclick="startGame()">게임 시작!</button>
+</div>
+
+<div id="game-wrap">
+  <h1>🎨 색깔 기억 챌린지</h1>
+
+  <div id="status-bar">
+    <div class="stat">🎯 레벨 <span id="level-num">1</span></div>
+    <div class="stat">⭐ <span id="score-num">0</span>점</div>
+    <div class="stat">❤️ <span id="lives-num">3</span></div>
+  </div>
+
+  <div id="level-stars">⭐⭐⭐</div>
+
+  <div id="message">준비하세요!</div>
+
+  <div id="progress-bar-wrap">
+    <div id="progress-bar"></div>
+  </div>
+
+  <div id="sequence-display">
+    <!-- color pads generated by JS -->
+  </div>
+</div>
+
+<script>
+  const COLORS = [
+    { name: '빨강', hex: '#ff4757', emoji: '🔴' },
+    { name: '파랑', hex: '#1e90ff', emoji: '🔵' },
+    { name: '초록', hex: '#2ed573', emoji: '🟢' },
+    { name: '노랑', hex: '#ffd166', emoji: '🟡' },
+    { name: '보라', hex: '#a855f7', emoji: '🟣' },
+    { name: '주황', hex: '#ff7f50', emoji: '🟠' },
+    { name: '하늘', hex: '#00d2ff', emoji: '🩵' },
+    { name: '분홍', hex: '#ff6b9d', emoji: '🩷' },
+  ];
+
+  let sequence = [];
+  let playerSeq = [];
+  let level = 1;
+  let score = 0;
+  let lives = 3;
+  let canInput = false;
+  let gameOver = false;
+
+  function buildPads() {
+    const container = document.getElementById('sequence-display');
+    container.innerHTML = '';
+    COLORS.forEach((c, i) => {
+      const div = document.createElement('div');
+      div.className = 'color-pad';
+      div.style.background = `radial-gradient(circle at 30% 30%, ${lighten(c.hex)}, ${c.hex})`;
+      div.dataset.idx = i;
+      div.innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(1.6rem,6vw,2.2rem)">${c.emoji}</div>`;
+      div.addEventListener('pointerdown', () => onPadTap(i, div));
+      container.appendChild(div);
+    });
+  }
+
+  function lighten(hex) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgb(${Math.min(r+60,255)},${Math.min(g+60,255)},${Math.min(b+60,255)})`;
+  }
+
+  function getPads() {
+    return document.querySelectorAll('.color-pad');
+  }
+
+  function flashPad(idx, duration=420) {
+    return new Promise(resolve => {
+      const pad = getPads()[idx];
+      pad.classList.add('lit');
+      setTimeout(() => {
+        pad.classList.remove('lit');
+        resolve();
+      }, duration);
+    });
+  }
+
+  async function playSequence() {
+    canInput = false;
+    setMessage('👀 잘 봐봐!');
+    await sleep(600);
+    for (let i = 0; i < sequence.length; i++) {
+      await flashPad(sequence[i], 400);
+      await sleep(180);
+    }
+    setMessage('🖐 이제 네 차례!');
+    playerSeq = [];
+    updateProgress(0);
+    canInput = true;
+  }
+
+  async function startGame() {
+    document.getElementById('overlay').classList.add('hidden');
+    gameOver = false;
+    sequence = [];
+    playerSeq = [];
+    level = 1;
+    score = 0;
+    lives = 3;
+    updateUI();
+    buildPads();
+    await sleep(400);
+    await nextLevel();
+  }
+
+  async function nextLevel() {
+    updateStars();
+    const seqLen = Math.min(2 + level, 12);
+    sequence.push(Math.floor(Math.random() * COLORS.length));
+    while (sequence.length < seqLen) {
+      sequence.push(Math.floor(Math.random() * COLORS.length));
+    }
+    await sleep(700);
+    await playSequence();
+  }
+
+  async function onPadTap(idx, el) {
+    if (!canInput || gameOver) return;
+    el.classList.add('pressed');
+    await flashPad(idx, 200);
+    el.classList.remove('pressed');
+
+    playerSeq.push(idx);
+    const pos = playerSeq.length - 1;
+
+    if (playerSeq[pos] !== sequence[pos]) {
+      // Wrong
+      el.classList.add('wrong');
+      setTimeout(() => el.classList.remove('wrong'), 500);
+      lives--;
+      updateUI();
+      setMessage(`❌ 틀렸어! ❤️ ${lives}개 남았어`);
+      canInput = false;
+      await sleep(900);
+      if (lives <= 0) {
+        endGame();
+        return;
+      }
+      playerSeq = [];
+      updateProgress(0);
+      await playSequence();
+      return;
+    }
+
+    updateProgress(playerSeq.length / sequence.length * 100);
+
+    if (playerSeq.length === sequence.length) {
+      // Level clear!
+      canInput = false;
+      score += level * 10;
+      updateUI();
+      setMessage(`✅ 완벽! +${level * 10}점`);
+      await sleep(900);
+      level++;
+      updateUI();
+      await nextLevel();
+    }
+  }
+
+  function endGame() {
+    gameOver = true;
+    canInput = false;
+    const overlay = document.getElementById('overlay');
+    overlay.innerHTML = `
+      <div class="emoji-big">${score >= 100 ? '🏆' : score >= 50 ? '🥈' : '🎮'}</div>
+      <h2>게임 종료!</h2>
+      <div id="final-score">${score}점</div>
+      <p>레벨 ${level}까지 도달했어!<br>대단한데? 다시 도전해봐! 💪</p>
+      <button id="restart-btn" onclick="startGame()">다시 하기!</button>
+    `;
+    overlay.classList.remove('hidden');
+  }
+
+  function updateUI() {
+    document.getElementById('level-num').textContent = level;
+    document.getElementById('score-num').textContent = score;
+    document.getElementById('lives-num').textContent = lives;
+  }
+
+  function updateStars() {
+    const stars = document.getElementById('level-stars');
+    const count = Math.min(level, 8);
+    stars.textContent = '⭐'.repeat(count);
+  }
+
+  function updateProgress(pct) {
+    document.getElementById('progress-bar').style.width = pct + '%';
+  }
+
+  function setMessage(msg) {
+    document.getElementById('message').textContent = msg;
+  }
+
+  function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+</script>
+</body>
+</html>

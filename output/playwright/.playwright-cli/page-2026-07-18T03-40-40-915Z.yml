@@ -1,0 +1,32 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - heading "♻️ 분리수거 구조대" [level=1] [ref=e3]
+    - generic [ref=e4]:
+      - generic [ref=e5]: 점수 0
+      - generic [ref=e6]: 연속 0
+      - generic [ref=e7]: 시간 40
+    - region "분리수거 게임 영역" [ref=e8]:
+      - generic [ref=e9]: 물건을 알맞은 통으로 끌어 주세요!
+      - generic [ref=e10]: ☁️
+      - generic [ref=e11]: ☁️
+      - button "분류할 물건" [ref=e12]: 📒
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]: 📦
+          - text: 종이
+        - generic [ref=e16]:
+          - generic [ref=e17]: 🧴
+          - text: 플라스틱
+        - generic [ref=e18]:
+          - generic [ref=e19]: 🥫
+          - text: 캔
+    - generic [ref=e20]:
+      - generic [ref=e21]: 끌어서 쏙! 지구가 깨끗해져요.
+      - link "← 홈으로" [ref=e22] [cursor=pointer]:
+        - /url: ../index.html
+  - generic [ref=e24]:
+    - heading "♻️ 분리수거 구조대" [level=2] [ref=e25]
+    - paragraph [ref=e26]: 물건을 손가락으로 끌어알맞은 분리수거 통에 넣어요.
+    - generic [ref=e27]: 📰 → 📦
+    - paragraph [ref=e28]: 틀려도 감점 없이 다시 도전!
+    - button "시작!" [ref=e29] [cursor=pointer]

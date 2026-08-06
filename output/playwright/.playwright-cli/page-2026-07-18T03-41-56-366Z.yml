@@ -1,0 +1,22 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - heading "🌙 달빛 순서 탐험" [level=1] [ref=e3]
+    - generic [ref=e4]:
+      - generic [ref=e5]: 단계 1/5
+      - generic [ref=e6]: 별 0
+      - generic [ref=e7]: 최고 0
+    - region "달 모양 순서 게임" [ref=e8]:
+      - paragraph [ref=e9]:
+        - text: 가느다란 달부터
+        - strong [ref=e10]: 점점 밝아지는 순서
+        - text: 로 눌러요!
+    - generic [ref=e11]:
+      - generic [ref=e12]: 달은 매일 조금씩 모양이 달라져요.
+      - link "← 홈으로" [ref=e13] [cursor=pointer]:
+        - /url: ../index.html
+  - generic [ref=e15]:
+    - heading "🌙 달빛 순서 탐험" [level=2] [ref=e16]
+    - paragraph [ref=e17]: 섞여 있는 달을 눌러가느다란 달부터 보름달까지 이어요.
+    - generic [ref=e18]: 🌑 🌒 🌓 🌕
+    - paragraph [ref=e19]: 틀려도 별은 줄지 않아요!
+    - button "시작!" [ref=e20] [cursor=pointer]

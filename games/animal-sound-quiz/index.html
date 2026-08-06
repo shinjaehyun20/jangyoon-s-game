@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>🐾 동물 소리 퀴즈</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(135deg, #0d2b0a 0%, #1a4d1a 40%, #0b3322 100%);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    #game-wrap {
+      width: min(440px, 100vw);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    h1 {
+      font-size: clamp(1.3rem, 5vw, 1.8rem);
+      text-align: center;
+    }
+
+    #status-bar {
+      display: flex;
+      gap: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 6px 16px;
+    }
+
+    #timer-bar-wrap {
+      width: 100%;
+      height: 10px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    #timer-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #06d6a0, #ffd166);
+      border-radius: 99px;
+      transition: width 0.1s linear;
+      width: 100%;
+    }
+
+    #timer-bar.danger {
+      background: linear-gradient(90deg, #ff4757, #ff9f43);
+    }
+
+    #animal-display {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 4px solid rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: transform 0.15s;
+      position: relative;
+    }
+
+    #animal-display.reveal {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    #question-text {
+      font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+      font-weight: 800;
+      text-align: center;
+      color: #a8edbc;
+      min-height: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #hint-text {
+      font-size: clamp(0.9rem, 3.5vw, 1.05rem);
+      text-align: center;
+      color: rgba(255,255,255,0.6);
+      min-height: 1.5em;
+      font-style: italic;
+    }
+
+    #choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .choice-btn {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      padding: 14px 10px;
+      font-size: clamp(1rem, 4vw, 1.2rem);
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.08s, background 0.1s, border-color 0.1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .choice-btn:active {
+      transform: scale(0.95);
+    }
+
+    .choice-btn.correct {
+      background: rgba(46, 213, 115, 0.35);
+      border-color: #2ed573;
+      animation: pop 0.3s ease;
+    }
+
+    .choice-btn.wrong {
+      background: rgba(255, 71, 87, 0.35);
+      border-color: #ff4757;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-7px); }
+      75% { transform: translateX(7px); }
+    }
+
+    #start-btn {
+      background: linear-gradient(135deg, #2ed573, #06d6a0);
+      border: none;
+      border-radius: 99px;
+      padding: 14px 44px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #0d2b0a;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(46,213,115,0.4);
+      transition: transform 0.1s;
+      letter-spacing: 0.5px;
+    }
+
+    #start-btn:active { transform: scale(0.95); }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5,20,5,0.94);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    #overlay h2 {
+      font-size: clamp(1.5rem, 6vw, 2.2rem);
+      text-align: center;
+    }
+
+    #overlay p {
+      font-size: 1rem;
+      color: #c8f7d8;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    #final-score {
+      font-size: clamp(2.5rem, 10vw, 4rem);
+      font-weight: 900;
+      color: #2ed573;
+      text-shadow: 0 0 20px rgba(46,213,115,0.7);
+    }
+
+    #final-detail {
+      font-size: 1.1rem;
+      color: #a8edbc;
+      text-align: center;
+    }
+
+    .emoji-big { font-size: clamp(3rem, 12vw, 5rem); }
+
+    #result-flash {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 5rem;
+      z-index: 50;
+      transition: transform 0.15s ease, opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #result-flash.show {
+      transform: translate(-50%, -50%) scale(1.2);
+      opacity: 1;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div id="result-flash"></div>
+
+<div id="overlay">
+  <div class="emoji-big">🐾</div>
+  <h2>동물 소리 퀴즈</h2>
+  <p>동물 이모지를 보고<br>이름과 울음소리를 맞춰봐!<br>⏱ 10초 안에 답해야 해!</p>
+  <button id="start-btn" onclick="startGame()">게임 시작!</button>
+</div>
+
+<div id="game-wrap">
+  <h1>🐾 동물 소리 퀴즈</h1>
+
+  <div id="status-bar">
+    <div class="stat">🏅 <span id="score-num">0</span>점</div>
+    <div class="stat">✅ <span id="correct-num">0</span>맞음</div>
+    <div class="stat">📋 <span id="q-num">0</span>/<span id="q-total">10</span></div>
+  </div>
+
+  <div id="timer-bar-wrap">
+    <div id="timer-bar"></div>
+  </div>
+
+  <div id="animal-display">❓</div>
+
+  <div id="question-text">동물 이름은 무엇일까요?</div>
+  <div id="hint-text">잠깐, 생각해봐!</div>
+
+  <div id="choices">
+    <!-- Generated by JS -->
+  </div>
+</div>
+
+<script>
+  const ANIMALS = [
+    { emoji: '🐶', name: '강아지', sound: '멍멍!', hint: '집에서 키우는 귀여운 친구' },
+    { emoji: '🐱', name: '고양이', sound: '야옹~', hint: '수염이 있고 조용히 걸어요' },
+    { emoji: '🐮', name: '소', sound: '음메~', hint: '우유를 만들어 줘요' },
+    { emoji: '🐷', name: '돼지', sound: '꿀꿀!', hint: '코가 동그랗고 귀여워요' },
+    { emoji: '🐸', name: '개구리', sound: '개굴개굴!', hint: '폴짝폴짝 뛰어요' },
+    { emoji: '🐔', name: '닭', sound: '꼬끼오!', hint: '아침에 일어나라고 알려줘요' },
+    { emoji: '🐧', name: '펭귄', sound: '끼룩끼룩!', hint: '남극에 살아요' },
+    { emoji: '🐻', name: '곰', sound: '으르렁!', hint: '겨울에 잠을 자요' },
+    { emoji: '🐯', name: '호랑이', sound: '어흥!', hint: '줄무늬가 있어요' },
+    { emoji: '🦁', name: '사자', sound: '으르렁!', hint: '갈기가 있는 동물의 왕' },
+    { emoji: '🐘', name: '코끼리', sound: '뿌우~', hint: '코가 아주 길어요' },
+    { emoji: '🐬', name: '돌고래', sound: '끼익끼익!', hint: '바다에서 헤엄쳐요' },
+    { emoji: '🐸', name: '개구리', sound: '개굴개굴!', hint: '연못에 살아요' },
+    { emoji: '🐦', name: '새', sound: '짹짹!', hint: '하늘을 날아요' },
+    { emoji: '🐝', name: '꿀벌', sound: '윙윙~', hint: '꿀을 만들어요' },
+    { emoji: '🦊', name: '여우', sound: '낑낑~', hint: '꼬리가 길고 영리해요' },
+    { emoji: '🐺', name: '늑대', sound: '우우~', hint: '달을 보고 울어요' },
+    { emoji: '🐼', name: '판다', sound: '끙끙!', hint: '대나무를 먹어요' },
+    { emoji: '🦒', name: '기린', sound: '음~ 음~', hint: '목이 아주 길어요' },
+    { emoji: '🦓', name: '얼룩말', sound: '히히잉~', hint: '흑백 줄무늬가 있어요' },
+    { emoji: '🐊', name: '악어', sound: '쿨쿨~', hint: '이빨이 무서워요' },
+    { emoji: '🐨', name: '코알라', sound: '끙끙!', hint: '유칼립투스를 먹어요' },
+    { emoji: '🦋', name: '나비', sound: '...', hint: '꽃 위에서 날아다녀요' },
+    { emoji: '🐢', name: '거북이', sound: '...', hint: '느리지만 오래 살아요' },
+    { emoji: '🦜', name: '앵무새', sound: '이야기해요!', hint: '말을 따라 할 수 있어요' },
+    { emoji: '🦆', name: '오리', sound: '꽥꽥!', hint: '물 위를 헤엄쳐요' },
+    { emoji: '🐓', name: '수탉', sound: '꼬끼오!', hint: '볏이 빨개요' },
+    { emoji: '🦅', name: '독수리', sound: '끼얏호~', hint: '하늘 높이 날아요' },
+    { emoji: '🐙', name: '문어', sound: '...', hint: '다리가 8개예요' },
+    { emoji: '🦈', name: '상어', sound: '...', hint: '바다의 무서운 물고기' },
+  ];
+
+  const TOTAL_QUESTIONS = 10;
+  const TIME_LIMIT = 10000;
+
+  let currentAnimal = null;
+  let choices = [];
+  let questionCount = 0;
+  let score = 0;
+  let correctCount = 0;
+  let canAnswer = false;
+  let timerInterval = null;
+  let timerStart = null;
+  let usedAnimals = [];
+
+  function shuffle(arr) {
+    return [...arr].sort(() => Math.random() - 0.5);
+  }
+
+  function pickAnimal() {
+    const available = ANIMALS.filter((a, i) => !usedAnimals.includes(i));
+    if (available.length === 0) {
+      usedAnimals = [];
+    }
+    const filtered = ANIMALS.filter((_, i) => !usedAnimals.includes(i));
+    const idx = Math.floor(Math.random() * filtered.length);
+    const originalIdx = ANIMALS.indexOf(filtered[idx]);
+    usedAnimals.push(originalIdx);
+    return filtered[idx];
+  }
+
+  function getWrongChoices(correctAnimal, count) {
+    const others = ANIMALS.filter(a => a.name !== correctAnimal.name);
+    const shuffled = shuffle(others);
+    const unique = [];
+    const seen = new Set([correctAnimal.name]);
+    for (const a of shuffled) {
+      if (!seen.has(a.name)) {
+        seen.add(a.name);
+        unique.push(a);
+        if (unique.length >= count) break;
+      }
+    }
+    return unique;
+  }
+
+  async function startGame() {
+    document.getElementById('overlay').classList.add('hidden');
+    questionCount = 0;
+    score = 0;
+    correctCount = 0;
+    usedAnimals = [];
+    updateUI();
+    await sleep(300);
+    nextQuestion();
+  }
+
+  function nextQuestion() {
+    if (questionCount >= TOTAL_QUESTIONS) {
+      endGame();
+      return;
+    }
+
+    questionCount++;
+    currentAnimal = pickAnimal();
+
+    const wrongs = getWrongChoices(currentAnimal, 3);
+    choices = shuffle([currentAnimal, ...wrongs]);
+
+    document.getElementById('animal-display').textContent = currentAnimal.emoji;
+    document.getElementById('animal-display').classList.remove('reveal');
+    document.getElementById('question-text').textContent = '이 동물의 이름은?';
+    document.getElementById('hint-text').textContent = `💡 힌트: ${currentAnimal.hint}`;
+
+    updateUI();
+    buildChoices();
+    startTimer();
+    canAnswer = true;
+  }
+
+  function buildChoices() {
+    const container = document.getElementById('choices');
+    container.innerHTML = '';
+    choices.forEach(animal => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.innerHTML = `<span style="font-size:1.8em">${animal.emoji}</span><span>${animal.name}</span><span style="font-size:0.8em;color:rgba(255,255,255,0.6)">${animal.sound}</span>`;
+      btn.addEventListener('click', () => onChoiceClick(animal, btn));
+      container.appendChild(btn);
+    });
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerStart = Date.now();
+    const bar = document.getElementById('timer-bar');
+    bar.style.width = '100%';
+    bar.classList.remove('danger');
+
+    timerInterval = setInterval(() => {
+      const elapsed = Date.now() - timerStart;
+      const pct = Math.max(0, 100 - (elapsed / TIME_LIMIT * 100));
+      bar.style.width = pct + '%';
+      if (pct < 30) bar.classList.add('danger');
+      if (elapsed >= TIME_LIMIT) {
+        clearInterval(timerInterval);
+        onTimeout();
+      }
+    }, 50);
+  }
+
+  async function onChoiceClick(animal, btn) {
+    if (!canAnswer) return;
+    canAnswer = false;
+    clearInterval(timerInterval);
+
+    const isCorrect = animal.name === currentAnimal.name;
+
+    if (isCorrect) {
+      const timeBonus = Math.round((1 - (Date.now() - timerStart) / TIME_LIMIT) * 50);
+      const gained = 10 + Math.max(0, timeBonus);
+      score += gained;
+      correctCount++;
+      btn.classList.add('correct');
+      document.getElementById('animal-display').classList.add('reveal');
+      showFlash('⭕');
+      document.getElementById('question-text').textContent = `✅ 맞아! ${currentAnimal.sound} (+${gained}점)`;
+      document.getElementById('hint-text').textContent = `빨리 맞출수록 보너스 점수!`;
+    } else {
+      btn.classList.add('wrong');
+      // Highlight correct
+      document.querySelectorAll('.choice-btn').forEach(b => {
+        const name = b.querySelector('span:nth-child(2)').textContent;
+        if (name === currentAnimal.name) b.classList.add('correct');
+      });
+      document.getElementById('animal-display').classList.add('reveal');
+      showFlash('❌');
+      document.getElementById('question-text').textContent = `❌ 틀렸어! 정답: ${currentAnimal.name}`;
+      document.getElementById('hint-text').textContent = `${currentAnimal.emoji} ${currentAnimal.sound}`;
+    }
+
+    updateUI();
+    await sleep(1200);
+    hideFlash();
+    nextQuestion();
+  }
+
+  async function onTimeout() {
+    if (!canAnswer) return;
+    canAnswer = false;
+    // Highlight correct
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      const name = b.querySelector('span:nth-child(2)').textContent;
+      if (name === currentAnimal.name) b.classList.add('correct');
+    });
+    document.getElementById('animal-display').classList.add('reveal');
+    showFlash('⏰');
+    document.getElementById('question-text').textContent = `⏰ 시간 초과! 정답: ${currentAnimal.name}`;
+    document.getElementById('hint-text').textContent = `다음엔 더 빨리! ${currentAnimal.sound}`;
+
+    await sleep(1400);
+    hideFlash();
+    nextQuestion();
+  }
+
+  function showFlash(emoji) {
+    const el = document.getElementById('result-flash');
+    el.textContent = emoji;
+    el.classList.add('show');
+  }
+
+  function hideFlash() {
+    document.getElementById('result-flash').classList.remove('show');
+  }
+
+  function endGame() {
+    const rank = correctCount >= 9 ? '🏆 천재!' : correctCount >= 7 ? '🥇 대단해!' : correctCount >= 5 ? '🥈 잘했어!' : '🎮 연습해봐!';
+    const overlay = document.getElementById('overlay');
+    overlay.innerHTML = `
+      <div class="emoji-big">${correctCount >= 8 ? '🏆' : correctCount >= 5 ? '🎉' : '🐾'}</div>
+      <h2>퀴즈 완료!</h2>
+      <div id="final-score">${score}점</div>
+      <div id="final-detail">✅ ${correctCount}/${TOTAL_QUESTIONS}개 맞춤<br>${rank}</div>
+      <p>동물 친구들을 얼마나 알고 있었니?<br>더 많이 알아보고 다시 도전해봐! 🌿</p>
+      <button id="start-btn" onclick="startGame()">다시 하기!</button>
+    `;
+    overlay.classList.remove('hidden');
+  }
+
+  function updateUI() {
+    document.getElementById('score-num').textContent = score;
+    document.getElementById('correct-num').textContent = correctCount;
+    document.getElementById('q-num').textContent = questionCount;
+    document.getElementById('q-total').textContent = TOTAL_QUESTIONS;
+  }
+
+  function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+</script>
+</body>
+</html>

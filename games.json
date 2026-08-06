@@ -1,5 +1,21 @@
 [
   {
+    "id": "color-memory-challenge",
+    "title": "Color Memory Challenge",
+    "title_ko": "🎨 색깔 기억 챌린지",
+    "description": "색깔 패턴을 기억하고 같은 순서로 탭해보세요! 레벨이 올라갈수록 패턴이 길어져요.",
+    "thumbnail": "color-memory-challenge/thumb.svg",
+    "path": "color-memory-challenge/index.html"
+  },
+  {
+    "id": "animal-sound-quiz",
+    "title": "Animal Sound Quiz",
+    "title_ko": "🐾 동물 소리 퀴즈",
+    "description": "동물 이모지를 보고 이름과 울음소리를 맞혀보세요! 10초 안에 답해야 해요.",
+    "thumbnail": "animal-sound-quiz/thumb.svg",
+    "path": "animal-sound-quiz/index.html"
+  },
+  {
     "id": "space-garbage-collector",
     "title": "Space Garbage Collector",
     "title_ko": "🚀 우주 쓰레기 청소부",

@@ -1,0 +1,8 @@
+127.0.0.1 - - [18/Jul/2026 12:40:15] "GET /recycle-rescue/ HTTP/1.1" 200 -
+127.0.0.1 - - [18/Jul/2026 12:40:27] "GET /recycle-rescue/ HTTP/1.1" 200 -
+127.0.0.1 - - [18/Jul/2026 12:40:40] "GET /recycle-rescue/ HTTP/1.1" 200 -
+127.0.0.1 - - [18/Jul/2026 12:40:40] code 404, message File not found
+127.0.0.1 - - [18/Jul/2026 12:40:40] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [18/Jul/2026 12:41:10] "GET /recycle-rescue/ HTTP/1.1" 200 -
+127.0.0.1 - - [18/Jul/2026 12:41:56] "GET /moon-phase-quest/ HTTP/1.1" 200 -
+127.0.0.1 - - [18/Jul/2026 12:41:57] "GET /moon-phase-quest/ HTTP/1.1" 304 -
