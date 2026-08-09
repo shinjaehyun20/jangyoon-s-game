@@ -10,3 +10,7 @@
 ## 2026-07-30 발견·해소 (PHASE 4, nyx)
 
 - [x] README.md 게임 표에 `typing-web`(외부 GitHub Pages 배포 항목, games.json에는 존재하나 로컬 `./id` 링크 패턴과 달라 누락) 1건 미반영 — 해소 2026-07-30 (표 193→194행, 외부 링크 형태로 추가, games.json/README 실측 diff로 재검증 완료)
+
+## 2026-08-09 발견 (일일 게임 제작, nyx)
+
+- [ ] `hidden-object-hunt`·`rhythm-touch-beat`(커밋 a919eae, 2026-08-07 배포)가 README.md "최근 변경사항" 섹션 및 CHANGES.md 양쪽에 변경 이력 항목이 없다. games.json/menu.json에는 정상 등록되어 있어 카탈로그 노출·플레이 기능상 문제는 없음(README 게임 표에는 이미 반영되어 있음, 208줄 확인) — 순수 변경 이력 문서(최근변경/CHANGES) 누락. 다음 회차(내일 게임 제작 세션) 최우선 처리: 두 게임의 실제 index.html을 열람해 메커니즘·차별화 포인트를 확인한 뒤 README "최근 변경사항 (2026-08)"과 CHANGES.md에 2026-08-07 날짜 항목으로 소급 추가.

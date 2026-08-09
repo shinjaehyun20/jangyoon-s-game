@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 210개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 212개.
 
-[![Games](https://img.shields.io/badge/games-210-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-212-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![204개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![212개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 210개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 212개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🥁 동물 밴드 연주 (percussion-band)](./percussion-band) | 악기 연주 순서를 기억하고 똑같이 따라 눌러보세요! | 기억/인지 |
+| [🍂 계절 옷장 분류 (season-sort)](./season-sort) | 옷과 물건을 알맞은 계절 칸으로 드래그! | 인지/학습 |
 | [🔍 숨은 그림 찾기 챌린지 (hidden-object-hunt)](./games/hidden-object-hunt) | 그림 속에 숨겨진 5개의 물건을 찾아 탭하세요! | 관찰/퍼즐 |
 | [🎵 리듬 터치 타임 (rhythm-touch-beat)](./games/rhythm-touch-beat) | 원형 박자 링이 축소되어 겹칠 때 탭! 리듬감 퍼즐 | 리듬/반응 |
 | [🎨 색깔 기억 챌린지 (color-memory-challenge)](./color-memory-challenge) | 색깔 패턴을 기억하고 같은 순서로 탭해보세요! | 기억/인지 |
@@ -409,6 +411,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-08)
+
+- **🥁 동물 밴드 연주 · 🍂 계절 옷장 분류 추가 (2026-08-09)** — 동물 밴드 연주는 4가지 악기(북·트라이앵글·실로폰·탬버린)가 켜지는 순서를 기억하고 똑같이 눌러 라운드를 이어가는 순서 기억 게임으로, 라운드마다 순서가 하나씩 늘어납니다. 계절 옷장 분류는 옷과 물건을 봄·여름·가을·겨울 4칸 중 알맞은 계절 칸으로 드래그해 40초 동안 최대한 많이 분류하는 인지 게임입니다. 두 게임 모두 단일 HTML, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일, 외부 의존성 0건을 포함합니다. 부수 발견: `hidden-object-hunt`·`rhythm-touch-beat`(2026-08-07 배포)가 README 최근 변경사항 및 CHANGES.md에 미반영 상태였습니다 — `KNOWN_ISSUES.md` 참조.
 
 - **🚲 자전거 균형 타기 · 🧊 냉장고 정리하기 추가 (2026-08-04)** — 자전거 균형 타기는 화면 드래그로 균형 마커를 초록 구역에 맞추고 페달 버튼을 연타해 앞으로 나아가는 실시간 균형 유지 게임으로, 기존 balance-tower(정적 블록 쌓기)·stone-balance-walk(교차 버튼 균형)와 달리 지속적으로 표류하는 균형점을 계속 재조정해야 하는 실시간 밸런스가 핵심입니다. 냉장고 정리하기는 음식 아이템을 냉장·냉동·실온 3칸에 드래그로 분류하는 생활 인지 게임으로, 기존 recycle-rescue(재질 분류)·laundry-sort(색깔 분류)와 달리 "보관 온도" 판단 기준과 아무 칸에나 치우면 되는 상한 음식 등장이 차별점입니다. 두 게임 모두 단일 HTML, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일, 외부 의존성 0건을 포함합니다. 부수 발견: README "최근 변경사항 (2026-08)" 섹션에 2026-08-03 rocket-sequence-launch·shadow-trail-match 추가 항목이 누락돼 있어 함께 보완했습니다.
 

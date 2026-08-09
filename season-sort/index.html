@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>🍂 계절 옷장 분류</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+    touch-action: none;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  }
+  :root {
+    --bg: #1e3a2f;
+    --accent: #ffb703;
+    --text: #ffffff;
+  }
+  body {
+    background: linear-gradient(160deg, #1e3a2f 0%, #2f5946 100%);
+    color: var(--text);
+  }
+  .wrap {
+    width: 100%; max-width: 480px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 10px 12px 8px; gap: 8px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: clamp(18px, 5vw, 26px);
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .hud {
+    display: flex; flex-direction: row; justify-content: space-between;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  #gameArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    min-height: 0;
+  }
+  .item-stage {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 22vh;
+    position: relative;
+  }
+  .drag-item {
+    width: 78px; height: 78px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+    position: absolute;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    z-index: 5;
+  }
+  .drag-item.dragging { cursor: grabbing; transition: none; }
+  .bins {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    min-height: 0;
+  }
+  .bin {
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-weight: 800;
+    font-size: clamp(13px, 3.6vw, 16px);
+    border: 3px dashed rgba(255,255,255,0.25);
+    transition: filter 0.1s ease;
+  }
+  .bin.spring { background: rgba(255, 183, 197, 0.22); }
+  .bin.summer { background: rgba(255, 209, 102, 0.22); }
+  .bin.autumn { background: rgba(230, 126, 34, 0.22); }
+  .bin.winter { background: rgba(116, 185, 255, 0.22); }
+  .bin.highlight { filter: brightness(1.5); border-color: rgba(255,255,255,0.7); }
+  .bin .bin-emoji { font-size: 26px; }
+  footer {
+    display: flex; flex-direction: row; justify-content: space-between;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+  .home-link { color: rgba(255,255,255,0.7); text-decoration: none; }
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-card {
+    background: #16281f;
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align: center;
+    max-width: 320px;
+    width: 88%;
+  }
+  .overlay-card h2 { font-size: 22px; margin-bottom: 10px; }
+  .overlay-card p { font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.85); margin-bottom: 18px; }
+  .btn-start {
+    background: var(--accent);
+    color: #16281f;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 28px;
+    font-size: 17px;
+    font-weight: 800;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .result-score { font-size: 40px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍂 계절 옷장 분류</h1>
+
+    <div class="hud">
+      <span>점수 <span id="score">0</span></span>
+      <span>남은 시간 <span id="timeLeft">40</span>초</span>
+    </div>
+
+    <div id="gameArea">
+      <div class="item-stage" id="itemStage"></div>
+      <div class="bins">
+        <div class="bin spring" data-season="spring"><span class="bin-emoji">🌸</span>봄</div>
+        <div class="bin summer" data-season="summer"><span class="bin-emoji">☀️</span>여름</div>
+        <div class="bin autumn" data-season="autumn"><span class="bin-emoji">🍂</span>가을</div>
+        <div class="bin winter" data-season="winter"><span class="bin-emoji">❄️</span>겨울</div>
+      </div>
+    </div>
+
+    <footer>
+      <small>아이템을 알맞은 계절 칸으로 드래그하세요</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍂 계절 옷장 분류</h2>
+      <p>옷과 물건이 나오면 어울리는 계절 칸으로 드래그하세요! 40초 동안 최대한 많이 분류해보세요.</p>
+      <button class="btn-start" id="startBtn">시작!</button>
+    </div>
+  </div>
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 게임 종료!</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 하기</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+  const CONFIG = {
+    duration: 40,
+    storageKey: 'season-sort_best',
+    items: [
+      { emoji: '🌂', season: 'spring' },
+      { emoji: '🌷', season: 'spring' },
+      { emoji: '🧢', season: 'spring' },
+      { emoji: '🩳', season: 'summer' },
+      { emoji: '🍦', season: 'summer' },
+      { emoji: '🕶️', season: 'summer' },
+      { emoji: '🎃', season: 'autumn' },
+      { emoji: '🍁', season: 'autumn' },
+      { emoji: '🧣', season: 'autumn' },
+      { emoji: '⛄', season: 'winter' },
+      { emoji: '🧤', season: 'winter' },
+      { emoji: '🧥', season: 'winter' }
+    ]
+  };
+
+  const itemStage = document.getElementById('itemStage');
+  const bins = Array.from(document.querySelectorAll('.bin'));
+  const scoreEl = document.getElementById('score');
+  const timeLeftEl = document.getElementById('timeLeft');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMsgEl = document.getElementById('resultMsg');
+
+  const state = {
+    score: 0,
+    timeLeft: CONFIG.duration,
+    timerId: null,
+    playing: false,
+    currentItem: null,
+    dragEl: null,
+    dragging: false,
+    offsetX: 0,
+    offsetY: 0
+  };
+
+  function getBest() {
+    return parseInt(localStorage.getItem(CONFIG.storageKey) || '0', 10);
+  }
+  function setBest(v) {
+    localStorage.setItem(CONFIG.storageKey, String(v));
+  }
+
+  function randomItem() {
+    return CONFIG.items[Math.floor(Math.random() * CONFIG.items.length)];
+  }
+
+  function spawnItem() {
+    itemStage.innerHTML = '';
+    const item = randomItem();
+    state.currentItem = item;
+    const el = document.createElement('div');
+    el.className = 'drag-item';
+    el.textContent = item.emoji;
+    const stageRect = itemStage.getBoundingClientRect();
+    el.style.left = (stageRect.width / 2 - 39) + 'px';
+    el.style.top = (stageRect.height / 2 - 39) + 'px';
+    itemStage.appendChild(el);
+    state.dragEl = el;
+    attachDrag(el);
+  }
+
+  function attachDrag(el) {
+    el.addEventListener('pointerdown', onDragStart);
+  }
+
+  function onDragStart(e) {
+    if (!state.playing) return;
+    state.dragging = true;
+    const el = state.dragEl;
+    el.classList.add('dragging');
+    el.setPointerCapture(e.pointerId);
+    const rect = el.getBoundingClientRect();
+    state.offsetX = e.clientX - rect.left;
+    state.offsetY = e.clientY - rect.top;
+    el.addEventListener('pointermove', onDragMove);
+    el.addEventListener('pointerup', onDragEnd);
+  }
+
+  function onDragMove(e) {
+    if (!state.dragging) return;
+    const el = state.dragEl;
+    el.style.position = 'fixed';
+    el.style.left = (e.clientX - state.offsetX) + 'px';
+    el.style.top = (e.clientY - state.offsetY) + 'px';
+    el.style.zIndex = '50';
+
+    const hovered = bins.find(bin => {
+      const r = bin.getBoundingClientRect();
+      return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    });
+    bins.forEach(b => b.classList.toggle('highlight', b === hovered));
+  }
+
+  function onDragEnd(e) {
+    if (!state.dragging) return;
+    state.dragging = false;
+    const el = state.dragEl;
+    el.classList.remove('dragging');
+    bins.forEach(b => b.classList.remove('highlight'));
+
+    const dropped = bins.find(bin => {
+      const r = bin.getBoundingClientRect();
+      return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    });
+
+    if (dropped) {
+      if (dropped.dataset.season === state.currentItem.season) {
+        state.score += 1;
+        scoreEl.textContent = state.score;
+      }
+      spawnItem();
+    } else {
+      // 칸 밖에 놓으면 제자리로 복귀 (다음 아이템으로 넘어가지 않음)
+      const stageRect = itemStage.getBoundingClientRect();
+      el.style.position = 'absolute';
+      el.style.left = (stageRect.width / 2 - 39) + 'px';
+      el.style.top = (stageRect.height / 2 - 39) + 'px';
+      el.style.zIndex = '5';
+    }
+  }
+
+  function tick() {
+    state.timeLeft -= 1;
+    timeLeftEl.textContent = state.timeLeft;
+    if (state.timeLeft <= 0) {
+      endGame();
+    }
+  }
+
+  function startGame() {
+    state.score = 0;
+    state.timeLeft = CONFIG.duration;
+    state.playing = true;
+    scoreEl.textContent = '0';
+    timeLeftEl.textContent = String(CONFIG.duration);
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    spawnItem();
+    if (state.timerId) clearInterval(state.timerId);
+    state.timerId = setInterval(tick, 1000);
+  }
+
+  function endGame() {
+    state.playing = false;
+    clearInterval(state.timerId);
+    itemStage.innerHTML = '';
+    const best = getBest();
+    if (state.score > best) setBest(state.score);
+    finalScoreEl.textContent = state.score;
+    resultMsgEl.textContent = state.score > best ? '최고 기록 달성! 🏆' : `최고 기록: ${getBest()}개`;
+    endOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('pointerdown', startGame);
+  restartBtn.addEventListener('pointerdown', startGame);
+})();
+</script>
+</body>
+</html>

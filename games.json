@@ -1,5 +1,21 @@
 [
   {
+    "id": "percussion-band",
+    "title": "Percussion Band",
+    "title_ko": "🥁 동물 밴드 연주",
+    "description": "악기가 울리는 순서를 기억하고 똑같이 따라 눌러보세요! 라운드마다 순서가 늘어나요.",
+    "thumbnail": "percussion-band/thumb.svg",
+    "path": "percussion-band/index.html"
+  },
+  {
+    "id": "season-sort",
+    "title": "Season Sort",
+    "title_ko": "🍂 계절 옷장 분류",
+    "description": "옷과 물건을 알맞은 계절 칸으로 드래그! 40초 안에 최대한 많이 분류하세요.",
+    "thumbnail": "season-sort/thumb.svg",
+    "path": "season-sort/index.html"
+  },
+  {
     "id": "hidden-object-hunt",
     "title": "Hidden Object Hunt",
     "title_ko": "🔍 숨은 그림 찾기 챌린지",

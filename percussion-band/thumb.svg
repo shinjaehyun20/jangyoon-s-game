@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2b1b4d"/>
+      <stop offset="100%" stop-color="#4a2e7a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <g font-size="46">
+    <text x="30" y="80">🥁</text>
+    <text x="90" y="60">🔺</text>
+    <text x="30" y="140">🎹</text>
+    <text x="100" y="130">🪘</text>
+  </g>
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#ffb703">동물 밴드 연주</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">PERCUSSION BAND</text>
+  </g>
+</svg>

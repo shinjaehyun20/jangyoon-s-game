@@ -1,3 +1,12 @@
+## 2026-08-09 (일일 게임 제작, nyx)
+
+- 게임 2종 추가: `percussion-band`(🥁 동물 밴드 연주), `season-sort`(🍂 계절 옷장 분류).
+- `percussion-band` — 북·트라이앵글·실로폰·탬버린 4개 패드가 순서대로 켜지는 것을 보여준 뒤 같은 순서로 눌러야 하는 순서 기억(사이먼 세즈) 게임. 라운드마다 순서가 1개씩 늘어나며(최초 1개), 오답 시 즉시 종료하고 도달한 라운드-1을 점수로 저장. 기존 rocket-sequence-launch(고정 6라운드 그림 명령)와 달리 라운드마다 무한히 증가하는 시퀀스 길이와 4-패드 색상 대비 구조가 차별점. `percussion-band_best`에 최고 라운드 저장.
+- `season-sort` — 옷·물건 아이템(우산·튜브·목도리 등)이 화면 중앙에 하나씩 등장하면 봄/여름/가을/겨울 4칸 중 알맞은 칸으로 드래그하는 40초 생활 인지 게임. 칸 밖에 놓으면 제자리로 복귀, 정답 시 다음 아이템 자동 등장. 기존 fridge-sort(3칸 온도 분류)·recycle-rescue(재질 분류)와 달리 "계절"이라는 시간적 분류 기준과 4칸 그리드 배치가 차별점. `season-sort_best`에 최고 점수 저장.
+- 두 게임 모두 단일 HTML, 외부 의존성 없음, Pointer Events(pointerdown/move/up만 사용, touchstart/mousedown 미사용), 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함. JS 구문 검증(node --check) PASS, SVG XML 파싱 PASS.
+- `games.json` 210→212, 고유 ID 212(중복 0건), `menu.json` kids 카테고리 최상단에 신규 2건 배치(161개). README 뱃지·상단문구·게임 표·최근변경 섹션을 실측 212로 동기화.
+- 부수 발견(미해소, 오늘 범위 밖): `hidden-object-hunt`·`rhythm-touch-beat`(커밋 a919eae, 2026-08-07)가 이번 확인 시점까지 README "최근 변경사항"과 CHANGES.md 모두에 항목이 없는 상태로 남아 있었다. games.json/menu.json에는 정상 등록되어 있어 카탈로그 기능상 문제는 없으나 변경 이력 문서 누락이다. `KNOWN_ISSUES.md`에 기록, 다음 회차 최우선 처리 대상으로 이월.
+
 ## 2026-08-04 (일일 게임 제작, nyx)
 
 - 게임 2종 추가: `bicycle-balance`(🚲 자전거 균형 타기), `fridge-sort`(🧊 냉장고 정리하기).

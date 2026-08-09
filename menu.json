@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "percussion-band",
+        "label": "🥁 동물 밴드 연주",
+        "path": "percussion-band/index.html"
+      },
+      {
+        "id": "season-sort",
+        "label": "🍂 계절 옷장 분류",
+        "path": "season-sort/index.html"
+      },
+      {
         "id": "bicycle-balance",
         "label": "🚲 자전거 균형 타기",
         "path": "bicycle-balance/index.html"
