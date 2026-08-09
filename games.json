@@ -1,5 +1,21 @@
 [
   {
+    "id": "space-dodge",
+    "title": "Space Dodge",
+    "title_ko": "🚀 우주선 피하기 챌린지",
+    "description": "좌우로 우주선을 조종해 떨어지는 운석을 피하세요! 20초간 충돌 없이 버티는 회피 미션.",
+    "thumbnail": "space-dodge/thumb.svg",
+    "path": "space-dodge/index.html"
+  },
+  {
+    "id": "fruit-match",
+    "title": "Fruit Match",
+    "title_ko": "🍎 과일 짝 맞추기",
+    "description": "카드 뒤에 숨겨진 같은 모양의 과일 짝을 찾아 연속으로 맞춰보세요! 8쌍 매칭 완료 도전.",
+    "thumbnail": "fruit-match/thumb.svg",
+    "path": "fruit-match/index.html"
+  },
+  {
     "id": "percussion-band",
     "title": "Percussion Band",
     "title_ko": "🥁 동물 밴드 연주",

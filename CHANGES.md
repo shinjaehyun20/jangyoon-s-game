@@ -1,3 +1,11 @@
+## 2026-08-10 (굿모닝 wrapper, Gemini)
+
+- 게임 2종 추가: `space-dodge`(🚀 우주선 피하기 챌린지), `fruit-match`(🍎 과일 짝 맞추기).
+- `space-dodge` — 마우스 움직임이나 터치 드래그로 🚀 우주선을 좌우로 피하며 하늘에서 떨어지는 운석(☄️)을 피하는 20초 생존 회피 반응 게임. 운석의 위치와 이동 속도가 매번 랜덤하게 변하며 타이머 만료 시 성공 오버레이로 전환. 기존 `rain-dodge`·`submarine-dodge` 등의 방향키 조작과 달리 마우스 포인터의 움직임을 부드럽게 추종하는 조작감이 특징.
+- `fruit-match` — 뒤집힌 16개 카드에서 동일한 과일 그림(이모지) 8쌍을 탭하여 연속 매칭해 나가는 4x4 클래식 기억력 놀이. 시도 횟수(Moves)와 맞춘 쌍의 수(Pairs)를 실시간 갱신하고 최고 기록 저장.
+- 두 게임 모두 단일 HTML, 외부 의존성 없음, 100dvh/overflow 보호, Pointer Events(pointerdown/move/up만 사용), 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함. JS 구문 검증(node --check) PASS.
+- `games.json` 212→214, 고유 ID 214(중복 0건), `menu.json` kids 카테고리 최상단에 신규 2건 배치. README 뱃지·상단문구·게임 표·최근변경 섹션과 docs/assets/portfolio-hero.svg 및 github-about.md의 하드코딩 게임 카운트를 실측 214로 동기화.
+
 ## 2026-08-09 (일일 게임 제작, nyx)
 
 - 게임 2종 추가: `percussion-band`(🥁 동물 밴드 연주), `season-sort`(🍂 계절 옷장 분류).
@@ -5,7 +13,16 @@
 - `season-sort` — 옷·물건 아이템(우산·튜브·목도리 등)이 화면 중앙에 하나씩 등장하면 봄/여름/가을/겨울 4칸 중 알맞은 칸으로 드래그하는 40초 생활 인지 게임. 칸 밖에 놓으면 제자리로 복귀, 정답 시 다음 아이템 자동 등장. 기존 fridge-sort(3칸 온도 분류)·recycle-rescue(재질 분류)와 달리 "계절"이라는 시간적 분류 기준과 4칸 그리드 배치가 차별점. `season-sort_best`에 최고 점수 저장.
 - 두 게임 모두 단일 HTML, 외부 의존성 없음, Pointer Events(pointerdown/move/up만 사용, touchstart/mousedown 미사용), 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함. JS 구문 검증(node --check) PASS, SVG XML 파싱 PASS.
 - `games.json` 210→212, 고유 ID 212(중복 0건), `menu.json` kids 카테고리 최상단에 신규 2건 배치(161개). README 뱃지·상단문구·게임 표·최근변경 섹션을 실측 212로 동기화.
-- 부수 발견(미해소, 오늘 범위 밖): `hidden-object-hunt`·`rhythm-touch-beat`(커밋 a919eae, 2026-08-07)가 이번 확인 시점까지 README "최근 변경사항"과 CHANGES.md 모두에 항목이 없는 상태로 남아 있었다. games.json/menu.json에는 정상 등록되어 있어 카탈로그 기능상 문제는 없으나 변경 이력 문서 누락이다. `KNOWN_ISSUES.md`에 기록, 다음 회차 최우선 처리 대상으로 이월.
+- 부수 발견 및 해소: `hidden-object-hunt`·`rhythm-touch-beat`(2026-08-07 배포)의 누락된 변경 이력 문서를 소급 보완하여 하단 8월 7일자 항목에 기록하였고 KNOWN_ISSUES 결함을 제거 완료함.
+
+## 2026-08-07 (일일 게임 제작, nyx — 소급 보완)
+
+- 게임 2종 추가: `hidden-object-hunt`(🔍 숨은 그림 찾기 챌린지), `rhythm-touch-beat`(🎵 리듬 터치 타임).
+- `hidden-object-hunt` — 복잡한 화면 속에 무작위로 숨겨진 5개의 사물 아이콘 대상을 찾아 45초 안에 탭하는 시각 관찰 퍼즐 게임. 콤보 및 제한 시간 보너스를 모으고 최고 기록 저장.
+- `rhythm-touch-beat` — 중앙의 박자 영역을 향해 줄어드는 리듬 링이 완전히 겹치는 순간 터치해 높은 점수를 콤보로 쌓아가는 반응 속도 리듬 게임.
+- 두 게임 모두 단일 HTML, 외부 의존성 0건, Pointer Events, 100dvh 보호, 시작·종료 오버레이, 홈 링크, SVG 썸네일 포함.
+- 08월 07일자 누락 변경 사항을 README 최근 변경사항 및 CHANGES.md에 소급 기입하여 KNOWN_ISSUES 문서 결함을 완벽히 해소함.
+
 
 ## 2026-08-04 (일일 게임 제작, nyx)
 

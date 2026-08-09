@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우주선 피하기 게임</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0b16;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 10px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #e0e0ff;
+            text-align: center;
+        }
+        p {
+            font-size: 14px;
+            color: #8a8ab0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .stats {
+            display: flex;
+            gap: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #gameArea {
+            position: relative;
+            width: 320px;
+            height: 400px;
+            background-color: #121224;
+            border: 2px solid #3d3d7a;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: none;
+        }
+        #player {
+            position: absolute;
+            bottom: 10px;
+            left: 140px;
+            width: 40px;
+            height: 40px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: left 0.05s ease-out;
+        }
+        .meteor {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        .btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #5d5dbd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #47479c;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 우주선 피하기 챌린지</h1>
+    <p>좌우로 움직여 하늘에서 떨어지는 운석을 피하세요! 20초간 버티면 승리!</p>
+    <div class="stats">
+        <div>남은 시간: <span id="timer">20</span>초</div>
+        <div>최고 기록: <span id="highscore">20</span>초</div>
+    </div>
+    <div id="gameArea">
+        <div id="player">🚀</div>
+    </div>
+    <button class="btn" id="startBtn">게임 시작</button>
+
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const player = document.getElementById('player');
+        const timerElement = document.getElementById('timer');
+        const highscoreElement = document.getElementById('highscore');
+        const startBtn = document.getElementById('startBtn');
+
+        let playerX = 140;
+        const playerWidth = 40;
+        const areaWidth = 320;
+        const areaHeight = 400;
+
+        let gameInterval;
+        let meteorInterval;
+        let timerInterval;
+        let gameActive = false;
+        let timeLeft = 20;
+        let highscore = 20;
+        let meteors = [];
+
+        // Track mouse or touch inside game area
+        gameArea.addEventListener('mousemove', (e) => {
+            if (!gameActive) return;
+            const rect = gameArea.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            playerX = mouseX - playerWidth / 2;
+            
+            // Boundary constraints
+            if (playerX < 0) playerX = 0;
+            if (playerX > areaWidth - playerWidth) playerX = areaWidth - playerWidth;
+            
+            player.style.left = playerX + 'px';
+        });
+
+        // Key controls as fallback
+        window.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+            if (e.key === 'ArrowLeft') {
+                playerX -= 15;
+            } else if (e.key === 'ArrowRight') {
+                playerX += 15;
+            }
+            if (playerX < 0) playerX = 0;
+            if (playerX > areaWidth - playerWidth) playerX = areaWidth - playerWidth;
+            player.style.left = playerX + 'px';
+        });
+
+        function createMeteor() {
+            if (!gameActive) return;
+            const m = document.createElement('div');
+            m.classList.add('meteor');
+            m.textContent = '☄️';
+            
+            const startX = Math.random() * (areaWidth - 30);
+            m.style.left = startX + 'px';
+            m.style.top = '0px';
+            gameArea.appendChild(m);
+
+            const speed = 3 + Math.random() * 4; // speed randomizer
+            meteors.push({ element: m, x: startX, y: 0, speed: speed });
+        }
+
+        function updateMeteors() {
+            for (let i = meteors.length - 1; i >= 0; i--) {
+                const m = meteors[i];
+                m.y += m.speed;
+                m.element.style.top = m.y + 'px';
+
+                // Check collision
+                if (checkCollision(m)) {
+                    endGame(false);
+                    return;
+                }
+
+                // Remove out-of-bound meteors
+                if (m.y > areaHeight) {
+                    m.element.remove();
+                    meteors.splice(i, 1);
+                }
+            }
+        }
+
+        function checkCollision(m) {
+            // Player box: bottom is 10px from bottom (y=350 to 390), x is playerX to playerX+40
+            const pMinY = areaHeight - 50;
+            const pMaxY = areaHeight - 10;
+            const pMinX = playerX;
+            const pMaxX = playerX + playerWidth;
+
+            // Meteor box: y is m.y to m.y+30, x is m.x to m.x+30
+            const mMinY = m.y;
+            const mMaxY = m.y + 30;
+            const mMinX = m.x;
+            const mMaxX = m.x + 30;
+
+            return !(mMaxX < pMinX || mMinX > pMaxX || mMaxY < pMinY || mMinY > pMaxY);
+        }
+
+        function startGame() {
+            if (gameActive) return;
+            
+            // Clean up old meteors
+            meteors.forEach(m => m.element.remove());
+            meteors = [];
+            
+            timeLeft = 20;
+            timerElement.textContent = timeLeft;
+            playerX = 140;
+            player.style.left = playerX + 'px';
+            
+            gameActive = true;
+            startBtn.style.display = 'none';
+
+            // Game loop
+            gameInterval = setInterval(updateMeteors, 20);
+            meteorInterval = setInterval(createMeteor, 600);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame(true);
+                }
+            }, 1000);
+        }
+
+        function endGame(won) {
+            gameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(meteorInterval);
+            clearInterval(timerInterval);
+            startBtn.style.display = 'block';
+
+            if (won) {
+                alert('🏆 미션 성공! 우주선이 무사히 탈출했습니다!');
+            } else {
+                alert('💥 충돌했습니다! 게임 오버!');
+            }
+        }
+
+        startBtn.addEventListener('click', startGame);
+    </script>
+</body>
+</html>

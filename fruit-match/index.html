@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과일 짝 맞추기 게임</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 320px;
+            max-width: 100%;
+        }
+        .card {
+            width: 72px;
+            height: 72px;
+            background-color: #34495e;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card:active {
+            transform: scale(0.95);
+        }
+        .card.flipped {
+            background-color: #fff;
+            transform: rotateY(180deg);
+        }
+        .card.matched {
+            background-color: #2ecc71;
+            cursor: default;
+            transform: scale(0.98);
+            box-shadow: none;
+        }
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍎 과일 짝 맞추기</h1>
+    <p>같은 과일 그림을 연속으로 뒤집어 모든 짝을 맞추세요!</p>
+    <div class="stats">
+        <div>시도 횟수: <span id="moves">0</span></div>
+        <div>성공 짝: <span id="pairs">0</span>/8</div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <button class="btn" id="restart">다시 시작</button>
+
+    <script>
+        const fruits = ['🍎', '🍌', '🍇', '🍊', '🍓', '🍒', '🍉', '🥝', '🍎', '🍌', '🍇', '🍊', '🍓', '🍒', '🍉', '🥝'];
+        let deck = [];
+        let flippedCards = [];
+        let moves = 0;
+        let matchedPairs = 0;
+        let lockBoard = false;
+
+        const gridElement = document.getElementById('grid');
+        const movesElement = document.getElementById('moves');
+        const pairsElement = document.getElementById('pairs');
+        const restartButton = document.getElementById('restart');
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initGame() {
+            deck = shuffle([...fruits]);
+            gridElement.innerHTML = '';
+            flippedCards = [];
+            moves = 0;
+            matchedPairs = 0;
+            lockBoard = false;
+            movesElement.textContent = moves;
+            pairsElement.textContent = matchedPairs;
+
+            deck.forEach((fruit, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.index = index;
+                card.dataset.fruit = fruit;
+                card.addEventListener('click', flipCard);
+                gridElement.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            const clickedCard = this;
+            if (clickedCard === flippedCards[0] || clickedCard.classList.contains('matched')) return;
+
+            clickedCard.classList.add('flipped');
+            clickedCard.textContent = clickedCard.dataset.fruit;
+            flippedCards.push(clickedCard);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                movesElement.textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.dataset.fruit === card2.dataset.fruit) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                pairsElement.textContent = matchedPairs;
+                resetFlipped();
+                if (matchedPairs === 8) {
+                    setTimeout(() => alert('축하합니다! 모든 과일 짝을 맞추셨습니다!'), 300);
+                }
+            } else {
+                lockBoard = true;
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    card1.textContent = '';
+                    card2.textContent = '';
+                    resetFlipped();
+                }, 1000);
+            }
+        }
+
+        function resetFlipped() {
+            flippedCards = [];
+            lockBoard = false;
+        }
+
+        restartButton.addEventListener('click', initGame);
+        window.onload = initGame;
+    </script>
+</body>
+</html>

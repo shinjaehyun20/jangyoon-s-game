@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 212개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 214개.
 
-[![Games](https://img.shields.io/badge/games-212-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-214-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![212개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![214개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 212개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 214개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🚀 우주선 피하기 챌린지 (space-dodge)](./space-dodge) | 좌우로 우주선을 조종해 떨어지는 운석을 피하세요! | 액션/반응 |
+| [🍎 과일 짝 맞추기 (fruit-match)](./fruit-match) | 카드 뒤에 숨겨진 같은 모양의 과일 짝을 매칭해보세요! | 기억/인지 |
 | [🥁 동물 밴드 연주 (percussion-band)](./percussion-band) | 악기 연주 순서를 기억하고 똑같이 따라 눌러보세요! | 기억/인지 |
 | [🍂 계절 옷장 분류 (season-sort)](./season-sort) | 옷과 물건을 알맞은 계절 칸으로 드래그! | 인지/학습 |
 | [🔍 숨은 그림 찾기 챌린지 (hidden-object-hunt)](./games/hidden-object-hunt) | 그림 속에 숨겨진 5개의 물건을 찾아 탭하세요! | 관찰/퍼즐 |

@@ -13,4 +13,4 @@
 
 ## 2026-08-09 발견 (일일 게임 제작, nyx)
 
-- [ ] `hidden-object-hunt`·`rhythm-touch-beat`(커밋 a919eae, 2026-08-07 배포)가 README.md "최근 변경사항" 섹션 및 CHANGES.md 양쪽에 변경 이력 항목이 없다. games.json/menu.json에는 정상 등록되어 있어 카탈로그 노출·플레이 기능상 문제는 없음(README 게임 표에는 이미 반영되어 있음, 208줄 확인) — 순수 변경 이력 문서(최근변경/CHANGES) 누락. 다음 회차(내일 게임 제작 세션) 최우선 처리: 두 게임의 실제 index.html을 열람해 메커니즘·차별화 포인트를 확인한 뒤 README "최근 변경사항 (2026-08)"과 CHANGES.md에 2026-08-07 날짜 항목으로 소급 추가.
+- [x] `hidden-object-hunt`·`rhythm-touch-beat`(커밋 a919eae, 2026-08-07 배포)가 README.md "최근 변경사항" 섹션 및 CHANGES.md 양쪽에 변경 이력 항목이 없다. — 해소 2026-08-10 (Gemini 굿모닝 래퍼 세션에서 README 최근 변경사항 및 CHANGES.md에 소급 반영 완료)

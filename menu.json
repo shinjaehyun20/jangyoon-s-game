@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "space-dodge",
+        "label": "🚀 우주선 피하기 챌린지",
+        "path": "space-dodge/index.html"
+      },
+      {
+        "id": "fruit-match",
+        "label": "🍎 과일 짝 맞추기",
+        "path": "fruit-match/index.html"
+      },
+      {
         "id": "percussion-band",
         "label": "🥁 동물 밴드 연주",
         "path": "percussion-band/index.html"
