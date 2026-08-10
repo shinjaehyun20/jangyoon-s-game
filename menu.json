@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "firetruck-fire-out",
+        "label": "🚒 소방차 불 끄기",
+        "path": "firetruck-fire-out/index.html"
+      },
+      {
+        "id": "dino-bone-dig",
+        "label": "🦖 공룡 뼈 발굴",
+        "path": "dino-bone-dig/index.html"
+      },
+      {
         "id": "space-dodge",
         "label": "🚀 우주선 피하기 챌린지",
         "path": "space-dodge/index.html"

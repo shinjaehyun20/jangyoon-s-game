@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 214개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 216개.
 
-[![Games](https://img.shields.io/badge/games-214-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-216-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![214개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![216개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 214개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 216개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🚒 소방차 불 끄기 (firetruck-fire-out)](./firetruck-fire-out) | 활활 타는 불(🔥)을 터치해 꺼주세요! 30초 동안 마을을 구하는 소방대장 미션. | 어린이/반응·터치 |
+| [🦖 공룡 뼈 발굴 (dino-bone-dig)](./dino-bone-dig) | 흙 타일을 탭하여 공룡 뼈(🦴) 5개를 전부 찾아내고 멋진 공룡을 조립하는 탐험. | 어린이/공간·터치 |
 | [🚀 우주선 피하기 챌린지 (space-dodge)](./space-dodge) | 좌우로 우주선을 조종해 떨어지는 운석을 피하세요! | 액션/반응 |
 | [🍎 과일 짝 맞추기 (fruit-match)](./fruit-match) | 카드 뒤에 숨겨진 같은 모양의 과일 짝을 매칭해보세요! | 기억/인지 |
 | [🥁 동물 밴드 연주 (percussion-band)](./percussion-band) | 악기 연주 순서를 기억하고 똑같이 따라 눌러보세요! | 기억/인지 |
@@ -474,6 +476,10 @@ VS Code `Live Server` 확장을 써도 된다.
 - **🎳 볼링 · 🪂 낙하산 착륙 추가 (2026-06-23)** — 스와이프 볼링(10프레임·스트라이크/스페어)과 좌우 조종 낙하산 착륙(바람·새 회피·레벨업) 2종 신규. 기존 catch/jump류와 차별화.
 - **🍄 슈퍼 점프 모험 추가 (2026-06-16)** — 캔버스 기반 옆스크롤 플랫포머. 달리기·점프·코인·머리치기·굼바 밟기·깃발 골인, 슈퍼버섯 파워업(큰 마리오=피격 시 작아지는 실드), 가변 점프, WebAudio 효과음. 키보드+모바일 터치 동시 지원, 시간 제한 없는 완주형. localStorage 키: `super-mario_best`.
 - **🌀 미로 탈출 시간 제한 제거 (2026-06-14)** — 60초 카운트다운 강제 종료를 없애고 자기 페이스로 모든 난이도 미로를 완주하는 방식으로 변경. 타이머는 "걸린 시간" 카운트업 기록, 최고 기록=최단 완주 시간(`maze-escape_besttime`). 순수 타임어택/생존형 게임의 시간 제한은 의도된 룰이라 유지.
+## 최근 변경사항 (2026-08)
+
+- **소방차 불 끄기 / 공룡 뼈 발굴 추가 (2026-08-11)** — 7살 장윤이가 직관적으로 즐길 수 있는 불 끄기 터치 반응 게임과 공룡 뼈 발굴 탐험 게임 추가. 단일 HTML, 외부 의존성 없음, Pointer Events 통합 조작.
+
 - **엘리베이터 층 맞추기 추가 (2026-06-16)** — 숫자 1~5 인식+매칭 학습, 엘리베이터 이동 애니메이션+WebAudio 효과음, 기존 숫자 순서 게임(number-order)과 달리 공간 매칭 방식
 
 - **달팽이 경주 추가 (2026-06-15)** — 달팽이 3마리 중 하나 골라 화면 탭탭탭! 결승선에 1등으로 밀어주는 응원형 레이스. 탭 즉각 부스트 + CPU 자동이동, 1등 시 컨페티 + 최고기록(탭 수) 저장. car-race(방향키 차선 변경)와 달리 탭 연타로 자기 달팽이를 응원해 밀어주는 직접 응원 메커니즘 특화.
@@ -497,6 +503,10 @@ VS Code `Live Server` 확장을 써도 된다.
 - **신호등 안전 건너기·숨결 비눗방울 추가 (2026-07-24)** — `wait-then-tap` 생활 안전 판단과 `hold-to-inflate/release` 크기 조절이라는 서로 다른 주 동사로 신규 2종을 추가. 모바일 Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, localStorage 최고기록, 외부 의존성 0건.
 
 ## 최근 변경사항 (2026-05)
+## 최근 변경사항 (2026-08)
+
+- **소방차 불 끄기 / 공룡 뼈 발굴 추가 (2026-08-11)** — 7살 장윤이가 직관적으로 즐길 수 있는 불 끄기 터치 반응 게임과 공룡 뼈 발굴 탐험 게임 추가. 단일 HTML, 외부 의존성 없음, Pointer Events 통합 조작.
+
 - **엘리베이터 층 맞추기 추가 (2026-06-16)** — 숫자 1~5 인식+매칭 학습, 엘리베이터 이동 애니메이션+WebAudio 효과음, 기존 숫자 순서 게임(number-order)과 달리 공간 매칭 방식
 
 - **동물원 탈출 추가 (2026-05-29)** — 동물별 올바른 탈출 문을 탭하는 빠른 인지 게임. 10종 동물(🦁🐘🐯🐧🦒🐼🦓🐨🦊🦋)과 3개 문(열쇠 마크로 정답 표시), 오답 시 목숨 차감, 레벨이 오를수록 문 세트 변화 + 보너스 점수 증가. rabbit-maze(경로 드래그)와 달리 즉각 탭 반응 + 오탐 패널티로 속도와 정확도를 동시에 요구하는 선택 판단 메커니즘 특화.
@@ -536,6 +546,10 @@ VS Code `Live Server` 확장을 써도 된다.
 - **애벌레 먹이주기 시작하기 버튼 핫픽스 (2026-05-03)** — `bindStart` 래퍼 함수 내 `e.preventDefault()` 호출이 iOS Safari에서 pointerdown 이벤트 자체를 취소시키는 버그 수정. 단순 `click` 이벤트로 교체해 모든 환경에서 시작하기/다시하기 버튼 정상 동작.
 
 ## 최근 변경사항 (2026-04)
+## 최근 변경사항 (2026-08)
+
+- **소방차 불 끄기 / 공룡 뼈 발굴 추가 (2026-08-11)** — 7살 장윤이가 직관적으로 즐길 수 있는 불 끄기 터치 반응 게임과 공룡 뼈 발굴 탐험 게임 추가. 단일 HTML, 외부 의존성 없음, Pointer Events 통합 조작.
+
 - **엘리베이터 층 맞추기 추가 (2026-06-16)** — 숫자 1~5 인식+매칭 학습, 엘리베이터 이동 애니메이션+WebAudio 효과음, 기존 숫자 순서 게임(number-order)과 달리 공간 매칭 방식
 
 - **색칠 놀이 추가 (2026-04-30)** — 팔레트에서 색을 고르고 픽셀 아트 격자를 탭으로 채우는 창의 게임. 해바라기·물고기·집·별·나비 5가지 그림 수록. 드래그로 연속 색칠, 완성 시 다음 그림으로 자동 이동. color-tap(색깔 판단)·animal-coloring(자유 색칠)과 달리 픽셀 단위 영역 채우기 집중.

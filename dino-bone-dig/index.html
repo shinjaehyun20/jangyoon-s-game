@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🦖 우당탕탕 공룡 뼈 발굴</title>
+  <style>
+    :root {
+      --bg: #2d1b0f;
+      --accent: #4cd137;
+      --text: #ffffff;
+      --dirt: #8c7ae6;
+      --amber: #e1b12c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 12px 14px 10px; gap: 8px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 24px);
+      text-align: center;
+      color: var(--amber);
+      text-shadow: 0 0 10px rgba(225, 177, 44, 0.5);
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .hud span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #gameArea {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 2px dashed rgba(225, 177, 44, 0.2);
+      border-radius: 16px;
+      padding: 8px;
+      position: relative;
+    }
+    .tile {
+      background: #747d8c;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s, transform 0.1s;
+      border: 2px solid #57606f;
+    }
+    .tile.active-dirt {
+      background: #a4b0be;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+    }
+    .tile.dug {
+      background: #57606f;
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: scale(0.95);
+    }
+    .tile.bone {
+      background: #ffa502;
+      border-color: var(--amber);
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 5px var(--amber); }
+      100% { transform: scale(1.02); box-shadow: 0 0 15px var(--amber); }
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .home-link {
+      color: var(--amber);
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      width: 85%;
+      max-width: 360px;
+      background: #2d1b0f;
+      border: 3px solid var(--amber);
+      border-radius: 24px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .overlay-card h2 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: var(--amber);
+    }
+    .overlay-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .btn-start {
+      background: var(--amber);
+      color: #000000;
+      border: none;
+      padding: 12px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      min-height: 48px;
+      box-shadow: 0 4px 15px rgba(225, 177, 44, 0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active {
+      transform: scale(0.95);
+    }
+    .result-score {
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🦖 고고학자 장윤! 공룡 뼈 발굴</h1>
+    <div class="hud">
+      <span>⏱️ 시간: <span id="timeVal">0.0</span>초</span>
+      <span>🦴 찾은 뼈: <span id="scoreVal">0</span> / 5</span>
+      <span>🏆 최단: <span id="bestVal">0.0</span>초</span>
+    </div>
+    <div id="gameArea"></div>
+    <footer>
+      <small>흙 타일을 터치해 공룡 뼈 5개를 전부 찾아주세요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🦖 공룡 뼈 발굴 탐험</h2>
+      <p>단단한 흙 속에 무시무시한 공룡의 뼈(🦴) 5개가 깊숙이 묻혀 있어요! 타일을 탭하여 흙을 파헤치고 뼈를 모두 찾아내 공룡을 완성해 보세요! 최대한 빠르게 발굴해야 해요!</p>
+      <button class="btn-start" id="startBtn">탐험 시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🦖 공룡 완성!</h2>
+      <div class="result-score" id="finalScore">0.0초</div>
+      <p id="resultMsg"></p>
+      <button class="btn-start" id="restartBtn">다시 탐험!</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const CONFIG = {
+      totalBones: 5,
+      gridSize: 16,
+      bestScoreKey: 'dino-bone-dig_best'
+    };
+    const state = {
+      bonesFound: 0,
+      elapsedTime: 0,
+      isPlaying: false,
+      timerId: null,
+      bonePositions: []
+    };
+
+    const dom = {
+      gameArea: document.getElementById('gameArea'),
+      timeVal: document.getElementById('timeVal'),
+      scoreVal: document.getElementById('scoreVal'),
+      bestVal: document.getElementById('bestVal'),
+      startOverlay: document.getElementById('startOverlay'),
+      endOverlay: document.getElementById('endOverlay'),
+      startBtn: document.getElementById('startBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      finalScore: document.getElementById('finalScore'),
+      resultMsg: document.getElementById('resultMsg')
+    };
+
+    const loadBestScore = () => {
+      const best = localStorage.getItem(CONFIG.bestScoreKey) || "999.9";
+      dom.bestVal.textContent = best === "999.9" ? "없음" : best + "초";
+      return parseFloat(best);
+    };
+    let bestScore = loadBestScore();
+
+    const generateGrid = () => {
+      dom.gameArea.innerHTML = '';
+      state.bonePositions = [];
+      
+      const arr = Array.from({length: CONFIG.gridSize}, (_, i) => i);
+      arr.sort(() => Math.random() - 0.5);
+      state.bonePositions = arr.slice(0, CONFIG.totalBones);
+
+      for (let i = 0; i < CONFIG.gridSize; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'tile active-dirt';
+        tile.textContent = '🟫';
+        tile.dataset.index = i;
+
+        tile.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          digTile(tile, i);
+        });
+
+        dom.gameArea.appendChild(tile);
+      }
+    };
+
+    const digTile = (tileEl, index) => {
+      if (!state.isPlaying || tileEl.classList.contains('dug')) return;
+
+      tileEl.classList.remove('active-dirt');
+      tileEl.classList.add('dug');
+
+      if (state.bonePositions.includes(index)) {
+        tileEl.classList.add('bone');
+        tileEl.textContent = '🦴';
+        state.bonesFound++;
+        dom.scoreVal.textContent = state.bonesFound;
+        
+        if (state.bonesFound >= CONFIG.totalBones) {
+          endGame();
+        }
+      } else {
+        tileEl.textContent = '🕳️';
+      }
+    };
+
+    const startGame = () => {
+      state.bonesFound = 0;
+      state.elapsedTime = 0;
+      state.isPlaying = true;
+      
+      dom.scoreVal.textContent = '0';
+      dom.timeVal.textContent = '0.0';
+      dom.startOverlay.classList.add('hidden');
+      dom.endOverlay.classList.add('hidden');
+
+      generateGrid();
+
+      state.timerId = setInterval(() => {
+        state.elapsedTime += 0.1;
+        dom.timeVal.textContent = state.elapsedTime.toFixed(1);
+      }, 100);
+    };
+
+    const endGame = () => {
+      state.isPlaying = false;
+      clearInterval(state.timerId);
+      
+      const tiles = dom.gameArea.getElementsByClassName('tile');
+      state.bonePositions.forEach(idx => {
+        tiles[idx].textContent = '🦖';
+      });
+
+      const finalTime = state.elapsedTime;
+      dom.finalScore.textContent = finalTime.toFixed(1) + "초";
+
+      if (finalTime < bestScore) {
+        bestScore = finalTime;
+        localStorage.setItem(CONFIG.bestScoreKey, bestScore.toFixed(1));
+        dom.bestVal.textContent = bestScore.toFixed(1) + "초";
+        dom.resultMsg.textContent = '👑 대성공! 장윤 박사님, 새로운 최단 기록이에요!';
+      } else {
+        dom.resultMsg.textContent = '공룡 뼈를 전부 멋지게 조립해냈어요! 🦖🔥';
+      }
+
+      dom.endOverlay.classList.remove('hidden');
+    };
+
+    dom.startBtn.addEventListener('pointerdown', startGame);
+    dom.restartBtn.addEventListener('pointerdown', startGame);
+  })();
+  </script>
+</body>
+</html>

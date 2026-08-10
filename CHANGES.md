@@ -1,3 +1,11 @@
+## 2026-08-11 (굿모닝 wrapper, Gemini)
+
+- 게임 2종 추가: `firetruck-fire-out`(🚒 소방차 불 끄기), `dino-bone-dig`(🦖 공룡 뼈 발굴).
+- `firetruck-fire-out` — 활활 타는 불(🔥)을 터치해 30초 동안 마을을 구하는 반사신경 및 터치 반응 게임. 불을 터치할 때마다 6개의 물방울 파티클 이펙트(💧)가 랜덤하게 퍼지고 콤보 및 점수가 적립되며 최고 기록 저장. 기존 `rain-dodge`·`submarine-dodge` 의 회피 물리 조작과 달리 타깃을 직접 터치/클릭하는 판단 속도 특화.
+- `dino-bone-dig` — 흙 타일(🟫)로 덮인 16개 그리드를 탭해 파헤쳐 숨겨진 공룡 뼈(🦴) 5개를 찾아내고 공룡(🦖)을 완성하는 고고학 탐험 게임. 최단 시간 발굴 기록을 실시간 소수점 단위로 갱신하여 localStorage 최고 기록 저장. 기존 `fossil-dig`(단순 드래그 모래 쓸어내기)와 달리 16분할 그리드 탭 판정 + 뼈 5개 조립 완성 시퀀스 구조가 차별점.
+- 두 게임 모두 단일 HTML, 외부 의존성 없음, 100dvh/overflow 보호, Pointer Events(pointerdown/move/up만 사용), 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함. JS 구문 검증(node --check) PASS.
+- `games.json` 214→216, 고유 ID 216(중복 0건), `menu.json` kids 카테고리 최상단에 신규 2건 배치. README 뱃지·상단문구·게임 표·최근변경 섹션을 실측 216으로 동기화.
+
 ## 2026-08-10 (굿모닝 wrapper, Gemini)
 
 - 게임 2종 추가: `space-dodge`(🚀 우주선 피하기 챌린지), `fruit-match`(🍎 과일 짝 맞추기).

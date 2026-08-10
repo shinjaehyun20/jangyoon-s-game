@@ -1710,5 +1710,21 @@
     "description": "음식을 냉장·냉동·실온에 드래그 분류",
     "thumbnail": "fridge-sort/thumb.svg",
     "path": "fridge-sort/index.html"
+  },
+  {
+    "id": "firetruck-fire-out",
+    "title": "Firetruck Fire Out",
+    "title_ko": "🚒 소방차 불 끄기",
+    "description": "활활 타는 불(🔥)을 터치해 꺼주세요! 30초 동안 마을을 구하는 소방대장 미션.",
+    "thumbnail": "firetruck-fire-out/thumb.svg",
+    "path": "firetruck-fire-out/index.html"
+  },
+  {
+    "id": "dino-bone-dig",
+    "title": "Dino Bone Dig",
+    "title_ko": "🦖 공룡 뼈 발굴",
+    "description": "흙 타일을 탭하여 공룡 뼈(🦴) 5개를 전부 찾아내고 멋진 공룡을 조립하는 탐험.",
+    "thumbnail": "dino-bone-dig/thumb.svg",
+    "path": "dino-bone-dig/index.html"
   }
 ]
