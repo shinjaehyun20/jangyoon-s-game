@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect width="100" height="100" fill="#070714" rx="10"/>
+  <!-- Glowing Constellation Lines -->
+  <line x1="20" y1="40" x2="50" y2="20" stroke="rgba(255, 215, 0, 0.4)" stroke-width="2" stroke-dasharray="2,2"/>
+  <line x1="50" y1="20" x2="80" y2="45" stroke="rgba(255, 215, 0, 0.4)" stroke-width="2" stroke-dasharray="2,2"/>
+  <line x1="80" y1="45" x2="60" y2="80" stroke="rgba(255, 215, 0, 0.4)" stroke-width="2" stroke-dasharray="2,2"/>
+  <!-- Stars -->
+  <path d="M20,35 L22,39 L26,40 L23,43 L24,47 L20,45 L16,47 L17,43 L14,40 L18,39 Z" fill="#ffd700"/>
+  <path d="M50,15 L52,19 L56,20 L53,23 L54,27 L50,25 L46,27 L47,23 L44,20 L48,19 Z" fill="#ffd700"/>
+  <path d="M80,40 L82,44 L86,45 L83,48 L84,52 L80,50 L76,52 L77,48 L74,45 L78,44 Z" fill="#ffd700"/>
+  <path d="M60,75 L62,79 L66,80 L63,83 L64,87 L60,85 L56,87 L57,83 L54,80 L58,79 Z" fill="#ffd700"/>
+  <!-- Central Math Target -->
+  <circle cx="50" cy="55" r="14" fill="rgba(255, 215, 0, 0.1)" stroke="#ffd700" stroke-width="2"/>
+  <text x="50" y="60" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#ffd700" text-anchor="middle">10</text>
+</svg>

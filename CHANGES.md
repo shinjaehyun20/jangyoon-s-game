@@ -1,3 +1,11 @@
+## 2026-08-12 (굿모닝 wrapper, Gemini)
+
+- 게임 2종 추가: `star-match-math`(⭐ 별자리 산수 짝 맞추기), `color-wave-harmony`(🌈 색상 파동 맞추기).
+- `star-match-math` — 무작위 숫자가 적힌 노란 별들을 클릭해 숫자의 합이 목표값과 정확히 일치하도록 연결하는 산수 연산 퍼즐 게임. 성공 시 별자리가 이쁘게 이어지는 시각 효과와 함께 30초 내에 가장 많은 퍼즐을 푸는 방식.
+- `color-wave-harmony` — 회전하는 바늘이 지시한 타겟 색상을 가리키는 정확한 순간에 터치 버튼을 클릭하는 타이밍 리듬 게임. 30초 내에 콤보를 이어가며 최고 기록을 달성.
+- 두 게임 모두 단일 HTML, 외부 의존성 없음, 100dvh/overflow 보호, Pointer Events 사용, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함. JS 구문 검증(node --check) PASS.
+- `games.json` 216→218, 고유 ID 218(중복 0건). README 뱃지·상단문구·게임 표·최근변경 섹션과 docs/assets/portfolio-hero.svg 및 docs/github-about.md의 하드코딩 게임 카운트를 실측 218로 동기화.
+
 ## 2026-08-11 (굿모닝 wrapper, Gemini)
 
 - 게임 2종 추가: `firetruck-fire-out`(🚒 소방차 불 끄기), `dino-bone-dig`(🦖 공룡 뼈 발굴).

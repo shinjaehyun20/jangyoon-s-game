@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 216개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 218개.
 
-[![Games](https://img.shields.io/badge/games-216-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-218-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![216개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![218개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 216개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 218개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [⭐ 별자리 산수 짝 맞추기 (star-match-math)](./star-match-math) | 화면의 별들을 선택하여 숫자의 합이 목표값과 정확히 일치하도록 하세요! 별자리를 잇는 연산 퍼즐. | 어린이/학습·인지 |
+| [🌈 색상 파동 맞추기 (color-wave-harmony)](./color-wave-harmony) | 회전하는 바늘이 타겟 색상을 가리키는 정확한 타이밍에 탭하세요! 리듬 타이밍 챌린지. | 어린이/반응·터치 |
 | [🚒 소방차 불 끄기 (firetruck-fire-out)](./firetruck-fire-out) | 활활 타는 불(🔥)을 터치해 꺼주세요! 30초 동안 마을을 구하는 소방대장 미션. | 어린이/반응·터치 |
 | [🦖 공룡 뼈 발굴 (dino-bone-dig)](./dino-bone-dig) | 흙 타일을 탭하여 공룡 뼈(🦴) 5개를 전부 찾아내고 멋진 공룡을 조립하는 탐험. | 어린이/공간·터치 |
 | [🚀 우주선 피하기 챌린지 (space-dodge)](./space-dodge) | 좌우로 우주선을 조종해 떨어지는 운석을 피하세요! | 액션/반응 |

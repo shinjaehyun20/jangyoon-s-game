@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>별자리 산수 짝 맞추기</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #070714;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 10px;
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            text-align: center;
+        }
+        p {
+            font-size: 13px;
+            color: #a0a0d0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        #gameContainer {
+            position: relative;
+            width: 320px;
+            height: 400px;
+            background-color: #0b0b20;
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+        .target-box {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 215, 0, 0.15);
+            border: 1px solid #ffd700;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+            z-index: 10;
+        }
+        .star {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffd700'><path d='M12 .587l3.668 7.431 8.2 1.192-5.934 5.786 1.4 8.168L12 18.896l-7.334 3.857 1.4-8.168L.132 9.21l8.2-1.192z'/></svg>");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            user-select: none;
+            transition: transform 0.2s, filter 0.2s;
+        }
+        .star.selected {
+            filter: drop-shadow(0 0 10px #ff6b6b) brightness(1.2);
+            transform: scale(1.1);
+        }
+        .star.selected font {
+            color: #fff;
+        }
+        .star-num {
+            margin-top: 2px;
+            color: #121212;
+            pointer-events: none;
+        }
+        .star.selected .star-num {
+            color: #fff;
+            text-shadow: 0 0 5px #000;
+        }
+        #current-sum {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 15px;
+            color: #a0a0d0;
+            z-index: 10;
+        }
+        .btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background-color: #ffd700;
+            color: #121212;
+            border: none;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn:hover {
+            background-color: #e6c200;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        #lineCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>⭐ 별자리 산수 짝 맞추기</h1>
+    <p>화면의 별들을 선택하여 숫자의 합이 목표값과 정확히 일치하도록 하세요!</p>
+
+    <div class="stats-container">
+        <div>시간: <span id="timer">30</span>초</div>
+        <div>점수: <span id="score">0</span></div>
+    </div>
+
+    <div id="gameContainer">
+        <canvas id="lineCanvas"></canvas>
+        <div class="target-box">목표: <span id="target-val">10</span></div>
+        <div id="starsArea"></div>
+        <div id="current-sum">선택한 합: <span id="sum-val">0</span></div>
+    </div>
+
+    <button class="btn" id="actionBtn" onclick="startGame()">게임 시작</button>
+
+    <script>
+        const gameContainer = document.getElementById("gameContainer");
+        const starsArea = document.getElementById("starsArea");
+        const targetValSpan = document.getElementById("target-val");
+        const sumValSpan = document.getElementById("sum-val");
+        const scoreSpan = document.getElementById("score");
+        const timerSpan = document.getElementById("timer");
+        const actionBtn = document.getElementById("actionBtn");
+        const canvas = document.getElementById("lineCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval = null;
+        let isPlaying = false;
+        let targetNum = 0;
+        let selectedStars = [];
+        let starsData = [];
+
+        function resizeCanvas() {
+            canvas.width = gameContainer.clientWidth;
+            canvas.height = gameContainer.clientHeight;
+        }
+        window.addEventListener("load", resizeCanvas);
+
+        function startGame() {
+            if (isPlaying) return;
+            score = 0;
+            timeLeft = 30;
+            isPlaying = true;
+            scoreSpan.textContent = score;
+            timerSpan.textContent = timeLeft;
+            actionBtn.style.display = "none";
+            selectedStars = [];
+            
+            resizeCanvas();
+            nextRound();
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerSpan.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(gameInterval);
+            starsArea.innerHTML = "";
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            actionBtn.style.display = "block";
+            actionBtn.textContent = "다시 시작";
+            alert(`게임 종료! 최종 점수: ${score}점`);
+        }
+
+        function nextRound() {
+            selectedStars = [];
+            sumValSpan.textContent = "0";
+            starsArea.innerHTML = "";
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Generate target number
+            targetNum = Math.floor(Math.random() * 11) + 10; // 10 to 20
+            targetValSpan.textContent = targetNum;
+
+            // Generate stars
+            starsData = [];
+            const count = 7;
+            const numbers = [];
+            
+            // Ensure at least one combination matches targetNum
+            let currentCombinationSum = 0;
+            const combCount = Math.floor(Math.random() * 2) + 2; // 2 or 3 numbers
+            for (let i = 0; i < combCount - 1; i++) {
+                const maxVal = targetNum - currentCombinationSum - (combCount - 1 - i);
+                const val = Math.floor(Math.random() * Math.max(1, maxVal - 1)) + 1;
+                numbers.push(val);
+                currentCombinationSum += val;
+            }
+            numbers.push(targetNum - currentCombinationSum);
+
+            // Fill the rest with random numbers
+            while (numbers.length < count) {
+                numbers.push(Math.floor(Math.random() * 9) + 1);
+            }
+
+            // Shuffle
+            numbers.sort(() => Math.random() - 0.5);
+
+            // Render stars at non-overlapping random positions
+            for (let i = 0; i < count; i++) {
+                let x, y, overlap;
+                let attempts = 0;
+                do {
+                    overlap = false;
+                    x = Math.random() * (canvas.width - 70) + 10;
+                    y = Math.random() * (canvas.height - 120) + 60;
+                    
+                    for (let p of starsData) {
+                        const dist = Math.hypot(p.x - x, p.y - y);
+                        if (dist < 60) {
+                            overlap = true;
+                            break;
+                        }
+                    }
+                    attempts++;
+                } while (overlap && attempts < 100);
+
+                const starObj = { id: i, val: numbers[i], x: x + 25, y: y + 25 };
+                starsData.push(starObj);
+
+                const starEl = document.createElement("div");
+                starEl.className = "star";
+                starEl.style.left = `${x}px`;
+                starEl.style.top = `${y}px`;
+                starEl.dataset.id = i;
+                starEl.innerHTML = `<span class="star-num">${numbers[i]}</span>`;
+                starEl.addEventListener("click", onStarClick);
+                starsArea.appendChild(starEl);
+            }
+        }
+
+        function onStarClick(e) {
+            if (!isPlaying) return;
+            const el = e.currentTarget;
+            const id = parseInt(el.dataset.id);
+
+            const index = selectedStars.indexOf(id);
+            if (index > -1) {
+                selectedStars.splice(index, 1);
+                el.classList.remove("selected");
+            } else {
+                selectedStars.push(id);
+                el.classList.add("selected");
+            }
+
+            // Recalculate sum
+            let currentSum = 0;
+            selectedStars.forEach(sid => {
+                const star = starsData.find(s => s.id === sid);
+                currentSum += star.val;
+            });
+            sumValSpan.textContent = currentSum;
+
+            drawConstellationLines();
+
+            if (currentSum === targetNum) {
+                score += 100;
+                scoreSpan.textContent = score;
+                setTimeout(nextRound, 300);
+            } else if (currentSum > targetNum) {
+                // Flash error
+                sumValSpan.style.color = "#ff6b6b";
+                setTimeout(() => {
+                    sumValSpan.style.color = "#a0a0d0";
+                    // Deselect all
+                    selectedStars = [];
+                    document.querySelectorAll(".star").forEach(s => s.classList.remove("selected"));
+                    sumValSpan.textContent = "0";
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }, 400);
+            }
+        }
+
+        function drawConstellationLines() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (selectedStars.length < 2) return;
+
+            ctx.beginPath();
+            const firstStar = starsData.find(s => s.id === selectedStars[0]);
+            ctx.moveTo(firstStar.x, firstStar.y);
+
+            for (let i = 1; i < selectedStars.length; i++) {
+                const star = starsData.find(s => s.id === selectedStars[i]);
+                ctx.lineTo(star.x, star.y);
+            }
+
+            ctx.strokeStyle = "rgba(255, 215, 0, 0.6)";
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 3]);
+            ctx.stroke();
+        }
+    </script>
+</body>
+</html>

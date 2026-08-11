@@ -1,5 +1,21 @@
 [
   {
+    "id": "star-match-math",
+    "title": "Star Match Math",
+    "title_ko": "⭐ 별자리 산수 짝 맞추기",
+    "description": "화면의 별들을 선택하여 숫자의 합이 목표값과 정확히 일치하도록 하세요! 별자리를 잇는 연산 퍼즐.",
+    "thumbnail": "star-match-math/thumb.svg",
+    "path": "star-match-math/index.html"
+  },
+  {
+    "id": "color-wave-harmony",
+    "title": "Color Wave Harmony",
+    "title_ko": "🌈 색상 파동 맞추기",
+    "description": "회전하는 바늘이 타겟 색상을 가리키는 정확한 타이밍에 탭하세요! 리듬 타이밍 챌린지.",
+    "thumbnail": "color-wave-harmony/thumb.svg",
+    "path": "color-wave-harmony/index.html"
+  },
+  {
     "id": "space-dodge",
     "title": "Space Dodge",
     "title_ko": "🚀 우주선 피하기 챌린지",

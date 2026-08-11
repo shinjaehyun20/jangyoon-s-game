@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>색상 파동 맞추기</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0c0816;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 10px;
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: #ff007f;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+            text-align: center;
+        }
+        p {
+            font-size: 13px;
+            color: #a09ab5;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        #gameContainer {
+            position: relative;
+            width: 320px;
+            height: 400px;
+            background-color: #141026;
+            border: 2px solid #ff007f;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+        .target-color-box {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            padding: 10px;
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        #color-name {
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        #color-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        .wave-area {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .color-wheel {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000);
+            position: relative;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+        #needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 6px;
+            background-color: #fff;
+            border-radius: 3px;
+            transform-origin: left center;
+            transform: translate(0, -50%) rotate(0deg);
+            box-shadow: 0 0 8px #fff;
+        }
+        #needle-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background-color: #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px #fff;
+        }
+        .btn {
+            padding: 10px 25px;
+            background-color: #ff007f;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 0, 127, 0.3);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn:hover {
+            background-color: #d8006b;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        #hitBtn {
+            width: 80%;
+            height: 50px;
+            font-size: 18px;
+            border-radius: 25px;
+            background-color: #00ffcc;
+            color: #121212;
+            box-shadow: 0 4px 10px rgba(0, 255, 204, 0.3);
+        }
+        #hitBtn:hover {
+            background-color: #00d4aa;
+        }
+        #feedback {
+            font-size: 16px;
+            font-weight: bold;
+            height: 20px;
+            color: #00ffcc;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌈 색상 파동 맞추기</h1>
+    <p>바늘이 타겟 색상 영역을 가리키는 정확한 순간에 터치 버튼을 탭하세요!</p>
+
+    <div class="stats-container">
+        <div>시간: <span id="timer">30</span>초</div>
+        <div>점수: <span id="score">0</span></div>
+    </div>
+
+    <div id="gameContainer">
+        <div class="target-color-box">
+            <div>타겟 색상</div>
+            <div id="color-preview"></div>
+            <div id="color-name">빨간색</div>
+        </div>
+
+        <div class="wave-area">
+            <div class="color-wheel">
+                <div id="needle"></div>
+                <div id="needle-center"></div>
+            </div>
+        </div>
+
+        <div id="feedback"></div>
+
+        <button class="btn" id="hitBtn" onclick="onHitClick()">터치!</button>
+        <button class="btn" id="actionBtn" style="display:none;" onclick="startGame()">게임 시작</button>
+    </div>
+
+    <script>
+        const colorPreview = document.getElementById("color-preview");
+        const colorName = document.getElementById("color-name");
+        const needle = document.getElementById("needle");
+        const feedback = document.getElementById("feedback");
+        const scoreSpan = document.getElementById("score");
+        const timerSpan = document.getElementById("timer");
+        const hitBtn = document.getElementById("hitBtn");
+        const actionBtn = document.getElementById("actionBtn");
+
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval = null;
+        let rotationInterval = null;
+        let isPlaying = false;
+        let currentAngle = 0;
+        let rotationSpeed = 3; // degrees per frame
+        
+        const colors = [
+            { name: "빨간색", range: [337.5, 22.5], hex: "#ff0000" },
+            { name: "주황색", range: [22.5, 67.5], hex: "#ff7f00" },
+            { name: "노란색", range: [67.5, 112.5], hex: "#ffff00" },
+            { name: "초록색", range: [112.5, 157.5], hex: "#00ff00" },
+            { name: "파란색", range: [157.5, 202.5], hex: "#0000ff" },
+            { name: "남색", range: [202.5, 247.5], hex: "#4b0082" },
+            { name: "보라색", range: [247.5, 292.5], hex: "#8b00ff" },
+            { name: "자주색", range: [292.5, 337.5], hex: "#ff007f" }
+        ];
+
+        let targetColorIndex = 0;
+
+        function startGame() {
+            if (isPlaying) return;
+            score = 0;
+            timeLeft = 30;
+            isPlaying = true;
+            scoreSpan.textContent = score;
+            timerSpan.textContent = timeLeft;
+            actionBtn.style.display = "none";
+            hitBtn.style.display = "block";
+            feedback.textContent = "";
+
+            chooseNextColor();
+            startRotation();
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerSpan.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(gameInterval);
+            clearInterval(rotationInterval);
+            actionBtn.style.display = "block";
+            actionBtn.textContent = "다시 시작";
+            hitBtn.style.display = "none";
+            alert(`게임 종료! 최종 점수: ${score}점`);
+        }
+
+        function startRotation() {
+            if (rotationInterval) clearInterval(rotationInterval);
+            
+            // Adjust speed randomly to add variety
+            rotationSpeed = (Math.random() * 2 + 3) * (Math.random() > 0.5 ? 1 : -1);
+
+            rotationInterval = setInterval(() => {
+                currentAngle = (currentAngle + rotationSpeed) % 360;
+                if (currentAngle < 0) currentAngle += 360;
+                needle.style.transform = `translate(0, -50%) rotate(${currentAngle}deg)`;
+            }, 20);
+        }
+
+        function chooseNextColor() {
+            targetColorIndex = Math.floor(Math.random() * colors.length);
+            const target = colors[targetColorIndex];
+            colorPreview.style.backgroundColor = target.hex;
+            colorName.textContent = target.name;
+            colorName.style.color = target.hex;
+        }
+
+        function onHitClick() {
+            if (!isPlaying) return;
+            
+            const target = colors[targetColorIndex];
+            let isHit = false;
+
+            // Check if currentAngle is within target color's range
+            const start = target.range[0];
+            const end = target.range[1];
+
+            if (start > end) { // wraps around 360/0
+                if (currentAngle >= start || currentAngle < end) {
+                    isHit = true;
+                }
+            } else {
+                if (currentAngle >= start && currentAngle < end) {
+                    isHit = true;
+                }
+            }
+
+            if (isHit) {
+                // Determine precision for bonus points
+                let center = (start + end) / 2;
+                if (start > end) center = (center + 180) % 360;
+                const diff = Math.min(Math.abs(currentAngle - center), 360 - Math.abs(currentAngle - center));
+
+                let points = 100;
+                if (diff < 10) {
+                    feedback.textContent = "Perfect! ✨";
+                    feedback.style.color = "#00ffcc";
+                    points = 200;
+                } else if (diff < 18) {
+                    feedback.textContent = "Great! 👍";
+                    feedback.style.color = "#ffff00";
+                    points = 150;
+                } else {
+                    feedback.textContent = "Good! 🙂";
+                    feedback.style.color = "#fff";
+                }
+
+                score += points;
+                scoreSpan.textContent = score;
+                chooseNextColor();
+                startRotation(); // change speed/direction on hit
+            } else {
+                feedback.textContent = "Miss! 😢";
+                feedback.style.color = "#ff6b6b";
+            }
+        }
+
+        // Auto start game
+        window.addEventListener("load", () => {
+            hitBtn.style.display = "none";
+            actionBtn.style.display = "block";
+            actionBtn.textContent = "게임 시작";
+        });
+    </script>
+</body>
+</html>
