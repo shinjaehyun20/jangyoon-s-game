@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>☁️ 구름 바람길 탐험</title>
+<style>
+:root{--night:#122b52;--sky:#75c9ef;--mint:#8ff0d1;--sun:#ffd166;--ink:#f7fcff;--deep:#17345f}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--night);color:var(--ink)}
+body{background:radial-gradient(circle at 75% 8%,#4c9ed1 0,#214d80 45%,#102647 100%)}
+.wrap{width:100%;max-width:500px;height:100vh;height:100dvh;margin:auto;padding:10px 12px 8px;display:flex;flex-direction:column;gap:8px}
+h1{font-size:clamp(21px,6vw,30px);line-height:1.05;text-align:center;text-shadow:0 3px 0 #0b1b37}
+.hud{display:flex;justify-content:space-between;gap:8px;background:#081a36aa;border:1px solid #ffffff2b;border-radius:16px;padding:9px 13px;font-weight:800;font-size:15px}.hud b{color:var(--sun)}
+#gameArea{position:relative;flex:1;min-height:0;border-radius:24px;overflow:hidden;background:linear-gradient(#6fc4ef 0 50%,#baf1dc 50% 72%,#4ca66f 72%);border:3px solid #ffffff45;box-shadow:inset 0 0 35px #0a285455}
+#gameArea:before{content:"☀️";position:absolute;right:12%;top:7%;font-size:34px;filter:drop-shadow(0 3px 2px #2a6a8b55)}
+#gameArea:after{content:"🏔️  🌲  🏔️";position:absolute;left:8%;bottom:5%;font-size:28px;letter-spacing:7px;opacity:.8}
+.goal{position:absolute;z-index:2;width:76px;height:76px;border:3px dashed #fff;border-radius:50%;display:grid;place-items:center;background:#ffd16666;color:#fff;font-size:35px;box-shadow:0 0 0 7px #ffd16622,0 0 22px #fff8;transition:transform .2s}.goal span{position:absolute;top:78px;white-space:nowrap;font-size:12px;font-weight:900;color:#17446c;background:#ffffffcc;border-radius:10px;padding:4px 8px}.goal.hit{transform:scale(1.22);background:#8ff0d199}
+.cloud{position:absolute;z-index:3;width:78px;height:54px;border:3px solid #fff;border-radius:50%;background:#fff;color:#3171a0;font-size:28px;display:grid;place-items:center;box-shadow:0 6px 0 #72b7cb;user-select:none;pointer-events:none;transition:left .05s linear,top .05s linear}.cloud small{position:absolute;bottom:-24px;white-space:nowrap;font-size:12px;font-weight:900;color:#17446c;background:#ffffffcc;border-radius:10px;padding:3px 7px}
+.wind{position:absolute;z-index:5;right:14px;bottom:14px;width:76px;height:76px;border-radius:50%;background:#ffffffea;color:#236390;border:4px solid var(--mint);display:grid;place-items:center;font-size:36px;box-shadow:0 6px 0 #2e8e87;touch-action:none;user-select:none;cursor:grab}.wind:after{content:"";position:absolute;inset:-9px;border:2px dashed #8ff0d199;border-radius:50%;pointer-events:none}.wind small{position:absolute;bottom:-23px;font-size:11px;color:white;font-weight:900;white-space:nowrap}.wind.active{background:#d9fff5;cursor:grabbing}
+.path{position:absolute;z-index:1;height:8px;border-radius:99px;background:repeating-linear-gradient(90deg,#ffffffb8 0 12px,transparent 12px 22px);transform-origin:left center;opacity:.78;pointer-events:none}.hint{position:absolute;z-index:4;left:50%;top:42%;transform:translate(-50%,-50%);font-size:14px;font-weight:850;color:#12375d;background:#ffffffcc;padding:8px 12px;border-radius:12px;pointer-events:none;white-space:nowrap;text-align:center}
+footer{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:#d9f5ff}footer a{color:#fff;background:#ffffff1f;border-radius:10px;padding:8px 10px;text-decoration:none;min-height:36px;white-space:nowrap}
+.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px;background:#06173599;backdrop-filter:blur(5px)}.overlay.hidden{display:none}.card{width:min(92vw,390px);text-align:center;background:linear-gradient(150deg,#173c71,#10224a);border:2px solid #8ff0d1aa;border-radius:26px;padding:27px 20px;box-shadow:0 15px 45px #0008}.card h2{font-size:clamp(24px,8vw,35px);margin-bottom:12px}.card p{line-height:1.55;margin-bottom:18px;color:#e5f8ff}.card strong{color:var(--sun)}button{border:0;border-radius:16px;background:var(--mint);color:#10324c;font-weight:900;font-size:20px;min-height:52px;padding:0 30px;box-shadow:0 5px 0 #409f91;cursor:pointer}button:active{transform:translateY(3px);box-shadow:0 2px 0 #409f91}.result{font-size:44px;font-weight:900;color:var(--sun);margin:8px 0}
+@media(max-height:700px){h1{font-size:23px}.hud{padding:7px 11px}.wrap{gap:6px;padding-top:8px}.hint{top:38%}}
+</style>
+</head>
+<body>
+<div class="wrap"><h1>☁️ 구름 바람길 탐험</h1><div class="hud"><span>탐험 <b id="score">0</b>회</span><span>남은 시간 <b id="time">45</b>초</span><span>최고 <b id="best">0</b></span></div><main id="gameArea" aria-label="구름 바람길 놀이"><div class="hint" id="hint">바람개비를 드래그해 화살표 방향으로<br>구름을 빛나는 하늘문까지 보내요!</div><div class="path" id="path"></div><div class="goal" id="goal" aria-label="빛나는 하늘문">🌟<span>하늘문</span></div><div class="cloud" id="cloud" aria-label="움직이는 구름">☁️<small>이 구름을 안내해요</small></div><div class="wind" id="wind" aria-label="바람 방향 조절: 드래그">🌀<small>드래그해서 방향 조절</small></div></main><footer><span>한 번에 구름 하나만 안내해요 ☁️</span><a href="../index.html">← 홈으로</a></footer></div>
+<div class="overlay" id="startOverlay"><section class="card"><h2>☁️ 구름 바람길 탐험</h2><p>바람개비를 <strong>드래그한 방향</strong>으로<br>구름이 한 칸씩 움직여요.<br>빛나는 <strong>하늘문</strong>까지 안내해 보세요!</p><button id="startBtn">탐험 시작!</button></section></div>
+<div class="overlay hidden" id="endOverlay"><section class="card"><h2>🎉 탐험 끝!</h2><div class="result"><span id="finalScore">0</span>회 성공</div><p id="resultMsg"></p><button id="restartBtn">다시 탐험</button></section></div>
+<script>
+(() => {'use strict';
+const CFG={duration:45,storage:'windy-cloud-postman_best'};
+const area=document.getElementById('gameArea'),cloud=document.getElementById('cloud'),goal=document.getElementById('goal'),wind=document.getElementById('wind'),path=document.getElementById('path'),hint=document.getElementById('hint');
+const scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),bestEl=document.getElementById('best'),startOverlay=document.getElementById('startOverlay'),endOverlay=document.getElementById('endOverlay'),finalScore=document.getElementById('finalScore'),resultMsg=document.getElementById('resultMsg');
+let best=Number(localStorage.getItem(CFG.storage)||0);bestEl.textContent=best;
+let state={playing:false,score:0,time:CFG.duration,timer:null,dragging:false,angle:0,x:0,y:0,gx:0,gy:0};
+function updateHud(){scoreEl.textContent=state.score;timeEl.textContent=state.time}
+function center(el){const r=el.getBoundingClientRect(),a=area.getBoundingClientRect();return{x:r.left-a.left+r.width/2,y:r.top-a.top+r.height/2}}
+function placeRound(){const ar=area.getBoundingClientRect();state.x=Math.max(38,ar.width*.18);state.y=ar.height*.36;state.gx=Math.min(ar.width-58,ar.width*.78);state.gy=ar.height*.28;cloud.style.left=(state.x-39)+'px';cloud.style.top=(state.y-27)+'px';goal.style.left=(state.gx-38)+'px';goal.style.top=(state.gy-38)+'px';drawPath();hint.style.display=state.score?'none':'block'}
+function drawPath(){const dx=state.gx-state.x,dy=state.gy-state.y,len=Math.hypot(dx,dy),deg=Math.atan2(dy,dx)*180/Math.PI;path.style.left=state.x+'px';path.style.top=state.y+'px';path.style.width=Math.max(20,len-35)+'px';path.style.transform='rotate('+deg+'deg)'}
+function setDirection(e){const r=wind.getBoundingClientRect();const a=Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2));state.angle=a;wind.style.transform='rotate('+(a*180/Math.PI+90)+'deg)';path.style.background='repeating-linear-gradient(90deg,#fff 0 12px,transparent 12px 22px)';moveCloud()}
+function moveCloud(){if(!state.playing)return;const step=18;state.x+=Math.cos(state.angle)*step;state.y+=Math.sin(state.angle)*step;const ar=area.getBoundingClientRect();state.x=Math.max(40,Math.min(ar.width-40,state.x));state.y=Math.max(30,Math.min(ar.height*.58,state.y));cloud.style.left=(state.x-39)+'px';cloud.style.top=(state.y-27)+'px';drawPath();if(Math.hypot(state.gx-state.x,state.gy-state.y)<48){state.score++;goal.classList.add('hit');updateHud();if(state.score>best){best=state.score;localStorage.setItem(CFG.storage,String(best));bestEl.textContent=best}setTimeout(()=>{goal.classList.remove('hit');placeRound()},220)}}
+function endGame(){if(!state.playing)return;state.playing=false;clearInterval(state.timer);state.timer=null;finalScore.textContent=state.score;resultMsg.textContent=state.score?'구름이 하늘문을 잘 찾았어요!':'다음에는 바람개비를 하늘문 쪽으로 움직여 보세요!';endOverlay.classList.remove('hidden')}
+function start(){startOverlay.classList.add('hidden');endOverlay.classList.add('hidden');state={playing:true,score:0,time:CFG.duration,timer:null,dragging:false,angle:0,x:0,y:0,gx:0,gy:0};placeRound();updateHud();state.timer=setInterval(()=>{state.time--;updateHud();if(state.time<=0)endGame()},1000)}
+wind.addEventListener('pointerdown',e=>{if(!state.playing)return;e.preventDefault();state.dragging=true;wind.classList.add('active');hint.style.display='none';try{wind.setPointerCapture(e.pointerId)}catch(_){}setDirection(e)});
+wind.addEventListener('pointermove',e=>{if(!state.dragging)return;e.preventDefault();setDirection(e)});
+function stop(){state.dragging=false;wind.classList.remove('active')}
+wind.addEventListener('pointerup',stop);wind.addEventListener('pointercancel',stop);window.addEventListener('pointerup',stop);
+document.getElementById('startBtn').addEventListener('pointerdown',start);document.getElementById('restartBtn').addEventListener('pointerdown',start);
+placeRound();
+})();
+</script></body></html>

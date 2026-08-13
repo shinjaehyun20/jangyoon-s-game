@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "juice-pour-party",
+        "label": "🍹 주스 따르기 파티",
+        "path": "juice-pour-party/index.html"
+      },
+      {
+        "id": "windy-cloud-postman",
+        "label": "☁️ 구름 바람길 탐험",
+        "path": "windy-cloud-postman/index.html"
+      },
+      {
         "id": "firetruck-fire-out",
         "label": "🚒 소방차 불 끄기",
         "path": "firetruck-fire-out/index.html"

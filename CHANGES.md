@@ -1,3 +1,11 @@
+## 2026-08-13 (굿모닝 wrapper, Hermes)
+
+- 게임 2종 추가: `juice-pour-party`(🍹 주스 따르기 파티), `windy-cloud-postman`(☁️ 구름 바람길 탐험).
+- `juice-pour-party` — 색깔 주전자를 알맞은 컵 위로 드래그해 45초 동안 주스를 따르는 위치·색상 판단 놀이. 기존 `bubble-tea-maker`의 재료 선택·완성 버튼 방식과 달리 직접 드래그와 컵 겹침 판정이 핵심입니다.
+- `windy-cloud-postman` — 바람개비를 드래그한 방향으로 구름을 직접 한 칸씩 움직여 빛나는 하늘문까지 안내하는 공간 드래그 놀이. 초기 우편 배달 시안을 독립 검수에서 반려한 뒤, 우체통·번호·자율 충돌을 제거하여 `letter-delivery`와의 전달/숫자 매칭 중복을 해소했습니다.
+- 두 게임 모두 단일 HTML, 외부 의존성 없음, 100dvh/overflow 보호, Pointer Events, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일 포함. 독립 브라우저 검수에서 `juice-pour-party`는 PASS, `windy-cloud-postman`은 재설계 후 모바일 시각·직접조작·콘솔 오류 0건을 확인했습니다.
+- `games.json` 218→220, 고유 ID 220, `menu.json` 어린이 추천 최상단에 신규 2건 배치. README 뱃지·상단문구·게임 표와 대표 자산의 하드코딩 개수를 220으로 동기화.
+
 ## 2026-08-12 (굿모닝 wrapper, Gemini)
 
 - 게임 2종 추가: `star-match-math`(⭐ 별자리 산수 짝 맞추기), `color-wave-harmony`(🌈 색상 파동 맞추기).
