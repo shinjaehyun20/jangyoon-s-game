@@ -1,5 +1,21 @@
 [
   {
+    "id": "lumi-dew-garden",
+    "title": "Lumi Dew Garden",
+    "title_ko": "🌱 루미 이슬정원",
+    "description": "이슬을 굴려 정원의 꽃과 풀을 싹틔우세요! 꽃잎과 잎새를 조화롭게 피워내는 힐링 물리 퍼즐.",
+    "thumbnail": "lumi-dew-garden/thumb.svg",
+    "path": "lumi-dew-garden/index.html"
+  },
+  {
+    "id": "woodland-marble-slide",
+    "title": "Woodland Marble Slide",
+    "title_ko": "🪵 숲속 구슬길",
+    "description": "나무 블록과 숲속 길을 이리저리 슬라이드해 구슬이 🏁 결승점까지 굴러가도록 경로를 완성하세요!",
+    "thumbnail": "woodland-marble-slide/thumb.svg",
+    "path": "woodland-marble-slide/index.html"
+  },
+  {
     "id": "star-match-math",
     "title": "Star Match Math",
     "title_ko": "⭐ 별자리 산수 짝 맞추기",

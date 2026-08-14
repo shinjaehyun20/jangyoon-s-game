@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "lumi-dew-garden",
+        "label": "🌱 루미 이슬정원",
+        "path": "lumi-dew-garden/index.html"
+      },
+      {
+        "id": "woodland-marble-slide",
+        "label": "🪵 숲속 구슬길",
+        "path": "woodland-marble-slide/index.html"
+      },
+      {
         "id": "juice-pour-party",
         "label": "🍹 주스 따르기 파티",
         "path": "juice-pour-party/index.html"
