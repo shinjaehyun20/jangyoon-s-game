@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="바다거북 비눗방울 구출">
+<defs>
+  <linearGradient id="seaBg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#00527b"/>
+    <stop offset="50%" stop-color="#007799"/>
+    <stop offset="100%" stop-color="#002b47"/>
+  </linearGradient>
+  <linearGradient id="bubbleGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
+    <stop offset="40%" stop-color="#67e8f9" stop-opacity="0.4"/>
+    <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.2"/>
+  </linearGradient>
+  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="4" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+<rect width="320" height="180" rx="18" fill="url(#seaBg)"/>
+<circle cx="50" cy="140" r="35" fill="#0284c7" opacity="0.25"/>
+<circle cx="270" cy="50" r="45" fill="#38bdf8" opacity="0.2"/>
+<path d="M10 180 Q30 130 50 180 Q70 140 90 180" fill="#f43f5e" opacity="0.6"/>
+<path d="M230 180 Q255 125 280 180 Q300 135 320 180" fill="#10b981" opacity="0.5"/>
+<g transform="translate(160, 80)">
+  <circle cx="0" cy="0" r="42" fill="url(#bubbleGrad)" stroke="#e0f2fe" stroke-width="2" filter="url(#glow)"/>
+  <ellipse cx="-14" cy="-14" rx="10" ry="5" fill="#ffffff" opacity="0.6" transform="rotate(-30, -14, -14)"/>
+  <ellipse cx="0" cy="2" rx="16" ry="13" fill="#22c55e"/>
+  <ellipse cx="0" cy="2" rx="13" ry="10" fill="#15803d" stroke="#86efac" stroke-width="1.5"/>
+  <circle cx="-18" cy="-1" r="6" fill="#4ade80"/>
+  <circle cx="-19" cy="-2" r="1.5" fill="#0f172a"/>
+  <path d="M-8 -6 Q-18 -18 -4 -12" fill="#22c55e"/>
+  <path d="M8 -6 Q18 -18 4 -12" fill="#22c55e"/>
+  <path d="M-6 10 Q-12 18 -2 14" fill="#22c55e"/>
+  <path d="M6 10 Q12 18 2 14" fill="#22c55e"/>
+</g>
+<circle cx="80" cy="60" r="12" fill="url(#bubbleGrad)" stroke="#e0f2fe" stroke-width="1.5"/>
+<circle cx="240" cy="110" r="16" fill="url(#bubbleGrad)" stroke="#e0f2fe" stroke-width="1.5"/>
+<circle cx="105" cy="115" r="8" fill="url(#bubbleGrad)" stroke="#e0f2fe" stroke-width="1"/>
+<text x="296" y="148" text-anchor="end" font-family="Pretendard,Malgun Gothic,sans-serif" font-size="20" font-weight="900" fill="#67e8f9">바다거북 비눗방울 구출</text>
+<text x="296" y="166" text-anchor="end" font-family="Pretendard,Arial,sans-serif" font-size="10" font-weight="700" fill="#bae6fd" letter-spacing="2">TURTLE BUBBLE RESCUE</text>
+<rect x="0.5" y="0.5" width="319" height="179" rx="18" fill="none" stroke="#ffffff" stroke-opacity="0.15"/>
+</svg>

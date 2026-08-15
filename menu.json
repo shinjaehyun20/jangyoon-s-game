@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "turtle-bubble-rescue",
+        "label": "🐢 바다거북 비눗방울 구출",
+        "path": "turtle-bubble-rescue/index.html"
+      },
+      {
+        "id": "cosmic-star-baker",
+        "label": "🥐 우주 별빛 베이커리",
+        "path": "cosmic-star-baker/index.html"
+      },
+      {
         "id": "lumi-dew-garden",
         "label": "🌱 루미 이슬정원",
         "path": "lumi-dew-garden/index.html"

@@ -1,5 +1,21 @@
 [
   {
+    "id": "turtle-bubble-rescue",
+    "title": "Turtle Bubble Rescue",
+    "title_ko": "🐢 바다거북 비눗방울 구출",
+    "description": "비눗방울에 갇힌 아기 바다거북과 물고기 친구들을 톡톡 터치해 안전한 산호초 둥지로 구출해주세요!",
+    "thumbnail": "turtle-bubble-rescue/thumb.svg",
+    "path": "turtle-bubble-rescue/index.html"
+  },
+  {
+    "id": "cosmic-star-baker",
+    "title": "Cosmic Star Baker",
+    "title_ko": "🥐 우주 별빛 베이커리",
+    "description": "외계인 손님들의 주문 순서에 맞춰 별빛 반죽, 행성 시럽, 별가루 토핑을 올려 맛있는 우주 디저트를 구워내세요!",
+    "thumbnail": "cosmic-star-baker/thumb.svg",
+    "path": "cosmic-star-baker/index.html"
+  },
+  {
     "id": "lumi-dew-garden",
     "title": "Lumi Dew Garden",
     "title_ko": "🌱 루미 이슬정원",

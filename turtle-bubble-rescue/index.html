@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>바다거북 비눗방울 구출</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--teal:#0284c7;--cyan:#38bdf8;--green:#22c55e;--coral:#f43f5e;--sand:#fde047}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100vh;height:100dvh;margin:0;overflow:hidden;touch-action:manipulation;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:#fff;background:#032b43}
+body{background:radial-gradient(circle at 50% 10%,#006494 0,transparent 50%),linear-gradient(180deg,#003554 0%,#051923 100%)}
+.wrap{position:relative;width:100%;max-width:520px;height:100vh;height:100dvh;margin:auto;padding:12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:clamp(20px,5.5vw,26px);margin:0;color:#e0f2fe;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+.sub{font-size:11px;font-weight:700;color:#7dd3fc;margin-top:2px}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.chip{padding:6px;text-align:center;border-radius:12px;background:rgba(255,255,255,.1);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.15);font-size:11px;color:#bae6fd}
+.chip b{display:block;font-size:17px;color:#fff;margin-top:2px}
+#canvas-box{position:relative;flex:1;min-height:0;border-radius:20px;overflow:hidden;border:1px solid rgba(56,189,248,.3);background:radial-gradient(circle at 50% 30%,rgba(56,189,248,.15),transparent 60%),rgba(0,30,50,.6);box-shadow:inset 0 0 20px rgba(0,0,0,.5)}
+canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#7dd3fc}
+.home-link{color:#fde047;font-weight:900;text-decoration:none;font-size:12px}
+.overlay{position:fixed;z-index:10;inset:0;padding:20px;display:grid;place-items:center;background:rgba(3,43,67,.75);backdrop-filter:blur(8px)}
+.overlay.hidden{display:none}
+.card{width:min(380px,100%);padding:24px 20px;text-align:center;border-radius:24px;border:1px solid rgba(255,255,255,.2);background:linear-gradient(160deg,#006494,#003554);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.card h2{margin:0 0 10px;font-size:24px;color:#fde047}
+.card p{margin:0 0 16px;font-size:13px;line-height:1.6;color:#e0f2fe}
+.btn{padding:12px 24px;border:0;border-radius:14px;background:linear-gradient(135deg,#38bdf8,#0284c7);color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(2,132,199,.4)}
+.btn:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+  <div><h1>🐢 바다거북 비눗방울 구출</h1><div class="sub">비눗방울에 갇힌 바다 친구들을 터치해 구해주세요!</div></div>
+  <div class="chip" style="min-width:70px">최고 <b id="best">0</b></div>
+</header>
+<section class="hud">
+  <div class="chip">구출 점수<b id="score">0</b></div>
+  <div class="chip">남은 시간<b id="timer">45초</b></div>
+  <div class="chip">콤보<b id="combo">0x</b></div>
+</section>
+<div id="canvas-box"><canvas id="cvs"></canvas></div>
+<footer class="footer"><span>🫧 거품을 톡! 가시복어 거품은 피해요!</span><a class="home-link" href="../index.html">← 홈</a></footer>
+</main>
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <div style="font-size:50px;margin-bottom:6px">🐢🫧🐠</div>
+    <h2>바다거북 비눗방울 구출</h2>
+    <p>바다속 비눗방울에 갇힌 아기 거북이와<br>물고기 친구들을 톡톡 터치해 구출해주세요!<br><br>⚠️ 검은 가시복어 거품은 터뜨리면 안돼요!</p>
+    <button class="btn" id="startBtn">구출 작전 시작!</button>
+  </div>
+</div>
+<div class="overlay hidden" id="endOverlay">
+  <div class="card">
+    <div style="font-size:50px;margin-bottom:6px" id="endEmoji">🎉</div>
+    <h2 id="endTitle">구출 작전 완료!</h2>
+    <p id="endText"></p>
+    <button class="btn" id="restartBtn">다시 하기</button>
+  </div>
+</div>
+<script>
+(()=>{'use strict';
+const KEY='turtle_bubble_rescue_best';
+let canvas=document.getElementById('cvs'),ctx=canvas.getContext('2d');
+let score=0,timeLeft=45,combo=0,running=false,bubbles=[],particles=[],timerInterval=null;
+let W=0,H=0;
+
+function resize(){
+  const rect=canvas.parentElement.getBoundingClientRect();
+  W=canvas.width=rect.width;
+  H=canvas.height=rect.height;
+}
+window.addEventListener('resize',resize);
+resize();
+
+const AUD=window.AudioContext||window.webkitAudioContext;
+let actx=null;
+function beep(f,type='sine',dur=0.15){
+  try{
+    if(!actx)actx=new AUD();
+    let osc=actx.createOscillator(),g=actx.createGain();
+    osc.type=type;osc.frequency.value=f;
+    g.gain.setValueAtTime(0.2,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+dur);
+    osc.connect(g);g.connect(actx.destination);
+    osc.start();osc.stop(actx.currentTime+dur);
+  }catch(e){}
+}
+
+const CREATURES=[
+  {type:'turtle',emoji:'🐢',pts:100,spd:1.2,r:32,prob:0.45},
+  {type:'fish',emoji:'🐠',pts:80,spd:1.5,r:28,prob:0.3},
+  {type:'star',emoji:'⭐',pts:150,spd:1.8,r:26,prob:0.15},
+  {type:'puffer',emoji:'🐡',pts:-150,spd:1.0,r:30,prob:0.1,bad:true}
+];
+
+function spawnBubble(){
+  if(!running)return;
+  let rand=Math.random(),acc=0,chosen=CREATURES[0];
+  for(let c of CREATURES){
+    acc+=c.prob;
+    if(rand<=acc){chosen=c;break;}
+  }
+  bubbles.push({
+    x:Math.random()*(W-80)+40,
+    y:H+40,
+    r:chosen.r,
+    type:chosen.type,
+    emoji:chosen.emoji,
+    pts:chosen.pts,
+    bad:chosen.bad||false,
+    vy:(chosen.spd+Math.random()*0.5)*(H/450),
+    wobble:Math.random()*Math.PI*2,
+    scale:1
+  });
+}
+
+function tapAt(tx,ty){
+  if(!running)return;
+  for(let i=bubbles.length-1;i>=0;i--){
+    let b=bubbles[i];
+    let dist=Math.hypot(tx-b.x,ty-b.y);
+    if(dist<=b.r*1.2){
+      bubbles.splice(i,1);
+      if(b.bad){
+        combo=0;
+        score=Math.max(0,score+b.pts);
+        beep(180,'sawtooth',0.3);
+        spawnParticles(b.x,b.y,'#1e293b',12);
+      }else{
+        combo++;
+        let bonus=Math.floor(b.pts*(1+(combo-1)*0.2));
+        score+=bonus;
+        beep(400+combo*40,'sine',0.15);
+        spawnParticles(b.x,b.y,'#38bdf8',15);
+        spawnFloater(b.x,b.y,'+'+bonus+(combo>1?' ('+combo+'x)':''));
+      }
+      document.getElementById('score').textContent=score;
+      document.getElementById('combo').textContent=combo+'x';
+      return;
+    }
+  }
+}
+
+let floaters=[];
+function spawnFloater(x,y,text){
+  floaters.push({x,y,text,alpha:1,vy:-1.5});
+}
+
+function spawnParticles(x,y,color,cnt){
+  for(let i=0;i<cnt;i++){
+    let ang=Math.random()*Math.PI*2,spd=2+Math.random()*4;
+    particles.push({
+      x,y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,
+      r:3+Math.random()*3,color,alpha:1
+    });
+  }
+}
+
+canvas.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  let rect=canvas.getBoundingClientRect();
+  tapAt(e.clientX-rect.left,e.clientY-rect.top);
+});
+
+function loop(){
+  ctx.clearRect(0,0,W,H);
+
+  ctx.fillStyle='rgba(56,189,248,0.03)';
+  ctx.beginPath();
+  ctx.moveTo(W*0.2,0);ctx.lineTo(W*0.5,H);ctx.lineTo(W*0.35,H);ctx.lineTo(W*0.1,0);ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(W*0.7,0);ctx.lineTo(W*0.9,H);ctx.lineTo(W*0.75,H);ctx.lineTo(W*0.55,0);ctx.fill();
+
+  for(let i=bubbles.length-1;i>=0;i--){
+    let b=bubbles[i];
+    b.y-=b.vy;
+    b.wobble+=0.04;
+    let wx=b.x+Math.sin(b.wobble)*10;
+
+    ctx.save();
+    ctx.translate(wx,b.y);
+    ctx.beginPath();
+    ctx.arc(0,0,b.r,0,Math.PI*2);
+    if(b.bad){
+      ctx.fillStyle='rgba(15,23,42,0.6)';
+      ctx.strokeStyle='rgba(244,63,94,0.8)';
+    }else{
+      ctx.fillStyle='rgba(56,189,248,0.25)';
+      ctx.strokeStyle='rgba(224,242,254,0.7)';
+    }
+    ctx.lineWidth=2;
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(-b.r*0.3,-b.r*0.3,b.r*0.25,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.6)';
+    ctx.fill();
+
+    ctx.font=Math.floor(b.r*1.1)+'px sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(b.emoji,0,2);
+    ctx.restore();
+
+    if(b.y<-50)bubbles.splice(i,1);
+  }
+
+  for(let i=particles.length-1;i>=0;i--){
+    let p=particles[i];
+    p.x+=p.vx;p.y+=p.vy;p.alpha-=0.03;
+    if(p.alpha<=0){particles.splice(i,1);continue;}
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.color;
+    ctx.globalAlpha=p.alpha;
+    ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  for(let i=floaters.length-1;i>=0;i--){
+    let f=floaters[i];
+    f.y+=f.vy;f.alpha-=0.025;
+    if(f.alpha<=0){floaters.splice(i,1);continue;}
+    ctx.font='bold 16px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillStyle='#fde047';
+    ctx.globalAlpha=f.alpha;
+    ctx.fillText(f.text,f.x,f.y);
+    ctx.globalAlpha=1;
+  }
+
+  if(running)requestAnimationFrame(loop);
+}
+
+let spawnTimer=null;
+function startGame(){
+  score=0;timeLeft=45;combo=0;bubbles=[];particles=[];floaters=[];running=true;
+  document.getElementById('score').textContent='0';
+  document.getElementById('timer').textContent='45초';
+  document.getElementById('combo').textContent='0x';
+  document.getElementById('startOverlay').classList.add('hidden');
+  document.getElementById('endOverlay').classList.add('hidden');
+  resize();
+  loop();
+
+  if(spawnTimer)clearInterval(spawnTimer);
+  spawnTimer=setInterval(spawnBubble,700);
+
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    document.getElementById('timer').textContent=timeLeft+'초';
+    if(timeLeft<=0)endGame();
+  },1000);
+}
+
+function endGame(){
+  running=false;
+  clearInterval(timerInterval);
+  clearInterval(spawnTimer);
+  let best=Math.max(+localStorage.getItem(KEY)||0,score);
+  localStorage.setItem(KEY,best);
+  document.getElementById('best').textContent=best;
+
+  document.getElementById('endTitle').textContent='구출 성공!';
+  document.getElementById('endText').textContent='총 '+score+'점을 획득하여 바다 친구들을 안전하게 구출했어요!';
+  document.getElementById('endOverlay').classList.remove('hidden');
+}
+
+document.getElementById('best').textContent=localStorage.getItem(KEY)||0;
+document.getElementById('startBtn').addEventListener('pointerdown',startGame);
+document.getElementById('restartBtn').addEventListener('pointerdown',startGame);
+})();
+</script>
+</body>
+</html>

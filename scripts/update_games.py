@@ -1,6 +1,7 @@
 import os
 import json
 import re
+from pathlib import Path
 
 GAME_ROOT = r"D:\workspace\projects\active\jangyoon-s-game"
 GAMES_JSON = os.path.join(GAME_ROOT, "games.json")
@@ -11,20 +12,20 @@ README_MD = os.path.join(GAME_ROOT, "README.md")
 
 NEW_GAMES = [
     {
-        "id": "lumi-dew-garden",
-        "title": "Lumi Dew Garden",
-        "title_ko": "🌱 루미 이슬정원",
-        "description": "이슬을 굴려 정원의 꽃과 풀을 싹틔우세요! 꽃잎과 잎새를 조화롭게 피워내는 힐링 물리 퍼즐.",
-        "thumbnail": "lumi-dew-garden/thumb.svg",
-        "path": "lumi-dew-garden/index.html"
+        "id": "turtle-bubble-rescue",
+        "title": "Turtle Bubble Rescue",
+        "title_ko": "🐢 바다거북 비눗방울 구출",
+        "description": "비눗방울에 갇힌 아기 바다거북과 물고기 친구들을 톡톡 터치해 안전한 산호초 둥지로 구출해주세요!",
+        "thumbnail": "turtle-bubble-rescue/thumb.svg",
+        "path": "turtle-bubble-rescue/index.html"
     },
     {
-        "id": "woodland-marble-slide",
-        "title": "Woodland Marble Slide",
-        "title_ko": "🪵 숲속 구슬길",
-        "description": "나무 블록과 숲속 길을 이리저리 슬라이드해 구슬이 🏁 결승점까지 굴러가도록 경로를 완성하세요!",
-        "thumbnail": "woodland-marble-slide/thumb.svg",
-        "path": "woodland-marble-slide/index.html"
+        "id": "cosmic-star-baker",
+        "title": "Cosmic Star Baker",
+        "title_ko": "🥐 우주 별빛 베이커리",
+        "description": "외계인 손님들의 주문 순서에 맞춰 별빛 반죽, 행성 시럽, 별가루 토핑을 올려 맛있는 우주 디저트를 구워내세요!",
+        "thumbnail": "cosmic-star-baker/thumb.svg",
+        "path": "cosmic-star-baker/index.html"
     }
 ]
 
@@ -32,7 +33,6 @@ def update_games_json():
     with open(GAMES_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
         
-    # Check if already present to prevent duplicates
     existing_ids = {g["id"] for g in data}
     to_add = [g for g in NEW_GAMES if g["id"] not in existing_ids]
     
@@ -52,7 +52,6 @@ def update_menu_json():
     with open(MENU_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
         
-    # Find kids category
     kids_cat = None
     for cat in data:
         if cat.get("id") == "kids":
@@ -114,7 +113,6 @@ def update_counters(new_count):
         Path(README_MD).write_text(updated_readme, encoding="utf-8")
         print(f"Updated README.md to count {new_count}.")
 
-from pathlib import Path
 if __name__ == "__main__":
     count = update_games_json()
     update_menu_json()
