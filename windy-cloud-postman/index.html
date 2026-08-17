@@ -23,6 +23,10 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:8px;fon
 .overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px;background:#06173599;backdrop-filter:blur(5px)}.overlay.hidden{display:none}.card{width:min(92vw,390px);text-align:center;background:linear-gradient(150deg,#173c71,#10224a);border:2px solid #8ff0d1aa;border-radius:26px;padding:27px 20px;box-shadow:0 15px 45px #0008}.card h2{font-size:clamp(24px,8vw,35px);margin-bottom:12px}.card p{line-height:1.55;margin-bottom:18px;color:#e5f8ff}.card strong{color:var(--sun)}button{border:0;border-radius:16px;background:var(--mint);color:#10324c;font-weight:900;font-size:20px;min-height:52px;padding:0 30px;box-shadow:0 5px 0 #409f91;cursor:pointer}button:active{transform:translateY(3px);box-shadow:0 2px 0 #409f91}.result{font-size:44px;font-weight:900;color:var(--sun);margin:8px 0}
 @media(max-height:700px){h1{font-size:23px}.hud{padding:7px 11px}.wrap{gap:6px;padding-top:8px}.hint{top:38%}}
 </style>
+<!-- jangyoon-s-game catalog metadata -->
+<meta name="description" content="☁️ 구름 바람길 탐험 — 바람개비를 드래그한 방향으로 구름을 직접 움직여 빛나는 하늘문까지 안내하는 놀이 장윤이 게임 놀이터의 어린이 미니게임입니다.">
+<meta property="og:title" content="☁️ 구름 바람길 탐험 | 장윤이 게임 놀이터">
+<meta property="og:description" content="☁️ 구름 바람길 탐험 — 바람개비를 드래그한 방향으로 구름을 직접 움직여 빛나는 하늘문까지 안내하는 놀이 장윤이 게임 놀이터의 어린이 미니게임입니다.">
 </head>
 <body>
 <div class="wrap"><h1>☁️ 구름 바람길 탐험</h1><div class="hud"><span>탐험 <b id="score">0</b>회</span><span>남은 시간 <b id="time">45</b>초</span><span>최고 <b id="best">0</b></span></div><main id="gameArea" aria-label="구름 바람길 놀이"><div class="hint" id="hint">바람개비를 드래그해 화살표 방향으로<br>구름을 빛나는 하늘문까지 보내요!</div><div class="path" id="path"></div><div class="goal" id="goal" aria-label="빛나는 하늘문">🌟<span>하늘문</span></div><div class="cloud" id="cloud" aria-label="움직이는 구름">☁️<small>이 구름을 안내해요</small></div><div class="wind" id="wind" aria-label="바람 방향 조절: 드래그">🌀<small>드래그해서 방향 조절</small></div></main><footer><span>한 번에 구름 하나만 안내해요 ☁️</span><a href="../index.html">← 홈으로</a></footer></div>
