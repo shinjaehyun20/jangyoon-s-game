@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import re
 import subprocess
@@ -139,3 +140,12 @@ if __name__ == "__main__":
     count = update_games_json()
     update_menu_json()
     update_counters(count)
+    
+    # 6. Run automated integrity check
+    print("\n--- Running automated integrity check ---")
+    verify_script = os.path.join(os.path.dirname(__file__), "verify_integrity.py")
+    res = subprocess.run([sys.executable, verify_script], check=False)
+    if res.returncode != 0:
+        print("[!] Integrity check failed! Please fix errors above.")
+        sys.exit(1)
+
