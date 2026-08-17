@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>숲속 마법 물약방</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--forest:#064e3b;--mint:#34d399;--pink:#f472b6;--gold:#fde047;--cyan:#38bdf8;--purple:#c084fc}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100vh;height:100dvh;margin:0;overflow:hidden;touch-action:manipulation;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:#fff;background:#022c22}
+body{background:radial-gradient(circle at 50% 15%,#064e3b 0,transparent 55%),linear-gradient(180deg,#022c22 0%,#011710 100%)}
+.wrap{position:relative;width:100%;max-width:520px;height:100vh;height:100dvh;margin:auto;padding:12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:clamp(20px,5.5vw,26px);margin:0;color:#a7f3d0;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.sub{font-size:11px;font-weight:700;color:#6ee7b7;margin-top:2px}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.chip{padding:6px;text-align:center;border-radius:12px;background:rgba(255,255,255,.08);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.15);font-size:11px;color:#a7f3d0}
+.chip b{display:block;font-size:17px;color:#fff;margin-top:2px}
+.order-card{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(52,211,153,.2),rgba(56,189,248,.15));border:1px solid rgba(52,211,153,.4)}
+.order-info{display:flex;align-items:center;gap:10px}
+.order-emoji{font-size:32px}
+.order-steps{display:flex;gap:6px;margin-top:4px}
+.step-dot{padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(255,255,255,.15);color:#fff}
+.step-dot.done{background:#22c55e;color:#fff}
+.workshop{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border-radius:20px;border:1px solid rgba(52,211,153,.25);background:rgba(6,78,59,.4);box-shadow:inset 0 0 30px rgba(0,0,0,.6)}
+.cauldron{width:160px;height:160px;border-radius:50%;border:4px dashed rgba(52,211,153,.4);display:grid;place-items:center;position:relative;background:radial-gradient(circle,rgba(52,211,153,.15),transparent 70%)}
+.cauldron-preview{font-size:68px;filter:drop-shadow(0 6px 12px rgba(0,0,0,.4));transition:transform .2s ease}
+.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.c-btn{padding:10px 4px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.04));color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-size:11px;font-weight:700}
+.c-btn span{font-size:24px}
+.c-btn:active{transform:scale(.94);background:rgba(52,211,153,.3)}
+.footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#a7f3d0}
+.home-link{color:#fde047;font-weight:900;text-decoration:none;font-size:12px}
+.overlay{position:fixed;z-index:10;inset:0;padding:20px;display:grid;place-items:center;background:rgba(2,44,34,.8);backdrop-filter:blur(8px)}
+.overlay.hidden{display:none}
+.card{width:min(380px,100%);padding:24px 20px;text-align:center;border-radius:24px;border:1px solid rgba(52,211,153,.3);background:linear-gradient(160deg,#064e3b,#022c22);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.card h2{margin:0 0 10px;font-size:24px;color:#fde047}
+.card p{margin:0 0 16px;font-size:13px;line-height:1.6;color:#a7f3d0}
+.btn{padding:12px 24px;border:0;border-radius:14px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(5,150,105,.4)}
+.btn:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+  <div><h1>🧪 숲속 마법 물약방</h1><div class="sub">요정 손님의 레시피에 맞춰 신비한 마법 물약을 제조해요!</div></div>
+  <div class="chip" style="min-width:70px">최고 <b id="best">0</b></div>
+</header>
+<section class="hud">
+  <div class="chip">연금 점수<b id="score">0</b></div>
+  <div class="chip">남은 시간<b id="timer">50초</b></div>
+  <div class="chip">완성 물약<b id="served">0개</b></div>
+</section>
+<div class="order-card">
+  <div class="order-info">
+    <div class="order-emoji" id="orderGuest">🧚</div>
+    <div>
+      <div style="font-size:13px;font-weight:800" id="orderName">별빛 비행 물약</div>
+      <div class="order-steps" id="orderSteps"></div>
+    </div>
+  </div>
+  <button class="btn" id="mixBtn" style="padding:8px 14px;font-size:13px">✨ 물약 조제!</button>
+</div>
+<div class="workshop">
+  <div class="cauldron"><div class="cauldron-preview" id="previewEmoji">🥣</div></div>
+</div>
+<div class="controls">
+  <button class="c-btn" data-item="dew"><span>💧</span>이슬</button>
+  <button class="c-btn" data-item="leaf"><span>🌿</span>풀잎</button>
+  <button class="c-btn" data-item="star"><span>⭐</span>별가루</button>
+  <button class="c-btn" data-item="bloom"><span>🌸</span>꽃잎</button>
+</div>
+<footer class="footer"><span>✨ 재료를 순서대로 넣고 물약 조제 버튼을 눌러요!</span><a class="home-link" href="../index.html">← 홈</a></footer>
+</main>
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <div style="font-size:50px;margin-bottom:6px">🧪🌿🧚</div>
+    <h2>숲속 마법 물약방</h2>
+    <p>신비한 숲속 연금술사가 되어보세요!<br>손님의 주문 순서대로 마법 재료를 넣고<br>물약 조제 버튼을 눌러 완성하세요!</p>
+    <button class="btn" id="startBtn">물약방 열기!</button>
+  </div>
+</div>
+<div class="overlay hidden" id="endOverlay">
+  <div class="card">
+    <div style="font-size:50px;margin-bottom:6px" id="endEmoji">🧪</div>
+    <h2 id="endTitle">영업 종료!</h2>
+    <p id="endText"></p>
+    <button class="btn" id="restartBtn">다시 조제하기</button>
+  </div>
+</div>
+<script>
+(()=>{'use strict';
+const KEY='potion_magic_shop_best';
+let score=0,timeLeft=50,served=0,running=false,currentOrder=null,userItems=[],timerInterval=null;
+
+const RECIPES=[
+  {name:'별빛 비행 물약',guest:'🧚',steps:['dew','star','bloom'],emoji:'🧪',pts:120},
+  {name:'숲속 치유 물약',guest:'🧝',steps:['dew','leaf'],emoji:'🍵',pts:90},
+  {name:'오로라 변신 물약',guest:'🧙',steps:['dew','bloom','star'],emoji:'🍷',pts:130},
+  {name:'요정의 황금 물약',guest:'🦄',steps:['dew','leaf','star'],emoji:'🏺',pts:140}
+];
+
+const ITEM_NAMES={dew:'이슬 💧',leaf:'풀잎 🌿',star:'별가루 ⭐',bloom:'꽃잎 🌸'};
+
+const AUD=window.AudioContext||window.webkitAudioContext;
+let actx=null;
+function beep(f,type='sine',dur=0.12){
+  try{
+    if(!actx)actx=new AUD();
+    let osc=actx.createOscillator(),g=actx.createGain();
+    osc.type=type;osc.frequency.value=f;
+    g.gain.setValueAtTime(0.2,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+dur);
+    osc.connect(g);g.connect(actx.destination);
+    osc.start();osc.stop(actx.currentTime+dur);
+  }catch(e){}
+}
+
+function nextOrder(){
+  currentOrder=RECIPES[Math.floor(Math.random()*RECIPES.length)];
+  userItems=[];
+  document.getElementById('orderGuest').textContent=currentOrder.guest;
+  document.getElementById('orderName').textContent=currentOrder.name;
+  renderSteps();
+  document.getElementById('previewEmoji').textContent='🥣';
+}
+
+function renderSteps(){
+  let html='';
+  currentOrder.steps.forEach((s,idx)=>{
+    let isDone=userItems[idx]===s;
+    html+='<span class="step-dot '+(isDone?'done':'')+'">'+ITEM_NAMES[s]+'</span>';
+  });
+  document.getElementById('orderSteps').innerHTML=html;
+}
+
+document.querySelectorAll('.c-btn').forEach(b=>{
+  b.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    if(!running)return;
+    let item=b.dataset.item;
+    userItems.push(item);
+    beep(450+userItems.length*70);
+    renderSteps();
+
+    if(userItems.length===1)document.getElementById('previewEmoji').textContent='💧';
+    else if(userItems.length===2)document.getElementById('previewEmoji').textContent='🫧';
+    else document.getElementById('previewEmoji').textContent='✨';
+  });
+});
+
+document.getElementById('mixBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  if(!running)return;
+  let match=userItems.length===currentOrder.steps.length&&userItems.every((v,i)=>v===currentOrder.steps[i]);
+  if(match){
+    beep(880,'triangle',0.25);
+    score+=currentOrder.pts;
+    served++;
+    document.getElementById('score').textContent=score;
+    document.getElementById('served').textContent=served+'개';
+    document.getElementById('previewEmoji').textContent=currentOrder.emoji;
+    document.getElementById('previewEmoji').style.transform='scale(1.25)';
+    setTimeout(()=>{
+      document.getElementById('previewEmoji').style.transform='scale(1)';
+      nextOrder();
+    },350);
+  }else{
+    beep(200,'sawtooth',0.3);
+    document.getElementById('previewEmoji').textContent='💥';
+    userItems=[];
+    setTimeout(()=>{
+      renderSteps();
+      document.getElementById('previewEmoji').textContent='🥣';
+    },400);
+  }
+});
+
+function start(){
+  score=0;timeLeft=50;served=0;running=true;
+  document.getElementById('score').textContent='0';
+  document.getElementById('timer').textContent='50초';
+  document.getElementById('served').textContent='0개';
+  document.getElementById('startOverlay').classList.add('hidden');
+  document.getElementById('endOverlay').classList.add('hidden');
+  nextOrder();
+
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    document.getElementById('timer').textContent=timeLeft+'초';
+    if(timeLeft<=0)end();
+  },1000);
+}
+
+function end(){
+  running=false;
+  clearInterval(timerInterval);
+  let best=Math.max(+localStorage.getItem(KEY)||0,score);
+  localStorage.setItem(KEY,best);
+  document.getElementById('best').textContent=best;
+
+  document.getElementById('endTitle').textContent='물약 조제 완료!';
+  document.getElementById('endText').textContent='총 '+served+'개의 마법 물약을 완성하여 '+score+'점을 획득했어요!';
+  document.getElementById('endOverlay').classList.remove('hidden');
+}
+
+document.getElementById('best').textContent=localStorage.getItem(KEY)||0;
+document.getElementById('startBtn').addEventListener('pointerdown',start);
+document.getElementById('restartBtn').addEventListener('pointerdown',start);
+})();
+</script>
+</body>
+</html>

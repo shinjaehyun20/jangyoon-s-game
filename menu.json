@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "star-whale-voyage",
+        "label": "🐳 아기별고래 우주 유영",
+        "path": "star-whale-voyage/index.html"
+      },
+      {
+        "id": "potion-magic-shop",
+        "label": "🧪 숲속 마법 물약방",
+        "path": "potion-magic-shop/index.html"
+      },
+      {
         "id": "turtle-bubble-rescue",
         "label": "🐢 바다거북 비눗방울 구출",
         "path": "turtle-bubble-rescue/index.html"

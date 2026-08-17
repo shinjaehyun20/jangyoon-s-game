@@ -14,20 +14,20 @@ README_MD = os.path.join(GAME_ROOT, "README.md")
 
 NEW_GAMES = [
     {
-        "id": "turtle-bubble-rescue",
-        "title": "Turtle Bubble Rescue",
-        "title_ko": "🐢 바다거북 비눗방울 구출",
-        "description": "비눗방울에 갇힌 아기 바다거북과 물고기 친구들을 톡톡 터치해 안전한 산호초 둥지로 구출해주세요!",
-        "thumbnail": "turtle-bubble-rescue/thumb.svg",
-        "path": "turtle-bubble-rescue/index.html"
+        "id": "star-whale-voyage",
+        "title": "Star Whale Voyage",
+        "title_ko": "🐳 아기별고래 우주 유영",
+        "description": "은하수 바다를 헤엄치는 아기별고래를 부드럽게 유영시켜 반짝이는 별가루를 모으고 우주 오로라를 펼치세요!",
+        "thumbnail": "star-whale-voyage/thumb.svg",
+        "path": "star-whale-voyage/index.html"
     },
     {
-        "id": "cosmic-star-baker",
-        "title": "Cosmic Star Baker",
-        "title_ko": "🥐 우주 별빛 베이커리",
-        "description": "외계인 손님들의 주문 순서에 맞춰 별빛 반죽, 행성 시럽, 별가루 토핑을 올려 맛있는 우주 디저트를 구워내세요!",
-        "thumbnail": "cosmic-star-baker/thumb.svg",
-        "path": "cosmic-star-baker/index.html"
+        "id": "potion-magic-shop",
+        "title": "Potion Magic Shop",
+        "title_ko": "🧪 숲속 마법 물약방",
+        "description": "숲속 요정 손님들의 주문 순서에 맞춰 이슬, 풀잎, 별가루, 꽃잎을 플라스크에 넣어 신비한 마법 물약을 조제하세요!",
+        "thumbnail": "potion-magic-shop/thumb.svg",
+        "path": "potion-magic-shop/index.html"
     }
 ]
 

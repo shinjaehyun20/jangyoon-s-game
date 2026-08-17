@@ -1,5 +1,21 @@
 [
   {
+    "id": "star-whale-voyage",
+    "title": "Star Whale Voyage",
+    "title_ko": "🐳 아기별고래 우주 유영",
+    "description": "은하수 바다를 헤엄치는 아기별고래를 부드럽게 유영시켜 반짝이는 별가루를 모으고 우주 오로라를 펼치세요!",
+    "thumbnail": "star-whale-voyage/thumb.svg",
+    "path": "star-whale-voyage/index.html"
+  },
+  {
+    "id": "potion-magic-shop",
+    "title": "Potion Magic Shop",
+    "title_ko": "🧪 숲속 마법 물약방",
+    "description": "숲속 요정 손님들의 주문 순서에 맞춰 이슬, 풀잎, 별가루, 꽃잎을 플라스크에 넣어 신비한 마법 물약을 조제하세요!",
+    "thumbnail": "potion-magic-shop/thumb.svg",
+    "path": "potion-magic-shop/index.html"
+  },
+  {
     "id": "turtle-bubble-rescue",
     "title": "Turtle Bubble Rescue",
     "title_ko": "🐢 바다거북 비눗방울 구출",
