@@ -19,6 +19,7 @@ import os
 import sys
 import json
 import re
+import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from collections import Counter, defaultdict
@@ -32,7 +33,7 @@ GITHUB_ABOUT = REPO_ROOT / "docs" / "github-about.md"
 HERO_SVG = REPO_ROOT / "docs" / "assets" / "portfolio-hero.svg"
 
 REQUIRED_GAME_FIELDS = ["id", "title", "title_ko", "description", "thumbnail", "path"]
-EXCLUDED_DIRS = {".git", ".claude", ".github", "__pycache__", "_candidates", "docs", "games", "output", "scripts"}
+EXCLUDED_DIRS = {".git", ".claude", ".github", "__pycache__", "_candidates", "docs", "games", "marketing", "output", "scripts"}
 
 def check_all():
     errors = []
@@ -164,6 +165,29 @@ def check_all():
         hero_txt = HERO_SVG.read_text(encoding="utf-8")
         if f">{count_str}</text>" not in hero_txt and f"{count_str}개 어린이용" not in hero_txt:
             warnings.append(f"portfolio-hero.svg 내 표시 숫자가 최신 수치({count_str})와 일치하지 않습니다.")
+
+    # 4-4. GitHub About Description Check & Auto-sync via gh CLI
+    try:
+        gh_view = subprocess.run(["gh", "repo", "view", "shinjaehyun20/jangyoon-s-game", "--json", "description"], capture_output=True, text=True, timeout=5)
+        if gh_view.returncode == 0:
+            gh_desc = json.loads(gh_view.stdout).get("description", "")
+            if count_str not in gh_desc:
+                warnings.append(f"GitHub Repo Description({gh_desc})에 최신 수치({count_str})가 반영되지 않았습니다. 자동 갱신을 실행합니다.")
+                new_desc = f"터치로 바로 즐기는 {count_str}개 어린이 미니게임 아케이드 — 학습, 액션, 퍼즐, 창의 놀이."
+                subprocess.run(["gh", "repo", "edit", "shinjaehyun20/jangyoon-s-game", "--description", new_desc], check=False)
+                print(f"[*] GitHub Repo Description 자동 갱신 완료 -> {new_desc}")
+    except Exception as e:
+        warnings.append(f"gh CLI Description 확인 실패 (네트워크 또는 비설치): {e}")
+
+    # 4-5. Git Branches Hygiene (No lingering merged worktree/branches)
+    try:
+        br_res = subprocess.run(["git", "branch", "-r", "--merged", "origin/main"], capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=5)
+        if br_res.returncode == 0:
+            lingering = [b.strip() for b in br_res.stdout.splitlines() if b.strip() and not b.strip().endswith("origin/main") and not b.strip().endswith("origin/HEAD")]
+            if lingering:
+                warnings.append(f"origin/main에 머지된 후 삭제되지 않은 원격 브랜치 발견: {', '.join(lingering)}")
+    except Exception:
+        pass
 
     # [5] 게임 다양성 및 메커니즘 분석 리포트
     print("\n--- 🧩 게임 메커니즘 및 다양성 분석 리포트 ---")
