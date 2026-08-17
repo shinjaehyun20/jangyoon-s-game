@@ -1,8 +1,8 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 226개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 228개.
 
-[![Games](https://img.shields.io/badge/games-226-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-228-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)

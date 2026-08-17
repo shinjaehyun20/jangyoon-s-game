@@ -1,5 +1,17 @@
 [
   {
+    "id": "gravity-ball-architect",
+    "title": "Gravity Ball Architect",
+    "title_ko": "🧲 중력 구슬 건축가",
+    "category": "arcade"
+  },
+  {
+    "id": "beat-bubble-drummer",
+    "title": "Beat Bubble Drummer",
+    "title_ko": "🥁 쿵치딱 리듬 버블 밴드",
+    "category": "arcade"
+  },
+  {
     "id": "kids",
     "label": "어린이 추천",
     "items": [

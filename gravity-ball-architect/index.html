@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🧲 중력 구슬 건축가 (Gravity Ball Architect)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent-blue: #38bdf8;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
+      color: var(--text);
+      font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 900px;
+      height: 100vh;
+      max-height: 620px;
+      background: #090d16;
+      border: 2px solid rgba(56, 189, 248, 0.3);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-group h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      letter-spacing: -0.5px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .stat-badge {
+      background: rgba(30, 41, 59, 0.8);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #canvas-wrap {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Toolbar */
+    #toolbar {
+      padding: 8px 12px;
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .tool-palette {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 2px;
+    }
+
+    .tool-btn {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .tool-btn:hover {
+      background: #334155;
+      transform: translateY(-1px);
+    }
+
+    .tool-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+    }
+
+    .action-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: transform 0.15s, filter 0.15s;
+    }
+
+    .btn-play {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-reset {
+      background: #e11d48;
+      color: white;
+    }
+
+    .btn-clear {
+      background: #475569;
+      color: white;
+    }
+
+    .action-btn:hover {
+      filter: brightness(1.15);
+      transform: scale(1.03);
+    }
+
+    .action-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Modals & Overlays */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #1e293b;
+      border: 2px solid var(--accent-blue);
+      border-radius: 20px;
+      padding: 28px 36px;
+      max-width: 440px;
+      width: 90%;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-card h2 {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+      color: #38bdf8;
+    }
+
+    .modal-card p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .modal-btn {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      border: none;
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4);
+      transition: transform 0.15s, filter 0.15s;
+    }
+
+    .modal-btn:hover {
+      filter: brightness(1.1);
+      transform: scale(1.05);
+    }
+
+    /* Stage Selector Pill */
+    .stage-pill {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <header>
+    <div class="title-group">
+      <h1>🧲 중력 구슬 건축가</h1>
+    </div>
+    <div class="stats">
+      <div class="stat-badge stage-pill" id="stage-btn">🚩 스테이지 <span id="stage-num">1</span>/6</div>
+      <div class="stat-badge">⭐ <span id="star-count">0</span>/3</div>
+      <div class="stat-badge">🛠️ 도구 잔여: <span id="tool-budget">4</span></div>
+    </div>
+  </header>
+
+  <div id="canvas-wrap">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Clear Overlay -->
+    <div class="overlay" id="victory-modal">
+      <div class="modal-card">
+        <h2 id="vic-title">🎉 스테이지 클리어!</h2>
+        <div id="vic-stars" style="font-size: 2.2rem; margin: 10px 0;">⭐⭐⭐</div>
+        <p id="vic-desc">구슬이 모든 별을 획득하고 안전하게 골인했습니다!</p>
+        <button class="modal-btn" id="next-stage-btn">다음 스테이지 ▶</button>
+      </div>
+    </div>
+
+    <!-- Start Tutorial Overlay -->
+    <div class="overlay show" id="start-modal">
+      <div class="modal-card">
+        <h2>🧲 트랙을 설계해보세요!</h2>
+        <p>도구를 캔버스에 배치하여 시작점(🟡)에서 떨어진 구슬이 모든 별(⭐)을 먹고 골인 컵(🏁)에 들어가도록 만들어보세요!</p>
+        <div style="font-size: 0.85rem; color: #38bdf8; margin-bottom: 16px; text-align: left; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+          • 🟢 스프링: 구슬을 높이 튕겨 올립니다.<br>
+          • 🌀 가속판: 구슬에 순간적인 전방 가속을 줍니다.<br>
+          • 🔮 포털: A포털로 들어가면 B포털로 워프!<br>
+          • 🪵 슬로프: 구슬이 미끄러지는 안전한 경사로.
+        </div>
+        <button class="modal-btn" id="start-game-btn">건축 시작하기! 🛠️</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toolbar">
+    <div class="tool-palette">
+      <button class="tool-btn active" data-tool="spring">🟢 스프링</button>
+      <button class="tool-btn" data-tool="booster">🌀 가속판</button>
+      <button class="tool-btn" data-tool="ramp_right">🪵 우경사</button>
+      <button class="tool-btn" data-tool="ramp_left">🪵 좌경사</button>
+      <button class="tool-btn" data-tool="portal">🔮 포털</button>
+      <button class="tool-btn" data-tool="eraser">❌ 지우개</button>
+    </div>
+    <div class="action-controls">
+      <button class="action-btn btn-clear" id="clear-btn">🧹 비우기</button>
+      <button class="action-btn btn-reset" id="reset-btn" style="display:none;">⏹️ 정지</button>
+      <button class="action-btn btn-play" id="play-btn">▶️ 롤링!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Web Audio Synthesizer
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(type) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  if (type === 'bounce') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(300, now);
+    osc.frequency.exponentialRampToValueAtTime(700, now + 0.12);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+    osc.start(now);
+    osc.stop(now + 0.15);
+  } else if (type === 'boost') {
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  } else if (type === 'star') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(659.25, now); // E5
+    osc.frequency.setValueAtTime(880, now + 0.08); // A5
+    osc.frequency.setValueAtTime(1318.51, now + 0.16); // E6
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+    osc.start(now);
+    osc.stop(now + 0.35);
+  } else if (type === 'portal') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(400, now);
+    osc.frequency.exponentialRampToValueAtTime(900, now + 0.1);
+    osc.frequency.exponentialRampToValueAtTime(300, now + 0.2);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  } else if (type === 'win') {
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((f, idx) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(f, now + idx * 0.1);
+      g.gain.setValueAtTime(0.25, now + idx * 0.1);
+      g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.3);
+      o.start(now + idx * 0.1);
+      o.stop(now + idx * 0.1 + 0.3);
+    });
+  } else if (type === 'place') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+    osc.start(now);
+    osc.stop(now + 0.08);
+  }
+}
+
+// Stage Database
+const STAGES = [
+  {
+    id: 1,
+    budget: 4,
+    start: { x: 80, y: 100 },
+    goal: { x: 780, y: 440, w: 60, h: 40 },
+    fixedBlocks: [
+      { type: 'wall', x: 200, y: 250, w: 20, h: 220 }
+    ],
+    stars: [
+      { x: 300, y: 150, collected: false },
+      { x: 500, y: 280, collected: false },
+      { x: 700, y: 360, collected: false }
+    ]
+  },
+  {
+    id: 2,
+    budget: 5,
+    start: { x: 80, y: 80 },
+    goal: { x: 800, y: 140, w: 60, h: 40 },
+    fixedBlocks: [
+      { type: 'wall', x: 300, y: 200, w: 300, h: 20 },
+      { type: 'wall', x: 450, y: 220, w: 20, h: 250 }
+    ],
+    stars: [
+      { x: 220, y: 380, collected: false },
+      { x: 600, y: 380, collected: false },
+      { x: 750, y: 100, collected: false }
+    ]
+  },
+  {
+    id: 3,
+    budget: 5,
+    start: { x: 100, y: 80 },
+    goal: { x: 120, y: 440, w: 60, h: 40 },
+    fixedBlocks: [
+      { type: 'wall', x: 0, y: 260, w: 600, h: 20 },
+      { type: 'wall', x: 720, y: 180, w: 20, h: 280 }
+    ],
+    stars: [
+      { x: 400, y: 180, collected: false },
+      { x: 800, y: 200, collected: false },
+      { x: 450, y: 400, collected: false }
+    ]
+  },
+  {
+    id: 4,
+    budget: 6,
+    start: { x: 80, y: 100 },
+    goal: { x: 780, y: 120, w: 60, h: 40 },
+    fixedBlocks: [
+      { type: 'wall', x: 260, y: 0, w: 20, h: 360 },
+      { type: 'wall', x: 540, y: 180, w: 20, h: 360 }
+    ],
+    stars: [
+      { x: 160, y: 420, collected: false },
+      { x: 400, y: 100, collected: false },
+      { x: 660, y: 420, collected: false }
+    ]
+  },
+  {
+    id: 5,
+    budget: 6,
+    start: { x: 80, y: 80 },
+    goal: { x: 450, y: 460, w: 60, h: 40 },
+    fixedBlocks: [
+      { type: 'wall', x: 200, y: 180, w: 500, h: 20 },
+      { type: 'wall', x: 200, y: 340, w: 500, h: 20 }
+    ],
+    stars: [
+      { x: 800, y: 120, collected: false },
+      { x: 100, y: 260, collected: false },
+      { x: 800, y: 380, collected: false }
+    ]
+  },
+  {
+    id: 6,
+    budget: 7,
+    start: { x: 80, y: 80 },
+    goal: { x: 800, y: 450, w: 60, h: 40 },
+    fixedBlocks: [
+      { type: 'wall', x: 280, y: 120, w: 20, h: 240 },
+      { type: 'wall', x: 580, y: 200, w: 20, h: 240 }
+    ],
+    stars: [
+      { x: 200, y: 420, collected: false },
+      { x: 430, y: 80, collected: false },
+      { x: 700, y: 140, collected: false }
+    ]
+  }
+];
+
+// Canvas & Engine State
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+let cw = 900, ch = 520;
+
+let currentStageIdx = 0;
+let currentTool = 'spring';
+let placedItems = [];
+let particles = [];
+let isSimulating = false;
+
+// Physics Ball
+let ball = {
+  x: 80, y: 100,
+  vx: 0, vy: 0,
+  radius: 12,
+  active: false,
+  trail: []
+};
+
+function resize() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  cw = canvas.width;
+  ch = canvas.height;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Load Stage
+function loadStage(idx) {
+  currentStageIdx = idx % STAGES.length;
+  const stage = STAGES[currentStageIdx];
+  placedItems = [];
+  particles = [];
+  isSimulating = false;
+  
+  // reset ball
+  const scaleX = cw / 900;
+  const scaleY = ch / 520;
+  ball.x = stage.start.x * scaleX;
+  ball.y = stage.start.y * scaleY;
+  ball.vx = 0;
+  ball.vy = 0;
+  ball.active = false;
+  ball.trail = [];
+
+  // reset stars
+  stage.stars.forEach(s => s.collected = false);
+
+  updateUI();
+}
+
+function updateUI() {
+  const stage = STAGES[currentStageIdx];
+  document.getElementById('stage-num').textContent = currentStageIdx + 1;
+  const collected = stage.stars.filter(s => s.collected).length;
+  document.getElementById('star-count').textContent = collected;
+  const budgetLeft = stage.budget - placedItems.length;
+  document.getElementById('tool-budget').textContent = budgetLeft;
+
+  document.getElementById('play-btn').style.display = isSimulating ? 'none' : 'flex';
+  document.getElementById('reset-btn').style.display = isSimulating ? 'flex' : 'none';
+}
+
+// Tool Selection
+document.querySelectorAll('.tool-btn').forEach(btn => {
+  btn.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTool = btn.dataset.tool;
+  });
+});
+
+// Canvas Interaction (Placing/Removing tools)
+canvas.parentElement.addEventListener('pointerdown', (e) => {
+  if (isSimulating) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  const stage = STAGES[currentStageIdx];
+
+  if (currentTool === 'eraser') {
+    // Delete item if clicked
+    const idx = placedItems.findIndex(item => {
+      return Math.hypot(item.x - x, item.y - y) < 30;
+    });
+    if (idx !== -1) {
+      placedItems.splice(idx, 1);
+      playSound('bounce');
+      updateUI();
+    }
+    return;
+  }
+
+  // Check budget
+  if (placedItems.length >= stage.budget) {
+    playSound('bounce');
+    return;
+  }
+
+  // Prevent placing on start/goal/fixed blocks
+  const scaleX = cw / 900;
+  const scaleY = ch / 520;
+  if (Math.hypot(x - stage.start.x * scaleX, y - stage.start.y * scaleY) < 40) return;
+  if (Math.hypot(x - (stage.goal.x + stage.goal.w/2) * scaleX, y - (stage.goal.y + stage.goal.h/2) * scaleY) < 50) return;
+
+  // Add Item
+  let newItem = { type: currentTool, x, y };
+  if (currentTool === 'portal') {
+    // Need pair portal logic if odd
+    const portals = placedItems.filter(i => i.type === 'portal');
+    newItem.isEntry = (portals.length % 2 === 0);
+  }
+
+  placedItems.push(newItem);
+  playSound('place');
+  createSparks(x, y, '#38bdf8', 8);
+  updateUI();
+});
+
+// Particle System
+function createSparks(x, y, color, count = 12) {
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 4 + 1.5;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      color,
+      size: Math.random() * 3 + 2,
+      alpha: 1,
+      life: 0.03 + Math.random() * 0.03
+    });
+  }
+}
+
+// Action Buttons
+document.getElementById('play-btn').addEventListener('click', () => {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  isSimulating = true;
+  ball.active = true;
+  ball.vx = 2.5; // slight launch speed
+  ball.vy = 0;
+  updateUI();
+});
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  resetSimulation();
+});
+
+function resetSimulation() {
+  isSimulating = false;
+  const stage = STAGES[currentStageIdx];
+  const scaleX = cw / 900;
+  const scaleY = ch / 520;
+  ball.x = stage.start.x * scaleX;
+  ball.y = stage.start.y * scaleY;
+  ball.vx = 0;
+  ball.vy = 0;
+  ball.active = false;
+  ball.trail = [];
+  stage.stars.forEach(s => s.collected = false);
+  updateUI();
+}
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  if (isSimulating) resetSimulation();
+  placedItems = [];
+  updateUI();
+});
+
+document.getElementById('start-game-btn').addEventListener('click', () => {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  document.getElementById('start-modal').classList.remove('show');
+  loadStage(0);
+});
+
+document.getElementById('next-stage-btn').addEventListener('click', () => {
+  document.getElementById('victory-modal').classList.remove('show');
+  loadStage(currentStageIdx + 1);
+});
+
+// Physics & Game Loop
+let lastTime = performance.now();
+const GRAVITY = 0.35;
+const RESTITUTION = 0.72; // bounce friction
+
+function update(dt) {
+  const scaleX = cw / 900;
+  const scaleY = ch / 520;
+  const stage = STAGES[currentStageIdx];
+
+  // Update Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.alpha -= p.life;
+    if (p.alpha <= 0) particles.splice(i, 1);
+  }
+
+  if (!isSimulating || !ball.active) return;
+
+  // Ball physics
+  ball.vy += GRAVITY;
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  // Trail
+  ball.trail.push({ x: ball.x, y: ball.y, alpha: 0.8 });
+  if (ball.trail.length > 15) ball.trail.shift();
+  ball.trail.forEach(t => t.alpha -= 0.04);
+
+  // Screen Boundaries
+  if (ball.x - ball.radius < 0) {
+    ball.x = ball.radius;
+    ball.vx = -ball.vx * RESTITUTION;
+    playSound('bounce');
+  } else if (ball.x + ball.radius > cw) {
+    ball.x = cw - ball.radius;
+    ball.vx = -ball.vx * RESTITUTION;
+    playSound('bounce');
+  }
+
+  if (ball.y + ball.radius > ch) {
+    // Fell off bottom -> reset
+    resetSimulation();
+    return;
+  }
+
+  // Fixed Walls Collision
+  stage.fixedBlocks.forEach(b => {
+    const bx = b.x * scaleX;
+    const by = b.y * scaleY;
+    const bw = b.w * scaleX;
+    const bh = b.h * scaleY;
+
+    if (ball.x + ball.radius > bx && ball.x - ball.radius < bx + bw &&
+        ball.y + ball.radius > by && ball.y - ball.radius < by + bh) {
+      // Find closest edge
+      const overlapLeft = (ball.x + ball.radius) - bx;
+      const overlapRight = (bx + bw) - (ball.x - ball.radius);
+      const overlapTop = (ball.y + ball.radius) - by;
+      const overlapBottom = (by + bh) - (ball.y - ball.radius);
+      const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+      if (minOverlap === overlapTop) {
+        ball.y = by - ball.radius;
+        ball.vy = -ball.vy * RESTITUTION;
+      } else if (minOverlap === overlapBottom) {
+        ball.y = by + bh + ball.radius;
+        ball.vy = -ball.vy * RESTITUTION;
+      } else if (minOverlap === overlapLeft) {
+        ball.x = bx - ball.radius;
+        ball.vx = -ball.vx * RESTITUTION;
+      } else {
+        ball.x = bx + bw + ball.radius;
+        ball.vx = -ball.vx * RESTITUTION;
+      }
+      playSound('bounce');
+    }
+  });
+
+  // Placed Tools Collision & Interaction
+  placedItems.forEach(item => {
+    const dist = Math.hypot(ball.x - item.x, ball.y - item.y);
+
+    if (item.type === 'spring' && dist < 32) {
+      ball.vy = -14; // High bounce
+      ball.vx *= 1.1;
+      createSparks(item.x, item.y, '#10b981', 15);
+      playSound('bounce');
+    } else if (item.type === 'booster' && dist < 34) {
+      ball.vx += (ball.vx >= 0 ? 8 : -8);
+      ball.vy -= 2;
+      createSparks(item.x, item.y, '#f59e0b', 16);
+      playSound('boost');
+    } else if (item.type === 'ramp_right' && dist < 35) {
+      // 45 deg right ramp
+      ball.vx = Math.abs(ball.vx) + 3;
+      ball.vy = -Math.abs(ball.vy) * 0.8 - 3;
+      createSparks(item.x, item.y, '#38bdf8', 8);
+      playSound('bounce');
+    } else if (item.type === 'ramp_left' && dist < 35) {
+      // 45 deg left ramp
+      ball.vx = -Math.abs(ball.vx) - 3;
+      ball.vy = -Math.abs(ball.vy) * 0.8 - 3;
+      createSparks(item.x, item.y, '#38bdf8', 8);
+      playSound('bounce');
+    } else if (item.type === 'portal' && dist < 24) {
+      // Warp to matching portal
+      const portals = placedItems.filter(p => p.type === 'portal');
+      if (portals.length >= 2) {
+        const dest = portals.find(p => p !== item);
+        if (dest) {
+          ball.x = dest.x;
+          ball.y = dest.y;
+          createSparks(dest.x, dest.y, '#c084fc', 20);
+          playSound('portal');
+        }
+      }
+    }
+  });
+
+  // Star Collection
+  stage.stars.forEach(s => {
+    if (!s.collected) {
+      const sx = s.x * scaleX;
+      const sy = s.y * scaleY;
+      if (Math.hypot(ball.x - sx, ball.y - sy) < ball.radius + 18) {
+        s.collected = true;
+        createSparks(sx, sy, '#fbbf24', 24);
+        playSound('star');
+        updateUI();
+      }
+    }
+  });
+
+  // Goal Collision
+  const gx = stage.goal.x * scaleX;
+  const gy = stage.goal.y * scaleY;
+  const gw = stage.goal.w * scaleX;
+  const gh = stage.goal.h * scaleY;
+
+  if (ball.x > gx && ball.x < gx + gw && ball.y > gy && ball.y < gy + gh + 10) {
+    // WIN!
+    ball.active = false;
+    isSimulating = false;
+    createSparks(gx + gw/2, gy + gh/2, '#38bdf8', 40);
+    playSound('win');
+
+    const collectedCount = stage.stars.filter(s => s.collected).length;
+    let starStr = '⭐'.repeat(collectedCount) + '☆'.repeat(3 - collectedCount);
+    document.getElementById('vic-stars').textContent = starStr;
+    document.getElementById('vic-title').textContent = collectedCount === 3 ? '🏆 완벽한 클리어!' : '🎉 스테이지 클리어!';
+    document.getElementById('victory-modal').classList.add('show');
+  }
+}
+
+function render() {
+  ctx.clearRect(0, 0, cw, ch);
+  const scaleX = cw / 900;
+  const scaleY = ch / 520;
+  const stage = STAGES[currentStageIdx];
+
+  // Grid Background
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+  ctx.lineWidth = 1;
+  const gridSize = 40;
+  for (let x = 0; x < cw; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, ch);
+    ctx.stroke();
+  }
+  for (let y = 0; y < ch; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(cw, y);
+    ctx.stroke();
+  }
+
+  // Draw Fixed Blocks
+  stage.fixedBlocks.forEach(b => {
+    const bx = b.x * scaleX;
+    const by = b.y * scaleY;
+    const bw = b.w * scaleX;
+    const bh = b.h * scaleY;
+    ctx.fillStyle = '#334155';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, bh, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    // Stripes
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.beginPath();
+    for (let i = 0; i < bw + bh; i += 16) {
+      ctx.moveTo(Math.max(bx, bx + i - bh), Math.min(by + bh, by + i));
+      ctx.lineTo(Math.min(bx + bw, bx + i), Math.max(by, by + i - bw));
+    }
+    ctx.stroke();
+  });
+
+  // Draw Placed Items
+  placedItems.forEach(item => {
+    ctx.save();
+    ctx.translate(item.x, item.y);
+
+    if (item.type === 'spring') {
+      ctx.fillStyle = '#10b981';
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(0, 0, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🟢', 0, 0);
+    } else if (item.type === 'booster') {
+      ctx.fillStyle = '#f59e0b';
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.arc(0, 0, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🌀', 0, 0);
+    } else if (item.type === 'ramp_right') {
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.moveTo(-16, 16);
+      ctx.lineTo(16, 16);
+      ctx.lineTo(16, -16);
+      ctx.closePath();
+      ctx.fill();
+    } else if (item.type === 'ramp_left') {
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.moveTo(-16, -16);
+      ctx.lineTo(-16, 16);
+      ctx.lineTo(16, 16);
+      ctx.closePath();
+      ctx.fill();
+    } else if (item.type === 'portal') {
+      ctx.fillStyle = '#a855f7';
+      ctx.shadowColor = '#c084fc';
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 14, 22, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🔮', 0, 0);
+    }
+    ctx.restore();
+  });
+
+  // Draw Stars
+  const time = performance.now() * 0.003;
+  stage.stars.forEach(s => {
+    if (!s.collected) {
+      const sx = s.x * scaleX;
+      const sy = s.y * scaleY + Math.sin(time + s.x) * 4;
+      ctx.save();
+      ctx.font = '22px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 12;
+      ctx.fillText('⭐', sx, sy);
+      ctx.restore();
+    }
+  });
+
+  // Draw Start Zone
+  const stX = stage.start.x * scaleX;
+  const stY = stage.start.y * scaleY;
+  ctx.save();
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.arc(stX, stY, 22, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.font = '12px Pretendard, sans-serif';
+  ctx.fillStyle = '#38bdf8';
+  ctx.textAlign = 'center';
+  ctx.fillText('출발 🟡', stX, stY - 26);
+  ctx.restore();
+
+  // Draw Goal Cup
+  const gx = stage.goal.x * scaleX;
+  const gy = stage.goal.y * scaleY;
+  const gw = stage.goal.w * scaleX;
+  const gh = stage.goal.h * scaleY;
+  ctx.save();
+  ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+  ctx.strokeStyle = '#10b981';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(gx, gy, gw, gh, [0, 0, 16, 16]);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#10b981';
+  ctx.font = '14px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🏁 골인', gx + gw/2, gy - 8);
+  ctx.restore();
+
+  // Draw Ball & Trail
+  if (ball.trail.length > 1) {
+    ctx.save();
+    for (let i = 0; i < ball.trail.length; i++) {
+      const t = ball.trail[i];
+      ctx.fillStyle = `rgba(56, 189, 248, ${Math.max(0, t.alpha)})`;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, ball.radius * (i / ball.trail.length), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // Main Ball
+  ctx.save();
+  ctx.fillStyle = '#38bdf8';
+  ctx.shadowColor = '#38bdf8';
+  ctx.shadowBlur = 15;
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+  ctx.fill();
+  // Inner highlight
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(ball.x - 3, ball.y - 3, ball.radius * 0.35, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Draw Particles
+  particles.forEach(p => {
+    ctx.save();
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function loop(timestamp) {
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

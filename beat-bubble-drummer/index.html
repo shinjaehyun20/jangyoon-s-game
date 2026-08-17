@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🥁 쿵치딱 리듬 버블 밴드 (Beat Bubble Drummer)</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --lane-1: #f43f5e; /* Kick / Red */
+      --lane-2: #38bdf8; /* Snare / Blue */
+      --lane-3: #fbbf24; /* HiHat / Yellow */
+      --lane-4: #34d399; /* Synth / Green */
+      --text: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #18181b 0%, #09090b 100%);
+      color: var(--text);
+      font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 520px;
+      height: 100vh;
+      max-height: 740px;
+      background: #0f172a;
+      border: 2px solid rgba(251, 191, 36, 0.4);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(251, 191, 36, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Stage & Band Area */
+    #band-stage {
+      height: 120px;
+      background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      position: relative;
+    }
+
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .score-badge {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fbbf24;
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    }
+
+    .combo-badge {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .band-characters {
+      display: flex;
+      gap: 20px;
+      align-items: flex-end;
+    }
+
+    .band-char {
+      font-size: 2.2rem;
+      transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .band-char.bounce {
+      transform: scale(1.35) translateY(-8px);
+    }
+
+    /* Rhythm Field */
+    #rhythm-field {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      background: #090d16;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .lane {
+      flex: 1;
+      position: relative;
+      border-right: 1px dashed rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: center;
+    }
+    .lane:last-child {
+      border-right: none;
+    }
+
+    /* Hit Line */
+    #hit-line-bar {
+      position: absolute;
+      bottom: 90px;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--lane-1), var(--lane-2), var(--lane-3), var(--lane-4));
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.8);
+      z-index: 10;
+    }
+
+    .hit-target {
+      position: absolute;
+      bottom: 66px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      z-index: 11;
+      transition: transform 0.08s ease, background 0.08s ease;
+    }
+
+    .hit-target.active {
+      transform: scale(1.2);
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Falling Notes */
+    .note {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      z-index: 5;
+    }
+
+    .note-1 { background: var(--lane-1); box-shadow: 0 0 12px var(--lane-1); }
+    .note-2 { background: var(--lane-2); box-shadow: 0 0 12px var(--lane-2); }
+    .note-3 { background: var(--lane-3); box-shadow: 0 0 12px var(--lane-3); }
+    .note-4 { background: var(--lane-4); box-shadow: 0 0 12px var(--lane-4); }
+
+    /* Judgment Toast */
+    #judgment-display {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.8rem;
+      font-weight: 900;
+      pointer-events: none;
+      z-index: 30;
+      opacity: 0;
+      transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s;
+    }
+
+    #judgment-display.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.2);
+    }
+
+    .judg-perfect { color: #fbbf24; text-shadow: 0 0 20px #f59e0b; }
+    .judg-great { color: #38bdf8; text-shadow: 0 0 20px #0284c7; }
+    .judg-good { color: #34d399; text-shadow: 0 0 20px #059669; }
+    .judg-miss { color: #f43f5e; text-shadow: 0 0 20px #e11d48; }
+
+    /* Touch Controls / Pads */
+    #drum-pads {
+      height: 90px;
+      background: #090d16;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      z-index: 20;
+    }
+
+    .drum-btn {
+      flex: 1;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      transition: filter 0.08s, transform 0.08s;
+    }
+
+    .drum-btn:active {
+      filter: brightness(1.35);
+      transform: scale(0.95);
+    }
+
+    .btn-lane-1 { background: #9f1239; border-bottom: 4px solid #881337; }
+    .btn-lane-2 { background: #075985; border-bottom: 4px solid #0c4a6e; }
+    .btn-lane-3 { background: #92400e; border-bottom: 4px solid #78350f; }
+    .btn-lane-4 { background: #065f46; border-bottom: 4px solid #064e3b; }
+
+    .key-hint {
+      font-size: 0.72rem;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Modal Overlay */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #1e293b;
+      border: 2px solid #fbbf24;
+      border-radius: 20px;
+      padding: 28px 32px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-card h2 {
+      font-size: 1.6rem;
+      color: #fbbf24;
+      margin-bottom: 12px;
+    }
+
+    .track-select-btn {
+      display: block;
+      width: 100%;
+      background: #334155;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      color: white;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .track-select-btn:hover {
+      background: #0284c7;
+      border-color: #38bdf8;
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <!-- Band Stage Header -->
+  <div id="band-stage">
+    <div class="top-bar">
+      <div class="score-badge">SCORE: <span id="score-val">0</span></div>
+      <div class="combo-badge">🔥 <span id="combo-val">0</span> COMBO</div>
+    </div>
+    <div class="band-characters">
+      <div class="band-char" id="char-1" title="드럼 곰돌이">🐻🥁</div>
+      <div class="band-char" id="char-2" title="신스 토끼">🐰🎹</div>
+      <div class="band-char" id="char-3" title="기타 여우">🦊🎸</div>
+      <div class="band-char" id="char-4" title="보컬 판다">🐼🎤</div>
+    </div>
+  </div>
+
+  <!-- Rhythm Canvas / Field -->
+  <div id="rhythm-field">
+    <div class="lane" id="lane-1">
+      <div class="hit-target" style="border-color: var(--lane-1);">🥁</div>
+    </div>
+    <div class="lane" id="lane-2">
+      <div class="hit-target" style="border-color: var(--lane-2);">👏</div>
+    </div>
+    <div class="lane" id="lane-3">
+      <div class="hit-target" style="border-color: var(--lane-3);">🔔</div>
+    </div>
+    <div class="lane" id="lane-4">
+      <div class="hit-target" style="border-color: var(--lane-4);">🌟</div>
+    </div>
+
+    <div id="hit-line-bar"></div>
+    <div id="judgment-display">PERFECT!</div>
+  </div>
+
+  <!-- Touch & Click Drum Pads -->
+  <div id="drum-pads">
+    <button class="drum-btn btn-lane-1" data-lane="0">
+      <span>🥁 쿵</span>
+      <span class="key-hint">A / 1</span>
+    </button>
+    <button class="drum-btn btn-lane-2" data-lane="1">
+      <span>👏 딱</span>
+      <span class="key-hint">S / 2</span>
+    </button>
+    <button class="drum-btn btn-lane-3" data-lane="2">
+      <span>🔔 챙</span>
+      <span class="key-hint">D / 3</span>
+    </button>
+    <button class="drum-btn btn-lane-4" data-lane="3">
+      <span>🌟 뿅</span>
+      <span class="key-hint">F / 4</span>
+    </button>
+  </div>
+
+  <!-- Start Menu Modal -->
+  <div class="overlay show" id="start-modal">
+    <div class="modal-card">
+      <h2>🥁 리듬 버블 밴드</h2>
+      <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 16px;">
+        신나는 음악 박자에 맞춰 떨어지는 음표를 판정선에 닿았을 때 정확히 터치하세요!
+      </p>
+      <button class="track-select-btn" onclick="startSong('star')">🌟 1. 반짝별 행진곡 (이지)</button>
+      <button class="track-select-btn" onclick="startSong('jelly')">🍭 2. 젤리 팝 댄스 (노말)</button>
+      <button class="track-select-btn" onclick="startSong('rock')">🚀 3. 은하수 록 페스티벌 (하드)</button>
+    </div>
+  </div>
+
+  <!-- Song Finished Modal -->
+  <div class="overlay" id="end-modal">
+    <div class="modal-card">
+      <h2 id="end-title">🎉 연주 완료!</h2>
+      <div style="font-size: 2.5rem; margin: 12px 0;" id="end-grade">🏆 S</div>
+      <p id="end-stats" style="color: #cbd5e1; font-size: 1rem; line-height: 1.6; margin-bottom: 20px;">
+        최종 점수: 12,500점<br>최대 콤보: 45 COMBO
+      </p>
+      <button class="track-select-btn" onclick="document.getElementById('end-modal').classList.remove('show'); document.getElementById('start-modal').classList.add('show');">다른 곡 선택하기 🎵</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Web Audio Synthesizer Engine
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playDrum(lane) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const now = audioCtx.currentTime;
+
+  if (lane === 0) {
+    // 808 Bass Kick (쿵)
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+    gain.gain.setValueAtTime(1.0, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+    osc.start(now);
+    osc.stop(now + 0.18);
+  } else if (lane === 1) {
+    // Snare Snap (딱)
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.exponentialRampToValueAtTime(80, now + 0.12);
+    gain.gain.setValueAtTime(0.7, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+    osc.start(now);
+    osc.stop(now + 0.14);
+  } else if (lane === 2) {
+    // Hi-Hat Cymbal (챙)
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(900, now);
+    osc.frequency.exponentialRampToValueAtTime(3000, now + 0.08);
+    gain.gain.setValueAtTime(0.4, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+    osc.start(now);
+    osc.stop(now + 0.09);
+  } else if (lane === 3) {
+    // Funky Synth Pop (뿅)
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(523.25, now); // C5
+    osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.15); // C6
+    gain.gain.setValueAtTime(0.5, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+}
+
+// Track Sheet Music Database
+const TRACKS = {
+  star: {
+    title: '반짝별 행진곡',
+    bpm: 110,
+    speed: 380, // px per sec
+    pattern: [
+      { t: 1.0, lane: 0 }, { t: 1.5, lane: 1 }, { t: 2.0, lane: 0 }, { t: 2.5, lane: 1 },
+      { t: 3.0, lane: 2 }, { t: 3.5, lane: 3 }, { t: 4.0, lane: 0 }, { t: 4.5, lane: 1 },
+      { t: 5.0, lane: 0 }, { t: 5.5, lane: 1 }, { t: 6.0, lane: 2 }, { t: 6.5, lane: 2 },
+      { t: 7.0, lane: 3 }, { t: 7.5, lane: 3 }, { t: 8.0, lane: 0 }, { t: 8.5, lane: 1 },
+      { t: 9.0, lane: 0 }, { t: 9.5, lane: 2 }, { t: 10.0, lane: 1 }, { t: 10.5, lane: 3 },
+      { t: 11.0, lane: 0 }, { t: 11.5, lane: 1 }, { t: 12.0, lane: 0 }, { t: 12.5, lane: 3 }
+    ]
+  },
+  jelly: {
+    title: '젤리 팝 댄스',
+    bpm: 130,
+    speed: 460,
+    pattern: [
+      { t: 0.8, lane: 0 }, { t: 1.2, lane: 2 }, { t: 1.6, lane: 1 }, { t: 2.0, lane: 3 },
+      { t: 2.4, lane: 0 }, { t: 2.8, lane: 0 }, { t: 3.2, lane: 1 }, { t: 3.6, lane: 2 },
+      { t: 4.0, lane: 3 }, { t: 4.4, lane: 3 }, { t: 4.8, lane: 1 }, { t: 5.2, lane: 0 },
+      { t: 5.6, lane: 2 }, { t: 6.0, lane: 1 }, { t: 6.4, lane: 3 }, { t: 6.8, lane: 0 },
+      { t: 7.2, lane: 1 }, { t: 7.6, lane: 2 }, { t: 8.0, lane: 3 }, { t: 8.4, lane: 0 },
+      { t: 8.8, lane: 1 }, { t: 9.2, lane: 2 }, { t: 9.6, lane: 3 }, { t: 10.0, lane: 0 }
+    ]
+  },
+  rock: {
+    title: '은하수 록 페스티벌',
+    bpm: 155,
+    speed: 540,
+    pattern: [
+      { t: 0.6, lane: 0 }, { t: 0.9, lane: 2 }, { t: 1.2, lane: 1 }, { t: 1.5, lane: 2 },
+      { t: 1.8, lane: 0 }, { t: 2.1, lane: 3 }, { t: 2.4, lane: 1 }, { t: 2.7, lane: 2 },
+      { t: 3.0, lane: 0 }, { t: 3.3, lane: 0 }, { t: 3.6, lane: 1 }, { t: 3.9, lane: 3 },
+      { t: 4.2, lane: 2 }, { t: 4.5, lane: 2 }, { t: 4.8, lane: 0 }, { t: 5.1, lane: 1 },
+      { t: 5.4, lane: 3 }, { t: 5.7, lane: 0 }, { t: 6.0, lane: 2 }, { t: 6.3, lane: 1 },
+      { t: 6.6, lane: 3 }, { t: 6.9, lane: 0 }, { t: 7.2, lane: 1 }, { t: 7.5, lane: 3 }
+    ]
+  }
+};
+
+// Game State
+let isPlaying = false;
+let currentTrack = null;
+let startTime = 0;
+let score = 0;
+let combo = 0;
+let maxCombo = 0;
+let activeNotes = [];
+let noteEmojis = ['🥁', '👏', '🔔', '🌟'];
+
+const rhythmField = document.getElementById('rhythm-field');
+const lanes = [
+  document.getElementById('lane-1'),
+  document.getElementById('lane-2'),
+  document.getElementById('lane-3'),
+  document.getElementById('lane-4')
+];
+
+function startSong(trackKey) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  document.getElementById('start-modal').classList.remove('show');
+  
+  currentTrack = TRACKS[trackKey];
+  score = 0;
+  combo = 0;
+  maxCombo = 0;
+  activeNotes = [];
+  
+  // Clear any existing note elements
+  document.querySelectorAll('.note').forEach(n => n.remove());
+
+  // Clone note pattern
+  currentTrack.pattern.forEach(p => {
+    activeNotes.push({
+      time: p.t,
+      lane: p.lane,
+      spawned: false,
+      hit: false,
+      el: null
+    });
+  });
+
+  isPlaying = true;
+  startTime = performance.now() / 1000;
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('score-val').textContent = score.toLocaleString();
+  document.getElementById('combo-val').textContent = combo;
+  if (combo > maxCombo) maxCombo = combo;
+}
+
+// Note Trigger and Hit Judgment
+function triggerHit(lane) {
+  playDrum(lane);
+
+  // Band Animation
+  const char = document.getElementById(`char-${lane + 1}`);
+  if (char) {
+    char.classList.add('bounce');
+    setTimeout(() => char.classList.remove('bounce'), 120);
+  }
+
+  // Hit Target Animation
+  const targets = document.querySelectorAll('.hit-target');
+  if (targets[lane]) {
+    targets[lane].classList.add('active');
+    setTimeout(() => targets[lane].classList.remove('active'), 100);
+  }
+
+  if (!isPlaying) return;
+
+  const now = (performance.now() / 1000) - startTime;
+  const targetTime = now;
+  const hitLineY = rhythmField.clientHeight - 90;
+
+  // Find closest note in this lane
+  let closestNote = null;
+  let minDiff = 999;
+
+  activeNotes.forEach(n => {
+    if (n.lane === lane && !n.hit && n.spawned) {
+      const diff = Math.abs(n.time - targetTime);
+      if (diff < minDiff && diff < 0.28) {
+        minDiff = diff;
+        closestNote = n;
+      }
+    }
+  });
+
+  if (closestNote) {
+    closestNote.hit = true;
+    if (closestNote.el) closestNote.el.remove();
+
+    if (minDiff < 0.08) {
+      showJudgment('PERFECT!', 'judg-perfect');
+      score += 500 + (combo * 20);
+      combo++;
+    } else if (minDiff < 0.16) {
+      showJudgment('GREAT!', 'judg-great');
+      score += 300 + (combo * 10);
+      combo++;
+    } else {
+      showJudgment('GOOD', 'judg-good');
+      score += 150;
+      combo++;
+    }
+  } else {
+    // Empty tap
+  }
+
+  updateStats();
+}
+
+function showJudgment(text, cls) {
+  const display = document.getElementById('judgment-display');
+  display.textContent = text;
+  display.className = `show ${cls}`;
+  setTimeout(() => {
+    display.classList.remove('show');
+  }, 350);
+}
+
+// Input Handlers (Touch & Keyboard)
+document.querySelectorAll('.drum-btn').forEach(btn => {
+  btn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    const lane = parseInt(btn.dataset.lane);
+    triggerHit(lane);
+  });
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.repeat) return;
+  const key = e.key.toLowerCase();
+  if (key === 'a' || key === '1' || key === 'arrowleft') triggerHit(0);
+  else if (key === 's' || key === '2' || key === 'arrowdown') triggerHit(1);
+  else if (key === 'd' || key === '3' || key === 'arrowup') triggerHit(2);
+  else if (key === 'f' || key === '4' || key === 'arrowright') triggerHit(3);
+});
+
+// Game Loop
+function gameLoop() {
+  if (isPlaying) {
+    const now = (performance.now() / 1000) - startTime;
+    const hitLineY = rhythmField.clientHeight - 90;
+    const fieldHeight = rhythmField.clientHeight;
+    const speed = currentTrack.speed;
+
+    let unhitRemaining = 0;
+
+    activeNotes.forEach(n => {
+      if (!n.hit) {
+        unhitRemaining++;
+        const timeUntilHit = n.time - now;
+        const noteY = hitLineY - (timeUntilHit * speed);
+
+        // Spawn note if entering visible screen
+        if (!n.spawned && noteY > -60 && noteY < fieldHeight) {
+          n.spawned = true;
+          const el = document.createElement('div');
+          el.className = `note note-${n.lane + 1}`;
+          el.textContent = noteEmojis[n.lane];
+          lanes[n.lane].appendChild(el);
+          n.el = el;
+        }
+
+        // Update Position
+        if (n.spawned && n.el) {
+          n.el.style.top = `${noteY}px`;
+
+          // Miss check (passed hitline)
+          if (noteY > hitLineY + 60) {
+            n.hit = true;
+            n.el.remove();
+            showJudgment('MISS', 'judg-miss');
+            combo = 0;
+            updateStats();
+          }
+        }
+      }
+    });
+
+    // Check Song End
+    const lastNoteTime = currentTrack.pattern[currentTrack.pattern.length - 1].t;
+    if (now > lastNoteTime + 2.0 && unhitRemaining === 0) {
+      isPlaying = false;
+      finishSong();
+    }
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+function finishSong() {
+  let grade = 'S';
+  if (score < 4000) grade = 'C';
+  else if (score < 7000) grade = 'B';
+  else if (score < 10000) grade = 'A';
+
+  document.getElementById('end-grade').textContent = `🏆 ${grade} 등급`;
+  document.getElementById('end-stats').innerHTML = `
+    최종 점수: <strong>${score.toLocaleString()}점</strong><br>
+    최대 콤보: <strong>${maxCombo} COMBO</strong>
+  `;
+  document.getElementById('end-modal').classList.add('show');
+}
+
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>

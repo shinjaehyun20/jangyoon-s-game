@@ -1,5 +1,21 @@
 [
   {
+    "id": "gravity-ball-architect",
+    "title": "Gravity Ball Architect",
+    "title_ko": "🧲 중력 구슬 건축가",
+    "description": "스프링, 가속판, 포털을 직접 배치해 구슬이 모든 별을 먹고 골인하도록 트랙을 설계하는 창의적 물리 롤러코스터 퍼즐!",
+    "thumbnail": "gravity-ball-architect/thumb.svg",
+    "path": "gravity-ball-architect/index.html"
+  },
+  {
+    "id": "beat-bubble-drummer",
+    "title": "Beat Bubble Drummer",
+    "title_ko": "🥁 쿵치딱 리듬 버블 밴드",
+    "description": "신나는 8비트 드럼 비트에 맞춰 떨어지는 컬러 음표를 터치하고 콤보를 이어가는 동물 악단 리듬 액션 게임!",
+    "thumbnail": "beat-bubble-drummer/thumb.svg",
+    "path": "beat-bubble-drummer/index.html"
+  },
+  {
     "id": "star-whale-voyage",
     "title": "Star Whale Voyage",
     "title_ko": "🐳 아기별고래 우주 유영",

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-grad-drum" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="50%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="glow-drum" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" rx="16" fill="url(#bg-grad-drum)"/>
+
+  <!-- Stage Lights -->
+  <circle cx="80" cy="0" r="100" fill="#f43f5e" fill-opacity="0.15"/>
+  <circle cx="200" cy="0" r="120" fill="#38bdf8" fill-opacity="0.15"/>
+  <circle cx="320" cy="0" r="100" fill="#fbbf24" fill-opacity="0.15"/>
+
+  <!-- 4 Lanes -->
+  <line x1="100" y1="0" x2="100" y2="300" stroke="#ffffff" stroke-opacity="0.08" stroke-dasharray="4,4"/>
+  <line x1="200" y1="0" x2="200" y2="300" stroke="#ffffff" stroke-opacity="0.08" stroke-dasharray="4,4"/>
+  <line x1="300" y1="0" x2="300" y2="300" stroke="#ffffff" stroke-opacity="0.08" stroke-dasharray="4,4"/>
+
+  <!-- Animal Band Members -->
+  <text x="70" y="70" font-size="28" text-anchor="middle">🐻</text>
+  <text x="150" y="60" font-size="28" text-anchor="middle">🐰</text>
+  <text x="250" y="60" font-size="28" text-anchor="middle">🦊</text>
+  <text x="330" y="70" font-size="28" text-anchor="middle">🐼</text>
+
+  <!-- Falling Rhythm Notes -->
+  <!-- Lane 1 (Red) -->
+  <circle cx="50" cy="120" r="18" fill="#f43f5e" filter="url(#glow-drum)"/>
+  <text x="50" y="126" font-size="16" text-anchor="middle" fill="#ffffff">🥁</text>
+
+  <!-- Lane 2 (Blue) -->
+  <circle cx="150" cy="180" r="18" fill="#38bdf8" filter="url(#glow-drum)"/>
+  <text x="150" y="186" font-size="16" text-anchor="middle" fill="#ffffff">👏</text>
+
+  <!-- Lane 3 (Yellow) -->
+  <circle cx="250" cy="130" r="18" fill="#fbbf24" filter="url(#glow-drum)"/>
+  <text x="250" y="136" font-size="16" text-anchor="middle" fill="#ffffff">🔔</text>
+
+  <!-- Lane 4 (Green) -->
+  <circle cx="350" cy="160" r="18" fill="#34d399" filter="url(#glow-drum)"/>
+  <text x="350" y="166" font-size="16" text-anchor="middle" fill="#ffffff">🌟</text>
+
+  <!-- Hit Line Bar -->
+  <rect x="0" y="215" width="400" height="6" fill="#fbbf24" filter="url(#glow-drum)"/>
+
+  <!-- Title Badge -->
+  <rect x="25" y="248" width="350" height="38" rx="10" fill="#1e293b" fill-opacity="0.95" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="200" y="272" font-family="'Pretendard', sans-serif" font-size="15" font-weight="bold" fill="#fbbf24" text-anchor="middle">🥁 쿵치딱 리듬 버블 밴드</text>
+</svg>
