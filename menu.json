@@ -16,6 +16,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "cyber-drone-delivery",
+        "label": "🚁 사이버 드론 택배 비행사",
+        "path": "cyber-drone-delivery/index.html"
+      },
+      {
+        "id": "pixel-dungeon-miner",
+        "label": "⛏️ 픽셀 던전 광산 탐험가",
+        "path": "pixel-dungeon-miner/index.html"
+      },
+      {
         "id": "star-whale-voyage",
         "label": "🐳 아기별고래 우주 유영",
         "path": "star-whale-voyage/index.html"

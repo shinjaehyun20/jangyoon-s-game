@@ -1,5 +1,21 @@
 [
   {
+    "id": "cyber-drone-delivery",
+    "title": "Cyber Drone Delivery",
+    "title_ko": "🚁 사이버 드론 택배 비행사",
+    "description": "메가시티의 강풍과 회전 레이저를 뚫고 드론의 양쪽 로터와 부스터를 제어해 지정된 헬리패드에 안전하게 화물을 배송하세요!",
+    "thumbnail": "cyber-drone-delivery/thumb.svg",
+    "path": "cyber-drone-delivery/index.html"
+  },
+  {
+    "id": "pixel-dungeon-miner",
+    "title": "Pixel Dungeon Miner",
+    "title_ko": "⛏️ 픽셀 던전 광산 탐험가",
+    "description": "미지의 지하 동굴을 파고 내려가 진귀한 광석을 채굴하고, 산소를 관리하며 지상 베이스 캠프에서 장비를 업그레이드하세요!",
+    "thumbnail": "pixel-dungeon-miner/thumb.svg",
+    "path": "pixel-dungeon-miner/index.html"
+  },
+  {
     "id": "gravity-ball-architect",
     "title": "Gravity Ball Architect",
     "title_ko": "🧲 중력 구슬 건축가",

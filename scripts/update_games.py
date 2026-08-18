@@ -15,20 +15,20 @@ README_MD = os.path.join(GAME_ROOT, "README.md")
 
 NEW_GAMES = [
     {
-        "id": "star-whale-voyage",
-        "title": "Star Whale Voyage",
-        "title_ko": "🐳 아기별고래 우주 유영",
-        "description": "은하수 바다를 헤엄치는 아기별고래를 부드럽게 유영시켜 반짝이는 별가루를 모으고 우주 오로라를 펼치세요!",
-        "thumbnail": "star-whale-voyage/thumb.svg",
-        "path": "star-whale-voyage/index.html"
+        "id": "cyber-drone-delivery",
+        "title": "Cyber Drone Delivery",
+        "title_ko": "🚁 사이버 드론 택배 비행사",
+        "description": "메가시티의 강풍과 회전 레이저를 뚫고 드론의 양쪽 로터와 부스터를 제어해 지정된 헬리패드에 안전하게 화물을 배송하세요!",
+        "thumbnail": "cyber-drone-delivery/thumb.svg",
+        "path": "cyber-drone-delivery/index.html"
     },
     {
-        "id": "potion-magic-shop",
-        "title": "Potion Magic Shop",
-        "title_ko": "🧪 숲속 마법 물약방",
-        "description": "숲속 요정 손님들의 주문 순서에 맞춰 이슬, 풀잎, 별가루, 꽃잎을 플라스크에 넣어 신비한 마법 물약을 조제하세요!",
-        "thumbnail": "potion-magic-shop/thumb.svg",
-        "path": "potion-magic-shop/index.html"
+        "id": "pixel-dungeon-miner",
+        "title": "Pixel Dungeon Miner",
+        "title_ko": "⛏️ 픽셀 던전 광산 탐험가",
+        "description": "미지의 지하 동굴을 파고 내려가 진귀한 광석을 채굴하고, 산소를 관리하며 지상 베이스 캠프에서 장비를 업그레이드하세요!",
+        "thumbnail": "pixel-dungeon-miner/thumb.svg",
+        "path": "pixel-dungeon-miner/index.html"
     }
 ]
 

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>⛏️ 픽셀 던전 광산 탐험가 (Pixel Dungeon Miner)</title>
+  <style>
+    :root {
+      --bg: #150a04;
+      --card-bg: #2c1a0e;
+      --accent-gold: #ffd700;
+      --accent-cyan: #00f5d4;
+      --accent-ruby: #ff4757;
+      --accent-emerald: #2ed573;
+      --text: #f8fafc;
+      --text-dim: #a4b0be;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #2c1a0e 0%, #150a04 100%);
+      color: var(--text);
+      font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 900px;
+      height: 100vh;
+      max-height: 640px;
+      background: #0d0603;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      padding: 10px 16px;
+      background: rgba(30, 19, 12, 0.9);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+      z-index: 10;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-group h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .stat-badge {
+      background: rgba(44, 26, 14, 0.8);
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-badge span.val {
+      color: var(--accent-gold);
+    }
+
+    .btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--accent-gold);
+      color: #150a04;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+    }
+
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #0a0502;
+    }
+
+    /* Virtual D-pad for mobile */
+    #touch-controls {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, 56px);
+      grid-template-rows: repeat(3, 56px);
+      gap: 6px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .dpad-btn {
+      pointer-events: auto;
+      background: rgba(44, 26, 14, 0.75);
+      border: 2px solid var(--accent-gold);
+      color: var(--accent-gold);
+      font-size: 1.3rem;
+      font-weight: bold;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .dpad-btn:active, .dpad-btn.active {
+      background: var(--accent-gold);
+      color: #150a04;
+      transform: scale(0.92);
+    }
+
+    #action-controls {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .action-btn {
+      pointer-events: auto;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(44, 26, 14, 0.8);
+      border: 2px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .action-btn:active, .action-btn.active {
+      background: var(--accent-cyan);
+      color: #150a04;
+      transform: scale(0.92);
+    }
+
+    /* Modals & Shop */
+    .modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 6, 3, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 2px solid var(--accent-gold);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+    }
+
+    .modal-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      color: var(--accent-gold);
+    }
+
+    .shop-items {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .shop-card {
+      background: rgba(21, 10, 4, 0.8);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .shop-card:hover {
+      border-color: var(--accent-gold);
+      background: rgba(255, 215, 0, 0.1);
+    }
+
+    .shop-card h4 {
+      font-size: 0.9rem;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+    }
+
+    .shop-card p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .shop-card .price {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #2ed573;
+    }
+
+    .btn-large {
+      background: linear-gradient(135deg, var(--accent-gold), #e67e22);
+      color: #150a04;
+      font-size: 1.1rem;
+      font-weight: 800;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+      transition: all 0.2s;
+    }
+
+    .btn-large:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <div class="title-group">
+        <a href="../index.html" class="btn" style="text-decoration: none;">🏠 홈</a>
+        <h1>⛏️ 픽셀 던전 광산 탐험가</h1>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-badge">심도: <span class="val" id="depth-val">0m</span></div>
+        <div class="stat-badge">골드: <span class="val" id="gold-val">0G</span></div>
+        <div class="stat-badge">배낭: <span class="val" id="bag-val">0/10</span></div>
+        <div class="stat-badge">산소: <span class="val" id="oxygen-val">100%</span></div>
+        <button class="btn" id="btn-sound">🔊</button>
+      </div>
+    </header>
+
+    <canvas id="game-canvas"></canvas>
+
+    <div id="touch-controls">
+      <div></div>
+      <button class="dpad-btn" id="btn-up">▲</button>
+      <div></div>
+      <button class="dpad-btn" id="btn-left">◀</button>
+      <button class="dpad-btn" id="btn-down">▼</button>
+      <button class="dpad-btn" id="btn-right">▶</button>
+    </div>
+
+    <div id="action-controls">
+      <button class="action-btn" id="btn-surface" title="지상 귀환 엘리베이터">🏢</button>
+    </div>
+
+    <!-- Modals -->
+    <div id="start-modal" class="modal">
+      <div class="modal-card">
+        <h2>⛏️ 전설의 던전 광산 착공</h2>
+        <p>미지의 지하 동굴을 파고 내려가 진귀한 광석과 고대 유물을 채굴하세요!</p>
+        <p style="color: var(--accent-gold);">조작법: [WASD 또는 방향키] 이동 및 타일 채굴<br>[🏢 엘리베이터 버튼] 지상 상점으로 긴급 귀환</p>
+        <p style="font-size: 0.85rem; color: #ff6b81;">⚠️ 지하 깊을수록 산소가 빠르게 소모됩니다. 산소가 바닥나기 전에 지상으로 귀환해 광석을 판매하고 장비를 강화하세요!</p>
+        <button class="btn-large" id="btn-start">광산 탐험 시작</button>
+      </div>
+    </div>
+
+    <div id="shop-modal" class="modal hidden">
+      <div class="modal-card">
+        <h2>🏢 지상 베이스 캠프 상점</h2>
+        <p>채굴한 광석을 판매하여 골드를 획득하고 탐사 장비를 업그레이드하세요!</p>
+        <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; margin-bottom: 12px;">
+          획득 골드: <b style="color: var(--accent-gold);" id="sell-gold-val">+0G</b>
+        </div>
+        <div class="shop-items">
+          <div class="shop-card" id="up-pickaxe">
+            <h4>⛏️ 곡괭이 강화 (Lv.<span id="lv-pick">1</span>)</h4>
+            <p>단단한 암석 채굴 속도 증가</p>
+            <div class="price" id="cost-pick">50G</div>
+          </div>
+          <div class="shop-card" id="up-bag">
+            <h4>🎒 배낭 확장 (Lv.<span id="lv-bag">1</span>)</h4>
+            <p>광석 적재 용량 +5칸 증가</p>
+            <div class="price" id="cost-bag">80G</div>
+          </div>
+          <div class="shop-card" id="up-oxygen">
+            <h4>🤿 산소통 확장 (Lv.<span id="lv-oxy">1</span>)</h4>
+            <p>최대 산소 보유량 +30%</p>
+            <div class="price" id="cost-oxy">100G</div>
+          </div>
+          <div class="shop-card" id="up-drill">
+            <h4>⚡ 플라즈마 드릴 (Lv.<span id="lv-drill">0</span>)</h4>
+            <p>주변 3x3 범위 폭파 채굴</p>
+            <div class="price" id="cost-drill">200G</div>
+          </div>
+        </div>
+        <button class="btn-large" id="btn-resume">지하 광산으로 복귀</button>
+      </div>
+    </div>
+
+    <div id="gameover-modal" class="modal hidden">
+      <div class="modal-card" style="border-color: var(--accent-ruby);">
+        <h2 style="color: var(--accent-ruby);">⚠️ 구조대 호출 (산소 고갈)</h2>
+        <p>지하 깊은 곳에서 산소가 고갈되어 비상 탈출했습니다.<br>보유 광석의 절반을 분실했습니다.</p>
+        <button class="btn-large" id="btn-rescue">베이스캠프 복귀</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Audio Synthesizer
+    class SoundFX {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      playDig() {
+        if (this.muted || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140 + Math.random() * 40, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      }
+      playGem() {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        [880, 1318.5, 1760].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.05);
+          gain.gain.setValueAtTime(0.1, now + i * 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.15);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.05);
+          osc.stop(now + i * 0.05 + 0.16);
+        });
+      }
+      playBuy() {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        [587.33, 880, 1174.66].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, now + i * 0.06);
+          gain.gain.setValueAtTime(0.08, now + i * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.2);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.06);
+          osc.stop(now + i * 0.06 + 0.22);
+        });
+      }
+    }
+
+    const sfx = new SoundFX();
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Tile Types
+    const TILES = {
+      EMPTY: 0,
+      SURFACE: 1,
+      DIRT: 2,
+      STONE: 3,
+      COAL: 4,
+      IRON: 5,
+      GOLD: 6,
+      EMERALD: 7,
+      DIAMOND: 8,
+      ANCIENT: 9,
+      BEDROCK: 10
+    };
+
+    const ORE_VALUES = {
+      [TILES.COAL]: 5,
+      [TILES.IRON]: 15,
+      [TILES.GOLD]: 40,
+      [TILES.EMERALD]: 100,
+      [TILES.DIAMOND]: 250,
+      [TILES.ANCIENT]: 600
+    };
+
+    const ORE_COLORS = {
+      [TILES.SURFACE]: '#2ed573',
+      [TILES.DIRT]: '#5c3d2e',
+      [TILES.STONE]: '#57606f',
+      [TILES.COAL]: '#2f3542',
+      [TILES.IRON]: '#dcdde1',
+      [TILES.GOLD]: '#ffd700',
+      [TILES.EMERALD]: '#00f5d4',
+      [TILES.DIAMOND]: '#70a1ff',
+      [TILES.ANCIENT]: '#ff4757',
+      [TILES.BEDROCK]: '#1e1e24'
+    };
+
+    const MAP_WIDTH = 24;
+    const MAP_HEIGHT = 120;
+    const TILE_SIZE = 32;
+
+    let worldMap = [];
+    let player = {
+      x: 12,
+      y: 0,
+      animFrame: 0,
+      facing: 'right',
+      digging: false,
+      oxygen: 100,
+      maxOxygen: 100,
+      bag: [],
+      maxBag: 10,
+      gold: 0,
+      pickaxeLv: 1,
+      bagLv: 1,
+      oxyLv: 1,
+      drillLv: 0
+    };
+
+    let camera = { y: 0 };
+    let gameState = 'START';
+
+    function initMap() {
+      worldMap = [];
+      for (let y = 0; y < MAP_HEIGHT; y++) {
+        const row = [];
+        for (let x = 0; x < MAP_WIDTH; x++) {
+          if (y === 0) {
+            row.push(TILES.SURFACE);
+          } else if (y >= MAP_HEIGHT - 2) {
+            row.push(TILES.BEDROCK);
+          } else {
+            // Procedural Ore Generation based on depth
+            const rand = Math.random();
+            if (y < 15) {
+              if (rand < 0.12) row.push(TILES.COAL);
+              else if (rand < 0.25) row.push(TILES.STONE);
+              else row.push(TILES.DIRT);
+            } else if (y < 40) {
+              if (rand < 0.08) row.push(TILES.GOLD);
+              else if (rand < 0.20) row.push(TILES.IRON);
+              else if (rand < 0.35) row.push(TILES.COAL);
+              else row.push(TILES.STONE);
+            } else if (y < 80) {
+              if (rand < 0.06) row.push(TILES.EMERALD);
+              else if (rand < 0.14) row.push(TILES.GOLD);
+              else if (rand < 0.28) row.push(TILES.IRON);
+              else row.push(TILES.STONE);
+            } else {
+              if (rand < 0.05) row.push(TILES.ANCIENT);
+              else if (rand < 0.12) row.push(TILES.DIAMOND);
+              else if (rand < 0.22) row.push(TILES.EMERALD);
+              else row.push(TILES.STONE);
+            }
+          }
+        }
+        worldMap.push(row);
+      }
+      // Start tunnel
+      worldMap[0][12] = TILES.EMPTY;
+      worldMap[1][12] = TILES.EMPTY;
+      player.x = 12;
+      player.y = 0;
+    }
+
+    function resizeCanvas() {
+      canvas.width = 900;
+      canvas.height = 540;
+    }
+
+    // Input Handling
+    const keys = {};
+    window.addEventListener('keydown', (e) => {
+      sfx.init();
+      keys[e.code] = true;
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+        e.preventDefault();
+        handleMove(e.code);
+      }
+    });
+
+    function setupDpad(id, code) {
+      const el = document.getElementById(id);
+      el.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        sfx.init();
+        el.classList.add('active');
+        handleMove(code);
+      });
+      el.addEventListener('pointerup', () => el.classList.remove('active'));
+      el.addEventListener('pointerleave', () => el.classList.remove('active'));
+    }
+
+    setupDpad('btn-up', 'KeyW');
+    setupDpad('btn-down', 'KeyS');
+    setupDpad('btn-left', 'KeyA');
+    setupDpad('btn-right', 'KeyD');
+
+    document.getElementById('btn-surface').addEventListener('click', () => {
+      sfx.init();
+      openShop();
+    });
+
+    function handleMove(code) {
+      if (gameState !== 'PLAYING') return;
+
+      let dx = 0, dy = 0;
+      if (code === 'KeyA' || code === 'ArrowLeft') { dx = -1; player.facing = 'left'; }
+      if (code === 'KeyD' || code === 'ArrowRight') { dx = 1; player.facing = 'right'; }
+      if (code === 'KeyW' || code === 'ArrowUp') { dy = -1; }
+      if (code === 'KeyS' || code === 'ArrowDown') { dy = 1; }
+
+      const nx = player.x + dx;
+      const ny = player.y + dy;
+
+      if (nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT) return;
+
+      const targetTile = worldMap[ny][nx];
+
+      if (targetTile === TILES.BEDROCK) return;
+
+      if (targetTile === TILES.EMPTY) {
+        player.x = nx;
+        player.y = ny;
+      } else {
+        // Digging tile
+        if (player.bag.length >= player.maxBag && ORE_VALUES[targetTile]) {
+          alert('🎒 배낭이 가득 찼습니다! 지상 상점으로 귀환하여 판매하세요.');
+          return;
+        }
+
+        sfx.playDig();
+        worldMap[ny][nx] = TILES.EMPTY;
+        player.x = nx;
+        player.y = ny;
+
+        if (ORE_VALUES[targetTile]) {
+          sfx.playGem();
+          player.bag.push(targetTile);
+        }
+      }
+
+      // Oxygen deduction
+      const depthFactor = 1 + (player.y / 20);
+      player.oxygen -= 0.6 * depthFactor;
+
+      if (player.oxygen <= 0) {
+        handleOxygenEmpty();
+      }
+
+      updateUI();
+    }
+
+    function handleOxygenEmpty() {
+      gameState = 'GAMEOVER';
+      player.bag = player.bag.slice(0, Math.floor(player.bag.length / 2));
+      document.getElementById('gameover-modal').classList.remove('hidden');
+    }
+
+    function openShop() {
+      gameState = 'SHOP';
+      sfx.playBuy();
+
+      // Sell ores
+      let earnings = 0;
+      for (const ore of player.bag) {
+        earnings += ORE_VALUES[ore] || 0;
+      }
+      player.gold += earnings;
+      player.bag = [];
+      player.oxygen = player.maxOxygen;
+      player.x = 12;
+      player.y = 0;
+
+      document.getElementById('sell-gold-val').textContent = `+${earnings}G (현재 잔액: ${player.gold}G)`;
+      document.getElementById('shop-modal').classList.remove('hidden');
+      updateShopUI();
+      updateUI();
+    }
+
+    function updateShopUI() {
+      document.getElementById('lv-pick').textContent = player.pickaxeLv;
+      document.getElementById('cost-pick').textContent = `${player.pickaxeLv * 50}G`;
+
+      document.getElementById('lv-bag').textContent = player.bagLv;
+      document.getElementById('cost-bag').textContent = `${player.bagLv * 80}G`;
+
+      document.getElementById('lv-oxy').textContent = player.oxyLv;
+      document.getElementById('cost-oxy').textContent = `${player.oxyLv * 100}G`;
+
+      document.getElementById('lv-drill').textContent = player.drillLv;
+      document.getElementById('cost-drill').textContent = `${(player.drillLv + 1) * 200}G`;
+    }
+
+    // Shop buy handlers
+    document.getElementById('up-pickaxe').addEventListener('click', () => {
+      const cost = player.pickaxeLv * 50;
+      if (player.gold >= cost) {
+        player.gold -= cost;
+        player.pickaxeLv++;
+        sfx.playBuy();
+        updateShopUI();
+        updateUI();
+      }
+    });
+
+    document.getElementById('up-bag').addEventListener('click', () => {
+      const cost = player.bagLv * 80;
+      if (player.gold >= cost) {
+        player.gold -= cost;
+        player.bagLv++;
+        player.maxBag += 5;
+        sfx.playBuy();
+        updateShopUI();
+        updateUI();
+      }
+    });
+
+    document.getElementById('up-oxygen').addEventListener('click', () => {
+      const cost = player.oxyLv * 100;
+      if (player.gold >= cost) {
+        player.gold -= cost;
+        player.oxyLv++;
+        player.maxOxygen += 30;
+        player.oxygen = player.maxOxygen;
+        sfx.playBuy();
+        updateShopUI();
+        updateUI();
+      }
+    });
+
+    document.getElementById('btn-resume').addEventListener('click', () => {
+      document.getElementById('shop-modal').classList.add('hidden');
+      gameState = 'PLAYING';
+    });
+
+    document.getElementById('btn-rescue').addEventListener('click', () => {
+      document.getElementById('gameover-modal').classList.add('hidden');
+      openShop();
+    });
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      sfx.init();
+      document.getElementById('start-modal').classList.add('hidden');
+      gameState = 'PLAYING';
+      initMap();
+      updateUI();
+    });
+
+    document.getElementById('btn-sound').addEventListener('click', () => {
+      sfx.init();
+      sfx.muted = !sfx.muted;
+      document.getElementById('btn-sound').textContent = sfx.muted ? '🔇' : '🔊';
+    });
+
+    function updateUI() {
+      document.getElementById('depth-val').textContent = `${player.y}m`;
+      document.getElementById('gold-val').textContent = `${player.gold}G`;
+      document.getElementById('bag-val').textContent = `${player.bag.length}/${player.maxBag}`;
+      const oxyPercent = Math.max(0, Math.floor((player.oxygen / player.maxOxygen) * 100));
+      document.getElementById('oxygen-val').textContent = `${oxyPercent}%`;
+    }
+
+    // Render loop
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Smooth camera follow
+      const targetCamY = player.y * TILE_SIZE - canvas.height / 2 + TILE_SIZE;
+      camera.y += (targetCamY - camera.y) * 0.1;
+      if (camera.y < 0) camera.y = 0;
+
+      const offsetX = (canvas.width - MAP_WIDTH * TILE_SIZE) / 2;
+
+      // Draw Sky at surface
+      if (camera.y < 200) {
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, 200 - camera.y);
+        skyGrad.addColorStop(0, '#1e293b');
+        skyGrad.addColorStop(1, '#0f172a');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, canvas.width, 200 - camera.y);
+      }
+
+      // Draw Tiles
+      const startRow = Math.max(0, Math.floor(camera.y / TILE_SIZE));
+      const endRow = Math.min(MAP_HEIGHT, Math.ceil((camera.y + canvas.height) / TILE_SIZE) + 1);
+
+      for (let y = startRow; y < endRow; y++) {
+        for (let x = 0; x < MAP_WIDTH; x++) {
+          const tile = worldMap[y][x];
+          const px = offsetX + x * TILE_SIZE;
+          const py = y * TILE_SIZE - camera.y;
+
+          if (tile === TILES.EMPTY) {
+            ctx.fillStyle = '#150a04';
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+          } else {
+            ctx.fillStyle = ORE_COLORS[tile] || '#331b0b';
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+
+            // Gem sparkle
+            if (ORE_VALUES[tile]) {
+              ctx.fillStyle = '#ffffff';
+              ctx.beginPath();
+              ctx.arc(px + 16, py + 16, 4, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+      }
+
+      // Draw Miner Player
+      const pScreenX = offsetX + player.x * TILE_SIZE;
+      const pScreenY = player.y * TILE_SIZE - camera.y;
+
+      // Headlight glow
+      const grad = ctx.createRadialGradient(pScreenX + 16, pScreenY + 16, 10, pScreenX + 16, pScreenY + 16, 120);
+      grad.addColorStop(0, 'rgba(254, 202, 87, 0.4)');
+      grad.addColorStop(1, 'rgba(254, 202, 87, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(pScreenX + 16, pScreenY + 16, 120, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Miner Body
+      ctx.fillStyle = '#fbc531';
+      ctx.beginPath();
+      ctx.arc(pScreenX + 16, pScreenY + 16, 12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Helmet & Light
+      ctx.fillStyle = '#e1b12c';
+      ctx.fillRect(pScreenX + 8, pScreenY + 6, 16, 6);
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(player.facing === 'right' ? pScreenX + 22 : pScreenX + 10, pScreenY + 9, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pickaxe
+      ctx.strokeStyle = '#dcdde1';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      if (player.facing === 'right') {
+        ctx.moveTo(pScreenX + 22, pScreenY + 18);
+        ctx.lineTo(pScreenX + 30, pScreenY + 10);
+      } else {
+        ctx.moveTo(pScreenX + 10, pScreenY + 18);
+        ctx.lineTo(pScreenX + 2, pScreenY + 10);
+      }
+      ctx.stroke();
+
+      requestAnimationFrame(render);
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    initMap();
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>

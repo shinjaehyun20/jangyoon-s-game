@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🚁 사이버 드론 택배 비행사 (Cyber Drone Delivery)</title>
+  <style>
+    :root {
+      --bg: #0b132b;
+      --card-bg: #1c2541;
+      --accent-cyan: #00f5d4;
+      --accent-blue: #00bbf9;
+      --accent-pink: #f72585;
+      --accent-gold: #fee440;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #1c2541 0%, #0b132b 100%);
+      color: var(--text);
+      font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 900px;
+      height: 100vh;
+      max-height: 640px;
+      background: #060b19;
+      border: 2px solid rgba(0, 245, 212, 0.3);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 245, 212, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      padding: 10px 16px;
+      background: rgba(11, 19, 43, 0.9);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0, 245, 212, 0.2);
+      z-index: 10;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-group h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .stat-badge {
+      background: rgba(28, 37, 65, 0.8);
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-badge span.val {
+      color: var(--accent-gold);
+    }
+
+    .btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid rgba(0, 245, 212, 0.4);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--accent-cyan);
+      color: #060b19;
+      box-shadow: 0 0 12px rgba(0, 245, 212, 0.6);
+    }
+
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #060b19;
+    }
+
+    /* Telemetry HUD overlay */
+    #hud {
+      position: absolute;
+      top: 60px;
+      left: 16px;
+      background: rgba(11, 19, 43, 0.75);
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Mobile virtual controls */
+    #touch-controls {
+      position: absolute;
+      bottom: 16px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 24px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .touch-btn {
+      pointer-events: auto;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(28, 37, 65, 0.7);
+      border: 2px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .touch-btn:active, .touch-btn.active {
+      background: var(--accent-cyan);
+      color: #060b19;
+      transform: scale(0.92);
+      box-shadow: 0 0 20px rgba(0, 245, 212, 0.8);
+    }
+
+    #touch-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .thrust-btn {
+      width: 84px;
+      height: 84px;
+      border-color: var(--accent-pink);
+      color: var(--accent-pink);
+    }
+    .thrust-btn:active, .thrust-btn.active {
+      background: var(--accent-pink);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(247, 37, 133, 0.8);
+    }
+
+    /* Modals */
+    .modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(6, 11, 25, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 2px solid var(--accent-cyan);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 0 40px rgba(0, 245, 212, 0.3);
+    }
+
+    .modal-card h2 {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+      color: var(--accent-cyan);
+    }
+
+    .modal-card p {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .btn-large {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      color: #060b19;
+      font-size: 1.1rem;
+      font-weight: 800;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0, 245, 212, 0.5);
+      transition: all 0.2s;
+    }
+
+    .btn-large:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(0, 245, 212, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <div class="title-group">
+        <a href="../index.html" class="btn" style="text-decoration: none;">🏠 홈</a>
+        <h1>🚁 사이버 드론 택배 비행사</h1>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-badge">스테이지: <span class="val" id="stage-val">1/5</span></div>
+        <div class="stat-badge">배송 점수: <span class="val" id="score-val">0</span></div>
+        <div class="stat-badge">배터리: <span class="val" id="battery-val">100%</span></div>
+        <button class="btn" id="btn-sound">🔊</button>
+      </div>
+    </header>
+
+    <div id="hud">
+      <div>수직 속도: <span id="hud-vy">0.0</span> m/s</div>
+      <div>수평 속도: <span id="hud-vx">0.0</span> m/s</div>
+      <div>기울기 각: <span id="hud-angle">0.0</span>°</div>
+      <div>풍속: <span id="hud-wind">0.0</span> kt</div>
+    </div>
+
+    <canvas id="game-canvas"></canvas>
+
+    <div id="touch-controls">
+      <button class="touch-btn" id="btn-left">◀</button>
+      <div id="touch-center">
+        <button class="touch-btn thrust-btn" id="btn-up">▲</button>
+      </div>
+      <button class="touch-btn" id="btn-right">▶</button>
+    </div>
+
+    <!-- Start / Level Complete / Game Over Modals -->
+    <div id="start-modal" class="modal">
+      <div class="modal-card">
+        <h2>🚁 드론 비행 준비</h2>
+        <p>미래 메가시티의 고층 빌딩과 악천후를 뚫고 소중한 택배 화물을 지정된 헬리패드에 안전하게 배송하세요!</p>
+        <p style="color: var(--accent-gold);">조작법: [A/D 또는 좌우 화살표] 회전 & 좌우 추진<br>[W 또는 위 화살표/Space] 메인 부스터 추진</p>
+        <p style="font-size: 0.85rem; color: #ff758f;">⚠️ 주의: 착륙 속도 2.0 m/s 이하, 착륙 각도 15° 이내여야 파손 없이 안전 착륙합니다!</p>
+        <button class="btn-large" id="btn-start">배송 임무 시작</button>
+      </div>
+    </div>
+
+    <div id="win-modal" class="modal hidden">
+      <div class="modal-card">
+        <h2 id="win-title">📦 배송 완료!</h2>
+        <p id="win-desc">화물을 완벽한 각도와 속도로 안전 배송했습니다.</p>
+        <div style="font-size: 2.2rem; margin-bottom: 16px;" id="win-stars">⭐⭐⭐</div>
+        <button class="btn-large" id="btn-next-stage">다음 배송지로 이동</button>
+      </div>
+    </div>
+
+    <div id="fail-modal" class="modal hidden">
+      <div class="modal-card" style="border-color: var(--accent-pink);">
+        <h2 style="color: var(--accent-pink);">💥 드론 불시착!</h2>
+        <p id="fail-desc">충격 속도가 너무 빠르거나 장애물에 충돌했습니다.</p>
+        <button class="btn-large" style="background: linear-gradient(135deg, #f72585, #7209b7); color: #fff;" id="btn-retry">다시 도전하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Audio Synthesizer (Web Audio API)
+    class SoundFX {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playThrust() {
+        if (this.muted || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+        
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(80 + Math.random() * 30, this.ctx.currentTime);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(300, this.ctx.currentTime);
+        
+        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+        
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.12);
+      }
+      playLandSuccess() {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          gain.gain.setValueAtTime(0.12, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.35);
+        });
+      }
+      playCrash() {
+        if (this.muted || !this.ctx) return;
+        const bufferSize = this.ctx.sampleRate * 0.3;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(400, this.ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.3);
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+      }
+      playBeep() {
+        if (this.muted || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      }
+    }
+
+    const sfx = new SoundFX();
+
+    // Game Engine
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentStage = 1;
+    let totalScore = 0;
+    let battery = 100;
+    let gameState = 'START'; // START, PLAYING, WON, FAILED
+
+    const STAGES = [
+      {
+        id: 1,
+        title: "스테이지 1: 루키 빌딩 옥상 배송",
+        wind: 0,
+        spawn: { x: 100, y: 100 },
+        landing: { x: 680, y: 460, w: 120, h: 20 },
+        obstacles: [
+          { type: 'rect', x: 0, y: 500, w: 900, h: 100 },
+          { type: 'rect', x: 380, y: 250, w: 80, h: 250 }
+        ]
+      },
+      {
+        id: 2,
+        title: "스테이지 2: 메가타워 횡풍 통과",
+        wind: 0.12,
+        spawn: { x: 80, y: 120 },
+        landing: { x: 720, y: 400, w: 100, h: 20 },
+        obstacles: [
+          { type: 'rect', x: 0, y: 520, w: 900, h: 80 },
+          { type: 'rect', x: 260, y: 160, w: 70, h: 360 },
+          { type: 'rect', x: 500, y: 0, w: 70, h: 320 }
+        ]
+      },
+      {
+        id: 3,
+        title: "스테이지 3: 레이저 보안 센서 회피",
+        wind: -0.08,
+        spawn: { x: 80, y: 150 },
+        landing: { x: 740, y: 480, w: 90, h: 20 },
+        obstacles: [
+          { type: 'rect', x: 0, y: 520, w: 900, h: 80 },
+          { type: 'laser', x: 320, y: 100, h: 220, speed: 2, offset: 0 },
+          { type: 'laser', x: 540, y: 240, h: 220, speed: 2.5, offset: Math.PI }
+        ]
+      },
+      {
+        id: 4,
+        title: "스테이지 4: 야간 고층 좁은 발코니",
+        wind: 0.22,
+        spawn: { x: 90, y: 100 },
+        landing: { x: 420, y: 320, w: 80, h: 18 },
+        obstacles: [
+          { type: 'rect', x: 0, y: 520, w: 900, h: 80 },
+          { type: 'rect', x: 200, y: 0, w: 60, h: 360 },
+          { type: 'rect', x: 600, y: 200, w: 80, h: 320 },
+          { type: 'rect', x: 380, y: 0, w: 160, h: 180 }
+        ]
+      },
+      {
+        id: 5,
+        title: "스테이지 5: 최종 사이버 허브 특송",
+        wind: -0.18,
+        spawn: { x: 80, y: 80 },
+        landing: { x: 760, y: 440, w: 90, h: 20 },
+        obstacles: [
+          { type: 'rect', x: 0, y: 520, w: 900, h: 80 },
+          { type: 'rect', x: 240, y: 220, w: 70, h: 300 },
+          { type: 'laser', x: 450, y: 80, h: 260, speed: 3, offset: 0 },
+          { type: 'rect', x: 620, y: 0, w: 70, h: 320 }
+        ]
+      }
+    ];
+
+    // Drone state
+    let drone = {
+      x: 100,
+      y: 100,
+      vx: 0,
+      vy: 0,
+      angle: 0,
+      va: 0,
+      thrustLeft: false,
+      thrustRight: false,
+      thrustMain: false,
+      particles: []
+    };
+
+    const GRAVITY = 0.07;
+    const THRUST_POWER = 0.16;
+    const ROT_SPEED = 0.0035;
+    const DAMPING = 0.99;
+    const ROT_DAMPING = 0.94;
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = 900;
+      canvas.height = 540;
+    }
+
+    function initStage(stageIdx) {
+      const st = STAGES[stageIdx - 1];
+      drone.x = st.spawn.x;
+      drone.y = st.spawn.y;
+      drone.vx = 0;
+      drone.vy = 0;
+      drone.angle = 0;
+      drone.va = 0;
+      drone.thrustLeft = false;
+      drone.thrustRight = false;
+      drone.thrustMain = false;
+      drone.particles = [];
+      battery = 100;
+      
+      document.getElementById('stage-val').textContent = `${stageIdx}/${STAGES.length}`;
+      document.getElementById('score-val').textContent = totalScore;
+    }
+
+    // Input handlers
+    const keys = {};
+    window.addEventListener('keydown', (e) => {
+      sfx.init();
+      keys[e.code] = true;
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      keys[e.code] = false;
+    });
+
+    // Touch button bindings
+    function setupTouch(id, onDown, onUp) {
+      const el = document.getElementById(id);
+      el.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        sfx.init();
+        el.classList.add('active');
+        onDown();
+      });
+      el.addEventListener('pointerup', (e) => {
+        e.preventDefault();
+        el.classList.remove('active');
+        onUp();
+      });
+      el.addEventListener('pointerleave', (e) => {
+        el.classList.remove('active');
+        onUp();
+      });
+    }
+
+    setupTouch('btn-left', () => { keys['KeyA'] = true; }, () => { keys['KeyA'] = false; });
+    setupTouch('btn-right', () => { keys['KeyD'] = true; }, () => { keys['KeyD'] = false; });
+    setupTouch('btn-up', () => { keys['KeyW'] = true; }, () => { keys['KeyW'] = false; });
+
+    // Sound toggle
+    document.getElementById('btn-sound').addEventListener('click', () => {
+      sfx.init();
+      sfx.muted = !sfx.muted;
+      document.getElementById('btn-sound').textContent = sfx.muted ? '🔇' : '🔊';
+    });
+
+    // Start / Retry / Next stage triggers
+    document.getElementById('btn-start').addEventListener('click', () => {
+      sfx.init();
+      document.getElementById('start-modal').classList.add('hidden');
+      gameState = 'PLAYING';
+      initStage(1);
+    });
+
+    document.getElementById('btn-next-stage').addEventListener('click', () => {
+      document.getElementById('win-modal').classList.add('hidden');
+      if (currentStage < STAGES.length) {
+        currentStage++;
+        initStage(currentStage);
+        gameState = 'PLAYING';
+      } else {
+        alert(`🏆 축하합니다! 모든 배송 임무를 완수했습니다! 최종 점수: ${totalScore}점`);
+        currentStage = 1;
+        totalScore = 0;
+        initStage(1);
+        gameState = 'PLAYING';
+      }
+    });
+
+    document.getElementById('btn-retry').addEventListener('click', () => {
+      document.getElementById('fail-modal').classList.add('hidden');
+      initStage(currentStage);
+      gameState = 'PLAYING';
+    });
+
+    // Update loop
+    let lastTime = performance.now();
+
+    function update() {
+      if (gameState !== 'PLAYING') return;
+
+      const st = STAGES[currentStage - 1];
+
+      // Input checks
+      const leftActive = keys['KeyA'] || keys['ArrowLeft'];
+      const rightActive = keys['KeyD'] || keys['ArrowRight'];
+      const upActive = keys['KeyW'] || keys['ArrowUp'] || keys['Space'];
+
+      if (battery > 0) {
+        if (leftActive) {
+          drone.va -= ROT_SPEED;
+          drone.vx -= 0.04;
+          battery -= 0.04;
+          sfx.playThrust();
+          emitParticle(drone.x - 14, drone.y - 4, '#00f5d4');
+        }
+        if (rightActive) {
+          drone.va += ROT_SPEED;
+          drone.vx += 0.04;
+          battery -= 0.04;
+          sfx.playThrust();
+          emitParticle(drone.x + 14, drone.y - 4, '#00f5d4');
+        }
+        if (upActive) {
+          const fx = Math.sin(drone.angle) * THRUST_POWER;
+          const fy = -Math.cos(drone.angle) * THRUST_POWER;
+          drone.vx += fx;
+          drone.vy += fy;
+          battery -= 0.08;
+          sfx.playThrust();
+          emitParticle(drone.x - 10, drone.y + 10, '#f72585');
+          emitParticle(drone.x + 10, drone.y + 10, '#f72585');
+        }
+      }
+
+      // Wind and gravity
+      drone.vx += st.wind * 0.05;
+      drone.vy += GRAVITY;
+
+      // Damping
+      drone.vx *= DAMPING;
+      drone.vy *= DAMPING;
+      drone.va *= ROT_DAMPING;
+
+      // Position update
+      drone.x += drone.vx;
+      drone.y += drone.vy;
+      drone.angle += drone.va;
+
+      // Angle limit (-pi to pi)
+      while (drone.angle > Math.PI) drone.angle -= Math.PI * 2;
+      while (drone.angle < -Math.PI) drone.angle += Math.PI * 2;
+
+      // Battery update
+      document.getElementById('battery-val').textContent = `${Math.max(0, Math.floor(battery))}%`;
+
+      // Telemetry HUD
+      document.getElementById('hud-vx').textContent = (drone.vx * 10).toFixed(1);
+      document.getElementById('hud-vy').textContent = (drone.vy * 10).toFixed(1);
+      document.getElementById('hud-angle').textContent = (drone.angle * 180 / Math.PI).toFixed(1);
+      document.getElementById('hud-wind').textContent = (st.wind * 20).toFixed(1);
+
+      // Particles update
+      for (let i = drone.particles.length - 1; i >= 0; i--) {
+        const p = drone.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.04;
+        if (p.life <= 0) drone.particles.splice(i, 1);
+      }
+
+      // Boundary check
+      if (drone.x < 15 || drone.x > 885 || drone.y < 15 || drone.y > 525) {
+        failMission("구역 경계선 밖으로 추락했습니다.");
+        return;
+      }
+
+      // Obstacle collisions
+      for (const obs of st.obstacles) {
+        if (obs.type === 'rect') {
+          if (drone.x > obs.x && drone.x < obs.x + obs.w &&
+              drone.y > obs.y && drone.y < obs.y + obs.h) {
+            failMission("빌딩 구조물에 정면 충돌했습니다!");
+            return;
+          }
+        } else if (obs.type === 'laser') {
+          const t = performance.now() * 0.002 * obs.speed + obs.offset;
+          const laserY = obs.y + (Math.sin(t) + 1) * 0.5 * obs.h;
+          if (Math.abs(drone.x - obs.x) < 25 && Math.abs(drone.y - laserY) < 18) {
+            failMission("보안 레이저 센서에 감지되어 파괴되었습니다!");
+            return;
+          }
+        }
+      }
+
+      // Landing check
+      const pad = st.landing;
+      if (drone.x > pad.x && drone.x < pad.x + pad.w &&
+          drone.y >= pad.y - 12 && drone.y <= pad.y + 10) {
+        
+        const speed = Math.sqrt(drone.vx * drone.vx + drone.vy * drone.vy) * 10;
+        const deg = Math.abs(drone.angle * 180 / Math.PI);
+
+        if (speed <= 2.2 && deg <= 16) {
+          winMission(speed, deg);
+        } else {
+          failMission(`불시착 충돌! (착륙 속도: ${speed.toFixed(1)}m/s, 착륙 각도: ${deg.toFixed(1)}°)`);
+        }
+      }
+    }
+
+    function emitParticle(x, y, color) {
+      drone.particles.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 1.5 - Math.sin(drone.angle) * 1.2,
+        vy: (Math.random() - 0.5) * 1.5 + Math.cos(drone.angle) * 1.5,
+        color: color,
+        life: 1.0,
+        size: 3 + Math.random() * 3
+      });
+    }
+
+    function winMission(speed, deg) {
+      gameState = 'WON';
+      sfx.playLandSuccess();
+      
+      let stageScore = Math.floor(1000 + battery * 10 - speed * 100 - deg * 20);
+      stageScore = Math.max(200, stageScore);
+      totalScore += stageScore;
+      
+      let stars = '⭐⭐⭐';
+      if (speed > 1.5 || deg > 10 || battery < 40) stars = '⭐⭐';
+      if (speed > 1.9 || deg > 14 || battery < 20) stars = '⭐';
+
+      document.getElementById('win-title').textContent = `📦 스테이지 ${currentStage} 배송 완료!`;
+      document.getElementById('win-desc').innerHTML = `착륙 속도: <b>${speed.toFixed(1)} m/s</b> | 각도: <b>${deg.toFixed(1)}°</b><br>남은 배터리: <b>${Math.floor(battery)}%</b> (획득 점수: +${stageScore}점)`;
+      document.getElementById('win-stars').textContent = stars;
+      document.getElementById('win-modal').classList.remove('hidden');
+    }
+
+    function failMission(reason) {
+      gameState = 'FAILED';
+      sfx.playCrash();
+      document.getElementById('fail-desc').textContent = reason;
+      document.getElementById('fail-modal').classList.remove('hidden');
+    }
+
+    // Render loop
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const st = STAGES[currentStage - 1];
+
+      // Draw Grid / City background
+      ctx.strokeStyle = 'rgba(0, 245, 212, 0.05)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Draw Wind flow lines
+      if (st.wind !== 0) {
+        const time = performance.now() * 0.002;
+        ctx.strokeStyle = 'rgba(72, 202, 228, 0.25)';
+        ctx.setLineDash([8, 8]);
+        for (let i = 0; i < 4; i++) {
+          const ly = 120 + i * 90;
+          ctx.beginPath();
+          ctx.moveTo(0, ly + Math.sin(time + i) * 15);
+          ctx.lineTo(canvas.width, ly + Math.cos(time + i) * 15);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+      }
+
+      // Draw Obstacles
+      for (const obs of st.obstacles) {
+        if (obs.type === 'rect') {
+          ctx.fillStyle = '#1c2541';
+          ctx.strokeStyle = 'rgba(0, 245, 212, 0.4)';
+          ctx.lineWidth = 2;
+          ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+          ctx.strokeRect(obs.x, obs.y, obs.w, obs.h);
+
+          // Windows in buildings
+          ctx.fillStyle = 'rgba(254, 228, 64, 0.3)';
+          for (let wx = obs.x + 12; wx < obs.x + obs.w - 12; wx += 20) {
+            for (let wy = obs.y + 16; wy < obs.y + obs.h - 16; wy += 24) {
+              ctx.fillRect(wx, wy, 8, 12);
+            }
+          }
+        } else if (obs.type === 'laser') {
+          const t = performance.now() * 0.002 * obs.speed + obs.offset;
+          const laserY = obs.y + (Math.sin(t) + 1) * 0.5 * obs.h;
+          
+          // Emitter poles
+          ctx.fillStyle = '#4a0e2e';
+          ctx.fillRect(obs.x - 6, obs.y - 10, 12, obs.h + 20);
+          
+          // Laser beam
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = '#f72585';
+          ctx.strokeStyle = '#f72585';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(obs.x - 30, laserY);
+          ctx.lineTo(obs.x + 30, laserY);
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      // Draw Landing Helipad
+      const pad = st.landing;
+      ctx.fillStyle = '#f72585';
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = '#f72585';
+      ctx.fillRect(pad.x, pad.y, pad.w, pad.h);
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('HELIPAD', pad.x + pad.w / 2, pad.y + 14);
+
+      // Draw Particles
+      for (const p of drone.particles) {
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1.0;
+
+      // Draw Drone
+      ctx.save();
+      ctx.translate(drone.x, drone.y);
+      ctx.rotate(drone.angle);
+
+      // Rotors
+      const rotorBlur = Math.sin(performance.now() * 0.05) * 4;
+      ctx.fillStyle = '#00f5d4';
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#00f5d4';
+      ctx.fillRect(-24, -14, 16 + rotorBlur, 4);
+      ctx.fillRect(8 - rotorBlur, -14, 16 + rotorBlur, 4);
+      ctx.shadowBlur = 0;
+
+      // Frame
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-16, -10);
+      ctx.lineTo(16, -10);
+      ctx.moveTo(0, -10);
+      ctx.lineTo(0, 4);
+      ctx.stroke();
+
+      // Main Pod
+      ctx.fillStyle = '#00bbf9';
+      ctx.beginPath();
+      ctx.arc(0, 4, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 4, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cargo Cable & Box
+      ctx.strokeStyle = '#fee440';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, 14);
+      ctx.lineTo(0, 22);
+      ctx.stroke();
+
+      ctx.fillStyle = '#f39c12';
+      ctx.strokeStyle = '#d35400';
+      ctx.lineWidth = 1;
+      ctx.fillRect(-7, 22, 14, 12);
+      ctx.strokeRect(-7, 22, 14, 12);
+
+      ctx.restore();
+    }
+
+    function loop(time) {
+      update();
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    initStage(1);
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

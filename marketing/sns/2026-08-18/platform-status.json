@@ -1,0 +1,58 @@
+{
+  "schema": "sns-promotion-status/v1",
+  "project_id": "jangyoon-s-game",
+  "task_id": "hermes-sns-20260818-jangyoon-game",
+  "canonical": "canonical.md",
+  "source_of_truth": [
+    "../../README.md",
+    "../../docs/github-about.md",
+    "https://shinjaehyun20.github.io/jangyoon-s-game/"
+  ],
+  "verified_claims": {
+    "game_count": 228,
+    "verification": "local games.json, origin/main:games.json, and GitHub raw main/games.json each contained 228 entries; public Pages menu reflected the latest entries.",
+    "public_url": "https://shinjaehyun20.github.io/jangyoon-s-game/",
+    "verified_at": "2026-08-18"
+  },
+  "story_boundary": "Use the creator's gentle origin story: busy days led to making two small games per day so there would still be moments to play together. Do not name or identify a child, and do not use child photos.",
+  "operator_boundary": "Hermes prepares, uploads, and verifies platform state. User authorization in Slack permits actual publication, but each final publish click requires fresh exact-surface and content read-back.",
+  "platforms": {
+    "x": {
+      "status": "published_verified",
+      "copy": "x.md",
+      "asset": "assets/x-card.png",
+      "public_url": "https://x.com/shinjaehyun2018/status/2089495037231206725",
+      "post_id": "2089495037231206725",
+      "published_claim_snapshot": {"game_count": 226},
+      "evidence": "X success toast + public profile newest-post URL read-back"
+    },
+    "threads": {
+      "status": "blocked_auth_required",
+      "copy": "threads.md",
+      "asset": "assets/threads-card.png",
+      "public_url": null,
+      "post_id": null,
+      "reason": "Existing Threads tab presented the login card 'Instagram으로 계속하기 shinjaehyun2018'. No account-link/login action was taken."
+    },
+    "instagram_shinjaehyun2018": {
+      "status": "published_profile_readback",
+      "copy": "instagram.md",
+      "asset": "assets/instagram-card.png",
+      "public_url": "https://www.instagram.com/shinjaehyun2018/",
+      "post_id": null,
+      "published_claim_snapshot": {"game_count": 226},
+      "reason": "Share-complete confirmation displayed. Profile then showed 게시물 1 and the new grid loading; post permalink was not surfaced."
+    },
+    "instagram_jh_shinz": {
+      "status": "published_profile_readback",
+      "copy": "instagram.md",
+      "asset": "assets/instagram-card.png",
+      "public_url": "https://www.instagram.com/jh_shinz/",
+      "post_id": null,
+      "ai_label": "enabled and visually read back in composer immediately before publication",
+      "threads_crosspost": "enabled in composer; Instagram completion was verified, but a separate public Threads post URL/read-back was not collected",
+      "evidence": "Instagram completion modal: '게시물이 공유되었습니다'. Profile post count changed 7 -> 8, and the newest first-grid card visibly showed '터치로 바로 즐기는 / 어린이 미니게임 228개'. Caption was subsequently repaired through a UTF-8 clipboard paste (454/2200 composer read-back); the public post read-back showed the intact title, 228 claim, category lines, UTM URL, and hashtags.",
+      "reason": "Published from jh_shinz on 2026-08-18. Individual Instagram permalink was not surfaced by the profile composer flow."
+    }
+  }
+}
