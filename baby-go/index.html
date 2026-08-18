@@ -113,6 +113,7 @@
     .controls button:active { transform: scale(0.96); }
     .controls .btn-undo { background: rgba(255,200,80,0.25); }
     .controls .btn-pass { background: rgba(120,180,255,0.22); }
+    .controls .btn-finish { background: rgba(130,225,150,0.30); color: #effff2; }
     .controls .btn-reset { background: rgba(255,120,120,0.28); }
     .controls .btn-hint { background: rgba(100,255,180,0.22); }
     .controls .btn-hint.on { background: rgba(100,255,180,0.55); color: #0a2e1a; }
@@ -477,6 +478,7 @@
     <div class="controls">
       <button class="btn-undo" id="undoBtn">↩ 무르기</button>
       <button class="btn-pass" id="passBtn">⏭ 쉬기</button>
+      <button class="btn-finish" id="finishBtn">🏁 점수 세기</button>
       <button class="btn-hint hidden" id="hintBtn">💡 도움말</button>
       <button class="btn-guide" id="guideBtn">📖 바둑말</button>
       <button class="btn-reset" id="resetBtn">🔄 새 판</button>
@@ -559,10 +561,11 @@
         <div class="term"><b>숨 쉴 자리</b> — 내 돌 바로 옆의 빈칸이에요. 하나라도 있으면 돌이 살아 있어요.</div>
         <div class="term"><b>잡기</b> — 상대 돌의 숨 쉴 자리를 전부 막으면 상대 돌이 판에서 사라져요.</div>
         <div class="term"><b>내 땅</b> — 빈칸 사방을 내 돌이 둘러싸서 상대가 들어오기 어려운 곳이에요.</div>
-        <div class="term"><b>쉬기</b> — 더 둘 곳이 없다고 생각되면 쉬기를 눌러요. 둘이 연달아 쉬면 점수를 세요.</div>
+        <div class="term"><b>쉬기</b> — 더 둘 이유가 없다고 생각되면 쉬기를 눌러요. 상대도 쉬면 점수를 세요.</div>
+        <div class="term"><b>점수 세기</b> — 빈칸을 전부 채우는 버튼이 아니에요. 둘이 더 둘 곳이 없을 때 바로 끝 점수를 볼 수 있어요.</div>
         <div class="term"><b>AI 형세</b> — 프로 바둑 화면의 “흑 +11.6” 같은 숫자는 지금 확정 점수가 아니라, 끝까지 잘 두면 어느 쪽이 얼마나 앞설지 컴퓨터가 예상한 값이에요.</div>
       </div>
-      <div class="score-note"><b>이 게임의 끝 점수</b><br>판에 남아 있는 내 돌 + 내 돌이 둘러싼 빈칸을 더해요. 잡은 돌 수는 게임 중 상황을 알려주는 숫자예요. 그래서 마지막까지 돌을 두어도 점수가 0:0으로 뒤집히지 않아요.</div>
+      <div class="score-note"><b>이 게임의 끝 점수</b><br>판에 남아 있는 내 돌 + 내 돌이 둘러싼 빈칸을 더해요. 잡은 돌 수는 게임 중 상황을 알려주는 숫자예요. 빈칸을 전부 채우는 게임이 아니니, 더 둘 이유가 없으면 점수를 세요.</div>
       <button class="btn-start" id="guideCloseBtn" style="margin-top:16px;">알겠어!</button>
     </div>
   </div>
@@ -1079,6 +1082,7 @@
       // 게임 컨트롤 비활성화 (hidden)
       document.getElementById('undoBtn').classList.add('hidden');
       document.getElementById('passBtn').classList.add('hidden');
+      document.getElementById('finishBtn').classList.add('hidden');
       document.getElementById('resetBtn').classList.add('hidden');
       hintBtn.classList.add('hidden');
 
@@ -1159,6 +1163,7 @@
       // 컨트롤 복원
       document.getElementById('undoBtn').classList.remove('hidden');
       document.getElementById('passBtn').classList.remove('hidden');
+      document.getElementById('finishBtn').classList.remove('hidden');
       document.getElementById('resetBtn').classList.remove('hidden');
 
       // AI 모드 + 도움말 ON으로 자동 진입
@@ -1191,6 +1196,7 @@
       // 컨트롤 복원
       document.getElementById('undoBtn').classList.remove('hidden');
       document.getElementById('passBtn').classList.remove('hidden');
+      document.getElementById('finishBtn').classList.remove('hidden');
       document.getElementById('resetBtn').classList.remove('hidden');
 
       localStorage.setItem(CONFIG.TUT_DONE_KEY, 'true');
@@ -1560,8 +1566,20 @@
       setTimeout(executeAiMove, delay);
     }
 
+    // 상대가 "쉬기"를 눌렀다면, 잡거나 살릴 급한 일이 없을 때 AI도 쉰다.
+    // 빈칸을 끝까지 메우는 것은 바둑의 종료 방식이 아니다.
+    function aiCanFinishAfterPass(board = state.board) {
+      return findCaptureMoves(board, 2).length === 0
+        && findRescueMoves(board, 2).length === 0;
+    }
+
     function executeAiMove() {
       if (state.ended) { state.aiThinking = false; return; }
+      if (state.passes === 1 && aiCanFinishAfterPass()) {
+        state.aiThinking = false;
+        pass(true);
+        return;
+      }
       const move = aiMove(gameMode.difficulty);
       if (!move) {
         state.aiThinking = false;
@@ -1613,6 +1631,13 @@
       if (!isAi && gameMode.mode === 'ai' && state.turn === 2 && !state.ended) {
         scheduleAiMove();
       }
+    }
+
+    function finishNow() {
+      if (state.ended || state.aiThinking || tut.active) return;
+      const score = countScore(state.board);
+      const text = `지금 점수를 셀까요?\n흑 ${score[1].total}점 · 백 ${score[2].total}점\n빈칸을 다 채우지 않아도 끝낼 수 있어요.`;
+      if (confirm(text)) endGame();
     }
 
     function undo() {
@@ -1724,6 +1749,7 @@
 
     document.getElementById('undoBtn').addEventListener('click', undo);
     document.getElementById('passBtn').addEventListener('click', () => pass(false));
+    document.getElementById('finishBtn').addEventListener('click', finishNow);
     guideBtn.addEventListener('click', () => guideOv.classList.remove('hidden'));
     guideCloseBtn.addEventListener('click', () => guideOv.classList.add('hidden'));
     guideOv.addEventListener('click', (e) => {
@@ -1839,6 +1865,7 @@
       window.__babyGoQa = Object.freeze({
         countScore: (board) => countScore(board),
         tryMove: (x, y, board, color) => tryMove(x, y, board, color),
+        aiCanFinishAfterPass: (board) => aiCanFinishAfterPass(board),
       });
     }
   })();
