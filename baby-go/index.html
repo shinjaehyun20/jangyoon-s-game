@@ -116,6 +116,7 @@
     .controls .btn-reset { background: rgba(255,120,120,0.28); }
     .controls .btn-hint { background: rgba(100,255,180,0.22); }
     .controls .btn-hint.on { background: rgba(100,255,180,0.55); color: #0a2e1a; }
+    .controls .btn-guide { background: rgba(255,217,102,0.24); }
 
     footer {
       display: flex; justify-content: space-between; align-items: center;
@@ -160,6 +161,7 @@
       line-height: 1.5;
       margin-bottom: 16px;
       color: rgba(255,255,255,0.85);
+      white-space: pre-line;
     }
     .rules {
       text-align: left;
@@ -198,6 +200,13 @@
       width: 100%;
     }
     .btn-secondary:active { transform: scale(0.96); }
+    .guide-card { max-width: 360px; text-align: left; max-height: min(78dvh, 620px); overflow-y: auto; }
+    .guide-card h2 { text-align: center; }
+    .guide-intro { text-align: center; color: rgba(255,255,255,0.82); font-size: 14px; line-height: 1.5; margin-bottom: 12px; }
+    .term-list { display: grid; gap: 8px; margin: 12px 0 16px; }
+    .term { background: rgba(0,0,0,0.23); border-radius: 10px; padding: 10px 12px; line-height: 1.42; font-size: 13px; }
+    .term b { color: #ffd966; }
+    .score-note { border-left: 3px solid #73d6ff; padding: 9px 11px; background: rgba(115,214,255,0.12); border-radius: 6px; font-size: 12px; line-height: 1.48; color: rgba(255,255,255,0.86); }
 
     /* 모드 선택 버튼 */
     .mode-pick {
@@ -435,11 +444,11 @@
 
     <div class="hud">
       <div>
-        <span class="label">⚫ 흑 점수</span>
+        <span class="label">⚫ 흑이 잡은 돌</span>
         <span id="capBlack">0</span>
       </div>
       <div>
-        <span class="label">⚪ 백 점수</span>
+        <span class="label">⚪ 백이 잡은 돌</span>
         <span id="capWhite">0</span>
       </div>
       <div>
@@ -469,6 +478,7 @@
       <button class="btn-undo" id="undoBtn">↩ 무르기</button>
       <button class="btn-pass" id="passBtn">⏭ 쉬기</button>
       <button class="btn-hint hidden" id="hintBtn">💡 도움말</button>
+      <button class="btn-guide" id="guideBtn">📖 바둑말</button>
       <button class="btn-reset" id="resetBtn">🔄 새 판</button>
     </div>
 
@@ -539,6 +549,24 @@
     </div>
   </div>
 
+  <!-- 쉬운 바둑말 가이드 -->
+  <div class="overlay hidden" id="guideOverlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="overlay-card guide-card">
+      <h2 id="guideTitle">📖 바둑말 쉽게 보기</h2>
+      <p class="guide-intro">어려운 말 대신, 판에서 무엇을 보면 되는지 알려줄게요.</p>
+      <div class="term-list">
+        <div class="term"><b>돌</b> — 검은 돌과 흰 돌. 빈 교차점에 하나씩 놓아요.</div>
+        <div class="term"><b>숨 쉴 자리</b> — 내 돌 바로 옆의 빈칸이에요. 하나라도 있으면 돌이 살아 있어요.</div>
+        <div class="term"><b>잡기</b> — 상대 돌의 숨 쉴 자리를 전부 막으면 상대 돌이 판에서 사라져요.</div>
+        <div class="term"><b>내 땅</b> — 빈칸 사방을 내 돌이 둘러싸서 상대가 들어오기 어려운 곳이에요.</div>
+        <div class="term"><b>쉬기</b> — 더 둘 곳이 없다고 생각되면 쉬기를 눌러요. 둘이 연달아 쉬면 점수를 세요.</div>
+        <div class="term"><b>AI 형세</b> — 프로 바둑 화면의 “흑 +11.6” 같은 숫자는 지금 확정 점수가 아니라, 끝까지 잘 두면 어느 쪽이 얼마나 앞설지 컴퓨터가 예상한 값이에요.</div>
+      </div>
+      <div class="score-note"><b>이 게임의 끝 점수</b><br>판에 남아 있는 내 돌 + 내 돌이 둘러싼 빈칸을 더해요. 잡은 돌 수는 게임 중 상황을 알려주는 숫자예요. 그래서 마지막까지 돌을 두어도 점수가 0:0으로 뒤집히지 않아요.</div>
+      <button class="btn-start" id="guideCloseBtn" style="margin-top:16px;">알겠어!</button>
+    </div>
+  </div>
+
   <script>
   (function () {
     'use strict';
@@ -575,6 +603,9 @@
     const resultMsg   = document.getElementById('resultMsg');
     const wrapEl      = document.querySelector('.wrap');
     const hintBtn     = document.getElementById('hintBtn');
+    const guideBtn    = document.getElementById('guideBtn');
+    const guideOv     = document.getElementById('guideOverlay');
+    const guideCloseBtn = document.getElementById('guideCloseBtn');
 
     // 튜토리얼 UI DOM
     const tutProgress     = document.getElementById('tutProgress');
@@ -677,6 +708,51 @@
         }
       }
       return libCoords;
+    }
+
+    // 입문용 면적 계산: 남은 돌 + 한 색이 둘러싼 빈칸.
+    // 실제 대국의 사활/덤/계가 합의까지 완전히 재현하는 것은 아니므로,
+    // 어린이 게임에서는 잡힌 돌을 다시 표시하지 않고 현재 판을 기준으로 계산한다.
+    function countScore(board) {
+      const score = {
+        1: { stones: 0, territory: 0, total: 0 },
+        2: { stones: 0, territory: 0, total: 0 },
+      };
+      const seen = new Set();
+      for (let y = 0; y < CONFIG.SIZE; y++) {
+        for (let x = 0; x < CONFIG.SIZE; x++) {
+          const value = board[y][x];
+          if (value === 1 || value === 2) { score[value].stones++; continue; }
+          const startKey = y * CONFIG.SIZE + x;
+          if (seen.has(startKey)) continue;
+          const stack = [[x, y]];
+          const empty = [];
+          const touching = new Set();
+          let touchesEdge = false;
+          seen.add(startKey);
+          while (stack.length) {
+            const [cx, cy] = stack.pop();
+            empty.push([cx, cy]);
+            if (cx === 0 || cy === 0 || cx === CONFIG.SIZE - 1 || cy === CONFIG.SIZE - 1) touchesEdge = true;
+            for (const [dx, dy] of DIRS) {
+              const nx = cx + dx, ny = cy + dy;
+              if (nx < 0 || nx >= CONFIG.SIZE || ny < 0 || ny >= CONFIG.SIZE) continue;
+              const next = board[ny][nx];
+              if (next === 0) {
+                const key = ny * CONFIG.SIZE + nx;
+                if (!seen.has(key)) { seen.add(key); stack.push([nx, ny]); }
+              } else {
+                touching.add(next);
+              }
+            }
+          }
+          // 판 가장자리까지 열린 빈 공간은 어린이판에서 '내 땅'으로 단정하지 않는다.
+          if (touching.size === 1 && !touchesEdge) score[[...touching][0]].territory += empty.length;
+        }
+      }
+      score[1].total = score[1].stones + score[1].territory;
+      score[2].total = score[2].stones + score[2].territory;
+      return score;
     }
 
     function tryMove(x, y, boardSrc, turnColor) {
@@ -1447,13 +1523,17 @@
       if (state.history.length > 60) state.history.shift();
 
       state.board = res.board;
-      state.captured[state.turn] += res.captured;
+      const playedColor = state.turn;
+      state.captured[playedColor] += res.captured;
       state.moveNum++;
       state.lastMove = { x, y };
       state.passes = 0;
-      state.turn = state.turn === 1 ? 2 : 1;
+      state.turn = playedColor === 1 ? 2 : 1;
 
-      if (res.captured > 0) showToast(`⚫ 흑이 백돌 ${res.captured}개 잡았어요!`);
+      if (res.captured > 0) {
+        const who = playedColor === 1 ? '⚫ 흑' : '⚪ 백';
+        showToast(`${who}이 상대 돌 ${res.captured}개 잡았어요!`);
+      }
 
       updateHud();
       drawBoard();
@@ -1578,18 +1658,21 @@
     function endGame() {
       state.ended = true;
       state.aiThinking = false;
-      const black = state.captured[1];
-      const white = state.captured[2];
+      const score = countScore(state.board);
+      const black = score[1].total;
+      const white = score[2].total;
+      const blackDetail = `흑: 돌 ${score[1].stones} + 땅 ${score[1].territory}`;
+      const whiteDetail = `백: 돌 ${score[2].stones} + 땅 ${score[2].territory}`;
       finalEl.textContent = `⚫ ${black} : ${white} ⚪`;
       let title, msg;
       if (gameMode.mode === 'ai') {
-        if (black > white) { title = '🎉 장윤이 이겼어요!'; msg = `흑이 백돌을 ${black - white}개 더 잡았어요! 대단해요!`; }
-        else if (white > black) { title = '🤖 AI가 이겼어요'; msg = `백이 흑돌을 ${white - black}개 더 잡았어요. 다시 도전!`; }
-        else { title = '🤝 비겼어요!'; msg = '아주 잘했어요!'; }
+        if (black > white) { title = '🎉 장윤이 이겼어요!'; msg = `${blackDetail} / ${whiteDetail}\n${black - white}점 앞섰어요!`; }
+        else if (white > black) { title = '🤖 AI가 이겼어요'; msg = `${blackDetail} / ${whiteDetail}\n백이 ${white - black}점 앞섰어요. 다시 도전!`; }
+        else { title = '🤝 비겼어요!'; msg = `${blackDetail} / ${whiteDetail}\n아주 잘했어요!`; }
       } else {
-        if (black > white) { title = '🎉 흑돌 승리!'; msg = `흑이 백돌을 ${black - white}개 더 잡았어요!`; }
-        else if (white > black) { title = '🎉 백돌 승리!'; msg = `백이 흑돌을 ${white - black}개 더 잡았어요!`; }
-        else { title = '🤝 무승부!'; msg = '둘 다 똑같이 잘했어요!'; }
+        if (black > white) { title = '🎉 흑돌 승리!'; msg = `${blackDetail} / ${whiteDetail}\n흑이 ${black - white}점 앞섰어요!`; }
+        else if (white > black) { title = '🎉 백돌 승리!'; msg = `${blackDetail} / ${whiteDetail}\n백이 ${white - black}점 앞섰어요!`; }
+        else { title = '🤝 무승부!'; msg = `${blackDetail} / ${whiteDetail}\n둘 다 똑같이 잘했어요!`; }
       }
       winnerEl.textContent = title;
       resultMsg.textContent = msg;
@@ -1641,6 +1724,11 @@
 
     document.getElementById('undoBtn').addEventListener('click', undo);
     document.getElementById('passBtn').addEventListener('click', () => pass(false));
+    guideBtn.addEventListener('click', () => guideOv.classList.remove('hidden'));
+    guideCloseBtn.addEventListener('click', () => guideOv.classList.add('hidden'));
+    guideOv.addEventListener('click', (e) => {
+      if (e.target === guideOv) guideOv.classList.add('hidden');
+    });
     document.getElementById('resetBtn').addEventListener('click', () => {
       if (tut.active) return;
       if (state.moveNum === 0 || confirm('새 판 시작할까요?')) reset();
@@ -1745,6 +1833,14 @@
       // tutDone이 있으면 시작 오버레이 그대로 표시 (기존 동작)
     }
     init();
+
+    // 브라우저 검증용: qa=1일 때만 현재 구현의 점수 함수를 노출한다.
+    if (new URLSearchParams(location.search).get('qa') === '1') {
+      window.__babyGoQa = Object.freeze({
+        countScore: (board) => countScore(board),
+        tryMove: (x, y, board, color) => tryMove(x, y, board, color),
+      });
+    }
   })();
   </script>
 </body>

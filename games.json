@@ -723,7 +723,7 @@
     "id": "baby-go",
     "title": "Baby Go",
     "title_ko": "⚫⚪ 아기 바둑",
-    "description": "9x9 / 13x13 / 19x19 난이도 선택, 2인 번갈아 두기, 따먹기 규칙만 적용한 입문판",
+    "description": "9x9 / 13x13 / 19x19 입문 바둑: 잡기·내 땅 계산·쉬운 바둑말 가이드",
     "thumbnail": "baby-go/thumb.svg",
     "path": "baby-go/index.html"
   },
