@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>🚁 사이버 드론 택배 비행사 (Cyber Drone Delivery)</title>
   <style>
     :root {
@@ -34,6 +34,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      min-height: 100dvh;
       overflow: hidden;
     }
 
@@ -42,6 +43,7 @@
       width: 100vw;
       max-width: 900px;
       height: 100vh;
+      height: 100dvh;
       max-height: 640px;
       background: #060b19;
       border: 2px solid rgba(0, 245, 212, 0.4);
@@ -53,7 +55,7 @@
     }
 
     header {
-      padding: 8px 16px;
+      padding: 8px 12px;
       background: rgba(11, 19, 43, 0.95);
       backdrop-filter: blur(8px);
       display: flex;
@@ -61,37 +63,43 @@
       justify-content: space-between;
       border-bottom: 1px solid rgba(0, 245, 212, 0.3);
       z-index: 10;
+      flex-shrink: 0;
+      gap: 6px;
     }
 
     .title-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .title-group h1 {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 800;
       color: var(--accent-cyan);
       text-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
+      white-space: nowrap;
     }
 
     .stats-bar {
       display: flex;
-      gap: 12px;
+      gap: 6px;
       align-items: center;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     .stat-badge {
       background: rgba(28, 37, 65, 0.85);
-      padding: 4px 10px;
-      border-radius: 8px;
+      padding: 3px 6px;
+      border-radius: 6px;
       border: 1px solid rgba(0, 245, 212, 0.2);
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
+      white-space: nowrap;
     }
 
     .stat-badge span.val {
@@ -102,18 +110,19 @@
       background: var(--card-bg);
       color: var(--text);
       border: 1px solid rgba(0, 245, 212, 0.4);
-      padding: 5px 10px;
-      border-radius: 8px;
-      font-size: 0.85rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .btn:hover {
       background: var(--accent-cyan);
       color: #060b19;
-      box-shadow: 0 0 12px rgba(0, 245, 212, 0.6);
+      box-shadow: 0 0 10px rgba(0, 245, 212, 0.6);
     }
 
     canvas {
@@ -126,15 +135,15 @@
 
     #hud {
       position: absolute;
-      top: 55px;
-      left: 16px;
+      top: 50px;
+      left: 12px;
       background: rgba(11, 19, 43, 0.85);
       border: 1px solid rgba(0, 245, 212, 0.3);
-      border-radius: 8px;
-      padding: 8px 12px;
+      border-radius: 6px;
+      padding: 6px 10px;
       font-family: monospace;
-      font-size: 0.8rem;
-      line-height: 1.4;
+      font-size: 0.75rem;
+      line-height: 1.3;
       pointer-events: none;
       z-index: 5;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
@@ -142,25 +151,25 @@
 
     #touch-controls {
       position: absolute;
-      bottom: 20px;
+      bottom: 16px;
       left: 0;
       width: 100%;
       display: flex;
       justify-content: space-between;
-      padding: 0 28px;
+      padding: 0 20px;
       pointer-events: none;
       z-index: 10;
     }
 
     .touch-btn {
       pointer-events: auto;
-      width: 68px;
-      height: 68px;
+      width: 62px;
+      height: 62px;
       border-radius: 50%;
       background: rgba(28, 37, 65, 0.85);
       border: 2px solid var(--accent-cyan);
       color: var(--accent-cyan);
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -182,8 +191,8 @@
     }
 
     .thrust-btn {
-      width: 78px;
-      height: 78px;
+      width: 72px;
+      height: 72px;
       border-color: var(--accent-pink);
       color: var(--accent-pink);
     }
@@ -193,20 +202,57 @@
       box-shadow: 0 0 20px rgba(247, 37, 133, 0.8);
     }
 
+    /* Mobile Responsive Rule */
+    @media (max-width: 600px) {
+      #game-container {
+        max-height: 100vh;
+        max-height: 100dvh;
+        border-radius: 0;
+        border: none;
+      }
+      header {
+        padding: 6px 8px;
+      }
+      .title-group h1 {
+        font-size: 0.9rem;
+      }
+      .stat-badge {
+        padding: 2px 4px;
+        font-size: 0.72rem;
+      }
+      .stat-label-long {
+        display: none;
+      }
+      .touch-btn {
+        width: 56px;
+        height: 56px;
+        font-size: 1.1rem;
+      }
+      .thrust-btn {
+        width: 66px;
+        height: 66px;
+      }
+      #hud {
+        font-size: 0.68rem;
+        padding: 4px 8px;
+        top: 44px;
+      }
+    }
+
     .modal {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(6, 11, 25, 0.9);
+      background: rgba(6, 11, 25, 0.92);
       backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 20;
-      padding: 20px;
+      padding: 16px;
       text-align: center;
     }
 
@@ -218,31 +264,31 @@
       background: var(--card-bg);
       border: 2px solid var(--accent-cyan);
       border-radius: 16px;
-      padding: 24px;
+      padding: 20px;
       max-width: 440px;
       width: 100%;
       box-shadow: 0 0 40px rgba(0, 245, 212, 0.4);
     }
 
     .modal-card h2 {
-      font-size: 1.6rem;
-      margin-bottom: 12px;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
       color: var(--accent-cyan);
     }
 
     .modal-card p {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--text-dim);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       line-height: 1.5;
     }
 
     .btn-large {
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
       color: #060b19;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 800;
-      padding: 12px 28px;
+      padding: 10px 24px;
       border: none;
       border-radius: 12px;
       cursor: pointer;
@@ -261,20 +307,20 @@
     <header>
       <div class="title-group">
         <a href="../index.html" class="btn" style="text-decoration: none;">🏠 홈</a>
-        <h1>🚁 사이버 드론 택배 비행사</h1>
+        <h1>🚁 사이버 드론</h1>
       </div>
       <div class="stats-bar">
-        <div class="stat-badge">스테이지: <span class="val" id="stage-val">1/5</span></div>
-        <div class="stat-badge">배송 점수: <span class="val" id="score-val">0</span></div>
-        <div class="stat-badge">배터리: <span class="val" id="battery-val">100%</span></div>
+        <div class="stat-badge"><span class="stat-label-long">스테이지: </span><span class="val" id="stage-val">1/5</span></div>
+        <div class="stat-badge"><span class="stat-label-long">점수: </span><span class="val" id="score-val">0</span></div>
+        <div class="stat-badge">🔋 <span class="val" id="battery-val">100%</span></div>
         <button class="btn" id="btn-sound">🔊</button>
       </div>
     </header>
 
     <div id="hud">
-      <div>수직 속도: <span id="hud-vy">0.0</span> m/s</div>
-      <div>수평 속도: <span id="hud-vx">0.0</span> m/s</div>
-      <div>기울기 각: <span id="hud-angle">0.0</span>°</div>
+      <div>수직: <span id="hud-vy">0.0</span> m/s</div>
+      <div>수평: <span id="hud-vx">0.0</span> m/s</div>
+      <div>기울기: <span id="hud-angle">0.0</span>°</div>
       <div>풍속: <span id="hud-wind">0.0</span> kt</div>
     </div>
 
@@ -292,7 +338,7 @@
       <div class="modal-card">
         <h2>🚁 드론 비행 준비</h2>
         <p>미래 메가시티의 고층 빌딩과 악천후를 뚫고 소중한 택배 화물을 지정된 헬리패드에 안전하게 배송하세요!</p>
-        <p style="color: var(--accent-gold); line-height: 1.6;">조작법: [A/D 또는 좌우 화살표] 회전 & 좌우 추진<br>[W 또는 위 화살표/Space] 메인 부스터 추진</p>
+        <p style="color: var(--accent-gold); line-height: 1.6;">조작법: [A/D 또는 좌우 화살표/버튼] 회전 & 좌우 추진<br>[W 또는 위 화살표/부스터] 메인 부스터 추진</p>
         <p style="font-size: 0.85rem; color: #ff758f;">⚠️ 착륙 속도 2.2 m/s 이하, 착륙 각도 16° 이내여야 안전 배송에 성공합니다!</p>
         <button class="btn-large" id="btn-start">배송 임무 시작</button>
       </div>

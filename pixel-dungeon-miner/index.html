@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>⛏️ 픽셀 던전 광산 탐험가 (Pixel Dungeon Miner)</title>
   <style>
     :root {
@@ -34,6 +34,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      min-height: 100dvh;
       overflow: hidden;
     }
 
@@ -42,6 +43,7 @@
       width: 100vw;
       max-width: 900px;
       height: 100vh;
+      height: 100dvh;
       max-height: 640px;
       background: #0d0603;
       border: 2px solid rgba(255, 215, 0, 0.4);
@@ -53,7 +55,7 @@
     }
 
     header {
-      padding: 8px 16px;
+      padding: 8px 12px;
       background: rgba(30, 19, 12, 0.95);
       backdrop-filter: blur(8px);
       display: flex;
@@ -61,37 +63,43 @@
       justify-content: space-between;
       border-bottom: 1px solid rgba(255, 215, 0, 0.3);
       z-index: 10;
+      flex-shrink: 0;
+      gap: 6px;
     }
 
     .title-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .title-group h1 {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 800;
       color: var(--accent-gold);
       text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+      white-space: nowrap;
     }
 
     .stats-bar {
       display: flex;
-      gap: 10px;
+      gap: 6px;
       align-items: center;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     .stat-badge {
       background: rgba(44, 26, 14, 0.9);
-      padding: 4px 8px;
-      border-radius: 8px;
+      padding: 3px 6px;
+      border-radius: 6px;
       border: 1px solid rgba(255, 215, 0, 0.2);
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
+      white-space: nowrap;
     }
 
     .stat-badge span.val {
@@ -102,18 +110,19 @@
       background: var(--card-bg);
       color: var(--text);
       border: 1px solid rgba(255, 215, 0, 0.4);
-      padding: 5px 10px;
-      border-radius: 8px;
-      font-size: 0.85rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .btn:hover {
       background: var(--accent-gold);
       color: #150a04;
-      box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
     }
 
     canvas {
@@ -124,15 +133,14 @@
       background: #0a0502;
     }
 
-    /* Virtual D-pad for mobile */
     #touch-controls {
       position: absolute;
       bottom: 20px;
-      left: 20px;
+      left: 16px;
       display: grid;
-      grid-template-columns: repeat(3, 52px);
-      grid-template-rows: repeat(3, 52px);
-      gap: 6px;
+      grid-template-columns: repeat(3, 50px);
+      grid-template-rows: repeat(3, 50px);
+      gap: 5px;
       pointer-events: none;
       z-index: 10;
     }
@@ -142,9 +150,9 @@
       background: rgba(44, 26, 14, 0.85);
       border: 2px solid var(--accent-gold);
       color: var(--accent-gold);
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: bold;
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -161,24 +169,24 @@
 
     #action-controls {
       position: absolute;
-      bottom: 24px;
-      right: 24px;
+      bottom: 20px;
+      right: 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       pointer-events: none;
       z-index: 10;
     }
 
     .action-btn {
       pointer-events: auto;
-      width: 68px;
-      height: 68px;
+      width: 62px;
+      height: 62px;
       border-radius: 50%;
       background: rgba(44, 26, 14, 0.9);
       border: 2px solid var(--accent-cyan);
       color: var(--accent-cyan);
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -192,21 +200,57 @@
       transform: scale(0.92);
     }
 
-    /* Modals & Shop */
+    @media (max-width: 600px) {
+      #game-container {
+        max-height: 100vh;
+        max-height: 100dvh;
+        border-radius: 0;
+        border: none;
+      }
+      header {
+        padding: 6px 8px;
+      }
+      .title-group h1 {
+        font-size: 0.9rem;
+      }
+      .stat-badge {
+        padding: 2px 4px;
+        font-size: 0.72rem;
+      }
+      .stat-label-long {
+        display: none;
+      }
+      .dpad-btn {
+        font-size: 1rem;
+      }
+      #touch-controls {
+        grid-template-columns: repeat(3, 44px);
+        grid-template-rows: repeat(3, 44px);
+        bottom: 14px;
+        left: 12px;
+      }
+      .action-btn {
+        width: 56px;
+        height: 56px;
+        bottom: 14px;
+        right: 14px;
+      }
+    }
+
     .modal {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(13, 6, 3, 0.9);
+      background: rgba(13, 6, 3, 0.92);
       backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 20;
-      padding: 20px;
+      padding: 16px;
       text-align: center;
     }
 
@@ -218,30 +262,30 @@
       background: var(--card-bg);
       border: 2px solid var(--accent-gold);
       border-radius: 16px;
-      padding: 24px;
+      padding: 20px;
       max-width: 480px;
       width: 100%;
       box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
     }
 
     .modal-card h2 {
-      font-size: 1.6rem;
-      margin-bottom: 12px;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
       color: var(--accent-gold);
     }
 
     .shop-items {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 16px 0;
+      gap: 8px;
+      margin: 14px 0;
     }
 
     .shop-card {
       background: rgba(21, 10, 4, 0.85);
       border: 1px solid rgba(255, 215, 0, 0.3);
       border-radius: 10px;
-      padding: 10px;
+      padding: 8px;
       text-align: left;
       cursor: pointer;
       transition: all 0.2s;
@@ -254,19 +298,19 @@
     }
 
     .shop-card h4 {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--accent-gold);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .shop-card p {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-dim);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .shop-card .price {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: bold;
       color: #2ed573;
     }
@@ -274,9 +318,9 @@
     .btn-large {
       background: linear-gradient(135deg, var(--accent-gold), #e67e22);
       color: #150a04;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 800;
-      padding: 12px 28px;
+      padding: 10px 24px;
       border: none;
       border-radius: 12px;
       cursor: pointer;
@@ -295,13 +339,13 @@
     <header>
       <div class="title-group">
         <a href="../index.html" class="btn" style="text-decoration: none;">🏠 홈</a>
-        <h1>⛏️ 픽셀 던전 광산 탐험가</h1>
+        <h1>⛏️ 던전 광부</h1>
       </div>
       <div class="stats-bar">
-        <div class="stat-badge">심도: <span class="val" id="depth-val">0m</span></div>
-        <div class="stat-badge">골드: <span class="val" id="gold-val">0G</span></div>
-        <div class="stat-badge">배낭: <span class="val" id="bag-val">0/10</span></div>
-        <div class="stat-badge">산소: <span class="val" id="oxygen-val">100%</span></div>
+        <div class="stat-badge"><span class="stat-label-long">심도: </span><span class="val" id="depth-val">0m</span></div>
+        <div class="stat-badge"><span class="stat-label-long">골드: </span>🪙 <span class="val" id="gold-val">0G</span></div>
+        <div class="stat-badge">🎒 <span class="val" id="bag-val">0/10</span></div>
+        <div class="stat-badge">🤿 <span class="val" id="oxygen-val">100%</span></div>
         <button class="btn" id="btn-sound">🔊</button>
       </div>
     </header>
@@ -321,12 +365,11 @@
       <button class="action-btn" id="btn-surface" title="지상 귀환 상점">🏢</button>
     </div>
 
-    <!-- Modals -->
     <div id="start-modal" class="modal">
       <div class="modal-card">
         <h2>⛏️ 전설의 던전 광산 착공</h2>
         <p>미지의 지하 동굴을 파고 내려가 진귀한 광석과 전설의 보석을 채굴하세요!</p>
-        <p style="color: var(--accent-gold); line-height: 1.6;">조작법: [WASD / 방향키] 이동 및 채굴<br>[🏢 상점 버튼] 지상 베이스 캠프로 즉시 귀환</p>
+        <p style="color: var(--accent-gold); line-height: 1.6;">조작법: [WASD / 방향키 / 화면패드] 이동 및 채굴<br>[🏢 상점 버튼] 지상 베이스 캠프로 즉시 귀환</p>
         <p style="font-size: 0.85rem; color: #ff6b81;">⚠️ 지하 깊을수록 산소가 빠르게 소모됩니다. 산소가 떨어지기 전에 지상으로 돌아와 보석을 판매하고 장비를 강화하세요!</p>
         <button class="btn-large" id="btn-start">광산 탐험 시작</button>
       </div>
@@ -336,7 +379,7 @@
       <div class="modal-card">
         <h2>🏢 지상 베이스 캠프 상점</h2>
         <p>채굴한 광석을 판매하여 골드를 획득하고 탐사 장비를 업그레이드하세요!</p>
-        <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(255,215,0,0.3);">
+        <div style="background: rgba(0,0,0,0.5); padding: 8px; border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(255,215,0,0.3);">
           광석 판매 수익: <b style="color: var(--accent-gold);" id="sell-gold-val">+0G</b>
         </div>
         <div class="shop-items">
@@ -375,7 +418,6 @@
   </div>
 
   <script>
-    // Audio Synthesizer
     class SoundFX {
       constructor() {
         this.ctx = null;
@@ -750,7 +792,6 @@
       document.getElementById('oxygen-val').textContent = `${oxyPercent}%`;
     }
 
-    // Render loop
     function render() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -760,7 +801,6 @@
 
       const offsetX = (canvas.width - MAP_WIDTH * TILE_SIZE) / 2;
 
-      // Surface sky & clouds
       if (camera.y < 240) {
         const skyGrad = ctx.createLinearGradient(0, 0, 0, 240 - camera.y);
         skyGrad.addColorStop(0, '#0f172a');
@@ -768,14 +808,12 @@
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, canvas.width, 240 - camera.y);
 
-        // Sun
         ctx.fillStyle = '#f59e0b';
         ctx.beginPath();
         ctx.arc(canvas.width - 120, 60 - camera.y * 0.4, 28, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Draw Tiles with Pixel Texture
       const startRow = Math.max(0, Math.floor(camera.y / TILE_SIZE));
       const endRow = Math.min(MAP_HEIGHT, Math.ceil((camera.y + canvas.height) / TILE_SIZE) + 1);
 
@@ -812,12 +850,10 @@
             ctx.fillStyle = '#ff4757';
             ctx.fillRect(px + 4, py + 14, 26, 4);
           } else {
-            // Ore Tiles
             const info = ORE_INFO[tile];
             ctx.fillStyle = (y < 25) ? '#4a2810' : '#475569';
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
 
-            // Gem Crystal Graphic
             ctx.fillStyle = info.gemColor;
             ctx.shadowBlur = 10;
             ctx.shadowColor = info.gemColor;
@@ -832,7 +868,6 @@
             ctx.fill();
           }
 
-          // Tile Border
           if (tile !== TILES.EMPTY) {
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
             ctx.lineWidth = 1;
@@ -841,7 +876,6 @@
         }
       }
 
-      // Draw Particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
@@ -858,7 +892,6 @@
       }
       ctx.globalAlpha = 1.0;
 
-      // Draw Popups
       for (let i = popups.length - 1; i >= 0; i--) {
         const pop = popups[i];
         pop.y -= 0.8;
@@ -875,11 +908,9 @@
       }
       ctx.globalAlpha = 1.0;
 
-      // Draw Cute Miner Character
       const pScreenX = offsetX + player.x * TILE_SIZE;
       const pScreenY = player.y * TILE_SIZE - camera.y;
 
-      // Headlight Beam
       const lightGrad = ctx.createRadialGradient(pScreenX + 17, pScreenY + 17, 10, pScreenX + 17, pScreenY + 17, 130);
       lightGrad.addColorStop(0, 'rgba(254, 202, 87, 0.45)');
       lightGrad.addColorStop(1, 'rgba(254, 202, 87, 0)');
@@ -888,21 +919,17 @@
       ctx.arc(pScreenX + 17, pScreenY + 17, 130, 0, Math.PI * 2);
       ctx.fill();
 
-      // Body (Overalls)
       ctx.fillStyle = '#2563eb';
       ctx.fillRect(pScreenX + 8, pScreenY + 14, 18, 14);
 
-      // Shirt
       ctx.fillStyle = '#ef4444';
       ctx.fillRect(pScreenX + 10, pScreenY + 12, 14, 6);
 
-      // Head
       ctx.fillStyle = '#fed7aa';
       ctx.beginPath();
       ctx.arc(pScreenX + 17, pScreenY + 10, 8, 0, Math.PI * 2);
       ctx.fill();
 
-      // Eyes
       ctx.fillStyle = '#0f172a';
       if (player.facing === 'right') {
         ctx.fillRect(pScreenX + 19, pScreenY + 9, 2.5, 3);
@@ -910,12 +937,10 @@
         ctx.fillRect(pScreenX + 12, pScreenY + 9, 2.5, 3);
       }
 
-      // Yellow Miner Helmet
       ctx.fillStyle = '#f59e0b';
       ctx.fillRect(pScreenX + 8, pScreenY + 2, 18, 6);
       ctx.fillRect(pScreenX + 6, pScreenY + 6, 22, 3);
 
-      // Headlight Lamp
       ctx.fillStyle = '#ffffff';
       ctx.shadowBlur = 8;
       ctx.shadowColor = '#ffd700';
@@ -925,7 +950,6 @@
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Pickaxe Animation
       ctx.save();
       ctx.translate(pScreenX + 17, pScreenY + 18);
       let angle = player.facing === 'right' ? 0.6 : -0.6;
