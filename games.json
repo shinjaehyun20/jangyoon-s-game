@@ -1,5 +1,21 @@
 [
   {
+    "id": "neon-circuit-connect",
+    "title": "Neon Circuit Connect",
+    "title_ko": "⚡ 네온 회로 연결사",
+    "description": "타일을 회전시켜 발전소에서 아기 로봇까지 네온 전선을 연결하고 번쩍이는 에너지를 충전하세요!",
+    "thumbnail": "neon-circuit-connect/thumb.svg",
+    "path": "neon-circuit-connect/index.html"
+  },
+  {
+    "id": "jungle-vine-swinger",
+    "title": "Jungle Vine Swinger",
+    "title_ko": "🐒 정글 덩굴 스윙 타잔",
+    "description": "화면을 터치해 덩굴을 잡고 반동을 실어 날아가며 정글의 바나나와 별을 모으는 스윙 액션 놀이!",
+    "thumbnail": "jungle-vine-swinger/thumb.svg",
+    "path": "jungle-vine-swinger/index.html"
+  },
+  {
     "id": "cyber-drone-delivery",
     "title": "Cyber Drone Delivery",
     "title_ko": "🚁 사이버 드론 택배 비행사",

@@ -16,6 +16,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "neon-circuit-connect",
+        "label": "⚡ 네온 회로 연결사",
+        "path": "neon-circuit-connect/index.html"
+      },
+      {
+        "id": "jungle-vine-swinger",
+        "label": "🐒 정글 덩굴 스윙 타잔",
+        "path": "jungle-vine-swinger/index.html"
+      },
+      {
         "id": "cyber-drone-delivery",
         "label": "🚁 사이버 드론 택배 비행사",
         "path": "cyber-drone-delivery/index.html"

@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 230개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 232개.
 
-[![Games](https://img.shields.io/badge/games-230-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-232-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![230개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![232개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 230개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 232개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [⚡ 네온 회로 연결사 (neon-circuit-connect)](./neon-circuit-connect) | 타일을 회전시켜 발전소에서 아기 로봇까지 네온 전선을 연결하고 번쩍이는 에너지를 충전하세요! | 어린이/퍼즐·인지 |
+| [🐒 정글 덩굴 스윙 타잔 (jungle-vine-swinger)](./jungle-vine-swinger) | 화면을 터치해 덩굴을 잡고 반동을 실어 날아가며 정글의 바나나와 별을 모으는 스윙 액션 놀이! | 어린이/액션·물리 |
 | [🍹 주스 따르기 파티 (juice-pour-party)](./juice-pour-party) | 색깔 주전자를 알맞은 컵 위로 드래그해 맛있는 주스를 따라 보는 45초 놀이. | 어린이/드래그·생활놀이 |
 | [☁️ 구름 바람길 탐험 (windy-cloud-postman)](./windy-cloud-postman) | 바람개비를 드래그한 방향으로 구름을 직접 움직여 빛나는 하늘문까지 안내하는 놀이. | 어린이/공간·드래그 |
 | [⭐ 별자리 산수 짝 맞추기 (star-match-math)](./star-match-math) | 화면의 별들을 선택하여 숫자의 합이 목표값과 정확히 일치하도록 하세요! 별자리를 잇는 연산 퍼즐. | 어린이/학습·인지 |
@@ -419,6 +421,9 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-08)
+
+- **⚡ 네온 회로 연결사 · 🐒 정글 덩굴 스윙 타잔 추가 (2026-08-27)** — 터치 회전으로 ⚡발전소에서 🤖로봇까지 전선을 잇는 네온 회로 퍼즐과 진자 물리 반동으로 시원하게 날아가는 정글 스윙 액션 미니게임 2종 추가 (총 232개). 단일 HTML, 외부 CDN 의존성 없음, 100dvh/overflow 보호, Pointer Events 통합 조작.
+
 
 - **🥁 동물 밴드 연주 · 🍂 계절 옷장 분류 추가 (2026-08-09)** — 동물 밴드 연주는 4가지 악기(북·트라이앵글·실로폰·탬버린)가 켜지는 순서를 기억하고 똑같이 눌러 라운드를 이어가는 순서 기억 게임으로, 라운드마다 순서가 하나씩 늘어납니다. 계절 옷장 분류는 옷과 물건을 봄·여름·가을·겨울 4칸 중 알맞은 계절 칸으로 드래그해 40초 동안 최대한 많이 분류하는 인지 게임입니다. 두 게임 모두 단일 HTML, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일, 외부 의존성 0건을 포함합니다. 부수 발견: `hidden-object-hunt`·`rhythm-touch-beat`(2026-08-07 배포)가 README 최근 변경사항 및 CHANGES.md에 미반영 상태였습니다 — `KNOWN_ISSUES.md` 참조.
 

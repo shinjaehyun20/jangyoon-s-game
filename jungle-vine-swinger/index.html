@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>정글 덩굴 스윙 타잔</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --emerald: #10b981;
+  --green: #22c55e;
+  --gold: #fde047;
+  --bg: #062e1c;
+  --border: rgba(34, 197, 94, 0.3);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+html, body {
+  height: 100vh; height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+  touch-action: manipulation;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  color: #fff;
+  background: var(--bg);
+}
+body {
+  background: radial-gradient(circle at 50% 10%, #064e3b 0%, #022c22 100%);
+}
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: 100vh; height: 100dvh;
+  margin: auto;
+  padding: 10px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+h1 {
+  font-size: clamp(19px, 5vw, 24px);
+  color: #d1fae5;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6ee7b7;
+  margin-top: 2px;
+}
+.hud {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.chip {
+  padding: 6px 4px;
+  text-align: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: #a7f3d0;
+}
+.chip b {
+  display: block;
+  font-size: 16px;
+  color: #fff;
+  margin-top: 2px;
+}
+#game-box {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: radial-gradient(circle at 50% 20%, rgba(34, 197, 94, 0.15), transparent 70%), rgba(2, 44, 34, 0.7);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #6ee7b7;
+  padding: 0 4px;
+}
+.home-link {
+  color: #fde047;
+  font-weight: 900;
+  text-decoration: none;
+  font-size: 12px;
+}
+.overlay {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  padding: 20px;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 44, 34, 0.85);
+  backdrop-filter: blur(10px);
+}
+.overlay.hidden { display: none; }
+.card {
+  width: min(380px, 100%);
+  padding: 24px 20px;
+  text-align: center;
+  border-radius: 24px;
+  border: 1px solid var(--green);
+  background: linear-gradient(160deg, #064e3b, #022c22);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: #fde047;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.card p {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d1fae5;
+}
+.btn {
+  padding: 12px 26px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #22c55e, #10b981);
+  color: #062e1c;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+}
+.btn:active { transform: scale(0.96); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div>
+      <h1>🐒 정글 덩굴 스윙 타잔</h1>
+      <div class="sub">화면을 터치해 덩굴을 잡고 날아가 바나나를 모으세요!</div>
+    </div>
+    <div class="chip" style="min-width:65px">최고 <b id="best">0</b></div>
+  </header>
+  <section class="hud">
+    <div class="chip">점수<b id="score">0</b></div>
+    <div class="chip">남은 시간<b id="timer">45초</b></div>
+    <div class="chip">바나나<b id="bananas">0개</b></div>
+    <div class="chip">콤보<b id="combo">0x</b></div>
+  </section>
+  <div id="game-box">
+    <canvas id="cvs"></canvas>
+  </div>
+  <footer class="footer">
+    <span>🌴 덩굴 흔들릴 때 탭하면 점프! 다음 덩굴 근처에서 착지!</span>
+    <a class="home-link" href="../index.html">← 홈</a>
+  </footer>
+</main>
+
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <div style="font-size:48px;margin-bottom:8px">🐒🌴🍌</div>
+    <h2>정글 덩굴 스윙 타잔</h2>
+    <p>아기 원숭이와 함께 신나는 정글 여행을 떠나요!<br>덩굴이 앞뒤로 흔들릴 때 화면을 톡! 탭하면<br>바람을 타고 시원하게 점프해요!<br><br>공중에 뜬 바나나와 별을 모으고 다음 덩굴을 잡으세요!</p>
+    <button class="btn" id="startBtn">정글 탐험 출발!</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="card">
+    <div style="font-size:48px;margin-bottom:8px" id="endEmoji">🍌</div>
+    <h2 id="endTitle">정글 탐험 완료!</h2>
+    <p id="endText"></p>
+    <button class="btn" id="restartBtn">다시 달리기</button>
+  </div>
+</div>
+
+<script>
+(()=>{'use strict';
+const KEY = 'jungle_vine_swinger_best';
+const AUD = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+
+function playSound(type) {
+  try {
+    if (!actx) actx = new AUD();
+    if (actx.state === 'suspended') actx.resume();
+    let now = actx.currentTime;
+    if (type === 'jump') {
+      let osc = actx.createOscillator(), g = actx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(700, now + 0.15);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.linearRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(g); g.connect(actx.destination);
+      osc.start(now); osc.stop(now + 0.15);
+    } else if (type === 'collect') {
+      let osc = actx.createOscillator(), g = actx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.setValueAtTime(1200, now + 0.06);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.linearRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(g); g.connect(actx.destination);
+      osc.start(now); osc.stop(now + 0.12);
+    } else if (type === 'catch') {
+      let osc = actx.createOscillator(), g = actx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(500, now);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.linearRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(g); g.connect(actx.destination);
+      osc.start(now); osc.stop(now + 0.08);
+    } else if (type === 'bounce') {
+      let osc = actx.createOscillator(), g = actx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(550, now + 0.2);
+      g.gain.setValueAtTime(0.25, now);
+      g.gain.linearRampToValueAtTime(0.001, now + 0.2);
+      osc.connect(g); g.connect(actx.destination);
+      osc.start(now); osc.stop(now + 0.2);
+    }
+  } catch(e) {}
+}
+
+const canvas = document.getElementById('cvs');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+
+function resize() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  W = canvas.width = rect.width;
+  H = canvas.height = rect.height;
+}
+window.addEventListener('resize', resize);
+resize();
+
+let score = 0, timeLeft = 45, bananasCount = 0, combo = 0, running = false, timerInterval = null;
+let cameraX = 0;
+
+let monkey = {
+  x: 0, y: 0,
+  vx: 0, vy: 0,
+  onVine: true,
+  vineIdx: 0,
+  angle: 0,
+  angVel: 0.05,
+  state: 'swing'
+};
+
+let vines = [];
+let items = [];
+let particles = [];
+let floaters = [];
+
+function initWorld() {
+  cameraX = 0;
+  vines = [];
+  items = [];
+  particles = [];
+  floaters = [];
+
+  let curX = W * 0.3;
+  for (let i = 0; i < 20; i++) {
+    let len = H * (0.45 + Math.random() * 0.15);
+    vines.push({
+      x: curX,
+      y: 0,
+      len: len,
+      angle: -0.6 + Math.random() * 0.3,
+      angVel: 0.045
+    });
+
+    if (i > 0) {
+      let midX = curX - (curX - vines[i-1].x) / 2;
+      let types = ['banana', 'banana', 'star', 'star', 'pineapple'];
+      let chosen = types[Math.floor(Math.random() * types.length)];
+      items.push({
+        x: midX + (Math.random() - 0.5) * 40,
+        y: H * (0.35 + Math.random() * 0.3),
+        type: chosen,
+        r: 18,
+        collected: false
+      });
+    }
+    curX += W * (0.55 + Math.random() * 0.15);
+  }
+
+  monkey.vineIdx = 0;
+  monkey.onVine = true;
+  monkey.state = 'swing';
+  monkey.angle = -0.5;
+  monkey.angVel = 0.04;
+  updateMonkeyOnVine();
+}
+
+function updateMonkeyOnVine() {
+  let v = vines[monkey.vineIdx];
+  if (!v) return;
+  monkey.x = v.x + Math.sin(v.angle) * v.len;
+  monkey.y = v.y + Math.cos(v.angle) * v.len;
+}
+
+function handleTap() {
+  if (!running) return;
+
+  if (monkey.onVine) {
+    let v = vines[monkey.vineIdx];
+    let spd = v.angVel * v.len * 1.35;
+    let tx = Math.cos(v.angle) * spd;
+    let ty = -Math.sin(v.angle) * spd;
+
+    monkey.vx = Math.max(3.5, tx + 4.5);
+    monkey.vy = ty - 4.5;
+    monkey.onVine = false;
+    monkey.state = 'flying';
+    playSound('jump');
+    spawnBurst(monkey.x, monkey.y, '#4ade80', 10);
+  }
+}
+
+function spawnBurst(x, y, color, count = 12) {
+  for (let i = 0; i < count; i++) {
+    let a = Math.random() * Math.PI * 2;
+    let s = 1.5 + Math.random() * 4;
+    particles.push({
+      x, y,
+      vx: Math.cos(a) * s,
+      vy: Math.sin(a) * s,
+      r: 3 + Math.random() * 3,
+      color,
+      alpha: 1
+    });
+  }
+}
+
+function spawnFloater(x, y, text, color = '#fde047') {
+  floaters.push({ x, y, text, color, alpha: 1, vy: -1.2 });
+}
+
+function loop() {
+  ctx.clearRect(0, 0, W, H);
+
+  let bgOffset = (cameraX * 0.2) % W;
+  ctx.fillStyle = 'rgba(4, 120, 87, 0.15)';
+  ctx.beginPath();
+  ctx.arc(W * 0.2 - bgOffset, H * 0.3, 80, 0, Math.PI * 2);
+  ctx.arc(W * 0.7 - bgOffset, H * 0.4, 100, 0, Math.PI * 2);
+  ctx.arc(W * 1.2 - bgOffset, H * 0.3, 80, 0, Math.PI * 2);
+  ctx.fill();
+
+  let targetCamX = monkey.x - W * 0.3;
+  cameraX += (targetCamX - cameraX) * 0.1;
+
+  ctx.save();
+  ctx.translate(-cameraX, 0);
+
+  for (let i = 0; i < vines.length; i++) {
+    let v = vines[i];
+    v.angle += v.angVel;
+    if (Math.abs(v.angle) > 0.75) {
+      v.angVel = -v.angVel;
+    }
+
+    let endX = v.x + Math.sin(v.angle) * v.len;
+    let endY = v.y + Math.cos(v.angle) * v.len;
+
+    ctx.strokeStyle = '#15803d';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(v.x, v.y);
+    ctx.quadraticCurveTo(v.x + Math.sin(v.angle * 0.5) * (v.len * 0.5), v.len * 0.5, endX, endY);
+    ctx.stroke();
+
+    ctx.fillStyle = '#166534';
+    ctx.beginPath();
+    ctx.arc(endX, endY, 6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  for (let item of items) {
+    if (item.collected) continue;
+    ctx.save();
+    ctx.translate(item.x, item.y);
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    let emoji = item.type === 'banana' ? '🍌' : item.type === 'star' ? '⭐' : '🍍';
+    ctx.fillText(emoji, 0, 0);
+    ctx.restore();
+
+    if (!item.collected) {
+      let dist = Math.hypot(monkey.x - item.x, monkey.y - item.y);
+      if (dist < item.r + 20) {
+        item.collected = true;
+        let pts = item.type === 'banana' ? 50 : item.type === 'star' ? 100 : 150;
+        let finalPts = pts + combo * 10;
+        score += finalPts;
+        if (item.type === 'banana') bananasCount++;
+        playSound('collect');
+        spawnBurst(item.x, item.y, item.type === 'star' ? '#fde047' : '#22c55e', 14);
+        spawnFloater(item.x, item.y, `+${finalPts}`);
+        document.getElementById('score').textContent = score;
+        document.getElementById('bananas').textContent = bananasCount + '개';
+      }
+    }
+  }
+
+  if (monkey.onVine) {
+    let v = vines[monkey.vineIdx];
+    monkey.angle = v.angle;
+    updateMonkeyOnVine();
+  } else {
+    monkey.vy += 0.24;
+    monkey.x += monkey.vx;
+    monkey.y += monkey.vy;
+
+    for (let i = monkey.vineIdx + 1; i < vines.length; i++) {
+      let v = vines[i];
+      let endX = v.x + Math.sin(v.angle) * v.len;
+      let endY = v.y + Math.cos(v.angle) * v.len;
+      let dist = Math.hypot(monkey.x - endX, monkey.y - endY);
+
+      if (dist < 42 && monkey.vy > -1) {
+        monkey.onVine = true;
+        monkey.vineIdx = i;
+        monkey.state = 'swing';
+        combo++;
+        score += 80 * combo;
+        document.getElementById('score').textContent = score;
+        document.getElementById('combo').textContent = combo + 'x';
+        playSound('catch');
+        spawnBurst(endX, endY, '#fde047', 16);
+        spawnFloater(endX, endY - 20, `연속 스윙 ${combo}x!`, '#4ade80');
+        break;
+      }
+    }
+
+    if (monkey.y > H * 0.85) {
+      monkey.vy = -8.5;
+      monkey.y = H * 0.85;
+      combo = 0;
+      document.getElementById('combo').textContent = '0x';
+      playSound('bounce');
+      spawnBurst(monkey.x, monkey.y, '#10b981', 16);
+      spawnFloater(monkey.x, monkey.y - 15, '통통 점프!', '#6ee7b7');
+    }
+  }
+
+  let lastVine = vines[vines.length - 1];
+  if (lastVine && lastVine.x - cameraX < W * 2) {
+    let newX = lastVine.x + W * (0.55 + Math.random() * 0.15);
+    let len = H * (0.45 + Math.random() * 0.15);
+    vines.push({
+      x: newX,
+      y: 0,
+      len: len,
+      angle: -0.6 + Math.random() * 0.3,
+      angVel: 0.045
+    });
+    items.push({
+      x: newX - W * 0.25,
+      y: H * (0.35 + Math.random() * 0.3),
+      type: Math.random() > 0.4 ? 'banana' : 'star',
+      r: 18,
+      collected: false
+    });
+  }
+
+  ctx.save();
+  ctx.translate(monkey.x, monkey.y);
+  let rot = monkey.onVine ? monkey.angle : Math.atan2(monkey.vy, monkey.vx);
+  ctx.rotate(rot);
+
+  // Tail
+  ctx.strokeStyle = '#b45309';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-10, 8);
+  ctx.quadraticCurveTo(-22, 16, -18, 26);
+  ctx.stroke();
+
+  // Body
+  ctx.fillStyle = '#b45309';
+  ctx.beginPath();
+  ctx.ellipse(0, 10, 13, 15, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#fde68a';
+  ctx.beginPath();
+  ctx.ellipse(0, 12, 8, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Head
+  ctx.fillStyle = '#b45309';
+  ctx.beginPath();
+  ctx.arc(0, -6, 13, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Ears
+  ctx.fillStyle = '#fde68a';
+  ctx.beginPath();
+  ctx.arc(-13, -6, 5, 0, Math.PI * 2);
+  ctx.arc(13, -6, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Face
+  ctx.beginPath();
+  ctx.ellipse(0, -3, 9, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Eyes & Smile
+  ctx.fillStyle = '#0f172a';
+  ctx.beginPath();
+  ctx.arc(-4, -5, 2.5, 0, Math.PI * 2);
+  ctx.arc(4, -5, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = '#78350f';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, -1, 3, 0.2, Math.PI - 0.2);
+  ctx.stroke();
+
+  ctx.restore();
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.alpha -= 0.035;
+    if (p.alpha <= 0) {
+      particles.splice(i, 1);
+      continue;
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  for (let i = floaters.length - 1; i >= 0; i--) {
+    let f = floaters[i];
+    f.y += f.vy;
+    f.alpha -= 0.025;
+    if (f.alpha <= 0) {
+      floaters.splice(i, 1);
+      continue;
+    }
+    ctx.font = 'bold 15px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = f.color;
+    ctx.globalAlpha = f.alpha;
+    ctx.fillText(f.text, f.x, f.y);
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.restore();
+
+  if (running) requestAnimationFrame(loop);
+}
+
+function startGame() {
+  score = 0; timeLeft = 45; bananasCount = 0; combo = 0; running = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('timer').textContent = '45초';
+  document.getElementById('bananas').textContent = '0개';
+  document.getElementById('combo').textContent = '0x';
+  document.getElementById('startOverlay').classList.add('hidden');
+  document.getElementById('endOverlay').classList.add('hidden');
+
+  resize();
+  initWorld();
+  loop();
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer').textContent = timeLeft + '초';
+    if (timeLeft <= 0) endGame();
+  }, 1000);
+}
+
+function endGame() {
+  running = false;
+  clearInterval(timerInterval);
+  let best = Math.max(+localStorage.getItem(KEY) || 0, score);
+  localStorage.setItem(KEY, best);
+  document.getElementById('best').textContent = best;
+
+  document.getElementById('endTitle').textContent = '탐험 완료!';
+  document.getElementById('endText').textContent = `총 ${score}점을 얻고 바나나 ${bananasCount}개를 획득했어요!`;
+  document.getElementById('endOverlay').classList.remove('hidden');
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  handleTap();
+});
+
+document.getElementById('best').textContent = localStorage.getItem(KEY) || 0;
+document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+})();
+</script>
+</body>
+</html>

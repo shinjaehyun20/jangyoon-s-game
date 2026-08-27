@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>네온 회로 연결사</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --cyan: #00f0ff;
+  --lime: #39ff14;
+  --purple: #c084fc;
+  --bg: #090d16;
+  --panel: rgba(15, 23, 42, 0.85);
+  --border: rgba(0, 240, 255, 0.25);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+html, body {
+  height: 100vh; height: 100dvh;
+  overflow: hidden;
+  touch-action: manipulation;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  color: #fff;
+  background: var(--bg);
+}
+body {
+  background: radial-gradient(circle at 50% 20%, #111d38 0%, #080c14 100%);
+}
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 100vh; height: 100dvh;
+  margin: auto;
+  padding: 10px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+h1 {
+  font-size: clamp(19px, 5vw, 24px);
+  color: #e0f2fe;
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7dd3fc;
+  margin-top: 2px;
+}
+.hud {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.chip {
+  padding: 6px 4px;
+  text-align: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: #a5f3fc;
+}
+.chip b {
+  display: block;
+  font-size: 16px;
+  color: #fff;
+  margin-top: 2px;
+}
+.board-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.05), transparent 70%), rgba(10, 16, 30, 0.7);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
+  padding: 12px;
+}
+.grid {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1 / 1;
+  place-items: center;
+  position: relative;
+}
+.tile {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  place-items: center;
+  position: relative;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, border-color 0.2s;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.tile:active {
+  transform: scale(0.92);
+}
+.tile.powered {
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5), inset 0 0 10px rgba(0, 240, 255, 0.2);
+  background: rgba(0, 240, 255, 0.15);
+}
+.tile.source-tile {
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.4), rgba(15, 23, 42, 0.8));
+  border-color: var(--cyan);
+}
+.tile.target-tile {
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.4), rgba(15, 23, 42, 0.8));
+  border-color: var(--purple);
+}
+.tile-svg {
+  width: 80%;
+  height: 80%;
+  transition: transform 0.22s ease-out;
+  pointer-events: none;
+}
+.badge-node {
+  position: absolute;
+  font-size: 24px;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.8));
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #7dd3fc;
+  padding: 0 4px;
+}
+.home-link {
+  color: #39ff14;
+  font-weight: 900;
+  text-decoration: none;
+  font-size: 12px;
+}
+.overlay {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  padding: 20px;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 12, 20, 0.85);
+  backdrop-filter: blur(10px);
+}
+.overlay.hidden { display: none; }
+.card {
+  width: min(380px, 100%);
+  padding: 24px 20px;
+  text-align: center;
+  border-radius: 24px;
+  border: 1px solid var(--cyan);
+  background: linear-gradient(160deg, #111d38, #090d16);
+  box-shadow: 0 16px 40px rgba(0, 240, 255, 0.2);
+}
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+}
+.card p {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e0f2fe;
+}
+.btn {
+  padding: 12px 26px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #00f0ff, #3b82f6);
+  color: #000;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.4);
+}
+.btn:active { transform: scale(0.96); }
+/* Particle floating canvas */
+#spark-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div>
+      <h1>⚡ 네온 회로 연결사</h1>
+      <div class="sub">타일을 탭해 회전시켜 로봇까지 에너지를 연결하세요!</div>
+    </div>
+    <div class="chip" style="min-width:65px">최고 <b id="best">0</b></div>
+  </header>
+  <section class="hud">
+    <div class="chip">스테이지<b id="stage">1</b></div>
+    <div class="chip">점수<b id="score">0</b></div>
+    <div class="chip">시간<b id="timer">45초</b></div>
+    <div class="chip">콤보<b id="combo">0x</b></div>
+  </section>
+  <div class="board-container">
+    <canvas id="spark-canvas"></canvas>
+    <div class="grid" id="grid"></div>
+  </div>
+  <footer class="footer">
+    <span>💡 ⚡발전소에서 🤖로봇까지 전선이 이어지면 충전 성공!</span>
+    <a class="home-link" href="../index.html">← 홈</a>
+  </footer>
+</main>
+
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <div style="font-size:48px;margin-bottom:8px">⚡🧩🤖</div>
+    <h2>네온 회로 연결사</h2>
+    <p>어두운 메가시티에 에너지를 공급해주세요!<br>회로 타일을 톡톡 터치해 회전시키면<br>⚡발전소에서 🤖아기 로봇까지 네온 불빛이 켜져요!<br><br>연결할 때마다 보너스 시간 +3초 지급!</p>
+    <button class="btn" id="startBtn">회로 연결 시작!</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="card">
+    <div style="font-size:48px;margin-bottom:8px" id="endEmoji">🎉</div>
+    <h2 id="endTitle">충전 완료!</h2>
+    <p id="endText"></p>
+    <button class="btn" id="restartBtn">다시 도전</button>
+  </div>
+</div>
+
+<script>
+(()=>{'use strict';
+const KEY = 'neon_circuit_connect_best';
+const AUD = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+
+function playSound(type) {
+  try {
+    if (!actx) actx = new AUD();
+    if (actx.state === 'suspended') actx.resume();
+    let now = actx.currentTime;
+    if (type === 'click') {
+      let osc = actx.createOscillator(), g = actx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
+      g.gain.setValueAtTime(0.15, now);
+      g.gain.linearRampToValueAtTime(0.001, now + 0.05);
+      osc.connect(g); g.connect(actx.destination);
+      osc.start(now); osc.stop(now + 0.05);
+    } else if (type === 'win') {
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+        let osc = actx.createOscillator(), g = actx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + i * 0.07);
+        g.gain.setValueAtTime(0.2, now + i * 0.07);
+        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.25);
+        osc.connect(g); g.connect(actx.destination);
+        osc.start(now + i * 0.07); osc.stop(now + i * 0.07 + 0.25);
+      });
+    }
+  } catch(e) {}
+}
+
+const TILE_TYPES = {
+  line:   [1, 0, 1, 0], // Top, Right, Bottom, Left
+  corner: [1, 1, 0, 0],
+  tee:    [1, 1, 1, 0],
+  cross:  [1, 1, 1, 1]
+};
+
+let stage = 1, score = 0, timeLeft = 45, combo = 0, running = false, timerInterval = null;
+let GRID_SIZE = 3;
+let board = []; // 2D array: { type, rot: 0..3, powered: false }
+
+const cvs = document.getElementById('spark-canvas');
+const ctx = cvs.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  const rect = cvs.getBoundingClientRect();
+  cvs.width = rect.width;
+  cvs.height = rect.height;
+}
+window.addEventListener('resize', resizeCanvas);
+
+function spawnSparks(x, y, color = '#00f0ff', count = 18) {
+  for (let i = 0; i < count; i++) {
+    let ang = Math.random() * Math.PI * 2;
+    let spd = 2 + Math.random() * 5;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang) * spd,
+      vy: Math.sin(ang) * spd,
+      r: 2 + Math.random() * 3,
+      alpha: 1,
+      color
+    });
+  }
+}
+
+function updateParticles() {
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.alpha -= 0.035;
+    if (p.alpha <= 0) {
+      particles.splice(i, 1);
+      continue;
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  if (running || particles.length > 0) {
+    requestAnimationFrame(updateParticles);
+  }
+}
+
+function getOpenings(tile) {
+  let base = TILE_TYPES[tile.type];
+  let rot = tile.rot % 4;
+  let op = [0, 0, 0, 0];
+  for (let i = 0; i < 4; i++) {
+    op[(i + rot) % 4] = base[i];
+  }
+  return op; // [Top, Right, Bottom, Left]
+}
+
+function generateSolvableLevel() {
+  GRID_SIZE = stage >= 5 ? 4 : 3;
+  const gridEl = document.getElementById('grid');
+  gridEl.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
+  gridEl.style.gridTemplateRows = `repeat(${GRID_SIZE}, 1fr)`;
+
+  let maxAttempts = 50;
+  while (maxAttempts-- > 0) {
+    board = [];
+    for (let r = 0; r < GRID_SIZE; r++) {
+      let row = [];
+      for (let c = 0; c < GRID_SIZE; c++) {
+        let types = ['line', 'corner', 'corner', 'tee'];
+        if (stage >= 3) types.push('cross');
+        let t = types[Math.floor(Math.random() * types.length)];
+        let correctRot = Math.floor(Math.random() * 4);
+        row.push({ r, c, type: t, rot: correctRot, powered: false });
+      }
+      board.push(row);
+    }
+
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        board[r][c].rot = Math.floor(Math.random() * 4);
+      }
+    }
+
+    checkPowerFlow();
+    if (!board[GRID_SIZE - 1][GRID_SIZE - 1].powered) {
+      break;
+    }
+  }
+  renderGrid();
+}
+
+function checkPowerFlow() {
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      board[r][c].powered = false;
+    }
+  }
+
+  let queue = [{ r: 0, c: 0 }];
+  board[0][0].powered = true;
+  let visited = new Set(['0,0']);
+
+  const dr = [-1, 0, 1, 0];
+  const dc = [0, 1, 0, -1];
+  const opp = [2, 3, 0, 1];
+
+  while (queue.length > 0) {
+    let curr = queue.shift();
+    let op = getOpenings(board[curr.r][curr.c]);
+
+    for (let d = 0; d < 4; d++) {
+      if (op[d] === 1) {
+        let nr = curr.r + dr[d];
+        let nc = curr.c + dc[d];
+        if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+          let neighbor = board[nr][nc];
+          let nop = getOpenings(neighbor);
+          if (nop[opp[d]] === 1) {
+            let key = `${nr},${nc}`;
+            if (!visited.has(key)) {
+              visited.add(key);
+              neighbor.powered = true;
+              queue.push({ r: nr, c: nc });
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+function renderGrid() {
+  const gridEl = document.getElementById('grid');
+  gridEl.innerHTML = '';
+
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      const tile = board[r][c];
+      const div = document.createElement('div');
+      div.className = 'tile' + (tile.powered ? ' powered' : '');
+      if (r === 0 && c === 0) div.classList.add('source-tile');
+      if (r === GRID_SIZE - 1 && c === GRID_SIZE - 1) div.classList.add('target-tile');
+
+      div.innerHTML = getTileSVG(tile.type, tile.rot, tile.powered);
+
+      if (r === 0 && c === 0) {
+        let badge = document.createElement('span');
+        badge.className = 'badge-node';
+        badge.textContent = '⚡';
+        div.appendChild(badge);
+      } else if (r === GRID_SIZE - 1 && c === GRID_SIZE - 1) {
+        let badge = document.createElement('span');
+        badge.className = 'badge-node';
+        badge.textContent = tile.powered ? '🤖✨' : '🤖';
+        div.appendChild(badge);
+      }
+
+      div.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        if (!running) return;
+        tile.rot = (tile.rot + 1) % 4;
+        playSound('click');
+        checkPowerFlow();
+        renderGrid();
+
+        let rect = div.getBoundingClientRect();
+        let cRect = cvs.getBoundingClientRect();
+        spawnSparks(rect.left + rect.width / 2 - cRect.left, rect.top + rect.height / 2 - cRect.top, tile.powered ? '#00f0ff' : '#64748b', 6);
+
+        if (board[GRID_SIZE - 1][GRID_SIZE - 1].powered) {
+          handleWin();
+        }
+      });
+
+      gridEl.appendChild(div);
+    }
+  }
+}
+
+function getTileSVG(type, rot, powered) {
+  let stroke = powered ? '#00f0ff' : '#475569';
+  let glow = powered ? 'filter="drop-shadow(0 0 6px #00f0ff)"' : '';
+  let width = powered ? '8' : '6';
+
+  let pathData = '';
+  if (type === 'line') {
+    pathData = '<line x1="50" y1="0" x2="50" y2="100" />';
+  } else if (type === 'corner') {
+    pathData = '<path d="M50 0 V50 H100" fill="none" />';
+  } else if (type === 'tee') {
+    pathData = '<path d="M50 0 V100 M50 50 H100" fill="none" />';
+  } else if (type === 'cross') {
+    pathData = '<line x1="50" y1="0" x2="50" y2="100" /><line x1="0" y1="50" x2="100" y2="50" />';
+  }
+
+  let deg = rot * 90;
+  return `
+    <svg class="tile-svg" viewBox="0 0 100 100" style="transform: rotate(${deg}deg)">
+      <g stroke="${stroke}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" ${glow}>
+        ${pathData}
+      </g>
+    </svg>
+  `;
+}
+
+function handleWin() {
+  playSound('win');
+  combo++;
+  let addScore = 100 + (combo - 1) * 25;
+  score += addScore;
+  timeLeft = Math.min(60, timeLeft + 3);
+
+  document.getElementById('score').textContent = score;
+  document.getElementById('combo').textContent = combo + 'x';
+  document.getElementById('timer').textContent = timeLeft + '초';
+
+  let cRect = cvs.getBoundingClientRect();
+  spawnSparks(cRect.width / 2, cRect.height / 2, '#39ff14', 35);
+  spawnSparks(cRect.width / 2, cRect.height / 2, '#c084fc', 25);
+
+  setTimeout(() => {
+    stage++;
+    document.getElementById('stage').textContent = stage;
+    generateSolvableLevel();
+  }, 450);
+}
+
+function startGame() {
+  stage = 1; score = 0; timeLeft = 45; combo = 0; running = true;
+  document.getElementById('stage').textContent = '1';
+  document.getElementById('score').textContent = '0';
+  document.getElementById('timer').textContent = '45초';
+  document.getElementById('combo').textContent = '0x';
+  document.getElementById('startOverlay').classList.add('hidden');
+  document.getElementById('endOverlay').classList.add('hidden');
+
+  resizeCanvas();
+  updateParticles();
+  generateSolvableLevel();
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer').textContent = timeLeft + '초';
+    if (timeLeft <= 0) endGame();
+  }, 1000);
+}
+
+function endGame() {
+  running = false;
+  clearInterval(timerInterval);
+  let best = Math.max(+localStorage.getItem(KEY) || 0, score);
+  localStorage.setItem(KEY, best);
+  document.getElementById('best').textContent = best;
+
+  document.getElementById('endTitle').textContent = '에너지 충전 완료!';
+  document.getElementById('endText').textContent = `총 ${score}점을 획득하고 ${stage - 1}개의 회로를 완벽하게 연결했어요!`;
+  document.getElementById('endOverlay').classList.remove('hidden');
+}
+
+document.getElementById('best').textContent = localStorage.getItem(KEY) || 0;
+document.getElementById('startBtn').addEventListener('pointerdown', startGame);
+document.getElementById('restartBtn').addEventListener('pointerdown', startGame);
+})();
+</script>
+</body>
+</html>

@@ -1,3 +1,11 @@
+## 2026-08-27 (일일 게임 제작, nyx)
+
+- 게임 2종 추가: `neon-circuit-connect`(⚡ 네온 회로 연결사), `jungle-vine-swinger`(🐒 정글 덩굴 스윙 타잔).
+- `neon-circuit-connect` — 3x3/4x4 그리드 상의 회로 타일을 탭하여 90도씩 회전시켜 ⚡발전소에서 🤖아기 로봇까지 네온 전선을 연결하는 직관적이고 시각적으로 화려한 전기 연결 퍼즐 놀이. BFS 실시간 경로 탐색, 네온 펄스 및 스파크 파티클 효과, 성공 시 스테이지 클리어 및 보너스 시간 지급.
+- `jungle-vine-swinger` — 진자 운동으로 흔들리는 덩굴을 타고 화면을 탭하여 시원하게 공중으로 날아가며 🍌바나나와 ⭐별을 모으고 다음 덩굴을 잡는 타이밍 기반 정글 스윙 액션 놀이. 부드러운 60fps 캔버스 물리, 트램펄린 나뭇잎 안전 낙하 방지, 콤보 스윙 시스템 탑재.
+- 두 게임 모두 단일 HTML, 외부 CDN 의존성 0건, 100dvh/overflow 보호, Pointer Events, 시작·종료 오버레이, 홈 링크, localStorage 최고기록(`neon_circuit_connect_best`, `jungle_vine_swinger_best`), SVG 썸네일 포함.
+- `games.json` 230→232, 고유 ID 232(중복 0건), `menu.json` kids 카테고리 최상단에 신규 2건 배치. README 뱃지·상단문구·게임 표·최근변경 섹션과 docs/assets/portfolio-hero.svg, docs/github-about.md, index.html의 하드코딩 게임 카운트를 실측 232로 동기화.
+
 ## 2026-08-18 (아기 바둑 로직 검수)
 
 - `baby-go`의 종료 판정을 잡은 돌 수만 비교하던 방식에서 **판에 남은 돌 + 완전히 둘러싼 빈칸**을 세는 입문용 면적 점수로 교체. 마지막까지 돌을 두어도 `0 : 0`으로 잘못 끝나는 문제를 막음.
