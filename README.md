@@ -602,3 +602,5 @@ VS Code `Live Server` 확장을 써도 된다.
 - 루트 목록 페이지 및 우봉고: MIT License
 - `tetris/`: MIT License (Jake Gordon, 2011-2016) — `tetris/LICENSE` 참조
 - 그 외 각 게임 폴더의 라이선스는 개별 `README.md` 또는 `LICENSE` 파일 참조
+
+- 2026-08-28: `turtle-bubble-rescue`, `cosmic-star-baker` 추가됨
