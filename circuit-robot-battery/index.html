@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>⚡ 꼬마 로봇 건전지 충전</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+      background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      color: #38bdf8;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+    .hud {
+      display: flex; justify-content: space-around;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      padding: 8px 12px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #94a3b8;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .hud-val { color: #38bdf8; font-size: 17px; font-weight: 900; margin-left: 4px; }
+    
+    #gameArea {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #020617;
+      border: 2px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+    .robot-box {
+      text-align: center;
+      padding: 12px;
+      background: rgba(56, 189, 248, 0.1);
+      border-radius: 14px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .robot-icon { font-size: 54px; animation: robotBounce 1.5s infinite ease-in-out; display: inline-block; }
+    @keyframes robotBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .battery-bar-wrap {
+      width: 100%;
+      height: 18px;
+      background: #334155;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      border: 1px solid #475569;
+    }
+    .battery-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f59e0b, #10b981);
+      transition: width 0.2s ease;
+    }
+
+    .circuit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: auto;
+    }
+    .cell-btn {
+      height: 72px;
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+      cursor: pointer;
+      transition: transform 0.1s, border-color 0.2s;
+    }
+    .cell-btn:active {
+      transform: scale(0.92);
+      border-color: #38bdf8;
+    }
+    .cell-btn.charged {
+      border-color: #34d399;
+      background: rgba(52, 211, 153, 0.15);
+    }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .home-link {
+      color: #38bdf8;
+      text-decoration: none;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      width: 100%;
+      max-width: 340px;
+      color: #f8fafc;
+    }
+    .overlay-card h2 { font-size: 22px; color: #38bdf8; margin-bottom: 8px; }
+    .overlay-card p { font-size: 14px; color: #94a3b8; line-height: 1.5; margin-bottom: 20px; }
+    .btn-start {
+      width: 100%;
+      min-height: 48px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .result-score { font-size: 36px; font-weight: 900; color: #38bdf8; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>⚡ 꼬마 로봇 건전지 충전</h1>
+    </header>
+
+    <div class="hud">
+      <div>충전량: <span class="hud-val" id="chargeVal">0</span>%</div>
+      <div>레벨: <span class="hud-val" id="lvlVal">1</span></div>
+      <div>점수: <span class="hud-val" id="scoreVal">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="robot-box">
+        <div class="robot-icon" id="robotIcon">🤖</div>
+        <div class="battery-bar-wrap">
+          <div class="battery-bar" id="batteryBar"></div>
+        </div>
+      </div>
+
+      <div class="circuit-grid" id="circuitGrid">
+        <!-- 6 Cells -->
+        <div class="cell-btn" data-idx="0">⚡</div>
+        <div class="cell-btn" data-idx="1">🔋</div>
+        <div class="cell-btn" data-idx="2">🔌</div>
+        <div class="cell-btn" data-idx="3">💡</div>
+        <div class="cell-btn" data-idx="4">🔋</div>
+        <div class="cell-btn" data-idx="5">⚡</div>
+      </div>
+    </div>
+
+    <footer>
+      <small>반짝이는 번개·건전지를 터치해 충전하세요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>⚡ 꼬마 로봇 충전</h2>
+      <p>꼬마 로봇의 배터리가 방전되었어요!<br>반짝이는 건전지(🔋)와 번개(⚡)를 빠르게 터치하여 100% 완충해 주세요!</p>
+      <button class="btn-start" id="startBtn">충전 시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🔋 충전 완료!</h2>
+      <p>로봇이 신나게 작동합니다!</p>
+      <div class="result-score" id="finalScore">0점</div>
+      <button class="btn-start" id="restartBtn">다음 레벨</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const GAME_ID = 'circuit-robot-battery';
+    const BEST_KEY = GAME_ID + '_best';
+    const chargeVal = document.getElementById('chargeVal');
+    const lvlVal = document.getElementById('lvlVal');
+    const scoreVal = document.getElementById('scoreVal');
+    const batteryBar = document.getElementById('batteryBar');
+    const robotIcon = document.getElementById('robotIcon');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const cells = document.querySelectorAll('.cell-btn');
+
+    let charge = 0;
+    let score = 0;
+    let level = 1;
+    let targetIdx = 0;
+    let isRunning = false;
+
+    const ICONS = ['🔋', '⚡', '💡', '🔌', '⭐', '🤖'];
+
+    function refreshGrid() {
+      targetIdx = Math.floor(Math.random() * cells.length);
+      cells.forEach((cell, idx) => {
+        cell.classList.remove('charged');
+        if (idx === targetIdx) {
+          cell.textContent = Math.random() < 0.5 ? '🔋' : '⚡';
+          cell.style.borderColor = '#38bdf8';
+        } else {
+          cell.textContent = ICONS[Math.floor(Math.random() * (ICONS.length - 2)) + 2];
+          cell.style.borderColor = '#334155';
+        }
+      });
+    }
+
+    function onCellClick(e) {
+      if (!isRunning) return;
+      const idx = parseInt(e.currentTarget.getAttribute('data-idx'), 10);
+      if (idx === targetIdx) {
+        charge += 20;
+        score += 50;
+        scoreVal.textContent = score;
+        if (charge >= 100) {
+          charge = 100;
+          chargeVal.textContent = charge;
+          batteryBar.style.width = '100%';
+          robotIcon.textContent = '🥳';
+          setTimeout(levelComplete, 300);
+          return;
+        }
+        chargeVal.textContent = charge;
+        batteryBar.style.width = charge + '%';
+        refreshGrid();
+      }
+    }
+
+    function levelComplete() {
+      isRunning = false;
+      finalScore.textContent = score + '점';
+      endOverlay.classList.remove('hidden');
+    }
+
+    function startGame() {
+      charge = 0;
+      isRunning = true;
+      chargeVal.textContent = charge;
+      batteryBar.style.width = '0%';
+      robotIcon.textContent = '🤖';
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+      refreshGrid();
+    }
+
+    function nextLevel() {
+      level++;
+      lvlVal.textContent = level;
+      startGame();
+    }
+
+    cells.forEach(c => c.addEventListener('pointerdown', onCellClick));
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', nextLevel);
+  })();
+  </script>
+</body>
+</html>

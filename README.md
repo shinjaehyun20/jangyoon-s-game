@@ -1,8 +1,8 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 232개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 234개.
 
-[![Games](https://img.shields.io/badge/games-232-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-234-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -422,7 +422,7 @@ VS Code `Live Server` 확장을 써도 된다.
 
 ## 최근 변경사항 (2026-08)
 
-- **⚡ 네온 회로 연결사 · 🐒 정글 덩굴 스윙 타잔 추가 (2026-08-27)** — 터치 회전으로 ⚡발전소에서 🤖로봇까지 전선을 잇는 네온 회로 퍼즐과 진자 물리 반동으로 시원하게 날아가는 정글 스윙 액션 미니게임 2종 추가 (총 232개). 단일 HTML, 외부 CDN 의존성 없음, 100dvh/overflow 보호, Pointer Events 통합 조작.
+- **⚡ 네온 회로 연결사 · 🐒 정글 덩굴 스윙 타잔 추가 (2026-08-27)** — 터치 회전으로 ⚡발전소에서 🤖로봇까지 전선을 잇는 네온 회로 퍼즐과 진자 물리 반동으로 시원하게 날아가는 정글 스윙 액션 미니게임 2종 추가 (총 234개). 단일 HTML, 외부 CDN 의존성 없음, 100dvh/overflow 보호, Pointer Events 통합 조작.
 
 
 - **🥁 동물 밴드 연주 · 🍂 계절 옷장 분류 추가 (2026-08-09)** — 동물 밴드 연주는 4가지 악기(북·트라이앵글·실로폰·탬버린)가 켜지는 순서를 기억하고 똑같이 눌러 라운드를 이어가는 순서 기억 게임으로, 라운드마다 순서가 하나씩 늘어납니다. 계절 옷장 분류는 옷과 물건을 봄·여름·가을·겨울 4칸 중 알맞은 계절 칸으로 드래그해 40초 동안 최대한 많이 분류하는 인지 게임입니다. 두 게임 모두 단일 HTML, Pointer Events, 100dvh/overflow 보호, 시작·종료 오버레이, 홈 링크, localStorage 최고기록, SVG 썸네일, 외부 의존성 0건을 포함합니다. 부수 발견: `hidden-object-hunt`·`rhythm-touch-beat`(2026-08-07 배포)가 README 최근 변경사항 및 CHANGES.md에 미반영 상태였습니다 — `KNOWN_ISSUES.md` 참조.

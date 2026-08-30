@@ -1,5 +1,21 @@
 [
   {
+    "id": "balloon-rainbow-pop",
+    "title": "Balloon Rainbow Pop",
+    "title_ko": "🎈 무지개 풍선 팡팡",
+    "description": "떠오르는 무지개 풍선을 터치하여 팡팡 터뜨리는 게임입니다.",
+    "thumbnail": "balloon-rainbow-pop/thumb.svg",
+    "path": "balloon-rainbow-pop/index.html"
+  },
+  {
+    "id": "circuit-robot-battery",
+    "title": "Circuit Robot Battery",
+    "title_ko": "⚡ 꼬마 로봇 건전지 충전",
+    "description": "꼬마 로봇에게 건전지와 번개를 충전해주는 게임입니다.",
+    "thumbnail": "circuit-robot-battery/thumb.svg",
+    "path": "circuit-robot-battery/index.html"
+  },
+  {
     "id": "neon-circuit-connect",
     "title": "Neon Circuit Connect",
     "title_ko": "⚡ 네온 회로 연결사",

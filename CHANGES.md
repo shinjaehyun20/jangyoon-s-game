@@ -1,3 +1,7 @@
+## 2026-08-30 — balloon-rainbow-pop, circuit-robot-battery
+- `balloon-rainbow-pop`: 7세 남아용 무지개 풍선 터치 액션 게임. 별 풍선 폭발 연쇄 반응 및 타이머/콤보 시스템 구현. 외부 의존성 없음(0).
+- `circuit-robot-battery`: 7세 남아용 꼬마 로봇 건전지 충전 인지 퍼즐 게임. 번개/건전지 패턴 탭 충전 게이지 및 레벨 시스템 구현. 외부 의존성 없음(0).
+
 ## 2026-08-27 (일일 게임 제작, nyx)
 
 - 게임 2종 추가: `neon-circuit-connect`(⚡ 네온 회로 연결사), `jungle-vine-swinger`(🐒 정글 덩굴 스윙 타잔).

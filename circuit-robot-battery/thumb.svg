@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <rect x="0.5" y="0.5" width="319" height="179" rx="12" fill="url(#bg)" stroke="rgba(56,189,248,0.2)"/>
+  
+  <!-- Robot & Battery Visual -->
+  <g transform="translate(50, 30)">
+    <text x="40" y="55" font-size="52" text-anchor="middle">🤖</text>
+    <text x="110" y="55" font-size="44" text-anchor="middle" filter="url(#glow)">⚡</text>
+    <text x="165" y="55" font-size="44" text-anchor="middle">🔋</text>
+  </g>
+
+  <!-- Title -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="146" text-anchor="end" font-size="21" font-weight="900" fill="#38bdf8">꼬마 로봇 건전지 충전</text>
+    <text x="296" y="165" text-anchor="end" font-size="11" font-weight="600" fill="rgba(255,255,255,0.6)" letter-spacing="1.5">CIRCUIT ROBOT BATTERY</text>
+  </g>
+</svg>

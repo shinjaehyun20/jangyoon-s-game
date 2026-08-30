@@ -16,6 +16,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "circuit-robot-battery",
+        "label": "⚡ 꼬마 로봇 건전지 충전",
+        "path": "circuit-robot-battery/index.html"
+      },
+      {
+        "id": "balloon-rainbow-pop",
+        "label": "🎈 무지개 풍선 팡팡",
+        "path": "balloon-rainbow-pop/index.html"
+      },
+      {
         "id": "neon-circuit-connect",
         "label": "⚡ 네온 회로 연결사",
         "path": "neon-circuit-connect/index.html"
