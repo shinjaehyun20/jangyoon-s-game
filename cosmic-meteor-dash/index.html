@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🚀 우주 운석 대시</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+      background: #090a1a;
+      color: #fff;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      color: #38bdf8;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+    }
+    .hud {
+      display: flex; justify-content: space-around;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      padding: 8px 12px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .hud-val { color: #fde047; font-size: 18px; font-weight: 900; margin-left: 4px; }
+    #canvasWrap {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 30%, #1e1b4b 0%, #090a1a 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      touch-action: none;
+    }
+    canvas { width: 100%; height: 100%; display: block; }
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .home-link {
+      color: #38bdf8;
+      text-decoration: none;
+      background: rgba(56, 189, 248, 0.15);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(9, 10, 26, 0.85);
+      backdrop-filter: blur(6px);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 100; padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1e1b4b;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      width: 100%; max-width: 340px;
+      border: 2px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .overlay-card h2 { font-size: 22px; color: #38bdf8; margin-bottom: 8px; }
+    .overlay-card p { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px; }
+    .btn-start {
+      width: 100%; min-height: 48px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #ffffff; border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 800; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(56, 189, 248, 0.4);
+    }
+    .result-score { font-size: 36px; font-weight: 900; color: #fde047; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🚀 우주 운석 대시</h1>
+    </header>
+    <div class="hud">
+      <div>점수: <span class="hud-val" id="scoreVal">0</span></div>
+      <div>보호막: <span class="hud-val" id="shieldVal">1</span></div>
+      <div>최고: <span class="hud-val" id="bestVal">0</span></div>
+    </div>
+    <div id="canvasWrap">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+    <footer>
+      <small>손가락으로 드래그하거나 좌우로 움직여 운석을 피하세요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🚀 우주 운석 대시</h2>
+      <p>우주선을 좌우로 조종해 쏟아지는 불타는 운석을 피하고,<br>⭐ 반짝이는 별 보석과 🛡️ 보호막을 모아 최고 점수에 도전하세요!</p>
+      <button class="btn-start" id="startBtn">비행 시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>💥 미션 종료!</h2>
+      <p>오늘의 우주 탐험 점수:</p>
+      <div class="result-score" id="finalScore">0점</div>
+      <p id="resultMsg">멋진 비행 실력이에요!</p>
+      <button class="btn-start" id="restartBtn">다시 도전</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const GAME_ID = 'cosmic-meteor-dash';
+    const BEST_KEY = GAME_ID + '_best';
+    const canvasWrap = document.getElementById('canvasWrap');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const shieldVal = document.getElementById('shieldVal');
+    const bestVal = document.getElementById('bestVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let W = 360, H = 500;
+    let score = 0, shields = 1, isRunning = false, animId = null;
+    let best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+    bestVal.textContent = best;
+
+    let audioCtx = null;
+    function playSfx(type) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'gem') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'shield') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'hit') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.linearRampToValueAtTime(50, now + 0.25);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (e) {}
+    }
+
+    function resize() {
+      const rect = canvasWrap.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = W; canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+
+    const ship = { x: 180, y: 420, radius: 20, targetX: 180, invincible: 0 };
+    let stars = [], meteors = [], gems = [], particles = [], spawnTimer = 0, gemTimer = 0;
+
+    function initBgStars() {
+      stars = [];
+      for (let i = 0; i < 45; i++) {
+        stars.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          size: Math.random() * 2 + 1,
+          speed: Math.random() * 1.5 + 0.5
+        });
+      }
+    }
+
+    function addExplosion(x, y, color, count = 12) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 4 + 1.5;
+        particles.push({
+          x, y, vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd,
+          life: 1.0, color
+        });
+      }
+    }
+
+    function update() {
+      ship.x += (ship.targetX - ship.x) * 0.2;
+      ship.x = Math.max(ship.radius + 10, Math.min(W - ship.radius - 10, ship.x));
+      ship.y = H - 65;
+      if (ship.invincible > 0) ship.invincible--;
+
+      for (let s of stars) {
+        s.y += s.speed;
+        if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+      }
+
+      spawnTimer++;
+      const currentSpawnRate = Math.max(25, 55 - Math.floor(score / 60));
+      if (spawnTimer > currentSpawnRate) {
+        spawnTimer = 0;
+        const rad = Math.random() * 12 + 16;
+        meteors.push({
+          x: Math.random() * (W - rad * 2) + rad,
+          y: -rad - 10, radius: rad,
+          speed: (Math.random() * 2 + 2.5) + (score / 350),
+          color: Math.random() < 0.5 ? '#f97316' : '#ef4444',
+          rot: 0, rotSpd: (Math.random() - 0.5) * 0.1
+        });
+      }
+
+      gemTimer++;
+      if (gemTimer > 70) {
+        gemTimer = 0;
+        const isShield = Math.random() < 0.18;
+        gems.push({
+          x: Math.random() * (W - 40) + 20, y: -20,
+          radius: isShield ? 16 : 14, speed: 2.2,
+          type: isShield ? 'shield' : 'gem', val: isShield ? 0 : 25
+        });
+      }
+
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i];
+        m.y += m.speed;
+        m.rot += m.rotSpd;
+
+        const dist = Math.hypot(ship.x - m.x, ship.y - m.y);
+        if (dist < ship.radius + m.radius) {
+          if (ship.invincible <= 0) {
+            if (shields > 0) {
+              shields--;
+              shieldVal.textContent = shields;
+              ship.invincible = 45;
+              playSfx('hit');
+              addExplosion(m.x, m.y, '#38bdf8', 16);
+              meteors.splice(i, 1);
+              continue;
+            } else {
+              playSfx('hit');
+              addExplosion(ship.x, ship.y, '#f43f5e', 25);
+              endGame();
+              return;
+            }
+          }
+        }
+        if (m.y > H + 40) {
+          meteors.splice(i, 1);
+          score += 5;
+          scoreVal.textContent = score;
+        }
+      }
+
+      for (let i = gems.length - 1; i >= 0; i--) {
+        const g = gems[i];
+        g.y += g.speed;
+        const dist = Math.hypot(ship.x - g.x, ship.y - g.y);
+        if (dist < ship.radius + g.radius) {
+          if (g.type === 'shield') {
+            shields = Math.min(3, shields + 1);
+            shieldVal.textContent = shields;
+            playSfx('shield');
+            addExplosion(g.x, g.y, '#38bdf8', 14);
+          } else {
+            score += g.val;
+            scoreVal.textContent = score;
+            playSfx('gem');
+            addExplosion(g.x, g.y, '#fde047', 12);
+          }
+          gems.splice(i, 1);
+          continue;
+        }
+        if (g.y > H + 40) gems.splice(i, 1);
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.life -= 0.035;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#ffffff';
+      for (let s of stars) {
+        ctx.globalAlpha = Math.random() * 0.4 + 0.6;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1.0;
+
+      for (let g of gems) {
+        ctx.save();
+        ctx.translate(g.x, g.y);
+        if (g.type === 'shield') {
+          ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 10;
+          ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('🛡️', 0, 0);
+        } else {
+          ctx.shadowColor = '#fde047'; ctx.shadowBlur = 12;
+          ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('⭐', 0, 0);
+        }
+        ctx.restore();
+      }
+
+      for (let m of meteors) {
+        ctx.save();
+        ctx.translate(m.x, m.y);
+        ctx.rotate(m.rot);
+        ctx.shadowColor = m.color; ctx.shadowBlur = 10;
+        ctx.fillStyle = m.color;
+        ctx.beginPath(); ctx.arc(0, 0, m.radius, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath(); ctx.arc(-m.radius * 0.2, -m.radius * 0.2, m.radius * 0.45, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+
+      for (let p of particles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.save();
+      ctx.translate(ship.x, ship.y);
+      if (ship.invincible > 0 && Math.floor(ship.invincible / 4) % 2 === 0) {
+        ctx.globalAlpha = 0.4;
+      }
+      if (shields > 0) {
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.arc(0, 0, ship.radius + 10, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.font = '34px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 8;
+      ctx.fillText('🚀', 0, 0);
+      ctx.restore();
+    }
+
+    function gameLoop() {
+      if (!isRunning) return;
+      update();
+      render();
+      animId = requestAnimationFrame(gameLoop);
+    }
+
+    function handlePointer(e) {
+      if (!isRunning) return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      ship.targetX = clientX - rect.left;
+    }
+    canvasWrap.addEventListener('pointerdown', handlePointer);
+    canvasWrap.addEventListener('pointermove', handlePointer);
+
+    window.addEventListener('keydown', (e) => {
+      if (!isRunning) return;
+      if (e.key === 'ArrowLeft') ship.targetX -= 30;
+      if (e.key === 'ArrowRight') ship.targetX += 30;
+    });
+
+    function startGame() {
+      resize(); initBgStars();
+      score = 0; shields = 1; meteors = []; gems = []; particles = [];
+      ship.x = W / 2; ship.targetX = W / 2; ship.invincible = 30;
+      scoreVal.textContent = score; shieldVal.textContent = shields;
+      isRunning = true;
+      startOverlay.classList.add('hidden'); endOverlay.classList.add('hidden');
+      if (animId) cancelAnimationFrame(animId);
+      gameLoop();
+    }
+
+    function endGame() {
+      isRunning = false;
+      if (animId) cancelAnimationFrame(animId);
+      if (score > best) {
+        best = score;
+        localStorage.setItem(BEST_KEY, best.toString());
+        bestVal.textContent = best;
+      }
+      finalScore.textContent = score + '점';
+      endOverlay.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+  })();
+  </script>
+</body>
+</html>

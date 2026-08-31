@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🔔 멜로디 크리스탈 차임</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+      background: #0f172a;
+      color: #fff;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px;
+    }
+    h1 {
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 900;
+      color: #c084fc;
+      text-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
+    }
+    .hud {
+      display: flex; justify-content: space-around;
+      background: rgba(30, 27, 75, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      padding: 8px 12px;
+      border: 1px solid rgba(192, 132, 252, 0.3);
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .hud-val { color: #fde047; font-size: 18px; font-weight: 900; margin-left: 4px; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 20%, #2e1065 0%, #0f172a 100%);
+      border: 1px solid rgba(192, 132, 252, 0.25);
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+    }
+    #noteCanvas {
+      flex: 1;
+      width: 100%;
+      display: block;
+    }
+    .chime-bar {
+      height: 90px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      padding: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      border-top: 1px solid rgba(192, 132, 252, 0.3);
+    }
+    .chime-btn {
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.1s ease, filter 0.1s ease;
+      touch-action: manipulation;
+    }
+    .chime-btn:active, .chime-btn.active {
+      transform: scale(0.92);
+      filter: brightness(1.3);
+    }
+    .chime-btn span { font-size: 11px; margin-top: 2px; font-weight: 700; opacity: 0.9; }
+    .btn-c { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+    .btn-d { background: linear-gradient(135deg, #fb923c, #ea580c); }
+    .btn-e { background: linear-gradient(135deg, #facc15, #ca8a04); }
+    .btn-g { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .btn-a { background: linear-gradient(135deg, #38bdf8, #0284c7); }
+
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .home-link {
+      color: #c084fc;
+      text-decoration: none;
+      background: rgba(192, 132, 252, 0.15);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      border: 1px solid rgba(192, 132, 252, 0.3);
+    }
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(6px);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 100; padding: 20px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #1e1b4b;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      width: 100%; max-width: 340px;
+      border: 2px solid rgba(192, 132, 252, 0.4);
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .overlay-card h2 { font-size: 22px; color: #c084fc; margin-bottom: 8px; }
+    .overlay-card p { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px; }
+    .btn-start {
+      width: 100%; min-height: 48px;
+      background: linear-gradient(135deg, #9333ea, #c084fc);
+      color: #ffffff; border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 800; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(192, 132, 252, 0.4);
+    }
+    .result-score { font-size: 36px; font-weight: 900; color: #fde047; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🔔 멜로디 크리스탈 차임</h1>
+    </header>
+    <div class="hud">
+      <div>점수: <span class="hud-val" id="scoreVal">0</span></div>
+      <div>콤보: <span class="hud-val" id="comboVal">0x</span></div>
+      <div>최고: <span class="hud-val" id="bestVal">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <canvas id="noteCanvas"></canvas>
+      <div class="chime-bar">
+        <button class="chime-btn btn-c" data-lane="0">🔔<span>도</span></button>
+        <button class="chime-btn btn-d" data-lane="1">💎<span>레</span></button>
+        <button class="chime-btn btn-e" data-lane="2">✨<span>미</span></button>
+        <button class="chime-btn btn-g" data-lane="3">🎵<span>솔</span></button>
+        <button class="chime-btn btn-a" data-lane="4">🎶<span>라</span></button>
+      </div>
+    </div>
+
+    <footer>
+      <small>떨어지는 음표가 하단 차임에 닿을 때 알맞은 종을 터치하세요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🔔 멜로디 크리스탈 차임</h2>
+      <p>빛나는 크리스탈 음표가 내려오면<br>알맞은 색상의 크리스탈 종을 탭하여<br>아름다운 멜로디를 연주해봐요!</p>
+      <button class="btn-start" id="startBtn">연주 시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎼 연주 완료!</h2>
+      <p>오늘의 멜로디 연주 점수:</p>
+      <div class="result-score" id="finalScore">0점</div>
+      <p id="resultMsg">멋진 연주자예요!</p>
+      <button class="btn-start" id="restartBtn">다시 연주</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const GAME_ID = 'melody-crystal-chime';
+    const BEST_KEY = GAME_ID + '_best';
+    const canvas = document.getElementById('noteCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const comboVal = document.getElementById('comboVal');
+    const bestVal = document.getElementById('bestVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const chimeBtns = document.querySelectorAll('.chime-btn');
+
+    let W = 360, H = 400;
+    let score = 0, combo = 0, isRunning = false, animId = null;
+    let best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+    bestVal.textContent = best;
+
+    const FREQS = [523.25, 587.33, 659.25, 783.99, 880.00];
+    const COLORS = ['#f43f5e', '#fb923c', '#facc15', '#22c55e', '#38bdf8'];
+    const ICONS = ['🔔', '💎', '✨', '🎵', '🎶'];
+
+    let audioCtx = null;
+    function playChime(lane) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(FREQS[lane], now);
+        gain1.gain.setValueAtTime(0.3, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.6);
+
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(FREQS[lane] * 2.76, now);
+        gain2.gain.setValueAtTime(0.12, now);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(now);
+        osc2.stop(now + 0.35);
+      } catch (e) {}
+    }
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = W; canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+
+    let notes = [];
+    let particles = [];
+    let spawnTimer = 0;
+    let timeLeft = 45;
+    let timerInterval = null;
+
+    function spawnNote() {
+      const lane = Math.floor(Math.random() * 5);
+      notes.push({
+        lane,
+        y: -30,
+        speed: 3.0 + (score / 400),
+        hit: false
+      });
+    }
+
+    function addHitRing(x, y, color) {
+      for (let i = 0; i < 16; i++) {
+        const angle = (Math.PI * 2 / 16) * i;
+        const spd = Math.random() * 3 + 2;
+        particles.push({
+          x, y, vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd,
+          life: 1.0, color
+        });
+      }
+    }
+
+    function update() {
+      spawnTimer++;
+      const rate = Math.max(22, 45 - Math.floor(score / 50));
+      if (spawnTimer > rate) {
+        spawnTimer = 0;
+        spawnNote();
+      }
+
+      const laneW = W / 5;
+      const targetY = H - 25;
+
+      for (let i = notes.length - 1; i >= 0; i--) {
+        const n = notes[i];
+        n.y += n.speed;
+
+        if (n.y > H + 20) {
+          notes.splice(i, 1);
+          combo = 0;
+          comboVal.textContent = '0x';
+        }
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.life -= 0.04;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, W, H);
+      const laneW = W / 5;
+
+      ctx.strokeStyle = 'rgba(192, 132, 252, 0.15)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * laneW, 0);
+        ctx.lineTo(i * laneW, H);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, H - 25);
+      ctx.lineTo(W, H - 25);
+      ctx.stroke();
+
+      for (let n of notes) {
+        const x = n.lane * laneW + laneW / 2;
+        ctx.save();
+        ctx.translate(x, n.y);
+        ctx.shadowColor = COLORS[n.lane];
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = COLORS[n.lane];
+        ctx.beginPath();
+        ctx.arc(0, 0, 18, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = '18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(ICONS[n.lane], 0, 0);
+        ctx.restore();
+      }
+
+      for (let p of particles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function gameLoop() {
+      if (!isRunning) return;
+      update();
+      render();
+      animId = requestAnimationFrame(gameLoop);
+    }
+
+    function triggerLane(lane) {
+      if (!isRunning) return;
+      playChime(lane);
+
+      const targetY = H - 25;
+      let hitIndex = -1;
+      let minDist = 45;
+
+      for (let i = 0; i < notes.length; i++) {
+        const n = notes[i];
+        if (n.lane === lane) {
+          const dist = Math.abs(n.y - targetY);
+          if (dist < minDist) {
+            minDist = dist;
+            hitIndex = i;
+          }
+        }
+      }
+
+      const laneW = W / 5;
+      const x = lane * laneW + laneW / 2;
+
+      if (hitIndex !== -1) {
+        notes.splice(hitIndex, 1);
+        combo++;
+        const pts = 20 + combo * 5;
+        score += pts;
+        scoreVal.textContent = score;
+        comboVal.textContent = combo + 'x';
+        addHitRing(x, targetY, COLORS[lane]);
+      }
+    }
+
+    chimeBtns.forEach(btn => {
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        const lane = parseInt(btn.dataset.lane, 10);
+        btn.classList.add('active');
+        setTimeout(() => btn.classList.remove('active'), 120);
+        triggerLane(lane);
+      });
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (!isRunning) return;
+      const map = { '1': 0, '2': 1, '3': 2, '4': 3, '5': 4, 'd': 0, 'f': 1, 'j': 2, 'k': 3, 'l': 4 };
+      if (e.key.toLowerCase() in map) {
+        triggerLane(map[e.key.toLowerCase()]);
+      }
+    });
+
+    function startGame() {
+      resize();
+      score = 0; combo = 0; timeLeft = 45; notes = []; particles = [];
+      scoreVal.textContent = score; comboVal.textContent = '0x';
+      isRunning = true;
+      startOverlay.classList.add('hidden'); endOverlay.classList.add('hidden');
+      if (animId) cancelAnimationFrame(animId);
+      if (timerInterval) clearInterval(timerInterval);
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) endGame();
+      }, 1000);
+
+      gameLoop();
+    }
+
+    function endGame() {
+      isRunning = false;
+      if (animId) cancelAnimationFrame(animId);
+      if (timerInterval) clearInterval(timerInterval);
+      if (score > best) {
+        best = score;
+        localStorage.setItem(BEST_KEY, best.toString());
+        bestVal.textContent = best;
+      }
+      finalScore.textContent = score + '점';
+      endOverlay.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+  })();
+  </script>
+</body>
+</html>

@@ -1,5 +1,17 @@
 [
   {
+    "id": "cosmic-meteor-dash",
+    "title": "우주 운석 대시",
+    "icon": "🚀",
+    "cat": "action"
+  },
+  {
+    "id": "melody-crystal-chime",
+    "title": "멜로디 크리스탈 차임",
+    "icon": "🔔",
+    "cat": "rhythm"
+  },
+  {
     "id": "gravity-ball-architect",
     "title": "Gravity Ball Architect",
     "title_ko": "🧲 중력 구슬 건축가",

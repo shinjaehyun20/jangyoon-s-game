@@ -1,5 +1,21 @@
 [
   {
+    "id": "cosmic-meteor-dash",
+    "title": "Cosmic Meteor Dash",
+    "title_ko": "🚀 우주 운석 대시",
+    "description": "우주선을 좌우로 조종해 쏟아지는 불타는 운석을 피하고 별 보석과 보호막을 모으는 스릴 넘치는 액션 게임입니다.",
+    "thumbnail": "cosmic-meteor-dash/thumb.svg",
+    "path": "cosmic-meteor-dash/index.html"
+  },
+  {
+    "id": "melody-crystal-chime",
+    "title": "Melody Crystal Chime",
+    "title_ko": "🔔 멜로디 크리스탈 차임",
+    "description": "내려오는 크리스탈 음표에 맞춰 오색 찬란한 종을 탭하여 맑고 고운 멜로디를 연주하는 리듬 힐링 게임입니다.",
+    "thumbnail": "melody-crystal-chime/thumb.svg",
+    "path": "melody-crystal-chime/index.html"
+  },
+  {
     "id": "balloon-rainbow-pop",
     "title": "Balloon Rainbow Pop",
     "title_ko": "🎈 무지개 풍선 팡팡",
