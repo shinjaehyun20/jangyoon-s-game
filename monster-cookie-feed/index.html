@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍪 아기 몬스터 쿠키 먹이기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body {
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: linear-gradient(180deg, #2d132c 0%, #1a0826 100%);
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      color: #fff;
+    }
+    .wrap {
+      width: 100%; max-width: 480px;
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column;
+      padding: 10px 12px 8px; gap: 8px;
+      margin: 0 auto;
+      position: relative;
+    }
+    h1 {
+      font-size: clamp(20px, 5.5vw, 26px);
+      text-align: center;
+      color: #ff4384;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.1);
+      padding: 8px 16px; border-radius: 12px;
+      font-size: 16px; font-weight: bold;
+      backdrop-filter: blur(4px);
+    }
+    .hud-val { color: #ffe600; font-size: 18px; }
+    #gameArea {
+      flex: 1;
+      position: relative;
+      background: radial-gradient(circle at center, #801336 0%, #2d132c 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(255,67,132,0.3);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+      display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+      padding: 16px 12px;
+    }
+    .monster-container {
+      display: flex; justify-content: space-around; width: 100%;
+      margin-top: 10px;
+    }
+    .monster {
+      width: 100px; height: 110px;
+      background: rgba(255,255,255,0.12);
+      border: 3px solid #ff4384;
+      border-radius: 20px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: transform 0.2s, background-color 0.2s;
+      position: relative;
+    }
+    .monster.active {
+      transform: scale(1.1);
+      background: rgba(255, 67, 132, 0.3);
+      box-shadow: 0 0 15px #ff4384;
+    }
+    .monster-face { font-size: 42px; }
+    .monster-label { font-size: 14px; font-weight: bold; margin-top: 4px; color: #ffeb3b; }
+    
+    .cookie-tray {
+      display: flex; gap: 12px; justify-content: center; width: 100%;
+      padding: 12px; background: rgba(0,0,0,0.3); border-radius: 16px;
+    }
+    .cookie {
+      width: 70px; height: 70px;
+      background: #ee6f57; border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 38px; cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+      transition: transform 0.1s;
+      touch-action: none;
+    }
+    .cookie:active { transform: scale(1.15); }
+    
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; color: rgba(255,255,255,0.7);
+    }
+    .home-link {
+      color: #ff4384; text-decoration: none; font-weight: bold;
+      background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px;
+    }
+    .overlay {
+      position: absolute; inset: 0;
+      background: rgba(26, 8, 38, 0.88);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 100; backdrop-filter: blur(6px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay-card {
+      background: #2d132c; border: 2px solid #ff4384;
+      padding: 24px; border-radius: 20px; text-align: center;
+      width: 85%; max-width: 340px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .overlay-card h2 { font-size: 24px; color: #ff4384; margin-bottom: 12px; }
+    .overlay-card p { font-size: 15px; color: #f9d5e5; margin-bottom: 20px; line-height: 1.5; }
+    .btn-start {
+      background: linear-gradient(135deg, #ff4384, #c72c41);
+      color: #fff; border: none; padding: 14px 28px;
+      font-size: 18px; font-weight: bold; border-radius: 30px;
+      cursor: pointer; box-shadow: 0 4px 15px rgba(255, 67, 132, 0.4);
+      width: 100%; min-height: 48px;
+    }
+    .btn-start:active { transform: scale(0.98); }
+    .feedback-text {
+      position: absolute; font-size: 24px; font-weight: bold; color: #ffe600;
+      pointer-events: none; animation: popUp 0.6s ease-out forwards;
+    }
+    @keyframes popUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-35px) scale(1.3); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍪 아기 몬스터 쿠키 먹이기</h1>
+
+    <div class="hud">
+      <div>⏱️ 시간: <span class="hud-val" id="timeVal">30</span>초</div>
+      <div>🍪 배부름: <span class="hud-val" id="scoreVal">0</span>점</div>
+      <div>🏆 최고: <span class="hud-val" id="bestVal">0</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div class="monster-container">
+        <div class="monster" data-type="red">
+          <div class="monster-face" id="mRed">👾</div>
+          <div class="monster-label">딸기 쿠키!</div>
+        </div>
+        <div class="monster" data-type="green">
+          <div class="monster-face" id="mGreen">🐸</div>
+          <div class="monster-label">메론 쿠키!</div>
+        </div>
+        <div class="monster" data-type="yellow">
+          <div class="monster-face" id="mYellow">🐥</div>
+          <div class="monster-label">바나나 쿠키!</div>
+        </div>
+      </div>
+
+      <div style="font-size: 16px; font-weight: bold; color: #ffeb3b; text-align: center; margin: 10px 0;">
+        👇 아래 쿠키를 맞춰서 클릭해보세요!
+      </div>
+
+      <div class="cookie-tray" id="cookieTray"></div>
+    </div>
+
+    <footer>
+      <small>💡 몬스터가 좋아하는 쿠키를 쏙쏙 줘보세요!</small>
+      <a class="home-link" href="../index.html">← 홈으로</a>
+    </footer>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h2>🍪 귀여운 아기 몬스터</h2>
+      <p>배고픈 아기 몬스터들이 찾아왔어요!<br>딸기, 메론, 바나나 쿠키를 맞춰서 냠냠 먹여주세요! 😋</p>
+      <button class="btn-start" id="startBtn">쿠키 주기!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="overlay-card">
+      <h2>🎉 배부르게 냠냠!</h2>
+      <p id="resultMsg">몬스터들이 엄청 기뻐해요!</p>
+      <button class="btn-start" id="restartBtn">다시 먹이기</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const GAME_TIME = 30;
+    const STORAGE_KEY = 'monster-cookie-feed_best';
+
+    const gameArea = document.getElementById('gameArea');
+    const cookieTray = document.getElementById('cookieTray');
+    const timeVal = document.getElementById('timeVal');
+    const scoreVal = document.getElementById('scoreVal');
+    const bestVal = document.getElementById('bestVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const resultMsg = document.getElementById('resultMsg');
+
+    const monsters = {
+      red: { el: document.querySelector('.monster[data-type="red"]'), face: document.getElementById('mRed'), wanted: '🍓' },
+      green: { el: document.querySelector('.monster[data-type="green"]'), face: document.getElementById('mGreen'), wanted: '🍈' },
+      yellow: { el: document.querySelector('.monster[data-type="yellow"]'), face: document.getElementById('mYellow'), wanted: '🍌' }
+    };
+
+    const cookieTypes = [
+      { type: 'red', emoji: '🍪', color: '#ff4384' },
+      { type: 'green', emoji: '🍩', color: '#00e676' },
+      { type: 'yellow', emoji: '🧁', color: '#ffeb3b' }
+    ];
+
+    let score = 0;
+    let timeLeft = GAME_TIME;
+    let timer = null;
+    let currentWanted = 'red';
+    let bestScore = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+    bestVal.textContent = bestScore;
+
+    function startGame() {
+      score = 0;
+      timeLeft = GAME_TIME;
+      scoreVal.textContent = score;
+      timeVal.textContent = timeLeft;
+
+      startOverlay.classList.add('hidden');
+      endOverlay.classList.add('hidden');
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timeVal.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      pickNextMonster();
+      renderCookies();
+    }
+
+    function pickNextMonster() {
+      const keys = ['red', 'green', 'yellow'];
+      currentWanted = keys[Math.floor(Math.random() * keys.length)];
+
+      keys.forEach(k => {
+        monsters[k].el.classList.remove('active');
+        monsters[k].face.textContent = k === 'red' ? '👾' : (k === 'green' ? '🐸' : '🐥');
+      });
+
+      monsters[currentWanted].el.classList.add('active');
+      monsters[currentWanted].face.textContent = '😋';
+    }
+
+    function renderCookies() {
+      cookieTray.innerHTML = '';
+      const shuffled = [...cookieTypes].sort(() => Math.random() - 0.5);
+
+      shuffled.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'cookie';
+        div.textContent = c.type === 'red' ? '🍓' : (c.type === 'green' ? '🍈' : '🍌');
+        div.style.background = c.color;
+
+        div.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          if (timeLeft <= 0) return;
+
+          if (c.type === currentWanted) {
+            score += 10;
+            scoreVal.textContent = score;
+            showPopText(e.clientX, e.clientY, '냠냠! +10 🎉');
+            monsters[currentWanted].face.textContent = '😍';
+            setTimeout(pickNextMonster, 300);
+          } else {
+            showPopText(e.clientX, e.clientY, '아이쿠! 😅');
+            monsters[c.type].face.textContent = '😝';
+            setTimeout(() => {
+              monsters[c.type].face.textContent = c.type === 'red' ? '👾' : (c.type === 'green' ? '🐸' : '🐥');
+            }, 400);
+          }
+          renderCookies();
+        });
+
+        cookieTray.appendChild(div);
+      });
+    }
+
+    function showPopText(x, y, text) {
+      const rect = gameArea.getBoundingClientRect();
+      const p = document.createElement('div');
+      p.className = 'feedback-text';
+      p.textContent = text;
+      p.style.left = (x - rect.left - 40) + 'px';
+      p.style.top = (y - rect.top - 40) + 'px';
+      gameArea.appendChild(p);
+      setTimeout(() => p.remove(), 600);
+    }
+
+    function endGame() {
+      clearInterval(timer);
+
+      if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem(STORAGE_KEY, bestScore);
+        bestVal.textContent = bestScore;
+      }
+
+      resultMsg.innerHTML = `우와! 몬스터를 신나게 먹였어요! 🍪<br>최종 점수: <strong>${score}점</strong> (최고: ${bestScore}점)`;
+      endOverlay.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+  })();
+  </script>
+</body>
+</html>

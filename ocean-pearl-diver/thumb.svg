@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0b2b40"/>
+      <stop offset="100%" stop-color="#051824"/>
+    </linearGradient>
+    <linearGradient id="bubbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7ee8fa" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0072ff" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bgGrad)"/>
+  <rect x="0.5" y="0.5" width="319" height="179" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  
+  <!-- Bubbles -->
+  <circle cx="50" cy="140" r="12" fill="url(#bubbleGrad)"/>
+  <circle cx="80" cy="70" r="18" fill="url(#bubbleGrad)"/>
+  <circle cx="220" cy="110" r="10" fill="url(#bubbleGrad)"/>
+
+  <!-- Clam and Pearl Illustration -->
+  <g transform="translate(100, 45)">
+    <!-- Clam shell bottom -->
+    <path d="M 10 50 Q 50 80 90 50 Q 50 40 10 50 Z" fill="#e056fd" stroke="#be2edd" stroke-width="2"/>
+    <!-- Clam shell top open -->
+    <path d="M 10 45 Q 50 5 90 45 Q 50 35 10 45 Z" fill="#f0932b" stroke="#e056fd" stroke-width="2"/>
+    <!-- Shiny Pearl -->
+    <circle cx="50" cy="42" r="14" fill="#ffffff" stroke="#7ee8fa" stroke-width="2"/>
+    <circle cx="45" cy="38" r="4" fill="#7ee8fa" opacity="0.8"/>
+  </g>
+
+  <!-- Titles -->
+  <g font-family="'Pretendard','Noto Sans KR',sans-serif">
+    <text x="296" y="148" text-anchor="end" font-size="22" font-weight="900" fill="#7ee8fa">해저 진주 조개</text>
+    <text x="296" y="166" text-anchor="end" font-size="10" font-weight="500" fill="rgba(255,255,255,0.5)" letter-spacing="2">OCEAN PEARL DIVER</text>
+  </g>
+</svg>

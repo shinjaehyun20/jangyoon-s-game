@@ -1886,5 +1886,21 @@
     "description": "바람개비를 드래그한 방향으로 구름을 직접 움직여 빛나는 하늘문까지 안내하는 놀이",
     "thumbnail": "windy-cloud-postman/thumb.svg",
     "path": "windy-cloud-postman/index.html"
+  },
+  {
+    "id": "ocean-pearl-diver",
+    "title": "Ocean Pearl Diver",
+    "title_ko": "🌊 해저 진주 조개 찾기",
+    "description": "반짝이는 조개 속 진주를 모아보세요!",
+    "thumbnail": "ocean-pearl-diver/thumb.svg",
+    "path": "ocean-pearl-diver/index.html"
+  },
+  {
+    "id": "monster-cookie-feed",
+    "title": "Monster Cookie Feed",
+    "title_ko": "🍪 아기 몬스터 쿠키 먹이기",
+    "description": "알록달록 맛있는 쿠키를 몬스터에게 쏙!",
+    "thumbnail": "monster-cookie-feed/thumb.svg",
+    "path": "monster-cookie-feed/index.html"
   }
 ]

@@ -28,6 +28,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "ocean-pearl-diver",
+        "label": "🌊 해저 진주 조개",
+        "path": "ocean-pearl-diver/index.html"
+      },
+      {
+        "id": "monster-cookie-feed",
+        "label": "🍪 아기 몬스터 쿠키",
+        "path": "monster-cookie-feed/index.html"
+      },
+      {
         "id": "circuit-robot-battery",
         "label": "⚡ 꼬마 로봇 건전지 충전",
         "path": "circuit-robot-battery/index.html"
