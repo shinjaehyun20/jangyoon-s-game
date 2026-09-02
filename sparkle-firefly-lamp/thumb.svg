@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="반짝반짝 반딧불이 호롱불">
+<defs>
+  <linearGradient id="nightBg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#050814"/>
+    <stop offset="50%" stop-color="#0f172a"/>
+    <stop offset="100%" stop-color="#1e1b4b"/>
+  </linearGradient>
+  <radialGradient id="lampGlow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#fef08a" stop-opacity="0.9"/>
+    <stop offset="50%" stop-color="#facc15" stop-opacity="0.4"/>
+    <stop offset="100%" stop-color="#eab308" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+<rect width="320" height="180" rx="18" fill="url(#nightBg)"/>
+<!-- Forest Silhouette -->
+<path d="M0 180 L20 120 L40 180 L70 110 L100 180 L140 130 L180 180 L230 115 L270 180 L300 125 L320 180 Z" fill="#090d16" opacity="0.8"/>
+<path d="M0 180 L30 140 L60 180 L110 135 L160 180 L210 145 L260 180 L320 150 L320 180 Z" fill="#030712" opacity="0.9"/>
+
+<!-- Lantern in center -->
+<g transform="translate(160, 95)">
+  <circle cx="0" cy="0" r="45" fill="url(#lampGlow)" filter="url(#glow)"/>
+  <!-- Lantern Frame -->
+  <path d="M-15 -35 L15 -35 L18 -28 L-18 -28 Z" fill="#78350f" stroke="#b45309" stroke-width="1.5"/>
+  <path d="M-18 -28 L18 -28 L22 22 L-22 22 Z" fill="rgba(254, 240, 138, 0.2)" stroke="#ca8a04" stroke-width="2"/>
+  <path d="M-22 22 L22 22 L15 32 L-15 32 Z" fill="#78350f" stroke="#b45309" stroke-width="1.5"/>
+  <path d="M-8 -35 C-8 -48 8 -48 8 -35" fill="none" stroke="#ca8a04" stroke-width="2.5"/>
+  <!-- Fireflies inside -->
+  <circle cx="-6" cy="-4" r="4" fill="#fef08a" filter="url(#glow)"/>
+  <circle cx="8" cy="6" r="3.5" fill="#a7f3d0" filter="url(#glow)"/>
+  <circle cx="-2" cy="12" r="3" fill="#fde047" filter="url(#glow)"/>
+</g>
+
+<!-- Flying fireflies -->
+<circle cx="55" cy="45" r="4" fill="#fef08a" filter="url(#glow)"/>
+<circle cx="95" cy="75" r="3" fill="#6ee7b7" filter="url(#glow)"/>
+<circle cx="245" cy="50" r="4.5" fill="#fef08a" filter="url(#glow)"/>
+<circle cx="280" cy="85" r="3" fill="#fde047" filter="url(#glow)"/>
+<circle cx="70" cy="135" r="2.5" fill="#a7f3d0" filter="url(#glow)"/>
+
+<!-- Titles -->
+<text x="296" y="148" text-anchor="end" font-family="Pretendard,Malgun Gothic,sans-serif" font-size="20" font-weight="900" fill="#fef08a">반짝반짝 반딧불이 호롱불</text>
+<text x="296" y="166" text-anchor="end" font-family="Pretendard,Arial,sans-serif" font-size="10" font-weight="700" fill="#fde047" letter-spacing="2">SPARKLE FIREFLY LAMP</text>
+<rect x="0.5" y="0.5" width="319" height="179" rx="18" fill="none" stroke="#ffffff" stroke-opacity="0.15"/>
+</svg>

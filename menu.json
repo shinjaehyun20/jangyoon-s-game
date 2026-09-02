@@ -28,6 +28,34 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "sparkle-firefly-lamp",
+        "title": "✨ 반짝반짝 반딧불이 호롱불",
+        "desc": "어두운 밤하늘 숲속의 반딧불이를 터치해 호롱불을 밝히는 힐링 터치 놀이",
+        "badge": "터치·반응",
+        "tags": [
+          "터치",
+          "반응",
+          "어린이",
+          "빛",
+          "힐링"
+        ],
+        "icon": "✨"
+      },
+      {
+        "id": "rainbow-gem-minecart",
+        "title": "💎 무지개 보석 광산 열차",
+        "desc": "쏟아지는 오색 보석을 광차로 쏙쏙 담는 레일 액션 게임",
+        "badge": "액션·캐치",
+        "tags": [
+          "액션",
+          "캐치",
+          "어린이",
+          "보석",
+          "광산"
+        ],
+        "icon": "💎"
+      },
+      {
         "id": "ocean-pearl-diver",
         "label": "🌊 해저 진주 조개",
         "path": "ocean-pearl-diver/index.html"

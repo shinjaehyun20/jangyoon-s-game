@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>무지개 보석 광산 열차</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--sky:#38bdf8;--purple:#c084fc;--gold:#fde047;--emerald:#4ade80;--rose:#fb7185}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100vh;height:100dvh;margin:0;overflow:hidden;touch-action:manipulation;font-family:"Pretendard","Malgun Gothic",sans-serif;color:#fff;background:#18181b}
+body{background:radial-gradient(circle at 50% 20%,#27272a 0%,#09090b 100%)}
+.wrap{position:relative;width:100%;max-width:520px;height:100vh;height:100dvh;margin:auto;padding:12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:clamp(19px,5vw,25px);margin:0;color:#38bdf8;text-shadow:0 0 12px rgba(56,189,248,.5)}
+.sub{font-size:11px;font-weight:700;color:#a1a1aa;margin-top:2px}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.chip{padding:6px;text-align:center;border-radius:14px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px);border:1px solid rgba(56,189,248,.25);font-size:11px;color:#cbd5e1}
+.chip b{display:block;font-size:17px;color:#fff;margin-top:2px}
+#canvas-box{position:relative;flex:1;min-height:0;border-radius:22px;overflow:hidden;border:1px solid rgba(56,189,248,.3);background:radial-gradient(circle at 50% 40%,#27272a 0%,#09090b 100%);box-shadow:inset 0 0 30px rgba(0,0,0,.8)}
+canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#94a3b8}
+.home-link{color:#fde047;font-weight:900;text-decoration:none;font-size:12px}
+.overlay{position:fixed;z-index:10;inset:0;padding:20px;display:grid;place-items:center;background:rgba(9,9,11,.85);backdrop-filter:blur(8px)}
+.overlay.hidden{display:none}
+.card{width:min(380px,100%);padding:24px 20px;text-align:center;border-radius:24px;border:1px solid rgba(56,189,248,.3);background:linear-gradient(160deg,#27272a,#18181b);box-shadow:0 16px 40px rgba(0,0,0,.6)}
+.card h2{margin:0 0 10px;font-size:24px;color:#38bdf8;text-shadow:0 0 10px rgba(56,189,248,.4)}
+.card p{margin:0 0 16px;font-size:13px;line-height:1.6;color:#e2e8f0}
+.btn{padding:12px 26px;border:0;border-radius:14px;background:linear-gradient(135deg,#38bdf8,#0284c7);color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(2,132,199,.4)}
+.btn:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+  <div><h1>💎 무지개 보석 광산 열차</h1><div class="sub">화면을 좌우로 터치해 보석을 광차에 담으세요!</div></div>
+  <div class="chip" style="min-width:70px">최고 <b id="best">0</b></div>
+</header>
+<section class="hud">
+  <div class="chip">채굴 점수<b id="score">0</b></div>
+  <div class="chip">남은 시간<b id="timer">45초</b></div>
+  <div class="chip">콤보<b id="combo">0x</b></div>
+</section>
+<div id="canvas-box"><canvas id="cvs"></canvas></div>
+<footer class="footer"><span>💎 무지개 다이아몬드는 50점 보너스!</span><a class="home-link" href="../index.html">← 홈</a></footer>
+</main>
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <h2>💎 광산 열차 출발!</h2>
+    <p>반짝이는 보석 광산에서 쏟아지는 보석들을<br>광산 열차를 좌우로 조종해 쏙쏙 담아보세요!<br>폭탄(💣)은 피해야 해요! 🚀</p>
+    <button class="btn" id="startBtn">광산으로 출발 ⛏️</button>
+  </div>
+</div>
+<div class="overlay hidden" id="endOverlay">
+  <div class="card">
+    <h2>🎉 채굴 대성공!</h2>
+    <p id="endText">광차 가득 보석을 채웠어요!</p>
+    <button class="btn" id="restartBtn">다시 하기 🔄</button>
+  </div>
+</div>
+
+<script>
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const comboEl = document.getElementById('combo');
+const bestEl = document.getElementById('best');
+const startOverlay = document.getElementById('startOverlay');
+const endOverlay = document.getElementById('endOverlay');
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const endText = document.getElementById('endText');
+
+let width = 0, height = 0;
+let score = 0, timeLeft = 45, combo = 0, comboTimer = null;
+let gameRunning = false, lastTime = 0, timerInterval = null, spawnTimer = 0;
+let gems = [], particles = [];
+
+let bestScore = parseInt(localStorage.getItem('jangyoon_minecart_best') || '0', 10);
+bestEl.textContent = bestScore;
+
+// Cart object
+const cart = {
+  x: 0,
+  targetX: 0,
+  width: 70,
+  height: 38
+};
+
+// Sound Synthesizer
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function playTone(freq, duration = 0.15, type = 'sine') {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e){}
+}
+
+function resize() {
+  const rect = cvs.parentElement.getBoundingClientRect();
+  width = rect.width;
+  height = rect.height;
+  cvs.width = width * window.devicePixelRatio;
+  cvs.height = height * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  if (!gameRunning) cart.x = cart.targetX = width / 2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+const GEM_TYPES = [
+  { color: '#ef4444', pts: 10, name: 'ruby' },
+  { color: '#3b82f6', pts: 15, name: 'sapphire' },
+  { color: '#10b981', pts: 20, name: 'emerald' },
+  { color: '#facc15', pts: 25, name: 'topaz' },
+  { color: '#ec4899', pts: 50, name: 'diamond', isRainbow: true },
+  { color: '#3f3f46', pts: -20, name: 'bomb', isBomb: true }
+];
+
+class Gem {
+  constructor() {
+    this.x = Math.random() * (width - 60) + 30;
+    this.y = -20;
+    this.speed = 120 + Math.random() * 80;
+    const rand = Math.random();
+    if (rand < 0.12) this.type = GEM_TYPES[5]; // bomb (12%)
+    else if (rand < 0.25) this.type = GEM_TYPES[4]; // rainbow diamond (13%)
+    else if (rand < 0.50) this.type = GEM_TYPES[3];
+    else if (rand < 0.75) this.type = GEM_TYPES[2];
+    else this.type = GEM_TYPES[0];
+    this.radius = this.type.isRainbow ? 16 : 13;
+    this.rotation = 0;
+    this.rotSpeed = (Math.random() - 0.5) * 4;
+  }
+  update(dt) {
+    this.y += this.speed * dt;
+    this.rotation += this.rotSpeed * dt;
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    if (this.type.isBomb) {
+      // Draw Bomb
+      ctx.beginPath();
+      ctx.arc(0, 0, 14, 0, Math.PI * 2);
+      ctx.fillStyle = '#27272a';
+      ctx.fill();
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#ef4444';
+      ctx.fillText('💣', -8, 5);
+    } else {
+      // Draw Gem Diamond
+      ctx.beginPath();
+      ctx.moveTo(0, -this.radius);
+      ctx.lineTo(this.radius, 0);
+      ctx.lineTo(0, this.radius);
+      ctx.lineTo(-this.radius, 0);
+      ctx.closePath();
+      ctx.fillStyle = this.type.color;
+      ctx.shadowColor = this.type.color;
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+class Particle {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.vx = (Math.random() - 0.5) * 8;
+    this.vy = (Math.random() - 0.5) * 8;
+    this.life = 1.0;
+    this.decay = Math.random() * 0.04 + 0.02;
+    this.size = Math.random() * 4 + 2;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life -= this.decay;
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function handlePointer(e) {
+  if (!gameRunning) return;
+  const rect = cvs.getBoundingClientRect();
+  const px = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+  cart.targetX = Math.max(cart.width / 2 + 10, Math.min(width - cart.width / 2 - 10, px));
+}
+
+cvs.addEventListener('pointermove', handlePointer);
+cvs.addEventListener('pointerdown', handlePointer);
+
+function startGame() {
+  initAudio();
+  score = 0;
+  timeLeft = 45;
+  combo = 0;
+  gems = [];
+  particles = [];
+  cart.x = cart.targetX = width / 2;
+  
+  scoreEl.textContent = '0';
+  timerEl.textContent = '45초';
+  comboEl.textContent = '0x';
+  
+  startOverlay.classList.add('hidden');
+  endOverlay.classList.add('hidden');
+  gameRunning = true;
+  lastTime = performance.now();
+  spawnTimer = 0;
+  
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = timeLeft + '초';
+    if (timeLeft <= 0) endGame();
+  }, 1000);
+  
+  requestAnimationFrame(loop);
+}
+
+function endGame() {
+  gameRunning = false;
+  clearInterval(timerInterval);
+  playTone(587.33, 0.4, 'triangle');
+  
+  if (score > bestScore) {
+    bestScore = score;
+    localStorage.setItem('jangyoon_minecart_best', bestScore);
+    bestEl.textContent = bestScore;
+  }
+  
+  endText.innerHTML = `최종 채굴 점수: <b style="color:#38bdf8;font-size:22px">${score}점</b><br>최고 기록: ${bestScore}점`;
+  endOverlay.classList.remove('hidden');
+}
+
+function loop(timestamp) {
+  if (!gameRunning) return;
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+  lastTime = timestamp;
+  
+  // Smooth cart movement
+  cart.x += (cart.targetX - cart.x) * 12 * dt;
+  
+  // Spawn gems
+  spawnTimer += dt;
+  if (spawnTimer > 0.6) {
+    gems.push(new Gem());
+    spawnTimer = 0;
+  }
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  // Rail
+  const railY = height - 40;
+  ctx.strokeStyle = '#71717a';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(10, railY);
+  ctx.lineTo(width - 10, railY);
+  ctx.stroke();
+  
+  // Draw Cart
+  const cartY = railY - 15;
+  ctx.save();
+  ctx.translate(cart.x, cartY);
+  ctx.fillStyle = '#b45309';
+  ctx.strokeStyle = '#ca8a04';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(-cart.width/2, -cart.height/2, cart.width, cart.height, 8);
+  ctx.fill();
+  ctx.stroke();
+  // Cart Wheels
+  ctx.fillStyle = '#52525b';
+  ctx.beginPath();
+  ctx.arc(-cart.width/3, cart.height/2 + 2, 7, 0, Math.PI * 2);
+  ctx.arc(cart.width/3, cart.height/2 + 2, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  
+  // Update & Draw Gems
+  for (let i = gems.length - 1; i >= 0; i--) {
+    const g = gems[i];
+    g.update(dt);
+    g.draw();
+    
+    // Collision with cart
+    if (g.y > cartY - cart.height/2 && g.y < cartY + cart.height/2) {
+      if (Math.abs(g.x - cart.x) < cart.width/2 + 10) {
+        // Collect!
+        if (g.type.isBomb) {
+          combo = 0;
+          score = Math.max(0, score - 20);
+          playTone(150, 0.3, 'sawtooth');
+          for(let p=0; p<15; p++) particles.push(new Particle(g.x, g.y, '#ef4444'));
+        } else {
+          combo++;
+          score += g.type.pts + (combo * 2);
+          playTone(g.type.isRainbow ? 1046.5 : 440 + combo * 30, 0.15, 'triangle');
+          for(let p=0; p<12; p++) particles.push(new Particle(g.x, g.y, g.type.color));
+        }
+        scoreEl.textContent = score;
+        comboEl.textContent = combo + 'x';
+        gems.splice(i, 1);
+        continue;
+      }
+    }
+    
+    // Missed
+    if (g.y > height + 20) {
+      gems.splice(i, 1);
+    }
+  }
+  
+  // Update & Draw particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update();
+    particles[i].draw();
+    if (particles[i].life <= 0) particles.splice(i, 1);
+  }
+  
+  requestAnimationFrame(loop);
+}
+
+startBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('click', startGame);
+</script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 238개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 240개.
 
-[![Games](https://img.shields.io/badge/games-238-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-240-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 238개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 240개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [✨ 반짝반짝 반딧불이 호롱불 (sparkle-firefly-lamp)](./sparkle-firefly-lamp) | 밤하늘 반딧불이를 터치해 호롱불을 밝히는 힐링 터치 놀이 | 어린이/반응·터치 |
+| [💎 무지개 보석 광산 열차 (rainbow-gem-minecart)](./rainbow-gem-minecart) | 쏟아지는 오색 보석을 광차로 쏙쏙 담는 레일 액션 게임 | 어린이/액션·캐치 |
 | [🌊 해저 진주 조개 찾기 (ocean-pearl-diver)](./ocean-pearl-diver) | 조개 타일을 터치해 반짝이는 진주를 수집하는 해저 탐험 게임 | 어린이/액션·반응 |
 | [🍪 아기 몬스터 쿠키 먹이기 (monster-cookie-feed)](./monster-cookie-feed) | 배고픈 몬스터에게 딸기·메론·바나나 쿠키를 맞춰 쏙 먹여주는 게임 | 어린이/인지·드래그 |
 | [⚡ 네온 회로 연결사 (neon-circuit-connect)](./neon-circuit-connect) | 타일을 회전시켜 발전소에서 아기 로봇까지 네온 전선을 연결하고 번쩍이는 에너지를 충전하세요! | 어린이/퍼즐·인지 |

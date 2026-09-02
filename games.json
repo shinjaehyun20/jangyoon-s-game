@@ -1,5 +1,21 @@
 [
   {
+    "id": "sparkle-firefly-lamp",
+    "title": "Sparkle Firefly Lamp",
+    "title_ko": "✨ 반짝반짝 반딧불이 호롱불",
+    "description": "어두운 밤하늘 숲속을 날아다니는 황금빛·에메랄드빛 반딧불이를 톡톡 터치해 호롱불에 빛을 모아 환하게 밝히는 힐링 터치 놀이입니다.",
+    "thumbnail": "sparkle-firefly-lamp/thumb.svg",
+    "path": "sparkle-firefly-lamp/index.html"
+  },
+  {
+    "id": "rainbow-gem-minecart",
+    "title": "Rainbow Gem Minecart",
+    "title_ko": "💎 무지개 보석 광산 열차",
+    "description": "쏟아지는 오색 영롱한 보석들을 레일을 달리는 광차를 좌우로 조종해 쏙쏙 담아 점수를 모으는 경쾌한 레일 액션 게임입니다.",
+    "thumbnail": "rainbow-gem-minecart/thumb.svg",
+    "path": "rainbow-gem-minecart/index.html"
+  },
+  {
     "id": "cosmic-meteor-dash",
     "title": "Cosmic Meteor Dash",
     "title_ko": "🚀 우주 운석 대시",
