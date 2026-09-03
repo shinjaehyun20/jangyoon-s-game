@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>다람쥐의 도토리 퐁퐁 발사기 🐿️🌰</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--wood:#78350f;--orange:#ea580c;--leaf:#22c55e;--bg-top:#bae6fd;--bg-bottom:#fef08a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100vh;height:100dvh;margin:0;overflow:hidden;touch-action:manipulation;font-family:"Pretendard","Malgun Gothic",sans-serif;color:#1e293b;background:#bae6fd}
+body{background:radial-gradient(circle at 50% 20%,#bae6fd 0%,#bbf7d0 100%)}
+.wrap{position:relative;width:100%;max-width:520px;height:100vh;height:100dvh;margin:auto;padding:12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:clamp(18px,4.8vw,24px);margin:0;color:#78350f;text-shadow:0 1px 2px rgba(255,255,255,.8)}
+.sub{font-size:11px;font-weight:700;color:#475569;margin-top:2px}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.chip{padding:6px;text-align:center;border-radius:14px;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);border:1px solid rgba(234,88,12,.3);font-size:11px;color:#64748b}
+.chip b{display:block;font-size:17px;color:#78350f;margin-top:2px}
+#canvas-box{position:relative;flex:1;min-height:0;border-radius:22px;overflow:hidden;border:2px solid rgba(234,88,12,.4);background:linear-gradient(180deg,#bae6fd 0%,#fef08a 65%,#86efac 100%);box-shadow:inset 0 0 20px rgba(0,0,0,.08)}
+canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#475569}
+.home-link{color:#ea580c;font-weight:900;text-decoration:none;font-size:12px}
+.overlay{position:fixed;z-index:10;inset:0;padding:20px;display:grid;place-items:center;background:rgba(15,23,42,.65);backdrop-filter:blur(6px)}
+.overlay.hidden{display:none}
+.card{width:min(380px,100%);padding:24px 20px;text-align:center;border-radius:24px;border:2px solid #fdba74;background:#fff;box-shadow:0 16px 40px rgba(0,0,0,.25)}
+.card h2{margin:0 0 10px;font-size:24px;color:#78350f}
+.card p{margin:0 0 16px;font-size:13px;line-height:1.6;color:#475569}
+.btn{padding:12px 26px;border:0;border-radius:14px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(234,88,12,.4)}
+.btn:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+  <div><h1>🐿️ 도토리 퐁퐁 발사기</h1><div class="sub">다람쥐의 도토리를 당겨서 바구니에 퐁!</div></div>
+  <div class="chip" style="min-width:70px">최고 <b id="best">0</b></div>
+</header>
+<section class="hud">
+  <div class="chip">골인 점수<b id="score">0</b></div>
+  <div class="chip">남은 시간<b id="timer">45초</b></div>
+  <div class="chip">콤보<b id="combo">0x</b></div>
+</section>
+<div id="canvas-box"><canvas id="cvs"></canvas></div>
+<footer class="footer"><span>💡 황금 도토리는 보너스 3배 획득!</span><a class="home-link" href="../index.html">← 홈</a></footer>
+</main>
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <h2>🐿️ 도토리 퐁퐁 발사기</h2>
+    <p>귀여운 다람쥐의 새총을 뒤로 쭈욱 당겨서 조준하세요!<br>손을 떼면 도토리가 퐁~ 날아갑니다.<br>나뭇잎 바구니에 도토리를 골인시켜봐요! 🌰</p>
+    <button class="btn" id="startBtn">숲속으로 출발 🚀</button>
+  </div>
+</div>
+<div class="overlay hidden" id="endOverlay">
+  <div class="card">
+    <h2>🎉 놀이 완료!</h2>
+    <p id="endText">바구니에 맛있는 도토리가 가득 찼어요!</p>
+    <button class="btn" id="restartBtn">다시 하기 🔄</button>
+  </div>
+</div>
+
+<script>
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const comboEl = document.getElementById('combo');
+const bestEl = document.getElementById('best');
+const startOverlay = document.getElementById('startOverlay');
+const endOverlay = document.getElementById('endOverlay');
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const endText = document.getElementById('endText');
+
+let width = 0, height = 0;
+let score = 0, timeLeft = 45, combo = 0, comboTimer = null;
+let gameRunning = false, lastTime = 0, timerInterval = null;
+let particles = [];
+
+let bestScore = parseInt(localStorage.getItem('jangyoon_acorn_best') || '0', 10);
+bestEl.textContent = bestScore;
+
+// Web Audio API Synth
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playSound(type) {
+  if (!audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'launch') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, t);
+      osc.frequency.exponentialRampToValueAtTime(750, t + 0.12);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+      osc.start(t);
+      osc.stop(t + 0.16);
+    } else if (type === 'score') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, t); // C5
+      osc.frequency.setValueAtTime(659.25, t + 0.08); // E5
+      osc.frequency.setValueAtTime(783.99, t + 0.16); // G5
+      osc.frequency.setValueAtTime(1046.50, t + 0.24); // C6
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+      osc.start(t);
+      osc.stop(t + 0.38);
+    } else if (type === 'miss') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, t);
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.15);
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
+      osc.start(t);
+      osc.stop(t + 0.2);
+    }
+  } catch (e) {}
+}
+
+// Slingshot & Squirrel
+const slingshot = { x: 70, y: 0 };
+let isDragging = false;
+let dragX = 0, dragY = 0;
+
+// Flying Acorn
+let acorn = {
+  active: false,
+  x: 0, y: 0,
+  vx: 0, vy: 0,
+  rotation: 0,
+  isGold: false
+};
+
+// Basket Target
+const basket = {
+  x: 0, y: 0,
+  baseY: 0,
+  width: 58, height: 32,
+  vy: 1.2,
+  angle: 0
+};
+
+function resize() {
+  const rect = cvs.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  width = rect.width;
+  height = rect.height;
+  cvs.width = width * dpr;
+  cvs.height = height * dpr;
+  ctx.scale(dpr, dpr);
+
+  slingshot.x = Math.max(50, width * 0.2);
+  slingshot.y = height - 90;
+
+  basket.x = width - Math.max(60, width * 0.22);
+  basket.baseY = height * 0.5;
+  basket.y = basket.baseY;
+}
+
+window.addEventListener('resize', resize);
+
+function getPointerPos(e) {
+  const rect = cvs.getBoundingClientRect();
+  const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+  const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+  return { x: clientX - rect.left, y: clientY - rect.top };
+}
+
+cvs.addEventListener('pointerdown', (e) => {
+  if (!gameRunning || acorn.active) return;
+  initAudio();
+  const pos = getPointerPos(e);
+  const dist = Math.hypot(pos.x - slingshot.x, pos.y - slingshot.y);
+  if (dist < 80) {
+    isDragging = true;
+    dragX = pos.x;
+    dragY = pos.y;
+  }
+});
+
+cvs.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+  const pos = getPointerPos(e);
+  // Restrict drag distance
+  const dx = pos.x - slingshot.x;
+  const dy = pos.y - slingshot.y;
+  const dist = Math.hypot(dx, dy);
+  const maxDist = 70;
+  if (dist > maxDist) {
+    dragX = slingshot.x + (dx / dist) * maxDist;
+    dragY = slingshot.y + (dy / dist) * maxDist;
+  } else {
+    dragX = pos.x;
+    dragY = pos.y;
+  }
+});
+
+function launchAcorn() {
+  if (!isDragging) return;
+  isDragging = false;
+  const dx = slingshot.x - dragX;
+  const dy = slingshot.y - dragY;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist > 15) {
+    playSound('launch');
+    acorn.active = true;
+    acorn.x = slingshot.x;
+    acorn.y = slingshot.y;
+    acorn.vx = dx * 0.22;
+    acorn.vy = dy * 0.22;
+    acorn.rotation = 0;
+    acorn.isGold = Math.random() < 0.25; // 25% chance of gold acorn
+  }
+}
+
+cvs.addEventListener('pointerup', launchAcorn);
+cvs.addEventListener('pointercancel', () => { isDragging = false; });
+cvs.addEventListener('touchend', launchAcorn);
+
+function createBurst(x, y, color, count = 15) {
+  for (let i = 0; i < count; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const spd = Math.random() * 4 + 2;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang) * spd,
+      vy: Math.sin(ang) * spd,
+      color,
+      size: Math.random() * 4 + 2,
+      life: 1.0,
+      decay: Math.random() * 0.03 + 0.02
+    });
+  }
+}
+
+function update(dt) {
+  // Basket gentle bobbing
+  basket.angle += 0.04;
+  basket.y = basket.baseY + Math.sin(basket.angle) * (height * 0.22);
+
+  // Acorn physics
+  if (acorn.active) {
+    acorn.vy += 0.38; // gravity
+    acorn.x += acorn.vx;
+    acorn.y += acorn.vy;
+    acorn.rotation += 0.12;
+
+    // Trail particle
+    if (Math.random() < 0.6) {
+      particles.push({
+        x: acorn.x, y: acorn.y,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        color: acorn.isGold ? '#facc15' : '#fed7aa',
+        size: Math.random() * 2.5 + 1.5,
+        life: 0.6,
+        decay: 0.04
+      });
+    }
+
+    // Check collision with basket
+    const bTop = basket.y - basket.height * 0.5;
+    const bBottom = basket.y + basket.height * 0.5;
+    const bLeft = basket.x - basket.width * 0.5;
+    const bRight = basket.x + basket.width * 0.5;
+
+    if (acorn.x >= bLeft && acorn.x <= bRight && acorn.y >= bTop && acorn.y <= bBottom && acorn.vy > 0) {
+      // GOAL!
+      playSound('score');
+      combo++;
+      if (comboTimer) clearTimeout(comboTimer);
+      comboTimer = setTimeout(() => { combo = 0; comboEl.textContent = '0x'; }, 3000);
+      comboEl.textContent = combo + 'x';
+
+      const pts = (acorn.isGold ? 60 : 20) * (combo > 3 ? 2 : 1);
+      score += pts;
+      scoreEl.textContent = score;
+
+      createBurst(acorn.x, acorn.y, acorn.isGold ? '#facc15' : '#22c55e', 22);
+      createBurst(acorn.x, acorn.y, '#f43f5e', 8);
+      acorn.active = false;
+    }
+
+    // Out of bounds / Ground hit
+    if (acorn.y > height - 30 || acorn.x > width + 40 || acorn.x < -40) {
+      playSound('miss');
+      combo = 0;
+      comboEl.textContent = '0x';
+      createBurst(Math.min(width, Math.max(0, acorn.x)), height - 35, '#86efac', 8);
+      acorn.active = false;
+    }
+  }
+
+  // Update particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+function drawSquirrel(x, y) {
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Big Tail
+  ctx.fillStyle = '#ea580c';
+  ctx.beginPath();
+  ctx.moveTo(-10, 10);
+  ctx.bezierCurveTo(-35, 10, -42, -22, -26, -36);
+  ctx.bezierCurveTo(-14, -48, 5, -40, 2, -24);
+  ctx.bezierCurveTo(0, -10, -8, -5, -10, 10);
+  ctx.fill();
+
+  // Body
+  ctx.beginPath();
+  ctx.ellipse(4, 8, 14, 16, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#ea580c';
+  ctx.fill();
+
+  // Belly
+  ctx.beginPath();
+  ctx.ellipse(8, 10, 8, 11, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff7ed';
+  ctx.fill();
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(12, -8, 12, 0, Math.PI * 2);
+  ctx.fillStyle = '#ea580c';
+  ctx.fill();
+
+  // Ears
+  ctx.beginPath();
+  ctx.moveTo(8, -18); ctx.lineTo(6, -26); ctx.lineTo(14, -20);
+  ctx.fillStyle = '#c2410c';
+  ctx.fill();
+
+  // Eye
+  ctx.beginPath();
+  ctx.arc(16, -9, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#0f172a';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(17, -10, 1, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+
+  // Cheek
+  ctx.beginPath();
+  ctx.ellipse(14, -3, 3.5, 2, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(244,63,94,0.65)';
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawSlingshot() {
+  const sx = slingshot.x;
+  const sy = slingshot.y;
+
+  // Wood Post
+  ctx.strokeStyle = '#78350f';
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(sx, sy + 30);
+  ctx.lineTo(sx, sy);
+  ctx.lineTo(sx - 12, sy - 16);
+  ctx.moveTo(sx, sy);
+  ctx.lineTo(sx + 12, sy - 16);
+  ctx.stroke();
+
+  // Rubber Bands & Loaded Acorn
+  if (isDragging) {
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(sx - 12, sy - 16);
+    ctx.lineTo(dragX, dragY);
+    ctx.lineTo(sx + 12, sy - 16);
+    ctx.stroke();
+
+    // Loaded acorn at drag pos
+    drawAcorn(dragX, dragY, 0, false);
+
+    // Trajectory dots preview
+    const dx = sx - dragX;
+    const dy = sy - dragY;
+    let simX = sx;
+    let simY = sy;
+    let simVx = dx * 0.22;
+    let simVy = dy * 0.22;
+    ctx.fillStyle = 'rgba(234, 88, 12, 0.7)';
+    for (let i = 0; i < 18; i++) {
+      simVy += 0.38;
+      simX += simVx;
+      simY += simVy;
+      if (i % 2 === 0) {
+        ctx.beginPath();
+        ctx.arc(simX, simY, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (!acorn.active) {
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(sx - 12, sy - 16);
+    ctx.lineTo(sx, sy - 8);
+    ctx.lineTo(sx + 12, sy - 16);
+    ctx.stroke();
+    drawAcorn(sx, sy - 8, 0, false);
+  }
+}
+
+function drawAcorn(x, y, rot, isGold) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+
+  // Acorn body
+  ctx.beginPath();
+  ctx.ellipse(0, 4, 8, 10, 0, 0, Math.PI * 2);
+  ctx.fillStyle = isGold ? '#facc15' : '#d97706';
+  ctx.fill();
+
+  // Cap
+  ctx.beginPath();
+  ctx.arc(0, -2, 9, Math.PI, 0);
+  ctx.fillStyle = isGold ? '#ca8a04' : '#78350f';
+  ctx.fill();
+
+  // Stem
+  ctx.strokeStyle = '#451a03';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, -9);
+  ctx.lineTo(0, -13);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawBasket() {
+  const bx = basket.x;
+  const by = basket.y;
+  const bw = basket.width;
+  const bh = basket.height;
+
+  ctx.save();
+  ctx.translate(bx, by);
+
+  // Basket shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  ctx.beginPath();
+  ctx.ellipse(0, bh * 0.5 + 4, bw * 0.5, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Basket Body
+  ctx.fillStyle = '#b45309';
+  ctx.strokeStyle = '#78350f';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-bw * 0.5, -bh * 0.4);
+  ctx.lineTo(bw * 0.5, -bh * 0.4);
+  ctx.lineTo(bw * 0.38, bh * 0.5);
+  ctx.lineTo(-bw * 0.38, bh * 0.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Basket Weave lines
+  ctx.strokeStyle = '#d97706';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(-bw * 0.45, 0); ctx.lineTo(bw * 0.45, 0);
+  ctx.moveTo(-bw * 0.4, bh * 0.25); ctx.lineTo(bw * 0.4, bh * 0.25);
+  ctx.stroke();
+
+  // Green Leaf Trim on top
+  ctx.fillStyle = '#22c55e';
+  ctx.beginPath();
+  ctx.ellipse(0, -bh * 0.4, bw * 0.52, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function render() {
+  ctx.clearRect(0, 0, width, height);
+
+  // Ground Lawn
+  ctx.fillStyle = '#22c55e';
+  ctx.fillRect(0, height - 38, width, 38);
+  ctx.fillStyle = '#16a34a';
+  ctx.fillRect(0, height - 12, width, 12);
+
+  // Basket Target
+  drawBasket();
+
+  // Squirrel character
+  drawSquirrel(slingshot.x - 30, slingshot.y + 12);
+
+  // Slingshot & band
+  drawSlingshot();
+
+  // Flying Acorn
+  if (acorn.active) {
+    drawAcorn(acorn.x, acorn.y, acorn.rotation, acorn.isGold);
+  }
+
+  // Particles
+  particles.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function loop(timestamp) {
+  if (!gameRunning) return;
+  if (!lastTime) lastTime = timestamp;
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+  lastTime = timestamp;
+
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+function startGame() {
+  initAudio();
+  score = 0;
+  timeLeft = 45;
+  combo = 0;
+  particles = [];
+  acorn.active = false;
+  isDragging = false;
+  scoreEl.textContent = '0';
+  timerEl.textContent = '45초';
+  comboEl.textContent = '0x';
+  startOverlay.classList.add('hidden');
+  endOverlay.classList.add('hidden');
+  gameRunning = true;
+  lastTime = 0;
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!gameRunning) return;
+    timeLeft--;
+    timerEl.textContent = timeLeft + '초';
+    if (timeLeft <= 0) endGame();
+  }, 1000);
+
+  requestAnimationFrame(loop);
+}
+
+function endGame() {
+  gameRunning = false;
+  clearInterval(timerInterval);
+
+  if (score > bestScore) {
+    bestScore = score;
+    localStorage.setItem('jangyoon_acorn_best', bestScore);
+    bestEl.textContent = bestScore;
+  }
+
+  endText.innerHTML = `다람쥐와 함께 <b>${score}점</b>을 모았어요!<br>${score >= 250 ? '🌰 와우! 도토리 백발백중 명사수!' : '✨ 참 잘했어요! 다람쥐가 배부르게 웃어요!'}`;
+  endOverlay.classList.remove('hidden');
+}
+
+startBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('click', startGame);
+
+resize();
+render();
+</script>
+</body>
+</html>

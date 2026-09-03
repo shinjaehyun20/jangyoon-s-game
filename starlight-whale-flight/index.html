@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>별빛 고래의 하늘 비행 🐳✨</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--sky-light:#93c5fd;--sky-main:#3b82f6;--sky-dark:#1d4ed8;--gold:#facc15}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100vh;height:100dvh;margin:0;overflow:hidden;touch-action:manipulation;font-family:"Pretendard","Malgun Gothic",sans-serif;color:#fff;background:#020617}
+body{background:radial-gradient(circle at 50% 25%,#1e1b4b 0%,#020617 100%)}
+.wrap{position:relative;width:100%;max-width:520px;height:100vh;height:100dvh;margin:auto;padding:12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:clamp(18px,4.8vw,24px);margin:0;color:#bae6fd;text-shadow:0 0 12px rgba(56,189,248,.5)}
+.sub{font-size:11px;font-weight:700;color:#94a3b8;margin-top:2px}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.chip{padding:6px;text-align:center;border-radius:14px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px);border:1px solid rgba(56,189,248,.25);font-size:11px;color:#cbd5e1}
+.chip b{display:block;font-size:17px;color:#fff;margin-top:2px}
+#canvas-box{position:relative;flex:1;min-height:0;border-radius:22px;overflow:hidden;border:1px solid rgba(56,189,248,.3);background:radial-gradient(circle at 50% 50%,#0f172a 0%,#020617 100%);box-shadow:inset 0 0 30px rgba(0,0,0,.8)}
+canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#94a3b8}
+.home-link{color:#7dd3fc;font-weight:900;text-decoration:none;font-size:12px}
+.overlay{position:fixed;z-index:10;inset:0;padding:20px;display:grid;place-items:center;background:rgba(2,6,23,.85);backdrop-filter:blur(8px)}
+.overlay.hidden{display:none}
+.card{width:min(380px,100%);padding:24px 20px;text-align:center;border-radius:24px;border:1px solid rgba(56,189,248,.35);background:linear-gradient(160deg,#1e1b4b,#0f172a);box-shadow:0 16px 40px rgba(0,0,0,.6)}
+.card h2{margin:0 0 10px;font-size:24px;color:#bae6fd;text-shadow:0 0 10px rgba(56,189,248,.4)}
+.card p{margin:0 0 16px;font-size:13px;line-height:1.6;color:#e2e8f0}
+.btn{padding:12px 26px;border:0;border-radius:14px;background:linear-gradient(135deg,#38bdf8,#2563eb);color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,.4)}
+.btn:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+  <div><h1>🐳 별빛 고래의 하늘 비행</h1><div class="sub">밤하늘을 헤엄치며 반짝이는 별빛을 모아주세요!</div></div>
+  <div class="chip" style="min-width:70px">최고 <b id="best">0</b></div>
+</header>
+<section class="hud">
+  <div class="chip">모은 별빛<b id="score">0</b></div>
+  <div class="chip">남은 시간<b id="timer">45초</b></div>
+  <div class="chip">콤보<b id="combo">0x</b></div>
+</section>
+<div id="canvas-box"><canvas id="cvs"></canvas></div>
+<footer class="footer"><span>💡 무지개 별사탕은 별빛 파티 보너스!</span><a class="home-link" href="../index.html">← 홈</a></footer>
+</main>
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <h2>🐳 별빛 고래의 비행</h2>
+    <p>은하수 밤하늘을 나는 아기 별빛 고래를 손가락으로 이끌어주세요!<br>황금별과 무지개 별사탕을 모으고<br>먹구름은 쏙 피해 비행해요! 🌟</p>
+    <button class="btn" id="startBtn">은하수로 출발 🚀</button>
+  </div>
+</div>
+<div class="overlay hidden" id="endOverlay">
+  <div class="card">
+    <h2>🎉 비행 완료!</h2>
+    <p id="endText">밤하늘에 별빛이 가득 찼어요!</p>
+    <button class="btn" id="restartBtn">다시 날기 🔄</button>
+  </div>
+</div>
+
+<script>
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const comboEl = document.getElementById('combo');
+const bestEl = document.getElementById('best');
+const startOverlay = document.getElementById('startOverlay');
+const endOverlay = document.getElementById('endOverlay');
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const endText = document.getElementById('endText');
+
+let width = 0, height = 0;
+let score = 0, timeLeft = 45, combo = 0, comboTimer = null;
+let gameRunning = false, lastTime = 0, timerInterval = null;
+let items = [], clouds = [], particles = [], bgStars = [];
+
+let bestScore = parseInt(localStorage.getItem('jangyoon_whale_best') || '0', 10);
+bestEl.textContent = bestScore;
+
+// Whale Player
+const whale = {
+  x: 80,
+  y: 200,
+  targetY: 200,
+  vy: 0,
+  width: 54,
+  height: 28,
+  tailAngle: 0,
+  spoutTimer: 0
+};
+
+// Web Audio API Synth
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function playSound(type) {
+  if (!audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'star') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(587.33, t); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, t + 0.12); // A5
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
+      osc.start(t);
+      osc.stop(t + 0.2);
+    } else if (type === 'rainbow') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, t); // C5
+      osc.frequency.setValueAtTime(659.25, t + 0.08); // E5
+      osc.frequency.setValueAtTime(783.99, t + 0.16); // G5
+      osc.frequency.setValueAtTime(1046.50, t + 0.24); // C6
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+      osc.start(t);
+      osc.stop(t + 0.38);
+    } else if (type === 'cloud') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, t);
+      osc.frequency.exponentialRampToValueAtTime(90, t + 0.2);
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+      osc.start(t);
+      osc.stop(t + 0.28);
+    }
+  } catch (e) {}
+}
+
+function resize() {
+  const rect = cvs.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  width = rect.width;
+  height = rect.height;
+  cvs.width = width * dpr;
+  cvs.height = height * dpr;
+  ctx.scale(dpr, dpr);
+  whale.x = Math.max(50, width * 0.2);
+  if (!gameRunning) whale.y = whale.targetY = height * 0.5;
+
+  // Background stars
+  bgStars = [];
+  for (let i = 0; i < 40; i++) {
+    bgStars.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 1.8 + 0.6,
+      twinkle: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.5 + 0.2
+    });
+  }
+}
+
+window.addEventListener('resize', resize);
+
+function handlePointer(e) {
+  if (!gameRunning) return;
+  const rect = cvs.getBoundingClientRect();
+  const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+  const py = clientY - rect.top;
+  whale.targetY = Math.max(30, Math.min(height - 30, py));
+}
+
+cvs.addEventListener('pointerdown', (e) => {
+  initAudio();
+  handlePointer(e);
+});
+cvs.addEventListener('pointermove', handlePointer);
+cvs.addEventListener('touchmove', (e) => { e.preventDefault(); handlePointer(e); }, { passive: false });
+
+function spawnItem() {
+  const types = ['gold', 'gold', 'aqua', 'rainbow'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  items.push({
+    x: width + 30,
+    y: Math.random() * (height - 80) + 40,
+    type: type,
+    radius: type === 'rainbow' ? 14 : 11,
+    speed: Math.random() * 1.5 + 2.2,
+    angle: 0
+  });
+}
+
+function spawnCloud() {
+  clouds.push({
+    x: width + 60,
+    y: Math.random() * (height - 90) + 45,
+    width: 55,
+    height: 30,
+    speed: Math.random() * 1.2 + 1.8
+  });
+}
+
+function createBurst(x, y, color, count = 12) {
+  for (let i = 0; i < count; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const spd = Math.random() * 3 + 1.5;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang) * spd,
+      vy: Math.sin(ang) * spd,
+      color,
+      size: Math.random() * 3.5 + 2,
+      life: 1.0,
+      decay: Math.random() * 0.03 + 0.02
+    });
+  }
+}
+
+function update(dt) {
+  // Whale follow targetY smoothly
+  const dy = whale.targetY - whale.y;
+  whale.vy = dy * 0.12;
+  whale.y += whale.vy;
+  whale.tailAngle += 0.15;
+
+  // Whale blowhole sparkle
+  whale.spoutTimer += dt;
+  if (whale.spoutTimer > 0.08) {
+    whale.spoutTimer = 0;
+    particles.push({
+      x: whale.x - 14,
+      y: whale.y - 12,
+      vx: -(Math.random() * 2 + 1),
+      vy: -(Math.random() * 2 + 1),
+      color: '#7dd3fc',
+      size: Math.random() * 2.5 + 1.5,
+      life: 0.8,
+      decay: 0.04
+    });
+  }
+
+  // Background stars drift
+  bgStars.forEach(st => {
+    st.x -= st.speed;
+    if (st.x < 0) st.x = width;
+    st.twinkle += 0.05;
+  });
+
+  // Spawn items & clouds
+  if (Math.random() < 0.035) spawnItem();
+  if (Math.random() < 0.018) spawnCloud();
+
+  // Update Items
+  for (let i = items.length - 1; i >= 0; i--) {
+    const it = items[i];
+    it.x -= it.speed;
+    it.angle += 0.05;
+
+    // Check collision with whale
+    const dist = Math.hypot(whale.x - it.x, whale.y - it.y);
+    if (dist < whale.width * 0.45 + it.radius) {
+      combo++;
+      if (comboTimer) clearTimeout(comboTimer);
+      comboTimer = setTimeout(() => { combo = 0; comboEl.textContent = '0x'; }, 2500);
+      comboEl.textContent = combo + 'x';
+
+      let pts = 10;
+      let clr = '#facc15';
+      if (it.type === 'aqua') { pts = 20; clr = '#67e8f9'; playSound('star'); }
+      else if (it.type === 'rainbow') { pts = 50; clr = '#f472b6'; playSound('rainbow'); }
+      else { playSound('star'); }
+
+      const totalAdd = pts * (combo > 5 ? 2 : 1);
+      score += totalAdd;
+      scoreEl.textContent = score;
+
+      createBurst(it.x, it.y, clr, it.type === 'rainbow' ? 20 : 12);
+      items.splice(i, 1);
+      continue;
+    }
+
+    if (it.x < -30) items.splice(i, 1);
+  }
+
+  // Update Clouds
+  for (let i = clouds.length - 1; i >= 0; i--) {
+    const c = clouds[i];
+    c.x -= c.speed;
+
+    const dist = Math.hypot(whale.x - c.x, whale.y - c.y);
+    if (dist < 35) {
+      // Hit cloud
+      playSound('cloud');
+      combo = 0;
+      comboEl.textContent = '0x';
+      score = Math.max(0, score - 5);
+      scoreEl.textContent = score;
+      createBurst(c.x, c.y, '#94a3b8', 14);
+      clouds.splice(i, 1);
+      continue;
+    }
+
+    if (c.x < -70) clouds.splice(i, 1);
+  }
+
+  // Update Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+function drawWhale() {
+  ctx.save();
+  ctx.translate(whale.x, whale.y);
+  const tilt = Math.max(-0.3, Math.min(0.3, whale.vy * 0.04));
+  ctx.rotate(tilt);
+
+  // Tail wave
+  const tailSway = Math.sin(whale.tailAngle) * 4;
+
+  // Whale Body Gradient
+  const grad = ctx.createLinearGradient(-30, -15, 30, 15);
+  grad.addColorStop(0, '#38bdf8');
+  grad.addColorStop(0.6, '#2563eb');
+  grad.addColorStop(1, '#1d4ed8');
+
+  // Body
+  ctx.beginPath();
+  ctx.moveTo(-32, -4);
+  ctx.bezierCurveTo(-28, -20, 15, -18, 30, -5);
+  ctx.bezierCurveTo(42, 2, 45, 10, 36, 14);
+  ctx.bezierCurveTo(20, 20, -10, 18, -28, 10);
+  ctx.bezierCurveTo(-35, 6, -36, 0, -32, -4);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // White/Light Belly
+  ctx.beginPath();
+  ctx.moveTo(-25, 4);
+  ctx.bezierCurveTo(-10, 14, 15, 14, 30, 8);
+  ctx.bezierCurveTo(22, 14, 5, 16, -20, 12);
+  ctx.closePath();
+  ctx.fillStyle = '#e0f2fe';
+  ctx.fill();
+
+  // Flipper
+  ctx.beginPath();
+  ctx.moveTo(-4, 3);
+  ctx.bezierCurveTo(6, 12, 12, 15, 8, 20);
+  ctx.bezierCurveTo(1, 19, -3, 11, -4, 3);
+  ctx.fillStyle = '#1e40af';
+  ctx.fill();
+
+  // Tail
+  ctx.beginPath();
+  ctx.moveTo(30, -5);
+  ctx.quadraticCurveTo(42 + tailSway, -12, 48 + tailSway, -10);
+  ctx.quadraticCurveTo(40 + tailSway, 0, 48 + tailSway, 10);
+  ctx.quadraticCurveTo(40 + tailSway, 8, 30, 4);
+  ctx.fillStyle = '#1d4ed8';
+  ctx.fill();
+
+  // Eye
+  ctx.beginPath();
+  ctx.arc(-20, -3, 3.2, 0, Math.PI * 2);
+  ctx.fillStyle = '#0f172a';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-21, -4, 1.2, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+
+  // Rosy Cheek
+  ctx.beginPath();
+  ctx.ellipse(-14, 3, 3.5, 2.2, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(244, 114, 182, 0.85)';
+  ctx.fill();
+
+  // Glowing star marks on back
+  ctx.fillStyle = '#fef08a';
+  ctx.beginPath(); ctx.arc(-6, -8, 1.6, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(6, -6, 1.4, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(16, -3, 1.2, 0, Math.PI * 2); ctx.fill();
+
+  ctx.restore();
+}
+
+function drawStarShape(cx, cy, r, color, glow = true) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (glow) {
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 10;
+  }
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * r, -Math.sin((18 + i * 72) * Math.PI / 180) * r);
+    ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (r * 0.45), -Math.sin((54 + i * 72) * Math.PI / 180) * (r * 0.45));
+  }
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawCloud(c) {
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  ctx.fillStyle = 'rgba(71, 85, 105, 0.85)';
+  ctx.beginPath();
+  ctx.arc(-14, 0, 15, 0, Math.PI * 2);
+  ctx.arc(4, -8, 19, 0, Math.PI * 2);
+  ctx.arc(20, 2, 14, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Little thunder spark
+  ctx.strokeStyle = '#facc15';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(0, 10);
+  ctx.lineTo(-4, 16);
+  ctx.lineTo(3, 16);
+  ctx.lineTo(-1, 23);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function render() {
+  ctx.clearRect(0, 0, width, height);
+
+  // Background stars
+  bgStars.forEach(st => {
+    const alpha = 0.4 + Math.sin(st.twinkle) * 0.4;
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Clouds
+  clouds.forEach(drawCloud);
+
+  // Items
+  items.forEach(it => {
+    if (it.type === 'rainbow') {
+      ctx.save();
+      ctx.translate(it.x, it.y);
+      ctx.rotate(it.angle);
+      drawStarShape(0, 0, it.radius, '#f472b6', true);
+      drawStarShape(0, 0, it.radius * 0.6, '#fef08a', false);
+      ctx.restore();
+    } else if (it.type === 'aqua') {
+      drawStarShape(it.x, it.y, it.radius, '#67e8f9', true);
+    } else {
+      drawStarShape(it.x, it.y, it.radius, '#facc15', true);
+    }
+  });
+
+  // Particles
+  particles.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // Whale
+  drawWhale();
+}
+
+function loop(timestamp) {
+  if (!gameRunning) return;
+  if (!lastTime) lastTime = timestamp;
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+  lastTime = timestamp;
+
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+function startGame() {
+  initAudio();
+  score = 0;
+  timeLeft = 45;
+  combo = 0;
+  items = [];
+  clouds = [];
+  particles = [];
+  scoreEl.textContent = '0';
+  timerEl.textContent = '45초';
+  comboEl.textContent = '0x';
+  startOverlay.classList.add('hidden');
+  endOverlay.classList.add('hidden');
+  gameRunning = true;
+  lastTime = 0;
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!gameRunning) return;
+    timeLeft--;
+    timerEl.textContent = timeLeft + '초';
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }, 1000);
+
+  requestAnimationFrame(loop);
+}
+
+function endGame() {
+  gameRunning = false;
+  clearInterval(timerInterval);
+
+  if (score > bestScore) {
+    bestScore = score;
+    localStorage.setItem('jangyoon_whale_best', bestScore);
+    bestEl.textContent = bestScore;
+  }
+
+  endText.innerHTML = `별빛 고래와 함께 <b>${score}점</b>을 모았어요!<br>${score >= 300 ? '🌟 대단해요! 밤하늘 최고 파일럿!' : '✨ 참 잘했어요! 은하수가 반짝여요!'}`;
+  endOverlay.classList.remove('hidden');
+}
+
+startBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('click', startGame);
+
+resize();
+render();
+</script>
+</body>
+</html>

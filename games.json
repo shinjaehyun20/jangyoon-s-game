@@ -1918,5 +1918,21 @@
     "description": "알록달록 맛있는 쿠키를 몬스터에게 쏙!",
     "thumbnail": "monster-cookie-feed/thumb.svg",
     "path": "monster-cookie-feed/index.html"
+  },
+  {
+    "id": "starlight-whale-flight",
+    "title": "Starlight Whale Flight",
+    "title_ko": "🐳 별빛 고래의 하늘 비행",
+    "description": "은하수 밤하늘을 헤엄치며 반짝이는 별빛을 모아주세요!",
+    "thumbnail": "starlight-whale-flight/thumb.svg",
+    "path": "starlight-whale-flight/index.html"
+  },
+  {
+    "id": "forest-acorn-catapult",
+    "title": "Forest Acorn Catapult",
+    "title_ko": "🐿️ 도토리 퐁퐁 발사기",
+    "description": "다람쥐의 도토리를 당겨서 나뭇잎 바구니에 퐁!",
+    "thumbnail": "forest-acorn-catapult/thumb.svg",
+    "path": "forest-acorn-catapult/index.html"
   }
 ]

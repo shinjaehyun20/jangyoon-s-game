@@ -1,8 +1,8 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 240개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 242개.
 
-[![Games](https://img.shields.io/badge/games-240-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-242-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 240개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 242개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🐳 별빛 고래의 하늘 비행 (starlight-whale-flight)](./starlight-whale-flight) | 은하수 밤하늘을 헤엄치며 반짝이는 별빛을 모으는 비행 놀이 | 어린이/액션·비행 |
+| [🐿️ 도토리 퐁퐁 발사기 (forest-acorn-catapult)](./forest-acorn-catapult) | 다람쥐의 도토리를 당겨서 나뭇잎 바구니에 퐁 골인시키는 물리 조준 놀이 | 어린이/물리·조준 |
 | [✨ 반짝반짝 반딧불이 호롱불 (sparkle-firefly-lamp)](./sparkle-firefly-lamp) | 밤하늘 반딧불이를 터치해 호롱불을 밝히는 힐링 터치 놀이 | 어린이/반응·터치 |
 | [💎 무지개 보석 광산 열차 (rainbow-gem-minecart)](./rainbow-gem-minecart) | 쏟아지는 오색 보석을 광차로 쏙쏙 담는 레일 액션 게임 | 어린이/액션·캐치 |
 | [🌊 해저 진주 조개 찾기 (ocean-pearl-diver)](./ocean-pearl-diver) | 조개 타일을 터치해 반짝이는 진주를 수집하는 해저 탐험 게임 | 어린이/액션·반응 |

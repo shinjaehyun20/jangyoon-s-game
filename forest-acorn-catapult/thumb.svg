@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="다람쥐의 도토리 퐁퐁 발사기">
+<defs>
+  <linearGradient id="forestSky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#bae6fd"/>
+    <stop offset="60%" stop-color="#fef08a"/>
+    <stop offset="100%" stop-color="#86efac"/>
+  </linearGradient>
+  <radialGradient id="squirrelGrad" cx="35%" cy="35%" r="65%">
+    <stop offset="0%" stop-color="#fdba74"/>
+    <stop offset="70%" stop-color="#ea580c"/>
+    <stop offset="100%" stop-color="#9a3412"/>
+  </radialGradient>
+  <radialGradient id="acornGrad" cx="30%" cy="30%" r="70%">
+    <stop offset="0%" stop-color="#fcd34d"/>
+    <stop offset="60%" stop-color="#d97706"/>
+    <stop offset="100%" stop-color="#78350f"/>
+  </radialGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.25"/>
+  </filter>
+</defs>
+<rect width="320" height="180" rx="18" fill="url(#forestSky)"/>
+
+<!-- Distant Trees -->
+<path d="M-10 140 Q40 100 90 140 Q150 90 210 140 Q270 95 330 140 L330 180 L-10 180 Z" fill="#86efac" opacity="0.7"/>
+<path d="M-20 155 Q50 125 120 155 Q190 120 260 155 Q300 130 340 155 L340 180 L-20 180 Z" fill="#4ade80" opacity="0.85"/>
+<!-- Ground Lawn -->
+<rect y="152" width="320" height="28" fill="#22c55e"/>
+
+<!-- Dotted Trajectory Line -->
+<path d="M95 118 Q160 50 230 105" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6,6"/>
+
+<!-- Cute Squirrel on Left -->
+<g transform="translate(65, 115)" filter="url(#shadow)">
+  <!-- Big Fluffy Tail -->
+  <path d="M-12 18 C-32 18 -42 -10 -28 -32 C-16 -48 6 -42 4 -26 C3 -10 -10 -5 -12 18 Z" fill="url(#squirrelGrad)"/>
+  <!-- Squirrel Body -->
+  <ellipse cx="6" cy="12" rx="16" ry="18" fill="url(#squirrelGrad)"/>
+  <!-- White Belly -->
+  <ellipse cx="12" cy="15" rx="9" ry="12" fill="#fff7ed"/>
+  <!-- Head -->
+  <circle cx="15" cy="-8" r="14" fill="url(#squirrelGrad)"/>
+  <!-- Ear -->
+  <polygon points="12,-20 8,-28 18,-23" fill="#ea580c"/>
+  <polygon points="12,-20 10,-26 16,-22" fill="#fed7aa"/>
+  <!-- Eye -->
+  <circle cx="20" cy="-9" r="3" fill="#1e293b"/>
+  <circle cx="21" cy="-10" r="1.2" fill="#ffffff"/>
+  <!-- Cheek -->
+  <ellipse cx="18" cy="-3" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/>
+  <!-- Snout -->
+  <ellipse cx="25" cy="-6" rx="3.5" ry="2.5" fill="#fff7ed"/>
+  <circle cx="27" cy="-7" r="1.2" fill="#0f172a"/>
+  <!-- Arms holding slingshot -->
+  <path d="M14 8 L28 4" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Wooden Slingshot -->
+  <path d="M28 6 L35 0 L32 -10 M35 0 L42 -8" fill="none" stroke="#78350f" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+
+<!-- Flying Acorn -->
+<g transform="translate(160, 68) rotate(25)" filter="url(#shadow)">
+  <ellipse cx="0" cy="4" rx="9" ry="11" fill="url(#acornGrad)"/>
+  <!-- Acorn Cap -->
+  <path d="M-10 0 C-10 -7 10 -7 10 0 Z" fill="#78350f"/>
+  <rect x="-1.5" y="-10" width="3" height="4" rx="1.5" fill="#451a03"/>
+</g>
+
+<!-- Target Basket on Right -->
+<g transform="translate(240, 115)" filter="url(#shadow)">
+  <!-- Basket -->
+  <path d="M-22 0 L22 0 L16 26 L-16 26 Z" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+  <!-- Weave pattern -->
+  <line x1="-19" y1="8" x2="19" y2="8" stroke="#d97706" stroke-width="1.5"/>
+  <line x1="-17" y1="17" x2="17" y2="17" stroke="#d97706" stroke-width="1.5"/>
+  <line x1="-8" y1="0" x2="-6" y2="26" stroke="#d97706" stroke-width="1.5"/>
+  <line x1="8" y1="0" x2="6" y2="26" stroke="#d97706" stroke-width="1.5"/>
+  <!-- Leaf Ribbon -->
+  <path d="M-24 -4 Q0 -10 24 -4 Q0 2 -24 -4 Z" fill="#22c55e"/>
+  <!-- Acorns inside -->
+  <circle cx="-5" cy="-2" r="5" fill="#d97706"/>
+  <circle cx="6" cy="-1" r="4.5" fill="#f59e0b"/>
+</g>
+
+<!-- Leaf & Sparkle particles -->
+<circle cx="230" cy="85" r="3" fill="#facc15"/>
+<circle cx="255" cy="90" r="2.5" fill="#f43f5e"/>
+<path d="M220 70 Q225 65 230 72 Q225 78 220 70 Z" fill="#4ade80"/>
+
+<!-- Titles -->
+<text x="296" y="148" text-anchor="end" font-family="Pretendard,Malgun Gothic,sans-serif" font-size="20" font-weight="900" fill="#78350f">도토리 퐁퐁 발사기</text>
+<text x="296" y="166" text-anchor="end" font-family="Pretendard,Arial,sans-serif" font-size="10" font-weight="700" fill="#9a3412" letter-spacing="2">FOREST ACORN CATAPULT</text>
+<rect x="0.5" y="0.5" width="319" height="179" rx="18" fill="none" stroke="#ffffff" stroke-opacity="0.2"/>
+</svg>
