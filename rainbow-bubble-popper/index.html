@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🌈 알록달록 무지개 비눗방울 팡팡 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-overlay {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2c3e50;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-sound {
+      pointer-events: auto;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: transform 0.15s;
+    }
+    .btn-sound:active {
+      transform: scale(0.92);
+    }
+    .home-link {
+      pointer-events: auto;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-overlay">
+    <a href="../" class="home-link">
+      <div class="stat-pill">🏠 홈으로</div>
+    </a>
+    <div style="display: flex; gap: 12px;">
+      <div class="stat-pill">⭐ 점수: <span id="scoreVal">0</span></div>
+      <div class="stat-pill" id="comboPill" style="display: none; color: #ff4757;">🔥 <span id="comboVal">0</span> 콤보!</div>
+      <button id="soundBtn" class="btn-sound">🔊</button>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const comboPill = document.getElementById('comboPill');
+    const comboVal = document.getElementById('comboVal');
+    const soundBtn = document.getElementById('soundBtn');
+
+    let width, height;
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio Sound Synth
+    let soundEnabled = true;
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+    soundBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+      if (soundEnabled) initAudio();
+    });
+
+    function playPopSound(pitchMultiplier = 1) {
+      if (!soundEnabled) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        const startFreq = 400 * pitchMultiplier;
+        const endFreq = 900 * pitchMultiplier;
+        osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.13);
+      } catch (e) {}
+    }
+
+    function playFeverSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      try {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.06);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.06);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.06 + 0.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(audioCtx.currentTime + idx * 0.06);
+          osc.stop(audioCtx.currentTime + idx * 0.06 + 0.22);
+        });
+      } catch (e) {}
+    }
+
+    let score = 0;
+    let combo = 0;
+    let comboTimer = null;
+    const EMOJIS = ['🍓', '🌟', '🍭', '🐱', '🦄', '💎', '🌈', '🍒', '✨', '🎈', '💖'];
+
+    class Bubble {
+      constructor(isSpecial = false) {
+        this.reset(isSpecial);
+      }
+
+      reset(isSpecial = false) {
+        this.isSpecial = isSpecial || (Math.random() < 0.08);
+        this.radius = this.isSpecial ? (45 + Math.random() * 15) : (35 + Math.random() * 25);
+        this.x = Math.random() * (width - this.radius * 2) + this.radius;
+        this.y = height + this.radius + Math.random() * 100;
+        this.vy = -(1.5 + Math.random() * 2.2);
+        this.vx = (Math.random() - 0.5) * 1.2;
+        this.wobbleSpeed = 0.03 + Math.random() * 0.04;
+        this.wobbleAmp = 15 + Math.random() * 20;
+        this.angle = Math.random() * Math.PI * 2;
+        this.emoji = this.isSpecial ? '👑' : EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        this.colorHue = Math.random() * 360;
+        this.alpha = 0.85;
+      }
+
+      update() {
+        this.y += this.vy;
+        this.angle += this.wobbleSpeed;
+        this.x += Math.sin(this.angle) * 0.8 + this.vx;
+
+        if (this.y < -this.radius * 2) {
+          this.reset();
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        // Bubble sphere gradient
+        const grad = ctx.createRadialGradient(-this.radius * 0.3, -this.radius * 0.3, this.radius * 0.1, 0, 0, this.radius);
+        if (this.isSpecial) {
+          grad.addColorStop(0, 'rgba(255, 240, 180, 0.9)');
+          grad.addColorStop(0.6, 'rgba(255, 215, 0, 0.6)');
+          grad.addColorStop(1, 'rgba(255, 180, 0, 0.4)');
+        } else {
+          grad.addColorStop(0, `hsla(${this.colorHue}, 90%, 85%, 0.85)`);
+          grad.addColorStop(0.7, `hsla(${(this.colorHue + 60) % 360}, 80%, 75%, 0.55)`);
+          grad.addColorStop(1, `hsla(${(this.colorHue + 120) % 360}, 75%, 65%, 0.35)`);
+        }
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Shimmer shine highlight
+        ctx.strokeStyle = this.isSpecial ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.75)';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.beginPath();
+        ctx.arc(-this.radius * 0.38, -this.radius * 0.38, this.radius * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Emoji inside
+        ctx.font = `${Math.floor(this.radius * 0.8)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.emoji, 0, 2);
+
+        ctx.restore();
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 8;
+        this.vy = (Math.random() - 0.5) * 8;
+        this.radius = 3 + Math.random() * 4;
+        this.color = color;
+        this.alpha = 1;
+        this.decay = 0.02 + Math.random() * 0.03;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.15; // Gravity
+        this.alpha -= this.decay;
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class ScorePopup {
+      constructor(x, y, text, color = '#2ed573') {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.color = color;
+        this.alpha = 1;
+        this.vy = -2.5;
+      }
+      update() {
+        this.y += this.vy;
+        this.alpha -= 0.025;
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.font = 'bold 24px Pretendard, sans-serif';
+        ctx.fillStyle = this.color;
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 4;
+        ctx.textAlign = 'center';
+        ctx.strokeText(this.text, this.x, this.y);
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    const bubbles = [];
+    const particles = [];
+    const popups = [];
+
+    for (let i = 0; i < 18; i++) {
+      bubbles.push(new Bubble());
+    }
+
+    function triggerPop(x, y) {
+      let popped = false;
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        const dist = Math.hypot(x - b.x, y - b.y);
+        if (dist <= b.radius + 15) {
+          popped = true;
+          combo++;
+          clearTimeout(comboTimer);
+          comboTimer = setTimeout(() => {
+            combo = 0;
+            comboPill.style.display = 'none';
+          }, 1800);
+
+          if (combo >= 2) {
+            comboPill.style.display = 'flex';
+            comboVal.textContent = combo;
+          }
+
+          const basePoints = b.isSpecial ? 50 : 10;
+          const totalPoints = basePoints * Math.min(combo, 10);
+          score += totalPoints;
+          scoreVal.textContent = score;
+
+          if (b.isSpecial) {
+            playFeverSound();
+            popups.push(new ScorePopup(b.x, b.y, `⭐ FEVER +${totalPoints}!`, '#ffa502'));
+            // Spawn fever mini bubbles
+            for (let k = 0; k < 6; k++) {
+              bubbles.push(new Bubble(false));
+            }
+          } else {
+            playPopSound(1 + (combo % 12) * 0.1);
+            popups.push(new ScorePopup(b.x, b.y, `+${totalPoints}`, combo > 3 ? '#ff4757' : '#2ed573'));
+          }
+
+          // Particles
+          const pColor = b.isSpecial ? '#ffd32a' : `hsl(${b.colorHue}, 90%, 65%)`;
+          for (let p = 0; p < 16; p++) {
+            particles.push(new Particle(b.x, b.y, pColor));
+          }
+
+          b.reset();
+          break;
+        }
+      }
+    }
+
+    // Pointer events
+    window.addEventListener('pointerdown', (e) => {
+      initAudio();
+      triggerPop(e.clientX, e.clientY);
+    });
+
+    // Main animation loop
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw background clouds
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.beginPath();
+      ctx.arc(width * 0.2, height * 0.2, 80, 0, Math.PI * 2);
+      ctx.arc(width * 0.28, height * 0.18, 100, 0, Math.PI * 2);
+      ctx.arc(width * 0.36, height * 0.2, 70, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(width * 0.75, height * 0.4, 90, 0, Math.PI * 2);
+      ctx.arc(width * 0.83, height * 0.38, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Update & draw bubbles
+      bubbles.forEach(b => {
+        b.update();
+        b.draw();
+      });
+
+      // Update & draw particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw();
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      // Update & draw popups
+      for (let i = popups.length - 1; i >= 0; i--) {
+        const pop = popups[i];
+        pop.update();
+        pop.draw();
+        if (pop.alpha <= 0) popups.splice(i, 1);
+      }
+
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a1c4fd"/>
+      <stop offset="100%" stop-color="#c2e9fb"/>
+    </linearGradient>
+    <radialGradient id="bubble1" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#ff9a9e" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#fecfef" stop-opacity="0.4"/>
+    </radialGradient>
+    <radialGradient id="bubble2" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#a18cd1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#fbc2eb" stop-opacity="0.4"/>
+    </radialGradient>
+    <radialGradient id="goldBubble" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fff9d2" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#f6d365" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#fda085" stop-opacity="0.5"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="400" height="300" fill="url(#skyGrad)"/>
+
+  <!-- Soft Clouds -->
+  <circle cx="80" cy="80" r="50" fill="#ffffff" opacity="0.45"/>
+  <circle cx="120" cy="70" r="60" fill="#ffffff" opacity="0.45"/>
+  <circle cx="160" cy="80" r="45" fill="#ffffff" opacity="0.45"/>
+  <circle cx="320" cy="110" r="55" fill="#ffffff" opacity="0.45"/>
+  <circle cx="360" cy="100" r="65" fill="#ffffff" opacity="0.45"/>
+
+  <!-- Bubbles -->
+  <!-- Bubble Left Pink -->
+  <circle cx="100" cy="180" r="55" fill="url(#bubble1)" stroke="#ffffff" stroke-width="3"/>
+  <circle cx="85" cy="165" r="12" fill="#ffffff" opacity="0.8"/>
+  <text x="100" y="195" font-size="44" text-anchor="middle">🍓</text>
+
+  <!-- Bubble Center Gold Fever -->
+  <circle cx="205" cy="130" r="68" fill="url(#goldBubble)" stroke="#ffffff" stroke-width="4"/>
+  <circle cx="185" cy="110" r="16" fill="#ffffff" opacity="0.9"/>
+  <text x="205" y="148" font-size="52" text-anchor="middle">👑</text>
+
+  <!-- Bubble Right Purple -->
+  <circle cx="310" cy="190" r="58" fill="url(#bubble2)" stroke="#ffffff" stroke-width="3"/>
+  <circle cx="295" cy="175" r="13" fill="#ffffff" opacity="0.8"/>
+  <text x="310" y="205" font-size="46" text-anchor="middle">🦄</text>
+
+  <!-- Sparkling Stars -->
+  <text x="60" y="240" font-size="22" opacity="0.85">✨</text>
+  <text x="260" y="60" font-size="24" opacity="0.85">⭐</text>
+  <text x="360" y="250" font-size="22" opacity="0.85">✨</text>
+
+  <!-- Banner -->
+  <rect x="50" y="245" width="300" height="42" rx="21" fill="#ffffff" opacity="0.92"/>
+  <text x="200" y="273" font-family="'Pretendard', sans-serif" font-weight="bold" font-size="18" fill="#2d3436" text-anchor="middle">🌈 무지개 비눗방울 팡팡</text>
+</svg>

@@ -28,6 +28,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "rainbow-bubble-popper",
+        "label": "🌈 알록달록 무지개 비눗방울 팡팡",
+        "path": "rainbow-bubble-popper/index.html"
+      },
+      {
+        "id": "magic-crystal-cave",
+        "label": "🔮 반짝반짝 마법 수정 동굴 탐험",
+        "path": "magic-crystal-cave/index.html"
+      },
+      {
         "id": "sparkle-firefly-lamp",
         "title": "✨ 반짝반짝 반딧불이 호롱불",
         "desc": "어두운 밤하늘 숲속의 반딧불이를 터치해 호롱불을 밝히는 힐링 터치 놀이",

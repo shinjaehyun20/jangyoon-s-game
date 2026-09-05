@@ -1,5 +1,21 @@
 [
   {
+    "id": "rainbow-bubble-popper",
+    "title": "Rainbow Bubble Popper",
+    "title_ko": "🌈 알록달록 무지개 비눗방울 팡팡",
+    "description": "화면 가득 둥실둥실 떠오르는 영롱한 무지개 비눗방울과 보석·과일을 퐁퐁 터뜨려 신나는 콤보와 점수를 모으는 경쾌한 힐링 터치 놀이입니다.",
+    "thumbnail": "rainbow-bubble-popper/thumb.svg",
+    "path": "rainbow-bubble-popper/index.html"
+  },
+  {
+    "id": "magic-crystal-cave",
+    "title": "Magic Crystal Cave",
+    "title_ko": "🔮 반짝반짝 마법 수정 동굴 탐험",
+    "description": "신비로운 보석 동굴에서 쏟아지는 루비·사파이어·에메랄드 크리스탈을 마법 카트로 쏙쏙 받아내고 무지개 프리즘 파워를 발동하는 힐링 아케이드 놀이입니다.",
+    "thumbnail": "magic-crystal-cave/thumb.svg",
+    "path": "magic-crystal-cave/index.html"
+  },
+  {
     "id": "sparkle-firefly-lamp",
     "title": "Sparkle Firefly Lamp",
     "title_ko": "✨ 반짝반짝 반딧불이 호롱불",
