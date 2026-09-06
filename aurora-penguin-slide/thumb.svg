@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a1128"/>
+      <stop offset="50%" stop-color="#1c315e"/>
+      <stop offset="100%" stop-color="#227c9d"/>
+    </linearGradient>
+    <linearGradient id="aurora" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#sky)"/>
+  <path d="M0,50 Q100,10 200,60 T400,40 L400,140 Q300,100 200,150 T0,110 Z" fill="url(#aurora)"/>
+  <path d="M0,200 Q150,170 400,210 L400,300 L0,300 Z" fill="#e0f2fe"/>
+  <circle cx="80" cy="80" r="2" fill="#fff"/>
+  <circle cx="280" cy="50" r="2" fill="#fff"/>
+  <circle cx="340" cy="90" r="2.5" fill="#fff"/>
+  <text x="200" y="225" font-size="64" text-anchor="middle">🐧</text>
+  <rect x="170" y="242" width="60" height="10" rx="5" fill="#ef4444"/>
+  <text x="200" y="282" font-size="20" font-weight="bold" fill="#0369a1" text-anchor="middle" font-family="sans-serif">오로라 펭귄 눈썰매</text>
+</svg>

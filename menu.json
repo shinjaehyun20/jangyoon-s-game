@@ -28,6 +28,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "cosmic-star-weaver",
+        "label": "✨ 우주 별자리 잇기 탐험",
+        "path": "cosmic-star-weaver/index.html"
+      },
+      {
+        "id": "aurora-penguin-slide",
+        "label": "🐧 오로라 펭귄의 눈썰매 슬라이드",
+        "path": "aurora-penguin-slide/index.html"
+      },
+      {
         "id": "rainbow-bubble-popper",
         "label": "🌈 알록달록 무지개 비눗방울 팡팡",
         "path": "rainbow-bubble-popper/index.html"

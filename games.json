@@ -1950,5 +1950,21 @@
     "description": "다람쥐의 도토리를 당겨서 나뭇잎 바구니에 퐁!",
     "thumbnail": "forest-acorn-catapult/thumb.svg",
     "path": "forest-acorn-catapult/index.html"
+  },
+  {
+    "id": "aurora-penguin-slide",
+    "title": "Aurora Penguin Slide",
+    "title_ko": "🐧 오로라 펭귄의 눈썰매 슬라이드",
+    "description": "반짝이는 오로라 하늘 아래 귀여운 펭귄과 함께 달리는 눈썰매 질주!",
+    "thumbnail": "aurora-penguin-slide/thumb.svg",
+    "path": "aurora-penguin-slide/index.html"
+  },
+  {
+    "id": "cosmic-star-weaver",
+    "title": "Cosmic Star Weaver",
+    "title_ko": "✨ 우주 별자리 잇기 탐험",
+    "description": "은하수에 흩어진 반짝이는 별들을 순서대로 이어 신비한 동물 별자리를 완성해보세요!",
+    "thumbnail": "cosmic-star-weaver/thumb.svg",
+    "path": "cosmic-star-weaver/index.html"
   }
 ]
