@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🫧 반짝반짝 심해 잠수함 탐험 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      background: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-overlay {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .stat-pill {
+      background: rgba(15, 32, 39, 0.8);
+      border: 1.5px solid rgba(72, 219, 251, 0.5);
+      backdrop-filter: blur(8px);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #48dbfb;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal {
+      position: absolute;
+      z-index: 20;
+      background: rgba(15, 32, 39, 0.92);
+      border: 2px solid #48dbfb;
+      backdrop-filter: blur(14px);
+      padding: 32px 40px;
+      border-radius: 28px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      text-align: center;
+      max-width: 90%;
+      width: 380px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal h1 {
+      font-size: 1.8rem;
+      color: #ffe259;
+      margin-bottom: 4px;
+    }
+    .modal p {
+      font-size: 1.05rem;
+      color: #c8d6e5;
+      line-height: 1.5;
+    }
+    .btn {
+      background: linear-gradient(135deg, #ffe259 0%, #ffa751 100%);
+      color: #0f2027;
+      border: none;
+      padding: 14px 36px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 226, 89, 0.4);
+      transition: transform 0.1s, box-shadow 0.1s;
+      pointer-events: auto;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-overlay">
+    <div class="stat-pill">🫧 진주: <span id="scoreVal">0</span></div>
+    <div class="stat-pill">🛡️ 실드: <span id="livesVal">❤️❤️❤️</span></div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startModal" class="modal active">
+    <h1>🫧 심해 잠수함 탐험</h1>
+    <p>손가락이나 마우스로 잠수함을 부드럽게 조종하세요!<br>신비한 진주와 보물상자를 모으고 해파리를 피해요!</p>
+    <button class="btn" id="startBtn">깊은 바다로 출항! 🌊</button>
+  </div>
+
+  <div id="overModal" class="modal">
+    <h1>⚓ 탐험 완료!</h1>
+    <p>획득한 진주 점수: <strong id="finalScore" style="color:#ffe259; font-size:1.4rem;">0</strong>점<br>정말 멋진 심해 항해였어요!</p>
+    <button class="btn" id="restartBtn">다시 항해하기! 🔄</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const livesVal = document.getElementById('livesVal');
+    const startModal = document.getElementById('startModal');
+    const overModal = document.getElementById('overModal');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let W, H;
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Sound FX (Web Audio)
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+    function playSonarPing() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1046.5, audioCtx.currentTime); // C6
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.4);
+    }
+    function playPearlSound() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(659.25, audioCtx.currentTime); // E5
+      osc.frequency.exponentialRampToValueAtTime(1318.5, audioCtx.currentTime + 0.2); // E6
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    }
+    function playHitSound() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    // Entities
+    const sub = {
+      x: 100,
+      y: H / 2,
+      targetX: 100,
+      targetY: H / 2,
+      vx: 0,
+      vy: 0,
+      angle: 0,
+      radius: 30
+    };
+
+    let items = [];
+    let bubbles = [];
+    let particles = [];
+    let score = 0;
+    let lives = 3;
+    let isPlaying = false;
+    let lastSpawn = 0;
+    let animId = null;
+
+    // Background ambient bubbles
+    for (let i = 0; i < 25; i++) {
+      bubbles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: 2 + Math.random() * 6,
+        speed: 0.5 + Math.random() * 1.5,
+        alpha: 0.15 + Math.random() * 0.25
+      });
+    }
+
+    function spawnEntity() {
+      const isObstacle = Math.random() < 0.35;
+      const isTreasure = !isObstacle && Math.random() < 0.25;
+      items.push({
+        type: isObstacle ? 'jellyfish' : (isTreasure ? 'chest' : 'pearl'),
+        x: W + 50,
+        y: 60 + Math.random() * (H - 120),
+        vx: -(2.5 + Math.random() * 2),
+        vy: (Math.random() - 0.5) * 1.2,
+        radius: isObstacle ? 22 : (isTreasure ? 20 : 14),
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    function addSparkles(x, y, color, count = 10) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random() * 4;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius: 2 + Math.random() * 3,
+          color: color,
+          alpha: 1,
+          life: 0.94
+        });
+      }
+    }
+
+    // Input
+    window.addEventListener('pointermove', e => {
+      sub.targetX = Math.max(60, Math.min(W - 60, e.clientX));
+      sub.targetY = Math.max(60, Math.min(H - 60, e.clientY));
+    });
+    window.addEventListener('touchmove', e => {
+      if (e.touches.length > 0) {
+        sub.targetX = Math.max(60, Math.min(W - 60, e.touches[0].clientX));
+        sub.targetY = Math.max(60, Math.min(H - 60, e.touches[0].clientY));
+      }
+    }, { passive: true });
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      lives = 3;
+      items = [];
+      particles = [];
+      scoreVal.textContent = '0';
+      livesVal.textContent = '❤️❤️❤️';
+      startModal.classList.remove('active');
+      overModal.classList.remove('active');
+      isPlaying = true;
+      lastSpawn = performance.now();
+      playSonarPing();
+      if (animId) cancelAnimationFrame(animId);
+      loop(performance.now());
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    function gameOver() {
+      isPlaying = false;
+      document.getElementById('finalScore').textContent = score;
+      overModal.classList.add('active');
+    }
+
+    function loop(now) {
+      if (!isPlaying) return;
+
+      // Submarine physics
+      const dx = sub.targetX - sub.x;
+      const dy = sub.targetY - sub.y;
+      sub.x += dx * 0.12;
+      sub.y += dy * 0.12;
+      sub.angle = Math.atan2(dy, 120) * 0.5;
+
+      // Spawn
+      if (now - lastSpawn > 1100) {
+        spawnEntity();
+        lastSpawn = now;
+      }
+
+      // Render Background
+      ctx.clearRect(0, 0, W, H);
+
+      // Light beams
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.beginPath();
+      ctx.moveTo(W * 0.2, 0);
+      ctx.lineTo(W * 0.35, 0);
+      ctx.lineTo(W * 0.45, H);
+      ctx.lineTo(W * 0.25, H);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(W * 0.65, 0);
+      ctx.lineTo(W * 0.8, 0);
+      ctx.lineTo(W * 0.95, H);
+      ctx.lineTo(W * 0.75, H);
+      ctx.fill();
+      ctx.restore();
+
+      // Ambient bubbles
+      ctx.fillStyle = '#e0f7fa';
+      for (let b of bubbles) {
+        b.y -= b.speed;
+        if (b.y < -10) {
+          b.y = H + 10;
+          b.x = Math.random() * W;
+        }
+        ctx.globalAlpha = b.alpha;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1.0;
+
+      // Draw Submarine
+      ctx.save();
+      ctx.translate(sub.x, sub.y);
+      ctx.rotate(sub.angle);
+
+      // Searchlight cone
+      const beamGrad = ctx.createRadialGradient(25, 0, 5, 120, 0, 100);
+      beamGrad.addColorStop(0, 'rgba(255, 234, 167, 0.4)');
+      beamGrad.addColorStop(1, 'rgba(255, 234, 167, 0)');
+      ctx.fillStyle = beamGrad;
+      ctx.beginPath();
+      ctx.moveTo(25, 0);
+      ctx.lineTo(160, -45);
+      ctx.lineTo(160, 45);
+      ctx.closePath();
+      ctx.fill();
+
+      // Propeller
+      ctx.fillStyle = '#cf6a87';
+      ctx.fillRect(-38, -8, 4, 16);
+
+      // Body
+      const subGrad = ctx.createLinearGradient(-30, -18, 30, 18);
+      subGrad.addColorStop(0, '#ffe259');
+      subGrad.addColorStop(1, '#ffa751');
+      ctx.fillStyle = subGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 32, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Periscope
+      ctx.fillStyle = '#ffa751';
+      ctx.fillRect(-6, -22, 5, 8);
+      ctx.fillRect(-6, -24, 10, 4);
+
+      // Porthole
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(8, -2, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#48dbfb';
+      ctx.beginPath();
+      ctx.arc(8, -2, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(6, -4, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // Update & Draw Items
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.x += item.vx;
+        item.y += Math.sin(now * 0.004 + item.phase) * 0.8;
+
+        // Collision with Submarine
+        const dist = Math.hypot(item.x - sub.x, item.y - sub.y);
+        if (dist < item.radius + sub.radius) {
+          if (item.type === 'jellyfish') {
+            lives--;
+            playHitSound();
+            livesVal.textContent = '❤️❤️❤️'.substring(0, Math.max(0, lives * 2));
+            addSparkles(item.x, item.y, '#ff7675', 16);
+            items.splice(i, 1);
+            if (lives <= 0) {
+              gameOver();
+              return;
+            }
+            continue;
+          } else if (item.type === 'chest') {
+            score += 50;
+            playPearlSound();
+            addSparkles(item.x, item.y, '#ffd166', 20);
+            scoreVal.textContent = score;
+            items.splice(i, 1);
+            continue;
+          } else {
+            score += 20;
+            playPearlSound();
+            addSparkles(item.x, item.y, '#48dbfb', 12);
+            scoreVal.textContent = score;
+            items.splice(i, 1);
+            continue;
+          }
+        }
+
+        // Out of screen
+        if (item.x < -40) {
+          items.splice(i, 1);
+          continue;
+        }
+
+        // Render Item
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        if (item.type === 'jellyfish') {
+          // Jellyfish (Obstacle)
+          ctx.fillStyle = 'rgba(255, 118, 117, 0.85)';
+          ctx.beginPath();
+          ctx.arc(0, -4, item.radius * 0.8, Math.PI, 0);
+          ctx.fill();
+          // Tentacles
+          ctx.strokeStyle = '#ff7675';
+          ctx.lineWidth = 2;
+          for (let t = -8; t <= 8; t += 4) {
+            ctx.beginPath();
+            ctx.moveTo(t, -4);
+            ctx.quadraticCurveTo(t + Math.sin(now * 0.006 + t) * 4, 8, t, 16);
+            ctx.stroke();
+          }
+        } else if (item.type === 'chest') {
+          // Treasure Chest
+          ctx.fillStyle = '#ffd166';
+          ctx.beginPath();
+          ctx.roundRect(-14, -10, 28, 20, 4);
+          ctx.fill();
+          ctx.fillStyle = '#f39c12';
+          ctx.fillRect(-14, -2, 28, 4);
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(0, 0, 3, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Pearl (Collectable)
+          const pGrad = ctx.createRadialGradient(-3, -3, 2, 0, 0, item.radius);
+          pGrad.addColorStop(0, '#ffffff');
+          pGrad.addColorStop(0.6, '#e0f7fa');
+          pGrad.addColorStop(1, '#48dbfb');
+          ctx.fillStyle = pGrad;
+          ctx.beginPath();
+          ctx.arc(0, 0, item.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(-4, -4, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Update & Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha *= p.life;
+        if (p.alpha <= 0.05) {
+          particles.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      animId = requestAnimationFrame(loop);
+    }
+  </script>
+</body>
+</html>

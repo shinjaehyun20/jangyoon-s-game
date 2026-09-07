@@ -28,6 +28,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "sweet-jelly-trampoline",
+        "label": "🍮 말랑말랑 젤리 트램펄린",
+        "path": "sweet-jelly-trampoline/index.html"
+      },
+      {
+        "id": "twinkle-deepsea-submarine",
+        "label": "🫧 반짝반짝 심해 잠수함 탐험",
+        "path": "twinkle-deepsea-submarine/index.html"
+      },
+      {
         "id": "cosmic-star-weaver",
         "label": "✨ 우주 별자리 잇기 탐험",
         "path": "cosmic-star-weaver/index.html"

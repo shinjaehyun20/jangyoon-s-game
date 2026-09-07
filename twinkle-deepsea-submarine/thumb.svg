@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="seaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f2027"/>
+      <stop offset="50%" stop-color="#203a43"/>
+      <stop offset="100%" stop-color="#2c5364"/>
+    </linearGradient>
+    <linearGradient id="subGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe259"/>
+      <stop offset="100%" stop-color="#ffa751"/>
+    </linearGradient>
+    <radialGradient id="pearlGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#e0f7fa"/>
+      <stop offset="100%" stop-color="#80deea"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Deepsea Background -->
+  <rect width="400" height="300" fill="url(#seaGrad)"/>
+
+  <!-- Light rays -->
+  <polygon points="60,0 120,0 160,300 80,300" fill="#ffffff" opacity="0.06"/>
+  <polygon points="200,0 270,0 330,300 240,300" fill="#ffffff" opacity="0.08"/>
+
+  <!-- Bubbles -->
+  <circle cx="90" cy="180" r="8" fill="#e0f7fa" opacity="0.3"/>
+  <circle cx="110" cy="140" r="5" fill="#e0f7fa" opacity="0.4"/>
+  <circle cx="280" cy="220" r="10" fill="#e0f7fa" opacity="0.25"/>
+  <circle cx="310" cy="160" r="6" fill="#e0f7fa" opacity="0.35"/>
+
+  <!-- Submarine -->
+  <g transform="translate(180, 140)">
+    <!-- Periscope -->
+    <path d="M -10 -25 L -10 -40 L 5 -40 L 5 -32 L -2 -32 L -2 -25 Z" fill="#ffa751"/>
+    <!-- Propeller -->
+    <rect x="-72" y="-12" width="6" height="24" rx="3" fill="#cf6a87"/>
+    <ellipse cx="-66" cy="0" rx="4" ry="7" fill="#ffa751"/>
+    <!-- Hull -->
+    <ellipse cx="0" cy="0" rx="65" ry="34" fill="url(#subGrad)"/>
+    <!-- Porthole Glass -->
+    <circle cx="16" cy="-2" r="16" fill="#ffffff" stroke="#e67e22" stroke-width="4"/>
+    <circle cx="16" cy="-2" r="13" fill="#48dbfb"/>
+    <circle cx="12" cy="-6" r="4" fill="#ffffff" opacity="0.8"/>
+    <!-- Nose Searchlight Beam -->
+    <polygon points="60,-10 160,-40 160,20 60,10" fill="#ffeaa7" opacity="0.2" filter="url(#glow)"/>
+  </g>
+
+  <!-- Glowing Pearls & Shell -->
+  <g transform="translate(320, 110)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="18" fill="url(#pearlGrad)"/>
+    <circle cx="-5" cy="-5" r="5" fill="#ffffff"/>
+  </g>
+
+  <!-- Title Text Banner -->
+  <rect x="50" y="250" width="300" height="38" rx="19" fill="#0f2027" opacity="0.9" stroke="#48dbfb" stroke-width="1.5"/>
+  <text x="200" y="275" font-family="'Pretendard', sans-serif" font-size="17" font-weight="900" fill="#48dbfb" text-anchor="middle">🫧 반짝반짝 심해 잠수함 탐험</text>
+</svg>

@@ -1966,5 +1966,21 @@
     "description": "은하수에 흩어진 반짝이는 별들을 순서대로 이어 신비한 동물 별자리를 완성해보세요!",
     "thumbnail": "cosmic-star-weaver/thumb.svg",
     "path": "cosmic-star-weaver/index.html"
+  },
+  {
+    "id": "sweet-jelly-trampoline",
+    "title": "Sweet Jelly Trampoline",
+    "title_ko": "🍮 말랑말랑 젤리 트램펄린",
+    "description": "말랑말랑 통통 튀는 무지개 푸딩 젤리 트램펄린을 좌우로 움직여 하늘에서 떨어지는 아기 곰 인형과 별사탕을 높이높이 튕겨 올리는 경쾌한 터치 바운스 놀이입니다.",
+    "thumbnail": "sweet-jelly-trampoline/thumb.svg",
+    "path": "sweet-jelly-trampoline/index.html"
+  },
+  {
+    "id": "twinkle-deepsea-submarine",
+    "title": "Twinkle Deepsea Submarine",
+    "title_ko": "🫧 반짝반짝 심해 잠수함 탐험",
+    "description": "신비로운 심해 바닷속을 노란 잠수함으로 유영하며 해파리와 산호초를 피해 반짝이는 진주조개와 황금 보물상자를 쏙쏙 모으는 힐링 수중 탐험 놀이입니다.",
+    "thumbnail": "twinkle-deepsea-submarine/thumb.svg",
+    "path": "twinkle-deepsea-submarine/index.html"
   }
 ]
