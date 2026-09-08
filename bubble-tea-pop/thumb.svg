@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffecd2"/>
+      <stop offset="100%" stop-color="#fcb69f"/>
+    </linearGradient>
+    <linearGradient id="teaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffeaa7"/>
+      <stop offset="100%" stop-color="#fdcb6e"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="400" height="300" rx="24" fill="url(#bgGrad)"/>
+  
+  <!-- Ambient Pearls -->
+  <circle cx="60" cy="80" r="16" fill="#ff7675" opacity="0.7"/>
+  <circle cx="340" cy="110" r="20" fill="#00b894" opacity="0.6"/>
+  <circle cx="80" cy="220" r="22" fill="#a29bfe" opacity="0.7"/>
+  <circle cx="330" cy="230" r="18" fill="#fdcb6e" opacity="0.8"/>
+
+  <!-- Bubble Tea Cup -->
+  <path d="M140 90 L160 230 Q200 245 240 230 L260 90 Z" fill="#ffffff" opacity="0.8" stroke="#fdcb6e" stroke-width="6"/>
+  <path d="M148 130 L162 225 Q200 238 238 225 L252 130 Q200 140 148 130 Z" fill="url(#teaGrad)"/>
+
+  <!-- Thick Straw -->
+  <rect x="190" y="45" width="20" height="150" rx="4" fill="#ff7675" transform="rotate(12 200 120)"/>
+
+  <!-- Boba Pearls inside Cup -->
+  <circle cx="180" cy="210" r="12" fill="#2d3436"/>
+  <circle cx="210" cy="215" r="11" fill="#2d3436"/>
+  <circle cx="195" cy="195" r="10" fill="#2d3436"/>
+  <circle cx="170" cy="198" r="9" fill="#ff7675"/>
+  <circle cx="225" cy="200" r="9" fill="#00b894"/>
+
+  <!-- Floating Boba Bubbles -->
+  <g transform="translate(200, 100)">
+    <circle cx="0" cy="0" r="28" fill="rgba(255,255,255,0.4)" stroke="#ffffff" stroke-width="3"/>
+    <circle cx="0" cy="0" r="16" fill="#2d3436"/>
+    <circle cx="-5" cy="-5" r="4" fill="#ffffff"/>
+  </g>
+
+  <!-- Title Banner -->
+  <rect x="50" y="248" width="300" height="38" rx="19" fill="#ffffff" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.15))"/>
+  <text x="200" y="273" font-family="'Pretendard', sans-serif" font-weight="900" font-size="18" fill="#d63031" text-anchor="middle">🧋 버블티 펄 퐁퐁</text>
+</svg>

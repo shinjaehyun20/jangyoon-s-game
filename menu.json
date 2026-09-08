@@ -28,6 +28,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "bubble-tea-pop",
+        "label": "🧋 버블티 펄 퐁퐁",
+        "path": "bubble-tea-pop/index.html"
+      },
+      {
+        "id": "space-constellation-ranger",
+        "label": "🚀 250호 기념 우주 별자리 레인저",
+        "path": "space-constellation-ranger/index.html"
+      },
+      {
         "id": "sweet-jelly-trampoline",
         "label": "🍮 말랑말랑 젤리 트램펄린",
         "path": "sweet-jelly-trampoline/index.html"

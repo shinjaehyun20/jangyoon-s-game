@@ -19,6 +19,8 @@ CHANGES_MD = REPO_ROOT / "CHANGES.md"
 
 # Categorization mapping for missing games
 MISSING_ROWS = [
+    ("| [🚀 250호 기념 우주 별자리 레인저 (space-constellation-ranger)](./space-constellation-ranger) | 반짝이는 은하계 밤하늘을 우주선으로 비행하며 250개의 별빛 크리스탈을 모으고 신비로운 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이 | 어린이/탐험·우주 |", "space-constellation-ranger"),
+    ("| [🧋 버블티 펄 퐁퐁 (bubble-tea-pop)](./bubble-tea-pop) | 화면 아래에서 퐁퐁 떠오르는 달콤한 타피오카 펄과 과일 젤리를 쏙 터치해 컵에 담아 맛있는 무지개 버블티를 완성하는 힐링 터치 놀이 | 어린이/반응·터치 |", "bubble-tea-pop"),
     ("| [🫧 반짝반짝 심해 잠수함 탐험 (twinkle-deepsea-submarine)](./twinkle-deepsea-submarine) | 신비로운 심해 바닷속을 노란 잠수함으로 유영하며 해파리와 산호초를 피해 진주조개와 황금 보물상자를 모으는 힐링 수중 탐험 놀이 | 어린이/탐험·수중 |", "twinkle-deepsea-submarine"),
     ("| [🍮 말랑말랑 젤리 트램펄린 (sweet-jelly-trampoline)](./sweet-jelly-trampoline) | 말랑말랑 통통 튀는 무지개 푸딩 젤리 트램펄린을 좌우로 움직여 아기 곰 인형과 별사탕을 높이높이 튕겨 올리는 경쾌한 터치 바운스 놀이 | 어린이/액션·바운스 |", "sweet-jelly-trampoline"),
     ("| [✨ 우주 별자리 잇기 탐험 (cosmic-star-weaver)](./cosmic-star-weaver) | 반짝이는 우주 공간에서 별들을 선으로 이어 신비로운 별자리를 완성하는 공간 지각 놀이 | 어린이/공간·별자리 |", "cosmic-star-weaver"),
@@ -54,7 +56,11 @@ def polish_github_about(total_games):
 
 def polish_changes_md(total_games):
     txt = CHANGES_MD.read_text(encoding="utf-8")
-    new_entries = f"""## 2026-09-08 — sweet-jelly-trampoline, twinkle-deepsea-submarine (총 248개)
+    new_entries = f"""## 2026-09-09 — bubble-tea-pop, space-constellation-ranger (총 250개)
+- **[🧋 버블티 펄 퐁퐁 (bubble-tea-pop)]** — 화면 아래에서 떠오르는 달콤한 타피오카 펄과 과일 젤리를 쏙 터치해 컵에 담아 맛있는 버블티를 완성하는 힐링 터치 놀이 (외부 의존성 0).
+- **[🚀 250호 기념 우주 별자리 레인저 (space-constellation-ranger)]** — 우주선으로 밤하늘을 비행하며 250개 별빛 크리스탈을 모으고 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이 (외부 의존성 0).
+
+## 2026-09-08 — sweet-jelly-trampoline, twinkle-deepsea-submarine (총 248개)
 - **[🍮 말랑말랑 젤리 트램펄린 (sweet-jelly-trampoline)]** — 푸딩 젤리 트램펄린으로 아기 곰 인형과 별사탕을 튕겨 올리는 경쾌한 터치 바운스 놀이 (외부 의존성 0).
 - **[🫧 반짝반짝 심해 잠수함 탐험 (twinkle-deepsea-submarine)]** — 노란 잠수함으로 심해를 유영하며 진주조개와 보물상자를 모으는 힐링 수중 탐험 놀이 (외부 의존성 0).
 
@@ -75,9 +81,9 @@ def polish_changes_md(total_games):
 - **[💎 무지개 보석 광산 열차 (rainbow-gem-minecart)]** — 쏟아지는 오색 보석을 광차로 쏙쏙 담는 레일 액션 게임 (외부 의존성 0).
 
 """
-    if "sweet-jelly-trampoline" not in txt:
+    if "bubble-tea-pop" not in txt:
         txt = new_entries + txt
-        print("[*] CHANGES.md 2026-09 신규 게임 이력 추가 완료")
+        print("[*] CHANGES.md 2026-09-09 신규 게임 이력 추가 완료")
 
     # 2026-08-28 추가 누락 보완
     aug28_entry = """## 2026-08-28 — turtle-bubble-rescue, cosmic-star-baker (총 232개)
@@ -130,6 +136,7 @@ def polish_readme(total_games):
         base_pre = tech_split[0]
         clean_changes = f"""## 최근 변경사항 (2026-09)
 
+- **🧋 버블티 펄 퐁퐁 · 🚀 250호 기념 우주 별자리 레인저 추가 (2026-09-09)** — 타피오카 펄 버블티 제조 힐링 터치 놀이와 250회 기념 우주 별자리 완성 스페이스 어드벤처 미니게임 2종 추가 (총 250개 대기록 달성). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
 - **🍮 말랑말랑 젤리 트램펄린 · 🫧 반짝반짝 심해 잠수함 탐험 추가 (2026-09-08)** — 푸딩 젤리 트램펄린 바운스 놀이와 심해 잠수함 유영 탐험 미니게임 2종 추가 (총 248개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, 터치 반응형 최적화.
 - **🐧 오로라 펭귄의 눈썰매 슬라이드 · ✨ 우주 별자리 잇기 탐험 추가 (2026-09-06)** — 오로라 빙판길을 미끄러지는 스피드 슬라이드와 우주 별들을 선으로 잇는 별자리 지각 미니게임 2종 추가 (총 246개). 단일 HTML, 외부 의존성 없음, Pointer Events 통합 조작.
 - **🌈 알록달록 무지개 비눗방울 팡팡 · 🔮 반짝반짝 마법 수정 동굴 탐험 추가 (2026-09-05)** — 화면 가득 떠오르는 비눗방울 터치 놀이와 보석 카트 수집 아케이드 미니게임 2종 추가 (총 244개). 단일 HTML, 외부 의존성 없음.

@@ -1,3 +1,27 @@
+## 2026-09-09 — bubble-tea-pop, space-constellation-ranger (총 250개)
+- **[🧋 버블티 펄 퐁퐁 (bubble-tea-pop)]** — 화면 아래에서 떠오르는 달콤한 타피오카 펄과 과일 젤리를 쏙 터치해 컵에 담아 맛있는 버블티를 완성하는 힐링 터치 놀이 (외부 의존성 0).
+- **[🚀 250호 기념 우주 별자리 레인저 (space-constellation-ranger)]** — 우주선으로 밤하늘을 비행하며 250개 별빛 크리스탈을 모으고 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이 (외부 의존성 0).
+
+## 2026-09-08 — sweet-jelly-trampoline, twinkle-deepsea-submarine (총 248개)
+- **[🍮 말랑말랑 젤리 트램펄린 (sweet-jelly-trampoline)]** — 푸딩 젤리 트램펄린으로 아기 곰 인형과 별사탕을 튕겨 올리는 경쾌한 터치 바운스 놀이 (외부 의존성 0).
+- **[🫧 반짝반짝 심해 잠수함 탐험 (twinkle-deepsea-submarine)]** — 노란 잠수함으로 심해를 유영하며 진주조개와 보물상자를 모으는 힐링 수중 탐험 놀이 (외부 의존성 0).
+
+## 2026-09-06 — aurora-penguin-slide, cosmic-star-weaver (총 246개)
+- **[🐧 오로라 펭귄의 눈썰매 슬라이드 (aurora-penguin-slide)]** — 오로라 밤하늘 빙판길을 미끄러지며 물고기를 모으고 얼음 바위를 피하는 스피드 슬라이드 놀이 (외부 의존성 0).
+- **[✨ 우주 별자리 잇기 탐험 (cosmic-star-weaver)]** — 우주 공간에서 별들을 선으로 이어 신비로운 별자리를 완성하는 공간 지각 놀이 (외부 의존성 0).
+
+## 2026-09-05 — rainbow-bubble-popper, magic-crystal-cave (총 244개)
+- **[🌈 알록달록 무지개 비눗방울 팡팡 (rainbow-bubble-popper)]** — 떠오르는 무지개 비눗방울과 보석·과일을 터뜨려 콤보와 점수를 모으는 힐링 터치 놀이 (외부 의존성 0).
+- **[🔮 반짝반짝 마법 수정 동굴 탐험 (magic-crystal-cave)]** — 보석 동굴에서 쏟아지는 크리스탈을 마법 카트로 받아내고 프리즘 파워를 발동하는 아케이드 놀이 (외부 의존성 0).
+
+## 2026-09-03 — starlight-whale-flight, forest-acorn-catapult (총 242개)
+- **[🐳 별빛 고래의 하늘 비행 (starlight-whale-flight)]** — 은하수 밤하늘을 헤엄치며 반짝이는 별빛을 모으는 비행 놀이 (외부 의존성 0).
+- **[🐿️ 도토리 퐁퐁 발사기 (forest-acorn-catapult)]** — 다람쥐 도토리를 당겨서 나뭇잎 바구니에 골인시키는 물리 조준 놀이 (외부 의존성 0).
+
+## 2026-09-02 — sparkle-firefly-lamp, rainbow-gem-minecart (총 240개)
+- **[✨ 반짝반짝 반딧불이 호롱불 (sparkle-firefly-lamp)]** — 밤하늘 반딧불이를 터치해 호롱불을 밝히는 힐링 터치 놀이 (외부 의존성 0).
+- **[💎 무지개 보석 광산 열차 (rainbow-gem-minecart)]** — 쏟아지는 오색 보석을 광차로 쏙쏙 담는 레일 액션 게임 (외부 의존성 0).
+
 ## 2026-09-08 — sweet-jelly-trampoline, twinkle-deepsea-submarine (총 248개)
 - **[🍮 말랑말랑 젤리 트램펄린 (sweet-jelly-trampoline)]** — 푸딩 젤리 트램펄린으로 아기 곰 인형과 별사탕을 튕겨 올리는 경쾌한 터치 바운스 놀이 (외부 의존성 0).
 - **[🫧 반짝반짝 심해 잠수함 탐험 (twinkle-deepsea-submarine)]** — 노란 잠수함으로 심해를 유영하며 진주조개와 보물상자를 모으는 힐링 수중 탐험 놀이 (외부 의존성 0).

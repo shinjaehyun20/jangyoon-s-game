@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="spaceBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0c1b"/>
+      <stop offset="50%" stop-color="#1e1f44"/>
+      <stop offset="100%" stop-color="#0f1123"/>
+    </linearGradient>
+    <radialGradient id="nebula" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6c5ce7" stop-opacity="0.6"/>
+      <stop offset="60%" stop-color="#74b9ff" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#0b0c1b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="400" height="300" rx="24" fill="url(#spaceBg)"/>
+  <rect width="400" height="300" rx="24" fill="url(#nebula)"/>
+
+  <!-- Background Stars -->
+  <circle cx="50" cy="50" r="1.5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="120" cy="30" r="2" fill="#ffeaa7" opacity="0.9"/>
+  <circle cx="280" cy="40" r="1.5" fill="#ffffff" opacity="0.7"/>
+  <circle cx="360" cy="80" r="2" fill="#74b9ff" opacity="0.9"/>
+  <circle cx="40" cy="220" r="2" fill="#ffeaa7" opacity="0.8"/>
+  <circle cx="350" cy="230" r="1.5" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Constellation Lines & Stars (Ursa Major / Dipper) -->
+  <polyline points="80,140 130,125 180,150 230,175 290,160 320,210 260,225 230,175" fill="none" stroke="#fdcb6e" stroke-width="3" stroke-dasharray="4,4" opacity="0.85"/>
+  <circle cx="80" cy="140" r="6" fill="#ffeaa7" filter="drop-shadow(0 0 6px #fdcb6e)"/>
+  <circle cx="130" cy="125" r="5" fill="#ffeaa7"/>
+  <circle cx="180" cy="150" r="6" fill="#ffeaa7"/>
+  <circle cx="230" cy="175" r="7" fill="#ffffff"/>
+  <circle cx="290" cy="160" r="6" fill="#ffeaa7"/>
+  <circle cx="320" cy="210" r="6" fill="#ffeaa7"/>
+  <circle cx="260" cy="225" r="5" fill="#ffeaa7"/>
+
+  <!-- Spaceship Hero -->
+  <g transform="translate(200, 100) rotate(-25)">
+    <!-- Engine Flame -->
+    <polygon points="-6,15 6,15 0,30" fill="#ff7675"/>
+    <polygon points="-3,15 3,15 0,24" fill="#ffeaa7"/>
+    <!-- Wings & Hull -->
+    <polygon points="0,-24 16,15 -16,15" fill="#ffffff"/>
+    <polygon points="-16,8 -24,18 -14,18" fill="#fdcb6e"/>
+    <polygon points="16,8 24,18 14,18" fill="#fdcb6e"/>
+    <!-- Cockpit -->
+    <circle cx="0" cy="-4" r="6" fill="#74b9ff"/>
+  </g>
+
+  <!-- 250th Milestone Badge -->
+  <rect x="130" y="16" width="140" height="26" rx="13" fill="#fdcb6e"/>
+  <text x="200" y="34" font-family="'Pretendard', sans-serif" font-weight="900" font-size="13" fill="#0b0c1b" text-anchor="middle">🎉 250TH MILESTONE</text>
+
+  <!-- Title Banner -->
+  <rect x="40" y="248" width="320" height="38" rx="19" fill="rgba(26, 28, 56, 0.95)" stroke="#fdcb6e" stroke-width="1.5"/>
+  <text x="200" y="273" font-family="'Pretendard', sans-serif" font-weight="900" font-size="17" fill="#ffeaa7" text-anchor="middle">🚀 우주 별자리 레인저</text>
+</svg>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🧋 버블티 펄 퐁퐁 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #ff7675;
+      color: #d63031;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .stats {
+      display: flex;
+      gap: 12px;
+    }
+    .pill {
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid #fdcb6e;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #6c5ce7;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal {
+      position: absolute;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.96);
+      border: 3px solid #ff7675;
+      padding: 32px 36px;
+      border-radius: 32px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      text-align: center;
+      max-width: 90%;
+      width: 380px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal h1 {
+      font-size: 1.9rem;
+      color: #d63031;
+    }
+    .modal p {
+      font-size: 1.05rem;
+      color: #636e72;
+      line-height: 1.5;
+    }
+    .btn {
+      background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+      color: white;
+      border: none;
+      padding: 14px 40px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(214, 48, 49, 0.35);
+      transition: transform 0.15s;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="ui-layer">
+    <a href="../" class="home-btn">🏠 홈으로</a>
+    <div class="stats">
+      <div class="pill">🧋 완성: <span id="teaCount">0</span>잔</div>
+      <div class="pill">⭐ 점수: <span id="scoreText">0</span></div>
+    </div>
+  </div>
+
+  <div id="startModal" class="modal active">
+    <h1>🧋 버블티 펄 퐁퐁!</h1>
+    <p>아래에서 퐁퐁 떠오르는<br>달콤한 타피오카 펄과 과일 젤리를 쏙 터치해<br>컵에 담아 맛있는 버블티를 만들어보세요!</p>
+    <button id="startBtn" class="btn">놀이 시작!</button>
+  </div>
+
+  <div id="overModal" class="modal">
+    <h1>🎉 맛있는 버블티 파티!</h1>
+    <p>오늘 완성한 달콤한 버블티:<br><strong id="finalTea" style="font-size: 1.5rem; color:#d63031;">0</strong> 잔<br>최종 점수: <span id="finalScore">0</span>점<br>최고 점수: <span id="bestScore">0</span>점</p>
+    <button id="restartBtn" class="btn">다시 만들기</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const teaCountEl = document.getElementById('teaCount');
+    const scoreTextEl = document.getElementById('scoreText');
+    const startModal = document.getElementById('startModal');
+    const overModal = document.getElementById('overModal');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const finalTeaEl = document.getElementById('finalTea');
+    const finalScoreEl = document.getElementById('finalScore');
+    const bestScoreEl = document.getElementById('bestScore');
+
+    let W, H;
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+    function playPop(freq = 520) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.8, audioCtx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+    }
+    function playTeaComplete() {
+      if (!audioCtx) return;
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.08 + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + idx * 0.08);
+        osc.stop(audioCtx.currentTime + idx * 0.08 + 0.35);
+      });
+    }
+
+    const PEARL_TYPES = [
+      { name: 'boba', color: '#2d3436', highlight: '#636e72', score: 10, label: '🧋' },
+      { name: 'strawberry', color: '#ff7675', highlight: '#fab1a0', score: 15, label: '🍓' },
+      { name: 'mango', color: '#fdcb6e', highlight: '#ffeaa7', score: 15, label: '🥭' },
+      { name: 'matcha', color: '#00b894', highlight: '#55efc4', score: 20, label: '🍵' },
+      { name: 'star', color: '#a29bfe', highlight: '#dfe6e9', score: 30, label: '⭐' }
+    ];
+
+    let bubbles = [];
+    let particles = [];
+    let collectedPearls = [];
+    let score = 0;
+    let teaCount = 0;
+    let cupLevel = 0; // 0 to 10 pearls to complete
+    let isPlaying = false;
+    let lastSpawn = 0;
+    let celebrationTimer = 0;
+
+    class Bubble {
+      constructor() {
+        this.reset();
+        this.y = H + 40;
+      }
+      reset() {
+        this.type = PEARL_TYPES[Math.floor(Math.random() * PEARL_TYPES.length)];
+        this.radius = 32 + Math.random() * 12;
+        this.x = this.radius + Math.random() * (W - this.radius * 2);
+        this.y = H + this.radius + Math.random() * 80;
+        this.speed = 1.6 + Math.random() * 2.0;
+        this.wobbleSpeed = 0.03 + Math.random() * 0.03;
+        this.wobbleAmp = 12 + Math.random() * 16;
+        this.time = Math.random() * 100;
+        this.popped = false;
+      }
+      update() {
+        this.time += this.wobbleSpeed;
+        this.y -= this.speed;
+        this.currentX = this.x + Math.sin(this.time) * this.wobbleAmp;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.translate(this.currentX, this.y);
+
+        // Outer Soap Bubble
+        const grad = ctx.createRadialGradient(-this.radius*0.3, -this.radius*0.3, 4, 0, 0, this.radius);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+        grad.addColorStop(0.7, 'rgba(255, 255, 255, 0.25)');
+        grad.addColorStop(1, 'rgba(255, 118, 117, 0.4)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Inner Pearl / Jelly
+        const pr = this.radius * 0.55;
+        const pGrad = ctx.createRadialGradient(-pr*0.3, -pr*0.3, 2, 0, 0, pr);
+        pGrad.addColorStop(0, this.type.highlight);
+        pGrad.addColorStop(1, this.type.color);
+        ctx.fillStyle = pGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, pr, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pearl shine
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.beginPath();
+        ctx.arc(-pr*0.35, -pr*0.35, pr*0.25, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    function addSplash(x, y, color) {
+      for (let i = 0; i < 16; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = 2 + Math.random() * 6;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          r: 3 + Math.random() * 5,
+          color: color,
+          alpha: 1.0,
+          gravity: 0.15
+        });
+      }
+    }
+
+    function handlePointer(e) {
+      if (!isPlaying) return;
+      initAudio();
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.clientX - rect.left;
+      const clientY = e.clientY - rect.top;
+
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        const dist = Math.hypot(clientX - b.currentX, clientY - b.y);
+        if (dist <= b.radius + 15) {
+          // Popped!
+          playPop(480 + Math.random() * 200);
+          addSplash(b.currentX, b.y, b.type.highlight);
+          score += b.type.score;
+          scoreTextEl.textContent = score;
+
+          // Add to cup
+          cupLevel++;
+          collectedPearls.push({
+            color: b.type.color,
+            highlight: b.type.highlight,
+            x: (Math.random() - 0.5) * 60,
+            y: -cupLevel * 5
+          });
+
+          if (cupLevel >= 8) {
+            // Cup complete!
+            teaCount++;
+            teaCountEl.textContent = teaCount;
+            playTeaComplete();
+            celebrationTimer = 90;
+            cupLevel = 0;
+            collectedPearls = [];
+            addSplash(W / 2, H - 110, '#ffeaa7');
+            addSplash(W / 2, H - 110, '#ff7675');
+          }
+
+          bubbles.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    window.addEventListener('pointerdown', handlePointer);
+
+    function drawCup(ctx) {
+      const cx = W / 2;
+      const cy = H - 90;
+      const cw = 110;
+      const ch = 130;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Cup Body
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+      ctx.strokeStyle = '#fdcb6e';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-cw/2 + 10, -ch/2);
+      ctx.lineTo(-cw/2 + 20, ch/2);
+      ctx.quadraticCurveTo(0, ch/2 + 15, cw/2 - 20, ch/2);
+      ctx.lineTo(cw/2 - 10, -ch/2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Liquid Fill inside cup
+      const fillHeight = (cupLevel / 8) * (ch * 0.7);
+      if (fillHeight > 0) {
+        ctx.fillStyle = '#ffbe76';
+        ctx.beginPath();
+        ctx.moveTo(-cw/2 + 20, ch/2);
+        ctx.lineTo(-cw/2 + 20 - (fillHeight * 0.05), ch/2 - fillHeight);
+        ctx.quadraticCurveTo(0, ch/2 - fillHeight + 6, cw/2 - 20 + (fillHeight * 0.05), ch/2 - fillHeight);
+        ctx.lineTo(cw/2 - 20, ch/2);
+        ctx.quadraticCurveTo(0, ch/2 + 12, -cw/2 + 20, ch/2);
+        ctx.fill();
+      }
+
+      // Collected Pearls at bottom of cup
+      for (const p of collectedPearls) {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, ch/2 - 12 + p.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Big Straw
+      ctx.fillStyle = '#ff7675';
+      ctx.fillRect(-8, -ch/2 - 35, 16, ch + 20);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-8, -ch/2 - 20);
+      ctx.lineTo(8, -ch/2 - 10);
+      ctx.stroke();
+
+      // Celebration Star Banner
+      if (celebrationTimer > 0) {
+        celebrationTimer--;
+        ctx.font = 'bold 22px Pretendard, sans-serif';
+        ctx.fillStyle = '#d63031';
+        ctx.textAlign = 'center';
+        ctx.fillText('✨ 맛있는 버블티 완성! ✨', 0, -ch/2 - 45);
+      }
+
+      ctx.restore();
+    }
+
+    function loop(now) {
+      ctx.clearRect(0, 0, W, H);
+
+      if (isPlaying) {
+        if (now - lastSpawn > 650 && bubbles.length < 12) {
+          bubbles.push(new Bubble());
+          lastSpawn = now;
+        }
+
+        // Bubbles update & draw
+        for (let i = bubbles.length - 1; i >= 0; i--) {
+          const b = bubbles[i];
+          b.update();
+          b.draw(ctx);
+          if (b.y < -50) {
+            bubbles.splice(i, 1);
+          }
+        }
+
+        // Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravity;
+          p.alpha *= 0.94;
+          if (p.alpha <= 0.05) {
+            particles.splice(i, 1);
+            continue;
+          }
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        drawCup(ctx);
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      teaCount = 0;
+      cupLevel = 0;
+      collectedPearls = [];
+      bubbles = [];
+      particles = [];
+      scoreTextEl.textContent = '0';
+      teaCountEl.textContent = '0';
+      startModal.classList.remove('active');
+      overModal.classList.remove('active');
+      isPlaying = true;
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

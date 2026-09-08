@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 248개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 250개.
 
-[![Games](https://img.shields.io/badge/games-248-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-250-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![248개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![250개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 248개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 250개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🚀 250호 기념 우주 별자리 레인저 (space-constellation-ranger)](./space-constellation-ranger) | 반짝이는 은하계 밤하늘을 우주선으로 비행하며 250개의 별빛 크리스탈을 모으고 신비로운 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이 | 어린이/탐험·우주 |
+| [🧋 버블티 펄 퐁퐁 (bubble-tea-pop)](./bubble-tea-pop) | 화면 아래에서 퐁퐁 떠오르는 달콤한 타피오카 펄과 과일 젤리를 쏙 터치해 컵에 담아 맛있는 무지개 버블티를 완성하는 힐링 터치 놀이 | 어린이/반응·터치 |
 | [🫧 반짝반짝 심해 잠수함 탐험 (twinkle-deepsea-submarine)](./twinkle-deepsea-submarine) | 신비로운 심해 바닷속을 노란 잠수함으로 유영하며 해파리와 산호초를 피해 진주조개와 황금 보물상자를 모으는 힐링 수중 탐험 놀이 | 어린이/탐험·수중 |
 | [🍮 말랑말랑 젤리 트램펄린 (sweet-jelly-trampoline)](./sweet-jelly-trampoline) | 말랑말랑 통통 튀는 무지개 푸딩 젤리 트램펄린을 좌우로 움직여 아기 곰 인형과 별사탕을 높이높이 튕겨 올리는 경쾌한 터치 바운스 놀이 | 어린이/액션·바운스 |
 | [✨ 우주 별자리 잇기 탐험 (cosmic-star-weaver)](./cosmic-star-weaver) | 반짝이는 우주 공간에서 별들을 선으로 이어 신비로운 별자리를 완성하는 공간 지각 놀이 | 어린이/공간·별자리 |
@@ -445,6 +447,7 @@ VS Code `Live Server` 확장을 써도 된다.
 
 ## 최근 변경사항 (2026-09)
 
+- **🧋 버블티 펄 퐁퐁 · 🚀 250호 기념 우주 별자리 레인저 추가 (2026-09-09)** — 타피오카 펄 버블티 제조 힐링 터치 놀이와 250회 기념 우주 별자리 완성 스페이스 어드벤처 미니게임 2종 추가 (총 250개 대기록 달성). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
 - **🍮 말랑말랑 젤리 트램펄린 · 🫧 반짝반짝 심해 잠수함 탐험 추가 (2026-09-08)** — 푸딩 젤리 트램펄린 바운스 놀이와 심해 잠수함 유영 탐험 미니게임 2종 추가 (총 248개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, 터치 반응형 최적화.
 - **🐧 오로라 펭귄의 눈썰매 슬라이드 · ✨ 우주 별자리 잇기 탐험 추가 (2026-09-06)** — 오로라 빙판길을 미끄러지는 스피드 슬라이드와 우주 별들을 선으로 잇는 별자리 지각 미니게임 2종 추가 (총 246개). 단일 HTML, 외부 의존성 없음, Pointer Events 통합 조작.
 - **🌈 알록달록 무지개 비눗방울 팡팡 · 🔮 반짝반짝 마법 수정 동굴 탐험 추가 (2026-09-05)** — 화면 가득 떠오르는 비눗방울 터치 놀이와 보석 카트 수집 아케이드 미니게임 2종 추가 (총 244개). 단일 HTML, 외부 의존성 없음.

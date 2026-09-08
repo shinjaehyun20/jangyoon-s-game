@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🚀 250호 기념 우주 별자리 레인저 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #0b0c1b;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(26, 28, 56, 0.85);
+      border: 2px solid #fdcb6e;
+      color: #ffeaa7;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .stats {
+      display: flex;
+      gap: 12px;
+    }
+    .pill {
+      background: rgba(26, 28, 56, 0.9);
+      border: 2px solid #a29bfe;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #74b9ff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal {
+      position: absolute;
+      z-index: 20;
+      background: rgba(18, 19, 38, 0.95);
+      border: 3px solid #fdcb6e;
+      padding: 36px 40px;
+      border-radius: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      text-align: center;
+      max-width: 90%;
+      width: 400px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal h1 {
+      font-size: 1.85rem;
+      color: #ffeaa7;
+    }
+    .modal .badge {
+      background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+      color: #2d3436;
+      font-size: 0.85rem;
+      font-weight: 900;
+      padding: 4px 14px;
+      border-radius: 999px;
+    }
+    .modal p {
+      font-size: 1.05rem;
+      color: #dfe6e9;
+      line-height: 1.6;
+    }
+    .btn {
+      background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+      color: #0b0c1b;
+      border: none;
+      padding: 14px 44px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(253, 203, 110, 0.35);
+      transition: transform 0.15s;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="ui-layer">
+    <a href="../" class="home-btn">🏠 홈으로</a>
+    <div class="stats">
+      <div class="pill">✨ 별자리: <span id="constelCount">0</span>/6</div>
+      <div class="pill">⭐ 점수: <span id="scoreText">0</span></div>
+    </div>
+  </div>
+
+  <div id="startModal" class="modal active">
+    <span class="badge">🎉 250호 기념 스페셜 어드벤처</span>
+    <h1>🚀 우주 별자리 레인저!</h1>
+    <p>우주선을 조종해 밤하늘을 누비며<br>반짝이는 크리스탈 별을 모아<br>신비로운 별자리들을 완성해보세요!</p>
+    <button id="startBtn" class="btn">비행 시작!</button>
+  </div>
+
+  <div id="overModal" class="modal">
+    <span class="badge">🏆 250개 게임 대기록 달성 축하!</span>
+    <h1>🌌 은하계의 위대한 레인저!</h1>
+    <p>모든 별자리를 눈부시게 밝혔습니다!<br>완성한 별자리: <strong id="finalConstel" style="font-size: 1.4rem; color:#ffeaa7;">0</strong> 개<br>최종 점수: <span id="finalScore">0</span>점<br>최고 기록: <span id="bestScore">0</span>점</p>
+    <button id="restartBtn" class="btn">다시 탐험하기</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const constelCountEl = document.getElementById('constelCount');
+    const scoreTextEl = document.getElementById('scoreText');
+    const startModal = document.getElementById('startModal');
+    const overModal = document.getElementById('overModal');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const finalConstelEl = document.getElementById('finalConstel');
+    const finalScoreEl = document.getElementById('finalScore');
+    const bestScoreEl = document.getElementById('bestScore');
+
+    let W, H;
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+    function playStarChime(freq = 600) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + 0.25);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.25);
+    }
+    function playFanfare() {
+      if (!audioCtx) return;
+      const chord = [523.25, 659.25, 783.99, 1046.5, 1318.5]; // C E G C E
+      chord.forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.1);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.4);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + i * 0.1);
+        osc.stop(audioCtx.currentTime + i * 0.1 + 0.4);
+      });
+    }
+
+    // Constellations Definitions (Normalized coords 0.0 to 1.0)
+    const CONSTELLATIONS = [
+      {
+        name: '북두칠성 (큰곰자리)',
+        symbol: '🐻',
+        stars: [
+          {x: 0.2, y: 0.35}, {x: 0.32, y: 0.32}, {x: 0.44, y: 0.38},
+          {x: 0.55, y: 0.45}, {x: 0.68, y: 0.42}, {x: 0.75, y: 0.55}, {x: 0.62, y: 0.6}
+        ],
+        lines: [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,3]]
+      },
+      {
+        name: '카시오페이아자리 (W)',
+        symbol: '👑',
+        stars: [
+          {x: 0.22, y: 0.4}, {x: 0.35, y: 0.6}, {x: 0.5, y: 0.45},
+          {x: 0.65, y: 0.65}, {x: 0.78, y: 0.38}
+        ],
+        lines: [[0,1], [1,2], [2,3], [3,4]]
+      },
+      {
+        name: '오리온자리 (사냥꾼)',
+        symbol: '🏹',
+        stars: [
+          {x: 0.35, y: 0.3}, {x: 0.65, y: 0.3},
+          {x: 0.45, y: 0.5}, {x: 0.5, y: 0.5}, {x: 0.55, y: 0.5},
+          {x: 0.35, y: 0.7}, {x: 0.65, y: 0.7}
+        ],
+        lines: [[0,2], [1,4], [2,3], [3,4], [2,5], [4,6], [0,1], [5,6]]
+      },
+      {
+        name: '백조자리 (십자가)',
+        symbol: '🦢',
+        stars: [
+          {x: 0.5, y: 0.25}, {x: 0.5, y: 0.45}, {x: 0.5, y: 0.65}, {x: 0.5, y: 0.8},
+          {x: 0.3, y: 0.45}, {x: 0.7, y: 0.45}
+        ],
+        lines: [[0,1], [1,2], [2,3], [4,1], [1,5]]
+      },
+      {
+        name: '페가수스자리 (날개말)',
+        symbol: '🦄',
+        stars: [
+          {x: 0.35, y: 0.35}, {x: 0.65, y: 0.35},
+          {x: 0.65, y: 0.65}, {x: 0.35, y: 0.65},
+          {x: 0.2, y: 0.25}, {x: 0.8, y: 0.75}
+        ],
+        lines: [[0,1], [1,2], [2,3], [3,0], [0,4], [2,5]]
+      },
+      {
+        name: '황소자리 (플레이아데스)',
+        symbol: '🐂',
+        stars: [
+          {x: 0.3, y: 0.35}, {x: 0.45, y: 0.45}, {x: 0.6, y: 0.5},
+          {x: 0.75, y: 0.35}, {x: 0.5, y: 0.65}, {x: 0.65, y: 0.7}
+        ],
+        lines: [[0,1], [1,2], [2,3], [1,4], [4,5], [2,5]]
+      }
+    ];
+
+    // Background Twinkling Stars
+    const bgStars = [];
+    for (let i = 0; i < 70; i++) {
+      bgStars.push({
+        x: Math.random(),
+        y: Math.random(),
+        r: 1 + Math.random() * 2,
+        twinkle: Math.random() * Math.PI * 2,
+        spd: 0.02 + Math.random() * 0.03
+      });
+    }
+
+    // Ship State
+    const ship = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight * 0.8,
+      tx: window.innerWidth / 2,
+      ty: window.innerHeight * 0.8,
+      angle: 0
+    };
+
+    let currentConstelIdx = 0;
+    let currentStars = [];
+    let completedConstels = 0;
+    let score = 0;
+    let isPlaying = false;
+    let particles = [];
+    let bannerTimer = 0;
+    let bannerText = '';
+
+    function loadConstellation(idx) {
+      const c = CONSTELLATIONS[idx % CONSTELLATIONS.length];
+      currentStars = c.stars.map((s, i) => ({
+        x: s.x * W,
+        y: (s.y * 0.65 + 0.15) * H,
+        collected: false,
+        radius: 14,
+        pulse: i * 0.5
+      }));
+    }
+
+    function addSparkles(x, y, color, count = 15) {
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 2 + Math.random() * 5;
+        particles.push({
+          x: x, y: y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          r: 3 + Math.random() * 4,
+          color: color,
+          alpha: 1.0
+        });
+      }
+    }
+
+    function onPointerMove(e) {
+      if (!isPlaying) return;
+      initAudio();
+      const rect = canvas.getBoundingClientRect();
+      ship.tx = e.clientX - rect.left;
+      ship.ty = e.clientY - rect.top;
+    }
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerdown', (e) => {
+      onPointerMove(e);
+      initAudio();
+    });
+
+    function updateGame() {
+      // Ship smooth follow
+      const dx = ship.tx - ship.x;
+      const dy = ship.ty - ship.y;
+      ship.x += dx * 0.14;
+      ship.y += dy * 0.14;
+      if (Math.hypot(dx, dy) > 2) {
+        ship.angle = Math.atan2(dy, dx) + Math.PI / 2;
+      }
+
+      // Collect Stars
+      const cData = CONSTELLATIONS[currentConstelIdx % CONSTELLATIONS.length];
+      let newlyCollected = false;
+      let allDone = true;
+
+      for (let i = 0; i < currentStars.length; i++) {
+        const s = currentStars[i];
+        s.pulse += 0.05;
+        if (!s.collected) {
+          allDone = false;
+          const dist = Math.hypot(ship.x - s.x, ship.y - s.y);
+          if (dist < 32) {
+            s.collected = true;
+            newlyCollected = true;
+            playStarChime(500 + i * 80);
+            addSparkles(s.x, s.y, '#fdcb6e', 12);
+            score += 50;
+            scoreTextEl.textContent = score;
+          }
+        }
+      }
+
+      // Check if all stars in constellation collected
+      if (allDone && !bannerTimer) {
+        completedConstels++;
+        constelCountEl.textContent = completedConstels;
+        playFanfare();
+        bannerTimer = 120;
+        bannerText = `${cData.symbol} ${cData.name} 완성!`;
+        addSparkles(W / 2, H / 2, '#74b9ff', 35);
+        addSparkles(W / 2, H / 2, '#fdcb6e', 35);
+        score += 300;
+        scoreTextEl.textContent = score;
+
+        setTimeout(() => {
+          if (completedConstels >= 6) {
+            // Victory!
+            isPlaying = false;
+            finalConstelEl.textContent = completedConstels;
+            finalScoreEl.textContent = score;
+            const best = Math.max(score, parseInt(localStorage.getItem('jangyoon_ranger_best') || '0'));
+            localStorage.setItem('jangyoon_ranger_best', best);
+            bestScoreEl.textContent = best;
+            overModal.classList.add('active');
+          } else {
+            currentConstelIdx++;
+            loadConstellation(currentConstelIdx);
+          }
+        }, 1500);
+      }
+    }
+
+    function draw(ctx) {
+      ctx.fillStyle = '#0b0c1b';
+      ctx.fillRect(0, 0, W, H);
+
+      // Nebula background glow
+      const nebGrad = ctx.createRadialGradient(W*0.5, H*0.4, 50, W*0.5, H*0.4, W*0.6);
+      nebGrad.addColorStop(0, 'rgba(108, 92, 231, 0.25)');
+      nebGrad.addColorStop(0.5, 'rgba(116, 185, 255, 0.12)');
+      nebGrad.addColorStop(1, 'rgba(11, 12, 27, 0)');
+      ctx.fillStyle = nebGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Background twinkling stars
+      for (const bs of bgStars) {
+        bs.twinkle += bs.spd;
+        const alpha = 0.3 + Math.sin(bs.twinkle) * 0.25;
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(bs.x * W, bs.y * H, bs.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (isPlaying || bannerTimer > 0) {
+        const cData = CONSTELLATIONS[currentConstelIdx % CONSTELLATIONS.length];
+
+        // Draw Constellation Connecting Lines
+        for (const [a, b] of cData.lines) {
+          const sa = currentStars[a];
+          const sb = currentStars[b];
+          if (sa && sb) {
+            ctx.beginPath();
+            ctx.moveTo(sa.x, sa.y);
+            ctx.lineTo(sb.x, sb.y);
+            if (sa.collected && sb.collected) {
+              ctx.strokeStyle = 'rgba(253, 203, 110, 0.85)';
+              ctx.lineWidth = 3.5;
+              ctx.shadowColor = '#fdcb6e';
+              ctx.shadowBlur = 10;
+            } else {
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+              ctx.lineWidth = 1.5;
+              ctx.shadowBlur = 0;
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          }
+        }
+
+        // Draw Constellation Stars
+        for (let i = 0; i < currentStars.length; i++) {
+          const s = currentStars[i];
+          const pulseR = s.radius + Math.sin(s.pulse) * 3;
+
+          ctx.save();
+          ctx.translate(s.x, s.y);
+
+          if (s.collected) {
+            // Glowing collected star
+            ctx.fillStyle = '#ffeaa7';
+            ctx.shadowColor = '#fdcb6e';
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.arc(0, 0, pulseR, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 0, pulseR * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            // Uncollected crystal star
+            ctx.strokeStyle = '#74b9ff';
+            ctx.lineWidth = 2;
+            ctx.fillStyle = 'rgba(116, 185, 255, 0.4)';
+            ctx.beginPath();
+            ctx.arc(0, 0, pulseR, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 0, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        // Ship Draw
+        ctx.save();
+        ctx.translate(ship.x, ship.y);
+        ctx.rotate(ship.angle);
+
+        // Rocket Thruster Fire
+        ctx.fillStyle = '#ff7675';
+        ctx.beginPath();
+        ctx.moveTo(-6, 16);
+        ctx.lineTo(6, 16);
+        ctx.lineTo(0, 26 + Math.random() * 8);
+        ctx.closePath();
+        ctx.fill();
+
+        // Spaceship Body
+        ctx.fillStyle = '#dfe6e9';
+        ctx.beginPath();
+        ctx.moveTo(0, -22);
+        ctx.lineTo(14, 14);
+        ctx.lineTo(-14, 14);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cockpit Glass
+        ctx.fillStyle = '#74b9ff';
+        ctx.beginPath();
+        ctx.arc(0, -4, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Wing details
+        ctx.fillStyle = '#fdcb6e';
+        ctx.fillRect(-16, 8, 5, 8);
+        ctx.fillRect(11, 8, 5, 8);
+
+        ctx.restore();
+
+        // Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha *= 0.93;
+          if (p.alpha <= 0.05) {
+            particles.splice(i, 1);
+            continue;
+          }
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Completion Banner
+        if (bannerTimer > 0) {
+          bannerTimer--;
+          ctx.font = 'bold 26px Pretendard, sans-serif';
+          ctx.fillStyle = '#ffeaa7';
+          ctx.textAlign = 'center';
+          ctx.shadowColor = 'rgba(0,0,0,0.8)';
+          ctx.shadowBlur = 10;
+          ctx.fillText(`✨ ${bannerText} ✨`, W / 2, H * 0.22);
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    function loop() {
+      if (isPlaying) {
+        updateGame();
+      }
+      draw(ctx);
+      requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      completedConstels = 0;
+      currentConstelIdx = 0;
+      scoreTextEl.textContent = '0';
+      constelCountEl.textContent = '0';
+      startModal.classList.remove('active');
+      overModal.classList.remove('active');
+      loadConstellation(0);
+      isPlaying = true;
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

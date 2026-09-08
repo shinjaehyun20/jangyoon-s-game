@@ -1982,5 +1982,21 @@
     "description": "신비로운 심해 바닷속을 노란 잠수함으로 유영하며 해파리와 산호초를 피해 반짝이는 진주조개와 황금 보물상자를 쏙쏙 모으는 힐링 수중 탐험 놀이입니다.",
     "thumbnail": "twinkle-deepsea-submarine/thumb.svg",
     "path": "twinkle-deepsea-submarine/index.html"
+  },
+  {
+    "id": "bubble-tea-pop",
+    "title": "Bubble Tea Pearl Pop",
+    "title_ko": "🧋 버블티 펄 퐁퐁",
+    "description": "화면 아래에서 퐁퐁 떠오르는 달콤한 타피오카 펄과 과일 젤리를 쏙 터치해 컵에 담아 맛있는 무지개 버블티를 완성하는 힐링 터치 놀이입니다.",
+    "thumbnail": "bubble-tea-pop/thumb.svg",
+    "path": "bubble-tea-pop/index.html"
+  },
+  {
+    "id": "space-constellation-ranger",
+    "title": "Space Constellation Ranger",
+    "title_ko": "🚀 250호 기념 우주 별자리 레인저",
+    "description": "반짝이는 은하계 밤하늘을 우주선으로 비행하며 250개의 별빛 크리스탈을 모으고 신비로운 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이입니다.",
+    "thumbnail": "space-constellation-ranger/thumb.svg",
+    "path": "space-constellation-ranger/index.html"
   }
 ]
