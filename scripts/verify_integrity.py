@@ -31,6 +31,7 @@ README_MD = REPO_ROOT / "README.md"
 INDEX_HTML = REPO_ROOT / "index.html"
 GITHUB_ABOUT = REPO_ROOT / "docs" / "github-about.md"
 HERO_SVG = REPO_ROOT / "docs" / "assets" / "portfolio-hero.svg"
+CHANGES_MD = REPO_ROOT / "CHANGES.md"
 
 REQUIRED_GAME_FIELDS = ["id", "title", "title_ko", "description", "thumbnail", "path"]
 EXCLUDED_DIRS = {".git", ".claude", ".github", "__pycache__", "_candidates", "docs", "games", "marketing", "output", "scripts"}
@@ -145,28 +146,80 @@ def check_all():
             if item.is_dir():
                 errors.append(f"루트가 아닌 'games/' 하위로 오배치된 게임 폴더 발견: {item.name}")
 
-    # [4] 카운터 동기화 검증
+    # [4] 카운터 및 문서 동기화 전수 검증 (README.md, index.html, docs/github-about.md, CHANGES.md, SVG)
     count_str = str(total_games)
     
     # 4-1. README.md
     if README_MD.exists():
         readme_txt = README_MD.read_text(encoding="utf-8")
-        if f"games-{count_str}-6C5CE7" not in readme_txt and f"어린이 미니게임 {count_str}개" not in readme_txt:
-            warnings.append(f"README.md의 게임 카운터가 최신 수치({count_str})와 일치하지 않을 수 있습니다.")
+        if f"games-{count_str}-6C5CE7" not in readme_txt:
+            errors.append(f"README.md 배지 카운터 오류 (badge/games-{count_str}-6C5CE7 미발견)")
+        if f"어린이 미니게임 {count_str}개" not in readme_txt:
+            errors.append(f"README.md 상단 설명 카운터 오류 ('어린이 미니게임 {count_str}개' 미발견)")
+        if f"[{count_str}개의 게임을" not in readme_txt:
+            errors.append(f"README.md 히어로 링크 카운터 오류 ('{count_str}개의 게임을' 미발견)")
+        if f"전체 {count_str}개 게임 목록" not in readme_txt:
+            errors.append(f"README.md summary 카운터 오류 ('전체 {count_str}개 게임 목록' 미발견)")
+        
+        # README.md 게임 목록 표 행 1:1 정합성 검증
+        details_match = re.search(r'<details>\s*<summary><strong>전체 \d+개 게임 목록 펼치기</strong></summary>(.*?)</details>', readme_txt, re.DOTALL)
+        if not details_match:
+            errors.append("README.md 내 전체 게임 목록 <details> 표가 존재하지 않습니다.")
+        else:
+            table_rows = [l for l in details_match.group(1).splitlines() if l.strip().startswith('| [')]
+            if len(table_rows) != total_games:
+                errors.append(f"README.md 게임 목록 표 행 개수 불일치: 표({len(table_rows)}행) != games.json({total_games}개)")
+            else:
+                print(f"[*] README.md 게임 목록 표 1:1 동기화 정상 확인 ({len(table_rows)}/{total_games}행)")
 
-    # 4-2. index.html
+        # README.md 중복 섹션 헤더 검출
+        for h_year in ["2026-09", "2026-08", "2026-07", "2026-06", "2026-05", "2026-04"]:
+            header_pattern = f"## 최근 변경사항 ({h_year})"
+            h_count = readme_txt.count(header_pattern)
+            if h_count > 1:
+                errors.append(f"README.md 내 '{header_pattern}' 중복 헤더 검출 ({h_count}회)")
+    else:
+        errors.append("README.md 파일이 존재하지 않습니다.")
+
+    # 4-2. docs/github-about.md
+    if GITHUB_ABOUT.exists():
+        about_txt = GITHUB_ABOUT.read_text(encoding="utf-8")
+        if f"{count_str}개 어린이" not in about_txt:
+            errors.append(f"docs/github-about.md 카운터 오류 ('{count_str}개 어린이' 미발견)")
+        if "244개" in about_txt or "246개" in about_txt:
+            errors.append("docs/github-about.md 내 구버전 잔여 카운터(244개 또는 246개) 발견")
+        print(f"[*] docs/github-about.md 정합성 정상 확인 ({count_str}개)")
+    else:
+        errors.append("docs/github-about.md 파일이 존재하지 않습니다.")
+
+    # 4-3. index.html
     if INDEX_HTML.exists():
         html_txt = INDEX_HTML.read_text(encoding="utf-8")
         if f"총 {count_str}개의" not in html_txt:
-            warnings.append(f"index.html의 메타 설명 내 게임 카운터가 최신 수치({count_str})와 일치하지 않습니다.")
+            errors.append(f"index.html 메타 설명 내 카운터 오류 ('총 {count_str}개의' 미발견)")
+        print(f"[*] index.html 메타 카운터 정상 확인 ({count_str}개)")
+    else:
+        errors.append("index.html 파일이 존재하지 않습니다.")
 
-    # 4-3. portfolio-hero.svg
+    # 4-4. portfolio-hero.svg
     if HERO_SVG.exists():
         hero_txt = HERO_SVG.read_text(encoding="utf-8")
         if f">{count_str}</text>" not in hero_txt and f"{count_str}개 어린이용" not in hero_txt:
-            warnings.append(f"portfolio-hero.svg 내 표시 숫자가 최신 수치({count_str})와 일치하지 않습니다.")
+            errors.append(f"portfolio-hero.svg 내 카운터 오류 ({count_str} 미발견)")
+        print(f"[*] portfolio-hero.svg 카운터 정상 확인 ({count_str}개)")
+    else:
+        errors.append("portfolio-hero.svg 파일이 존재하지 않습니다.")
 
-    # 4-4. GitHub About Description Check & Auto-sync via gh CLI
+    # 4-5. CHANGES.md
+    if CHANGES_MD.exists():
+        changes_txt = CHANGES_MD.read_text(encoding="utf-8")
+        if f"총 {count_str}개" not in changes_txt:
+            errors.append(f"CHANGES.md 내 최신 총 게임 카운터('총 {count_str}개') 미발견")
+        print(f"[*] CHANGES.md 최신 게임 이력 정상 확인")
+    else:
+        errors.append("CHANGES.md 파일이 존재하지 않습니다.")
+
+    # 4-6. GitHub About Description Check & Auto-sync via gh CLI
     try:
         gh_view = subprocess.run(["gh", "repo", "view", "shinjaehyun20/jangyoon-s-game", "--json", "description"], capture_output=True, text=True, timeout=5)
         if gh_view.returncode == 0:
@@ -176,10 +229,12 @@ def check_all():
                 new_desc = f"터치로 바로 즐기는 {count_str}개 어린이 미니게임 아케이드 — 학습, 액션, 퍼즐, 창의 놀이."
                 subprocess.run(["gh", "repo", "edit", "shinjaehyun20/jangyoon-s-game", "--description", new_desc], check=False)
                 print(f"[*] GitHub Repo Description 자동 갱신 완료 -> {new_desc}")
+            else:
+                print(f"[*] GitHub Repo Description 최신 일치 확인 -> {gh_desc}")
     except Exception as e:
         warnings.append(f"gh CLI Description 확인 실패 (네트워크 또는 비설치): {e}")
 
-    # 4-5. Git Branches Hygiene (No lingering merged worktree/branches)
+    # 4-7. Git Branches Hygiene (No lingering merged worktree/branches)
     try:
         br_res = subprocess.run(["git", "branch", "-r", "--merged", "origin/main"], capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=5)
         if br_res.returncode == 0:
@@ -188,6 +243,7 @@ def check_all():
                 warnings.append(f"origin/main에 머지된 후 삭제되지 않은 원격 브랜치 발견: {', '.join(lingering)}")
     except Exception:
         pass
+
 
     # [5] 게임 다양성 및 메커니즘 분석 리포트
     print("\n--- 🧩 게임 메커니즘 및 다양성 분석 리포트 ---")
