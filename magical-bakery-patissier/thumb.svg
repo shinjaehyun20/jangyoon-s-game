@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bakeryBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff1eb"/>
+      <stop offset="100%" stop-color="#ace0f9"/>
+    </linearGradient>
+    <linearGradient id="goldPlate" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f1c40f"/>
+      <stop offset="100%" stop-color="#e67e22"/>
+    </linearGradient>
+    <linearGradient id="cakeCream" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7675"/>
+      <stop offset="100%" stop-color="#fd79a8"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="400" height="300" rx="24" fill="url(#bakeryBg)"/>
+
+  <!-- Ambient Sparkles -->
+  <circle cx="70" cy="70" r="14" fill="#ff7675" opacity="0.6"/>
+  <circle cx="330" cy="80" r="18" fill="#55efc4" opacity="0.7"/>
+  <circle cx="80" cy="210" r="16" fill="#a29bfe" opacity="0.6"/>
+  <circle cx="340" cy="220" r="14" fill="#ffeaa7" opacity="0.8"/>
+
+  <!-- Tiered Cake on Golden Plate -->
+  <!-- Golden Tray -->
+  <ellipse cx="200" cy="235" rx="100" ry="18" fill="url(#goldPlate)"/>
+  <ellipse cx="200" cy="230" rx="90" ry="14" fill="#ffeaa7"/>
+
+  <!-- Layer 1 -->
+  <path d="M125 210 Q200 220 275 210 L275 180 Q200 190 125 180 Z" fill="#fab1a0"/>
+  <path d="M125 180 Q200 190 275 180 Q200 170 125 180 Z" fill="#ffffff"/>
+
+  <!-- Layer 2 -->
+  <path d="M145 170 Q200 180 255 170 L255 145 Q200 155 145 145 Z" fill="#ffeaa7"/>
+  <path d="M145 145 Q200 155 255 145 Q200 135 145 145 Z" fill="#ffffff"/>
+
+  <!-- Layer 3 -->
+  <path d="M165 135 Q200 145 235 135 L235 115 Q200 125 165 115 Z" fill="url(#cakeCream)"/>
+  <path d="M165 115 Q200 125 235 115 Q200 105 165 115 Z" fill="#ffffff"/>
+
+  <!-- Top Strawberry -->
+  <circle cx="200" cy="95" r="14" fill="#ff4757"/>
+  <polygon points="195,85 200,75 205,85" fill="#2ed573"/>
+  <circle cx="196" cy="93" r="2" fill="#ffffff"/>
+  <circle cx="204" cy="95" r="2" fill="#ffffff"/>
+
+  <!-- Floating Toppings -->
+  <text x="100" y="110" font-size="28">🍓</text>
+  <text x="280" y="120" font-size="28">⭐</text>
+  <text x="130" y="70" font-size="26">🍦</text>
+  <text x="250" y="65" font-size="26">🍒</text>
+
+  <!-- Title Banner -->
+  <rect x="50" y="248" width="300" height="38" rx="19" fill="#ffffff" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.15))"/>
+  <text x="200" y="273" font-family="'Pretendard', sans-serif" font-weight="900" font-size="18" fill="#d63031" text-anchor="middle">🧁 달콤 마법 베이커리</text>
+</svg>

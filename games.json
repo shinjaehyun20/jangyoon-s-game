@@ -1998,5 +1998,21 @@
     "description": "반짝이는 은하계 밤하늘을 우주선으로 비행하며 250개의 별빛 크리스탈을 모으고 신비로운 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이입니다.",
     "thumbnail": "space-constellation-ranger/thumb.svg",
     "path": "space-constellation-ranger/index.html"
+  },
+  {
+    "id": "magical-bakery-patissier",
+    "title": "Magical Bakery Patissier",
+    "title_ko": "🧁 달콤 마법 베이커리 파티시에",
+    "description": "하늘에서 솔솔 내려오는 알록달록 무지개 생크림, 달콤한 딸기, 별사탕 토핑을 황금 케이크 받침대로 쏙쏙 받아 화려한 마법 케이크를 완성하는 터치 베이킹 놀이입니다.",
+    "thumbnail": "magical-bakery-patissier/thumb.svg",
+    "path": "magical-bakery-patissier/index.html"
+  },
+  {
+    "id": "cloud-whale-dream-voyage",
+    "title": "Cloud Whale Dream Voyage",
+    "title_ko": "🐳 몽실몽실 구름고래의 꿈나라 비행",
+    "description": "밤하늘을 자유롭게 유영하는 귀여운 핑크 구름고래를 터치/드래그하여 반짝이는 별빛 링을 통과하고 황금 별사탕을 모아 신비로운 오로라를 완성하는 힐링 플라잉 놀이입니다.",
+    "thumbnail": "cloud-whale-dream-voyage/thumb.svg",
+    "path": "cloud-whale-dream-voyage/index.html"
   }
 ]

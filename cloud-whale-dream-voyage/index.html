@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐳 몽실몽실 구름고래의 꿈나라 비행 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(135deg, #1e130c 0%, #2a5298 50%, #9b51e0 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #a29bfe;
+      color: #6c5ce7;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .stats {
+      display: flex;
+      gap: 12px;
+    }
+    .pill {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #6c5ce7;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2d3436;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 12, 41, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+      text-align: center;
+    }
+    .modal-box {
+      background: #ffffff;
+      padding: 32px 28px;
+      border-radius: 28px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+      border: 4px solid #a29bfe;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #6c5ce7;
+      margin-bottom: 12px;
+    }
+    .modal-desc {
+      font-size: 1rem;
+      color: #636e72;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      word-break: keep-all;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px 36px;
+      border-radius: 999px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+      transition: transform 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 홈으로</a>
+    <div class="stats">
+      <div class="pill"><span>⭐</span><span id="scoreText">0</span></div>
+      <div class="pill"><span>🌈</span><span id="auroraText">0</span></div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-title">🐳 몽실몽실 구름고래!</div>
+      <div class="modal-desc">
+        손가락이나 마우스로 귀여운 핑크 구름고래를 움직여 밤하늘을 자유롭게 날아보세요!<br><br>
+        반짝이는 별빛 링을 통과하고 황금 별사탕을 모으면 하늘에 화려한 오로라가 펼쳐져요! ✨
+      </div>
+      <button id="startBtn" class="start-btn">비행 시작! 🌌</button>
+    </div>
+  </div>
+
+  <script>
+    class WindChimeAudio {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playStar() {
+        if (!this.ctx) return;
+        const scale = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50]; // Pentatonic
+        const freq = scale[Math.floor(Math.random() * scale.length)];
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.35);
+      }
+      playRing() {
+        if (!this.ctx) return;
+        [659.25, 880.00, 1318.51].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.06);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.06 + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + i * 0.06);
+          osc.stop(this.ctx.currentTime + i * 0.06 + 0.3);
+        });
+      }
+    }
+
+    const audio = new WindChimeAudio();
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreText = document.getElementById('scoreText');
+    const auroraText = document.getElementById('auroraText');
+    const startModal = document.getElementById('startModal');
+    const startBtn = document.getElementById('startBtn');
+
+    let W = 0, H = 0;
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let isPlaying = false;
+    let score = 0;
+    let aurorasCount = 0;
+
+    // Whale Player
+    const whale = {
+      x: W * 0.25,
+      y: H * 0.5,
+      targetX: W * 0.25,
+      targetY: H * 0.5,
+      vx: 0,
+      vy: 0,
+      size: 48,
+      tailAngle: 0
+    };
+
+    let starsBg = [];
+    for (let i = 0; i < 70; i++) {
+      starsBg.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 2 + 1,
+        speed: Math.random() * 0.8 + 0.4,
+        twinkle: Math.random() * Math.PI
+      });
+    }
+
+    let rings = [];
+    let items = [];
+    let particles = [];
+    let trail = [];
+
+    function spawnRing() {
+      rings.push({
+        x: W + 80,
+        y: Math.random() * (H - 200) + 100,
+        radius: 54,
+        speed: 3.2,
+        passed: false
+      });
+    }
+
+    function spawnStar() {
+      items.push({
+        x: W + 40,
+        y: Math.random() * (H - 160) + 80,
+        radius: 20,
+        speed: 3.6,
+        emoji: ['⭐', '✨', '🌟', '🌙'][Math.floor(Math.random() * 4)],
+        points: 20
+      });
+    }
+
+    function handleInput(clientX, clientY) {
+      whale.targetX = Math.max(60, Math.min(W - 60, clientX));
+      whale.targetY = Math.max(80, Math.min(H - 80, clientY));
+    }
+
+    window.addEventListener('mousemove', e => handleInput(e.clientX, e.clientY));
+    window.addEventListener('touchmove', e => {
+      if (e.touches.length > 0) handleInput(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    window.addEventListener('touchstart', e => {
+      if (e.touches.length > 0) handleInput(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    startBtn.addEventListener('click', () => {
+      audio.init();
+      startModal.style.display = 'none';
+      isPlaying = true;
+      score = 0;
+      aurorasCount = 0;
+      rings = [];
+      items = [];
+      particles = [];
+      trail = [];
+      scoreText.textContent = score;
+      auroraText.textContent = aurorasCount;
+    });
+
+    let ringTimer = 0;
+    let starTimer = 0;
+    let lastTime = performance.now();
+
+    function gameLoop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // 1. Draw Starfield Background
+      starsBg.forEach(s => {
+        s.x -= s.speed;
+        if (s.x < 0) s.x = W;
+        s.twinkle += 0.05;
+        const alpha = 0.5 + Math.sin(s.twinkle) * 0.4;
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      if (isPlaying) {
+        // Whale Movement
+        whale.x += (whale.targetX - whale.x) * 0.12;
+        whale.y += (whale.targetY - whale.y) * 0.12;
+        whale.tailAngle += 0.1;
+
+        // Trail
+        trail.push({ x: whale.x - 30, y: whale.y, alpha: 0.8, size: 16 });
+        if (trail.length > 25) trail.shift();
+
+        // Draw Trail
+        for (let i = trail.length - 1; i >= 0; i--) {
+          const t = trail[i];
+          t.x -= 2;
+          t.alpha -= 0.03;
+          if (t.alpha <= 0) {
+            trail.splice(i, 1);
+            continue;
+          }
+          ctx.fillStyle = `rgba(255, 182, 193, ${t.alpha * 0.6})`;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, t.size * (t.alpha), 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Spawners
+        ringTimer += dt;
+        if (ringTimer > 2.2) {
+          ringTimer = 0;
+          spawnRing();
+        }
+
+        starTimer += dt;
+        if (starTimer > 0.9) {
+          starTimer = 0;
+          spawnStar();
+        }
+
+        // Update & Draw Rings
+        for (let i = rings.length - 1; i >= 0; i--) {
+          const r = rings[i];
+          r.x -= r.speed;
+
+          // Collision with Whale
+          const dist = Math.hypot(whale.x - r.x, whale.y - r.y);
+          if (!r.passed && dist < r.radius) {
+            r.passed = true;
+            score += 50;
+            aurorasCount++;
+            scoreText.textContent = score;
+            auroraText.textContent = aurorasCount;
+            audio.playRing();
+
+            // Aurora explosion particles
+            for (let p = 0; p < 30; p++) {
+              const ang = Math.random() * Math.PI * 2;
+              const spd = Math.random() * 6 + 2;
+              particles.push({
+                x: r.x,
+                y: r.y,
+                vx: Math.cos(ang) * spd,
+                vy: Math.sin(ang) * spd,
+                radius: Math.random() * 5 + 3,
+                color: ['#00cec9', '#81ecec', '#a29bfe', '#fd79a8'][Math.floor(Math.random() * 4)],
+                alpha: 1,
+                decay: 0.02
+              });
+            }
+          }
+
+          // Draw Ring
+          ctx.save();
+          ctx.lineWidth = 8;
+          ctx.strokeStyle = r.passed ? 'rgba(85, 239, 196, 0.8)' : 'rgba(255, 234, 167, 0.9)';
+          ctx.shadowColor = r.passed ? '#00cec9' : '#fdcb6e';
+          ctx.shadowBlur = 18;
+          ctx.beginPath();
+          ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+
+          if (r.x < -100) rings.splice(i, 1);
+        }
+
+        // Update & Draw Star Items
+        for (let i = items.length - 1; i >= 0; i--) {
+          const it = items[i];
+          it.x -= it.speed;
+
+          const dist = Math.hypot(whale.x - it.x, whale.y - it.y);
+          if (dist < whale.size + it.radius) {
+            score += it.points;
+            scoreText.textContent = score;
+            audio.playStar();
+
+            for (let p = 0; p < 10; p++) {
+              particles.push({
+                x: it.x,
+                y: it.y,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 6,
+                radius: Math.random() * 4 + 2,
+                color: '#ffeaa7',
+                alpha: 1,
+                decay: 0.03
+              });
+            }
+            items.splice(i, 1);
+            continue;
+          }
+
+          ctx.font = '28px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(it.emoji, it.x, it.y);
+
+          if (it.x < -50) items.splice(i, 1);
+        }
+
+        // Draw Whale
+        ctx.save();
+        ctx.translate(whale.x, whale.y);
+
+        // Whale Body (Puffy Cloud Shape)
+        ctx.fillStyle = '#ffb8b8';
+        ctx.shadowColor = 'rgba(255, 182, 193, 0.8)';
+        ctx.shadowBlur = 20;
+
+        // Main torso
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 46, 32, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cloud puffs on head/belly
+        ctx.beginPath();
+        ctx.arc(-18, -12, 22, 0, Math.PI * 2);
+        ctx.arc(14, -14, 20, 0, Math.PI * 2);
+        ctx.arc(0, 14, 18, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Whale Belly (Cream)
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.ellipse(4, 10, 30, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye
+        ctx.fillStyle = '#2d3436';
+        ctx.beginPath();
+        ctx.arc(22, -4, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(23, -5, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute Blush
+        ctx.fillStyle = 'rgba(255, 71, 87, 0.4)';
+        ctx.beginPath();
+        ctx.arc(16, 4, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Flipper
+        ctx.fillStyle = '#ff9999';
+        ctx.beginPath();
+        ctx.ellipse(2, 6, 12, 6, Math.PI / 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Waving Tail
+        const tailWave = Math.sin(whale.tailAngle) * 8;
+        ctx.fillStyle = '#ff9999';
+        ctx.beginPath();
+        ctx.moveTo(-42, 0);
+        ctx.lineTo(-64, -16 + tailWave);
+        ctx.lineTo(-56, 0 + tailWave * 0.5);
+        ctx.lineTo(-64, 16 + tailWave);
+        ctx.closePath();
+        ctx.fill();
+
+        // Water Spout (Sparkles)
+        ctx.fillStyle = '#74b9ff';
+        ctx.beginPath();
+        ctx.arc(6, -26 + Math.sin(now * 0.01) * 3, 3, 0, Math.PI * 2);
+        ctx.arc(12, -32 + Math.sin(now * 0.01 + 1) * 3, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+
+        // Update & Draw Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= p.decay;
+
+          if (p.alpha <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

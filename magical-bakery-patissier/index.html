@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🧁 달콤 마법 베이커리 파티시에 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: radial-gradient(circle at center, #fff1eb 0%, #ace0f9 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid #ff7675;
+      color: #d63031;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .stats {
+      display: flex;
+      gap: 12px;
+    }
+    .pill {
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid #e17055;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2d3436;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(45, 52, 54, 0.65);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+      text-align: center;
+    }
+    .modal-box {
+      background: #ffffff;
+      padding: 32px 28px;
+      border-radius: 28px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.2);
+      border: 4px solid #fab1a0;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #d63031;
+      margin-bottom: 12px;
+    }
+    .modal-desc {
+      font-size: 1rem;
+      color: #636e72;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      word-break: keep-all;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #ff7675 0%, #fab1a0 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px 36px;
+      border-radius: 999px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 118, 117, 0.35);
+      transition: transform 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 홈으로</a>
+    <div class="stats">
+      <div class="pill"><span>⭐</span><span id="scoreText">0</span></div>
+      <div class="pill"><span>🎂</span><span id="cakeText">0</span></div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-title">🧁 달콤 마법 베이커리!</div>
+      <div class="modal-desc">
+        하늘에서 솔솔 내려오는 알록달록 무지개 생크림, 달콤한 딸기, 별사탕 토핑을 황금 케이크 받침대로 쏙쏙 받아보세요!<br><br>
+        토핑을 5개 모을 때마다 화려한 마법 케이크가 퐁퐁 완성돼요! ✨
+      </div>
+      <button id="startBtn" class="start-btn">베이킹 시작! 🎂</button>
+    </div>
+  </div>
+
+  <script>
+    // Audio Synth
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playCatch() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+        const note = notes[Math.floor(Math.random() * notes.length)];
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(note, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(note * 1.5, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+      }
+      playComplete() {
+        if (!this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
+          gain.gain.setValueAtTime(0.3, this.ctx.currentTime + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.08 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + idx * 0.08);
+          osc.stop(this.ctx.currentTime + idx * 0.08 + 0.25);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreText = document.getElementById('scoreText');
+    const cakeText = document.getElementById('cakeText');
+    const startModal = document.getElementById('startModal');
+    const startBtn = document.getElementById('startBtn');
+
+    let W = 0, H = 0;
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let isPlaying = false;
+    let score = 0;
+    let cakesCreated = 0;
+    let currentStack = 0; // 0 to 5
+
+    // Basket / Plate
+    const plate = {
+      x: W / 2,
+      y: H - 90,
+      width: 140,
+      height: 28,
+      targetX: W / 2
+    };
+
+    // Falling Toppings
+    const TOPPINGS = [
+      { type: 'cream', color: '#ffffff', emoji: '🍦', points: 10, radius: 24 },
+      { type: 'strawberry', color: '#ff4757', emoji: '🍓', points: 15, radius: 22 },
+      { type: 'choco', color: '#574b90', emoji: '🍫', points: 20, radius: 22 },
+      { type: 'cherry', color: '#ff6b81', emoji: '🍒', points: 25, radius: 20 },
+      { type: 'star', color: '#ffa502', emoji: '⭐', points: 30, radius: 24 },
+      { type: 'rainbow', color: '#a29bfe', emoji: '🌈', points: 50, radius: 26 }
+    ];
+
+    let items = [];
+    let particles = [];
+    let floatingTexts = [];
+
+    function spawnTopping() {
+      const proto = TOPPINGS[Math.floor(Math.random() * TOPPINGS.length)];
+      items.push({
+        x: Math.random() * (W - 80) + 40,
+        y: -40,
+        speed: Math.random() * 2.5 + 2.5,
+        rotation: Math.random() * Math.PI,
+        rotSpeed: (Math.random() - 0.5) * 0.05,
+        ...proto
+      });
+    }
+
+    function createCelebration(x, y) {
+      for (let i = 0; i < 35; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8 + 3;
+        const colors = ['#ff7675', '#fd79a8', '#ffeaa7', '#55efc4', '#74b9ff', '#a29bfe'];
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2,
+          radius: Math.random() * 6 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          decay: Math.random() * 0.02 + 0.015
+        });
+      }
+    }
+
+    function addFloatingText(x, y, text, color = '#d63031') {
+      floatingTexts.push({
+        x: x,
+        y: y,
+        text: text,
+        color: color,
+        alpha: 1,
+        vy: -2
+      });
+    }
+
+    // Input handlers (Touch & Mouse)
+    function handleMove(clientX) {
+      plate.targetX = Math.max(plate.width / 2, Math.min(W - plate.width / 2, clientX));
+    }
+    window.addEventListener('mousemove', e => handleMove(e.clientX));
+    window.addEventListener('touchmove', e => {
+      if (e.touches.length > 0) handleMove(e.touches[0].clientX);
+    }, { passive: false });
+    window.addEventListener('touchstart', e => {
+      if (e.touches.length > 0) handleMove(e.touches[0].clientX);
+    }, { passive: false });
+
+    startBtn.addEventListener('click', () => {
+      sound.init();
+      startModal.style.display = 'none';
+      isPlaying = true;
+      score = 0;
+      cakesCreated = 0;
+      currentStack = 0;
+      items = [];
+      particles = [];
+      scoreText.textContent = score;
+      cakeText.textContent = cakesCreated;
+    });
+
+    let spawnTimer = 0;
+    let lastTime = performance.now();
+
+    function gameLoop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Background Bakery Decor
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.arc((W / 6) * i + 40, 120 + Math.sin(now * 0.002 + i) * 20, 28, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (isPlaying) {
+        // Smooth Plate Movement
+        plate.x += (plate.targetX - plate.x) * 0.2;
+        plate.y = H - 90;
+
+        // Spawn timer
+        spawnTimer += dt;
+        if (spawnTimer > 0.85) {
+          spawnTimer = 0;
+          spawnTopping();
+        }
+
+        // Update items
+        for (let i = items.length - 1; i >= 0; i--) {
+          const it = items[i];
+          it.y += it.speed;
+          it.rotation += it.rotSpeed;
+
+          // Catch check
+          const distY = it.y - plate.y;
+          const distX = Math.abs(it.x - plate.x);
+
+          if (distY >= -20 && distY <= 20 && distX <= plate.width / 2 + 10) {
+            // Caught!
+            sound.playCatch();
+            score += it.points;
+            currentStack++;
+            scoreText.textContent = score;
+            addFloatingText(it.x, it.y - 20, `+${it.points}`, it.color);
+
+            // Pop particles
+            for (let p = 0; p < 8; p++) {
+              particles.push({
+                x: it.x,
+                y: it.y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                radius: Math.random() * 4 + 2,
+                color: it.color,
+                alpha: 1,
+                decay: 0.03
+              });
+            }
+
+            if (currentStack >= 5) {
+              // Cake Completed!
+              currentStack = 0;
+              cakesCreated++;
+              score += 100;
+              cakeText.textContent = cakesCreated;
+              scoreText.textContent = score;
+              sound.playComplete();
+              createCelebration(plate.x, plate.y - 60);
+              addFloatingText(plate.x, plate.y - 60, '🎂 마법 케이크 완성! +100점! 🎂', '#ff4757');
+            }
+
+            items.splice(i, 1);
+            continue;
+          }
+
+          if (it.y > H + 40) {
+            items.splice(i, 1);
+          }
+        }
+
+        // Draw items
+        items.forEach(it => {
+          ctx.save();
+          ctx.translate(it.x, it.y);
+          ctx.rotate(it.rotation);
+          ctx.font = `${it.radius * 1.8}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(it.emoji, 0, 0);
+          ctx.restore();
+        });
+
+        // Draw Plate / Cake Base
+        ctx.save();
+        ctx.translate(plate.x, plate.y);
+
+        // Golden Tray
+        ctx.shadowColor = 'rgba(230, 126, 34, 0.35)';
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath();
+        ctx.roundRect(-plate.width / 2, 0, plate.width, plate.height, [14, 14, 18, 18]);
+        ctx.fill();
+
+        ctx.fillStyle = '#f1c40f';
+        ctx.beginPath();
+        ctx.roundRect(-plate.width / 2 + 6, 4, plate.width - 12, 8, 4);
+        ctx.fill();
+
+        // Stacked Cake Tiers
+        const stackHeight = 16;
+        for (let s = 0; s < currentStack; s++) {
+          const tierW = plate.width - 24 - s * 12;
+          const tierY = -((s + 1) * stackHeight);
+          const colors = ['#ffcccc', '#ffeaa7', '#dfe6e9', '#fd79a8', '#fab1a0'];
+
+          ctx.fillStyle = colors[s % colors.length];
+          ctx.beginPath();
+          ctx.roundRect(-tierW / 2, tierY, tierW, stackHeight + 2, 8);
+          ctx.fill();
+
+          // Icing drop
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(-tierW / 4, tierY + 2, 4, 0, Math.PI * 2);
+          ctx.arc(tierW / 4, tierY + 2, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+
+        // Update & Draw Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.15; // Gravity
+          p.alpha -= p.decay;
+
+          if (p.alpha <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Draw Floating Texts
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+          const ft = floatingTexts[i];
+          ft.y += ft.vy;
+          ft.alpha -= 0.02;
+
+          if (ft.alpha <= 0) {
+            floatingTexts.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = ft.alpha;
+          ctx.font = 'bold 20px Pretendard, sans-serif';
+          ctx.fillStyle = ft.color;
+          ctx.textAlign = 'center';
+          ctx.fillText(ft.text, ft.x, ft.y);
+          ctx.restore();
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
