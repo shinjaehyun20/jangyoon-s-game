@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐋 방울 고래의 심해 다이빙 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #001e3d;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #38bdf8;
+      color: #0284c7;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .status-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .badge {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #e0f2fe;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(8px);
+    }
+    .badge span {
+      color: #38bdf8;
+      font-weight: 900;
+    }
+    .oxygen-wrap {
+      position: absolute;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(280px, 80vw);
+      height: 18px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 2px solid #38bdf8;
+      border-radius: 12px;
+      overflow: hidden;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      padding: 2px;
+    }
+    .oxygen-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
+      border-radius: 8px;
+      transition: width 0.1s linear;
+    }
+    .touch-controls {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 30px;
+      z-index: 15;
+      pointer-events: none;
+    }
+    .ctrl-btn {
+      pointer-events: auto;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      cursor: pointer;
+    }
+    .ctrl-btn:active {
+      transform: scale(0.92);
+      background: rgba(56, 189, 248, 0.4);
+    }
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .overlay-screen.hidden {
+      display: none;
+    }
+    .overlay-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #38bdf8;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+      margin-bottom: 12px;
+    }
+    .overlay-desc {
+      font-size: 16px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      max-width: 320px;
+      margin-bottom: 28px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      color: #fff;
+      border: none;
+      padding: 14px 44px;
+      font-size: 19px;
+      font-weight: 900;
+      border-radius: 32px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4);
+      transition: transform 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 놀이터로</a>
+    <div class="status-group">
+      <div class="badge">수심 <span id="depthVal">0m</span></div>
+      <div class="badge">진주 <span id="pearlVal">0</span></div>
+    </div>
+  </div>
+
+  <div class="oxygen-wrap">
+    <div class="oxygen-fill" id="oxygenBar"></div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="touch-controls">
+    <div class="ctrl-btn" id="leftBtn">◀</div>
+    <div class="ctrl-btn" id="rightBtn">▶</div>
+  </div>
+
+  <div id="startScreen" class="overlay-screen">
+    <div class="overlay-title">🐋 방울 고래의 심해 다이빙</div>
+    <div class="overlay-desc">
+      아기 고래와 함께 신비로운 바닷속으로!<br>
+      산소 방울(🫧)을 먹으며 숨을 쉬고<br>
+      반짝이는 보물 진주를 모아보세요. 💎
+    </div>
+    <button class="start-btn" id="startBtn">다이빙 출발!</button>
+  </div>
+
+  <div id="gameOverScreen" class="overlay-screen hidden">
+    <div class="overlay-title">🌊 다이빙 완료!</div>
+    <div class="overlay-desc" id="gameResultDesc">
+      최대 수심 <b>120m</b> 도달!<br>
+      진주 15개를 모았습니다.
+    </div>
+    <button class="start-btn" id="restartBtn">다시 다이빙하기</button>
+  </div>
+
+  <script>
+    // Audio Context
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.3, gainVal = 0.2) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playBubbleSound() {
+      playTone(600 + Math.random() * 400, 'sine', 0.15, 0.2);
+    }
+    function playPearlSound() {
+      playTone(1046.50, 'triangle', 0.4, 0.25);
+      setTimeout(() => playTone(1318.51, 'sine', 0.3, 0.2), 80);
+    }
+    function playHurtSound() {
+      playTone(180, 'sawtooth', 0.35, 0.3);
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Whale Player
+    const whale = {
+      x: 0,
+      y: 0,
+      vx: 0,
+      targetVx: 0,
+      width: 54,
+      height: 38,
+      facingRight: true,
+      tilt: 0,
+      oxygen: 100,
+      invincibleTime: 0
+    };
+
+    let depth = 0;
+    let pearls = 0;
+    let isPlaying = false;
+    let speed = 3.5;
+    let items = [];
+    let obstacles = [];
+    let bubbles = [];
+
+    // Background floating ocean bubbles
+    for (let i = 0; i < 40; i++) {
+      bubbles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 4 + 2,
+        speed: Math.random() * 1.5 + 0.8,
+        alpha: Math.random() * 0.4 + 0.2
+      });
+    }
+
+    function resetGame() {
+      whale.x = width * 0.5;
+      whale.y = height * 0.35;
+      whale.vx = 0;
+      whale.targetVx = 0;
+      whale.oxygen = 100;
+      whale.invincibleTime = 0;
+      depth = 0;
+      pearls = 0;
+      speed = 3.5;
+      items = [];
+      obstacles = [];
+      isPlaying = true;
+      document.getElementById('depthVal').textContent = '0m';
+      document.getElementById('pearlVal').textContent = '0';
+      document.getElementById('oxygenBar').style.width = '100%';
+    }
+
+    // Input Handling
+    const keys = { left: false, right: false };
+    window.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+    });
+    window.addEventListener('keyup', e => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+    });
+
+    const leftBtn = document.getElementById('leftBtn');
+    const rightBtn = document.getElementById('rightBtn');
+
+    leftBtn.addEventListener('pointerdown', () => { initAudio(); keys.left = true; });
+    leftBtn.addEventListener('pointerup', () => { keys.left = false; });
+    leftBtn.addEventListener('pointerleave', () => { keys.left = false; });
+
+    rightBtn.addEventListener('pointerdown', () => { initAudio(); keys.right = true; });
+    rightBtn.addEventListener('pointerup', () => { keys.right = false; });
+    rightBtn.addEventListener('pointerleave', () => { keys.right = false; });
+
+    // Touch tilt on canvas
+    canvas.addEventListener('pointerdown', e => {
+      initAudio();
+      if (!isPlaying) return;
+      if (e.clientX < width * 0.5) {
+        keys.left = true;
+      } else {
+        keys.right = true;
+      }
+    });
+    window.addEventListener('pointerup', () => {
+      keys.left = false;
+      keys.right = false;
+    });
+
+    // Spawning logic
+    let spawnTimer = 0;
+    function updateEntities(dt) {
+      // Oxygen decay
+      whale.oxygen -= dt * 4.5;
+      if (whale.oxygen <= 0) {
+        whale.oxygen = 0;
+        gameOver();
+        return;
+      }
+      document.getElementById('oxygenBar').style.width = `${whale.oxygen}%`;
+
+      // Depth increment
+      depth += speed * dt * 3.2;
+      document.getElementById('depthVal').textContent = `${Math.floor(depth)}m`;
+
+      // Whale Movement
+      whale.targetVx = 0;
+      if (keys.left) whale.targetVx -= 280;
+      if (keys.right) whale.targetVx += 280;
+
+      whale.vx += (whale.targetVx - whale.vx) * 0.15;
+      whale.x += whale.vx * dt;
+
+      // Screen boundary
+      const padding = 30;
+      if (whale.x < padding) { whale.x = padding; whale.vx = 0; }
+      if (whale.x > width - padding) { whale.x = width - padding; whale.vx = 0; }
+
+      if (whale.vx > 20) whale.facingRight = true;
+      else if (whale.vx < -20) whale.facingRight = false;
+      whale.tilt = whale.vx * 0.001;
+
+      if (whale.invincibleTime > 0) whale.invincibleTime -= dt;
+
+      // Spawn items (Bubbles, Pearls)
+      spawnTimer += dt;
+      if (spawnTimer > 0.45) {
+        spawnTimer = 0;
+        const spawnX = Math.random() * (width - 60) + 30;
+        const isPearl = Math.random() < 0.35;
+        items.push({
+          x: spawnX,
+          y: height + 30,
+          type: isPearl ? 'pearl' : 'bubble',
+          r: isPearl ? 14 : 18
+        });
+
+        // Spawn Jellyfish Obstacles
+        if (Math.random() < 0.38) {
+          obstacles.push({
+            x: Math.random() * (width - 60) + 30,
+            y: height + 40,
+            r: 20,
+            pulse: 0
+          });
+        }
+      }
+
+      // Move items upwards (Whale dives down, objects scroll up)
+      const scrollSpeed = (speed + depth * 0.003) * 60;
+
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.y -= scrollSpeed * dt;
+
+        // Collision with whale
+        const dist = Math.hypot(item.x - whale.x, item.y - whale.y);
+        if (dist < item.r + whale.height * 0.5) {
+          if (item.type === 'bubble') {
+            whale.oxygen = Math.min(100, whale.oxygen + 14);
+            playBubbleSound();
+          } else {
+            pearls += 1;
+            document.getElementById('pearlVal').textContent = pearls;
+            playPearlSound();
+          }
+          items.splice(i, 1);
+          continue;
+        }
+
+        if (item.y < -40) items.splice(i, 1);
+      }
+
+      // Move obstacles
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.y -= scrollSpeed * dt;
+        obs.pulse += dt * 4;
+
+        // Collision
+        const dist = Math.hypot(obs.x - whale.x, obs.y - whale.y);
+        if (dist < obs.r + whale.height * 0.4 && whale.invincibleTime <= 0) {
+          whale.oxygen = Math.max(0, whale.oxygen - 18);
+          whale.invincibleTime = 1.0;
+          playHurtSound();
+        }
+
+        if (obs.y < -50) obstacles.splice(i, 1);
+      }
+    }
+
+    function gameOver() {
+      isPlaying = false;
+      document.getElementById('gameResultDesc').innerHTML = `
+        최대 잠수 깊이: <b>${Math.floor(depth)}m</b><br>
+        획득한 진주: <b>${pearls}개</b><br>
+        깊고 푸른 바닷속 멋진 다이버 장윤이! 🌊
+      `;
+      document.getElementById('gameOverScreen').classList.remove('hidden');
+    }
+
+    // Drawing Whale
+    function drawWhale() {
+      ctx.save();
+      ctx.translate(whale.x, whale.y);
+      ctx.rotate(whale.tilt);
+      if (!whale.facingRight) ctx.scale(-1, 1);
+
+      // Invincible Blink
+      if (whale.invincibleTime > 0 && Math.floor(performance.now() / 80) % 2 === 0) {
+        ctx.globalAlpha = 0.4;
+      }
+
+      // Whale Body
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 26, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Belly
+      ctx.fillStyle = '#e0f2fe';
+      ctx.beginPath();
+      ctx.ellipse(4, 6, 18, 10, 0, 0, Math.PI);
+      ctx.fill();
+
+      // Tail
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.moveTo(-22, 0);
+      ctx.lineTo(-34, -10);
+      ctx.lineTo(-28, 0);
+      ctx.lineTo(-34, 10);
+      ctx.closePath();
+      ctx.fill();
+
+      // Fin
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.ellipse(-2, 4, 8, 4, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(14, -4, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye Sparkle
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(15, -5, 1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Spout Water Drop
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.beginPath();
+      ctx.arc(6, -18, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Main Loop
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      if (isPlaying) {
+        updateEntities(dt);
+      }
+
+      // Dynamic Ocean Depth Color
+      const depthRatio = Math.min(depth / 800, 1.0);
+      // Top: #0284c7 -> #001e3d -> #020617
+      const r = Math.floor(2 * (1 - depthRatio));
+      const g = Math.floor(132 * (1 - depthRatio) + 15 * depthRatio);
+      const b = Math.floor(199 * (1 - depthRatio) + 50 * depthRatio);
+      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+      ctx.fillRect(0, 0, width, height);
+
+      // Background Bubbles
+      bubbles.forEach(b => {
+        b.y -= b.speed;
+        if (b.y < -10) { b.y = height + 10; b.x = Math.random() * width; }
+        ctx.fillStyle = `rgba(255, 255, 255, ${b.alpha})`;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw Items
+      items.forEach(it => {
+        if (it.type === 'bubble') {
+          // Oxygen Bubble
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2.5;
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+          ctx.beginPath();
+          ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Bubble glint
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(it.x - 4, it.y - 4, 3, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Pearl
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Shine
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(it.x - 3, it.y - 3, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Draw Obstacles (Jellyfish)
+      obstacles.forEach(obs => {
+        ctx.save();
+        ctx.translate(obs.x, obs.y);
+        const squish = Math.sin(obs.pulse) * 0.15;
+
+        // Jelly Cap
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.85)';
+        ctx.beginPath();
+        ctx.ellipse(0, -6, obs.r, obs.r * (0.8 + squish), 0, Math.PI, Math.PI * 2);
+        ctx.fill();
+
+        // Tentacles
+        ctx.strokeStyle = 'rgba(244, 114, 182, 0.7)';
+        ctx.lineWidth = 2;
+        for (let t = -3; t <= 3; t++) {
+          ctx.beginPath();
+          ctx.moveTo(t * 4, 2);
+          ctx.quadraticCurveTo(t * 6 + Math.sin(obs.pulse + t) * 4, 12, t * 4, 22);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      });
+
+      // Draw Player Whale
+      if (isPlaying) {
+        drawWhale();
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      initAudio();
+      document.getElementById('startScreen').classList.add('hidden');
+      resetGame();
+      requestAnimationFrame(loop);
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      document.getElementById('gameOverScreen').classList.add('hidden');
+      resetGame();
+    });
+  </script>
+</body>
+</html>

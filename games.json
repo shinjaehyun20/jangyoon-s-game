@@ -2030,5 +2030,21 @@
     "description": "신비로운 보석 광산의 반짝이는 레일을 달리며 좌우로 레일을 척척 바꾸고 루비, 사파이어, 에메랄드, 다이아몬드를 가득 싣는 신나는 3레일 어드벤처 놀이입니다.",
     "thumbnail": "gemstone-mine-cart-run/thumb.svg",
     "path": "gemstone-mine-cart-run/index.html"
+  },
+  {
+    "id": "star-constellation-weaver",
+    "title": "Star Constellation Weaver",
+    "title_ko": "✨ 반짝 별자리 엮기",
+    "description": "아름다운 밤하늘의 빛나는 별들을 손가락으로 이어 카시오페이아, 북두칠성, 백조자리, 오리온자리를 완성하고 별빛 오로라 마법을 피워내는 힐링 퍼즐 놀이입니다.",
+    "thumbnail": "star-constellation-weaver/thumb.svg",
+    "path": "star-constellation-weaver/index.html"
+  },
+  {
+    "id": "bubble-whale-ocean-dive",
+    "title": "Bubble Whale Ocean Dive",
+    "title_ko": "🐋 방울 고래의 심해 다이빙",
+    "description": "귀여운 아기 고래와 함께 신비로운 바닷속으로 잠수하며 뽀글뽀글 산소 방울을 마시고 반짝이는 조개 진주를 모으는 신나는 심해 어드벤처 놀이입니다.",
+    "thumbnail": "bubble-whale-ocean-dive/thumb.svg",
+    "path": "bubble-whale-ocean-dive/index.html"
   }
 ]

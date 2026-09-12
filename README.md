@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 254개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 256개.
 
-[![Games](https://img.shields.io/badge/games-254-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-256-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![254개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![256개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 254개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 256개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🐋 방울 고래의 심해 다이빙 (bubble-whale-ocean-dive)](./bubble-whale-ocean-dive) | 귀여운 아기 고래와 함께 심해로 다이빙하며 산소 방울과 진주를 모으는 해양 어드벤처 | 어린이/잠수·어드벤처 |
+| [✨ 반짝 별자리 엮기 (star-constellation-weaver)](./star-constellation-weaver) | 밤하늘의 빛나는 별들을 이어 전설의 별자리를 완성하고 챠임 멜로디를 피워내는 힐링 퍼즐 | 어린이/퍼즐·힐링 |
 | [💎 반짝 보석 광산 열차 (gemstone-mine-cart-run)](./gemstone-mine-cart-run) | 신비로운 보석 광산의 3레일을 달리며 루비, 사파이어, 다이아몬드를 모으는 스피드 레일 어드벤처 | 어린이/레일·아케이드 |
 | [🦋 햇살 나비의 마법 정원 (solar-butterfly-garden)](./solar-butterfly-garden) | 따스한 햇살 정원에서 무지개 나비로 꿀방울을 모으고 꽃들을 만개시키는 힐링 터치 비행 | 어린이/비행·힐링 |
 | [🐳 몽실몽실 구름고래의 꿈나라 비행 (cloud-whale-dream-voyage)](./cloud-whale-dream-voyage) | 밤하늘을 유영하는 핑크 구름고래로 별빛 링을 통과하고 오로라를 완성하는 힐링 플라잉 어드벤처 | 어린이/비행·힐링 |

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="60%" stop-color="#001e3d"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <rect width="400" height="300" fill="url(#oceanGrad)"/>
+
+  <!-- Bubbles -->
+  <circle cx="60" cy="180" r="14" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.6"/>
+  <circle cx="320" cy="90" r="20" fill="none" stroke="#38bdf8" stroke-width="2.5" opacity="0.8"/>
+  <circle cx="350" cy="240" r="12" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.5"/>
+
+  <!-- Whale -->
+  <g transform="translate(180, 140) scale(1.6)">
+    <!-- Body -->
+    <ellipse cx="0" cy="0" rx="30" ry="20" fill="#38bdf8"/>
+    <!-- Belly -->
+    <ellipse cx="4" cy="7" rx="20" ry="11" fill="#e0f2fe"/>
+    <!-- Tail -->
+    <path d="M -26,0 L -40,-12 L -33,0 L -40,12 Z" fill="#0284c7"/>
+    <!-- Fin -->
+    <ellipse cx="-2" cy="5" rx="9" ry="5" fill="#0284c7" transform="rotate(30 -2 5)"/>
+    <!-- Eye -->
+    <circle cx="16" cy="-4" r="3" fill="#0f172a"/>
+    <circle cx="17" cy="-5" r="1" fill="#fff"/>
+  </g>
+
+  <!-- Pearl -->
+  <g transform="translate(290, 180)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="12" fill="#fef08a" stroke="#f59e0b" stroke-width="2"/>
+    <circle cx="-3" cy="-3" r="3" fill="#ffffff"/>
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="65" y="235" width="270" height="44" rx="22" fill="rgba(15, 23, 42, 0.85)" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="200" y="263" fill="#38bdf8" font-family="'Pretendard', sans-serif" font-size="16" font-weight="900" text-anchor="middle">🐋 방울 고래의 심해 다이빙</text>
+</svg>

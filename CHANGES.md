@@ -1,3 +1,7 @@
+## 2026-09-13 — star-constellation-weaver, bubble-whale-ocean-dive (총 256개)
+- **[✨ 반짝 별자리 엮기 (star-constellation-weaver)]** — 밤하늘의 빛나는 별들을 이어 전설의 별자리를 완성하고 챠임 멜로디를 피워내는 힐링 퍼즐 (외부 의존성 0).
+- **[🐋 방울 고래의 심해 다이빙 (bubble-whale-ocean-dive)]** — 귀여운 아기 고래와 함께 심해로 다이빙하며 산소 방울과 진주를 모으는 해양 어드벤처 (외부 의존성 0).
+
 ## 2026-09-12 — solar-butterfly-garden, gemstone-mine-cart-run (총 254개)
 - **[🦋 햇살 나비의 마법 정원 (solar-butterfly-garden)]** — 따스한 햇살 정원에서 무지개 나비로 꿀방울을 모으고 꽃들을 만개시키는 힐링 터치 비행 (외부 의존성 0).
 - **[💎 반짝 보석 광산 열차 (gemstone-mine-cart-run)]** — 신비로운 보석 광산의 3레일을 달리며 루비, 사파이어, 다이아몬드를 모으는 스피드 레일 어드벤처 (외부 의존성 0).
