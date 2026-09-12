@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a1c4fd"/>
+      <stop offset="60%" stop-color="#c2e9fb"/>
+      <stop offset="100%" stop-color="#55efc4"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="80%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffeaa7"/>
+      <stop offset="100%" stop-color="#fdcb6e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="340" cy="60" r="80" fill="url(#sun)"/>
+
+  <!-- Grass Hill -->
+  <path d="M0 240 Q 200 210 400 240 L 400 300 L 0 300 Z" fill="#00b894"/>
+
+  <!-- Flowers -->
+  <g transform="translate(80, 230)">
+    <line x1="0" y1="0" x2="0" y2="40" stroke="#27ae60" stroke-width="4"/>
+    <circle cx="-10" cy="-6" r="12" fill="#ff7675"/>
+    <circle cx="10" cy="-6" r="12" fill="#ff7675"/>
+    <circle cx="0" cy="-14" r="12" fill="#ff7675"/>
+    <circle cx="0" cy="0" r="9" fill="#ffeaa7"/>
+  </g>
+  <g transform="translate(320, 235)">
+    <line x1="0" y1="0" x2="0" y2="40" stroke="#27ae60" stroke-width="4"/>
+    <circle cx="-10" cy="-6" r="12" fill="#fd79a8"/>
+    <circle cx="10" cy="-6" r="12" fill="#fd79a8"/>
+    <circle cx="0" cy="-14" r="12" fill="#fd79a8"/>
+    <circle cx="0" cy="0" r="9" fill="#ffeaa7"/>
+  </g>
+
+  <!-- Giant Butterfly -->
+  <g transform="translate(200, 130)">
+    <!-- Wings -->
+    <ellipse cx="-28" cy="-16" rx="36" ry="26" fill="#ff7675" transform="rotate(-15 -28 -16)"/>
+    <ellipse cx="28" cy="-16" rx="36" ry="26" fill="#fd79a8" transform="rotate(15 28 -16)"/>
+    <ellipse cx="-20" cy="20" rx="24" ry="18" fill="#a29bfe" transform="rotate(20 -20 20)"/>
+    <ellipse cx="20" cy="20" rx="24" ry="18" fill="#74b9ff" transform="rotate(-20 20 20)"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="0" rx="6" ry="26" fill="#2d3436"/>
+    <!-- Antennae -->
+    <path d="M -2 -20 Q -15 -38 -22 -32" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M 2 -20 Q 15 -38 22 -32" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- Sparkles -->
+    <circle cx="-15" cy="-20" r="5" fill="#ffffff" opacity="0.8"/>
+    <circle cx="15" cy="-20" r="5" fill="#ffffff" opacity="0.8"/>
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="70" y="16" width="260" height="42" rx="21" fill="rgba(255, 255, 255, 0.92)" stroke="#fd79a8" stroke-width="2"/>
+  <text x="200" y="43" text-anchor="middle" font-family="'Pretendard', sans-serif" font-weight="900" font-size="18" fill="#e84393">🦋 햇살 나비의 마법 정원</text>
+</svg>

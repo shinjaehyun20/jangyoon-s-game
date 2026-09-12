@@ -1,3 +1,7 @@
+## 2026-09-12 — solar-butterfly-garden, gemstone-mine-cart-run (총 254개)
+- **[🦋 햇살 나비의 마법 정원 (solar-butterfly-garden)]** — 따스한 햇살 정원에서 무지개 나비로 꿀방울을 모으고 꽃들을 만개시키는 힐링 터치 비행 (외부 의존성 0).
+- **[💎 반짝 보석 광산 열차 (gemstone-mine-cart-run)]** — 신비로운 보석 광산의 3레일을 달리며 루비, 사파이어, 다이아몬드를 모으는 스피드 레일 어드벤처 (외부 의존성 0).
+
 ## 2026-09-11 — magical-bakery-patissier, cloud-whale-dream-voyage (총 252개)
 - **[🧁 달콤 마법 베이커리 파티시에 (magical-bakery-patissier)]** — 무지개 생크림, 딸기, 별사탕 토핑을 받아 화려한 마법 3단 케이크를 굽는 터치 베이킹 아케이드 (외부 의존성 0).
 - **[🐳 몽실몽실 구름고래의 꿈나라 비행 (cloud-whale-dream-voyage)]** — 밤하늘을 유영하는 핑크 구름고래로 별빛 링을 통과하고 오로라를 완성하는 힐링 플라잉 어드벤처 (외부 의존성 0).

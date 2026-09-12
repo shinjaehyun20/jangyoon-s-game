@@ -2014,5 +2014,21 @@
     "description": "밤하늘을 자유롭게 유영하는 귀여운 핑크 구름고래를 터치/드래그하여 반짝이는 별빛 링을 통과하고 황금 별사탕을 모아 신비로운 오로라를 완성하는 힐링 플라잉 놀이입니다.",
     "thumbnail": "cloud-whale-dream-voyage/thumb.svg",
     "path": "cloud-whale-dream-voyage/index.html"
+  },
+  {
+    "id": "solar-butterfly-garden",
+    "title": "Solar Butterfly Garden",
+    "title_ko": "🦋 햇살 나비의 마법 정원",
+    "description": "따사로운 햇살 가득한 정원에서 알록달록 무지개 날개를 펄럭이며 향긋한 꿀방울과 황금 꽃가루를 모아 눈부신 마법 만개 축제를 완성하는 힐링 터치 비행 놀이입니다.",
+    "thumbnail": "solar-butterfly-garden/thumb.svg",
+    "path": "solar-butterfly-garden/index.html"
+  },
+  {
+    "id": "gemstone-mine-cart-run",
+    "title": "Gemstone Mine Cart Run",
+    "title_ko": "💎 반짝 보석 광산 열차",
+    "description": "신비로운 보석 광산의 반짝이는 레일을 달리며 좌우로 레일을 척척 바꾸고 루비, 사파이어, 에메랄드, 다이아몬드를 가득 싣는 신나는 3레일 어드벤처 놀이입니다.",
+    "thumbnail": "gemstone-mine-cart-run/thumb.svg",
+    "path": "gemstone-mine-cart-run/index.html"
   }
 ]

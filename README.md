@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 252개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 254개.
 
-[![Games](https://img.shields.io/badge/games-252-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-254-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![252개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![254개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 252개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 254개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [💎 반짝 보석 광산 열차 (gemstone-mine-cart-run)](./gemstone-mine-cart-run) | 신비로운 보석 광산의 3레일을 달리며 루비, 사파이어, 다이아몬드를 모으는 스피드 레일 어드벤처 | 어린이/레일·아케이드 |
+| [🦋 햇살 나비의 마법 정원 (solar-butterfly-garden)](./solar-butterfly-garden) | 따스한 햇살 정원에서 무지개 나비로 꿀방울을 모으고 꽃들을 만개시키는 힐링 터치 비행 | 어린이/비행·힐링 |
 | [🐳 몽실몽실 구름고래의 꿈나라 비행 (cloud-whale-dream-voyage)](./cloud-whale-dream-voyage) | 밤하늘을 유영하는 핑크 구름고래로 별빛 링을 통과하고 오로라를 완성하는 힐링 플라잉 어드벤처 | 어린이/비행·힐링 |
 | [🧁 달콤 마법 베이커리 파티시에 (magical-bakery-patissier)](./magical-bakery-patissier) | 무지개 생크림, 딸기, 별사탕 토핑을 받아 화려한 마법 3단 케이크를 굽는 터치 베이킹 아케이드 | 어린이/만들기·아케이드 |
 | [🚀 250호 기념 우주 별자리 레인저 (space-constellation-ranger)](./space-constellation-ranger) | 반짝이는 은하계 밤하늘을 우주선으로 비행하며 250개의 별빛 크리스탈을 모으고 신비로운 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이 | 어린이/탐험·우주 |

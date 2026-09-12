@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🦋 햇살 나비의 마법 정원 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #a1c4fd 0%, #c2e9fb 50%, #d4fc79 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid #fd79a8;
+      color: #e84393;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(253, 121, 168, 0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #ffeaa7;
+      padding: 8px 20px;
+      border-radius: 24px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #fdcb6e;
+      box-shadow: 0 4px 12px rgba(253, 203, 110, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .score-badge span {
+      color: #e17055;
+    }
+    .bloom-bar-wrap {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(320px, 85vw);
+      height: 24px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 2px solid #55efc4;
+      border-radius: 12px;
+      overflow: hidden;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      padding: 2px;
+    }
+    .bloom-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #55efc4, #00b894);
+      border-radius: 8px;
+      transition: width 0.2s ease-out;
+    }
+    .bloom-label {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #2d3436;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 홈으로</a>
+    <div class="score-badge">🌸 꿀방울: <span id="scoreVal">0</span></div>
+  </div>
+
+  <div class="bloom-bar-wrap">
+    <div class="bloom-bar-fill" id="bloomBar"></div>
+    <div class="bloom-label" id="bloomText">마법 만개 게이지 0%</div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <script>
+    // Web Audio Synthesizer
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+    }
+    function playNectarSound() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      const freq = notes[Math.floor(Math.random() * notes.length)];
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    }
+    function playBloomSound() {
+      if (!audioCtx) return;
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      notes.forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.08);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime + i * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.08 + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + i * 0.08);
+        osc.stop(audioCtx.currentTime + i * 0.08 + 0.3);
+      });
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const bloomBar = document.getElementById('bloomBar');
+    const bloomText = document.getElementById('bloomText');
+
+    let W = canvas.width = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      initFlowers();
+    });
+
+    let score = 0;
+    let bloomProgress = 0;
+    let isSuperBloom = false;
+    let bloomTimer = 0;
+
+    // Player: Butterfly
+    const player = {
+      x: W / 2,
+      y: H / 2,
+      targetX: W / 2,
+      targetY: H / 2,
+      wingAngle: 0,
+      wingSpeed: 0.15,
+      size: 26,
+      facing: 1
+    };
+
+    // Flowers & Nectars
+    let flowers = [];
+    const FLOWER_COLORS = ['#ff7675', '#fd79a8', '#e84393', '#fdcb6e', '#f0932b', '#74b9ff', '#a29bfe'];
+    function initFlowers() {
+      flowers = [];
+      const count = Math.max(7, Math.floor(W / 120));
+      for (let i = 0; i < count; i++) {
+        flowers.push({
+          x: 60 + i * ((W - 120) / (count - 1)),
+          y: H - 80 - Math.sin(i * 1.5) * 40,
+          color: FLOWER_COLORS[i % FLOWER_COLORS.length],
+          size: 28 + Math.random() * 8,
+          nectarReady: true,
+          respawnTime: 0
+        });
+      }
+    }
+    initFlowers();
+
+    // Floating nectars in breezy air
+    let nectars = [];
+    function spawnNectar() {
+      if (nectars.length < 8) {
+        nectars.push({
+          x: Math.random() * (W - 80) + 40,
+          y: -20,
+          speedY: 1.2 + Math.random() * 1.5,
+          speedX: Math.sin(Math.random() * Math.PI) * 0.8,
+          color: FLOWER_COLORS[Math.floor(Math.random() * FLOWER_COLORS.length)],
+          size: 14,
+          glow: 0
+        });
+      }
+    }
+
+    // Particles
+    let particles = [];
+    function createConfetti(x, y, count = 12) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 4;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: 4 + Math.random() * 4,
+          color: FLOWER_COLORS[Math.floor(Math.random() * FLOWER_COLORS.length)],
+          alpha: 1,
+          decay: 0.02 + Math.random() * 0.02
+        });
+      }
+    }
+
+    // Input handlers (Touch & Mouse)
+    function handlePointer(e) {
+      initAudio();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      player.targetX = clientX;
+      player.targetY = clientY;
+    }
+    window.addEventListener('pointerdown', handlePointer);
+    window.addEventListener('pointermove', handlePointer);
+    window.addEventListener('touchstart', handlePointer, { passive: false });
+    window.addEventListener('touchmove', handlePointer, { passive: false });
+
+    // Keyboard support
+    const keys = {};
+    window.addEventListener('keydown', e => {
+      initAudio();
+      keys[e.key] = true;
+    });
+    window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+
+      // Update Player position
+      if (keys['ArrowLeft'] || keys['a']) player.targetX -= 6;
+      if (keys['ArrowRight'] || keys['d']) player.targetX += 6;
+      if (keys['ArrowUp'] || keys['w']) player.targetY -= 6;
+      if (keys['ArrowDown'] || keys['s']) player.targetY += 6;
+
+      player.targetX = Math.max(30, Math.min(W - 30, player.targetX));
+      player.targetY = Math.max(50, Math.min(H - 60, player.targetY));
+
+      const dx = player.targetX - player.x;
+      const dy = player.targetY - player.y;
+      player.x += dx * 0.12;
+      player.y += dy * 0.12;
+      if (Math.abs(dx) > 1) player.facing = dx > 0 ? 1 : -1;
+
+      player.wingAngle += player.wingSpeed;
+
+      // Spawn falling nectars
+      if (Math.random() < 0.03) spawnNectar();
+
+      // Update nectars
+      for (let i = nectars.length - 1; i >= 0; i--) {
+        const n = nectars[i];
+        n.y += n.speedY;
+        n.x += Math.sin(now * 0.003 + i) * 1.2;
+
+        // Collision with butterfly
+        const dist = Math.hypot(player.x - n.x, player.y - n.y);
+        if (dist < player.size + n.size) {
+          score += 10;
+          bloomProgress = Math.min(100, bloomProgress + 5);
+          playNectarSound();
+          createConfetti(n.x, n.y, 8);
+          nectars.splice(i, 1);
+          continue;
+        }
+
+        // Removed offscreen
+        if (n.y > H + 20) nectars.splice(i, 1);
+      }
+
+      // Check flower nectar collisions
+      flowers.forEach(f => {
+        if (!f.nectarReady) {
+          f.respawnTime -= dt;
+          if (f.respawnTime <= 0) f.nectarReady = true;
+        } else {
+          const fDist = Math.hypot(player.x - f.x, player.y - (f.y - 10));
+          if (fDist < player.size + 24) {
+            f.nectarReady = false;
+            f.respawnTime = 4.0;
+            score += 25;
+            bloomProgress = Math.min(100, bloomProgress + 15);
+            playNectarSound();
+            createConfetti(f.x, f.y - 15, 16);
+          }
+        }
+      });
+
+      // Super Bloom Trigger
+      if (bloomProgress >= 100 && !isSuperBloom) {
+        isSuperBloom = true;
+        bloomTimer = 6.0;
+        playBloomSound();
+        for (let j = 0; j < 60; j++) {
+          createConfetti(Math.random() * W, Math.random() * H * 0.7, 4);
+        }
+      }
+
+      if (isSuperBloom) {
+        bloomTimer -= dt;
+        score += 1;
+        bloomText.innerText = `✨ 마법 만개 축제 피에스타! (${Math.ceil(bloomTimer)}s)`;
+        if (Math.random() < 0.2) createConfetti(Math.random() * W, Math.random() * (H * 0.5), 6);
+        if (bloomTimer <= 0) {
+          isSuperBloom = false;
+          bloomProgress = 0;
+        }
+      } else {
+        bloomText.innerText = `마법 만개 게이지 ${Math.floor(bloomProgress)}%`;
+      }
+
+      // Update UI
+      scoreVal.innerText = score;
+      bloomBar.style.width = bloomProgress + '%';
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      // Render
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Sun & Sunny Rays
+      ctx.save();
+      const sunGrad = ctx.createRadialGradient(W - 80, 80, 10, W - 80, 80, 120);
+      sunGrad.addColorStop(0, 'rgba(255, 234, 167, 0.9)');
+      sunGrad.addColorStop(0.5, 'rgba(253, 203, 110, 0.4)');
+      sunGrad.addColorStop(1, 'rgba(253, 203, 110, 0)');
+      ctx.fillStyle = sunGrad;
+      ctx.beginPath();
+      ctx.arc(W - 80, 80, 120, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Gentle Green Grass Hill
+      ctx.save();
+      ctx.fillStyle = '#00b894';
+      ctx.beginPath();
+      ctx.moveTo(0, H - 40);
+      ctx.quadraticCurveTo(W / 2, H - 90, W, H - 40);
+      ctx.lineTo(W, H);
+      ctx.lineTo(0, H);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#55efc4';
+      ctx.beginPath();
+      ctx.moveTo(0, H - 20);
+      ctx.quadraticCurveTo(W / 2, H - 60, W, H - 20);
+      ctx.lineTo(W, H);
+      ctx.lineTo(0, H);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Draw Flowers
+      flowers.forEach(f => {
+        ctx.save();
+        // Stem
+        ctx.strokeStyle = '#27ae60';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(f.x, f.y);
+        ctx.quadraticCurveTo(f.x - 5, f.y + 30, f.x, H - 30);
+        ctx.stroke();
+
+        // Petals
+        ctx.fillStyle = f.color;
+        for (let a = 0; a < Math.PI * 2; a += Math.PI / 3) {
+          const px = f.x + Math.cos(a) * (f.size * 0.55);
+          const py = f.y + Math.sin(a) * (f.size * 0.55);
+          ctx.beginPath();
+          ctx.arc(px, py, f.size * 0.45, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Flower Center
+        ctx.fillStyle = f.nectarReady ? '#ffeaa7' : '#b2bec3';
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.size * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Glowing Nectar Drop
+        if (f.nectarReady) {
+          ctx.fillStyle = '#fdcb6e';
+          ctx.beginPath();
+          ctx.arc(f.x, f.y - 12, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      });
+
+      // Draw Floating Nectars
+      nectars.forEach(n => {
+        ctx.save();
+        ctx.fillStyle = n.color;
+        ctx.shadowColor = n.color;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Little sparkle
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(n.x - 3, n.y - 3, n.size * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Draw Particles
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Draw Butterfly (Player)
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      ctx.scale(player.facing, 1);
+
+      const wingSpan = Math.cos(player.wingAngle);
+
+      // Glow aura
+      ctx.shadowColor = '#fd79a8';
+      ctx.shadowBlur = 15;
+
+      // Top Wing
+      ctx.fillStyle = '#ff7675';
+      ctx.beginPath();
+      ctx.ellipse(-8 * wingSpan, -12, 18 * Math.abs(wingSpan), 14, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#fd79a8';
+      ctx.beginPath();
+      ctx.ellipse(8 * wingSpan, -12, 18 * Math.abs(wingSpan), 14, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bottom Wing
+      ctx.fillStyle = '#a29bfe';
+      ctx.beginPath();
+      ctx.ellipse(-6 * wingSpan, 8, 12 * Math.abs(wingSpan), 10, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#74b9ff';
+      ctx.beginPath();
+      ctx.ellipse(6 * wingSpan, 8, 12 * Math.abs(wingSpan), 10, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Body & Antennae
+      ctx.fillStyle = '#2d3436';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 4, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#2d3436';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, -10);
+      ctx.quadraticCurveTo(-6, -20, -10, -18);
+      ctx.moveTo(0, -10);
+      ctx.quadraticCurveTo(6, -20, 10, -18);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
