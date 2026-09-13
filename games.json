@@ -2046,5 +2046,21 @@
     "description": "귀여운 아기 고래와 함께 신비로운 바닷속으로 잠수하며 뽀글뽀글 산소 방울을 마시고 반짝이는 조개 진주를 모으는 신나는 심해 어드벤처 놀이입니다.",
     "thumbnail": "bubble-whale-ocean-dive/thumb.svg",
     "path": "bubble-whale-ocean-dive/index.html"
+  },
+  {
+    "id": "rainbow-chameleon-catch",
+    "title": "Rainbow Chameleon Catch",
+    "title_ko": "🌈 무지개 카멜레온의 색깔 냠냠",
+    "description": "날아오는 곤충 젤리의 색깔에 맞춰 카멜레온의 몸 색을 바꾸고 기다란 혀를 뻗어 맛있는 젤리를 냠냠 낚아채는 색채 반응형 아케이드 놀이입니다.",
+    "thumbnail": "rainbow-chameleon-catch/thumb.svg",
+    "path": "rainbow-chameleon-catch/index.html"
+  },
+  {
+    "id": "space-rover-crystal-dash",
+    "title": "Space Rover Crystal Dash",
+    "title_ko": "🚀 우주 탐사차의 크리스탈 대쉬",
+    "description": "달과 화성의 신비로운 분화구를 누비는 꼬마 우주 탐사차 루나 1호와 함께 저중력 부스터 점프로 장애물을 뛰어넘고 우주 에너지 크리스탈을 모으는 점프 런 놀이입니다.",
+    "thumbnail": "space-rover-crystal-dash/thumb.svg",
+    "path": "space-rover-crystal-dash/index.html"
   }
 ]

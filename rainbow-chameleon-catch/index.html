@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🌈 무지개 카멜레온의 색깔 냠냠 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #bbf7d0 0%, #86efac 40%, #15803d 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid #16a34a;
+      color: #15803d;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .score-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #facc15;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #854d0e;
+      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .score-badge span {
+      color: #ea580c;
+    }
+    .color-palette-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.88);
+      padding: 10px 18px;
+      border-radius: 36px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(8px);
+    }
+    .color-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .color-btn:active {
+      transform: scale(0.9);
+    }
+    .color-btn.selected {
+      transform: scale(1.18);
+      border: 3px solid #1e293b;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    }
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(20, 83, 45, 0.9);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .overlay-screen.hidden {
+      display: none;
+    }
+    .overlay-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #fef08a;
+      text-shadow: 0 0 20px rgba(254, 240, 138, 0.6);
+      margin-bottom: 12px;
+    }
+    .overlay-desc {
+      font-size: 16px;
+      color: #f0fdf4;
+      line-height: 1.6;
+      max-width: 320px;
+      margin-bottom: 28px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #facc15 0%, #ea580c 100%);
+      color: #fff;
+      border: none;
+      padding: 14px 44px;
+      font-size: 19px;
+      font-weight: 900;
+      border-radius: 32px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(234, 88, 12, 0.4);
+      transition: transform 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 놀이터로</a>
+    <div class="score-group">
+      <div class="score-badge">냠냠 <span id="scoreVal">0</span>점</div>
+      <div class="score-badge">콤보 <span id="comboVal">0</span>x</div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="color-palette-bar" id="paletteBar">
+    <button class="color-btn selected" data-color="#ef4444" style="background:#ef4444;"></button>
+    <button class="color-btn" data-color="#f59e0b" style="background:#f59e0b;"></button>
+    <button class="color-btn" data-color="#eab308" style="background:#eab308;"></button>
+    <button class="color-btn" data-color="#22c55e" style="background:#22c55e;"></button>
+    <button class="color-btn" data-color="#3b82f6" style="background:#3b82f6;"></button>
+    <button class="color-btn" data-color="#a855f7" style="background:#a855f7;"></button>
+  </div>
+
+  <div id="startScreen" class="overlay-screen">
+    <div class="overlay-title">🌈 무지개 카멜레온의 색깔 냠냠</div>
+    <div class="overlay-desc">
+      날아오는 곤충 젤리의 색깔에 맞춰<br>
+      하단 팔레트로 카멜레온의 몸 색을 바꾸고<br>
+      화면을 탭해 기다란 혀로 냠냠 낚아채세요! 👅
+    </div>
+    <button class="start-btn" id="startBtn">색깔 냠냠 시작!</button>
+  </div>
+
+  <div id="clearScreen" class="overlay-screen hidden">
+    <div class="overlay-title">🎉 배부른 카멜레온 알록이!</div>
+    <div class="overlay-desc" id="clearScoreDesc">
+      총 <b>1,500</b>점을 획득했어요!<br>
+      무지개 정원의 최고의 색깔 마술사 장윤이! 🌿
+    </div>
+    <button class="start-btn" id="restartBtn">한 판 더 냠냠하기</button>
+  </div>
+
+  <script>
+    // Web Audio API
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.25, gainVal = 0.2) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playTongueShoot() {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(850, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch (e) {}
+    }
+
+    function playEatSound(isMatch) {
+      if (isMatch) {
+        playTone(523.25, 'triangle', 0.15, 0.3);
+        setTimeout(() => playTone(659.25, 'triangle', 0.15, 0.3), 60);
+        setTimeout(() => playTone(783.99, 'sine', 0.25, 0.35), 120);
+      } else {
+        playTone(280, 'sine', 0.2, 0.2);
+      }
+    }
+
+    function playColorChangeTone() {
+      playTone(440 + Math.random() * 200, 'sine', 0.12, 0.15);
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const COLORS = ['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
+    let currentColor = COLORS[0];
+    let score = 0;
+    let combo = 0;
+    let isPlaying = false;
+
+    // Chameleon position
+    const chameleon = {
+      x: 0,
+      y: 0,
+      targetColor: COLORS[0],
+      eyeAngle: 0,
+      tongueOut: false,
+      tongueTarget: null,
+      tongueProgress: 0
+    };
+
+    let bugs = [];
+    let particles = [];
+    let spawnTimer = 0;
+
+    function spawnBug() {
+      const isRainbow = Math.random() < 0.12;
+      const col = isRainbow ? 'rainbow' : COLORS[Math.floor(Math.random() * COLORS.length)];
+      bugs.push({
+        x: Math.random() * (width - 120) + 60,
+        y: -30,
+        vy: Math.random() * 80 + 90,
+        vx: (Math.random() - 0.5) * 40,
+        color: col,
+        r: 16,
+        wingPhase: 0,
+        alive: true
+      });
+    }
+
+    function shootTongue(targetPos) {
+      if (chameleon.tongueOut) return;
+      initAudio();
+      playTongueShoot();
+      chameleon.tongueOut = true;
+      chameleon.tongueTarget = targetPos;
+      chameleon.tongueProgress = 0;
+    }
+
+    // Palette Color Buttons
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        initAudio();
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        currentColor = btn.dataset.color;
+        chameleon.targetColor = currentColor;
+        playColorChangeTone();
+        spawnParticles(chameleon.x, chameleon.y, 10, currentColor);
+      });
+    });
+
+    // Tap on screen to shoot tongue at nearest bug or tap location
+    canvas.addEventListener('pointerdown', (e) => {
+      if (!isPlaying) return;
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      // Don't shoot if tapped inside palette bar area
+      if (clickY > height - 100) return;
+
+      // Find closest alive bug near tap
+      let closestBug = null;
+      let minDist = 140;
+      bugs.forEach(b => {
+        if (!b.alive) return;
+        const d = Math.hypot(b.x - clickX, b.y - clickY);
+        if (d < minDist) {
+          minDist = d;
+          closestBug = b;
+        }
+      });
+
+      if (closestBug) {
+        shootTongue({ x: closestBug.x, y: closestBug.y, bug: closestBug });
+      } else {
+        shootTongue({ x: clickX, y: clickY, bug: null });
+      }
+    });
+
+    function spawnParticles(x, y, count = 12, color = '#fef08a') {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 4 + 1;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1.0,
+          decay: Math.random() * 0.04 + 0.02,
+          size: Math.random() * 4 + 2,
+          color: color
+        });
+      }
+    }
+
+    // Loop
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      ctx.clearRect(0, 0, width, height);
+
+      chameleon.x = width * 0.5;
+      chameleon.y = height * 0.72;
+
+      if (isPlaying) {
+        // Spawn bugs
+        spawnTimer += dt;
+        if (spawnTimer > 0.8) {
+          spawnTimer = 0;
+          spawnBug();
+        }
+
+        // Update bugs
+        for (let i = bugs.length - 1; i >= 0; i--) {
+          const b = bugs[i];
+          b.y += b.vy * dt;
+          b.x += Math.sin(now * 0.004 + i) * 1.5;
+          b.wingPhase += dt * 15;
+
+          if (b.y > height + 40) {
+            bugs.splice(i, 1);
+            if (b.alive) {
+              combo = 0;
+              document.getElementById('comboVal').textContent = '0';
+            }
+          }
+        }
+
+        // Tongue Logic
+        if (chameleon.tongueOut && chameleon.tongueTarget) {
+          chameleon.tongueProgress += dt * 6.5;
+          if (chameleon.tongueProgress >= 1.0) {
+            // Reached target
+            const tgt = chameleon.tongueTarget;
+            if (tgt.bug && tgt.bug.alive) {
+              tgt.bug.alive = false;
+              const isMatch = (tgt.bug.color === 'rainbow' || tgt.bug.color === currentColor);
+              if (isMatch) {
+                combo += 1;
+                const pts = 200 + combo * 50;
+                score += pts;
+                playEatSound(true);
+                spawnParticles(tgt.bug.x, tgt.bug.y, 20, currentColor);
+              } else {
+                combo = 0;
+                score += 50;
+                playEatSound(false);
+                spawnParticles(tgt.bug.x, tgt.bug.y, 10, '#94a3b8');
+              }
+              document.getElementById('scoreVal').textContent = score;
+              document.getElementById('comboVal').textContent = combo;
+
+              // Clear target bug
+              const bIdx = bugs.indexOf(tgt.bug);
+              if (bIdx >= 0) bugs.splice(bIdx, 1);
+
+              if (score >= 1500) {
+                gameOver();
+              }
+            }
+            chameleon.tongueOut = false;
+            chameleon.tongueTarget = null;
+            chameleon.tongueProgress = 0;
+          }
+        }
+      }
+
+      // Draw Branch
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.roundRect(chameleon.x - 140, chameleon.y + 22, 280, 24, 12);
+      ctx.fill();
+
+      // Draw Tongue
+      if (chameleon.tongueOut && chameleon.tongueTarget) {
+        const tx = chameleon.x + (chameleon.tongueTarget.x - chameleon.x) * chameleon.tongueProgress;
+        const ty = (chameleon.y - 10) + (chameleon.tongueTarget.y - (chameleon.y - 10)) * chameleon.tongueProgress;
+
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 8;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(chameleon.x, chameleon.y - 10);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+
+        // Tongue tip
+        ctx.fillStyle = '#e11d48';
+        ctx.beginPath();
+        ctx.arc(tx, ty, 10, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw Chameleon Body
+      ctx.save();
+      ctx.translate(chameleon.x, chameleon.y);
+
+      // Chameleon Body
+      ctx.fillStyle = currentColor;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 48, 30, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Belly highlight
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.beginPath();
+      ctx.ellipse(0, 8, 32, 14, 0, 0, Math.PI);
+      ctx.fill();
+
+      // Chameleon Head
+      ctx.fillStyle = currentColor;
+      ctx.beginPath();
+      ctx.ellipse(32, -8, 22, 20, 0.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye Turret
+      ctx.fillStyle = currentColor;
+      ctx.beginPath();
+      ctx.arc(36, -14, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye Pupil
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(38, -14, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pupil Glint
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(39, -15, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Curled Tail
+      ctx.strokeStyle = currentColor;
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(-48, -4, 16, 0.5, Math.PI * 1.6);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // Draw Flying Bugs
+      bugs.forEach(b => {
+        if (!b.alive) return;
+        ctx.save();
+        ctx.translate(b.x, b.y);
+
+        // Wings
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        const wingSpread = Math.sin(b.wingPhase) * 14;
+        ctx.beginPath();
+        ctx.ellipse(-10, -6, 12, Math.abs(wingSpread), -0.3, 0, Math.PI * 2);
+        ctx.ellipse(10, -6, 12, Math.abs(wingSpread), 0.3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bug Body
+        if (b.color === 'rainbow') {
+          const grad = ctx.createLinearGradient(-b.r, 0, b.r, 0);
+          grad.addColorStop(0, '#ef4444');
+          grad.addColorStop(0.3, '#f59e0b');
+          grad.addColorStop(0.6, '#22c55e');
+          grad.addColorStop(1, '#3b82f6');
+          ctx.fillStyle = grad;
+        } else {
+          ctx.fillStyle = b.color;
+        }
+        ctx.beginPath();
+        ctx.arc(0, 0, b.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Glint
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-4, -4, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      // Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= p.decay;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function gameOver() {
+      isPlaying = false;
+      document.getElementById('clearScoreDesc').innerHTML = `
+        총 <b>${score}</b>점을 모았어요!<br>
+        무지개 카멜레온 알록이가 배부르게 웃고 있어요! 🌈
+      `;
+      document.getElementById('clearScreen').classList.remove('hidden');
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      initAudio();
+      document.getElementById('startScreen').classList.add('hidden');
+      score = 0;
+      combo = 0;
+      bugs = [];
+      particles = [];
+      isPlaying = true;
+      document.getElementById('scoreVal').textContent = '0';
+      document.getElementById('comboVal').textContent = '0';
+      requestAnimationFrame(loop);
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      document.getElementById('clearScreen').classList.add('hidden');
+      score = 0;
+      combo = 0;
+      bugs = [];
+      particles = [];
+      isPlaying = true;
+      document.getElementById('scoreVal').textContent = '0';
+      document.getElementById('comboVal').textContent = '0';
+    });
+  </script>
+</body>
+</html>

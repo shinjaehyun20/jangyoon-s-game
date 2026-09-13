@@ -1,3 +1,7 @@
+## 2026-09-14 — rainbow-chameleon-catch, space-rover-crystal-dash (총 258개)
+- **[🌈 무지개 카멜레온의 색깔 냠냠 (rainbow-chameleon-catch)]** — 날아오는 곤충 젤리 색깔에 맞춰 카멜레온 색을 바꾸고 기다란 혀로 낚아채는 색채 아케이드 (외부 의존성 0).
+- **[🚀 우주 탐사차의 크리스탈 대쉬 (space-rover-crystal-dash)]** — 달과 화성의 분화구를 저중력 부스터로 뛰어넘으며 에너지 크리스탈을 모으는 우주 점프 런 (외부 의존성 0).
+
 ## 2026-09-13 — star-constellation-weaver, bubble-whale-ocean-dive (총 256개)
 - **[✨ 반짝 별자리 엮기 (star-constellation-weaver)]** — 밤하늘의 빛나는 별들을 이어 전설의 별자리를 완성하고 챠임 멜로디를 피워내는 힐링 퍼즐 (외부 의존성 0).
 - **[🐋 방울 고래의 심해 다이빙 (bubble-whale-ocean-dive)]** — 귀여운 아기 고래와 함께 심해로 다이빙하며 산소 방울과 진주를 모으는 해양 어드벤처 (외부 의존성 0).
