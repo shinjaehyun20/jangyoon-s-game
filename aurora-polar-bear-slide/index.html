@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>❄️ 오로라 북극곰의 얼음 썰매 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: radial-gradient(circle at center, #022c43 0%, #051923 60%, #000814 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1.5px solid rgba(56, 189, 248, 0.5);
+      color: #38bdf8;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.25);
+      backdrop-filter: blur(8px);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .status-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .badge {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #e0f2fe;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(8px);
+    }
+    .badge span {
+      color: #38bdf8;
+      font-weight: 900;
+    }
+    .touch-controls {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 20;
+      pointer-events: none;
+    }
+    .ctrl-btn {
+      pointer-events: auto;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+    .ctrl-btn:active {
+      transform: scale(0.9);
+      background: rgba(56, 189, 248, 0.4);
+    }
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .overlay-screen.hidden {
+      display: none;
+    }
+    .overlay-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #38bdf8;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+      margin-bottom: 12px;
+    }
+    .overlay-desc {
+      font-size: 16px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      max-width: 320px;
+      margin-bottom: 28px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #38bdf8 0%, #06b6d4 100%);
+      color: #fff;
+      border: none;
+      padding: 14px 44px;
+      font-size: 19px;
+      font-weight: 900;
+      border-radius: 32px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+      transition: transform 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 놀이터로</a>
+    <div class="status-group">
+      <div class="badge">달린 거리 <span id="distVal">0m</span></div>
+      <div class="badge">눈송이 <span id="snowVal">0</span></div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="touch-controls">
+    <div class="ctrl-btn" id="leftBtn">◀</div>
+    <div class="ctrl-btn" id="jumpBtn">🚀</div>
+    <div class="ctrl-btn" id="rightBtn">▶</div>
+  </div>
+
+  <div id="startScreen" class="overlay-screen">
+    <div class="overlay-title">❄️ 오로라 북극곰의 얼음 썰매</div>
+    <div class="overlay-desc">
+      눈부신 오로라 아래 빙판길을 씽씽 달리는<br>
+      귀여운 아기 북극곰 포포!<br>
+      좌우로 레인을 바꾸고 점프하며<br>
+      반짝이는 눈송이와 물고기를 모아보세요! 🐟
+    </div>
+    <button class="start-btn" id="startBtn">얼음 썰매 출발!</button>
+  </div>
+
+  <div id="gameOverScreen" class="overlay-screen hidden">
+    <div class="overlay-title">🌨️ 썰매 질주 완료!</div>
+    <div class="overlay-desc" id="gameResultDesc">
+      총 <b>300m</b>를 신나게 달리고<br>
+      눈송이 25개를 모았습니다!
+    </div>
+    <button class="start-btn" id="restartBtn">다시 씽씽 달리기</button>
+  </div>
+
+  <script>
+    // Audio Context
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.25, gainVal = 0.2) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playSnowSound() {
+      playTone(880, 'triangle', 0.15, 0.2);
+      setTimeout(() => playTone(1318.51, 'sine', 0.25, 0.25), 60);
+    }
+    function playJumpSound() {
+      playTone(440, 'sine', 0.25, 0.25);
+    }
+    function playHitSound() {
+      playTone(150, 'sawtooth', 0.3, 0.3);
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Polar Bear Sled Player
+    const player = {
+      lane: 1, // 0: Left, 1: Center, 2: Right
+      x: 0,
+      targetX: 0,
+      y: 0,
+      jumpY: 0,
+      vy: 0,
+      isGrounded: true,
+      width: 50,
+      height: 40
+    };
+
+    let isPlaying = false;
+    let distance = 0;
+    let snowflakes = 0;
+    let speed = 260;
+    let obstacles = [];
+    let items = [];
+    let particles = [];
+    let auroras = [];
+
+    // Background Aurora Waves
+    for (let i = 0; i < 3; i++) {
+      auroras.push({
+        color: i === 0 ? 'rgba(56, 189, 248, 0.25)' : (i === 1 ? 'rgba(74, 222, 128, 0.25)' : 'rgba(168, 85, 247, 0.25)'),
+        offset: i * 2.0,
+        speed: 0.8 + i * 0.4
+      });
+    }
+
+    function getLaneX(laneIndex) {
+      const laneWidth = Math.min(100, width * 0.28);
+      const centerX = width * 0.5;
+      return centerX + (laneIndex - 1) * laneWidth;
+    }
+
+    function resetGame() {
+      player.lane = 1;
+      player.x = getLaneX(1);
+      player.targetX = player.x;
+      player.y = height * 0.76;
+      player.jumpY = 0;
+      player.vy = 0;
+      player.isGrounded = true;
+
+      distance = 0;
+      snowflakes = 0;
+      speed = 260;
+      obstacles = [];
+      items = [];
+      particles = [];
+      isPlaying = true;
+
+      document.getElementById('distVal').textContent = '0m';
+      document.getElementById('snowVal').textContent = '0';
+    }
+
+    function moveLeft() {
+      if (!isPlaying) return;
+      initAudio();
+      if (player.lane > 0) {
+        player.lane -= 1;
+        player.targetX = getLaneX(player.lane);
+        playTone(523.25, 'triangle', 0.1, 0.15);
+      }
+    }
+
+    function moveRight() {
+      if (!isPlaying) return;
+      initAudio();
+      if (player.lane < 2) {
+        player.lane += 1;
+        player.targetX = getLaneX(player.lane);
+        playTone(659.25, 'triangle', 0.1, 0.15);
+      }
+    }
+
+    function jump() {
+      if (!isPlaying) return;
+      initAudio();
+      if (player.isGrounded) {
+        player.vy = -380;
+        player.isGrounded = false;
+        playJumpSound();
+      }
+    }
+
+    // Input Events
+    document.getElementById('leftBtn').addEventListener('pointerdown', moveLeft);
+    document.getElementById('rightBtn').addEventListener('pointerdown', moveRight);
+    document.getElementById('jumpBtn').addEventListener('pointerdown', jump);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
+      if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
+      if (e.key === 'ArrowUp' || e.code === 'Space' || e.key === 'w') jump();
+    });
+
+    let spawnTimer = 0;
+    function updateEntities(dt) {
+      distance += (speed * dt) * 0.12;
+      document.getElementById('distVal').textContent = `${Math.floor(distance)}m`;
+      speed = Math.min(460, 260 + distance * 0.35);
+
+      // Player X interpolation
+      player.x += (player.targetX - player.x) * 16 * dt;
+
+      // Player Jump Physics
+      if (!player.isGrounded) {
+        player.vy += 880 * dt;
+        player.jumpY += player.vy * dt;
+        if (player.jumpY >= 0) {
+          player.jumpY = 0;
+          player.vy = 0;
+          player.isGrounded = true;
+        }
+      }
+
+      // Spawning
+      spawnTimer += dt;
+      if (spawnTimer > 1.2) {
+        spawnTimer = 0;
+        const chosenLane = Math.floor(Math.random() * 3);
+        const isSnow = Math.random() < 0.65;
+
+        if (isSnow) {
+          // Snowflake or fish item
+          items.push({
+            lane: chosenLane,
+            y: -30,
+            r: 16,
+            type: Math.random() < 0.3 ? 'fish' : 'snow'
+          });
+        } else {
+          // Obstacle (Snowman or Ice Rock)
+          obstacles.push({
+            lane: chosenLane,
+            y: -40,
+            width: 36,
+            height: 42
+          });
+        }
+      }
+
+      // Move Items
+      for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i];
+        it.y += speed * dt;
+        const itX = getLaneX(it.lane);
+
+        // Check collision
+        const dist = Math.hypot(itX - player.x, it.y - (player.y + player.jumpY));
+        if (dist < it.r + 25) {
+          snowflakes += (it.type === 'fish' ? 3 : 1);
+          document.getElementById('snowVal').textContent = snowflakes;
+          playSnowSound();
+          spawnParticles(itX, it.y, 14, it.type === 'fish' ? '#f59e0b' : '#38bdf8');
+          items.splice(i, 1);
+          continue;
+        }
+
+        if (it.y > height + 50) items.splice(i, 1);
+      }
+
+      // Move Obstacles
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.y += speed * dt;
+        const obsX = getLaneX(obs.lane);
+
+        // Collision Check (only if low enough to hit ground)
+        if (player.jumpY > -24) {
+          const dx = Math.abs(obsX - player.x);
+          const dy = Math.abs(obs.y - (player.y + player.jumpY));
+          if (dx < 28 && dy < 32) {
+            playHitSound();
+            gameOver();
+            return;
+          }
+        }
+
+        if (obs.y > height + 60) obstacles.splice(i, 1);
+      }
+    }
+
+    function spawnParticles(x, y, count = 12, color = '#38bdf8') {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 120 + 40;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          size: Math.random() * 4 + 2,
+          color: color,
+          life: 1.0,
+          decay: Math.random() * 0.04 + 0.02
+        });
+      }
+    }
+
+    function gameOver() {
+      isPlaying = false;
+      document.getElementById('gameResultDesc').innerHTML = `
+        총 썰매 질주 거리: <b>${Math.floor(distance)}m</b><br>
+        수집한 눈송이: <b>${snowflakes}개</b><br>
+        오로라 설원의 최고 썰매 챔피언 장윤이! ❄️
+      `;
+      document.getElementById('gameOverScreen').classList.remove('hidden');
+    }
+
+    // Drawing
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      player.y = height * 0.76;
+
+      if (isPlaying) {
+        updateEntities(dt);
+      }
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw Sky & Aurora
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, '#000814');
+      skyGrad.addColorStop(0.5, '#051923');
+      skyGrad.addColorStop(1, '#003554');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Aurora Waves
+      auroras.forEach((a, idx) => {
+        ctx.fillStyle = a.color;
+        ctx.beginPath();
+        ctx.moveTo(0, height * 0.1);
+        for (let x = 0; x <= width; x += 40) {
+          const y = height * 0.15 + Math.sin(x * 0.008 + now * 0.0015 * a.speed + a.offset) * 45;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(width, 0);
+        ctx.lineTo(0, 0);
+        ctx.closePath();
+        ctx.fill();
+      });
+
+      // Ice Highway Tracks (3 Lanes)
+      const laneWidth = Math.min(100, width * 0.28);
+      const centerX = width * 0.5;
+
+      for (let l = 0; l < 3; l++) {
+        const lx = getLaneX(l);
+        ctx.fillStyle = 'rgba(224, 242, 254, 0.12)';
+        ctx.beginPath();
+        ctx.roundRect(lx - laneWidth * 0.45, 0, laneWidth * 0.9, height, 16);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Draw Items
+      items.forEach(it => {
+        const ix = getLaneX(it.lane);
+        ctx.save();
+        ctx.translate(ix, it.y);
+
+        if (it.type === 'fish') {
+          ctx.fillStyle = '#38bdf8';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 16, 9, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(-12, 0);
+          ctx.lineTo(-20, -7);
+          ctx.lineTo(-20, 7);
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          // Snowflake
+          ctx.strokeStyle = '#e0f2fe';
+          ctx.lineWidth = 2.5;
+          for (let a = 0; a < 3; a++) {
+            ctx.beginPath();
+            ctx.moveTo(-12, 0);
+            ctx.lineTo(12, 0);
+            ctx.stroke();
+            ctx.rotate(Math.PI / 3);
+          }
+        }
+        ctx.restore();
+      });
+
+      // Draw Obstacles (Snowman)
+      obstacles.forEach(obs => {
+        const ox = getLaneX(obs.lane);
+        ctx.save();
+        ctx.translate(ox, obs.y);
+
+        // Snowman Body
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath();
+        ctx.arc(0, 8, 16, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Snowman Head
+        ctx.beginPath();
+        ctx.arc(0, -10, 11, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Carrot Nose
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.moveTo(0, -10);
+        ctx.lineTo(8, -8);
+        ctx.lineTo(0, -6);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      // Draw Polar Bear on Sled
+      ctx.save();
+      ctx.translate(player.x, player.y + player.jumpY);
+
+      // Wooden Sled
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.roundRect(-24, 10, 48, 8, 4);
+      ctx.fill();
+
+      // Sled Runners (Skis)
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-28, 18);
+      ctx.lineTo(26, 18);
+      ctx.lineTo(32, 12);
+      ctx.stroke();
+
+      // Polar Bear Body
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(0, -2, 18, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head
+      ctx.beginPath();
+      ctx.arc(10, -14, 11, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ears
+      ctx.beginPath();
+      ctx.arc(5, -23, 4, 0, Math.PI * 2);
+      ctx.arc(15, -23, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Nose & Eye
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(18, -13, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(12, -16, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Red Scarf
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.roundRect(2, -7, 14, 6, 3);
+      ctx.fill();
+
+      ctx.restore();
+
+      // Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life -= p.decay;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      initAudio();
+      document.getElementById('startScreen').classList.add('hidden');
+      resetGame();
+      requestAnimationFrame(loop);
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      document.getElementById('gameOverScreen').classList.add('hidden');
+      resetGame();
+    });
+  </script>
+</body>
+</html>

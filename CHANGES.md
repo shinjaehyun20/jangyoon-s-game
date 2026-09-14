@@ -1,3 +1,7 @@
+## 2026-09-15 — sweet-jelly-candy-factory, aurora-polar-bear-slide (총 260개)
+- **[🍬 달콤 젤리 사탕 공장 (sweet-jelly-candy-factory)]** — 컨베이어 벨트를 타고 오는 젤리 사탕을 타이밍에 맞춰 선물 상자에 쏙쏙 담는 리듬 패킹 (외부 의존성 0).
+- **[❄️ 오로라 북극곰의 얼음 썰매 (aurora-polar-bear-slide)]** — 눈부신 오로라 빙판길을 썰매 타고 달리며 눈송이와 물고기를 모으는 3레인 슬라이딩 런 (외부 의존성 0).
+
 ## 2026-09-14 — rainbow-chameleon-catch, space-rover-crystal-dash (총 258개)
 - **[🌈 무지개 카멜레온의 색깔 냠냠 (rainbow-chameleon-catch)]** — 날아오는 곤충 젤리 색깔에 맞춰 카멜레온 색을 바꾸고 기다란 혀로 낚아채는 색채 아케이드 (외부 의존성 0).
 - **[🚀 우주 탐사차의 크리스탈 대쉬 (space-rover-crystal-dash)]** — 달과 화성의 분화구를 저중력 부스터로 뛰어넘으며 에너지 크리스탈을 모으는 우주 점프 런 (외부 의존성 0).

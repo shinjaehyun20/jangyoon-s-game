@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 258개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 260개.
 
-[![Games](https://img.shields.io/badge/games-258-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-260-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![258개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![260개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 258개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 260개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [❄️ 오로라 북극곰의 얼음 썰매 (aurora-polar-bear-slide)](./aurora-polar-bear-slide) | 눈부신 오로라 빙판길을 썰매 타고 달리며 눈송이와 물고기를 모으는 3레인 슬라이딩 런 | 어린이/겨울·런 |
+| [🍬 달콤 젤리 사탕 공장 (sweet-jelly-candy-factory)](./sweet-jelly-candy-factory) | 컨베이어 벨트를 타고 오는 젤리 사탕을 타이밍에 맞춰 선물 상자에 쏙쏙 담는 리듬 패킹 | 어린이/리듬·패킹 |
 | [🚀 우주 탐사차의 크리스탈 대쉬 (space-rover-crystal-dash)](./space-rover-crystal-dash) | 달과 화성의 분화구를 저중력 부스터로 뛰어넘으며 에너지 크리스탈을 모으는 우주 점프 런 | 어린이/우주·런 |
 | [🌈 무지개 카멜레온의 색깔 냠냠 (rainbow-chameleon-catch)](./rainbow-chameleon-catch) | 날아오는 곤충 젤리 색깔에 맞춰 카멜레온 색을 바꾸고 기다란 혀로 낚아채는 색채 아케이드 | 어린이/색채·반응 |
 | [🐋 방울 고래의 심해 다이빙 (bubble-whale-ocean-dive)](./bubble-whale-ocean-dive) | 귀여운 아기 고래와 함께 심해로 다이빙하며 산소 방울과 진주를 모으는 해양 어드벤처 | 어린이/잠수·어드벤처 |

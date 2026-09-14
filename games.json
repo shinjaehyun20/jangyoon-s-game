@@ -2062,5 +2062,21 @@
     "description": "달과 화성의 신비로운 분화구를 누비는 꼬마 우주 탐사차 루나 1호와 함께 저중력 부스터 점프로 장애물을 뛰어넘고 우주 에너지 크리스탈을 모으는 점프 런 놀이입니다.",
     "thumbnail": "space-rover-crystal-dash/thumb.svg",
     "path": "space-rover-crystal-dash/index.html"
+  },
+  {
+    "id": "sweet-jelly-candy-factory",
+    "title": "Sweet Jelly Candy Factory",
+    "title_ko": "🍬 달콤 젤리 사탕 공장",
+    "description": "컨베이어 벨트를 타고 오는 알록달록 무지개 젤리 사탕을 포장 구역 타이밍에 맞춰 올바른 선물 상자에 쏙쏙 담아 포장하는 리듬 패킹 아케이드 놀이입니다.",
+    "thumbnail": "sweet-jelly-candy-factory/thumb.svg",
+    "path": "sweet-jelly-candy-factory/index.html"
+  },
+  {
+    "id": "aurora-polar-bear-slide",
+    "title": "Aurora Polar Bear Slide",
+    "title_ko": "❄️ 오로라 북극곰의 얼음 썰매",
+    "description": "눈부신 오로라 아래 빙판길을 썰매 타고 씽씽 미끄러지며 좌우로 레인을 바꾸고 점프하여 반짝이는 눈송이와 얼음 생선을 모으는 슬라이딩 런 놀이입니다.",
+    "thumbnail": "aurora-polar-bear-slide/thumb.svg",
+    "path": "aurora-polar-bear-slide/index.html"
   }
 ]

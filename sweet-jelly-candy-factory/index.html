@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍬 달콤 젤리 사탕 공장 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #fbcfe8 0%, #f472b6 45%, #db2777 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #ec4899;
+      color: #be185d;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .score-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #fde047;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #854d0e;
+      box-shadow: 0 4px 12px rgba(253, 224, 71, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .score-badge span {
+      color: #db2777;
+    }
+    .box-palette-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 16px;
+      border-radius: 36px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(8px);
+    }
+    .box-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      border: 3px solid #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.12s;
+    }
+    .box-btn:active {
+      transform: scale(0.88);
+    }
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(131, 24, 67, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .overlay-screen.hidden {
+      display: none;
+    }
+    .overlay-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #fef08a;
+      text-shadow: 0 0 20px rgba(254, 240, 138, 0.6);
+      margin-bottom: 12px;
+    }
+    .overlay-desc {
+      font-size: 16px;
+      color: #fdf2f8;
+      line-height: 1.6;
+      max-width: 320px;
+      margin-bottom: 28px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #fde047 0%, #f43f5e 100%);
+      color: #fff;
+      border: none;
+      padding: 14px 44px;
+      font-size: 19px;
+      font-weight: 900;
+      border-radius: 32px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(244, 63, 94, 0.4);
+      transition: transform 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 놀이터로</a>
+    <div class="score-group">
+      <div class="score-badge">포장 <span id="scoreVal">0</span>점</div>
+      <div class="score-badge">콤보 <span id="comboVal">0</span>x</div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="box-palette-bar" id="paletteBar">
+    <button class="box-btn" data-color="#ef4444" style="background:#ef4444;">🍓</button>
+    <button class="box-btn" data-color="#eab308" style="background:#eab308;">🍋</button>
+    <button class="box-btn" data-color="#22c55e" style="background:#22c55e;">🍏</button>
+    <button class="box-btn" data-color="#3b82f6" style="background:#3b82f6;">🫐</button>
+    <button class="box-btn" data-color="#a855f7" style="background:#a855f7;">🍇</button>
+  </div>
+
+  <div id="startScreen" class="overlay-screen">
+    <div class="overlay-title">🍬 달콤 젤리 사탕 공장</div>
+    <div class="overlay-desc">
+      컨베이어 벨트를 타고 오는 맛있는 젤리들!<br>
+      가운데 반짝이는 <b>포장 구역(🎯)</b>에 왔을 때<br>
+      같은 색깔의 상자 버튼을 쏙쏙 눌러주세요! 🎁
+    </div>
+    <button class="start-btn" id="startBtn">사탕 포장 시작!</button>
+  </div>
+
+  <div id="clearScreen" class="overlay-screen hidden">
+    <div class="overlay-title">🎉 포장 명장 장윤이!</div>
+    <div class="overlay-desc" id="clearScoreDesc">
+      총 <b>1,800</b>점을 달성했어요!<br>
+      세상에서 가장 달콤하고 예쁜 선물 상자 완성! 🎀
+    </div>
+    <button class="start-btn" id="restartBtn">한 번 더 포장하기</button>
+  </div>
+
+  <script>
+    // Audio Context
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.25, gainVal = 0.2) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playPackSound(isPerfect) {
+      if (isPerfect) {
+        playTone(659.25, 'triangle', 0.12, 0.25);
+        setTimeout(() => playTone(880.00, 'triangle', 0.18, 0.3), 60);
+        setTimeout(() => playTone(1318.51, 'sine', 0.25, 0.35), 120);
+      } else {
+        playTone(523.25, 'triangle', 0.15, 0.2);
+        setTimeout(() => playTone(659.25, 'sine', 0.2, 0.25), 80);
+      }
+    }
+
+    function playMissSound() {
+      playTone(220, 'sawtooth', 0.25, 0.2);
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const CANDY_TYPES = [
+      { color: '#ef4444', emoji: '🍓', name: '딸기' },
+      { color: '#eab308', emoji: '🍋', name: '레몬' },
+      { color: '#22c55e', emoji: '🍏', name: '사과' },
+      { color: '#3b82f6', emoji: '🫐', name: '블루베리' },
+      { color: '#a855f7', emoji: '🍇', name: '포도' }
+    ];
+
+    let score = 0;
+    let combo = 0;
+    let isPlaying = false;
+    let speed = 180;
+    let jellies = [];
+    let particles = [];
+    let spawnTimer = 0;
+
+    // Conveyor Belt Parameters
+    const belt = {
+      y: 0,
+      height: 80,
+      targetX: 0,
+      targetRadius: 42
+    };
+
+    function spawnJelly() {
+      const isStar = Math.random() < 0.12;
+      const type = isStar ? { color: 'rainbow', emoji: '⭐', name: '별빛' } : CANDY_TYPES[Math.floor(Math.random() * CANDY_TYPES.length)];
+      jellies.push({
+        x: -40,
+        y: belt.y + belt.height * 0.5,
+        type: type,
+        r: 26,
+        bouncePhase: Math.random() * Math.PI,
+        alive: true
+      });
+    }
+
+    function handleBoxClick(color) {
+      if (!isPlaying) return;
+      initAudio();
+
+      // Find jelly closest to target zone
+      let targetJelly = null;
+      let minDelta = 9999;
+      for (const j of jellies) {
+        if (!j.alive) continue;
+        const delta = Math.abs(j.x - belt.targetX);
+        if (delta < belt.targetRadius * 1.8 && delta < minDelta) {
+          minDelta = delta;
+          targetJelly = j;
+        }
+      }
+
+      if (targetJelly) {
+        const isMatch = (targetJelly.type.color === 'rainbow' || targetJelly.type.color === color);
+        if (isMatch) {
+          targetJelly.alive = false;
+          const isPerfect = minDelta < belt.targetRadius * 0.7;
+          combo += 1;
+          const pts = (isPerfect ? 200 : 120) + combo * 30;
+          score += pts;
+          document.getElementById('scoreVal').textContent = score;
+          document.getElementById('comboVal').textContent = combo;
+
+          playPackSound(isPerfect);
+          spawnParticles(targetJelly.x, targetJelly.y, 18, color);
+
+          const idx = jellies.indexOf(targetJelly);
+          if (idx >= 0) jellies.splice(idx, 1);
+
+          if (score >= 1800) {
+            gameOver();
+          }
+        } else {
+          combo = 0;
+          document.getElementById('comboVal').textContent = '0';
+          playMissSound();
+          spawnParticles(targetJelly.x, targetJelly.y, 8, '#64748b');
+        }
+      }
+    }
+
+    document.querySelectorAll('.box-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleBoxClick(btn.dataset.color);
+      });
+    });
+
+    // Keyboard support (1..5 or A..G)
+    window.addEventListener('keydown', (e) => {
+      const keyMap = {
+        '1': '#ef4444', 'a': '#ef4444', 'A': '#ef4444',
+        '2': '#eab308', 's': '#eab308', 'S': '#eab308',
+        '3': '#22c55e', 'd': '#22c55e', 'D': '#22c55e',
+        '4': '#3b82f6', 'f': '#3b82f6', 'F': '#3b82f6',
+        '5': '#a855f7', 'g': '#a855f7', 'G': '#a855f7'
+      };
+      if (keyMap[e.key]) {
+        handleBoxClick(keyMap[e.key]);
+      }
+    });
+
+    function spawnParticles(x, y, count = 12, color = '#fef08a') {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 120 + 40;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          size: Math.random() * 5 + 3,
+          color: color === 'rainbow' ? '#fde047' : color,
+          life: 1.0,
+          decay: Math.random() * 0.04 + 0.02
+        });
+      }
+    }
+
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      ctx.clearRect(0, 0, width, height);
+
+      belt.y = height * 0.42;
+      belt.targetX = width * 0.5;
+
+      if (isPlaying) {
+        spawnTimer += dt;
+        if (spawnTimer > 1.1) {
+          spawnTimer = 0;
+          spawnJelly();
+        }
+
+        // Move Jellies
+        for (let i = jellies.length - 1; i >= 0; i--) {
+          const j = jellies[i];
+          j.x += speed * dt;
+          j.bouncePhase += dt * 8;
+
+          if (j.x > width + 50) {
+            jellies.splice(i, 1);
+            if (j.alive) {
+              combo = 0;
+              document.getElementById('comboVal').textContent = '0';
+            }
+          }
+        }
+      }
+
+      // Draw Conveyor Belt
+      ctx.fillStyle = '#475569';
+      ctx.beginPath();
+      ctx.roundRect(0, belt.y, width, belt.height, 12);
+      ctx.fill();
+
+      // Belt rollers pattern
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      const rollerOffset = (now * 0.15) % 36;
+      for (let rx = -rollerOffset; rx < width; rx += 36) {
+        ctx.beginPath();
+        ctx.moveTo(rx, belt.y);
+        ctx.lineTo(rx, belt.y + belt.height);
+        ctx.stroke();
+      }
+
+      // Target Packing Zone
+      ctx.strokeStyle = '#fde047';
+      ctx.lineWidth = 4;
+      ctx.setLineDash([8, 8]);
+      ctx.beginPath();
+      ctx.arc(belt.targetX, belt.y + belt.height * 0.5, belt.targetRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = 'rgba(253, 224, 71, 0.2)';
+      ctx.beginPath();
+      ctx.arc(belt.targetX, belt.y + belt.height * 0.5, belt.targetRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Target Zone Pin
+      ctx.fillStyle = '#fde047';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🎯 포장 구역', belt.targetX, belt.y - 12);
+
+      // Draw Jellies
+      jellies.forEach(j => {
+        if (!j.alive) return;
+        const bounce = Math.abs(Math.sin(j.bouncePhase)) * 8;
+        const jy = j.y - bounce;
+
+        ctx.save();
+        ctx.translate(j.x, jy);
+
+        if (j.type.color === 'rainbow') {
+          const grad = ctx.createRadialGradient(0, 0, 4, 0, 0, j.r);
+          grad.addColorStop(0, '#fef08a');
+          grad.addColorStop(0.5, '#f472b6');
+          grad.addColorStop(1, '#38bdf8');
+          ctx.fillStyle = grad;
+        } else {
+          ctx.fillStyle = j.type.color;
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, j.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Shiny glint
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.beginPath();
+        ctx.arc(-7, -7, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Emoji
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(j.type.emoji, 0, 2);
+
+        ctx.restore();
+      });
+
+      // Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life -= p.decay;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function gameOver() {
+      isPlaying = false;
+      document.getElementById('clearScoreDesc').innerHTML = `
+        총 <b>${score}</b>점을 모았어요!<br>
+        달콤 젤리 사탕을 완벽하게 포장했습니다! 🍬
+      `;
+      document.getElementById('clearScreen').classList.remove('hidden');
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      initAudio();
+      document.getElementById('startScreen').classList.add('hidden');
+      score = 0;
+      combo = 0;
+      jellies = [];
+      particles = [];
+      isPlaying = true;
+      document.getElementById('scoreVal').textContent = '0';
+      document.getElementById('comboVal').textContent = '0';
+      requestAnimationFrame(loop);
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      document.getElementById('clearScreen').classList.add('hidden');
+      score = 0;
+      combo = 0;
+      jellies = [];
+      particles = [];
+      isPlaying = true;
+      document.getElementById('scoreVal').textContent = '0';
+      document.getElementById('comboVal').textContent = '0';
+    });
+  </script>
+</body>
+</html>
