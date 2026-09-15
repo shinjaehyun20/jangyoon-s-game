@@ -2078,5 +2078,21 @@
     "description": "눈부신 오로라 아래 빙판길을 썰매 타고 씽씽 미끄러지며 좌우로 레인을 바꾸고 점프하여 반짝이는 눈송이와 얼음 생선을 모으는 슬라이딩 런 놀이입니다.",
     "thumbnail": "aurora-polar-bear-slide/thumb.svg",
     "path": "aurora-polar-bear-slide/index.html"
+  },
+  {
+    "id": "magic-potion-cauldron",
+    "title": "Magic Potion Cauldron",
+    "title_ko": "✨ 마법 가마솥의 퐁당 물약",
+    "description": "신비로운 밤하늘 아래 별가루, 달빛 방울, 반짝 버섯 등 마법 재료를 가마솥으로 쏙쏙 받아내며 검은 연기 폭탄을 피하고 오색 무지개 물약을 완성하는 캐주얼 캐치 놀이입니다.",
+    "thumbnail": "magic-potion-cauldron/thumb.svg",
+    "path": "magic-potion-cauldron/index.html"
+  },
+  {
+    "id": "desert-fennic-dune-bounce",
+    "title": "Desert Fennic Dune Bounce",
+    "title_ko": "🦊 사막여우의 모래언덕 통통",
+    "description": "귀여운 아기 사막여우와 함께 바람결에 흔들리는 모래 언덕 발판을 퐁퐁 밟고 뛰어오르며 오아시스 물방울을 모으고 선인장 가시를 피해 더 높은 하늘로 도약하는 버티컬 점프 놀이입니다.",
+    "thumbnail": "desert-fennic-dune-bounce/thumb.svg",
+    "path": "desert-fennic-dune-bounce/index.html"
   }
 ]

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#fef08a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="dune" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#78350f" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect width="400" height="300" rx="24" fill="url(#sky)"/>
+  <!-- Distant Dunes -->
+  <path d="M0,220 Q120,180 240,230 T400,200 L400,300 L0,300 Z" fill="#fbbf24" opacity="0.6"/>
+  <!-- Floating Dune Platforms -->
+  <rect x="50" y="210" width="120" height="24" rx="12" fill="url(#dune)" stroke="#b45309" stroke-width="4" filter="url(#shadow)"/>
+  <rect x="230" y="150" width="130" height="24" rx="12" fill="url(#dune)" stroke="#b45309" stroke-width="4" filter="url(#shadow)"/>
+  <rect x="110" y="90" width="140" height="24" rx="12" fill="url(#dune)" stroke="#b45309" stroke-width="4" filter="url(#shadow)"/>
+  <!-- Collectables -->
+  <text x="180" y="70" font-size="28" text-anchor="middle">💧</text>
+  <text x="290" y="130" font-size="26" text-anchor="middle">⭐</text>
+  <!-- Jumping Fennec Fox -->
+  <text x="200" y="145" font-size="60" text-anchor="middle" filter="url(#shadow)">🦊</text>
+  <!-- Jump dust -->
+  <circle cx="110" cy="210" r="8" fill="#fde047" opacity="0.8"/>
+  <circle cx="95" cy="215" r="5" fill="#fde047" opacity="0.6"/>
+  <!-- Title text -->
+  <text x="200" y="270" font-family="'Pretendard', sans-serif" font-weight="900" font-size="20" fill="#78350f" text-anchor="middle">🦊 사막여우의 모래언덕 통통</text>
+</svg>

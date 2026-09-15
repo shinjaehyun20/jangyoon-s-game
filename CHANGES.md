@@ -1,3 +1,7 @@
+## 2026-09-16 — magic-potion-cauldron, desert-fennic-dune-bounce (총 262개)
+- **[✨ 마법 가마솥의 퐁당 물약 (magic-potion-cauldron)]** — 떨어지는 별가루와 마법 재료를 가마솥으로 받아 오색 물약을 완성하는 캐주얼 캐치 (외부 의존성 0).
+- **[🦊 사막여우의 모래언덕 통통 (desert-fennic-dune-bounce)]** — 모래 언덕 발판을 퐁퐁 밟고 뛰어오르며 물방울을 모으고 선인장을 피하는 버티컬 점프 (외부 의존성 0).
+
 ## 2026-09-15 — sweet-jelly-candy-factory, aurora-polar-bear-slide (총 260개)
 - **[🍬 달콤 젤리 사탕 공장 (sweet-jelly-candy-factory)]** — 컨베이어 벨트를 타고 오는 젤리 사탕을 타이밍에 맞춰 선물 상자에 쏙쏙 담는 리듬 패킹 (외부 의존성 0).
 - **[❄️ 오로라 북극곰의 얼음 썰매 (aurora-polar-bear-slide)]** — 눈부신 오로라 빙판길을 썰매 타고 달리며 눈송이와 물고기를 모으는 3레인 슬라이딩 런 (외부 의존성 0).

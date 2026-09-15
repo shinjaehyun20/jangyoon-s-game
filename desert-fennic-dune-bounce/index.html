@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🦊 사막여우의 모래언덕 통통 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #38bdf8 0%, #fde047 60%, #f59e0b 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #ea580c;
+      color: #c2410c;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .score-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #f59e0b;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #9a3412;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .game-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(120, 53, 15, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      text-align: center;
+      padding: 24px;
+    }
+    .game-overlay h1 {
+      font-size: 32px;
+      color: #fffbeb;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 12px rgba(245, 158, 11, 0.6);
+    }
+    .game-overlay p {
+      font-size: 16px;
+      color: #fed7aa;
+      margin-bottom: 24px;
+      line-height: 1.6;
+      max-width: 420px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      border: none;
+      color: #ffffff;
+      padding: 16px 42px;
+      border-radius: 36px;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.45);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 홈으로</a>
+    <div class="score-group">
+      <div class="score-badge">🦊 높이: <span id="heightVal">0m</span></div>
+      <div class="score-badge">⭐ 점수: <span id="scoreVal">0</span></div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startOverlay" class="game-overlay">
+    <h1>🦊 사막여우의 모래언덕 통통</h1>
+    <p>귀여운 아기 사막여우와 함께 모래언덕 발판을 퐁퐁 밟고 높이 점프하세요!<br>화면을 터치하거나 좌우로 움직여 여우를 이동시킵니다.<br>반짝이는 오아시스 물방울을 모으고 선인장은 피하세요!</p>
+    <button id="startBtn" class="start-btn">사막 모험 시작! 🏜️</button>
+  </div>
+
+  <div id="gameOverOverlay" class="game-overlay" style="display: none;">
+    <h1 id="endTitle">모래바람 착륙! 🏜️</h1>
+    <p id="endDesc">최고 높이 도달 완료!</p>
+    <button id="restartBtn" class="start-btn">다시 높이 뛰기! 🔄</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const heightVal = document.getElementById('heightVal');
+    const scoreVal = document.getElementById('scoreVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let W = 0, H = 0;
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio API
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', dur = 0.15, gain = 0.1) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(gain, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function playBounceSound() {
+      playTone(320, 'sine', 0.1, 0.15);
+      setTimeout(() => playTone(480, 'sine', 0.15, 0.12), 40);
+    }
+
+    function playItemSound() {
+      playTone(587.33, 'triangle', 0.1, 0.15);
+      setTimeout(() => playTone(880, 'sine', 0.2, 0.15), 60);
+    }
+
+    function playCactusSound() {
+      playTone(200, 'sawtooth', 0.2, 0.2);
+    }
+
+    // Game Variables
+    let gameActive = false;
+    let score = 0;
+    let maxHeight = 0;
+    let cameraY = 0;
+
+    // Fennec Fox
+    const fox = {
+      x: W / 2,
+      y: H - 150,
+      width: 44,
+      height: 44,
+      vx: 0,
+      vy: -12,
+      facing: 1
+    };
+
+    const platforms = [];
+    const collectables = [];
+    const particles = [];
+
+    function spawnPlatforms() {
+      platforms.length = 0;
+      collectables.length = 0;
+
+      // Base platform
+      platforms.push({
+        x: W / 2 - 80,
+        y: H - 80,
+        w: 160,
+        h: 22,
+        type: 'sand'
+      });
+
+      // Procedural vertical platforms
+      let curY = H - 160;
+      for (let i = 0; i < 40; i++) {
+        const pw = Math.random() * 30 + 80;
+        const px = Math.random() * (W - pw - 40) + 20;
+        const hasCactus = Math.random() < 0.15 && i > 5;
+        platforms.push({
+          x: px,
+          y: curY,
+          w: pw,
+          h: 20,
+          type: hasCactus ? 'cactus' : 'sand'
+        });
+
+        // Collectable on some platforms
+        if (!hasCactus && Math.random() < 0.4) {
+          collectables.push({
+            x: px + pw / 2,
+            y: curY - 24,
+            type: Math.random() < 0.5 ? 'water' : 'date',
+            char: Math.random() < 0.5 ? '💧' : '🌴',
+            collected: false
+          });
+        }
+
+        curY -= Math.random() * 40 + 75;
+      }
+    }
+
+    function addMorePlatforms(topY) {
+      let curY = topY - 80;
+      for (let i = 0; i < 20; i++) {
+        const pw = Math.random() * 30 + 80;
+        const px = Math.random() * (W - pw - 40) + 20;
+        const hasCactus = Math.random() < 0.18;
+        platforms.push({
+          x: px,
+          y: curY,
+          w: pw,
+          h: 20,
+          type: hasCactus ? 'cactus' : 'sand'
+        });
+
+        if (!hasCactus && Math.random() < 0.45) {
+          collectables.push({
+            x: px + pw / 2,
+            y: curY - 24,
+            type: 'water',
+            char: Math.random() < 0.5 ? '💧' : '⭐',
+            collected: false
+          });
+        }
+        curY -= Math.random() * 40 + 75;
+      }
+    }
+
+    function createDust(x, y, color = '#fde047', count = 8) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 3,
+          radius: Math.random() * 4 + 2,
+          color,
+          alpha: 1
+        });
+      }
+    }
+
+    // Input handlers
+    let targetX = W / 2;
+    function handlePointer(clientX) {
+      targetX = clientX;
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      if (gameActive) handlePointer(e.clientX);
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (gameActive && e.touches.length > 0) {
+        handlePointer(e.touches[0].clientX);
+      }
+    }, { passive: true });
+
+    window.addEventListener('keydown', (e) => {
+      if (!gameActive) return;
+      if (e.key === 'ArrowLeft' || e.key === 'a') {
+        targetX = Math.max(30, targetX - 40);
+      } else if (e.key === 'ArrowRight' || e.key === 'd') {
+        targetX = Math.min(W - 30, targetX + 40);
+      }
+    });
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      maxHeight = 0;
+      cameraY = 0;
+      particles.length = 0;
+      fox.x = W / 2;
+      fox.y = H - 150;
+      fox.vx = 0;
+      fox.vy = -12;
+      targetX = W / 2;
+      spawnPlatforms();
+      scoreVal.textContent = score;
+      heightVal.textContent = '0m';
+      gameActive = true;
+      startOverlay.style.display = 'none';
+      gameOverOverlay.style.display = 'none';
+    }
+
+    function endGame() {
+      gameActive = false;
+      document.getElementById('endTitle').textContent = `모래언덕 모험 완결! 🦊`;
+      document.getElementById('endDesc').innerHTML = `최고 도달 높이: <strong>${maxHeight}m</strong><br>총 획득 점수: <strong>${score}점</strong>!`;
+      gameOverOverlay.style.display = 'flex';
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    let lastTime = 0;
+
+    function update(dt) {
+      if (!gameActive) return;
+
+      // Fox Horizontal Move
+      const dx = targetX - fox.x;
+      fox.vx = dx * 0.15;
+      fox.x += fox.vx;
+      if (fox.vx > 0.5) fox.facing = 1;
+      else if (fox.vx < -0.5) fox.facing = -1;
+
+      // Wrap horizontal
+      if (fox.x < -20) fox.x = W + 20;
+      else if (fox.x > W + 20) fox.x = -20;
+
+      // Gravity & Vertical Move
+      fox.vy += 22 * dt; // gravity
+      fox.y += fox.vy;
+
+      // Camera follow fox moving up
+      const targetCamY = H * 0.55 - fox.y;
+      if (targetCamY > cameraY) {
+        cameraY += (targetCamY - cameraY) * 0.2;
+      }
+
+      // Record max height
+      const currentHeight = Math.max(0, Math.floor((H - 150 - fox.y) / 10));
+      if (currentHeight > maxHeight) {
+        maxHeight = currentHeight;
+        heightVal.textContent = `${maxHeight}m`;
+      }
+
+      // Check landing on platforms (only when falling downwards)
+      if (fox.vy > 0) {
+        for (const plat of platforms) {
+          if (
+            fox.x + 15 > plat.x &&
+            fox.x - 15 < plat.x + plat.w &&
+            fox.y + 20 >= plat.y &&
+            fox.y + 20 <= plat.y + 22
+          ) {
+            if (plat.type === 'cactus') {
+              playCactusSound();
+              fox.vy = -8;
+              createDust(fox.x, plat.y, '#16a34a', 12);
+              score = Math.max(0, score - 20);
+              scoreVal.textContent = score;
+            } else {
+              playBounceSound();
+              fox.vy = -13.5;
+              createDust(fox.x, plat.y, '#f59e0b', 10);
+            }
+            break;
+          }
+        }
+      }
+
+      // Check collectables
+      for (const col of collectables) {
+        if (!col.collected) {
+          const cdx = Math.abs(fox.x - col.x);
+          const cdy = Math.abs(fox.y - col.y);
+          if (cdx < 28 && cdy < 28) {
+            col.collected = true;
+            playItemSound();
+            createDust(col.x, col.y, '#38bdf8', 14);
+            score += 50;
+            scoreVal.textContent = score;
+          }
+        }
+      }
+
+      // Spawn more platforms if needed
+      const highestPlat = platforms[platforms.length - 1];
+      if (highestPlat && highestPlat.y + cameraY > -400) {
+        addMorePlatforms(highestPlat.y);
+      }
+
+      // Check Game Over (falling below screen)
+      if (fox.y + cameraY > H + 80) {
+        endGame();
+      }
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= dt * 2.0;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      ctx.save();
+      ctx.translate(0, cameraY);
+
+      // Draw platforms
+      for (const plat of platforms) {
+        if (plat.y + cameraY < -50 || plat.y + cameraY > H + 50) continue;
+
+        if (plat.type === 'cactus') {
+          ctx.fillStyle = '#15803d';
+          ctx.strokeStyle = '#166534';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.roundRect(plat.x, plat.y, plat.w, plat.h, 8);
+          ctx.fill();
+          ctx.stroke();
+          // Cactus spines
+          ctx.fillStyle = '#bbf7d0';
+          for (let sp = 8; sp < plat.w; sp += 16) {
+            ctx.fillRect(plat.x + sp, plat.y - 4, 3, 5);
+          }
+        } else {
+          // Sand Dune platform
+          const sandGrad = ctx.createLinearGradient(plat.x, plat.y, plat.x, plat.y + plat.h);
+          sandGrad.addColorStop(0, '#fef08a');
+          sandGrad.addColorStop(1, '#f59e0b');
+          ctx.fillStyle = sandGrad;
+          ctx.strokeStyle = '#d97706';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.roundRect(plat.x, plat.y, plat.w, plat.h, 10);
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+
+      // Draw collectables
+      for (const col of collectables) {
+        if (col.collected) continue;
+        if (col.y + cameraY < -50 || col.y + cameraY > H + 50) continue;
+        ctx.font = '24px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(col.char, col.x, col.y);
+      }
+
+      // Draw particles
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Draw Fennec Fox
+      ctx.save();
+      ctx.translate(fox.x, fox.y);
+      ctx.scale(fox.facing, 1);
+
+      // Fox Emoji & Graphic
+      ctx.font = '36px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🦊', 0, 0);
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    function gameLoop(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+      update(dt);
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    requestAnimationFrame((now) => {
+      lastTime = now;
+      gameLoop(now);
+    });
+  </script>
+</body>
+</html>
