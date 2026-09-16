@@ -1,3 +1,7 @@
+## 2026-09-17 — jellyfish-bubble-pop, constellation-star-catcher (총 264개)
+- **[🪼 해파리의 퐁퐁 방울 터뜨리기 (jellyfish-bubble-pop)]** — 바닷속 떠오르는 비눗방울을 터뜨리고 진주를 모으는 탭 팝 아케이드 (외부 의존성 0).
+- **[🌌 반짝 별자리 잇기 (constellation-star-catcher)]** — 밤하늘 별들을 순서대로 터치해 마법 별자리를 완성하는 감성 퍼즐 (외부 의존성 0).
+
 ## 2026-09-16 — magic-potion-cauldron, desert-fennic-dune-bounce (총 262개)
 - **[✨ 마법 가마솥의 퐁당 물약 (magic-potion-cauldron)]** — 떨어지는 별가루와 마법 재료를 가마솥으로 받아 오색 물약을 완성하는 캐주얼 캐치 (외부 의존성 0).
 - **[🦊 사막여우의 모래언덕 통통 (desert-fennic-dune-bounce)]** — 모래 언덕 발판을 퐁퐁 밟고 뛰어오르며 물방울을 모으고 선인장을 피하는 버티컬 점프 (외부 의존성 0).

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <radialGradient id="ocean" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="60%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <rect width="400" height="300" rx="24" fill="url(#ocean)"/>
+  <!-- Bubbles -->
+  <circle cx="80" cy="90" r="28" fill="#38bdf8" opacity="0.4" stroke="#7dd3fc" stroke-width="3"/>
+  <circle cx="72" cy="80" r="7" fill="#ffffff" opacity="0.8"/>
+  <circle cx="320" cy="110" r="32" fill="#fbbf24" opacity="0.4" stroke="#fde047" stroke-width="3"/>
+  <circle cx="310" cy="100" r="8" fill="#ffffff" opacity="0.8"/>
+  <text x="320" y="118" font-size="24" text-anchor="middle">⭐</text>
+  <circle cx="120" cy="220" r="24" fill="#f472b6" opacity="0.4" stroke="#fbcfe8" stroke-width="3"/>
+  <circle cx="280" cy="230" r="26" fill="#a78bfa" opacity="0.4" stroke="#ddd6fe" stroke-width="3"/>
+  <!-- Cute Pink Jellyfish -->
+  <g transform="translate(200, 140)">
+    <path d="M-40,0 A40,40 0 0,1 40,0 Q40,20 0,20 Q-40,20 -40,0 Z" fill="#f472b6" stroke="#fb7185" stroke-width="4" filter="url(#glow)"/>
+    <!-- Eyes & Smile -->
+    <circle cx="-14" cy="-5" r="4" fill="#0c4a6e"/>
+    <circle cx="14" cy="-5" r="4" fill="#0c4a6e"/>
+    <path d="M-6,6 Q0,12 6,6" stroke="#0c4a6e" stroke-width="3" fill="none"/>
+    <!-- Tentacles -->
+    <path d="M-28,20 Q-34,45 -22,70" stroke="#f472b6" stroke-width="5" fill="none"/>
+    <path d="M-10,20 Q-16,48 -8,72" stroke="#f472b6" stroke-width="5" fill="none"/>
+    <path d="M10,20 Q16,48 8,72" stroke="#f472b6" stroke-width="5" fill="none"/>
+    <path d="M28,20 Q34,45 22,70" stroke="#f472b6" stroke-width="5" fill="none"/>
+  </g>
+  <!-- Title text -->
+  <text x="200" y="265" font-family="'Pretendard', sans-serif" font-weight="900" font-size="20" fill="#f0f9ff" text-anchor="middle" filter="url(#glow)">🪼 해파리의 퐁퐁 방울 터뜨리기</text>
+</svg>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🪼 해파리의 퐁퐁 방울 터뜨리기 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: radial-gradient(circle at center, #0284c7 0%, #0369a1 40%, #0c4a6e 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #0284c7;
+      color: #0369a1;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .score-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #38bdf8;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #0284c7;
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .timer-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #f59e0b;
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #d97706;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+    .game-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(12, 74, 110, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      text-align: center;
+      padding: 24px;
+    }
+    .game-overlay h1 {
+      font-size: 32px;
+      color: #f0f9ff;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 12px rgba(56, 189, 248, 0.6);
+    }
+    .game-overlay p {
+      font-size: 16px;
+      color: #bae6fd;
+      margin-bottom: 24px;
+      line-height: 1.6;
+      max-width: 420px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      border: none;
+      color: #ffffff;
+      padding: 16px 42px;
+      border-radius: 36px;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.45);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 홈으로</a>
+    <div class="score-group">
+      <div class="score-badge">🪼 방울: <span id="scoreVal">0</span></div>
+      <div class="timer-badge">⏱️ <span id="timeVal">30</span>초</div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startOverlay" class="game-overlay">
+    <h1>🪼 해파리의 퐁퐁 방울 터뜨리기</h1>
+    <p>바닷속에서 퐁퐁 떠오르는 알록달록 무지개 비눗방울을 터치하세요!<br>황금 진주 방울을 터뜨리면 추가 점수를 얻어요.<br>먹물 방울(검은색)은 피해야 해요!</p>
+    <button id="startBtn" class="start-btn">바닷속 놀이 시작! 🌊</button>
+  </div>
+
+  <div id="gameOverOverlay" class="game-overlay" style="display: none;">
+    <h1 id="endTitle">방울 파티 완료! 🫧</h1>
+    <p id="endDesc">시원한 바닷속 방울 터뜨리기 대성공!</p>
+    <button id="restartBtn" class="start-btn">다시 터뜨리기! 🔄</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const timeVal = document.getElementById('timeVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let W = 0, H = 0;
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio API
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', dur = 0.1, gain = 0.15) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(gain, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function playPopSound(bonus = false) {
+      if (bonus) {
+        playTone(659.25, 'triangle', 0.12, 0.2);
+        setTimeout(() => playTone(880, 'sine', 0.15, 0.18), 50);
+      } else {
+        playTone(440 + Math.random() * 200, 'sine', 0.09, 0.15);
+      }
+    }
+
+    function playInkSound() {
+      playTone(160, 'sawtooth', 0.2, 0.2);
+    }
+
+    // Game variables
+    let gameActive = false;
+    let score = 0;
+    let timeLeft = 30;
+    let spawnTimer = 0;
+    let lastTime = 0;
+
+    const bubbles = [];
+    const particles = [];
+
+    // Cute floating jellyfish follower
+    const jellyfish = {
+      x: W / 2,
+      y: H / 2,
+      targetX: W / 2,
+      targetY: H / 2,
+      phase: 0
+    };
+
+    const BUBBLE_TYPES = [
+      { type: 'blue', color: '#38bdf8', pts: 10, char: '🫧', radius: 28, speed: 2.0 },
+      { type: 'pink', color: '#f472b6', pts: 15, char: '🌸', radius: 30, speed: 2.2 },
+      { type: 'gold', color: '#fbbf24', pts: 30, char: '⭐', radius: 34, speed: 2.5 },
+      { type: 'pearl', color: '#a78bfa', pts: 25, char: '🦪', radius: 32, speed: 2.3 },
+      { type: 'ink', color: '#475569', pts: -20, char: '🦑', radius: 30, speed: 2.1 }
+    ];
+
+    function spawnBubble() {
+      const isSpecial = Math.random();
+      let t;
+      if (isSpecial < 0.12) t = BUBBLE_TYPES[4]; // ink
+      else if (isSpecial < 0.28) t = BUBBLE_TYPES[2]; // gold
+      else if (isSpecial < 0.45) t = BUBBLE_TYPES[3]; // pearl
+      else if (isSpecial < 0.72) t = BUBBLE_TYPES[1]; // pink
+      else t = BUBBLE_TYPES[0]; // blue
+
+      const margin = 40;
+      bubbles.push({
+        x: Math.random() * (W - margin * 2) + margin,
+        y: H + 40,
+        t,
+        radius: t.radius,
+        vy: t.speed + Math.random() * 1.0,
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: Math.random() * 3 + 2
+      });
+    }
+
+    function createSplash(x, y, color, count = 12) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 4 + 1.5;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          radius: Math.random() * 4 + 2,
+          color,
+          alpha: 1
+        });
+      }
+    }
+
+    function popBubbleAt(clientX, clientY) {
+      if (!gameActive) return;
+      jellyfish.targetX = clientX;
+      jellyfish.targetY = clientY;
+
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        const dist = Math.hypot(clientX - b.x, clientY - b.y);
+        if (dist <= b.radius + 15) {
+          if (b.t.type === 'ink') {
+            playInkSound();
+            createSplash(b.x, b.y, '#334155', 16);
+            score = Math.max(0, score + b.t.pts);
+          } else {
+            playPopSound(b.t.type === 'gold');
+            createSplash(b.x, b.y, b.t.color, 14);
+            score += b.t.pts;
+          }
+          scoreVal.textContent = score;
+          bubbles.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      popBubbleAt(e.clientX, e.clientY);
+    });
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      timeLeft = 30;
+      bubbles.length = 0;
+      particles.length = 0;
+      scoreVal.textContent = score;
+      timeVal.textContent = timeLeft;
+      spawnTimer = 0;
+      gameActive = true;
+      startOverlay.style.display = 'none';
+      gameOverOverlay.style.display = 'none';
+      lastTime = performance.now();
+    }
+
+    function endGame() {
+      gameActive = false;
+      document.getElementById('endTitle').textContent = `퐁퐁 파티 완결! 🪼`;
+      document.getElementById('endDesc').innerHTML = `최종 점수: <strong>${score}점</strong><br>바닷속 비눗방울을 신나게 터뜨렸어요!`;
+      gameOverOverlay.style.display = 'flex';
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    function update(dt) {
+      if (!gameActive) return;
+
+      // Timer
+      timeLeft -= dt;
+      timeVal.textContent = Math.ceil(Math.max(0, timeLeft));
+      if (timeLeft <= 0) {
+        endGame();
+        return;
+      }
+
+      // Jellyfish smooth move
+      jellyfish.x += (jellyfish.targetX - jellyfish.x) * 0.1;
+      jellyfish.y += (jellyfish.targetY - jellyfish.y) * 0.1;
+      jellyfish.phase += dt * 4;
+
+      // Spawn
+      spawnTimer += dt;
+      if (spawnTimer >= 0.45) {
+        spawnBubble();
+        spawnTimer = 0;
+      }
+
+      // Update bubbles
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        b.y -= b.vy * 60 * dt;
+        b.wobble += b.wobbleSpeed * dt;
+        b.x += Math.sin(b.wobble) * 1.2;
+
+        if (b.y < -50) {
+          bubbles.splice(i, 1);
+        }
+      }
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= dt * 2.0;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Light rays
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(W * 0.2 * i, 0);
+        ctx.lineTo(W * 0.2 * i + 80, H);
+        ctx.lineTo(W * 0.2 * i + 140, H);
+        ctx.lineTo(W * 0.2 * i + 40, 0);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Draw bubbles
+      for (const b of bubbles) {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+
+        // Bubble circle
+        ctx.fillStyle = b.t.color + '44';
+        ctx.strokeStyle = b.t.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, b.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Highlight shine
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.beginPath();
+        ctx.arc(-b.radius * 0.35, -b.radius * 0.35, b.radius * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Icon inside
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(b.t.char, 0, 0);
+
+        ctx.restore();
+      }
+
+      // Draw particles
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Draw Jellyfish
+      ctx.save();
+      ctx.translate(jellyfish.x, jellyfish.y);
+      const pulse = Math.sin(jellyfish.phase) * 0.1 + 1.0;
+      ctx.scale(pulse, 2 - pulse);
+
+      // Jellyfish head
+      ctx.fillStyle = 'rgba(244, 114, 182, 0.85)';
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, 0, 26, Math.PI, 0);
+      ctx.quadraticCurveTo(26, 12, 0, 12);
+      ctx.quadraticCurveTo(-26, 12, -26, 0);
+      ctx.fill();
+      ctx.stroke();
+
+      // Tentacles
+      ctx.strokeStyle = 'rgba(244, 114, 182, 0.7)';
+      ctx.lineWidth = 3;
+      for (let t = -3; t <= 3; t++) {
+        ctx.beginPath();
+        ctx.moveTo(t * 6, 12);
+        const wav = Math.sin(jellyfish.phase + t) * 6;
+        ctx.quadraticCurveTo(t * 6 + wav, 24, t * 6 - wav, 36);
+        ctx.stroke();
+      }
+
+      // Cute Eyes
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(-8, -2, 3, 0, Math.PI * 2);
+      ctx.arc(8, -2, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function gameLoop(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+      update(dt);
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    requestAnimationFrame((now) => {
+      lastTime = now;
+      gameLoop(now);
+    });
+  </script>
+</body>
+</html>

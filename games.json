@@ -2094,5 +2094,21 @@
     "description": "귀여운 아기 사막여우와 함께 바람결에 흔들리는 모래 언덕 발판을 퐁퐁 밟고 뛰어오르며 오아시스 물방울을 모으고 선인장 가시를 피해 더 높은 하늘로 도약하는 버티컬 점프 놀이입니다.",
     "thumbnail": "desert-fennic-dune-bounce/thumb.svg",
     "path": "desert-fennic-dune-bounce/index.html"
+  },
+  {
+    "id": "jellyfish-bubble-pop",
+    "title": "Jellyfish Bubble Pop",
+    "title_ko": "🪼 해파리의 퐁퐁 방울 터뜨리기",
+    "description": "알록달록 깊은 바닷속에서 아기 해파리와 함께 퐁퐁 떠오르는 오색 비눗방울을 톡톡 터뜨리고 황금 별과 조개 진주를 모으는 경쾌한 탭 & 팝 아케이드 놀이입니다.",
+    "thumbnail": "jellyfish-bubble-pop/thumb.svg",
+    "path": "jellyfish-bubble-pop/index.html"
+  },
+  {
+    "id": "constellation-star-catcher",
+    "title": "Constellation Star Catcher",
+    "title_ko": "🌌 반짝 별자리 잇기",
+    "description": "신비로운 밤하늘의 별들을 1, 2, 3 번호 순서대로 터치해 선을 잇고 왕관자리, 아기곰자리, 백조자리 등 아름다운 마법 별자리를 완성하는 감성 별빛 퍼즐 놀이입니다.",
+    "thumbnail": "constellation-star-catcher/thumb.svg",
+    "path": "constellation-star-catcher/index.html"
   }
 ]
