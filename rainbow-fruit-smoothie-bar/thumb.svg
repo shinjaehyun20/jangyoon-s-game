@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <radialGradient id="fruitBg" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fff1f2"/>
+      <stop offset="60%" stop-color="#ffe4e6"/>
+      <stop offset="100%" stop-color="#fecdd3"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <rect width="400" height="300" rx="24" fill="url(#fruitBg)"/>
+  
+  <!-- Falling fruit circles -->
+  <g filter="url(#glow)">
+    <circle cx="70" cy="70" r="28" fill="#ffffff" stroke="#ff2a5f" stroke-width="3"/>
+    <text x="70" y="78" font-size="30" text-anchor="middle">🍓</text>
+
+    <circle cx="160" cy="50" r="28" fill="#ffffff" stroke="#facc15" stroke-width="3"/>
+    <text x="160" y="58" font-size="30" text-anchor="middle">🍌</text>
+
+    <circle cx="260" cy="55" r="28" fill="#ffffff" stroke="#84cc16" stroke-width="3"/>
+    <text x="260" y="63" font-size="30" text-anchor="middle">🥝</text>
+
+    <circle cx="340" cy="90" r="28" fill="#ffffff" stroke="#6366f1" stroke-width="3"/>
+    <text x="340" y="98" font-size="30" text-anchor="middle">🫐</text>
+  </g>
+
+  <!-- Smoothie Cup -->
+  <g transform="translate(140, 100)">
+    <!-- Shadow -->
+    <ellipse cx="60" cy="148" rx="48" ry="10" fill="#f43f5e" opacity="0.2"/>
+    <!-- Cup Body -->
+    <path d="M12,20 L108,20 L94,140 L26,140 Z" fill="#ffffff" opacity="0.7"/>
+    <!-- Smoothie layers -->
+    <path d="M24,140 L96,140 L93,115 L27,115 Z" fill="#6366f1"/>
+    <path d="M27,115 L93,115 L90,90 L30,90 Z" fill="#84cc16"/>
+    <path d="M30,90 L90,90 L87,65 L33,65 Z" fill="#facc15"/>
+    <path d="M33,65 L87,65 L84,40 L36,40 Z" fill="#ff2a5f"/>
+    <!-- Outline -->
+    <path d="M12,20 L108,20 L94,140 L26,140 Z" fill="none" stroke="#ffffff" stroke-width="5"/>
+    <!-- Straw -->
+    <path d="M70,80 L88,0 L102,-10" fill="none" stroke="#38bdf8" stroke-width="8" stroke-linecap="round"/>
+    <path d="M70,80 L88,0 L102,-10" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <!-- Whipped Cream & Cherry -->
+    <text x="60" y="24" font-size="28" text-anchor="middle">🍦</text>
+    <text x="64" y="0" font-size="18" text-anchor="middle">🍒</text>
+    <text x="15" y="10" font-size="18">✨</text>
+    <text x="95" y="5" font-size="18">⭐</text>
+  </g>
+
+  <!-- Title banner -->
+  <text x="200" y="275" font-family="'Pretendard', sans-serif" font-weight="900" font-size="20" fill="#be123c" text-anchor="middle" filter="url(#glow)">🍓 무지개 과일 스무디 바</text>
+</svg>

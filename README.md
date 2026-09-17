@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 264개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 266개.
 
-[![Games](https://img.shields.io/badge/games-264-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-266-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![264개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![266개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 264개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 266개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🍓 무지개 과일 스무디 바 (rainbow-fruit-smoothie-bar)](./rainbow-fruit-smoothie-bar) | 하늘에서 떨어지는 오색 과일을 터치해 믹서기로 갈아 알록달록 스무디 잔을 채우는 터치 놀이 | 어린이/요리·터치 |
+| [🐧 꼬마 펭귄의 빙하 퐁당퐁당 (polar-penguin-ice-hop)](./polar-penguin-ice-hop) | 바다 위로 떠내려오는 얼음 유빙을 타이밍 맞춰 퐁당퐁당 건너는 점프 모험 놀이 | 어린이/점프·액션 |
 | [🌌 반짝 별자리 잇기 (constellation-star-catcher)](./constellation-star-catcher) | 밤하늘 별들을 번호 순서대로 이어 마법 별자리를 완성하는 감성 터치 퍼즐 | 어린이/우주·퍼즐 |
 | [🪼 해파리의 퐁퐁 방울 터뜨리기 (jellyfish-bubble-pop)](./jellyfish-bubble-pop) | 바닷속 떠오르는 오색 비눗방울을 톡톡 터뜨리고 진주를 모으는 탭 팝 아케이드 | 어린이/바다·터치 |
 | [🦊 사막여우의 모래언덕 통통 (desert-fennic-dune-bounce)](./desert-fennic-dune-bounce) | 모래 언덕 발판을 퐁퐁 밟고 뛰어오르며 물방울을 모으고 선인장을 피하는 버티컬 점프 | 어린이/사막·점프 |
@@ -461,6 +463,7 @@ VS Code `Live Server` 확장을 써도 된다.
 
 ## 최근 변경사항 (2026-09)
 
+- **🍓 무지개 과일 스무디 바 · 🐧 꼬마 펭귄의 빙하 퐁당퐁당 추가 (2026-09-18)** — 떨어지는 과일을 터치해 무지개 스무디 잔을 채우는 힐링 아케이드와 얼음 유빙을 건너는 타이밍 점프 모험 미니게임 2종 추가 (총 266개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
 - **🧋 버블티 펄 퐁퐁 · 🚀 250호 기념 우주 별자리 레인저 추가 (2026-09-09)** — 타피오카 펄 버블티 제조 힐링 터치 놀이와 250회 기념 우주 별자리 완성 스페이스 어드벤처 미니게임 2종 추가 (총 250개 대기록 달성). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
 - **🍮 말랑말랑 젤리 트램펄린 · 🫧 반짝반짝 심해 잠수함 탐험 추가 (2026-09-08)** — 푸딩 젤리 트램펄린 바운스 놀이와 심해 잠수함 유영 탐험 미니게임 2종 추가 (총 248개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, 터치 반응형 최적화.
 - **🐧 오로라 펭귄의 눈썰매 슬라이드 · ✨ 우주 별자리 잇기 탐험 추가 (2026-09-06)** — 오로라 빙판길을 미끄러지는 스피드 슬라이드와 우주 별들을 선으로 잇는 별자리 지각 미니게임 2종 추가 (총 246개). 단일 HTML, 외부 의존성 없음, Pointer Events 통합 조작.

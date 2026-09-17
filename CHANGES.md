@@ -1,3 +1,7 @@
+## 2026-09-18 — rainbow-fruit-smoothie-bar, polar-penguin-ice-hop (총 266개)
+- **[🍓 무지개 과일 스무디 바 (rainbow-fruit-smoothie-bar)]** — 떨어지는 오색 과일을 터치해 믹서기로 갈아 무지개 스무디 잔을 완성하는 터치 아케이드 (외부 의존성 0).
+- **[🐧 꼬마 펭귄의 빙하 퐁당퐁당 (polar-penguin-ice-hop)]** — 바다 위를 떠내려오는 얼음 유빙을 타이밍 맞춰 건너며 크릴새우와 물고기를 모으는 빙하 점프 어드벤처 (외부 의존성 0).
+
 ## 2026-09-17 — jellyfish-bubble-pop, constellation-star-catcher (총 264개)
 - **[🪼 해파리의 퐁퐁 방울 터뜨리기 (jellyfish-bubble-pop)]** — 바닷속 떠오르는 비눗방울을 터뜨리고 진주를 모으는 탭 팝 아케이드 (외부 의존성 0).
 - **[🌌 반짝 별자리 잇기 (constellation-star-catcher)]** — 밤하늘 별들을 순서대로 터치해 마법 별자리를 완성하는 감성 퍼즐 (외부 의존성 0).

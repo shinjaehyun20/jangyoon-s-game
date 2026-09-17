@@ -2110,5 +2110,21 @@
     "description": "신비로운 밤하늘의 별들을 1, 2, 3 번호 순서대로 터치해 선을 잇고 왕관자리, 아기곰자리, 백조자리 등 아름다운 마법 별자리를 완성하는 감성 별빛 퍼즐 놀이입니다.",
     "thumbnail": "constellation-star-catcher/thumb.svg",
     "path": "constellation-star-catcher/index.html"
+  },
+  {
+    "id": "rainbow-fruit-smoothie-bar",
+    "title": "Rainbow Fruit Smoothie Bar",
+    "title_ko": "🍓 무지개 과일 스무디 바",
+    "description": "하늘에서 퐁퐁 떨어지는 신선한 딸기, 바나나, 키위, 블루베리를 톡톡 터치해 믹서기에 갈아 넣고 알록달록 무지개 스무디 잔을 가득 채우는 달콤한 터치 놀이입니다.",
+    "thumbnail": "rainbow-fruit-smoothie-bar/thumb.svg",
+    "path": "rainbow-fruit-smoothie-bar/index.html"
+  },
+  {
+    "id": "polar-penguin-ice-hop",
+    "title": "Polar Penguin Ice Hop",
+    "title_ko": "🐧 꼬마 펭귄의 빙하 퐁당퐁당",
+    "description": "바다 위를 둥실둥실 떠내려오는 시원한 얼음 유빙을 타이밍 맞춰 퐁당퐁당 건너며 반짝이는 크릴새우와 은빛 물고기를 모으는 귀여운 빙하 점프 모험 놀이입니다.",
+    "thumbnail": "polar-penguin-ice-hop/thumb.svg",
+    "path": "polar-penguin-ice-hop/index.html"
   }
 ]

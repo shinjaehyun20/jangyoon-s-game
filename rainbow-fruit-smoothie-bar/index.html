@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍓 무지개 과일 스무디 바 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: radial-gradient(circle at 50% 30%, #fff1f2 0%, #ffe4e6 50%, #fecdd3 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #fb7185;
+      color: #e11d48;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(251, 113, 133, 0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .score-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #f43f5e;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #be123c;
+      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .target-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #38bdf8;
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #0369a1;
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+    }
+    .game-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      text-align: center;
+      padding: 24px;
+    }
+    .game-overlay h1 {
+      font-size: 32px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 12px rgba(244, 63, 94, 0.6);
+    }
+    .game-overlay p {
+      font-size: 16px;
+      color: #ffe4e6;
+      margin-bottom: 24px;
+      line-height: 1.6;
+      max-width: 420px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #f43f5e, #fb7185);
+      border: none;
+      color: #ffffff;
+      padding: 16px 42px;
+      border-radius: 36px;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(244, 63, 94, 0.45);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 홈으로</a>
+    <div class="score-group">
+      <div class="target-badge">🥤 잔 완성: <span id="cupVal">0</span></div>
+      <div class="score-badge">⭐ 점수: <span id="scoreVal">0</span></div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startOverlay" class="game-overlay">
+    <h1>🍓 무지개 과일 스무디 바</h1>
+    <p>하늘에서 퐁퐁 떨어지는 싱싱한 과일들을 톡톡 터치하세요!<br>과일이 믹서기에 갈리며 알록달록 무지개 스무디 잔이 가득 채워집니다!</p>
+    <button id="startBtn" class="start-btn">스무디 만들기 시작! 🍹</button>
+  </div>
+
+  <div id="gameOverOverlay" class="game-overlay" style="display: none;">
+    <h1 id="endTitle">무지개 스무디 마스터! 🎉</h1>
+    <p id="endDesc">달콤하고 시원한 스무디를 가득 만들었어요!</p>
+    <button id="restartBtn" class="start-btn">또 만들기! 🔄</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const cupVal = document.getElementById('cupVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let W = 0, H = 0;
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio API Sound Effects
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', dur = 0.15, gain = 0.15) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(gain, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function playSquishSound() {
+      if (!audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(540, now + 0.12);
+        g.gain.setValueAtTime(0.18, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(now + 0.14);
+      } catch (e) {}
+    }
+
+    function playBlenderSound() {
+      if (!audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.linearRampToValueAtTime(480, now + 0.08);
+        osc.frequency.linearRampToValueAtTime(260, now + 0.18);
+        g.gain.setValueAtTime(0.12, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(now + 0.2);
+      } catch (e) {}
+    }
+
+    function playCupCompleteSound() {
+      playTone(440, 'sine', 0.12, 0.2);
+      setTimeout(() => playTone(554.37, 'sine', 0.12, 0.2), 80);
+      setTimeout(() => playTone(659.25, 'sine', 0.15, 0.22), 160);
+      setTimeout(() => playTone(880.00, 'triangle', 0.35, 0.25), 240);
+    }
+
+    // Fruit definitions
+    const FRUIT_TYPES = [
+      { name: '딸기', emoji: '🍓', color: '#ff2a5f', lightColor: '#ff7597' },
+      { name: '바나나', emoji: '🍌', color: '#facc15', lightColor: '#fef08a' },
+      { name: '키위', emoji: '🥝', color: '#84cc16', lightColor: '#bef264' },
+      { name: '블루베리', emoji: '🫐', color: '#6366f1', lightColor: '#a5b4fc' },
+      { name: '망고', emoji: '🥭', color: '#fb923c', lightColor: '#fed7aa' },
+      { name: '포도', emoji: '🍇', color: '#a855f7', lightColor: '#d8b4fe' }
+    ];
+
+    let gameState = 'start'; // 'start', 'play', 'cup_celebrate'
+    let score = 0;
+    let completedCups = 0;
+    let currentCupProgress = 0;
+    const MAX_CUP_PROGRESS = 12; // 12 fruits per cup
+    let cupLayers = []; // array of colors filling the cup
+
+    let fruits = [];
+    let particles = [];
+    let lastSpawnTime = 0;
+    let spawnInterval = 750;
+
+    class Fruit {
+      constructor() {
+        const type = FRUIT_TYPES[Math.floor(Math.random() * FRUIT_TYPES.length)];
+        this.name = type.name;
+        this.emoji = type.emoji;
+        this.color = type.color;
+        this.lightColor = type.lightColor;
+        this.radius = Math.min(W, H) * 0.055 + 6;
+        this.x = this.radius + Math.random() * (W - this.radius * 2);
+        this.y = -this.radius;
+        this.vy = 2.0 + Math.random() * 2.2;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.rot = Math.random() * Math.PI * 2;
+        this.vRot = (Math.random() - 0.5) * 0.08;
+        this.wobble = Math.random() * Math.PI * 2;
+        this.alive = true;
+      }
+
+      update() {
+        this.y += this.vy;
+        this.x += this.vx;
+        this.rot += this.vRot;
+        this.wobble += 0.05;
+        this.x += Math.sin(this.wobble) * 0.8;
+
+        if (this.y > H + this.radius) {
+          this.alive = false;
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rot);
+
+        // Fruit background glow bubble
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 12;
+        ctx.fill();
+
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Emoji
+        ctx.shadowBlur = 0;
+        ctx.font = `${Math.floor(this.radius * 1.25)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.emoji, 0, 2);
+
+        ctx.restore();
+      }
+
+      isHit(px, py) {
+        const dx = px - this.x;
+        const dy = py - this.y;
+        return (dx * dx + dy * dy) <= (this.radius * 1.45) * (this.radius * 1.45);
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.radius = 4 + Math.random() * 6;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2.5 + Math.random() * 5.0;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.life = 1.0;
+        this.decay = 0.03 + Math.random() * 0.03;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.12; // gravity
+        this.life -= this.decay;
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function createSplash(x, y, color) {
+      for (let i = 0; i < 16; i++) {
+        particles.push(new Particle(x, y, color));
+      }
+    }
+
+    function handleInput(px, py) {
+      if (gameState !== 'play') return;
+
+      for (let i = fruits.length - 1; i >= 0; i--) {
+        const f = fruits[i];
+        if (f.alive && f.isHit(px, py)) {
+          f.alive = false;
+          score += 10;
+          currentCupProgress++;
+          cupLayers.push(f.color);
+          scoreVal.textContent = score;
+
+          createSplash(f.x, f.y, f.color);
+          playSquishSound();
+          playBlenderSound();
+
+          if (currentCupProgress >= MAX_CUP_PROGRESS) {
+            triggerCupComplete();
+          }
+          break;
+        }
+      }
+    }
+
+    let celebrationTimer = 0;
+    function triggerCupComplete() {
+      completedCups++;
+      cupVal.textContent = completedCups;
+      score += 100;
+      scoreVal.textContent = score;
+      playCupCompleteSound();
+
+      // Confetti burst from cup
+      const cupX = W * 0.5;
+      const cupY = H * 0.72;
+      for (let i = 0; i < 40; i++) {
+        const p = new Particle(cupX, cupY - 80, FRUIT_TYPES[i % FRUIT_TYPES.length].color);
+        p.vy = - (4 + Math.random() * 7);
+        p.vx = (Math.random() - 0.5) * 8;
+        particles.push(p);
+      }
+
+      gameState = 'cup_celebrate';
+      celebrationTimer = 70; // frames
+    }
+
+    function drawBlenderCup() {
+      const cupW = Math.min(W * 0.42, 180);
+      const cupH = cupW * 1.35;
+      const cupX = W * 0.5 - cupW * 0.5;
+      const cupY = H - cupH - 30;
+
+      ctx.save();
+
+      // Cup shadow
+      ctx.beginPath();
+      ctx.ellipse(W * 0.5, H - 22, cupW * 0.6, 12, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.18)';
+      ctx.fill();
+
+      // Clip cup inside to draw smoothie layers
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cupX + 12, cupY);
+      ctx.lineTo(cupX + cupW - 12, cupY);
+      ctx.lineTo(cupX + cupW - 28, cupY + cupH);
+      ctx.lineTo(cupX + 28, cupY + cupH);
+      ctx.closePath();
+      ctx.clip();
+
+      // Cup background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.fill();
+
+      // Smoothie liquid layers
+      const layerHeight = cupH / MAX_CUP_PROGRESS;
+      for (let i = 0; i < cupLayers.length; i++) {
+        const ly = (cupY + cupH) - (i + 1) * layerHeight;
+        ctx.fillStyle = cupLayers[i];
+        ctx.fillRect(cupX, ly, cupW, layerHeight + 2);
+      }
+
+      // Swirl / bubbles in smoothie
+      if (cupLayers.length > 0) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+        for (let b = 0; b < cupLayers.length * 2; b++) {
+          const bx = cupX + 30 + ((b * 37) % (cupW - 60));
+          const by = cupY + cupH - (b * 14) % (cupLayers.length * layerHeight);
+          ctx.beginPath();
+          ctx.arc(bx, by, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+
+      // Cup Glass Outline
+      ctx.beginPath();
+      ctx.moveTo(cupX + 12, cupY);
+      ctx.lineTo(cupX + cupW - 12, cupY);
+      ctx.lineTo(cupX + cupW - 28, cupY + cupH);
+      ctx.lineTo(cupX + 28, cupY + cupH);
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
+      // Glass highlight glare
+      ctx.beginPath();
+      ctx.moveTo(cupX + 24, cupY + 12);
+      ctx.lineTo(cupX + 36, cupY + cupH - 12);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // Cute Straw
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cupX + cupW * 0.55, cupY + cupH * 0.6);
+      ctx.lineTo(cupX + cupW * 0.75, cupY - 45);
+      ctx.lineTo(cupX + cupW * 0.88, cupY - 55);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // Straw white stripes
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.restore();
+
+      // If finished, show whipped cream & cherry
+      if (gameState === 'cup_celebrate' || currentCupProgress >= MAX_CUP_PROGRESS) {
+        ctx.font = '36px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🍦', W * 0.5, cupY + 4);
+        ctx.font = '24px sans-serif';
+        ctx.fillText('🍒', W * 0.5 + 4, cupY - 22);
+
+        // Twinkle stars
+        ctx.font = '22px sans-serif';
+        ctx.fillText('✨', cupX + 8, cupY - 10);
+        ctx.fillText('⭐', cupX + cupW - 8, cupY - 15);
+      }
+
+      ctx.restore();
+    }
+
+    function gameLoop(time) {
+      ctx.clearRect(0, 0, W, H);
+
+      // Background soft bubbles
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      for (let i = 0; i < 5; i++) {
+        const bx = (W * 0.2 * i + Math.sin(time * 0.001 + i) * 30) % W;
+        const by = (H * 0.25 * i + Math.cos(time * 0.001 + i) * 20) % H;
+        ctx.beginPath();
+        ctx.arc(bx, by, 28, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (gameState === 'play' || gameState === 'cup_celebrate') {
+        if (gameState === 'play' && time - lastSpawnTime > spawnInterval) {
+          fruits.push(new Fruit());
+          lastSpawnTime = time;
+        }
+
+        for (let i = fruits.length - 1; i >= 0; i--) {
+          const f = fruits[i];
+          f.update();
+          f.draw();
+          if (!f.alive) {
+            fruits.splice(i, 1);
+          }
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.update();
+          p.draw();
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+          }
+        }
+
+        drawBlenderCup();
+
+        if (gameState === 'cup_celebrate') {
+          celebrationTimer--;
+          if (celebrationTimer <= 0) {
+            cupLayers = [];
+            currentCupProgress = 0;
+            gameState = 'play';
+          }
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      initAudio();
+      handleInput(e.clientX, e.clientY);
+    });
+
+    startBtn.addEventListener('click', () => {
+      initAudio();
+      startOverlay.style.display = 'none';
+      score = 0;
+      completedCups = 0;
+      currentCupProgress = 0;
+      cupLayers = [];
+      fruits = [];
+      particles = [];
+      scoreVal.textContent = score;
+      cupVal.textContent = completedCups;
+      gameState = 'play';
+    });
+
+    restartBtn.addEventListener('click', () => {
+      initAudio();
+      gameOverOverlay.style.display = 'none';
+      score = 0;
+      completedCups = 0;
+      currentCupProgress = 0;
+      cupLayers = [];
+      fruits = [];
+      particles = [];
+      scoreVal.textContent = score;
+      cupVal.textContent = completedCups;
+      gameState = 'play';
+    });
+
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
