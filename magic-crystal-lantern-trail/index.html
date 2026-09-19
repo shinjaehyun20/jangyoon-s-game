@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🏮 마법 호롱불 반딧불이 길 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: radial-gradient(circle at 50% 30%, #312e81 0%, #1e1b4b 50%, #0f172a 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #a78bfa;
+      color: #6d28d9;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(167, 139, 250, 0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .score-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #fbbf24;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #b45309;
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .round-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #38bdf8;
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #0369a1;
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+    }
+    .game-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      text-align: center;
+      padding: 24px;
+    }
+    .game-overlay h1 {
+      font-size: 32px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 12px rgba(251, 191, 36, 0.6);
+    }
+    .game-overlay p {
+      font-size: 16px;
+      color: #e0e7ff;
+      margin-bottom: 24px;
+      line-height: 1.6;
+      max-width: 420px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      border: none;
+      color: #451a03;
+      padding: 16px 42px;
+      border-radius: 36px;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.45);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 홈으로</a>
+    <div class="score-group">
+      <div class="round-badge">🌲 라운드: <span id="roundVal">1</span></div>
+      <div class="score-badge">🏮 점수: <span id="scoreVal">0</span></div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startOverlay" class="game-overlay">
+    <h1>🏮 마법 호롱불 반딧불이 길</h1>
+    <p>신비로운 밤숲의 호롱불이 맑은 멜로디와 함께 반짝입니다!<br>빛나는 호롱불의 순서를 기억하고 터치해 꼬마 반딧불이의 길을 밝혀주세요!</p>
+    <button id="startBtn" class="start-btn">반딧불이 길 켜기! ✨</button>
+  </div>
+
+  <div id="gameOverOverlay" class="game-overlay" style="display: none;">
+    <h1 id="endTitle">신비로운 밤숲 완주! 🌟</h1>
+    <p id="endDesc">마법 호롱불 길을 환하게 밝혔어요!</p>
+    <button id="restartBtn" class="start-btn">다시 켜기! 🔄</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const roundVal = document.getElementById('roundVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let W = 0, H = 0;
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio API
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]; // C, D, E, G, A, C5
+    function playChime(noteIdx, dur = 0.35) {
+      if (!audioCtx) return;
+      try {
+        const freq = PENTATONIC[noteIdx % PENTATONIC.length];
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function playSuccessChime() {
+      [523.25, 659.25, 783.99, 1046.50].forEach((f, idx) => {
+        setTimeout(() => {
+          if (!audioCtx) return;
+          try {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.18, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+            osc.connect(g);
+            g.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+          } catch (e) {}
+        }, idx * 75);
+      });
+    }
+
+    // 4 Lanterns layout
+    let lanterns = [];
+    function layoutLanterns() {
+      lanterns = [];
+      const colors = ['#f59e0b', '#ec4899', '#38bdf8', '#84cc16'];
+      const emojis = ['🏮', '🏮', '🏮', '🏮'];
+      const marginX = W * 0.18;
+      const marginY = H * 0.28;
+
+      const positions = [
+        { x: W * 0.5 - marginX, y: H * 0.42 },
+        { x: W * 0.5 + marginX, y: H * 0.42 },
+        { x: W * 0.5 - marginX, y: H * 0.42 + marginY },
+        { x: W * 0.5 + marginX, y: H * 0.42 + marginY }
+      ];
+
+      for (let i = 0; i < 4; i++) {
+        lanterns.push({
+          x: positions[i].x,
+          y: positions[i].y,
+          color: colors[i],
+          emoji: emojis[i],
+          noteIdx: i + 1,
+          litTimer: 0,
+          wobble: Math.random() * Math.PI * 2,
+          radius: Math.min(W, H) * 0.11 + 10
+        });
+      }
+    }
+
+    let sequence = [];
+    let playerStep = 0;
+    let isShowingSequence = false;
+    let round = 1;
+    let score = 0;
+    let particles = [];
+    let firefly = { x: 0, y: 0, targetX: 0, targetY: 0 };
+    let gameState = 'start';
+
+    function addSparkles(x, y, color) {
+      for (let i = 0; i < 16; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 5,
+          vy: (Math.random() - 0.5) * 5,
+          life: 1.0,
+          color
+        });
+      }
+    }
+
+    function lightLantern(idx) {
+      lanterns[idx].litTimer = 25;
+      playChime(lanterns[idx].noteIdx);
+      addSparkles(lanterns[idx].x, lanterns[idx].y, lanterns[idx].color);
+      firefly.targetX = lanterns[idx].x;
+      firefly.targetY = lanterns[idx].y - 30;
+    }
+
+    function startRound() {
+      playerStep = 0;
+      roundVal.textContent = round;
+      sequence.push(Math.floor(Math.random() * 4));
+
+      isShowingSequence = true;
+      let stepIdx = 0;
+      const interval = setInterval(() => {
+        if (stepIdx < sequence.length) {
+          lightLantern(sequence[stepIdx]);
+          stepIdx++;
+        } else {
+          clearInterval(interval);
+          isShowingSequence = false;
+        }
+      }, 700);
+    }
+
+    function handleInput(px, py) {
+      if (gameState !== 'play' || isShowingSequence) return;
+
+      for (let i = 0; i < lanterns.length; i++) {
+        const l = lanterns[i];
+        const dx = px - l.x;
+        const dy = py - l.y;
+        if (dx * dx + dy * dy < l.radius * l.radius * 1.5) {
+          // Player pressed lantern i
+          lightLantern(i);
+
+          if (sequence[playerStep] === i) {
+            // Correct step!
+            playerStep++;
+            score += 10;
+            scoreVal.textContent = score;
+
+            if (playerStep >= sequence.length) {
+              // Completed round!
+              score += 50;
+              scoreVal.textContent = score;
+              playSuccessChime();
+              addSparkles(W * 0.5, H * 0.5, '#fbbf24');
+              round++;
+              setTimeout(startRound, 1000);
+            }
+          } else {
+            // Wrong step - restart current sequence
+            playChime(0, 0.4);
+            playerStep = 0;
+            setTimeout(() => {
+              isShowingSequence = true;
+              let stepIdx = 0;
+              const interval = setInterval(() => {
+                if (stepIdx < sequence.length) {
+                  lightLantern(sequence[stepIdx]);
+                  stepIdx++;
+                } else {
+                  clearInterval(interval);
+                  isShowingSequence = false;
+                }
+              }, 700);
+            }, 600);
+          }
+          break;
+        }
+      }
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Stars in night sky
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      for (let i = 0; i < 20; i++) {
+        const sx = (i * 97) % W;
+        const sy = (i * 71) % (H * 0.6);
+        ctx.fillRect(sx, sy, 2, 2);
+      }
+
+      // Draw Lanterns
+      for (let l of lanterns) {
+        l.wobble += 0.03;
+        const sway = Math.sin(l.wobble) * 6;
+
+        ctx.save();
+        ctx.translate(l.x + sway, l.y);
+
+        // String from ceiling
+        ctx.beginPath();
+        ctx.moveTo(0, -H * 0.4);
+        ctx.lineTo(0, -l.radius);
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Glow if lit
+        if (l.litTimer > 0) {
+          l.litTimer--;
+          ctx.beginPath();
+          ctx.arc(0, 0, l.radius * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = l.color;
+          ctx.globalAlpha = (l.litTimer / 25) * 0.5;
+          ctx.fill();
+          ctx.globalAlpha = 1.0;
+        }
+
+        // Lantern Outer Circle
+        ctx.beginPath();
+        ctx.arc(0, 0, l.radius, 0, Math.PI * 2);
+        ctx.fillStyle = l.litTimer > 0 ? l.color : '#1e1b4b';
+        ctx.fill();
+        ctx.strokeStyle = l.color;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Emoji
+        ctx.font = `${Math.floor(l.radius * 1.1)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(l.emoji, 0, 0);
+
+        ctx.restore();
+      }
+
+      // Move and draw Firefly
+      firefly.x += (firefly.targetX - firefly.x) * 0.1;
+      firefly.y += (firefly.targetY - firefly.y) * 0.1;
+
+      if (gameState === 'play') {
+        ctx.save();
+        ctx.translate(firefly.x, firefly.y);
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#fde047';
+        ctx.shadowColor = '#facc15';
+        ctx.shadowBlur = 18;
+        ctx.fill();
+        ctx.font = '18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('✨', 0, 0);
+        ctx.restore();
+      }
+
+      // Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.03;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        } else {
+          ctx.save();
+          ctx.globalAlpha = p.life;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      initAudio();
+      handleInput(e.clientX, e.clientY);
+    });
+
+    startBtn.addEventListener('click', () => {
+      initAudio();
+      layoutLanterns();
+      round = 1;
+      score = 0;
+      sequence = [];
+      scoreVal.textContent = score;
+      roundVal.textContent = round;
+      firefly.x = W * 0.5;
+      firefly.y = H * 0.4;
+      firefly.targetX = firefly.x;
+      firefly.targetY = firefly.y;
+      startOverlay.style.display = 'none';
+      gameState = 'play';
+      setTimeout(startRound, 600);
+    });
+
+    restartBtn.addEventListener('click', () => {
+      initAudio();
+      layoutLanterns();
+      round = 1;
+      score = 0;
+      sequence = [];
+      scoreVal.textContent = score;
+      roundVal.textContent = round;
+      firefly.x = W * 0.5;
+      firefly.y = H * 0.4;
+      firefly.targetX = firefly.x;
+      firefly.targetY = firefly.y;
+      gameOverOverlay.style.display = 'none';
+      gameState = 'play';
+      setTimeout(startRound, 600);
+    });
+
+    layoutLanterns();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

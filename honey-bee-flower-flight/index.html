@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐝 꿀벌의 꽃밭 꿀방울 모으기 | 장윤이의 게임 놀이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #ecfccb 0%, #fef08a 40%, #fed7aa 75%, #fde68a 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #eab308;
+      color: #a16207;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(234, 179, 8, 0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.95);
+    }
+    .score-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #ca8a04;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #854d0e;
+      box-shadow: 0 4px 12px rgba(202, 138, 4, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .honey-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #f97316;
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #c2410c;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+    }
+    .game-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      text-align: center;
+      padding: 24px;
+    }
+    .game-overlay h1 {
+      font-size: 32px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 12px rgba(234, 179, 8, 0.6);
+    }
+    .game-overlay p {
+      font-size: 16px;
+      color: #fef08a;
+      margin-bottom: 24px;
+      line-height: 1.6;
+      max-width: 420px;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #facc15, #eab308);
+      border: none;
+      color: #713f12;
+      padding: 16px 42px;
+      border-radius: 36px;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(234, 179, 8, 0.45);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-layer">
+    <a href="../index.html" class="home-btn">🏠 홈으로</a>
+    <div class="score-group">
+      <div class="honey-badge">🍯 꿀단지: <span id="honeyVal">0</span>%</div>
+      <div class="score-badge">🌻 점수: <span id="scoreVal">0</span></div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startOverlay" class="game-overlay">
+    <h1>🐝 꿀벌의 꽃밭 꿀방울 모으기</h1>
+    <p>화면을 터치하거나 드래그하여 귀여운 아기 꿀벌을 조종하세요!<br>꽃밭에서 향기로운 꿀방울을 모아 달콤한 꿀단지를 가득 채워보세요!</p>
+    <button id="startBtn" class="start-btn">꽃밭 비행 시작! 🌸</button>
+  </div>
+
+  <div id="gameOverOverlay" class="game-overlay" style="display: none;">
+    <h1 id="endTitle">달콤한 꿀단지 완성! 🍯</h1>
+    <p id="endDesc">꽃밭에서 맛있는 꿀을 가득 모았어요!</p>
+    <button id="restartBtn" class="start-btn">다시 날기! 🔄</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const honeyVal = document.getElementById('honeyVal');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let W = 0, H = 0;
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio API
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', dur = 0.15, gain = 0.15) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(gain, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function playHoneyChime() {
+      playTone(523.25, 'sine', 0.1, 0.2);
+      setTimeout(() => playTone(659.25, 'sine', 0.12, 0.2), 60);
+      setTimeout(() => playTone(783.99, 'triangle', 0.18, 0.22), 120);
+    }
+
+    function playRainbowChime() {
+      const freqs = [440, 554.37, 659.25, 880, 1108.73];
+      freqs.forEach((f, idx) => {
+        setTimeout(() => playTone(f, 'sine', 0.25, 0.18), idx * 80);
+      });
+    }
+
+    // Bee state
+    let bee = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      targetY: 0,
+      wingTimer: 0,
+      radius: 24,
+      rainbowTimer: 0
+    };
+
+    let items = []; // honey drops & flowers
+    let particles = [];
+    let clouds = [];
+    let flowersBg = [];
+    let gameState = 'start';
+    let score = 0;
+    let honeyProgress = 0;
+    let lastSpawn = 0;
+
+    function initBackground() {
+      flowersBg = [];
+      for (let i = 0; i < 15; i++) {
+        flowersBg.push({
+          x: Math.random() * W,
+          y: H - 40 - Math.random() * 80,
+          emoji: ['🌻', '🌷', '🌸', '🌼', '🌺', '🍀'][Math.floor(Math.random() * 6)],
+          size: 28 + Math.random() * 20
+        });
+      }
+      clouds = [];
+      for (let i = 0; i < 4; i++) {
+        clouds.push({
+          x: Math.random() * W,
+          y: 40 + Math.random() * 120,
+          speed: 0.3 + Math.random() * 0.4,
+          scale: 0.8 + Math.random() * 0.5
+        });
+      }
+    }
+
+    class HoneyItem {
+      constructor() {
+        this.x = 30 + Math.random() * (W - 60);
+        this.y = -30;
+        this.vy = 1.8 + Math.random() * 2.0;
+        this.type = Math.random() < 0.75 ? 'honey' : 'flower';
+        this.radius = 20;
+        this.wobble = Math.random() * Math.PI * 2;
+      }
+      update() {
+        this.y += this.vy;
+        this.wobble += 0.05;
+        this.x += Math.sin(this.wobble) * 1.2;
+      }
+      draw() {
+        ctx.save();
+        ctx.font = '28px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const icon = this.type === 'honey' ? '🍯' : '🌸';
+        ctx.fillText(icon, this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    function createSparkles(x, y, color = '#facc15') {
+      for (let i = 0; i < 12; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 6,
+          vy: (Math.random() - 0.5) * 6,
+          life: 1.0,
+          color
+        });
+      }
+    }
+
+    function update() {
+      // Move bee smoothly
+      bee.x += (bee.targetX - bee.x) * 0.12;
+      bee.y += (bee.targetY - bee.y) * 0.12;
+      bee.wingTimer += 0.4;
+
+      if (bee.rainbowTimer > 0) {
+        bee.rainbowTimer--;
+      }
+
+      // Spawning
+      const now = Date.now();
+      if (now - lastSpawn > 850) {
+        items.push(new HoneyItem());
+        lastSpawn = now;
+      }
+
+      // Update items
+      for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i];
+        it.update();
+
+        // Check collision with bee
+        const dx = bee.x - it.x;
+        const dy = bee.y - it.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < bee.radius + it.radius) {
+          // Collected!
+          items.splice(i, 1);
+          createSparkles(it.x, it.y, it.type === 'honey' ? '#f59e0b' : '#ec4899');
+          playHoneyChime();
+
+          const pts = (bee.rainbowTimer > 0 ? 20 : 10);
+          score += pts;
+          scoreVal.textContent = score;
+
+          honeyProgress += 10;
+          if (honeyProgress >= 100) {
+            honeyProgress = 0;
+            bee.rainbowTimer = 180; // 3 seconds rainbow mode
+            playRainbowChime();
+            createSparkles(bee.x, bee.y, '#38bdf8');
+          }
+          honeyVal.textContent = honeyProgress;
+          continue;
+        }
+
+        if (it.y > H + 40) {
+          items.splice(i, 1);
+        }
+      }
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.04;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Clouds
+      for (let c of clouds) {
+        c.x += c.speed;
+        if (c.x > W + 80) c.x = -80;
+      }
+    }
+
+    function drawBee() {
+      ctx.save();
+      ctx.translate(bee.x, bee.y);
+
+      // Rainbow aura if active
+      if (bee.rainbowTimer > 0) {
+        ctx.beginPath();
+        ctx.arc(0, 0, bee.radius + 14, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${(Date.now() * 0.3) % 360}, 90%, 75%)`;
+        ctx.globalAlpha = 0.4;
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+      }
+
+      // Bee shadow
+      ctx.beginPath();
+      ctx.ellipse(0, 22, 16, 6, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(161, 98, 7, 0.2)';
+      ctx.fill();
+
+      // Wings (flapping)
+      const wingOffset = Math.sin(bee.wingTimer) * 8;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.strokeStyle = '#bae6fd';
+      ctx.lineWidth = 1.5;
+
+      // Left wing
+      ctx.beginPath();
+      ctx.ellipse(-10, -16 + wingOffset, 8, 14, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Right wing
+      ctx.beginPath();
+      ctx.ellipse(10, -16 - wingOffset, 8, 14, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Body (Yellow with Black stripes)
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 18, 15, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#facc15';
+      ctx.fill();
+      ctx.strokeStyle = '#ca8a04';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Stripes
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(-6, -14, 4, 28);
+      ctx.fillRect(4, -13, 4, 26);
+
+      // Eyes
+      ctx.fillStyle = '#1e1b4b';
+      ctx.beginPath();
+      ctx.arc(10, -4, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(11, -5, 1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cute Pink Cheek
+      ctx.fillStyle = '#f43f5e';
+      ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      ctx.arc(8, 2, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+
+      // Little Stinger
+      ctx.beginPath();
+      ctx.moveTo(-18, -2);
+      ctx.lineTo(-24, 0);
+      ctx.lineTo(-18, 2);
+      ctx.closePath();
+      ctx.fillStyle = '#451a03';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Sun
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(W - 40, 40, 36, 0, Math.PI * 2);
+      ctx.fillStyle = '#fde047';
+      ctx.shadowColor = '#facc15';
+      ctx.shadowBlur = 24;
+      ctx.fill();
+      ctx.restore();
+
+      // Clouds
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      for (let c of clouds) {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 22 * c.scale, 0, Math.PI * 2);
+        ctx.arc(c.x + 18 * c.scale, c.y - 8 * c.scale, 26 * c.scale, 0, Math.PI * 2);
+        ctx.arc(c.x + 38 * c.scale, c.y, 20 * c.scale, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Background Flowers at bottom
+      for (let fl of flowersBg) {
+        ctx.font = `${fl.size}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(fl.emoji, fl.x, fl.y);
+      }
+
+      if (gameState === 'play') {
+        update();
+
+        // Items
+        for (let it of items) {
+          it.draw();
+        }
+
+        // Bee
+        drawBee();
+
+        // Particles
+        for (let p of particles) {
+          ctx.save();
+          ctx.globalAlpha = p.life;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    // Touch & Pointer Controls
+    function handlePointer(e) {
+      if (gameState !== 'play') return;
+      initAudio();
+      bee.targetX = e.clientX;
+      bee.targetY = Math.max(80, Math.min(H - 80, e.clientY));
+    }
+    window.addEventListener('pointerdown', handlePointer);
+    window.addEventListener('pointermove', handlePointer);
+
+    startBtn.addEventListener('click', () => {
+      initAudio();
+      initBackground();
+      bee.x = W * 0.5;
+      bee.y = H * 0.5;
+      bee.targetX = bee.x;
+      bee.targetY = bee.y;
+      score = 0;
+      honeyProgress = 0;
+      items = [];
+      particles = [];
+      scoreVal.textContent = score;
+      honeyVal.textContent = honeyProgress;
+      startOverlay.style.display = 'none';
+      gameState = 'play';
+    });
+
+    restartBtn.addEventListener('click', () => {
+      initAudio();
+      initBackground();
+      bee.x = W * 0.5;
+      bee.y = H * 0.5;
+      bee.targetX = bee.x;
+      bee.targetY = bee.y;
+      score = 0;
+      honeyProgress = 0;
+      items = [];
+      particles = [];
+      scoreVal.textContent = score;
+      honeyVal.textContent = honeyProgress;
+      gameOverOverlay.style.display = 'none';
+      gameState = 'play';
+    });
+
+    initBackground();
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>

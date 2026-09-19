@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <radialGradient id="nightForest" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <rect width="400" height="300" rx="24" fill="url(#nightForest)"/>
+
+  <!-- Starry Sky -->
+  <circle cx="50" cy="40" r="1.5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="340" cy="45" r="2" fill="#ffffff" opacity="0.9"/>
+  <circle cx="180" cy="30" r="1.5" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Lantern cords -->
+  <line x1="100" y1="0" x2="100" y2="90" stroke="#64748b" stroke-width="2"/>
+  <line x1="200" y1="0" x2="200" y2="70" stroke="#64748b" stroke-width="2"/>
+  <line x1="300" y1="0" x2="300" y2="90" stroke="#64748b" stroke-width="2"/>
+
+  <!-- Lanterns -->
+  <g filter="url(#glow)">
+    <!-- Left Lantern (Amber) -->
+    <circle cx="100" cy="120" r="28" fill="#f59e0b" opacity="0.3"/>
+    <circle cx="100" cy="120" r="22" fill="#1e1b4b" stroke="#f59e0b" stroke-width="3"/>
+    <text x="100" y="128" font-size="26" text-anchor="middle">🏮</text>
+
+    <!-- Center Lantern (Golden Light) -->
+    <circle cx="200" cy="100" r="32" fill="#fbbf24" opacity="0.4"/>
+    <circle cx="200" cy="100" r="25" fill="#fbbf24" stroke="#f59e0b" stroke-width="3"/>
+    <text x="200" y="108" font-size="28" text-anchor="middle">🏮</text>
+
+    <!-- Right Lantern (Pink/Violet) -->
+    <circle cx="300" cy="120" r="28" fill="#ec4899" opacity="0.3"/>
+    <circle cx="300" cy="120" r="22" fill="#1e1b4b" stroke="#ec4899" stroke-width="3"/>
+    <text x="300" y="128" font-size="26" text-anchor="middle">🏮</text>
+  </g>
+
+  <!-- Flying Glowing Firefly -->
+  <g transform="translate(200, 180)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="12" fill="#fde047"/>
+    <text x="0" y="6" font-size="16" text-anchor="middle">✨</text>
+    <text x="25" y="-10" font-size="12">⭐</text>
+    <text x="-25" y="-12" font-size="12">⭐</text>
+  </g>
+
+  <!-- Forest Silhouettes at bottom -->
+  <path d="M0,300 L0,250 Q100,230 200,250 Q300,270 400,250 L400,300 Z" fill="#020617" opacity="0.8"/>
+
+  <!-- Title text -->
+  <text x="200" y="280" font-family="'Pretendard', sans-serif" font-weight="900" font-size="20" fill="#fef08a" text-anchor="middle" filter="url(#glow)">🏮 마법 호롱불 반딧불이 길</text>
+</svg>

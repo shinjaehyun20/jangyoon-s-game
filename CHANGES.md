@@ -1,3 +1,7 @@
+## 2026-09-19 — honey-bee-flower-flight, magic-crystal-lantern-trail (총 268개)
+- **[🐝 꿀벌의 꽃밭 꿀방울 모으기 (honey-bee-flower-flight)]** — 향기로운 꽃밭에서 꿀방울을 모아 달콤한 꿀단지를 채우는 힐링 플라잉 터치 아케이드 (외부 의존성 0).
+- **[🏮 마법 호롱불 반딧불이 길 (magic-crystal-lantern-trail)]** — 신비로운 밤숲 호롱불의 멜로디 순서를 기억하고 반딧불이 길을 밝히는 리듬 기억 퍼즐 (외부 의존성 0).
+
 ## 2026-09-18 — rainbow-fruit-smoothie-bar, polar-penguin-ice-hop (총 266개)
 - **[🍓 무지개 과일 스무디 바 (rainbow-fruit-smoothie-bar)]** — 떨어지는 오색 과일을 터치해 믹서기로 갈아 무지개 스무디 잔을 완성하는 터치 아케이드 (외부 의존성 0).
 - **[🐧 꼬마 펭귄의 빙하 퐁당퐁당 (polar-penguin-ice-hop)]** — 바다 위를 떠내려오는 얼음 유빙을 타이밍 맞춰 건너며 크릴새우와 물고기를 모으는 빙하 점프 어드벤처 (외부 의존성 0).

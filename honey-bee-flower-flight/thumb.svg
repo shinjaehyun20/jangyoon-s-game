@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gardenGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ecfccb"/>
+      <stop offset="50%" stop-color="#fef08a"/>
+      <stop offset="100%" stop-color="#fed7aa"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <rect width="400" height="300" rx="24" fill="url(#gardenGrad)"/>
+
+  <!-- Sun -->
+  <circle cx="340" cy="50" r="32" fill="#fde047" opacity="0.9" filter="url(#glow)"/>
+
+  <!-- Blooming Flowers at bottom -->
+  <text x="50" y="270" font-size="34">🌻</text>
+  <text x="120" y="275" font-size="30">🌷</text>
+  <text x="210" y="270" font-size="32">🌸</text>
+  <text x="290" y="275" font-size="30">🌼</text>
+  <text x="360" y="268" font-size="32">🌺</text>
+
+  <!-- Honey drops in air -->
+  <g filter="url(#glow)">
+    <text x="80" y="110" font-size="28">🍯</text>
+    <text x="280" y="95" font-size="28">🍯</text>
+    <text x="330" y="160" font-size="24">✨</text>
+    <text x="90" y="180" font-size="20">✨</text>
+  </g>
+
+  <!-- Flying Cute Honey Bee -->
+  <g transform="translate(180, 130)">
+    <!-- Wings -->
+    <ellipse cx="-12" cy="-22" rx="10" ry="18" fill="#ffffff" opacity="0.85" stroke="#bae6fd" stroke-width="2" transform="rotate(-15 -12 -22)"/>
+    <ellipse cx="12" cy="-22" rx="10" ry="18" fill="#ffffff" opacity="0.85" stroke="#bae6fd" stroke-width="2" transform="rotate(15 12 -22)"/>
+
+    <!-- Bee body -->
+    <ellipse cx="0" cy="0" rx="26" ry="20" fill="#facc15" stroke="#ca8a04" stroke-width="3"/>
+    <!-- Stripes -->
+    <rect x="-8" y="-19" width="6" height="38" rx="2" fill="#451a03"/>
+    <rect x="6" y="-18" width="6" height="36" rx="2" fill="#451a03"/>
+
+    <!-- Eye & Cheek -->
+    <circle cx="16" cy="-4" r="4" fill="#1e1b4b"/>
+    <circle cx="17" cy="-5" r="1.5" fill="#ffffff"/>
+    <circle cx="13" cy="4" r="4" fill="#f43f5e" opacity="0.6"/>
+
+    <!-- Stinger -->
+    <polygon points="-26,-3 -34,0 -26,3" fill="#451a03"/>
+  </g>
+
+  <!-- Title text -->
+  <text x="200" y="275" font-family="'Pretendard', sans-serif" font-weight="900" font-size="20" fill="#854d0e" text-anchor="middle" filter="url(#glow)">🐝 꿀벌의 꽃밭 꿀방울 모으기</text>
+</svg>

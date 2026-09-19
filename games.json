@@ -2126,5 +2126,21 @@
     "description": "바다 위를 둥실둥실 떠내려오는 시원한 얼음 유빙을 타이밍 맞춰 퐁당퐁당 건너며 반짝이는 크릴새우와 은빛 물고기를 모으는 귀여운 빙하 점프 모험 놀이입니다.",
     "thumbnail": "polar-penguin-ice-hop/thumb.svg",
     "path": "polar-penguin-ice-hop/index.html"
+  },
+  {
+    "id": "honey-bee-flower-flight",
+    "title": "Honey Bee Flower Flight",
+    "title_ko": "🐝 꿀벌의 꽃밭 꿀방울 모으기",
+    "description": "화사한 봄 꽃밭에서 귀여운 아기 꿀벌과 함께 향기로운 꽃들을 유영하며 달콤한 꿀방울을 모으고 무지개 꽃가루 파워를 발동하는 힐링 비행 놀이입니다.",
+    "thumbnail": "honey-bee-flower-flight/thumb.svg",
+    "path": "honey-bee-flower-flight/index.html"
+  },
+  {
+    "id": "magic-crystal-lantern-trail",
+    "title": "Magic Crystal Lantern Trail",
+    "title_ko": "🏮 마법 호롱불 반딧불이 길",
+    "description": "신비로운 밤숲의 버드나무 호롱불이 연주하는 영롱한 펜타토닉 멜로디 순서를 기억하고 터치해 꼬마 반딧불이의 밤길을 환하게 밝히는 감성 기억 퍼즐 놀이입니다.",
+    "thumbnail": "magic-crystal-lantern-trail/thumb.svg",
+    "path": "magic-crystal-lantern-trail/index.html"
   }
 ]
