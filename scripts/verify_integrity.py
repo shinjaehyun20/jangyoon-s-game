@@ -117,15 +117,27 @@ def check_all():
             with open(MENU_JSON, "r", encoding="utf-8") as f:
                 menu = json.load(f)
             menu_item_count = 0
+            menu_ids = set()
             for sec in menu:
                 for item in sec.get("items", []):
                     menu_item_count += 1
+                    gid = item.get("id")
+                    if gid:
+                        menu_ids.add(gid)
                     mpath = item.get("path", "")
                     if mpath and not mpath.startswith("http"):
                         mtarget = REPO_ROOT / mpath.replace("/", os.sep)
                         if not mtarget.exists():
                             errors.append(f"menu.json [{item.get('id')}] 404 메뉴 경로: {mpath}")
-            print(f"[*] menu.json 검증 완료 (총 {menu_item_count}개 메뉴 항목 검사)")
+            
+            # 최신 게임 ID가 menu.json에 등록되어 있는지 검증 (메뉴 누락 방지)
+            if len(games) >= 2:
+                recent_ids = [g.get("id") for g in games[-2:]]
+                for rid in recent_ids:
+                    if rid and rid not in menu_ids:
+                        errors.append(f"menu.json 동기화 누락: 최신 게임 '{rid}'가 menu.json 항목에 등록되지 않았습니다.")
+            
+            print(f"[*] menu.json 검증 완료 (총 {menu_item_count}개 메뉴 항목 검사, 최신 게임 등록 확인)")
         except Exception as e:
             errors.append(f"menu.json 파싱 오류: {e}")
 
@@ -171,6 +183,25 @@ def check_all():
                 errors.append(f"README.md 게임 목록 표 행 개수 불일치: 표({len(table_rows)}행) != games.json({total_games}개)")
             else:
                 print(f"[*] README.md 게임 목록 표 1:1 동기화 정상 확인 ({len(table_rows)}/{total_games}행)")
+
+        # README.md 최근 변경사항 섹션 내 최신 총 게임 수 및 게임 타이틀 일치 검증
+        recent_changes_match = re.search(r'## 최근 변경사항 \(\d{4}-\d{2}\)(.*?)(?=\n## |\Z)', readme_txt, re.DOTALL)
+        if not recent_changes_match:
+            errors.append("README.md 내 '## 최근 변경사항' 섹션이 발견되지 않았습니다.")
+        else:
+            rc_content = recent_changes_match.group(1)
+            if f"(총 {count_str}개)" not in rc_content and f"총 {count_str}개" not in rc_content:
+                errors.append(f"README.md '## 최근 변경사항' 내 최신 총 게임 카운터('총 {count_str}개') 미반영")
+            else:
+                print(f"[*] README.md 최근 변경사항 최신 총 게임 카운터 정상 확인 (총 {count_str}개)")
+
+            if len(games) >= 2:
+                for g in games[-2:]:
+                    t_ko = g.get("title_ko", "")
+                    t_en = g.get("title", "")
+                    gid = g.get("id", "")
+                    if t_ko and (t_ko not in rc_content and gid not in rc_content and t_en not in rc_content):
+                        errors.append(f"README.md '## 최근 변경사항' 내 최신 게임 '{t_ko}'({gid}) 미등록")
 
         # README.md 중복 섹션 헤더 검출
         for h_year in ["2026-09", "2026-08", "2026-07", "2026-06", "2026-05", "2026-04"]:
