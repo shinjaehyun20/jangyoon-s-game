@@ -1,32 +1,98 @@
 [
   {
-    "id": "cosmic-meteor-dash",
-    "title": "우주 운석 대시",
-    "icon": "🚀",
-    "cat": "action"
-  },
-  {
-    "id": "melody-crystal-chime",
-    "title": "멜로디 크리스탈 차임",
-    "icon": "🔔",
-    "cat": "rhythm"
-  },
-  {
-    "id": "gravity-ball-architect",
-    "title": "Gravity Ball Architect",
-    "title_ko": "🧲 중력 구슬 건축가",
-    "category": "arcade"
-  },
-  {
-    "id": "beat-bubble-drummer",
-    "title": "Beat Bubble Drummer",
-    "title_ko": "🥁 쿵치딱 리듬 버블 밴드",
-    "category": "arcade"
-  },
-  {
     "id": "kids",
     "label": "어린이 추천",
     "items": [
+      {
+        "id": "honey-bee-flower-flight",
+        "label": "🐝 꿀벌의 꽃밭 꿀방울 모으기",
+        "path": "honey-bee-flower-flight/index.html"
+      },
+      {
+        "id": "magic-crystal-lantern-trail",
+        "label": "🏮 마법 호롱불 반딧불이 길",
+        "path": "magic-crystal-lantern-trail/index.html"
+      },
+      {
+        "id": "rainbow-fruit-smoothie-bar",
+        "label": "🍓 무지개 과일 스무디 바",
+        "path": "rainbow-fruit-smoothie-bar/index.html"
+      },
+      {
+        "id": "polar-penguin-ice-hop",
+        "label": "🐧 꼬마 펭귄의 빙하 퐁당퐁당",
+        "path": "polar-penguin-ice-hop/index.html"
+      },
+      {
+        "id": "jellyfish-bubble-pop",
+        "label": "🪼 해파리의 퐁퐁 방울 터뜨리기",
+        "path": "jellyfish-bubble-pop/index.html"
+      },
+      {
+        "id": "constellation-star-catcher",
+        "label": "🌌 반짝 별자리 잇기",
+        "path": "constellation-star-catcher/index.html"
+      },
+      {
+        "id": "magic-potion-cauldron",
+        "label": "✨ 마법 가마솥의 퐁당 물약",
+        "path": "magic-potion-cauldron/index.html"
+      },
+      {
+        "id": "desert-fennic-dune-bounce",
+        "label": "🦊 사막여우의 모래언덕 통통",
+        "path": "desert-fennic-dune-bounce/index.html"
+      },
+      {
+        "id": "sweet-jelly-candy-factory",
+        "label": "🍬 달콤 젤리 사탕 공장",
+        "path": "sweet-jelly-candy-factory/index.html"
+      },
+      {
+        "id": "aurora-polar-bear-slide",
+        "label": "❄️ 오로라 북극곰의 얼음 썰매",
+        "path": "aurora-polar-bear-slide/index.html"
+      },
+      {
+        "id": "rainbow-chameleon-catch",
+        "label": "🌈 무지개 카멜레온의 색깔 냠냠",
+        "path": "rainbow-chameleon-catch/index.html"
+      },
+      {
+        "id": "space-rover-crystal-dash",
+        "label": "🚀 우주 탐사차의 크리스탈 대쉬",
+        "path": "space-rover-crystal-dash/index.html"
+      },
+      {
+        "id": "star-constellation-weaver",
+        "label": "✨ 반짝 별자리 엮기",
+        "path": "star-constellation-weaver/index.html"
+      },
+      {
+        "id": "bubble-whale-ocean-dive",
+        "label": "🐋 방울 고래의 심해 다이빙",
+        "path": "bubble-whale-ocean-dive/index.html"
+      },
+      {
+        "id": "solar-butterfly-garden",
+        "label": "🦋 햇살 나비의 마법 정원",
+        "path": "solar-butterfly-garden/index.html"
+      },
+      {
+        "id": "gemstone-mine-cart-run",
+        "label": "💎 반짝 보석 광산 열차",
+        "path": "gemstone-mine-cart-run/index.html"
+      },
+      {
+        "id": "magical-bakery-patissier",
+        "label": "🧁 달콤 마법 베이커리 파티시에",
+        "path": "magical-bakery-patissier/index.html"
+      },
+      {
+        "id": "cloud-whale-dream-voyage",
+        "label": "🐳 몽실몽실 구름고래의 꿈나라 비행",
+        "path": "cloud-whale-dream-voyage/index.html"
+      },
       {
         "id": "bubble-tea-pop",
         "label": "🧋 버블티 펄 퐁퐁",
