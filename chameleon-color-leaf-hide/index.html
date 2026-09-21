@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #E8F8F5;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #FFFFFF;
+      box-shadow: 0 10px 30px rgba(22, 160, 133, 0.2);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #16A085;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      z-index: 10;
+    }
+    .score-badge {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 15px;
+    }
+    #stage-area {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: background-color 0.4s ease;
+    }
+    #chameleon-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #prompt-box {
+      position: absolute;
+      top: 15px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #117A65;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      pointer-events: none;
+      z-index: 5;
+    }
+    #palette {
+      padding: 16px 20px 24px;
+      background: #F4F6F6;
+      border-top: 2px solid #E5E8E8;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      z-index: 10;
+    }
+    .color-btn {
+      aspect-ratio: 1;
+      border: none;
+      border-radius: 18px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      transition: transform 0.1s;
+    }
+    .color-btn:active {
+      transform: scale(0.92);
+    }
+    .color-btn span {
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(232, 248, 245, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 20;
+    }
+    .overlay.hidden {
+      display: none;
+    }
+    .overlay h1 {
+      font-size: 24px;
+      color: #117A65;
+      margin-bottom: 12px;
+    }
+    .overlay p {
+      font-size: 16px;
+      color: #16A085;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .btn-start {
+      background: #1ABC9C;
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(26, 188, 156, 0.4);
+      transition: transform 0.1s;
+    }
+    .btn-start:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <header>
+    <div>🦎 카멜레온 숨바꼭질</div>
+    <div class="score-badge">⭐ 점수: <span id="scoreText">0</span></div>
+    <div class="score-badge">⏳ <span id="timerText">30</span>초</div>
+  </header>
+
+  <div id="stage-area">
+    <div id="prompt-box">🍃 나뭇잎 색깔에 맞춰 쏙 숨어봐요!</div>
+    <canvas id="chameleon-canvas"></canvas>
+  </div>
+
+  <div id="palette">
+    <button class="color-btn" style="background: #2ECC71;" data-color="#2ECC71" data-name="초록">
+      <span>🍃</span>초록
+    </button>
+    <button class="color-btn" style="background: #E74C3C;" data-color="#E74C3C" data-name="빨강">
+      <span>🍁</span>빨강
+    </button>
+    <button class="color-btn" style="background: #F1C40F; color: #7D6608; text-shadow: none;" data-color="#F1C40F" data-name="노랑">
+      <span>🍂</span>노랑
+    </button>
+    <button class="color-btn" style="background: #9B59B6;" data-color="#9B59B6" data-name="보라">
+      <span>🍇</span>보라
+    </button>
+  </div>
+
+  <div id="startOverlay" class="overlay">
+    <h1>🦎 꼬마 카멜레온의<br>알록달록 나뭇잎 숨바꼭질</h1>
+    <p>나뭇가지 위의 아기 카멜레온이<br>배경 나뭇잎 색깔에 맞춰 쏙 숨을 수 있게<br>아래에서 똑같은 색깔을 톡! 탭해주세요.</p>
+    <button class="btn-start" id="startBtn">숨바꼭질 시작! 🌿</button>
+  </div>
+
+  <div id="gameOverOverlay" class="overlay hidden">
+    <h1>🎉 숨바꼭질 대성공!</h1>
+    <p>카멜레온이 나뭇잎 속으로<br><strong id="finalScore" style="font-size: 26px; color: #16A085;">0</strong>번 완벽하게 숨었어요!</p>
+    <button class="btn-start" id="restartBtn">다시 숨바꼭질하기 🦎</button>
+  </div>
+</div>
+
+<script>
+  // Web Audio Synthesizer
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playSuccessSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(523.25, now); // C5
+    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+    osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+    osc.start(now);
+    osc.stop(now + 0.35);
+  }
+
+  function playWrongSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(261.63, now);
+    osc.frequency.exponentialRampToValueAtTime(196.00, now + 0.15);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
+
+  // Game Data
+  const COLORS = [
+    { code: '#2ECC71', name: '초록', bg: '#D4EFDF', leafEmoji: '🍃' },
+    { code: '#E74C3C', name: '빨강', bg: '#FADBD8', leafEmoji: '🍁' },
+    { code: '#F1C40F', name: '노랑', bg: '#FCF3CF', leafEmoji: '🍂' },
+    { code: '#9B59B6', name: '보라', bg: '#E8DAEF', leafEmoji: '🍇' }
+  ];
+
+  const canvas = document.getElementById('chameleon-canvas');
+  const ctx = canvas.getContext('2d');
+  const stageArea = document.getElementById('stage-area');
+  const promptBox = document.getElementById('prompt-box');
+  const scoreText = document.getElementById('scoreText');
+  const timerText = document.getElementById('timerText');
+  const startOverlay = document.getElementById('startOverlay');
+  const gameOverOverlay = document.getElementById('gameOverOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const finalScore = document.getElementById('finalScore');
+  const colorBtns = document.querySelectorAll('.color-btn');
+
+  let width, height;
+  let score = 0;
+  let timeLeft = 30;
+  let isPlaying = false;
+  let targetColorObj = COLORS[0];
+  let chameleonColor = '#2ECC71';
+  let targetChameleonColor = '#2ECC71';
+  let camouflageSuccess = false;
+  let successParticles = [];
+  let timerInterval = null;
+  let animId = null;
+
+  function resize() {
+    width = canvas.parentElement.clientWidth;
+    height = canvas.parentElement.clientHeight;
+    canvas.width = width;
+    canvas.height = height;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function setRandomTarget() {
+    const nextChoices = COLORS.filter(c => c.code !== targetColorObj.code);
+    targetColorObj = nextChoices[Math.floor(Math.random() * nextChoices.length)];
+    stageArea.style.backgroundColor = targetColorObj.bg;
+    camouflageSuccess = false;
+  }
+
+  function handleColorSelect(selectedHex) {
+    if (!isPlaying) return;
+    initAudio();
+
+    if (selectedHex === targetColorObj.code) {
+      // Correct!
+      score += 10;
+      scoreText.textContent = score;
+      targetChameleonColor = selectedHex;
+      camouflageSuccess = true;
+      playSuccessSound();
+      createCelebration(width / 2, height / 2, selectedHex);
+
+      promptBox.textContent = `✨ 완벽하게 숨었어요! (+10점)`;
+      promptBox.style.color = targetColorObj.code;
+
+      setTimeout(() => {
+        if (isPlaying) {
+          setRandomTarget();
+          promptBox.textContent = `🍃 나뭇잎 색깔에 맞춰 쏙 숨어봐요!`;
+          promptBox.style.color = '#117A65';
+        }
+      }, 500);
+    } else {
+      // Incorrect
+      playWrongSound();
+      promptBox.textContent = `앗! 나뭇잎 색깔을 다시 확인해봐요!`;
+      promptBox.style.color = '#C0392B';
+    }
+  }
+
+  colorBtns.forEach(btn => {
+    btn.addEventListener('pointerdown', () => {
+      handleColorSelect(btn.getAttribute('data-color'));
+    });
+  });
+
+  function createCelebration(x, y, color) {
+    for (let i = 0; i < 24; i++) {
+      successParticles.push({
+        x: x + (Math.random() - 0.5) * 60,
+        y: y + (Math.random() - 0.5) * 40,
+        vx: (Math.random() - 0.5) * 7,
+        vy: (Math.random() - 0.5) * 7 - 2,
+        size: 5 + Math.random() * 8,
+        color: color,
+        life: 1.0,
+        decay: 0.03 + Math.random() * 0.02
+      });
+    }
+  }
+
+  function startGame() {
+    initAudio();
+    score = 0;
+    timeLeft = 30;
+    scoreText.textContent = score;
+    timerText.textContent = timeLeft;
+    startOverlay.classList.add('hidden');
+    gameOverOverlay.classList.add('hidden');
+    isPlaying = true;
+    successParticles = [];
+    setRandomTarget();
+    chameleonColor = '#2ECC71';
+    targetChameleonColor = '#2ECC71';
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerText.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+
+    cancelAnimationFrame(animId);
+    loop();
+  }
+
+  function endGame() {
+    isPlaying = false;
+    clearInterval(timerInterval);
+    finalScore.textContent = score / 10;
+    gameOverOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+
+  function loop() {
+    if (!isPlaying) return;
+
+    // Smooth color interpolation for Chameleon
+    chameleonColor = targetChameleonColor;
+
+    // Update Particles
+    for (let i = successParticles.length - 1; i >= 0; i--) {
+      const p = successParticles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      if (p.life <= 0) successParticles.splice(i, 1);
+    }
+
+    render();
+    animId = requestAnimationFrame(loop);
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, width, height);
+
+    const cx = width / 2;
+    const cy = height / 2 + 10;
+
+    // 1. Lush Background Leaves matching target color
+    ctx.fillStyle = targetColorObj.code;
+    ctx.globalAlpha = 0.22;
+    for (let i = 0; i < 6; i++) {
+      const lx = cx + Math.cos(i * 1.05) * 140;
+      const ly = cy + Math.sin(i * 1.05) * 110;
+      ctx.beginPath();
+      ctx.ellipse(lx, ly, 50, 30, i * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1.0;
+
+    // 2. Tree Branch
+    ctx.fillStyle = '#795548';
+    ctx.beginPath();
+    ctx.roundRect(cx - 150, cy + 50, 300, 24, 12);
+    ctx.fill();
+    ctx.fillStyle = '#5D4037';
+    ctx.beginPath();
+    ctx.roundRect(cx - 140, cy + 56, 280, 6, 3);
+    ctx.fill();
+
+    // 3. Cute Chameleon
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // Spiraled Tail
+    ctx.strokeStyle = chameleonColor;
+    ctx.lineWidth = 14;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(75, 40, 22, 0, Math.PI * 1.7);
+    ctx.stroke();
+
+    // Body
+    ctx.fillStyle = chameleonColor;
+    ctx.beginPath();
+    ctx.ellipse(0, 20, 70, 42, -0.08, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Belly Shading
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+    ctx.beginPath();
+    ctx.ellipse(-10, 32, 45, 20, -0.08, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Back Crest (Cute Triangles)
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+    for (let i = -40; i <= 30; i += 18) {
+      ctx.beginPath();
+      ctx.moveTo(i, -12);
+      ctx.lineTo(i + 8, -26);
+      ctx.lineTo(i + 16, -10);
+      ctx.fill();
+    }
+
+    // Legs Clamping Branch
+    ctx.fillStyle = chameleonColor;
+    ctx.beginPath();
+    ctx.arc(-42, 52, 12, 0, Math.PI * 2);
+    ctx.arc(38, 52, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle = chameleonColor;
+    ctx.beginPath();
+    ctx.ellipse(-65, 0, 34, 30, -0.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Big Googly Eye
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.beginPath();
+    ctx.arc(-72, -4, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Pupil Looking forward/happy
+    ctx.fillStyle = '#1C2833';
+    ctx.beginPath();
+    ctx.arc(-75, -4, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.arc(-77, -6, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Happy Mouth
+    ctx.strokeStyle = '#2C3E50';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(-86, 12, 10, 0.1, Math.PI * 0.45);
+    ctx.stroke();
+
+    // Rosy Cheek
+    ctx.fillStyle = 'rgba(255, 100, 100, 0.45)';
+    ctx.beginPath();
+    ctx.arc(-56, 12, 7, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+
+    // 4. Celebration Confetti / Sparkles
+    for (const p of successParticles) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+</script>
+</body>
+</html>

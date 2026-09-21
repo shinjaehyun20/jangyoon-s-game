@@ -1,3 +1,7 @@
+## 2026-09-21 — autumn-squirrel-acorn-bounce, chameleon-color-leaf-hide (총 270개)
+- **[🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 (autumn-squirrel-acorn-bounce)]** — 단풍나무 아래 떨어지는 황금 도토리와 알밤을 바구니로 받아내는 캐주얼 터치 아케이드 (외부 의존성 0).
+- **[🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 (chameleon-color-leaf-hide)]** — 나뭇잎 색깔 변화에 맞춰 자신을 위장하는 색채 인지 매칭 퍼즐 (외부 의존성 0).
+
 ## 2026-09-19 — honey-bee-flower-flight, magic-crystal-lantern-trail (총 268개)
 - **[🐝 꿀벌의 꽃밭 꿀방울 모으기 (honey-bee-flower-flight)]** — 향기로운 꽃밭에서 꿀방울을 모아 달콤한 꿀단지를 채우는 힐링 플라잉 터치 아케이드 (외부 의존성 0).
 - **[🏮 마법 호롱불 반딧불이 길 (magic-crystal-lantern-trail)]** — 신비로운 밤숲 호롱불의 멜로디 순서를 기억하고 반딧불이 길을 밝히는 리듬 기억 퍼즐 (외부 의존성 0).

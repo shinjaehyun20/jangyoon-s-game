@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 268개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 270개.
 
-[![Games](https://img.shields.io/badge/games-268-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-270-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![268개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![270개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 268개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 270개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 (autumn-squirrel-acorn-bounce)](./autumn-squirrel-acorn-bounce) | 단풍나무 아래로 떨어지는 황금 도토리와 알밤을 바구니로 받아내는 캐주얼 터치 놀이 | 어린이/캐치·가을 |
+| [🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 (chameleon-color-leaf-hide)](./chameleon-color-leaf-hide) | 나뭇잎 색깔 변화에 맞춰 자신을 위장하는 색채 인지 매칭 퍼즐 놀이 | 어린이/색채·퍼즐 |
 | [🐝 꿀벌의 꽃밭 꿀방울 모으기 (honey-bee-flower-flight)](./honey-bee-flower-flight) | 화사한 꽃밭에서 꿀방울을 모아 달콤한 꿀단지를 채우는 힐링 비행 터치 놀이 | 어린이/비행·힐링 |
 | [🏮 마법 호롱불 반딧불이 길 (magic-crystal-lantern-trail)](./magic-crystal-lantern-trail) | 밤숲 호롱불 멜로디 순서를 기억해 꼬마 반딧불이 길을 밝히는 기억 퍼즐 놀이 | 어린이/기억·퍼즐 |
 | [🍓 무지개 과일 스무디 바 (rainbow-fruit-smoothie-bar)](./rainbow-fruit-smoothie-bar) | 하늘에서 떨어지는 오색 과일을 터치해 믹서기로 갈아 알록달록 스무디 잔을 채우는 터치 놀이 | 어린이/요리·터치 |
@@ -465,6 +467,7 @@ VS Code `Live Server` 확장을 써도 된다.
 
 ## 최근 변경사항 (2026-09)
 
+- **🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 · 🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 추가 (2026-09-21)** — 단풍나무 아래 도토리 바구니 캐치 아케이드와 나뭇잎 색채 변화 위장 매칭 퍼즐 미니게임 2종 추가 (총 270개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
 - **🐝 꿀벌의 꽃밭 꿀방울 모으기 · 🏮 마법 호롱불 반딧불이 길 추가 (2026-09-19)** — 꽃밭 꿀방울 수집 힐링 비행 아케이드와 밤숲 호롱불 멜로디 기억 순서 퍼즐 미니게임 2종 추가 (총 268개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
 - **🍓 무지개 과일 스무디 바 · 🐧 꼬마 펭귄의 빙하 퐁당퐁당 추가 (2026-09-18)** — 떨어지는 과일을 터치해 무지개 스무디 잔을 채우는 힐링 아케이드와 얼음 유빙을 건너는 타이밍 점프 모험 미니게임 2종 추가 (총 266개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
 - **🪼 해파리의 퐁퐁 방울 터뜨리기 · 🌌 반짝 별자리 잇기 추가 (2026-09-17)** — 바닷속 오색 비눗방울 탭 팝 아케이드와 밤하늘 번호 순서 별자리 완성 감성 퍼즐 미니게임 2종 추가 (총 264개). 단일 HTML, 외부 의존성 없음, Web Audio 효과음.

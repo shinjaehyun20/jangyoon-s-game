@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "autumn-squirrel-acorn-bounce",
+        "label": "🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니",
+        "path": "autumn-squirrel-acorn-bounce/index.html"
+      },
+      {
+        "id": "chameleon-color-leaf-hide",
+        "label": "🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질",
+        "path": "chameleon-color-leaf-hide/index.html"
+      },
+      {
         "id": "honey-bee-flower-flight",
         "label": "🐝 꿀벌의 꽃밭 꿀방울 모으기",
         "path": "honey-bee-flower-flight/index.html"

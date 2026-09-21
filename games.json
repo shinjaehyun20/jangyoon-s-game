@@ -2142,5 +2142,21 @@
     "description": "신비로운 밤숲의 버드나무 호롱불이 연주하는 영롱한 펜타토닉 멜로디 순서를 기억하고 터치해 꼬마 반딧불이의 밤길을 환하게 밝히는 감성 기억 퍼즐 놀이입니다.",
     "thumbnail": "magic-crystal-lantern-trail/thumb.svg",
     "path": "magic-crystal-lantern-trail/index.html"
+  },
+  {
+    "id": "autumn-squirrel-acorn-bounce",
+    "title": "Autumn Squirrel Acorn Bounce",
+    "title_ko": "🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니",
+    "description": "가을 단풍나무 아래로 톡톡 떨어지는 황금 도토리와 알밤을 귀여운 아기 다람쥐 바구니로 통통 받아내며 낙엽 파티를 즐기는 캐주얼 터치 놀이입니다.",
+    "thumbnail": "autumn-squirrel-acorn-bounce/thumb.svg",
+    "path": "autumn-squirrel-acorn-bounce/index.html"
+  },
+  {
+    "id": "chameleon-color-leaf-hide",
+    "title": "Chameleon Color Leaf Hide",
+    "title_ko": "🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질",
+    "description": "나뭇가지 위에 앉은 사랑스러운 아기 카멜레온이 주변 나뭇잎 색깔 변화(빨강, 노랑, 초록, 보라)에 맞춰 자신을 감쪽같이 위장하는 색채 인지 매칭 퍼즐 놀이입니다.",
+    "thumbnail": "chameleon-color-leaf-hide/thumb.svg",
+    "path": "chameleon-color-leaf-hide/index.html"
   }
 ]

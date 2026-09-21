@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #FDEBD0 0%, #F5CBA7 50%, #EDBB99 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #FFFDF9;
+      box-shadow: 0 10px 30px rgba(110, 44, 0, 0.15);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #D35400;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      z-index: 10;
+    }
+    .score-box {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 15px;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(253, 237, 208, 0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 20;
+    }
+    .overlay.hidden {
+      display: none;
+    }
+    .overlay h1 {
+      font-size: 26px;
+      color: #7E5109;
+      margin-bottom: 12px;
+    }
+    .overlay p {
+      font-size: 16px;
+      color: #873600;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .btn-start {
+      background: #E67E22;
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(230, 126, 34, 0.4);
+      transition: transform 0.1s, background 0.2s;
+    }
+    .btn-start:active {
+      transform: scale(0.96);
+      background: #D35400;
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <header>
+    <div>🐿️ 도토리 퐁퐁</div>
+    <div class="score-box">🌰 <span id="score-text">0</span>개</div>
+    <div class="score-box">❤️ <span id="life-text">3</span></div>
+  </header>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="startOverlay" class="overlay">
+    <h1>🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니</h1>
+    <p>가을 단풍나무 아래로 톡톡 떨어지는<br>황금 도토리와 알밤을 바구니로 받아내요!<br>화면을 좌우로 터치해 다람쥐를 움직여보세요!</p>
+    <button class="btn-start" id="startBtn">놀이 시작하기 🍂</button>
+  </div>
+
+  <div id="gameOverOverlay" class="overlay hidden">
+    <h1>🍂 가을 숲 산책 끝!</h1>
+    <p>다람쥐가 맛있는 도토리를<br><strong id="finalScore" style="font-size: 24px; color: #D35400;">0</strong>개 모았어요!</p>
+    <button class="btn-start" id="restartBtn">다시 모으기 🐿️</button>
+  </div>
+</div>
+
+<script>
+  // Web Audio Synthesizer
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new AudioContext();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  function playCatchSound(isGolden = false) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+    if (isGolden) {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.18); // C6
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now); // A4
+      osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.12); // E5
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    }
+  }
+
+  function playMissSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+
+  // Canvas & Game Loop
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const scoreText = document.getElementById('score-text');
+  const lifeText = document.getElementById('life-text');
+  const startOverlay = document.getElementById('startOverlay');
+  const gameOverOverlay = document.getElementById('gameOverOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const finalScore = document.getElementById('finalScore');
+
+  let width, height;
+  let score = 0;
+  let lives = 3;
+  let isPlaying = false;
+  let items = [];
+  let particles = [];
+  let leafBreeze = [];
+  let lastSpawnTime = 0;
+  let spawnInterval = 900;
+
+  // Squirrel Player
+  const squirrel = {
+    x: 0,
+    y: 0,
+    width: 70,
+    height: 60,
+    basketWidth: 80,
+    basketHeight: 25,
+    targetX: 0
+  };
+
+  function resize() {
+    width = canvas.parentElement.clientWidth;
+    height = canvas.parentElement.clientHeight - 50; // minus header
+    canvas.width = width;
+    canvas.height = height;
+    squirrel.y = height - 90;
+    squirrel.x = width / 2;
+    squirrel.targetX = width / 2;
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Background Falling Autumn Leaves
+  for (let i = 0; i < 15; i++) {
+    leafBreeze.push({
+      x: Math.random() * 480,
+      y: Math.random() * 800,
+      size: 8 + Math.random() * 10,
+      color: ['#E74C3C', '#E67E22', '#F39C12', '#D35400'][Math.floor(Math.random() * 4)],
+      speedX: -0.5 + Math.random() * 1,
+      speedY: 0.8 + Math.random() * 1.2,
+      angle: Math.random() * Math.PI * 2,
+      rotSpeed: 0.02 + Math.random() * 0.03
+    });
+  }
+
+  // Input Handling
+  function handlePointer(clientX) {
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    squirrel.targetX = Math.max(squirrel.width / 2, Math.min(width - squirrel.width / 2, x));
+  }
+
+  window.addEventListener('pointermove', e => {
+    if (isPlaying) handlePointer(e.clientX);
+  });
+  window.addEventListener('pointerdown', e => {
+    if (isPlaying) handlePointer(e.clientX);
+  });
+
+  // Spawn Items (Acorn, Chestnut, Golden Acorn)
+  function spawnItem() {
+    const types = [
+      { name: 'acorn', emoji: '🌰', score: 1, size: 28, isGolden: false, prob: 0.65 },
+      { name: 'chestnut', emoji: '🌰', score: 2, size: 32, isGolden: false, prob: 0.22 },
+      { name: 'golden', emoji: '✨', score: 5, size: 34, isGolden: true, prob: 0.13 }
+    ];
+    const rand = Math.random();
+    let selected = types[0];
+    let sum = 0;
+    for (const t of types) {
+      sum += t.prob;
+      if (rand <= sum) {
+        selected = t;
+        break;
+      }
+    }
+
+    items.push({
+      x: 30 + Math.random() * (width - 60),
+      y: -30,
+      speed: 2.2 + Math.random() * 1.8 + (score * 0.04),
+      type: selected,
+      rot: 0,
+      rotSpeed: (Math.random() - 0.5) * 0.06
+    });
+  }
+
+  // Confetti Particle
+  function createBurst(x, y, isGolden) {
+    const count = isGolden ? 20 : 12;
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 6,
+        vy: -Math.random() * 5 - 2,
+        size: 4 + Math.random() * 6,
+        color: isGolden ? '#F1C40F' : ['#E67E22', '#E74C3C', '#F39C12', '#2ECC71'][Math.floor(Math.random() * 4)],
+        life: 1.0,
+        decay: 0.02 + Math.random() * 0.02
+      });
+    }
+  }
+
+  function startGame() {
+    initAudio();
+    score = 0;
+    lives = 3;
+    items = [];
+    particles = [];
+    scoreText.textContent = score;
+    lifeText.textContent = lives;
+    startOverlay.classList.add('hidden');
+    gameOverOverlay.classList.add('hidden');
+    isPlaying = true;
+    lastSpawnTime = performance.now();
+    requestAnimationFrame(updateGame);
+  }
+
+  function gameOver() {
+    isPlaying = false;
+    finalScore.textContent = score;
+    gameOverOverlay.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+
+  function updateGame(timestamp) {
+    if (!isPlaying) return;
+
+    // Squirrel easing
+    squirrel.x += (squirrel.targetX - squirrel.x) * 0.22;
+
+    // Item Spawning
+    if (timestamp - lastSpawnTime > spawnInterval) {
+      spawnItem();
+      lastSpawnTime = timestamp;
+      if (spawnInterval > 450) spawnInterval -= 3;
+    }
+
+    // Update Items
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      it.y += it.speed;
+      it.rot += it.rotSpeed;
+
+      // Collision with Basket
+      const basketY = squirrel.y - 10;
+      if (it.y + it.type.size >= basketY && it.y <= basketY + squirrel.basketHeight) {
+        if (Math.abs(it.x - squirrel.x) < squirrel.basketWidth / 2 + 10) {
+          score += it.type.score;
+          scoreText.textContent = score;
+          playCatchSound(it.type.isGolden);
+          createBurst(it.x, it.y, it.type.isGolden);
+          items.splice(i, 1);
+          continue;
+        }
+      }
+
+      // Missed Item
+      if (it.y > height) {
+        if (!it.type.isGolden) {
+          lives--;
+          lifeText.textContent = lives;
+          playMissSound();
+          if (lives <= 0) {
+            gameOver();
+            return;
+          }
+        }
+        items.splice(i, 1);
+      }
+    }
+
+    // Update Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.15; // gravity
+      p.life -= p.decay;
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+      }
+    }
+
+    // Render
+    render();
+
+    requestAnimationFrame(updateGame);
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, width, height);
+
+    // 1. Gentle background leaves
+    for (const leaf of leafBreeze) {
+      leaf.y += leaf.speedY;
+      leaf.x += leaf.speedX;
+      leaf.angle += leaf.rotSpeed;
+      if (leaf.y > height) leaf.y = -20;
+      if (leaf.x < 0) leaf.x = width;
+      if (leaf.x > width) leaf.x = 0;
+
+      ctx.save();
+      ctx.translate(leaf.x, leaf.y);
+      ctx.rotate(leaf.angle);
+      ctx.fillStyle = leaf.color;
+      ctx.globalAlpha = 0.25;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, leaf.size, leaf.size * 0.55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1.0;
+
+    // 2. Autumn Grass Ground
+    ctx.fillStyle = '#E59866';
+    ctx.fillRect(0, height - 35, width, 35);
+    ctx.fillStyle = '#D35400';
+    ctx.fillRect(0, height - 35, width, 4);
+
+    // 3. Draw Falling Items
+    for (const it of items) {
+      ctx.save();
+      ctx.translate(it.x, it.y);
+      ctx.rotate(it.rot);
+      if (it.type.isGolden) {
+        // Glowing aura for golden acorn
+        ctx.shadowColor = '#F39C12';
+        ctx.shadowBlur = 15;
+        ctx.fillStyle = '#F4D03F';
+        ctx.beginPath();
+        ctx.arc(0, 0, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = '22px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🌰', 0, 0);
+      } else {
+        ctx.font = `${it.type.size}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(it.type.emoji, 0, 0);
+      }
+      ctx.restore();
+    }
+
+    // 4. Draw Particles
+    for (const p of particles) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1.0;
+
+    // 5. Draw Squirrel & Basket
+    const sx = squirrel.x;
+    const sy = squirrel.y;
+
+    // Basket
+    ctx.fillStyle = '#A04000';
+    ctx.beginPath();
+    ctx.roundRect(sx - squirrel.basketWidth / 2, sy - 12, squirrel.basketWidth, 22, [4, 4, 12, 12]);
+    ctx.fill();
+    ctx.fillStyle = '#D35400';
+    ctx.fillRect(sx - squirrel.basketWidth / 2 + 6, sy - 9, squirrel.basketWidth - 12, 4);
+
+    // Cute Squirrel Body
+    ctx.fillStyle = '#B9770E';
+    ctx.beginPath();
+    ctx.ellipse(sx, sy + 25, 24, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Belly
+    ctx.fillStyle = '#FDEBD0';
+    ctx.beginPath();
+    ctx.ellipse(sx, sy + 27, 14, 13, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Fluffy Tail
+    ctx.fillStyle = '#935116';
+    ctx.beginPath();
+    ctx.arc(sx + 26, sy + 15, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.arc(sx + 34, sy + 3, 14, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle = '#B9770E';
+    ctx.beginPath();
+    ctx.arc(sx, sy + 2, 18, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ears
+    ctx.fillStyle = '#935116';
+    ctx.beginPath();
+    ctx.arc(sx - 12, sy - 12, 6, 0, Math.PI * 2);
+    ctx.arc(sx + 12, sy - 12, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyes
+    ctx.fillStyle = '#1A1A1A';
+    ctx.beginPath();
+    ctx.arc(sx - 6, sy + 1, 3, 0, Math.PI * 2);
+    ctx.arc(sx + 6, sy + 1, 3, 0, Math.PI * 2);
+    ctx.fill();
+    // Eye shine
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.arc(sx - 7, sy - 0.5, 1, 0, Math.PI * 2);
+    ctx.arc(sx + 5, sy - 0.5, 1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cute Nose & Cheeks
+    ctx.fillStyle = '#6E2C00';
+    ctx.beginPath();
+    ctx.arc(sx, sy + 6, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#F1948A';
+    ctx.beginPath();
+    ctx.arc(sx - 11, sy + 5, 4, 0, Math.PI * 2);
+    ctx.arc(sx + 11, sy + 5, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+</script>
+</body>
+</html>
