@@ -8,7 +8,8 @@
 3. menu.json 항목 및 실물 파일 링크 무결성
 4. 루트 디렉토리 vs 등록 디렉토리 1:1 정합성 (하위 오배치, 유령 폴더, 누락 폴더 검출)
 5. 문서 카운터 동기화 (README.md, index.html, docs/github-about.md, docs/assets/portfolio-hero.svg)
-6. 게임 메커니즘 및 키워드 유사도/다양성 진단
+6. GitHub Pages 배포 소스 브랜치(main) 및 실서버 라이브 HTTP Read-Back (games.json 270개, #269/#270)
+7. 게임 메커니즘 및 키워드 유사도/다양성 진단
 
 종료 코드:
 - 0: 모든 무결성 검증 통과 (PASS)
@@ -19,7 +20,10 @@ import os
 import sys
 import json
 import re
+import argparse
 import subprocess
+import urllib.request
+import urllib.error
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from collections import Counter, defaultdict
@@ -36,7 +40,7 @@ CHANGES_MD = REPO_ROOT / "CHANGES.md"
 REQUIRED_GAME_FIELDS = ["id", "title", "title_ko", "description", "thumbnail", "path"]
 EXCLUDED_DIRS = {".git", ".claude", ".github", "__pycache__", "_candidates", "docs", "games", "marketing", "output", "scripts"}
 
-def check_all():
+def check_all(check_live=True):
     errors = []
     warnings = []
 
@@ -276,7 +280,99 @@ def check_all():
         pass
 
 
-    # [5] 게임 다양성 및 메커니즘 분석 리포트
+    # [5] GitHub Pages 배포 브랜치 및 실서버 라이브 HTTP Read-Back 검증 (Live Verifier)
+    if check_live:
+        print("\n--- 🌐 GitHub Pages 배포 브랜치 및 실서버 라이브 HTTP Read-Back 검증 ---")
+        # 5-1. gh api 배포 소스 브랜치 확인
+        try:
+            gh_pages = subprocess.run(
+                ["gh", "api", "repos/shinjaehyun20/jangyoon-s-game/pages"],
+                capture_output=True, text=True, timeout=10
+            )
+            if gh_pages.returncode == 0:
+                pages_info = json.loads(gh_pages.stdout)
+                source_branch = pages_info.get("source", {}).get("branch", "")
+                pages_status = pages_info.get("status", "")
+                if source_branch != "main":
+                    errors.append(f"[실서버 라이브 검증] GitHub Pages 배포 브랜치 불일치: '{source_branch}' (기대값: 'main')")
+                else:
+                    print(f"[*] GitHub Pages 배포 브랜치 정상 확인 -> {source_branch} (status: {pages_status})")
+            else:
+                errors.append(f"[실서버 라이브 검증] gh api repos/shinjaehyun20/jangyoon-s-game/pages 호출 실패 (코드 {gh_pages.returncode}): {gh_pages.stderr.strip()}")
+        except Exception as e:
+            errors.append(f"[실서버 라이브 검증] GitHub Pages 배포 소스 브랜치 조회 예외: {e}")
+
+        # 5-2. 실서버 games.json 라이브 HTTP GET 검증
+        live_games_url = "https://shinjaehyun20.github.io/jangyoon-s-game/games.json"
+        try:
+            req = urllib.request.Request(
+                live_games_url,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) JangyoonVerifier/1.0", "Cache-Control": "no-cache"}
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status != 200:
+                    errors.append(f"[실서버 라이브 검증] games.json HTTP GET 실패 (상태 코드: {resp.status})")
+                else:
+                    live_games = json.loads(resp.read().decode("utf-8"))
+                    live_count = len(live_games)
+                    if live_count != total_games:
+                        errors.append(f"[실서버 라이브 검증] 실서버 games.json 게임 수 불일치: 실서버({live_count}개) != 로컬({total_games}개) — 빌드 지연 또는 미반영")
+                    else:
+                        print(f"[*] GitHub Pages 실서버 games.json 게임 수 완벽 일치 ({live_count}/{total_games}개)")
+
+                    if len(games) >= 2 and len(live_games) >= 2:
+                        expected_recent = [g.get("id") for g in games[-2:]]
+                        live_recent = [g.get("id") for g in live_games[-2:]]
+                        if expected_recent != live_recent:
+                            errors.append(f"[실서버 라이브 검증] 실서버 games.json 최신 게임 ID 불일치: 실서버({live_recent}) != 로컬({expected_recent})")
+                        else:
+                            print(f"[*] GitHub Pages 실서버 최신 게임 ID 일치 확인 ({live_recent})")
+        except Exception as e:
+            errors.append(f"[실서버 라이브 검증] 실서버 games.json HTTP 요청 실패: {e}")
+
+        # 5-3. 실서버 메인 페이지 라이브 HTTP GET 검증
+        live_main_url = "https://shinjaehyun20.github.io/jangyoon-s-game/"
+        try:
+            req_main = urllib.request.Request(
+                live_main_url,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) JangyoonVerifier/1.0", "Cache-Control": "no-cache"}
+            )
+            with urllib.request.urlopen(req_main, timeout=10) as resp_main:
+                if resp_main.status != 200:
+                    errors.append(f"[실서버 라이브 검증] 메인 페이지 HTTP GET 실패 (상태 코드: {resp_main.status})")
+                else:
+                    live_html = resp_main.read().decode("utf-8")
+                    if f"총 {count_str}개의" not in live_html and f"총 {count_str}개" not in live_html:
+                        errors.append(f"[실서버 라이브 검증] 실서버 메인 페이지 메타 카운터 오류: '총 {count_str}개의' 미발견")
+                    else:
+                        print(f"[*] GitHub Pages 실서버 메인 페이지 메타 카운터 정상 확인 (총 {count_str}개)")
+        except Exception as e:
+            errors.append(f"[실서버 라이브 검증] 실서버 메인 페이지 HTTP 요청 실패: {e}")
+
+        # 5-4. 최신 게임 2종 실서버 개별 페이지 HTTP GET 200 OK 검증
+        if len(games) >= 2:
+            for g in games[-2:]:
+                gid = g.get("id")
+                gpath = g.get("path", "")
+                if gid and gpath and not gpath.startswith("http"):
+                    game_live_url = f"https://shinjaehyun20.github.io/jangyoon-s-game/{gpath}"
+                    try:
+                        req_g = urllib.request.Request(
+                            game_live_url,
+                            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) JangyoonVerifier/1.0", "Cache-Control": "no-cache"}
+                        )
+                        with urllib.request.urlopen(req_g, timeout=10) as resp_g:
+                            if resp_g.status != 200:
+                                errors.append(f"[실서버 라이브 검증] 최신 게임 '{gid}' 개별 페이지 HTTP GET 실패 ({resp_g.status}): {game_live_url}")
+                            else:
+                                print(f"[*] GitHub Pages 최신 게임 '{gid}' 실서버 정상 응답 (200 OK)")
+                    except Exception as e:
+                        errors.append(f"[실서버 라이브 검증] 최신 게임 '{gid}' 개별 페이지 요청 실패: {e}")
+    else:
+        print("\n[*] 실서버 라이브 검증 건너뜀 (--skip-live)")
+
+
+    # [6] 게임 다양성 및 메커니즘 분석 리포트
     print("\n--- 🧩 게임 메커니즘 및 다양성 분석 리포트 ---")
     genre_keywords = {
         "피하기 (Dodge/Avoid)": ["dodge", "rain-dodge", "lightning", "snow-dodge", "submarine", "traffic"],
@@ -322,11 +418,20 @@ def check_all():
         print(f" - 깨진 이미지: 0건")
         print(f" - 누락/오배치 디렉토리: 0건")
         print(f" - SVG XML 문법: 전수 정상")
+        if check_live:
+            print(f" - GitHub Pages 배포 브랜치 (main): 일치")
+            print(f" - 실서버 games.json (270개 / 최신 게임 #269, #270): 완벽 일치")
+            print(f" - 실서버 메인 페이지 및 개별 게임 200 OK: 전수 정상")
         print("==================================================")
         return True, errors, warnings
 
 if __name__ == "__main__":
-    passed, errs, warns = check_all()
+    parser = argparse.ArgumentParser(description="장윤이 게임 아케이드 전수 무결성 및 다양성 검증기")
+    parser.add_argument("--live", dest="live", action="store_true", default=True, help="GitHub Pages 배포 소스 브랜치 및 실서버 라이브 HTTP Read-Back 검증 (기본값: True)")
+    parser.add_argument("--skip-live", "--no-live", "--offline", dest="live", action="store_false", help="실서버 라이브 검증 건너뛰기")
+    args = parser.parse_args()
+
+    passed, errs, warns = check_all(check_live=args.live)
     if not passed:
         sys.exit(1)
     sys.exit(0)
