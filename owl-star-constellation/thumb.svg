@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="nightBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0B132B"/>
+      <stop offset="50%" stop-color="#1C2541"/>
+      <stop offset="100%" stop-color="#3A506B"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFDE7" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#FFF9C4" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#FFF59D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="40%" stop-color="#FFEB3B"/>
+      <stop offset="100%" stop-color="#FFEB3B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Night Sky Background -->
+  <rect width="300" height="300" rx="28" fill="url(#nightBg)"/>
+
+  <!-- Crescent Moon -->
+  <circle cx="235" cy="65" r="28" fill="url(#moonGlow)"/>
+  <circle cx="230" cy="60" r="22" fill="#FFFDE7"/>
+  <circle cx="240" cy="55" r="20" fill="#0E1733"/>
+
+  <!-- Constellation Lines & Stars (Big Dipper shape) -->
+  <g stroke="#64B5F6" stroke-width="2" stroke-dasharray="4,3" opacity="0.85">
+    <line x1="45" y1="65" x2="80" y2="85"/>
+    <line x1="80" y1="85" x2="115" y2="105"/>
+    <line x1="115" y1="105" x2="155" y2="105"/>
+    <line x1="155" y1="105" x2="185" y2="135"/>
+    <line x1="185" y1="135" x2="155" y2="155"/>
+    <line x1="155" y1="155" x2="125" y2="135"/>
+    <line x1="125" y1="135" x2="155" y2="105"/>
+  </g>
+
+  <!-- Glowing Stars -->
+  <circle cx="45" cy="65" r="5" fill="#FFF"/>
+  <circle cx="80" cy="85" r="5.5" fill="#FFF"/>
+  <circle cx="115" cy="105" r="5" fill="#FFF"/>
+  <circle cx="155" cy="105" r="6" fill="#FFE082"/>
+  <circle cx="185" cy="135" r="6.5" fill="#FFD54F"/>
+  <circle cx="155" cy="155" r="5.5" fill="#FFF"/>
+  <circle cx="125" cy="135" r="5" fill="#FFF"/>
+
+  <!-- Cute Professor Owl on Branch -->
+  <g transform="translate(195, 215)">
+    <!-- Branch -->
+    <path d="M -90,40 Q -10,35 70,50 L 70,60 Q -10,48 -90,52 Z" fill="#5D4037"/>
+
+    <!-- Owl Body -->
+    <ellipse cx="0" cy="10" rx="36" ry="42" fill="#8D6E63"/>
+    <!-- Belly -->
+    <ellipse cx="0" cy="20" rx="24" ry="28" fill="#FFF8E1"/>
+    <!-- Belly Feathers -->
+    <path d="M -12,12 Q -6,18 0,12 Q 6,18 12,12" stroke="#D7CCC8" stroke-width="2" fill="none"/>
+    <path d="M -12,24 Q -6,30 0,24 Q 6,30 12,24" stroke="#D7CCC8" stroke-width="2" fill="none"/>
+
+    <!-- Head Tuft Ears -->
+    <polygon points="-24,-26 -16,-48 -6,-30" fill="#6D4C41"/>
+    <polygon points="24,-26 16,-48 6,-30" fill="#6D4C41"/>
+
+    <!-- Big Eyes (Glasses) -->
+    <circle cx="-14" cy="-10" r="15" fill="#FFF"/>
+    <circle cx="14" cy="-10" r="15" fill="#FFF"/>
+    <!-- Glasses Rim -->
+    <circle cx="-14" cy="-10" r="16" fill="none" stroke="#FFA000" stroke-width="3"/>
+    <circle cx="14" cy="-10" r="16" fill="none" stroke="#FFA000" stroke-width="3"/>
+    <line x1="-2" y1="-10" x2="2" y2="-10" stroke="#FFA000" stroke-width="3"/>
+
+    <!-- Pupils -->
+    <circle cx="-13" cy="-11" r="7" fill="#263238"/>
+    <circle cx="15" cy="-11" r="7" fill="#263238"/>
+    <circle cx="-11" cy="-14" r="2.5" fill="#FFF"/>
+    <circle cx="17" cy="-14" r="2.5" fill="#FFF"/>
+
+    <!-- Beak -->
+    <polygon points="0,-2 -6,-8 6,-8" fill="#FFB300"/>
+
+    <!-- Graduation / Star Cap -->
+    <polygon points="0,-48 -32,-36 0,-24 32,-36" fill="#1565C0"/>
+    <rect x="-10" y="-34" width="20" height="10" fill="#0D47A1"/>
+    <!-- Tassel -->
+    <line x1="0" y1="-36" x2="26" y2="-24" stroke="#FFD54F" stroke-width="2"/>
+    <circle cx="27" cy="-22" r="3" fill="#FFD54F"/>
+
+    <!-- Tiny Feet -->
+    <ellipse cx="-12" cy="48" rx="6" ry="3" fill="#FFA000"/>
+    <ellipse cx="12" cy="48" rx="6" ry="3" fill="#FFA000"/>
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="25" y="16" width="250" height="38" rx="19" fill="#1A237E" opacity="0.9"/>
+  <text x="150" y="41" font-family="'Pretendard', sans-serif" font-size="15" font-weight="bold" fill="#FFE082" text-anchor="middle">🦉 반짝반짝 별자리 잇기</text>
+</svg>

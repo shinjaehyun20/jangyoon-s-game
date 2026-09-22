@@ -4,6 +4,32 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "hedgehog-chestnut-roll",
+        "title": "🦔 아기 고슴도치의 데굴데굴 가을 밤송이",
+        "path": "hedgehog-chestnut-roll/index.html",
+        "category": "arcade",
+        "tags": [
+          "고슴도치",
+          "가을",
+          "밤송이",
+          "도토리",
+          "터치"
+        ]
+      },
+      {
+        "id": "owl-star-constellation",
+        "title": "🦉 부엉이 박사님의 반짝반짝 별자리 잇기",
+        "path": "owl-star-constellation/index.html",
+        "category": "puzzle",
+        "tags": [
+          "부엉이",
+          "별자리",
+          "밤하늘",
+          "퍼즐",
+          "음악"
+        ]
+      },
+      {
         "id": "autumn-squirrel-acorn-bounce",
         "label": "🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니",
         "path": "autumn-squirrel-acorn-bounce/index.html"

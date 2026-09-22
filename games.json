@@ -2158,5 +2158,21 @@
     "description": "나뭇가지 위에 앉은 사랑스러운 아기 카멜레온이 주변 나뭇잎 색깔 변화(빨강, 노랑, 초록, 보라)에 맞춰 자신을 감쪽같이 위장하는 색채 인지 매칭 퍼즐 놀이입니다.",
     "thumbnail": "chameleon-color-leaf-hide/thumb.svg",
     "path": "chameleon-color-leaf-hide/index.html"
+  },
+  {
+    "id": "hedgehog-chestnut-roll",
+    "title": "Hedgehog Chestnut Roll",
+    "title_ko": "🦔 아기 고슴도치의 데굴데굴 가을 밤송이",
+    "description": "귀여운 아기 고슴도치와 함께 가을 숲길을 달리며 알밤과 도토리를 쏙쏙 바구니에 담는 터치 아케이드 미니게임입니다.",
+    "thumbnail": "hedgehog-chestnut-roll/thumb.svg",
+    "path": "hedgehog-chestnut-roll/index.html"
+  },
+  {
+    "id": "owl-star-constellation",
+    "title": "Owl Star Constellation",
+    "title_ko": "🦉 부엉이 박사님의 반짝반짝 별자리 잇기",
+    "description": "가을 밤하늘의 빛나는 별들을 순서대로 이어 신비로운 별자리와 신화를 완성하는 감성 터치 퍼즐 미니게임입니다.",
+    "thumbnail": "owl-star-constellation/thumb.svg",
+    "path": "owl-star-constellation/index.html"
   }
 ]

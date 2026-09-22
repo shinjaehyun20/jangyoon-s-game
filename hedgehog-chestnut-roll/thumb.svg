@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3E0"/>
+      <stop offset="100%" stop-color="#FFE0B2"/>
+    </linearGradient>
+    <radialGradient id="chestnutGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#A0522D"/>
+      <stop offset="60%" stop-color="#8B4513"/>
+      <stop offset="100%" stop-color="#5C2E0B"/>
+    </radialGradient>
+    <linearGradient id="grassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#81C784"/>
+      <stop offset="100%" stop-color="#4CAF50"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="300" height="300" rx="28" fill="url(#bg)"/>
+
+  <!-- Autumn Leaves in Background -->
+  <path d="M 40,60 C 50,40 70,50 80,70 C 70,90 50,80 40,60 Z" fill="#FF8A65" opacity="0.6"/>
+  <path d="M 230,50 C 250,40 260,60 250,80 C 230,90 220,70 230,50 Z" fill="#FFB74D" opacity="0.7"/>
+
+  <!-- Grass Hill -->
+  <path d="M 0,220 Q 150,180 300,220 L 300,300 L 0,300 Z" fill="url(#grassGrad)"/>
+
+  <!-- Chestnut (Rolling) -->
+  <g transform="translate(195, 175) scale(0.95)">
+    <!-- Base -->
+    <path d="M 0,-30 C 35,-30 45,15 0,35 C -45,15 -35,-30 0,-30 Z" fill="url(#chestnutGrad)"/>
+    <!-- Bottom cap -->
+    <path d="M -26,18 C -15,10 15,10 26,18 C 15,32 -15,32 -26,18 Z" fill="#D7CCC8"/>
+    <!-- Shine -->
+    <ellipse cx="-8" cy="-12" rx="7" ry="14" fill="#FFFFFF" opacity="0.3" transform="rotate(-20 -8 -12)"/>
+  </g>
+
+  <!-- Hedgehog Body -->
+  <g transform="translate(100, 175)">
+    <!-- Spikes (Back) -->
+    <path d="M -50,-10 C -65,-35 -30,-55 -5,-50 C 15,-60 45,-45 45,-20 C 55,-10 50,20 30,30 C 10,40 -40,35 -50,-10 Z" fill="#6D4C41"/>
+    <path d="M -45,-15 L -60,-30 L -40,-25 L -50,-45 L -30,-35 L -25,-55 L -10,-40 L 0,-60 L 10,-40 L 25,-55 L 30,-35 L 45,-40 L 35,-20 L 50,-15 L 35,-5 L 48,10 L 30,15 L 35,28 Z" fill="#5D4037"/>
+
+    <!-- Face / Body -->
+    <ellipse cx="25" cy="5" rx="35" ry="25" fill="#FFE0B2"/>
+    <path d="M 45,-5 Q 70,5 60,18 Z" fill="#FFE0B2"/>
+
+    <!-- Snout & Nose -->
+    <circle cx="62" cy="12" r="5" fill="#2E1C14"/>
+    <circle cx="63" cy="11" r="1.5" fill="#FFFFFF"/>
+
+    <!-- Eye -->
+    <circle cx="42" cy="3" r="4.5" fill="#2E1C14"/>
+    <circle cx="43" cy="1.5" r="1.5" fill="#FFFFFF"/>
+
+    <!-- Rosy Cheek -->
+    <circle cx="38" cy="12" r="6" fill="#FF8A80" opacity="0.6"/>
+
+    <!-- Tiny Feet -->
+    <ellipse cx="5" cy="28" rx="8" ry="5" fill="#D7CCC8"/>
+    <ellipse cx="40" cy="27" rx="8" ry="5" fill="#D7CCC8"/>
+  </g>
+
+  <!-- Motion lines -->
+  <path d="M 20,245 Q 60,240 100,245" stroke="#FFF" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <path d="M 140,248 Q 180,243 220,248" stroke="#FFF" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Title Badge -->
+  <rect x="30" y="16" width="240" height="38" rx="19" fill="#D35400" opacity="0.95"/>
+  <text x="150" y="41" font-family="'Pretendard', sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">🦔 가을 밤송이 데굴데굴</text>
+</svg>

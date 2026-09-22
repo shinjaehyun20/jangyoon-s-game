@@ -1,3 +1,7 @@
+## 2026-09-22 — hedgehog-chestnut-roll, owl-star-constellation (총 272개)
+- **[🦔 아기 고슴도치의 데굴데굴 가을 밤송이 (hedgehog-chestnut-roll)]** — 가을 단풍 숲길을 달리며 데굴데굴 굴러오는 알밤과 도토리를 바구니로 담아내는 힐링 터치 아케이드 (외부 의존성 0).
+- **[🦉 부엉이 박사님의 반짝반짝 별자리 잇기 (owl-star-constellation)]** — 부엉이 박사님과 함께 가을 밤하늘 별들을 순서대로 터치해 별자리를 완성하는 감성 사운드 퍼즐 (외부 의존성 0).
+
 ## 2026-09-21 — autumn-squirrel-acorn-bounce, chameleon-color-leaf-hide (총 270개)
 - **[🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 (autumn-squirrel-acorn-bounce)]** — 단풍나무 아래 떨어지는 황금 도토리와 알밤을 바구니로 받아내는 캐주얼 터치 아케이드 (외부 의존성 0).
 - **[🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 (chameleon-color-leaf-hide)]** — 나뭇잎 색깔 변화에 맞춰 자신을 위장하는 색채 인지 매칭 퍼즐 (외부 의존성 0).
