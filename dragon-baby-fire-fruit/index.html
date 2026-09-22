@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐲 아기 용의 말랑말랑 불꽃 과일 굽기</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #FBE9E7 0%, #FFCCBC 50%, #FFAB91 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #FFF8E1;
+      box-shadow: 0 10px 30px rgba(191, 54, 12, 0.2);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #E64A19;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+    }
+    .badge {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #FFFDE7;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(62, 39, 35, 0.65);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      color: white;
+      text-align: center;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+    .overlay h1 {
+      font-size: 26px;
+      margin-bottom: 12px;
+      color: #FFE082;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    .overlay p {
+      font-size: 15px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      color: #FFF3E0;
+    }
+    .btn {
+      background: #FF5722;
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(255, 87, 34, 0.4);
+      transition: transform 0.1s, background 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.95);
+      background: #E64A19;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <div id="score-display">🍡 구운 과일: <span id="score">0</span></div>
+      <div class="badge" id="level-display">달콤한 불꽃 1단계</div>
+      <div class="badge" id="timer-display">⏱️ 45s</div>
+    </header>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="start-overlay" class="overlay">
+      <h1>🐲 아기 용의 불꽃 과일 굽기</h1>
+      <p>화면을 톡톡 터치해 귀여운 아기 용의 불꽃을 발사하세요!<br>둥실 떠오르는 과일과 마시멜로를 노릇노릇 알맞게 구우면<br>달콤한 보너스 점수를 얻을 수 있어요 🔥</p>
+      <button class="btn" id="start-btn">불꽃 피우기!</button>
+    </div>
+
+    <div id="gameover-overlay" class="overlay" style="display: none;">
+      <h1 id="gameover-title">🎉 맛있는 파티 완료!</h1>
+      <p id="gameover-desc">아기 용이 구운 달콤 과일: 0개</p>
+      <button class="btn" id="restart-btn">다시 굽기</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const levelEl = document.getElementById('level-display');
+    const timerEl = document.getElementById('timer-display');
+    const startOverlay = document.getElementById('start-overlay');
+    const gameoverOverlay = document.getElementById('gameover-overlay');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playSound(freq, type = 'sine', duration = 0.15) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playFireSound() {
+      playSound(280 + Math.random() * 80, 'sawtooth', 0.1);
+    }
+
+    function playSuccessSound() {
+      playSound(659.25, 'triangle', 0.08); // E5
+      setTimeout(() => playSound(783.99, 'triangle', 0.08), 80); // G5
+      setTimeout(() => playSound(1046.50, 'triangle', 0.18), 160); // C6
+    }
+
+    let width, height;
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      width = canvas.width = rect.width;
+      height = canvas.height = rect.height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let isPlaying = false;
+    let score = 0;
+    let timeLeft = 45;
+    let timerInterval = null;
+
+    const dragon = {
+      x: width / 2,
+      y: height - 85,
+      targetX: width / 2,
+      size: 44,
+      fireTimer: 0
+    };
+
+    let flames = [];
+    let items = [];
+    let sparkles = [];
+
+    function spawnItem() {
+      if (!isPlaying) return;
+      const rand = Math.random();
+      let type = 'marshmallow';
+      let maxToast = 1; // 1 puff needed
+      let points = 10;
+      let radius = 22;
+
+      if (rand < 0.3) {
+        type = 'apple';
+        maxToast = 2; // 2 puffs needed
+        points = 25;
+        radius = 24;
+      } else if (rand < 0.5) {
+        type = 'dragonfruit';
+        maxToast = 3;
+        points = 40;
+        radius = 26;
+      }
+
+      items.push({
+        x: 40 + Math.random() * (width - 80),
+        y: -35,
+        vy: 1.8 + Math.random() * 1.8,
+        vx: (Math.random() - 0.5) * 1.2,
+        radius,
+        type,
+        toastCount: 0,
+        maxToast,
+        points,
+        rotation: 0,
+        rotSpeed: (Math.random() - 0.5) * 0.05
+      });
+    }
+
+    function shootFlame(targetX, targetY) {
+      if (!isPlaying) return;
+      initAudio();
+      playFireSound();
+      dragon.fireTimer = 10;
+
+      const angle = Math.atan2(targetY - (dragon.y - 25), targetX - dragon.x);
+      const speed = 7.5;
+
+      for (let i = -1; i <= 1; i++) {
+        const spread = angle + i * 0.12;
+        flames.push({
+          x: dragon.x,
+          y: dragon.y - 25,
+          vx: Math.cos(spread) * speed,
+          vy: Math.sin(spread) * speed,
+          r: 10 + Math.random() * 6,
+          life: 1.0,
+          decay: 0.035 + Math.random() * 0.02
+        });
+      }
+    }
+
+    function createToastSparkles(x, y, color) {
+      for (let i = 0; i < 15; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = 2 + Math.random() * 3.5;
+        sparkles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          r: 2 + Math.random() * 3.5,
+          life: 1.0,
+          decay: 0.04,
+          color
+        });
+      }
+    }
+
+    function update() {
+      if (!isPlaying) return;
+
+      dragon.x += (dragon.targetX - dragon.x) * 0.2;
+      if (dragon.fireTimer > 0) dragon.fireTimer--;
+
+      if (Math.random() < 0.04) {
+        spawnItem();
+      }
+
+      // Update flames
+      for (let f = flames.length - 1; f >= 0; f--) {
+        const flame = flames[f];
+        flame.x += flame.vx;
+        flame.y += flame.vy;
+        flame.life -= flame.decay;
+
+        // Check flame hit item
+        for (let i = items.length - 1; i >= 0; i--) {
+          const item = items[i];
+          const dist = Math.hypot(flame.x - item.x, flame.y - item.y);
+          if (dist < flame.r + item.radius) {
+            item.toastCount++;
+            flame.life = 0; // flame consumed
+            createToastSparkles(item.x, item.y, '#FFD54F');
+
+            if (item.toastCount >= item.maxToast) {
+              score += item.points;
+              scoreEl.textContent = score;
+              playSuccessSound();
+              createToastSparkles(item.x, item.y, '#FF7043');
+              items.splice(i, 1);
+            }
+            break;
+          }
+        }
+
+        if (flame.life <= 0 || flame.y < -20 || flame.x < -20 || flame.x > width + 20) {
+          flames.splice(f, 1);
+        }
+      }
+
+      // Update items
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.y += item.vy;
+        item.x += item.vx;
+        item.rotation += item.rotSpeed;
+
+        if (item.x < item.radius || item.x > width - item.radius) {
+          item.vx *= -1;
+        }
+
+        if (item.y > height + 40) {
+          items.splice(i, 1);
+        }
+      }
+
+      // Sparkles
+      for (let s = sparkles.length - 1; s >= 0; s--) {
+        const sp = sparkles[s];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.life -= sp.decay;
+        if (sp.life <= 0) {
+          sparkles.splice(s, 1);
+        }
+      }
+
+      if (score >= 220) {
+        levelEl.textContent = '불꽃 축제 3단계';
+      } else if (score >= 110) {
+        levelEl.textContent = '노릇노릇 2단계';
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Background warm cozy kitchen / outdoor twilight
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+      bgGrad.addColorStop(0, '#FFE0B2');
+      bgGrad.addColorStop(0.6, '#FFCC80');
+      bgGrad.addColorStop(1, '#FFAB91');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Sparkly background dust
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      for (let b = 0; b < 10; b++) {
+        const bx = (width * 0.1 * b + (Date.now() * 0.02 * (b + 1))) % width;
+        const by = (height * 0.1 * (b * 2) + Math.sin(Date.now() * 0.002 + b) * 20) % height;
+        ctx.beginPath();
+        ctx.arc(bx, by, 2 + (b % 3), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Flames
+      flames.forEach(f => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, f.life);
+        const fGrad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r);
+        fGrad.addColorStop(0, '#FFFFFF');
+        fGrad.addColorStop(0.3, '#FFEE58');
+        fGrad.addColorStop(0.7, '#FF7043');
+        fGrad.addColorStop(1, 'rgba(230, 74, 25, 0)');
+        ctx.fillStyle = fGrad;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Falling items (marshmallows, fruits on skewers)
+      items.forEach(item => {
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.rotate(item.rotation);
+
+        // Skewer stick
+        ctx.strokeStyle = '#8D6E63';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, -item.radius * 1.3);
+        ctx.lineTo(0, item.radius * 1.5);
+        ctx.stroke();
+
+        const toastProgress = item.toastCount / item.maxToast;
+
+        if (item.type === 'marshmallow') {
+          // Marshmallow
+          ctx.fillStyle = toastProgress > 0 ? '#FFE082' : '#FFFFFF';
+          ctx.beginPath();
+          ctx.roundRect(-item.radius * 0.8, -item.radius * 0.6, item.radius * 1.6, item.radius * 1.2, 8);
+          ctx.fill();
+          ctx.strokeStyle = toastProgress > 0 ? '#FFB300' : '#E0E0E0';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          // Cute smile
+          ctx.fillStyle = '#5D4037';
+          ctx.beginPath();
+          ctx.arc(-4, -1, 1.8, 0, Math.PI * 2);
+          ctx.arc(4, -1, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (item.type === 'apple') {
+          // Apple
+          ctx.fillStyle = toastProgress > 0 ? '#E65100' : '#E53935';
+          ctx.beginPath();
+          ctx.arc(0, 0, item.radius * 0.85, 0, Math.PI * 2);
+          ctx.fill();
+          // Leaf
+          ctx.fillStyle = '#4CAF50';
+          ctx.beginPath();
+          ctx.ellipse(4, -item.radius * 0.9, 6, 3, Math.PI / 4, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (item.type === 'dragonfruit') {
+          // Dragon fruit
+          ctx.fillStyle = toastProgress > 0 ? '#AD1457' : '#E91E63';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, item.radius * 0.85, item.radius * 0.95, 0, 0, Math.PI * 2);
+          ctx.fill();
+          // Green spikes
+          ctx.fillStyle = '#66BB6A';
+          ctx.beginPath();
+          ctx.moveTo(-item.radius * 0.7, -4); ctx.lineTo(-item.radius * 1.1, -12); ctx.lineTo(-item.radius * 0.3, -8);
+          ctx.moveTo(item.radius * 0.7, -4); ctx.lineTo(item.radius * 1.1, -12); ctx.lineTo(item.radius * 0.3, -8);
+          ctx.fill();
+        }
+
+        // Toast indicator dots
+        for (let d = 0; d < item.maxToast; d++) {
+          ctx.fillStyle = d < item.toastCount ? '#FF5722' : 'rgba(0, 0, 0, 0.2)';
+          ctx.beginPath();
+          ctx.arc(-8 + d * 8, item.radius * 0.9, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      });
+
+      // Sparkles
+      sparkles.forEach(sp => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, sp.life);
+        ctx.fillStyle = sp.color;
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Baby Dragon
+      ctx.save();
+      ctx.translate(dragon.x, dragon.y);
+
+      // Dragon Wings
+      ctx.fillStyle = '#81C784';
+      ctx.beginPath();
+      ctx.moveTo(-20, -10);
+      ctx.lineTo(-45, -35);
+      ctx.lineTo(-30, -5);
+      ctx.closePath();
+      ctx.moveTo(20, -10);
+      ctx.lineTo(45, -35);
+      ctx.lineTo(30, -5);
+      ctx.closePath();
+      ctx.fill();
+
+      // Dragon Body
+      ctx.fillStyle = '#4CAF50';
+      ctx.beginPath();
+      ctx.ellipse(0, 5, dragon.size * 0.65, dragon.size * 0.75, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dragon Yellow Tummy
+      ctx.fillStyle = '#FFF59D';
+      ctx.beginPath();
+      ctx.ellipse(0, 8, dragon.size * 0.4, dragon.size * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dragon Head
+      ctx.fillStyle = '#4CAF50';
+      ctx.beginPath();
+      ctx.arc(0, -dragon.size * 0.55, dragon.size * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Tiny Cute Horns
+      ctx.fillStyle = '#FFD54F';
+      ctx.beginPath();
+      ctx.moveTo(-12, -dragon.size * 0.85); ctx.lineTo(-18, -dragon.size * 1.15); ctx.lineTo(-6, -dragon.size * 0.95);
+      ctx.moveTo(12, -dragon.size * 0.85); ctx.lineTo(18, -dragon.size * 1.15); ctx.lineTo(6, -dragon.size * 0.95);
+      ctx.fill();
+
+      // Big Sparkling Eyes
+      ctx.fillStyle = '#2E7D32';
+      ctx.beginPath();
+      ctx.arc(-9, -dragon.size * 0.6, 5, 0, Math.PI * 2);
+      ctx.arc(9, -dragon.size * 0.6, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.arc(-8, -dragon.size * 0.65, 2, 0, Math.PI * 2);
+      ctx.arc(10, -dragon.size * 0.65, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cute Snout / Mouth
+      if (dragon.fireTimer > 0) {
+        // Mouth open breathing fire
+        ctx.fillStyle = '#FF7043';
+        ctx.beginPath();
+        ctx.ellipse(0, -dragon.size * 0.4, 7, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Happy smile
+        ctx.strokeStyle = '#2E7D32';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, -dragon.size * 0.45, 5, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+      }
+
+      // Rosy Cheeks
+      ctx.fillStyle = '#FF8A80';
+      ctx.beginPath();
+      ctx.arc(-16, -dragon.size * 0.48, 4, 0, Math.PI * 2);
+      ctx.arc(16, -dragon.size * 0.48, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      timeLeft = 45;
+      flames = [];
+      items = [];
+      sparkles = [];
+      scoreEl.textContent = score;
+      levelEl.textContent = '달콤한 불꽃 1단계';
+      timerEl.textContent = `⏱️ ${timeLeft}s`;
+      isPlaying = true;
+      startOverlay.style.display = 'none';
+      gameoverOverlay.style.display = 'none';
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏱️ ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(timerInterval);
+      playSound(350, 'sawtooth', 0.3);
+      setTimeout(() => playSound(240, 'sawtooth', 0.4), 300);
+      document.getElementById('gameover-desc').textContent = `아기 용이 구운 달콤 과일: ${score}점 🍡`;
+      gameoverOverlay.style.display = 'flex';
+    }
+
+    // Touch & Mouse Listeners
+    function handleTap(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = clientX - rect.left;
+      const clickY = clientY - rect.top;
+      dragon.targetX = Math.max(dragon.size, Math.min(width - dragon.size, clickX));
+      shootFlame(clickX, clickY);
+    }
+
+    canvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (e.touches.length > 0) {
+        handleTap(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('mousedown', e => {
+      handleTap(e.clientX, e.clientY);
+    });
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    gameLoop();
+  </script>
+</body>
+</html>

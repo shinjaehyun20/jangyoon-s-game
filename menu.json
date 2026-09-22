@@ -4,6 +4,32 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "otter-river-clam-catch",
+        "title": "🦦 아기 수달의 퐁당퐁당 조개 잡기",
+        "path": "otter-river-clam-catch/index.html",
+        "category": "arcade",
+        "tags": [
+          "수달",
+          "시냇물",
+          "조개",
+          "진주",
+          "터치"
+        ]
+      },
+      {
+        "id": "dragon-baby-fire-fruit",
+        "title": "🐲 아기 용의 말랑말랑 불꽃 과일 굽기",
+        "path": "dragon-baby-fire-fruit/index.html",
+        "category": "arcade",
+        "tags": [
+          "아기용",
+          "불꽃",
+          "과일",
+          "마시멜로",
+          "터치"
+        ]
+      },
+      {
         "id": "hedgehog-chestnut-roll",
         "title": "🦔 아기 고슴도치의 데굴데굴 가을 밤송이",
         "path": "hedgehog-chestnut-roll/index.html",

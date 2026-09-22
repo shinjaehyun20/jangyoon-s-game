@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 272개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 274개.
 
-[![Games](https://img.shields.io/badge/games-272-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-274-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![272개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![274개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 272개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 274개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
@@ -302,6 +302,8 @@
 | [🁣 도미노 잇기 (domino-chain)](./domino-chain) | 번호가 매겨진 도미노를 순서대로 터치하면 자동으로 연쇄 넘어짐! 라운드마다 도미노 개수 증가(5→8→12개) | 인지/순서 |
 | [🦔 아기 고슴도치의 데굴데굴 가을 밤송이](hedgehog-chestnut-roll/index.html) | 가을 숲길에서 굴러오는 알밤과 도토리를 바구니에 담는 터치 아케이드 | 아케이드 | 4~7세 |
 | [🦉 부엉이 박사님의 반짝반짝 별자리 잇기](owl-star-constellation/index.html) | 밤하늘 별들을 콕콕 이어 가을 별자리를 완성하는 감성 터치 퍼즐 | 퍼즐/학습 | 4~8세 |
+| [🦦 아기 수달의 퐁당퐁당 조개 잡기](otter-river-clam-catch/index.html) | 맑은 시냇물에서 조개와 진주를 잡고 바위를 피하는 힐링 터치 놀이 | 아케이드 | 4~7세 |
+| [🐲 아기 용의 말랑말랑 불꽃 과일 굽기](dragon-baby-fire-fruit/index.html) | 아기 용의 따뜻한 불꽃으로 마시멜로와 과일을 노릇노릇 굽는 힐링 타이밍 아케이드 | 아케이드 | 4~8세 |
 </details>
 
 ## 프로젝트 구조
@@ -469,6 +471,7 @@ VS Code `Live Server` 확장을 써도 된다.
 
 ## 최근 변경사항 (2026-09)
 
+- 2026-09-23: [🦦 아기 수달의 퐁당퐁당 조개 잡기](otter-river-clam-catch/index.html), [🐲 아기 용의 말랑말랑 불꽃 과일 굽기](dragon-baby-fire-fruit/index.html) (총 274개)
 - 2026-09-22: [🦔 아기 고슴도치의 데굴데굴 가을 밤송이](hedgehog-chestnut-roll/index.html), [🦉 부엉이 박사님의 반짝반짝 별자리 잇기](owl-star-constellation/index.html) (총 272개)
 - **🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 · 🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 추가 (2026-09-21)** — 단풍나무 아래 도토리 바구니 캐치 아케이드와 나뭇잎 색채 변화 위장 매칭 퍼즐 미니게임 2종 추가 (총 270개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
 - **🐝 꿀벌의 꽃밭 꿀방울 모으기 · 🏮 마법 호롱불 반딧불이 길 추가 (2026-09-19)** — 꽃밭 꿀방울 수집 힐링 비행 아케이드와 밤숲 호롱불 멜로디 기억 순서 퍼즐 미니게임 2종 추가 (총 268개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.

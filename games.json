@@ -2174,5 +2174,21 @@
     "description": "가을 밤하늘의 빛나는 별들을 순서대로 이어 신비로운 별자리와 신화를 완성하는 감성 터치 퍼즐 미니게임입니다.",
     "thumbnail": "owl-star-constellation/thumb.svg",
     "path": "owl-star-constellation/index.html"
+  },
+  {
+    "id": "otter-river-clam-catch",
+    "title": "Otter River Clam Catch",
+    "title_ko": "🦦 아기 수달의 퐁당퐁당 조개 잡기",
+    "description": "맑고 투명한 시냇물에서 헤엄치는 귀여운 아기 수달을 좌우로 조종하여 떠내려오는 반짝반짝 조개와 진주조개를 잡고 강돌을 피하는 힐링 터치 미니게임입니다.",
+    "thumbnail": "otter-river-clam-catch/thumb.svg",
+    "path": "otter-river-clam-catch/index.html"
+  },
+  {
+    "id": "dragon-baby-fire-fruit",
+    "title": "Baby Dragon Fire Fruit Toast",
+    "title_ko": "🐲 아기 용의 말랑말랑 불꽃 과일 굽기",
+    "description": "귀여운 아기 용의 따뜻한 불꽃을 톡톡 뿜어내어 둥실 떠오르는 달콤한 마시멜로와 과일을 노릇노릇 알맞게 굽는 힐링 타이밍 아케이드 미니게임입니다.",
+    "thumbnail": "dragon-baby-fire-fruit/thumb.svg",
+    "path": "dragon-baby-fire-fruit/index.html"
   }
 ]
