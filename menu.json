@@ -4,6 +4,32 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "squirrel-acorn-bowling",
+        "title": "🐿️ 아기 다람쥐의 도토리 굴리기 대작전",
+        "path": "squirrel-acorn-bowling/index.html",
+        "category": "arcade",
+        "tags": [
+          "다람쥐",
+          "도토리",
+          "볼링",
+          "숲속",
+          "터치"
+        ]
+      },
+      {
+        "id": "whale-rainbow-fountain",
+        "title": "🐳 아기 고래의 오색 무지개 물뿜기",
+        "path": "whale-rainbow-fountain/index.html",
+        "category": "arcade",
+        "tags": [
+          "고래",
+          "무지개",
+          "물뿜기",
+          "음표",
+          "터치"
+        ]
+      },
+      {
         "id": "otter-river-clam-catch",
         "title": "🦦 아기 수달의 퐁당퐁당 조개 잡기",
         "path": "otter-river-clam-catch/index.html",

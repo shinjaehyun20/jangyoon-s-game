@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 274개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 276개.
 
-[![Games](https://img.shields.io/badge/games-274-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-276-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![274개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![276개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 274개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 276개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🐿️ 아기 다람쥐의 도토리 굴리기 대작전 (squirrel-acorn-bowling)](./squirrel-acorn-bowling) | 귀여운 아기 다람쥐와 함께 황금 도토리를 굴려 솔방울 핀들을 쓰러뜨리는 숲속 볼링 아케이드 | 어린이/볼링·액션 |
+| [🐳 아기 고래의 오색 무지개 물뿜기 (whale-rainbow-fountain)](./whale-rainbow-fountain) | 푸른 바다 아기 고래로 오색 무지개 물줄기를 뿜어 별구름과 음표 방울을 터뜨리는 힐링 아케이드 | 어린이/타이밍·힐링 |
 | [🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 (autumn-squirrel-acorn-bounce)](./autumn-squirrel-acorn-bounce) | 단풍나무 아래로 떨어지는 황금 도토리와 알밤을 바구니로 받아내는 캐주얼 터치 놀이 | 어린이/캐치·가을 |
 | [🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 (chameleon-color-leaf-hide)](./chameleon-color-leaf-hide) | 나뭇잎 색깔 변화에 맞춰 자신을 위장하는 색채 인지 매칭 퍼즐 놀이 | 어린이/색채·퍼즐 |
 | [🐝 꿀벌의 꽃밭 꿀방울 모으기 (honey-bee-flower-flight)](./honey-bee-flower-flight) | 화사한 꽃밭에서 꿀방울을 모아 달콤한 꿀단지를 채우는 힐링 비행 터치 놀이 | 어린이/비행·힐링 |
@@ -471,6 +473,7 @@ VS Code `Live Server` 확장을 써도 된다.
 
 ## 최근 변경사항 (2026-09)
 
+- 2026-09-24: [🐿️ 아기 다람쥐의 도토리 굴리기 대작전](squirrel-acorn-bowling/index.html), [🐳 아기 고래의 오색 무지개 물뿜기](whale-rainbow-fountain/index.html) (총 276개)
 - 2026-09-23: [🦦 아기 수달의 퐁당퐁당 조개 잡기](otter-river-clam-catch/index.html), [🐲 아기 용의 말랑말랑 불꽃 과일 굽기](dragon-baby-fire-fruit/index.html) (총 274개)
 - 2026-09-22: [🦔 아기 고슴도치의 데굴데굴 가을 밤송이](hedgehog-chestnut-roll/index.html), [🦉 부엉이 박사님의 반짝반짝 별자리 잇기](owl-star-constellation/index.html) (총 272개)
 - **🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 · 🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 추가 (2026-09-21)** — 단풍나무 아래 도토리 바구니 캐치 아케이드와 나뭇잎 색채 변화 위장 매칭 퍼즐 미니게임 2종 추가 (총 270개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
@@ -613,8 +616,6 @@ VS Code `Live Server` 확장을 써도 된다.
 - **애벌레 먹이주기 시작하기 버튼 핫픽스 (2026-05-03)** — `bindStart` 래퍼 함수 내 `e.preventDefault()` 호출이 iOS Safari에서 pointerdown 이벤트 자체를 취소시키는 버그 수정. 단순 `click` 이벤트로 교체해 모든 환경에서 시작하기/다시하기 버튼 정상 동작.
 
 ## 최근 변경사항 (2026-04)
-
-- 2026-09-22: [🦔 아기 고슴도치의 데굴데굴 가을 밤송이](hedgehog-chestnut-roll/index.html), [🦉 부엉이 박사님의 반짝반짝 별자리 잇기](owl-star-constellation/index.html) (총 272개)
 - **색칠 놀이 추가 (2026-04-30)** — 팔레트에서 색을 고르고 픽셀 아트 격자를 탭으로 채우는 창의 게임. 해바라기·물고기·집·별·나비 5가지 그림 수록. 드래그로 연속 색칠, 완성 시 다음 그림으로 자동 이동. color-tap(색깔 판단)·animal-coloring(자유 색칠)과 달리 픽셀 단위 영역 채우기 집중.
 - **파도 서핑 추가 (2026-04-30)** — 서퍼를 드래그해 바위🪨·해파리🪼를 피하며 멀리 달리는 액션 게임. 거리에 비례해 속도 증가, 별⭐ 수집 시 +50m 보너스, 목숨 3개 시스템. 파도 5레이어 애니메이션 배경. dino-run(탭 점프 회피)·frog-jump(착지 타이밍)과 달리 좌우 드래그 조작으로 장애물 회피에 집중.
 - **공룡 달리기 추가 (2026-04-29)** — 탭 1회로 점프, 선인장(🌵)·새(🦅) 장애물 회피, 목숨 3개 시스템, 속도 점진 증가(거리 비례). runner-game(좌우 이동 수집)·frog-jump(착지 타이밍)와 달리 연속 달리기 중 반응 속도 훈련에 집중.

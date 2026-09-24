@@ -2190,5 +2190,21 @@
     "description": "귀여운 아기 용의 따뜻한 불꽃을 톡톡 뿜어내어 둥실 떠오르는 달콤한 마시멜로와 과일을 노릇노릇 알맞게 굽는 힐링 타이밍 아케이드 미니게임입니다.",
     "thumbnail": "dragon-baby-fire-fruit/thumb.svg",
     "path": "dragon-baby-fire-fruit/index.html"
+  },
+  {
+    "id": "squirrel-acorn-bowling",
+    "title": "Baby Squirrel Acorn Bowling",
+    "title_ko": "🐿️ 아기 다람쥐의 도토리 굴리기 대작전",
+    "description": "귀여운 아기 다람쥐와 함께 황금 도토리를 조준하여 굴려 솔방울 핀들을 퐁퐁 쓰러뜨리는 숲속 볼링 터치 아케이드 미니게임입니다.",
+    "thumbnail": "squirrel-acorn-bowling/thumb.svg",
+    "path": "squirrel-acorn-bowling/index.html"
+  },
+  {
+    "id": "whale-rainbow-fountain",
+    "title": "Baby Whale Rainbow Fountain",
+    "title_ko": "🐳 아기 고래의 오색 무지개 물뿜기",
+    "description": "푸른 바다를 헤엄치는 귀여운 아기 고래로 시원한 오색 무지개 물줄기를 뿜어 하늘의 별구름과 음표 방울을 터뜨리는 힐링 타이밍 아케이드 미니게임입니다.",
+    "thumbnail": "whale-rainbow-fountain/thumb.svg",
+    "path": "whale-rainbow-fountain/index.html"
   }
 ]

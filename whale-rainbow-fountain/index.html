@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐳 아기 고래의 오색 무지개 물뿜기</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #E1F5FE 0%, #B3E5FC 50%, #81D4FA 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #E0F7FA;
+      box-shadow: 0 10px 30px rgba(2, 119, 189, 0.25);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0277BD;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+    }
+    .badge {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #E0F7FA;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(1, 87, 155, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      color: white;
+      text-align: center;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+    .overlay h1 {
+      font-size: 26px;
+      margin-bottom: 12px;
+      color: #FFF59D;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    .overlay p {
+      font-size: 15px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      color: #E1F5FE;
+    }
+    .btn {
+      background: #00B0FF;
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 176, 255, 0.4);
+      transition: transform 0.1s, background 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.96);
+      background: #0091EA;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <div id="score-display">🌈 점수: 0</div>
+      <div class="badge" id="timer-display">남은 시간: 40초</div>
+    </header>
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Overlay -->
+    <div id="start-overlay" class="overlay">
+      <h1>🐳 아기 고래의 오색 무지개 물뿜기</h1>
+      <p>바다를 헤엄치는 귀여운 아기 고래를 터치하여 움직이고,<br>화면을 누르면 시원한 무지개 물줄기가 솟구쳐요!<br>하늘에서 내려오는 반짝 별구름과 음표 방울을 터뜨려요! 🌈✨</p>
+      <button class="btn" id="start-btn">물뿜기 시작!</button>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="overlay hidden">
+      <h1 id="over-title">🎉 신나는 바다 무지개 콘서트!</h1>
+      <p id="over-desc">아기 고래가 노래를 불러요!<br>최종 점수: <b id="final-score" style="color:#FFF59D; font-size:24px;">0</b>점</p>
+      <button class="btn" id="restart-btn">다시 헤엄치기!</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score-display');
+    const timerDisplay = document.getElementById('timer-display');
+    const startOverlay = document.getElementById('start-overlay');
+    const gameoverOverlay = document.getElementById('gameover-overlay');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const finalScore = document.getElementById('final-score');
+
+    let W, H;
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      W = canvas.width = rect.width;
+      H = canvas.height = rect.height;
+    }
+    window.addEventListener('resize', resize);
+    setTimeout(resize, 0);
+
+    // Audio synthesizer
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+    function playMelody(notes) {
+      if (!audioCtx) return;
+      notes.forEach((freq, i) => {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.08 + 0.15);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(audioCtx.currentTime + i * 0.08);
+          osc.stop(audioCtx.currentTime + i * 0.08 + 0.16);
+        } catch (e) {}
+      });
+    }
+
+    let score = 0;
+    let timeLeft = 40;
+    let gameState = 'START'; // START, PLAYING, GAMEOVER
+    let timerInterval = null;
+
+    // Whale state
+    let whale = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      width: 70,
+      height: 40,
+      spouting: false,
+      spoutHeight: 0
+    };
+
+    // Drops & Stars
+    let targets = [];
+    let waterStreams = [];
+    let rainbowColors = ['#FF1744', '#FF9100', '#FFEA00', '#00E676', '#00B0FF', '#651FFF'];
+
+    function spawnTarget() {
+      const colors = ['#FFD54F', '#FF80AB', '#B388FF', '#80D8FF', '#A7FFEB'];
+      const symbols = ['⭐', '🎵', '🎶', '✨', '☁️'];
+      const type = Math.floor(Math.random() * symbols.length);
+      targets.push({
+        x: Math.random() * (W - 80) + 40,
+        y: -30,
+        vy: Math.random() * 1.5 + 1.2,
+        r: 22,
+        symbol: symbols[type],
+        color: colors[type],
+        points: (type === 0 ? 30 : 20)
+      });
+    }
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      timeLeft = 40;
+      scoreDisplay.textContent = `🌈 점수: ${score}`;
+      timerDisplay.textContent = `남은 시간: ${timeLeft}초`;
+      startOverlay.classList.add('hidden');
+      gameoverOverlay.classList.add('hidden');
+      resize();
+
+      whale.x = W / 2;
+      whale.targetX = W / 2;
+      whale.y = H * 0.84;
+      whale.spouting = false;
+      whale.spoutHeight = 0;
+
+      targets = [];
+      waterStreams = [];
+      gameState = 'PLAYING';
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (gameState !== 'PLAYING') return;
+        timeLeft--;
+        timerDisplay.textContent = `남은 시간: ${timeLeft}초`;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      gameState = 'GAMEOVER';
+      clearInterval(timerInterval);
+      finalScore.textContent = score;
+      gameoverOverlay.classList.remove('hidden');
+      playMelody([523, 659, 784, 1046]);
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    // Pointer Controls
+    function handlePointer(e) {
+      if (gameState !== 'PLAYING') return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      whale.targetX = clientX - rect.x;
+      whale.spouting = true;
+    }
+
+    function handlePointerEnd() {
+      if (gameState !== 'PLAYING') return;
+      whale.spouting = false;
+    }
+
+    canvas.addEventListener('mousedown', (e) => { handlePointer(e); });
+    window.addEventListener('mousemove', (e) => { if (e.buttons > 0) handlePointer(e); });
+    window.addEventListener('mouseup', handlePointerEnd);
+
+    canvas.addEventListener('touchstart', (e) => { handlePointer(e); }, { passive: false });
+    window.addEventListener('touchmove', (e) => { handlePointer(e); }, { passive: false });
+    window.addEventListener('touchend', handlePointerEnd);
+
+    let spawnTimer = 0;
+
+    function update(dt) {
+      if (gameState !== 'PLAYING') return;
+
+      // Whale movement easing
+      whale.x += (whale.targetX - whale.x) * 0.15;
+      whale.x = Math.max(40, Math.min(W - 40, whale.x));
+
+      // Spouting water
+      if (whale.spouting) {
+        whale.spoutHeight = Math.min(H * 0.72, whale.spoutHeight + dt * H * 1.8);
+        // Add water particles
+        for (let i = 0; i < 4; i++) {
+          const col = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
+          waterStreams.push({
+            x: whale.x + (Math.random() - 0.5) * 20,
+            y: whale.y - 15 - whale.spoutHeight * (0.8 + Math.random() * 0.2),
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            r: Math.random() * 7 + 4,
+            color: col,
+            life: 1
+          });
+        }
+      } else {
+        whale.spoutHeight = Math.max(0, whale.spoutHeight - dt * H * 2.5);
+      }
+
+      // Update water particles
+      for (let i = waterStreams.length - 1; i >= 0; i--) {
+        const p = waterStreams[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= dt * 2.5;
+        if (p.life <= 0) waterStreams.splice(i, 1);
+      }
+
+      // Spawn falling targets
+      spawnTimer += dt;
+      if (spawnTimer > 0.8) {
+        spawnTimer = 0;
+        spawnTarget();
+      }
+
+      // Update targets & collision with spout
+      for (let i = targets.length - 1; i >= 0; i--) {
+        const t = targets[i];
+        t.y += t.vy;
+
+        // Check collision with water fountain column
+        if (whale.spouting && whale.spoutHeight > 30) {
+          const spoutTop = whale.y - 15 - whale.spoutHeight;
+          if (t.y >= spoutTop && t.y <= whale.y && Math.abs(t.x - whale.x) < 36) {
+            // Hit!
+            score += t.points;
+            scoreDisplay.textContent = `🌈 점수: ${score}`;
+            playMelody([659, 880]);
+            // Burst
+            for (let j = 0; j < 12; j++) {
+              waterStreams.push({
+                x: t.x,
+                y: t.y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                r: Math.random() * 6 + 3,
+                color: t.color,
+                life: 1
+              });
+            }
+            targets.splice(i, 1);
+            continue;
+          }
+        }
+
+        // Off screen
+        if (t.y > H + 40) {
+          targets.splice(i, 1);
+        }
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Sky and Sea Background
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.78);
+      skyGrad.addColorStop(0, '#E1F5FE');
+      skyGrad.addColorStop(1, '#B3E5FC');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H * 0.78);
+
+      // Sea water bottom
+      const seaGrad = ctx.createLinearGradient(0, H * 0.78, 0, H);
+      seaGrad.addColorStop(0, '#0288D1');
+      seaGrad.addColorStop(1, '#01579B');
+      ctx.fillStyle = seaGrad;
+      ctx.fillRect(0, H * 0.78, W, H * 0.22);
+
+      // Gentle Waves
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      for (let x = 0; x < W; x += 40) {
+        ctx.beginPath();
+        ctx.arc(x + 20, H * 0.78, 12, Math.PI, 0);
+        ctx.fill();
+      }
+
+      // Rainbow Water Fountain
+      if (whale.spoutHeight > 5) {
+        ctx.save();
+        const numCols = rainbowColors.length;
+        const colWidth = 6;
+        const totalW = numCols * colWidth;
+        const startX = whale.x - totalW / 2;
+
+        rainbowColors.forEach((color, idx) => {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = colWidth;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(startX + idx * colWidth, whale.y - 12);
+          ctx.lineTo(startX + idx * colWidth, whale.y - 12 - whale.spoutHeight);
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+
+      // Water Particles
+      waterStreams.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Falling Targets (Stars, Notes, Clouds)
+      targets.forEach(t => {
+        ctx.save();
+        ctx.translate(t.x, t.y);
+        ctx.fillStyle = t.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, t.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '22px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(t.symbol, 0, 2);
+        ctx.restore();
+      });
+
+      // Cute Baby Whale
+      ctx.save();
+      ctx.translate(whale.x, whale.y);
+      // Whale body
+      ctx.fillStyle = '#0288D1';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 36, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // White belly
+      ctx.fillStyle = '#E1F5FE';
+      ctx.beginPath();
+      ctx.ellipse(0, 8, 26, 12, 0, 0, Math.PI);
+      ctx.fill();
+      // Tail flippers
+      ctx.fillStyle = '#0277BD';
+      ctx.beginPath();
+      ctx.ellipse(-34, -4, 12, 7, -Math.PI / 6, 0, Math.PI * 2);
+      ctx.fill();
+      // Flipper fin
+      ctx.beginPath();
+      ctx.ellipse(6, 4, 10, 6, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+      // Cute eyes & smile
+      ctx.fillStyle = '#01579B';
+      ctx.beginPath();
+      ctx.arc(18, -4, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.arc(19, -5, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+      // Rosy cheek
+      ctx.fillStyle = '#FF8A80';
+      ctx.beginPath();
+      ctx.arc(14, 2, 4, 0, Math.PI * 2);
+      ctx.fill();
+      // Spout hole
+      ctx.fillStyle = '#01579B';
+      ctx.beginPath();
+      ctx.ellipse(2, -21, 4, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    let prevT = performance.now();
+    function loop(t) {
+      const dt = Math.min((t - prevT) / 1000, 0.1);
+      prevT = t;
+      update(dt);
+      draw();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
