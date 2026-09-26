@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 276개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 278개.
 
-[![Games](https://img.shields.io/badge/games-276-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-278-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![276개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![278개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,11 +25,13 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 276개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 278개 게임 목록 펼치기</strong></summary>
 
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🦔 아기 고슴도치의 달콤 딸기 굴리기 (hedgehog-strawberry-roll)](./hedgehog-strawberry-roll) | 귀여운 아기 고슴도치와 함께 과수원 언덕을 굴러가며 달콤한 딸기를 모으는 타이밍 점프 아케이드 | 어린이/점프·액션 |
+| [🐧 아기 펭귄의 북극 오로라 미끄럼틀 (penguin-aurora-slide)](./penguin-aurora-slide) | 신비로운 북극 오로라 레일을 타고 미끄러지며 반짝이는 별가루를 모으는 스와이프 힐링 아케이드 | 어린이/슬라이드·힐링 |
 | [🐿️ 아기 다람쥐의 도토리 굴리기 대작전 (squirrel-acorn-bowling)](./squirrel-acorn-bowling) | 귀여운 아기 다람쥐와 함께 황금 도토리를 굴려 솔방울 핀들을 쓰러뜨리는 숲속 볼링 아케이드 | 어린이/볼링·액션 |
 | [🐳 아기 고래의 오색 무지개 물뿜기 (whale-rainbow-fountain)](./whale-rainbow-fountain) | 푸른 바다 아기 고래로 오색 무지개 물줄기를 뿜어 별구름과 음표 방울을 터뜨리는 힐링 아케이드 | 어린이/타이밍·힐링 |
 | [🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 (autumn-squirrel-acorn-bounce)](./autumn-squirrel-acorn-bounce) | 단풍나무 아래로 떨어지는 황금 도토리와 알밤을 바구니로 받아내는 캐주얼 터치 놀이 | 어린이/캐치·가을 |
@@ -472,6 +474,7 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-09)
+- 2026-09-26: [🦔 아기 고슴도치의 달콤 딸기 굴리기](hedgehog-strawberry-roll/index.html), [🐧 아기 펭귄의 북극 오로라 미끄럼틀](penguin-aurora-slide/index.html) (총 278개)
 
 - 2026-09-24: [🐿️ 아기 다람쥐의 도토리 굴리기 대작전](squirrel-acorn-bowling/index.html), [🐳 아기 고래의 오색 무지개 물뿜기](whale-rainbow-fountain/index.html) (총 276개)
 - 2026-09-23: [🦦 아기 수달의 퐁당퐁당 조개 잡기](otter-river-clam-catch/index.html), [🐲 아기 용의 말랑말랑 불꽃 과일 굽기](dragon-baby-fire-fruit/index.html) (총 274개)

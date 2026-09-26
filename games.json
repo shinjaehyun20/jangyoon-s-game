@@ -2206,5 +2206,21 @@
     "description": "푸른 바다를 헤엄치는 귀여운 아기 고래로 시원한 오색 무지개 물줄기를 뿜어 하늘의 별구름과 음표 방울을 터뜨리는 힐링 타이밍 아케이드 미니게임입니다.",
     "thumbnail": "whale-rainbow-fountain/thumb.svg",
     "path": "whale-rainbow-fountain/index.html"
+  },
+  {
+    "id": "hedgehog-strawberry-roll",
+    "title": "Baby Hedgehog Strawberry Roll",
+    "title_ko": "🦔 아기 고슴도치의 달콤 딸기 굴리기",
+    "description": "가시를 동글게 말고 과수원 언덕을 데굴데굴 굴러가며 달콤한 딸기를 콕콕 모으고 돌멩이를 퐁퐁 뛰어넘는 귀여운 터치 점프 아케이드 미니게임입니다.",
+    "thumbnail": "hedgehog-strawberry-roll/thumb.svg",
+    "path": "hedgehog-strawberry-roll/index.html"
+  },
+  {
+    "id": "penguin-aurora-slide",
+    "title": "Baby Penguin Aurora Slide",
+    "title_ko": "🐧 아기 펭귄의 북극 오로라 미끄럼틀",
+    "description": "신비로운 북극 하늘에 펼쳐진 무지개 오로라 레일을 타고 부드럽게 미끄러지며 반짝이는 별빛 크리스탈을 모으는 스와이프 힐링 아케이드 미니게임입니다.",
+    "thumbnail": "penguin-aurora-slide/thumb.svg",
+    "path": "penguin-aurora-slide/index.html"
   }
 ]

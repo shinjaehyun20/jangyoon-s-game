@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "hedgehog-strawberry-roll",
+        "title": "🦔 아기 고슴도치의 달콤 딸기 굴리기",
+        "path": "hedgehog-strawberry-roll/index.html"
+      },
+      {
+        "id": "penguin-aurora-slide",
+        "title": "🐧 아기 펭귄의 북극 오로라 미끄럼틀",
+        "path": "penguin-aurora-slide/index.html"
+      },
+      {
         "id": "squirrel-acorn-bowling",
         "title": "🐿️ 아기 다람쥐의 도토리 굴리기 대작전",
         "path": "squirrel-acorn-bowling/index.html",

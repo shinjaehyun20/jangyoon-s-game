@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FCE4EC"/>
+      <stop offset="100%" stop-color="#F48FB1"/>
+    </linearGradient>
+    <linearGradient id="berry" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF4081"/>
+      <stop offset="100%" stop-color="#C2185B"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="30" fill="url(#bg)"/>
+  
+  <!-- Green Hill -->
+  <path d="M 0 140 Q 100 120 200 150 L 200 200 L 0 200 Z" fill="#81C784"/>
+  <path d="M 0 140 Q 100 120 200 150" stroke="#4CAF50" stroke-width="5" fill="none"/>
+
+  <!-- Strawberry -->
+  <g transform="translate(145, 95) scale(0.9)">
+    <path d="M 0 25 C -25 -5 -15 -25 0 -12 C 15 -25 25 -5 0 25 Z" fill="url(#berry)"/>
+    <ellipse cx="-6" cy="-14" rx="4" ry="7" fill="#4CAF50" transform="rotate(-30 -6 -14)"/>
+    <ellipse cx="6" cy="-14" rx="4" ry="7" fill="#4CAF50" transform="rotate(30 6 -14)"/>
+    <ellipse cx="0" cy="-16" rx="3" ry="6" fill="#388E3C"/>
+    <circle cx="-5" cy="-2" r="1.5" fill="#FFEB3B"/>
+    <circle cx="5" cy="-2" r="1.5" fill="#FFEB3B"/>
+    <circle cx="0" cy="8" r="1.5" fill="#FFEB3B"/>
+  </g>
+
+  <!-- Rolling Hedgehog -->
+  <g transform="translate(75, 120)">
+    <!-- Spikes -->
+    <path d="M -30 0 L -42 -8 L -28 -14 L -38 -25 L -20 -24 L -24 -38 L -6 -30 L -4 -42 L 12 -30 L 20 -40 L 26 -24 L 38 -28 L 32 -12 L 44 -8 L 30 0 Z" fill="#4E342E"/>
+    <!-- Body -->
+    <circle cx="0" cy="0" r="30" fill="#6D4C41"/>
+    <!-- Belly -->
+    <circle cx="6" cy="2" r="22" fill="#D7CCC8"/>
+    <!-- Nose & Eye -->
+    <circle cx="24" cy="-2" r="4.5" fill="#FF8A80"/>
+    <circle cx="16" cy="-8" r="4" fill="#212121"/>
+    <circle cx="17.5" cy="-9.5" r="1.5" fill="#FFF"/>
+    <!-- Pink Cheek -->
+    <circle cx="14" cy="2" r="5" fill="rgba(233, 30, 99, 0.4)"/>
+  </g>
+
+  <!-- Sparkling Stars -->
+  <path d="M 50 40 L 53 47 L 60 48 L 55 53 L 56 60 L 50 56 L 44 60 L 45 53 L 40 48 L 47 47 Z" fill="#FFD54F"/>
+  <circle cx="160" cy="45" r="3" fill="#FFF" opacity="0.8"/>
+  <circle cx="30" cy="90" r="2.5" fill="#FFF" opacity="0.8"/>
+</svg>

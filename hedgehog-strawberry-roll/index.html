@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🦔 아기 고슴도치의 달콤 딸기 굴리기</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #FCE4EC 0%, #F8BBD0 50%, #F48FB1 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #FFF5F7;
+      box-shadow: 0 10px 30px rgba(233, 30, 99, 0.2);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #C2185B;
+      color: #FFF;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+    }
+    .home-btn {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 5px 12px;
+      border-radius: 14px;
+      transition: background 0.2s;
+    }
+    .badge {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #FFF9FA;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(136, 14, 79, 0.75);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      color: white;
+      text-align: center;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+    .overlay h1 {
+      font-size: 26px;
+      margin-bottom: 12px;
+      color: #FFD54F;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .overlay p {
+      font-size: 15px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      color: #FFF0F5;
+    }
+    .btn {
+      background: #E91E63;
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      box-shadow: 0 6px 16px rgba(233, 30, 99, 0.4);
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.95);
+      background: #C2185B;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../index.html" class="home-btn">🏠 홈으로</a>
+      <div style="font-size: 16px;">🦔 달콤 딸기 굴리기</div>
+      <div class="badge" id="score-display">🍓 0개</div>
+    </header>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="start-overlay" class="overlay">
+      <h1>🦔 아기 고슴도치의<br>달콤 딸기 굴리기!</h1>
+      <p>동글동글 몸을 웅크려 언덕을 굴러가요!<br>화면을 톡 터치하면 퐁퐁 점프해요.<br>달콤한 딸기를 콕콕 찍고 돌멩이를 피해봐요!</p>
+      <button class="btn" id="start-btn">굴러가기 시작! 🍓</button>
+    </div>
+
+    <div id="gameover-overlay" class="overlay" style="display: none;">
+      <h1 id="gameover-title">신나는 딸기 소풍 끝!</h1>
+      <p id="gameover-desc">아기 고슴도치가 바구니 가득 딸기를 모았어요!</p>
+      <button class="btn" id="restart-btn">다시 굴러가기 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score-display');
+    const startOverlay = document.getElementById('start-overlay');
+    const gameoverOverlay = document.getElementById('gameover-overlay');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    let W, H;
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      W = canvas.width = rect.width;
+      H = canvas.height = rect.height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio Sound Engine
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    function playSfx(type) {
+      if (!audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'jump') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.exponentialRampToValueAtTime(650, now + 0.18);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'collect') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.setValueAtTime(780, now + 0.08);
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'hit') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (e) {}
+    }
+
+    let state = 'START'; // START, PLAYING, GAMEOVER
+    let score = 0;
+    let speed = 4;
+    let distance = 0;
+
+    const hedgehog = {
+      x: 80,
+      y: 0,
+      radius: 26,
+      vy: 0,
+      gravity: 0.7,
+      jumpStrength: -13,
+      isGrounded: false,
+      rotation: 0
+    };
+
+    let groundY;
+    let items = []; // strawberries and stars
+    let obstacles = []; // pebbles and tree stumps
+    let particles = [];
+
+    function resetGame() {
+      score = 0;
+      speed = 4.2;
+      distance = 0;
+      groundY = H - 90;
+      hedgehog.y = groundY - hedgehog.radius;
+      hedgehog.vy = 0;
+      hedgehog.rotation = 0;
+      items = [];
+      obstacles = [];
+      particles = [];
+      scoreDisplay.innerText = `🍓 0개`;
+    }
+
+    function spawnElements() {
+      // Spawn strawberries & bonus stars
+      if (Math.random() < 0.04) {
+        const isStar = Math.random() < 0.2;
+        const itemY = groundY - 30 - Math.random() * 110;
+        items.push({
+          x: W + 30,
+          y: itemY,
+          radius: isStar ? 16 : 14,
+          type: isStar ? 'star' : 'strawberry',
+          collected: false
+        });
+      }
+
+      // Spawn obstacles (pebble or stump)
+      if (Math.random() < 0.018 && (obstacles.length === 0 || W + 40 - obstacles[obstacles.length - 1].x > 180)) {
+        const isStump = Math.random() < 0.4;
+        obstacles.push({
+          x: W + 40,
+          y: groundY,
+          w: isStump ? 34 : 26,
+          h: isStump ? 44 : 22,
+          type: isStump ? 'stump' : 'pebble'
+        });
+      }
+    }
+
+    function addSparks(x, y, color, count = 10) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 6,
+          vy: (Math.random() - 0.5) * 6 - 2,
+          life: 1,
+          color,
+          size: Math.random() * 5 + 3
+        });
+      }
+    }
+
+    function jump() {
+      if (state !== 'PLAYING') return;
+      if (hedgehog.isGrounded) {
+        hedgehog.vy = hedgehog.jumpStrength;
+        hedgehog.isGrounded = false;
+        playSfx('jump');
+        addSparks(hedgehog.x, hedgehog.y + hedgehog.radius, '#F8BBD0', 6);
+      }
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
+      initAudio();
+      jump();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.code === 'ArrowUp') {
+        initAudio();
+        jump();
+      }
+    });
+
+    startBtn.addEventListener('click', () => {
+      initAudio();
+      resetGame();
+      state = 'PLAYING';
+      startOverlay.style.display = 'none';
+    });
+
+    restartBtn.addEventListener('click', () => {
+      initAudio();
+      resetGame();
+      state = 'PLAYING';
+      gameoverOverlay.style.display = 'none';
+    });
+
+    function update() {
+      if (state !== 'PLAYING') return;
+
+      distance += speed;
+      speed += 0.0006; // gradual acceleration
+
+      // Physics
+      hedgehog.vy += hedgehog.gravity;
+      hedgehog.y += hedgehog.vy;
+
+      if (hedgehog.y >= groundY - hedgehog.radius) {
+        hedgehog.y = groundY - hedgehog.radius;
+        hedgehog.vy = 0;
+        hedgehog.isGrounded = true;
+      }
+
+      // Rolling rotation
+      hedgehog.rotation += speed * 0.06;
+
+      spawnElements();
+
+      // Update items
+      for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i];
+        it.x -= speed;
+
+        // Collision check
+        const dx = hedgehog.x - it.x;
+        const dy = hedgehog.y - it.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < hedgehog.radius + it.radius && !it.collected) {
+          it.collected = true;
+          if (it.type === 'strawberry') {
+            score += 1;
+            playSfx('collect');
+            addSparks(it.x, it.y, '#E91E63', 12);
+          } else {
+            score += 3;
+            playSfx('collect');
+            addSparks(it.x, it.y, '#FFD54F', 16);
+          }
+          scoreDisplay.innerText = `🍓 ${score}개`;
+        }
+
+        if (it.x < -40 || it.collected) {
+          items.splice(i, 1);
+        }
+      }
+
+      // Update obstacles
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.x -= speed;
+
+        // Collision check (box vs circle)
+        const closestX = Math.max(obs.x - obs.w / 2, Math.min(hedgehog.x, obs.x + obs.w / 2));
+        const closestY = Math.max(obs.y - obs.h, Math.min(hedgehog.y, obs.y));
+        const dX = hedgehog.x - closestX;
+        const dY = hedgehog.y - closestY;
+
+        if (Math.hypot(dX, dY) < hedgehog.radius - 4) {
+          playSfx('hit');
+          addSparks(hedgehog.x, hedgehog.y, '#D32F2F', 24);
+          state = 'GAMEOVER';
+          document.getElementById('gameover-desc').innerHTML = `바구니에 달콤한 딸기를 <b>${score}개</b> 모았어요!<br>신선한 과일 잼을 만들어요! 🍓`;
+          gameoverOverlay.style.display = 'flex';
+          return;
+        }
+
+        if (obs.x < -60) {
+          obstacles.splice(i, 1);
+        }
+      }
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.025;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function drawHedgehog(x, y, r, rot) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+
+      // Cute Spiky Ball body
+      ctx.fillStyle = '#6D4C41';
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Soft belly
+      ctx.fillStyle = '#D7CCC8';
+      ctx.beginPath();
+      ctx.arc(r * 0.2, 0, r * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Spikes around back
+      ctx.fillStyle = '#4E342E';
+      for (let a = Math.PI * 0.6; a <= Math.PI * 1.8; a += 0.22) {
+        const sx = Math.cos(a) * r;
+        const sy = Math.sin(a) * r;
+        const tipX = Math.cos(a) * (r + 9);
+        const tipY = Math.sin(a) * (r + 9);
+        ctx.beginPath();
+        ctx.moveTo(sx - 4, sy);
+        ctx.lineTo(tipX, tipY);
+        ctx.lineTo(sx + 4, sy);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Eyes & Snout
+      ctx.fillStyle = '#212121';
+      ctx.beginPath();
+      ctx.arc(r * 0.5, -r * 0.2, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Shiny eye pupil
+      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.arc(r * 0.52, -r * 0.23, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cute Pink Cheek
+      ctx.fillStyle = 'rgba(233, 30, 99, 0.4)';
+      ctx.beginPath();
+      ctx.arc(r * 0.45, r * 0.1, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Nose
+      ctx.fillStyle = '#FF8A80';
+      ctx.beginPath();
+      ctx.arc(r * 0.75, 0, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawStrawberry(x, y, r) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Berry heart shape
+      ctx.fillStyle = '#E91E63';
+      ctx.beginPath();
+      ctx.moveTo(0, r);
+      ctx.bezierCurveTo(-r * 1.2, -r * 0.2, -r * 0.8, -r, 0, -r * 0.4);
+      ctx.bezierCurveTo(r * 0.8, -r, r * 1.2, -r * 0.2, 0, r);
+      ctx.fill();
+
+      // Little green leaves on top
+      ctx.fillStyle = '#4CAF50';
+      ctx.beginPath();
+      ctx.ellipse(-r * 0.3, -r * 0.7, 4, 8, -Math.PI / 4, 0, Math.PI * 2);
+      ctx.ellipse(r * 0.3, -r * 0.7, 4, 8, Math.PI / 4, 0, Math.PI * 2);
+      ctx.ellipse(0, -r * 0.8, 3, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Seeds
+      ctx.fillStyle = '#FFEB3B';
+      const seeds = [[-4, -2], [4, -2], [0, 4], [-3, 7], [3, 7]];
+      seeds.forEach(([sx, sy]) => {
+        ctx.beginPath();
+        ctx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
+    function drawStar(x, y, r) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = '#FFD54F';
+      ctx.strokeStyle = '#FFA000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * r, -Math.sin((18 + i * 72) * Math.PI / 180) * r);
+        ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (r * 0.5), -Math.sin((54 + i * 72) * Math.PI / 180) * (r * 0.5));
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawObstacle(obs) {
+      ctx.save();
+      ctx.translate(obs.x, obs.y);
+
+      if (obs.type === 'stump') {
+        // Wooden stump
+        ctx.fillStyle = '#795548';
+        ctx.fillRect(-obs.w / 2, -obs.h, obs.w, obs.h);
+        // Top ring
+        ctx.fillStyle = '#D7CCC8';
+        ctx.beginPath();
+        ctx.ellipse(0, -obs.h, obs.w / 2, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#5D4037';
+        ctx.stroke();
+      } else {
+        // Smooth pebble
+        ctx.fillStyle = '#78909C';
+        ctx.beginPath();
+        ctx.ellipse(0, -obs.h / 2, obs.w / 2, obs.h / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#90A4AE';
+        ctx.beginPath();
+        ctx.ellipse(-3, -obs.h / 2 - 2, obs.w / 4, obs.h / 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Background Sky & Orchard Hills
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, groundY);
+      skyGrad.addColorStop(0, '#FCE4EC');
+      skyGrad.addColorStop(1, '#FFF5F7');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, groundY);
+
+      // Distant rolling hills
+      ctx.fillStyle = '#F8BBD0';
+      ctx.beginPath();
+      ctx.arc(W * 0.3, groundY + 120, 220, Math.PI, 0);
+      ctx.arc(W * 0.8, groundY + 140, 200, Math.PI, 0);
+      ctx.fill();
+
+      // Lush Orchard Hill Path
+      ctx.fillStyle = '#81C784';
+      ctx.fillRect(0, groundY, W, H - groundY);
+      ctx.fillStyle = '#4CAF50';
+      ctx.fillRect(0, groundY, W, 10);
+
+      // Flowers on grass
+      ctx.fillStyle = '#FFFFFF';
+      for (let i = 0; i < W; i += 60) {
+        const fx = (i - (distance % 60));
+        ctx.beginPath();
+        ctx.arc(fx, groundY + 18, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw items
+      items.forEach(it => {
+        if (it.type === 'strawberry') drawStrawberry(it.x, it.y, it.radius);
+        else drawStar(it.x, it.y, it.radius);
+      });
+
+      // Draw obstacles
+      obstacles.forEach(drawObstacle);
+
+      // Draw Hedgehog
+      drawHedgehog(hedgehog.x, hedgehog.y, hedgehog.radius, hedgehog.rotation);
+
+      // Draw particles
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      update();
+      requestAnimationFrame(render);
+    }
+
+    render();
+  </script>
+</body>
+</html>
