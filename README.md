@@ -27,287 +27,287 @@
 <details>
 <summary><strong>전체 278개 게임 목록 펼치기</strong></summary>
 
-
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
-| [🦔 아기 고슴도치의 달콤 딸기 굴리기 (hedgehog-strawberry-roll)](./hedgehog-strawberry-roll) | 귀여운 아기 고슴도치와 함께 과수원 언덕을 굴러가며 달콤한 딸기를 모으는 타이밍 점프 아케이드 | 어린이/점프·액션 |
-| [🐧 아기 펭귄의 북극 오로라 미끄럼틀 (penguin-aurora-slide)](./penguin-aurora-slide) | 신비로운 북극 오로라 레일을 타고 미끄러지며 반짝이는 별가루를 모으는 스와이프 힐링 아케이드 | 어린이/슬라이드·힐링 |
-| [🐿️ 아기 다람쥐의 도토리 굴리기 대작전 (squirrel-acorn-bowling)](./squirrel-acorn-bowling) | 귀여운 아기 다람쥐와 함께 황금 도토리를 굴려 솔방울 핀들을 쓰러뜨리는 숲속 볼링 아케이드 | 어린이/볼링·액션 |
-| [🐳 아기 고래의 오색 무지개 물뿜기 (whale-rainbow-fountain)](./whale-rainbow-fountain) | 푸른 바다 아기 고래로 오색 무지개 물줄기를 뿜어 별구름과 음표 방울을 터뜨리는 힐링 아케이드 | 어린이/타이밍·힐링 |
-| [🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 (autumn-squirrel-acorn-bounce)](./autumn-squirrel-acorn-bounce) | 단풍나무 아래로 떨어지는 황금 도토리와 알밤을 바구니로 받아내는 캐주얼 터치 놀이 | 어린이/캐치·가을 |
-| [🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 (chameleon-color-leaf-hide)](./chameleon-color-leaf-hide) | 나뭇잎 색깔 변화에 맞춰 자신을 위장하는 색채 인지 매칭 퍼즐 놀이 | 어린이/색채·퍼즐 |
-| [🐝 꿀벌의 꽃밭 꿀방울 모으기 (honey-bee-flower-flight)](./honey-bee-flower-flight) | 화사한 꽃밭에서 꿀방울을 모아 달콤한 꿀단지를 채우는 힐링 비행 터치 놀이 | 어린이/비행·힐링 |
-| [🏮 마법 호롱불 반딧불이 길 (magic-crystal-lantern-trail)](./magic-crystal-lantern-trail) | 밤숲 호롱불 멜로디 순서를 기억해 꼬마 반딧불이 길을 밝히는 기억 퍼즐 놀이 | 어린이/기억·퍼즐 |
-| [🍓 무지개 과일 스무디 바 (rainbow-fruit-smoothie-bar)](./rainbow-fruit-smoothie-bar) | 하늘에서 떨어지는 오색 과일을 터치해 믹서기로 갈아 알록달록 스무디 잔을 채우는 터치 놀이 | 어린이/요리·터치 |
-| [🐧 꼬마 펭귄의 빙하 퐁당퐁당 (polar-penguin-ice-hop)](./polar-penguin-ice-hop) | 바다 위로 떠내려오는 얼음 유빙을 타이밍 맞춰 퐁당퐁당 건너는 점프 모험 놀이 | 어린이/점프·액션 |
-| [🌌 반짝 별자리 잇기 (constellation-star-catcher)](./constellation-star-catcher) | 밤하늘 별들을 번호 순서대로 이어 마법 별자리를 완성하는 감성 터치 퍼즐 | 어린이/우주·퍼즐 |
-| [🪼 해파리의 퐁퐁 방울 터뜨리기 (jellyfish-bubble-pop)](./jellyfish-bubble-pop) | 바닷속 떠오르는 오색 비눗방울을 톡톡 터뜨리고 진주를 모으는 탭 팝 아케이드 | 어린이/바다·터치 |
-| [🦊 사막여우의 모래언덕 통통 (desert-fennic-dune-bounce)](./desert-fennic-dune-bounce) | 모래 언덕 발판을 퐁퐁 밟고 뛰어오르며 물방울을 모으고 선인장을 피하는 버티컬 점프 | 어린이/사막·점프 |
-| [✨ 마법 가마솥의 퐁당 물약 (magic-potion-cauldron)](./magic-potion-cauldron) | 떨어지는 별가루와 마법 재료를 가마솥으로 쏙쏙 받아 오색 물약을 완성하는 캐주얼 캐치 | 어린이/마법·캐치 |
-| [❄️ 오로라 북극곰의 얼음 썰매 (aurora-polar-bear-slide)](./aurora-polar-bear-slide) | 눈부신 오로라 빙판길을 썰매 타고 달리며 눈송이와 물고기를 모으는 3레인 슬라이딩 런 | 어린이/겨울·런 |
-| [🍬 달콤 젤리 사탕 공장 (sweet-jelly-candy-factory)](./sweet-jelly-candy-factory) | 컨베이어 벨트를 타고 오는 젤리 사탕을 타이밍에 맞춰 선물 상자에 쏙쏙 담는 리듬 패킹 | 어린이/리듬·패킹 |
-| [🚀 우주 탐사차의 크리스탈 대쉬 (space-rover-crystal-dash)](./space-rover-crystal-dash) | 달과 화성의 분화구를 저중력 부스터로 뛰어넘으며 에너지 크리스탈을 모으는 우주 점프 런 | 어린이/우주·런 |
-| [🌈 무지개 카멜레온의 색깔 냠냠 (rainbow-chameleon-catch)](./rainbow-chameleon-catch) | 날아오는 곤충 젤리 색깔에 맞춰 카멜레온 색을 바꾸고 기다란 혀로 낚아채는 색채 아케이드 | 어린이/색채·반응 |
-| [🐋 방울 고래의 심해 다이빙 (bubble-whale-ocean-dive)](./bubble-whale-ocean-dive) | 귀여운 아기 고래와 함께 심해로 다이빙하며 산소 방울과 진주를 모으는 해양 어드벤처 | 어린이/잠수·어드벤처 |
-| [✨ 반짝 별자리 엮기 (star-constellation-weaver)](./star-constellation-weaver) | 밤하늘의 빛나는 별들을 이어 전설의 별자리를 완성하고 챠임 멜로디를 피워내는 힐링 퍼즐 | 어린이/퍼즐·힐링 |
-| [💎 반짝 보석 광산 열차 (gemstone-mine-cart-run)](./gemstone-mine-cart-run) | 신비로운 보석 광산의 3레일을 달리며 루비, 사파이어, 다이아몬드를 모으는 스피드 레일 어드벤처 | 어린이/레일·아케이드 |
-| [🦋 햇살 나비의 마법 정원 (solar-butterfly-garden)](./solar-butterfly-garden) | 따스한 햇살 정원에서 무지개 나비로 꿀방울을 모으고 꽃들을 만개시키는 힐링 터치 비행 | 어린이/비행·힐링 |
-| [🐳 몽실몽실 구름고래의 꿈나라 비행 (cloud-whale-dream-voyage)](./cloud-whale-dream-voyage) | 밤하늘을 유영하는 핑크 구름고래로 별빛 링을 통과하고 오로라를 완성하는 힐링 플라잉 어드벤처 | 어린이/비행·힐링 |
-| [🧁 달콤 마법 베이커리 파티시에 (magical-bakery-patissier)](./magical-bakery-patissier) | 무지개 생크림, 딸기, 별사탕 토핑을 받아 화려한 마법 3단 케이크를 굽는 터치 베이킹 아케이드 | 어린이/만들기·아케이드 |
-| [🚀 250호 기념 우주 별자리 레인저 (space-constellation-ranger)](./space-constellation-ranger) | 반짝이는 은하계 밤하늘을 우주선으로 비행하며 250개의 별빛 크리스탈을 모으고 신비로운 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이 | 어린이/탐험·우주 |
-| [🧋 버블티 펄 퐁퐁 (bubble-tea-pop)](./bubble-tea-pop) | 화면 아래에서 퐁퐁 떠오르는 달콤한 타피오카 펄과 과일 젤리를 쏙 터치해 컵에 담아 맛있는 무지개 버블티를 완성하는 힐링 터치 놀이 | 어린이/반응·터치 |
-| [🫧 반짝반짝 심해 잠수함 탐험 (twinkle-deepsea-submarine)](./twinkle-deepsea-submarine) | 신비로운 심해 바닷속을 노란 잠수함으로 유영하며 해파리와 산호초를 피해 진주조개와 황금 보물상자를 모으는 힐링 수중 탐험 놀이 | 어린이/탐험·수중 |
-| [🍮 말랑말랑 젤리 트램펄린 (sweet-jelly-trampoline)](./sweet-jelly-trampoline) | 말랑말랑 통통 튀는 무지개 푸딩 젤리 트램펄린을 좌우로 움직여 아기 곰 인형과 별사탕을 높이높이 튕겨 올리는 경쾌한 터치 바운스 놀이 | 어린이/액션·바운스 |
-| [✨ 우주 별자리 잇기 탐험 (cosmic-star-weaver)](./cosmic-star-weaver) | 반짝이는 우주 공간에서 별들을 선으로 이어 신비로운 별자리를 완성하는 공간 지각 놀이 | 어린이/공간·별자리 |
-| [🐧 오로라 펭귄의 눈썰매 슬라이드 (aurora-penguin-slide)](./aurora-penguin-slide) | 오로라 밤하늘 아래 빙판길을 미끄러지며 물고기를 모으고 얼음 바위를 피하는 스피드 슬라이드 놀이 | 어린이/액션·슬라이드 |
-| [🔮 반짝반짝 마법 수정 동굴 탐험 (magic-crystal-cave)](./magic-crystal-cave) | 신비로운 보석 동굴에서 쏟아지는 크리스탈을 마법 카트로 받아내고 무지개 프리즘 파워를 발동하는 힐링 아케이드 놀이 | 어린이/액션·캐치 |
-| [🌈 알록달록 무지개 비눗방울 팡팡 (rainbow-bubble-popper)](./rainbow-bubble-popper) | 화면 가득 떠오르는 영롱한 무지개 비눗방울과 보석·과일을 퐁퐁 터뜨려 신나는 콤보와 점수를 모으는 힐링 터치 놀이 | 어린이/반응·터치 |
-| [🔔 멜로디 크리스탈 차임 (melody-crystal-chime)](./melody-crystal-chime) | 5가지 영롱한 펜타토닉 크리스탈 차임벨을 터치해 맑은 멜로디를 연주하는 리듬 액션 놀이 | 어린이/음악·리듬 |
-| [🚀 우주 운석 대시 (cosmic-meteor-dash)](./cosmic-meteor-dash) | 쏟아지는 불타는 운석을 피하며 별 보석과 보호막을 수집하는 스릴 만점 우주선 비행 회피 놀이 | 어린이/액션·회피 |
-| [⚡ 꼬마 로봇 건전지 충전 (circuit-robot-battery)](./circuit-robot-battery) | 번개와 건전지 패턴을 탭하여 아기 로봇의 에너지를 충전하는 인지 퍼즐 놀이 | 어린이/퍼즐·인지 |
-| [🎈 무지개 풍선 팡팡 (balloon-rainbow-pop)](./balloon-rainbow-pop) | 하늘로 떠오르는 무지개 풍선을 터치하고 별 풍선 연쇄 폭발을 일으키는 터치 액션 놀이 | 어린이/반응·터치 |
-| [🥐 우주 별빛 베이커리 (cosmic-star-baker)](./cosmic-star-baker) | 우주 성운 반죽과 별빛 토핑으로 외계인 손님들이 주문한 신비한 빵을 굽는 베이킹 놀이 | 어린이/창의·요리 |
-| [🐢 바다거북 비눗방울 구출 (turtle-bubble-rescue)](./turtle-bubble-rescue) | 그물에 갇힌 바다거북과 해양 생물들을 거품 방울로 터치해 구출해 주는 바다 환경 구조 놀이 | 어린이/액션·구출 |
-| [🚁 사이버 드론 택배 비행사 (cyber-drone-delivery)](./cyber-drone-delivery) | 메가시티의 강풍과 회전 레이저를 뚫고 드론의 양쪽 로터와 부스터를 제어해 지정된 헬리패드에 안전하게 화물을 배송하는 조종 놀이 | 어린이/조종·물리 |
-| [⛏️ 픽셀 던전 광산 탐험가 (pixel-dungeon-miner)](./pixel-dungeon-miner) | 미지의 지하 동굴을 파고 내려가 진귀한 광석을 채굴하고 산소를 관리하며 장비를 업그레이드하는 탐험 놀이 | 어린이/탐험·채굴 |
-| [🧲 중력 구슬 건축가 (gravity-ball-architect)](./gravity-ball-architect) | 중력과 반동 발판을 배치하여 굴러가는 쇠구슬을 목표 지점까지 안내하는 물리 퍼즐 놀이 | 어린이/물리·퍼즐 |
-| [🥁 쿵치딱 리듬 버블 밴드 (beat-bubble-drummer)](./beat-bubble-drummer) | 리듬에 맞춰 떨어지는 음표 버블을 타이밍 맞추어 두드려 연주하는 경쾌한 드럼 놀이 | 어린이/음악·리듬 |
-| [🐳 아기별고래 우주 유영 (star-whale-voyage)](./star-whale-voyage) | 우주 바다를 헤엄치며 성운과 별가루를 먹고 몸집을 키워나가는 평화로운 비행 힐링 놀이 | 어린이/액션·비행 |
-| [🧪 숲속 마법 물약방 (potion-magic-shop)](./potion-magic-shop) | 신비로운 약초와 반짝이는 가루를 조합해 동물 친구들의 고민을 해결하는 마법 제작 놀이 | 어린이/학습·제작 |
-| [🌱 루미 이슬정원 (lumi-dew-garden)](./lumi-dew-garden) | 이슬 요정 루미와 함께 새싹에 영롱한 이슬방울을 맺어 예쁜 꽃을 피우는 자연 힐링 놀이 | 어린이/생활·힐링 |
-| [🪵 숲속 구슬길 (woodland-marble-slide)](./woodland-marble-slide) | 나무 레일과 물레방아를 조립해 숲속 다람쥐들에게 도토리 구슬을 배달하는 물리 퍼즐 놀이 | 어린이/물리·퍼즐 |
-| [🐳 별빛 고래의 하늘 비행 (starlight-whale-flight)](./starlight-whale-flight) | 은하수 밤하늘을 헤엄치며 반짝이는 별빛을 모으는 비행 놀이 | 어린이/액션·비행 |
-| [🐿️ 도토리 퐁퐁 발사기 (forest-acorn-catapult)](./forest-acorn-catapult) | 다람쥐의 도토리를 당겨서 나뭇잎 바구니에 퐁 골인시키는 물리 조준 놀이 | 어린이/물리·조준 |
-| [✨ 반짝반짝 반딧불이 호롱불 (sparkle-firefly-lamp)](./sparkle-firefly-lamp) | 밤하늘 반딧불이를 터치해 호롱불을 밝히는 힐링 터치 놀이 | 어린이/반응·터치 |
-| [💎 무지개 보석 광산 열차 (rainbow-gem-minecart)](./rainbow-gem-minecart) | 쏟아지는 오색 보석을 광차로 쏙쏙 담는 레일 액션 게임 | 어린이/액션·캐치 |
-| [🌊 해저 진주 조개 찾기 (ocean-pearl-diver)](./ocean-pearl-diver) | 조개 타일을 터치해 반짝이는 진주를 수집하는 해저 탐험 게임 | 어린이/액션·반응 |
-| [🍪 아기 몬스터 쿠키 먹이기 (monster-cookie-feed)](./monster-cookie-feed) | 배고픈 몬스터에게 딸기·메론·바나나 쿠키를 맞춰 쏙 먹여주는 게임 | 어린이/인지·드래그 |
-| [⚡ 네온 회로 연결사 (neon-circuit-connect)](./neon-circuit-connect) | 타일을 회전시켜 발전소에서 아기 로봇까지 네온 전선을 연결하고 번쩍이는 에너지를 충전하세요! | 어린이/퍼즐·인지 |
-| [🐒 정글 덩굴 스윙 타잔 (jungle-vine-swinger)](./jungle-vine-swinger) | 화면을 터치해 덩굴을 잡고 반동을 실어 날아가며 정글의 바나나와 별을 모으는 스윙 액션 놀이! | 어린이/액션·물리 |
-| [🍹 주스 따르기 파티 (juice-pour-party)](./juice-pour-party) | 색깔 주전자를 알맞은 컵 위로 드래그해 맛있는 주스를 따라 보는 45초 놀이. | 어린이/드래그·생활놀이 |
-| [☁️ 구름 바람길 탐험 (windy-cloud-postman)](./windy-cloud-postman) | 바람개비를 드래그한 방향으로 구름을 직접 움직여 빛나는 하늘문까지 안내하는 놀이. | 어린이/공간·드래그 |
-| [⭐ 별자리 산수 짝 맞추기 (star-match-math)](./star-match-math) | 화면의 별들을 선택하여 숫자의 합이 목표값과 정확히 일치하도록 하세요! 별자리를 잇는 연산 퍼즐. | 어린이/학습·인지 |
-| [🌈 색상 파동 맞추기 (color-wave-harmony)](./color-wave-harmony) | 회전하는 바늘이 타겟 색상을 가리키는 정확한 타이밍에 탭하세요! 리듬 타이밍 챌린지. | 어린이/반응·터치 |
-| [🚒 소방차 불 끄기 (firetruck-fire-out)](./firetruck-fire-out) | 활활 타는 불(🔥)을 터치해 꺼주세요! 30초 동안 마을을 구하는 소방대장 미션. | 어린이/반응·터치 |
-| [🦖 공룡 뼈 발굴 (dino-bone-dig)](./dino-bone-dig) | 흙 타일을 탭하여 공룡 뼈(🦴) 5개를 전부 찾아내고 멋진 공룡을 조립하는 탐험. | 어린이/공간·터치 |
-| [🚀 우주선 피하기 챌린지 (space-dodge)](./space-dodge) | 좌우로 우주선을 조종해 떨어지는 운석을 피하세요! | 액션/반응 |
-| [🍎 과일 짝 맞추기 (fruit-match)](./fruit-match) | 카드 뒤에 숨겨진 같은 모양의 과일 짝을 매칭해보세요! | 기억/인지 |
-| [🥁 동물 밴드 연주 (percussion-band)](./percussion-band) | 악기 연주 순서를 기억하고 똑같이 따라 눌러보세요! | 기억/인지 |
-| [🍂 계절 옷장 분류 (season-sort)](./season-sort) | 옷과 물건을 알맞은 계절 칸으로 드래그! | 인지/학습 |
-| [🔍 숨은 그림 찾기 챌린지 (hidden-object-hunt)](./games/hidden-object-hunt) | 그림 속에 숨겨진 5개의 물건을 찾아 탭하세요! | 관찰/퍼즐 |
-| [🎵 리듬 터치 타임 (rhythm-touch-beat)](./games/rhythm-touch-beat) | 원형 박자 링이 축소되어 겹칠 때 탭! 리듬감 퍼즐 | 리듬/반응 |
-| [🎨 색깔 기억 챌린지 (color-memory-challenge)](./color-memory-challenge) | 색깔 패턴을 기억하고 같은 순서로 탭해보세요! | 기억/인지 |
-| [🐾 동물 소리 퀴즈 (animal-sound-quiz)](./animal-sound-quiz) | 동물 이모지를 보고 이름과 울음소리를 맞혀보세요! | 학습/퀴즈 |
-| [🚀 우주 쓰레기 청소부 (space-garbage-collector)](./space-garbage-collector) | 30초 동안 우주 쓰레기를 모으고 운석을 피하세요! | 액션/반사 |
-| [📦 색깔 상자 쌓기 (color-box-stack)](./color-box-stack) | 화면을 터치해서 움직이는 상자를 떨어뜨려 높이 쌓아보세요! | 타이밍/퍼즐 |
-| [🚲 자전거 균형 타기 (bicycle-balance)](./bicycle-balance) | 균형 맞추며 페달 밟아 멀리 달리기 | 어린이/균형·타이밍 |
-| [🧊 냉장고 정리하기 (fridge-sort)](./fridge-sort) | 음식을 냉장·냉동·실온에 드래그 분류 | 어린이/생활인지 |
-| [🚀 로켓 순서 발사 (rocket-sequence-launch)](./rocket-sequence-launch) | 관제사가 보여주는 그림 명령을 기억하고 같은 순서로 눌러 6라운드 로켓을 발사해요! | 어린이/인지·순서 |
-| [🐾 그림자 발자국 탐정 (shadow-trail-match)](./shadow-trail-match) | 발자국 단서와 흐릿한 그림자를 보고 숨어 있는 동물을 찾는 8라운드 관찰 놀이예요! | 어린이/인지·순서 |
-| [📄 종이 접기 연구소 (paper-fold-lab)](./paper-fold-lab) | 접는 방향을 예측한 뒤 구멍을 찍고 펼쳐 4개·8개 대칭 무늬를 완성하는 6라운드 상태 변환 퍼즐. 오답 감점 없이 힌트를 주고 localStorage 최고 별 기록 저장 | 어린이/공간·대칭 |
-| [🔦 거울빛 구조대 (mirror-beam-rescue)](./mirror-beam-rescue) | 거울 손잡이를 드래그해 입사각과 반사각을 맞추고 별까지 빛의 길을 잇는 7라운드 반사 기하 퍼즐. 1개 거울에서 2개 거울로 확장하고 localStorage 최고점 저장 | 어린이/과학·드래그 |
-| [🫧 제미니 우주 방울 팡팡 (gemini-space-bubble)](./gemini-space-bubble) | 무중력 우주로 올라가는 방울을 톡톡 탭해서 40초 동안 구조하는 터치 판단 게임. Web Audio 사운드 효과 및 localStorage 최고점 저장 | 어린이/호흡·터치 |
-| [🌟 제미니 별빛 스파크 (gemini-star-spark)](./gemini-star-spark) | 밤하늘에 나타나는 반짝이는 별과 마법 보석을 탭해 별빛 점수를 모으는 40초 터치 반응 게임. 콤보 보너스와 Web Audio 사운드 효과, localStorage 최고점 저장 | 어린이/반응·터치 |
-| [🚦 신호등 안전 건너기 (traffic-light-crossing)](./traffic-light-crossing) | 빨간불·노란불에는 기다리고 초록불에만 건너기를 누르는 45초 안전 판단 게임. 충동 억제와 생활 안전을 함께 연습하고 localStorage 최고점 저장 | 어린이/생활안전·반응 |
-| [🫧 숨결 비눗방울 (breath-bubble)](./breath-bubble) | 버튼을 꾹 눌러 방울을 키우고 점선 목표 원 크기에서 떼는 8라운드 hold-to-release 게임. 크기 오차별 점수와 localStorage 최고점 저장 | 어린이/호흡·타이밍 |
-| [🌦️ 날씨 옷장 탐험 (weather-outfit)](./weather-outfit) | 햇빛·비·눈·바람·더위·추위 장면을 보고 알맞은 옷을 고르는 45초 생활 판단 게임. 매 라운드 보기 위치가 섞이고 오답은 감점 없이 날씨 힌트를 보여주며, localStorage 최고 준비 수 저장 | 어린이/생활·날씨 |
-| [🪞 마음 거울 (emotion-mirror)](./emotion-mirror) | 선물·퍼즐·천둥·소풍 등 생활 장면을 읽고 가장 가까운 감정 표정을 고르는 8라운드 사회정서 게임. 오답 시 감정 단서를 주고 재도전하며 localStorage 최고 마음 별 저장 | 어린이/사회정서·감정 |
-| [🪐 행성 궤도 주차 (planet-orbit-park)](./planet-orbit-park) | 손가락으로 달을 원형 드래그해 초록 궤도 구역에 주차하는 7라운드 각도 감각 게임. 기존 lighthouse-guide/meteor-shield의 회전 방어·유도와 달리 각도 위치를 직접 맞춘 뒤 손을 떼는 orbit parking 메커니즘, localStorage 최고점 저장 | 어린이/각도·드래그 |
-| [🎟️ 기차표 도장 찍기 (train-ticket-stamp)](./train-ticket-stamp) | 움직이는 기차표의 별표가 가운데 올 때 도장을 꾹 눌렀다 떼는 hold-to-punch 타이밍 게임. 기존 단순 탭 반응과 달리 누르기-떼기 판정과 이동 표적 정렬이 핵심, localStorage 최고점 저장 | 어린이/타이밍·홀드 |
-| [🥋 태권도 품새 리듬 (taekwondo-poomsae)](./taekwondo-poomsae) | 표시된 지르기·앞차기·막기·서기 동작을 45초 동안 맞추는 리듬 수련. 연속 정답 콤보와 localStorage 최고점 저장 | 어린이/운동·반응 |
-| [🎣 받침 낚시왕 (batchim-fishing)](./batchim-fishing) | 낱말을 소리 내어 읽고 알맞은 받침을 골라 물고기 10마리를 잡는 한글 놀이. 연속 정답 별 보너스와 localStorage 최고별 저장 | 학습/한글·받침 |
-| [♻️ 분리수거 구조대 (recycle-rescue)](./recycle-rescue) | 종이·플라스틱·캔 물건을 알맞은 통으로 직접 끌어 넣는 40초 환경 학습. 오답 감점 없이 재도전하고 연속 분류 보너스와 localStorage 최고점을 저장 | 어린이/환경·드래그 |
-| [🌙 달빛 순서 탐험 (moon-phase-quest)](./moon-phase-quest) | 섞인 네 가지 달 모양을 어두운 달부터 밝은 달까지 복원하는 5단계 우주 학습. 오답 감점 없이 달의 변화를 반복하고 localStorage 최고 별 수를 저장 | 어린이/우주·순서 |
-| [⏰ 시계 바늘 맞추기 (clock-hands)](./clock-hands) | 시·분 버튼으로 아날로그 시계 바늘을 목표 시간에 맞추는 60초 학습 게임. 5분 단위 조작, 오답 감점 없는 힌트, localStorage 최고 정답 수 저장 | 어린이/시간·생활학습 |
-| [🎭 패턴 퍼레이드 (pattern-parade)](./pattern-parade) | 동물 이모지가 번갈아·두 번씩·세 친구 순서로 반복되는 규칙을 보고 빈칸을 고르는 50초 패턴 게임. 오답 때 정답을 함께 보여주고 localStorage 최고 정답 수 저장 | 어린이/규칙·인지 |
-| [🥪 샌드위치 주문 (sandwich-order)](./sandwich-order) | 주문표의 재료 순서를 기억해 45초 동안 샌드위치를 완성. 틀리면 현재 주문만 다시 시작하고 localStorage 최고 완성 수 저장 | 어린이/기억·생활학습 |
-| [🧺 빨래 색깔 분류 (laundry-sort)](./laundry-sort) | 옷 색과 같은 바구니를 골라 40초 동안 빨래를 정리. 오답 감점 없이 색 인지 반복, localStorage 최고 정리 수 저장 | 어린이/색인지·생활학습 |
-| [🐇 그림자 손놀이 (shadow-puppet)](./shadow-puppet) | 토끼·새·강아지 그림자가 빛나는 순서를 기억한 뒤 같은 순서로 탭하는 5막 기억 공연. 막마다 순서가 3개에서 7개로 늘고, 틀려도 다시 보여주는 좌절 방지 설계, localStorage 최고점 | 어린이/기억·순서 |
-| [🌱 씨앗 새싹 달리기 (seed-sprout-race)](./seed-sprout-race) | 화면에 표시된 물·햇빛 버튼을 빠르게 골라 성장 게이지를 채우고 40초 동안 여러 꽃을 피우는 큐 반응 게임. 오답은 한 단계만 후퇴, localStorage 최고 꽃 기록 | 어린이/반응·생활학습 |
-| [🧶 고양이 낚싯대 놀이 (cat-teaser-play)](./cat-teaser-play) | 화면을 드래그해 깃털을 움직이면 고양이가 따라와 실뭉치를 낚아채는 드래그 유도 게임. CSS perspective 원근 방바닥, 40초 도전, localStorage 최고점 | 어린이/반사 |
-| [✈️ 종이비행기 날리기 (paper-airplane-fly)](./paper-airplane-fly) | 화면을 톡톡 터치해 종이비행기를 띄우는 중력+플랩 비행 게임. ⭐별 수집, 🌩️먹구름 3회까지 허용, 40초 도전, localStorage 최고점 | 어린이/반사 |
-| [🎯 몬스터 파크 (monster-park)](./monster-park) | 공원에 나타나는 12종 몬스터를 탭해서 포획하는 게임. 같은 몬스터 3마리 모으면 레벨업, 도감 완성 수집 요소, 45초 타임어택, localStorage 최고점·도감 저장 | 어린이/수집 |
-| [🌀 터널 달리기 (tunnel-dash)](./tunnel-dash) | CSS 3D(perspective+preserve-3d) 터널 원근 러너. 좌우 이동으로 장애물 피하고 보석 모으기, 30초 도전 | 어린이/반사 |
-| [🤿 다이빙대 점프 (diving-board-jump)](./diving-board-jump) | CSS 3D 원근 다이빙대에서 타이밍 맞춰 점프! 물결 링 중앙 착수 시 고득점, 5회 도전 | 어린이/타이밍 |
-| [🐧 펭귄 물고기 던지기 (penguin-fish-toss)](./penguin-fish-toss) | 헤엄치는 물고기를 탭해서 펭귄이 먹이를 던져 잡아요! 60초 안에 최대한 많이! | 동물/자연 |
-| [🥕 두더지 텃밭 (mole-garden)](./mole-garden) | 두더지가 올라오면 탭해서 당근·무·양배추를 지켜요! 콤보 보너스 + 45초 도전 | 동물/자연 |
-| [🌈 무지개 레일 공방 (rainbow-rail-builder)](./rainbow-rail-builder) | 회전 타일이 아니라 손가락 드래그로 직접 레일을 그리는 5레벨 드로잉 퍼즐 | 인지/퍼즐 |
-| [🫧 눈방울 구조대 (bubble-snow-rescue)](./bubble-snow-rescue) | 원형 조이스틱으로 움직이고 눈방울을 쏴 5스테이지를 클리어하는 2.5D 액션 퍼즐 | 어린이/액션 |
-| [🌙 달 로켓 연료 계산 (moon-rocket-math)](./moon-rocket-math) | 덧셈·뺄셈 정답 연료를 골라 로켓을 달까지 보내는 숫자 게임 | 학습/수학 |
-| [🤖 코덱스 로봇 연구소 (codex-robot-lab)](./codex-robot-lab) | 명령 카드를 순서대로 골라 계획→수정→검증→커밋/푸시 파이프라인을 완성하는 로봇 연구소 게임 | 학습/코딩 |
-| [🎳 볼링 (bowling)](./bowling) | 아래→위 스와이프로 공을 굴려 핀을 쓰러뜨리는 10프레임 볼링, 스트라이크·스페어 | 어린이 |
-| [🪂 낙하산 착륙 (parachute-drop)](./parachute-drop) | 좌우 탭·기울임으로 낙하산을 조종해 착륙 패드에 안전 착지, 바람·새 회피·레벨업 | 어린이 |
-| [공룡알 탭탭 (dinosaur-tap)](./dinosaur-tap) | 화면에 나타나는 공룡알을 빠르게 탭해서 아기 공룡을 부화시켜요! 5색 알·8종 공룡·콤보 보너스·30초 도전 | 반사 |
-| [과일 짝 맞추기 (fruit-pair)](./fruit-pair) | 같은 과일 카드 두 장을 찾아요! 4단계 난이도, 연속 콤보 보너스, 60초 도전 | 인지/매칭 |
-| [버블티 만들기 (bubble-tea-maker)](./bubble-tea-maker) | 손님 주문대로 시럽 붓고 펄·토핑 올려서 버블티를 완성해요! | 창의/드래그 |
-| [소원등 띄우기 (lantern-float)](./lantern-float) | 탭해서 소원등에 불을 켜고 밤하늘로 두둥실 띄워 보내요! | 어린이 |
-| [🍄 슈퍼 점프 모험 (super-mario)](./super-mario) | 5스테이지+👑보스 성 옆스크롤 플랫포머! 버섯·🌸불꽃·⭐별, 숨은 블록·파이프 비밀길, ▼숙이기, 보스는 밟기/도끼로! | 액션/플랫포머 |
-| [민들레 홀씨 날리기 (dandelion)](./dandelion) | 민들레를 탭하거나 쓸어서 홀씨를 날려요! | 어린이 |
-| [🧦 양말 짝 맞추기 (sock-match)](./sock-match) | 같은 색·무늬 양말 2짝을 터치로 골라 짝 맞추기! 3단계 난이도, 타이머 도전 | 인지/매칭 |
-| [다람쥐 도토리 모으기 (acorn-squirrel)](./acorn-squirrel) | 탭해서 점프! 나뭇가지를 밟고 도토리를 모으고 돌을 피해요 | 액션 |
-| [펭귄 얼음 미끄럼틀 (penguin-slide)](./penguin-slide) | 얼음 경사를 미끄러져 내려오며 물고기를 먹고 바위를 피해요! | 액션 |
-| [🚗 자동차 경주 (car-race)](./car-race) | 3차선을 바꿔 적 차를 피하고 코인을 모으는 스피드 레이싱! | 탈것/액션 |
-| [우주 장윤이 (space-catcher)](./space-catcher) | 떨어지는 별을 좌우 이동으로 잡는 액션 게임 | 액션 |
-| [달리는 장윤이 (runner-game)](./runner-game) | 위/아래 이동으로 아이템을 모으는 러너 게임 | 액션 |
-| [두더지 잡기 (whack-a-mole)](./whack-a-mole) | 올라오는 두더지를 빠르게 탭해서 잡아요! 연속 콤보 보너스 | 반사 |
-| [기억력 카드 (memory-match)](./memory-match) | 같은 이모지 카드 두 장을 기억해서 찾아보세요. 쉬움/보통/어려움 | 기억력 |
-| [색깔 맞추기 (color-tap)](./color-tap) | 글자가 어떤 색으로 쓰여있는지 골라요! 내용이 아닌 색깔을! | 인지 |
-| [한글 타이핑 (typing)](./typing) | 한글 단어 타이핑 연습 (스테이지별) | 학습 |
-| [장윤 한글 타이핑 웹 (typing-web)](https://shinjaehyun20.github.io/02-hangul-typing-game/#home) | 한글 단어 타이핑 연습 (외부 GitHub Pages 배포) | 학습 |
-| [자바스크립트 테트리스 (tetris)](./tetris) | 클래식 테트리스 | 퍼즐 |
-| [2048](./2048) | 숫자 합치기 퍼즐 | 퍼즐 |
-| [스도쿠 (sudoku)](./sudoku) | 9×9 숫자 퍼즐, 난이도·타이머·Lives 시스템 | 퍼즐 |
-| [우봉고 (ubongo)](./ubongo) | 폴리오미노 조각 배치 속도 퍼즐 (9라운드) | 퍼즐 |
-| [🔢 숫자 순서 맞추기 (number-order)](./number-order) | 흩어진 숫자 1→N 순서대로 빠르게 터치, 레벨 클리어 | 인지 |
-| [🐾 동물 색칠 놀이 (animal-coloring)](./animal-coloring) | 귀여운 동물을 원하는 색으로 색칠해봐요! | 창의 |
-| [⭐ 별 세기 숫자 놀이 (star-counting)](./star-counting) | 별을 세며 숫자를 맞추는 재미있는 퍼즐! | 학습 |
-| [🐰 토끼 당근 미로 (rabbit-maze)](./rabbit-maze) | 토끼가 당근을 찾아 미로를 탈출하도록 도와주세요! | 퍼즐 |
-| [🤖 로봇 배틀 (robot-game)](./robot-game) | 내 로봇으로 적 로봇을 물리쳐라! 공격과 방어 타이밍이 핵심! | 액션 |
-| [🚀 우주 슈팅 (space-shooter)](./space-shooter) | 우주선으로 적을 격파하라! 웨이브를 버텨내고 최고 점수에 도전! | 액션 |
-| [🎵 리듬 탭 (rhythm-tap)](./rhythm-tap) | 내려오는 노트를 박자에 맞춰 탭, 폭탄 회피, 콤보 보너스 | 리듬 |
-| [🎯 과녁 맞추기 (target-hit)](./target-hit) | 이동하는 과녁 터치, 정중앙=100점, 30초 타임어택 | 반사 |
-| [🍎 과일 받기 (fruit-catch)](./fruit-catch) | 떨어지는 과일을 바구니로 드래그해서 받기, 폭탄 회피, 콤보, 30초 | 반사 |
-| [🖼️ 그림 단어 맞추기 (word-picture-match)](./word-picture-match) | 이모지 그림에 맞는 한글 단어 4지선다, 10문제 퀴즈, 연속 정답 보너스 | 학습 |
-| [🏀 농구공 드리블 (bounce-ball)](./bounce-ball) | 공이 바닥에 닿기 전에 탭! 콤보 연결, 물리 기반 드리블 | 반사 |
-| [⭐ 별자리 잇기 (star-connect)](./star-connect) | 숫자 순서대로 별을 탭해 별자리 완성, 8가지 별자리, 캔버스 렌더링 | 인지/학습 |
-| [🐟 물고기 잡기 (fish-catch)](./fish-catch) | 잠자리채 드래그로 물고기 잡기, 폭탄 회피, 30초 타임어택 | 반사 |
-| [🧩 퍼즐 조각 맞추기 (jigsaw-mini)](./jigsaw-mini) | 이모지 조각 드래그해 제자리에 맞추기, 2×2·3×3 난이도, 8레벨 | 인지 |
-| [🌈 같은 색 버블 팡팡 (bubble-pop-color)](./bubble-pop-color) | 같은 색 버블 3개를 순서대로 탭해서 터뜨리기, 5세 친화 색상 매칭 | 인지 |
-| [🐛 애벌레 먹이주기 (caterpillar-feed)](./caterpillar-feed) | 애벌레를 드래그해 반짝이는 잎에 갖다 대기, 단순 드래그 1동작 | 드래그 |
-| [🐸 개구리 점프 (frog-jump)](./frog-jump) | 탭하면 점프! 수련잎 위에 착지하면 점수, 물에 빠지면 목숨 차감, 1버튼 타이밍 액션 | 타이밍 |
-| [🔮 색깔 기억 패턴 (color-memory)](./color-memory) | 버튼 점등 순서를 기억했다가 같은 순서로 탭! 단계별 패턴 증가, 쉬움/어려움 선택 | 기억력 |
-| [⚫⚪ 아기 바둑 (baby-go)](./baby-go) | 9×9 / 13×13 / 19×19에서 돌을 잡고, 남은 돌+둘러싼 빈칸으로 점수를 세는 입문 바둑. 빈칸을 다 채우지 않고 `점수 세기`로 끝낼 수 있음 | 보드 |
-| [🎹 피아노 놀이 (piano-tiles)](./piano-tiles) | 건반을 탭해서 음악 연주! 자유 연주 + 악보 따라하기(나비야·반짝반짝 등 4곡) | 음악 |
-| [🔷 모양 분류 놀이 (shape-sort)](./shape-sort) | 나타나는 도형을 모양·색깔·모양+색 바구니에 빠르게 분류! 레벨이 오를수록 제한 시간 단축 | 학습/인지 |
-| [🔢 숫자 퀴즈 (math-quiz)](./math-quiz) | 더하기·빼기 문제를 풀어봐요! 3가지 난이도, 10문제 퀴즈, 최고 기록 저장 | 학습 |
-| [🌑 그림자 맞추기 (shadow-match)](./shadow-match) | 그림자를 보고 어떤 그림인지 맞혀요! 동물·탈것·음식 40가지 이모지 | 인지 |
-| [🦕 공룡 달리기 (dino-run)](./dino-run) | 탭해서 점프! 선인장·새를 피해 멀리멀리 달려요. 목숨 3개 도전 | 액션 |
-| [🥕 채소 텃밭 (vegetable-garden)](./vegetable-garden) | 씨앗 심고 물 줘서 채소를 수확! 5레벨 텃밭 농부 도전 | 학습/경영 |
-| [🎨 색칠 놀이 (color-fill)](./color-fill) | 색을 골라 그림을 탭으로 색칠! 해바라기·물고기·집·별·나비 5가지 그림 완성 | 창의 |
-| [🌊 파도 서핑 (wave-surf)](./wave-surf) | 서퍼를 드래그해 바위·해파리 피하기! 별 획득 보너스, 멀리 달릴수록 고득점 | 액션 |
-| [🐾 동물 소리 맞추기 (animal-sound)](./animal-sound) | 이모지 동물 보고 울음소리 4지선다! 20종 동물 풀, 10문제 퀴즈, 연속 정답 보너스 | 학습 |
-| [☁️ 구름 점프 (cloud-jump)](./cloud-jump) | 탭해서 점프! 구름 발판 밟아 수직 상승, 이동 구름, 목숨 3개, 높이(m) 도전 | 액션 |
-| [🍉 과일 자르기 (fruit-slice)](./fruit-slice) | 날아오는 과일을 손가락 슬라이드로 자르기! 폭탄 피하고 콤보 연결, 60초 도전 | 반사 |
-| [🔍 다른 그림 찾기 (spot-difference)](./spot-difference) | 두 이모지 그림을 비교해서 다른 곳 탭! 레벨마다 다른 칸 수 증가, 힌트 3개 | 인지 |
-| [🌈 색깔 거품 잡기 (color-bubble-catch)](./color-bubble-catch) | 목표 색 거품만 터치, 다른 색은 피해요! 난이도 3단계, 목숨 3개 | 반사/인지 |
-| [🎭 표정 맞추기 (face-match)](./face-match) | 제시된 표정과 같은 얼굴을 찾아 탭! 20종 표정, 10문제 퀴즈, 빠를수록 보너스 | 인지/공감 |
-| [🎠 빙글빙글 색 맞추기 (spin-color)](./spin-color) | 빙글빙글 돌아가는 원판! 화살표가 가리키는 색깔 버튼을 빠르게 탭, 콤보 보너스 | 반사 |
-| [🍪 쿠키 낚아채기 (cookie-grab)](./cookie-grab) | 화면에 나타나는 쿠키를 빠르게 탭해서 모아요! 🌶️ 고추는 피하고, 콤보 연결, 30초 도전 | 반사 |
-| [🎣 얼음 낚시 (ice-fishing)](./ice-fishing) | 낚싯줄이 얼음 구멍 아래로 자동 하강! 물고기가 바늘 근처에 오면 탭해서 잡아요. 💣 폭탄은 피하고 목숨 3개 도전, 30초 타임어택 | 반사 |
-| [👨‍🍳 이모지 요리사 (emoji-chef)](./emoji-chef) | 레시피를 보고 재료를 순서대로 냄비에 넣어 요리를 완성! 10가지 레시피, 순서 기억+인지 복합 게임, 60초 도전 | 인지 |
-| [📝 우리말 쇼다운 (urimal-showdown)](./urimal-showdown) | 말뜻, 순화어, 맞춤법, 속담을 밝은 카드 화면에서 차근차근 풀어보는 어린이용 우리말 퀴즈 | 학습 |
-| [🚂 기차 피하기 (train-dodge)](./train-dodge) | 달려오는 기차를 탭해서 점프로 피해요! 30초 동안 최대한 많이 피하기 도전 | 반사 |
-| [🛡️ 운석 막기 (meteor-shield)](./meteor-shield) | 화면을 드래그해서 방패를 돌려 운석에서 행성을 지켜요! 40초 타임어택 | 반사 |
-| [🦋 나비 꽃밭 (butterfly-garden)](./butterfly-garden) | 꽃을 탭하면 나비가 날아가 꿀을 먹어요! 시들기 전에 빠르게 탭, 콤보 보너스, 40초 도전 | 반사 |
-| [🎪 서커스 저글링 (juggle-circus)](./juggle-circus) | 화면 탭해서 광대를 움직여 공을 튕겨요! 목숨 3개, 콤보 점수, 공 추가로 난이도 상승 | 반사 |
-| [🌧️ 빗방울 피하기 (rain-dodge)](./rain-dodge) | 우산을 드래그해서 빗방울을 피하고 햇살을 잡아요! 목숨 3개, 40초 타임어택 | 반사 |
-| [🐣 달걀 부화시키기 (hatch-egg)](./hatch-egg) | 달걀을 탭탭탭 눌러서 부화시키고 나온 동물을 맞혀요! 5마리, 60초 도전 | 인지 |
-| [☃️ 눈싸움 (snowball-fight)](./snowball-fight) | 터치로 눈사람을 움직여 날아오는 눈덩이를 피하세요! 40초 생존 도전 | 반사 |
-| [🦑 오징어 잡기 (squid-catch)](./squid-catch) | 그물을 위아래로 움직여 헤엄치는 오징어를 잡아요! 5번 놓치면 끝 | 액션 |
-| [⛄ 눈사람 만들기 (build-snowman)](./build-snowman) | 눈·코·입·모자·목도리 파츠를 골라 나만의 귀여운 눈사람을 완성해요! | 창의 |
-| [🔫 물총 싸움 (water-gun)](./water-gun) | 화면에 나타나는 귀여운 적 캐릭터를 탭해서 물총을 쏴요! 30초 타임어택 | 반사 |
-| [🍕 피자 만들기 (pizza-maker)](./pizza-maker) | 레시피를 보고 재료를 피자에 드래그! 60초 동안 피자 5판 완성 도전 | 창의/드래그 |
-| [🦘 캥거루 점프 (kangaroo-jump)](./kangaroo-jump) | 꾹 누를수록 높이 점프! 플랫폼 위 별을 먹고 가시를 피해 달려요 | 액션 |
-| [🫧 뽁뽁이 터뜨리기 (bubble-wrap)](./bubble-wrap) | 뽁뽁이를 전부 탭해서 터뜨려요! 레벨이 오를수록 크기 증가, 30초 도전 | 반사 |
-| [🧲 자석 낚시 (magnet-fish)](./magnet-fish) | 자석을 드래그해서 물고기를 끌어당겨 잡아요! 폭탄 피하고 목숨 3개, 40초 도전 | 반사 |
-| [🔵 미로 탈출 (maze-escape)](./maze-escape) | DFS 미로에서 보라 공을 드래그해 탈출! 4레벨 난이도, 시간 제한 없이 완주 | 퍼즐 |
-| [🎹 색깔 피아노 (color-piano)](./color-piano) | 7색 건반을 탭해서 음계 연주! 자유 연주·따라치기 2가지 모드, Web Audio API | 음악 |
-| [🍳 소꿉놀이 요리사 (pretend-play)](./pretend-play) | 레시피 보고 재료를 순서대로 접시에 올려요! 10가지 요리, 60초 타임어택 | 인지 |
-| [🎯 공 던지기 (ball-throw)](./ball-throw) | 드래그로 방향 조준, 움직이는 과녁에 공을 던져요! 5공·점수 합산 | 반사 |
-| [⭐ 별자리 잇기 (constellation-draw)](./constellation-draw) | 밤하늘의 별을 번호 순서대로 이어 별자리를 완성해요! | 인지 |
-| [🐾 동물 친구 밥주기 (pet-feed)](./pet-feed) | 동물 친구가 좋아하는 음식을 끌어다 줘봐요! | 어린이 |
-| [🚀 로켓 발사 (rocket-launch)](./rocket-launch) | 좌우 게이지가 초록존에 올 때 큰 버튼 탭! 3단계 누적 정확도로 도달 행성 결정 | 타이밍 |
-| [🚦 동물 길 건너기 (traffic-cross)](./traffic-cross) | 동물(🐢🦆🐹🐰)을 골라 한 칸씩 위로! 5차선 자동차를 피해 안전지대 도달, 통과마다 속도 상승 | 액션/회피 |
-| [🍔 햄버거 쌓기 (burger-stack)](./burger-stack) | 재료가 떨어질 때 탭! 타이밍 정확도(완벽=+2/좋아요=+1), 점수 오를수록 낙하 속도 상승, 3목숨 누적 빌딩 | 타이밍 |
-| [🐝 꿀벌 꽃가루 (bee-pollen)](./bee-pollen) | 꿀벌을 드래그해 꽃을 모두 방문한 뒤 벌집(🏠)으로 귀환! 라운드별 25초 제한, 통과마다 신규 꽃 6송이 재배치 | 드래그 |
-| [✨ 마법 지팡이 (magic-wand)](./magic-wand) | 손가락으로 동그라미를 그리면 별이 탄생! 7색 팔레트로 마법 별 수집, 캔버스 파티클 연출 | 창의 |
-| [🥁 드럼 비트 (drum-beat)](./drum-beat) | 6개 드럼 패드 탭으로 연주! 자유 연주 + 비트 따라치기 2가지 모드, Web Audio API | 음악/리듬 |
-| [공룡 화석 발굴 (fossil-dig)](./fossil-dig) | 모래를 손가락으로 쓸어서 숨겨진 공룡 화석을 발굴해요! 솔과 곡갱이 도구 선택 | 창의 |
-| [풍선 색깔 섞기 (balloon-color-mix)](./balloon-color-mix) | 색깔 풍선을 섞어서 목표 색깔을 만들어요! 빨강+노랑=주황? 직접 확인해 보세요 | 학습 |
-| [🌊 잠수함 피하기 (submarine-dodge)](./submarine-dodge) | 드래그로 잠수함 조종, 바위·물고기 피하며 30초 생존! 속도 증가로 난이도 상승 | 반사/회피 |
-| [🧠 순서 기억하기 (memory-sequence)](./memory-sequence) | 반짝이는 색깔 4칸의 순서를 기억하고 따라 눌러요! 단계마다 한 칸씩 늘어나는 기억력 게임 | 기억력 |
-| [👑 공주 옷 입히기 (princess-dressup)](./princess-dressup) | 공주에게 예쁜 옷과 액세서리를 입혀 나만의 스타일을 만들어요! | 창의 |
-| [🌙 반딧불이 잡기 (firefly-catch)](./firefly-catch) | 밤하늘에서 반짝이는 반딧불이를 탭! 빛날 때만 잡을 수 있어요. 30초 타임어택 | 반사/타이밍 |
-| [🏗️ 블록 탑 쌓기 (balance-tower)](./balance-tower) | 좌우로 움직이는 블록을 딱 맞게 탭해서 최대한 높이 쌓아보세요! | 타이밍 |
-| [🦁 동물원 탈출 (zoo-escape)](./zoo-escape) | 동물이 탈출할 올바른 문을 탭! 정답 문에는 열쇠 표시, 30초 도전 | 인지 |
-| [🎪 고리 던지기 (ring-toss)](./ring-toss) | 탭해서 고리를 날려 막대기에 올려요! 콤보 연결로 보너스 점수, 40초 도전 | 타이밍 |
-| [🤿 보물 잠수 (treasure-dive)](./treasure-dive) | 화면 탭으로 잠수! 보물 잡고 공기방울로 숨 채우고 상어는 피해요. 생명 3개 도전 | 액션 |
-| [🚀 색깔 로켓 (color-rocket)](./color-rocket) | 떨어지는 색깔 별을 같은 색 로켓으로 드래그! 콤보 연결로 고득점, 40초 도전 | 인지/드래그 |
-| [🪁 연 날리기 (kite-fly)](./kite-fly) | 손가락으로 연을 조종해 구름과 별을 터치! 30초 도전 | 드래그 |
-| [❄️ 눈덩이 피하기 (snow-dodge)](./snow-dodge) | 하늘에서 떨어지는 눈덩이를 피해요! 목숨 3개, 30초 생존 도전 | 반사/회피 |
-| [보석 모으기 (gem-collect)](./gem-collect) | 떨어지는 보석을 바구니로 받아요! 폭탄은 피하세요 | 반사 |
-| [화산 점프 (volcano-hop)](./volcano-hop) | 화산에서 솟는 용암 돌멩이를 피해 플랫폼을 좌우로 점프! 생존 도전 | 액션 |
-| [🍂 낙엽 잡기 (leaf-catch)](./leaf-catch) | 바람에 흔들리며 떨어지는 낙엽을 바구니로 받아요! 황금잎 보너스! | 어린이 |
-| [🔦 등대 불빛 (lighthouse-guide)](./lighthouse-guide) | 등대를 드래그로 회전시켜 불빛으로 밤바다 배들을 항구로 안내해요! | 어린이 |
-| [도형 따라 그리기 (shape-trace)](./shape-trace) | 점선으로 그려진 도형을 손가락으로 따라 그려 완성해요! 별, 하트, 동그라미 등 6가지 도형 | 창의 |
-| [사과 받기 (apple-catch-basket)](./apple-catch-basket) | 위에서 떨어지는 사과를 바구니로 받아요! 터치로 바구니를 좌우로 움직이세요. | 반사 |
-| [⛏️ 광물 캐기 (mine-craft-dig)](./mine-craft-dig) | 블록을 탭해서 광물을 캐요! 깊이 파고들수록 석탄→철→금→다이아몬드→에메랄드가 나와요. 곡괭이를 업그레이드해서 더 빨리 캐세요! | 액션 |
-| [대포 쏘기 (cannon-ball)](./cannon-ball) | 날아오는 몬스터를 탭해서 맞춰요! 반응 속도 액션 게임 | 반사 |
-| [성 쌓기 (castle-builder)](./castle-builder) | 블록을 탭해서 딱 맞게 쌓아 성을 완성하는 퍼즐 게임 | 퍼즐 |
-| [🍯 꿀 받기 (honey-drip)](./honey-drip) | 곰을 드래그해 떨어지는 꿀을 받고 벌은 피해요! 콤보, 40초 도전 | 동물/자연 |
-| [🍄 버섯 바구니 (mushroom-pick)](./mushroom-pick) | 바구니로 착한 버섯은 받고 독버섯은 피해요! 금버섯 3배 점수, 40초 도전 | 동물/자연 |
-| [🐬 돌고래 점프 (dolphin-jump)](./dolphin-jump) | 탭해서 점프! 돌고래가 물에서 뛰어올라 링을 통과해요. 타이밍이 핵심! | 타이밍/액션 |
-| [⭐ 별 더하기 (star-adder)](./star-adder) | 두 그룹의 별을 탭해서 바구니에 넣고 덧셈을 익혀요! 5레벨, 목숨 3개 | 어린이/학습 |
-| [🔶 탱그램 퍼즐 (tangram-puzzle)](./tangram-puzzle) | 7가지 조각을 끌어다 놓아 목표 모양을 완성해요! 공간 감각 드래그 퍼즐 | 퍼즐/창의 |
-| [🥁 동물 비트 (beat-animals)](./beat-animals) | 박자에 맞춰 반짝이는 동물을 탭! 9칸 그리드, BPM 3단계, 콤보 연결 | 리듬 |
-| [🌈 무지개 분류 (rainbow-sort)](./rainbow-sort) | 섞인 색깔 공을 같은 색 컵에 드래그해서 분류! 8레벨, 퍼펙트 보너스 | 인지/분류 |
-| [🎁 인형뽑기 (claw-machine)](./claw-machine) | 집게를 좌우로 움직여 탭! 귀여운 인형을 뽑아봐요. 5번 도전 | 어린이 |
-| [🎆 불꽃 폭죽 (fireworks-tap)](./fireworks-tap) | 화면을 탭하면 폭죽이 팡팡! 콤보로 점수를 올려봐요. 60초 도전 | 어린이 |
-| [🍬 솜사탕 만들기 (cotton-candy)](./cotton-candy) | 막대를 빙글빙글 돌려 솜사탕을 완성하고 손님에게 전달! 5라운드 색상 주문 달성 | 어린이 |
-| [🐌 달팽이 경주 (snail-race)](./snail-race) | 달팽이 3마리 중 하나 골라 화면 탭탭탭! 결승선에 1등으로 밀어주는 응원형 레이스 | 어린이/액션 |
-| [☂️ 우산 캐치](./umbrella-catch) | 우산을 좌우로 움직여 사탕·별을 받고 번개·먹구름은 피하는 낙하 게임 | 어린이 |
-| [🛗 엘리베이터 층 맞추기](./elevator-floor) | 동물 손님이 원하는 층 버튼 탭! 숫자 1~5 인식·매칭 | 어린이 |
-| [🤿 진주 잠수부 (pearl-diver)](./pearl-diver) | 잠수부를 터치로 움직여 바닷속 진주를 모으고 해파리를 피해요! 수면에서 공기 충전 | 액션 |
-| [🍦 아이스크림 스쿱 (ice-cream-scoop)](./ice-cream-scoop) | 콘을 좌우로 움직여 떨어지는 아이스크림 스쿱을 받아 높이 쌓아요! | 반사 |
-| [신호등 달리기 (green-light-run)](./green-light-run) | 무궁화꽃이 피었습니다! 초록불엔 달리고 빨간불엔 멈춰요 | 액션 |
-| [당근 뽑기 (carrot-pull)](./carrot-pull) | 꾹 누르다 딱 맞게 손 떼면 쑥! 황금 당근도 찾아봐요 | 타이밍 |
-| [벽돌 깨기 (brick-break)](./brick-break) | 공을 튕겨 벽돌을 모두 깨요! 패들을 좌우로 움직여 공을 받아내세요. 30초 스피드 도전! | 액션 |
-| [강아지 산책 (dog-walk)](./dog-walk) | 강아지를 좌우로 이동해 장애물을 피하고 뼈다귀를 모아요! 30초 산책 도전 | 액션 |
-| [⚽ 페널티킥 (penalty-kick)](./penalty-kick) | 공을 스와이프해 방향·파워를 정하고 골키퍼를 피해 골! 5킥 도전, 최고기록 저장 | 어린이 |
-| [⛳ 미니골프 (mini-golf)](./mini-golf) | 공을 당겼다 놓아 굴려 홀인! 벽 반사·장애물, 적은 타수일수록 ★ 등급 | 어린이 |
-| [기차 길 잇기 (train-track)](./train-track) | 선로 타일을 돌려 출발역에서 도착역까지 길을 잇는 퍼즐 | 퍼즐 |
-| [🚂 큐큐 기차역](./queue-train) | 맨 앞 칸을 보고 같은 색 역으로 보내는 Queue 자료구조 응용 기차 게임 | 학습/인지 |
-| [그림 밀기 퍼즐 (slide-puzzle)](./slide-puzzle) | 3x3 조각을 밀어 그림·숫자를 순서대로 맞추는 퍼즐 | 퍼즐 |
-| [별 새총 쏘기 (star-slingshot)](./star-slingshot) | 새총을 당겨 별을 발사해 풍선을 맞히는 조준 게임 | 조준 |
-| [도넛 탑 옮기기 (tower-rings)](./tower-rings) | 하노이 탑 7살 버전 — 도넛을 규칙대로 옮기는 논리 퍼즐 | 퍼즐 |
-| [🌊 바다 청소부 (ocean-cleanup)](./ocean-cleanup) | 잠수함을 드래그해 쓰레기를 모으고 물고기는 피하는 40초 환경 게임 | 어린이 |
-| [🎂 케이크 꾸미기 (cake-decor)](./cake-decor) | 레시피대로 재료를 순서대로 탭해 10가지 케이크를 완성하는 인지+창의 게임 | 어린이 |
-| [🚒 소방차 출동 (firetruck-rescue)](./firetruck-rescue) | 불(🔥)을 탭하면 물줄기로 꺼지는 라운드별 불 끄기 게임. 라운드마다 불이 빨라지는 난이도 상승, 실패 페널티 없는 7살 친화 톤 | 어린이/반사 |
-| [⭐ 별 잇기 숫자놀이 (star-trace-number)](./star-trace-number) | 1번부터 순서대로 별을 탭해 빛나는 선으로 별자리(집·물고기·곰·로켓)를 완성하는 1~10 숫자 학습 게임. 5단계, 틀려도 부드러운 흔들림으로 재시도 | 어린이/학습 |
-| [⭐ 별 쌓기 밤하늘 탑 (star-stacker)](./star-stacker) | 화면 위를 좌우로 움직이는 별을 탭하면 아래로 떨어져 쌓여요! 잘 맞추면 높이 점수 상승, 밤하늘 별 탑 만들기 | 타이밍 |
-| [🚂 색깔 기차 잇기 (color-train-match)](./color-train-match) | 기차 색깔과 같은 칸을 탭해서 칙칙폭폭 기차를 길게 연결해요! 레벨이 오를수록 색도 많아져요 | 인지 |
-| [🐸 개구리 파리 잡기 (frog-tongue-catch)](./frog-tongue-catch) | 날아다니는 곤충을 탭하면 개구리 혀가 뻗어 잡아먹는 조준·반사 게임. 🐝벌은 감점, 40초 타임어택, localStorage 최고점 | 어린이/반사 |
-| [🍣 회전초밥 주문받기 (sushi-conveyor)](./sushi-conveyor) | 손님 주문과 같은 초밥이 회전 벨트로 지나갈 때 탭하는 주문-매칭 게임. 콤보 보너스, 50초 타임어택, localStorage 최고점 | 어린이/인지 |
-| [🐹 햄스터 쳇바퀴 달리기 (hamster-wheel-run)](./hamster-wheel-run) | 화면을 빠르게 탭해서 쳇바퀴를 굴리는 탭 스피드 게임. 지나가는 도토리 탭하면 보너스 거리, 탭을 멈추면 감속, 30초 타임어택, localStorage 최고 거리 | 어린이/반사 |
-| [🐞 무당벌레 잎사귀 건너기 (ladybug-leaf-hop)](./ladybug-leaf-hop) | 반짝이는 다음 잎사귀만 순서대로 탭해 무당벌레를 건너게 하는 순서 판단 게임. 틀린 잎사귀 탭하면 풍덩, 목숨 3개, localStorage 최고점 | 어린이/인지 |
-| [🦆 오리 목욕 놀이 (rubber-duck-bath)](./rubber-duck-bath) | 욕조에 둥둥 뜬 오리를 콕 눌러 점수 모으는 탭 반사 게임. 황금 오리는 5점, 30초 타임어택, localStorage 최고점 | 어린이/반사 |
-| [🐶 강아지 뼈다귀 찾기 (puppy-bone-hunt)](./puppy-bone-hunt) | 16칸 흙더미를 파서 숨은 뼈다귀 6개를 찾는 기억력·탐색 게임. 두더지 칸은 감점, 40초 도전, localStorage 최고점 | 어린이/인지 |
-| [🏹 화살 풍선 맞추기 (archery-balloon)](./archery-balloon) | 화면을 드래그해 활을 당기고 놓으면 화살 발사, 떠오르는 풍선을 명중시키는 조준 게임. 폭탄 풍선은 콤보 초기화, 황금 풍선은 25점 보너스, 화살 8발 도전, localStorage 최고점 | 어린이/조준 |
-| [🫧 비눗방울 잡기 (soap-bubble-catch)](./soap-bubble-catch) | 손가락으로 채집망을 드래그해 둥둥 떠오르는 비눗방울을 잡는 게임. 작은 방울일수록 고득점, 무지개 방울은 60점 왕대박 보너스, 40초 도전, localStorage 최고점 | 어린이/드래그 |
-| [🪁 제기차기 (jegi-kick)](./jegi-kick) | 손가락 드래그로 아이를 좌우로 움직여 떨어지는 제기를 발밑에서 차올리는 전통놀이 게임. 좌우 드리프트에 맞춰 위치를 잡고 타이밍까지 맞춰야 성공, 놓치면 종료, localStorage 최고 연속 기록 | 어린이/드래그+타이밍 |
-| [🪀 팽이 돌리기 대결 (top-spin-duel)](./top-spin-duel) | 화면을 빠르게 탭해 팽이 파워를 충전하고, 대결 중 서서히 줄어드는 파워를 부스트(3회 한정)로 지키며 상대 팽이와 오래 버티기 대결. 5판 승부, localStorage 최고 승수 | 어린이/차징+대결 |
-| [🎴 딱지치기 (ddakji-flip)](./ddakji-flip) | 손가락으로 내 딱지를 힘차게 아래로 스와이프해 스와이프 속도가 기준 이상이면 상대 딱지가 뒤집히는 전통놀이 게임. 라운드가 오를수록 더 빠른 스와이프가 필요, 실패해도 감점 없이 다음 라운드 진행, 5판 도전, localStorage 최고 성공 수 | 어린이/전통놀이 |
-| [⚖️ 저울 균형 맞추기 (scale-balance)](./scale-balance) | 숫자 블록을 드래그해 저울 오른쪽 판에 담아 왼쪽 목표 숫자와 정확히 같은 합을 만드는 덧셈 퍼즐. 담을 때마다 저울이 기울고 정확히 맞으면 균형, 잘못 담은 블록은 탭해서 빼기 가능, 시간 제한 없이 5레벨 도전, localStorage 레벨 클리어 기록 | 학습/인지 |
-| [🪢 줄넘기 놀이 (jump-rope-rhythm)](./jump-rope-rhythm) | 원형 줄이 발밑 노란 구역에 닿는 순간 탭해서 폴짝 뛰어넘는 리듬 타이밍 게임. 성공할수록 줄이 빨라짐, 목숨 3개, localStorage 최고 콤보 | 어린이/리듬·타이밍 |
-| [🪨 비석치기 걷기 (stone-balance-walk)](./stone-balance-walk) | 머리 위 돌이 좌우로 기우는 반대쪽 버튼을 톡톡 눌러 균형을 맞추며 목표까지 걸어가는 전통놀이. 5판 도전, localStorage 최고 성공 수 | 어린이/전통놀이·균형 |
-| [🪨 공기놀이 (gonggi-nori)](./gonggi-nori) | 돌 하나가 하늘로 솟았다 떨어지는 동안 바닥 공기알을 모두 톡톡 모으고, 돌이 손에 닿는 순간 [잡기]를 탭하는 전통놀이. 라운드마다 모아야 할 알이 하나씩 늘고 비행 시간은 짧아짐, 5판 도전, localStorage 최고 성공 수 | 어린이/전통놀이·타이밍 |
-| [⛵ 종이배 항해 (paper-boat-sail)](./paper-boat-sail) | 좌우 버튼을 꾹 눌러 종이배를 조종하며 강문을 통과하고 별을 모으는 40초 항해 게임. 바위에 닿으면 다음 항해로 다시 도전, localStorage 최고 별 기록 | 어린이/조향·반사 |
-| [🪥 곰돌이 이 닦기 (bear-tooth-brush)](./bear-tooth-brush) | 치아 위를 드래그해 각 이를 세 번씩 문질러 깨끗하게 만드는 5판 생활 습관 놀이. 모든 치아가 반짝이면 다음 판 진행, localStorage 최고 기록 | 어린이/생활습관·드래그 |
-| [👣 사방치기 콩콩 (sabangchigi-hop)](./sabangchigi-hop) | 마커가 목표 칸 위에 있을 때 던지기를 탭해 돌을 놓고, 그 칸만 피해 나머지 칸을 순서대로 콩콩 밟는 전통놀이. 목표 칸을 밟으면 실패, 오조준은 3번까지 재시도, 5판 도전, localStorage 최고 성공 수 | 어린이/전통놀이·조준+순서 |
-| [🩹 반창고 동물병원 (bandage-doctor)](./bandage-doctor) | 다친 동물의 증상 아이콘을 보고 맞는 치료 도구(반창고·체온계·담요·차)를 골라 45초 동안 치료하는 인지 반응 게임. 기존 pet-feed(먹이 주기)와 달리 증상→원인별 도구를 매칭하는 진단 추론이 핵심, 매 환자마다 도구 버튼 위치가 섞여 위치 암기가 아닌 실제 판단을 유도, localStorage 최고점 저장 | 어린이/인지·매칭 |
-| [📮 편지 배달 놀이 (letter-delivery)](./letter-delivery) | 화면 위 편지의 숫자와 같은 번호가 붙은 우체통으로 드래그해 넣는 40초 배달 게임. 기존 recycle-rescue(재질 판단 드래그 분류)와 달리 숫자 인식이 핵심이며, 우체통 3개의 배치가 매 라운드 섞여 매번 다시 찾아야 하는 탐색 요소가 더해짐, localStorage 최고점 저장 | 어린이/숫자·드래그 |
-| [🍀 네잎클로버 찾기 (clover-find)](./clover-find) | 밭에 숨은 네잎클로버를 찾아라! 오탭 시 시간 감소, 레벨업으로 난이도 상승 | 어린이 |
-| [🧸 곰돌이 옷 입히기 (teddy-dress)](./teddy-dress) | 미션에 맞는 옷을 탭해 곰돌이를 꾸며요! 10라운드 콤보 점수 도전 | 창의 |
-| [🎈 풍선 터트리기 (balloon-pop)](./balloon-pop) | 하늘로 올라가는 알록달록 풍선을 톡톡 터트려요! 별 풍선을 보너스! | 반사 |
-| [🍎 떨어지는 사과 담기 (apple-basket)](./apple-basket) | 바구니를 움직여 맛있는 빨간 사과를 쏙! 폭탄을 피해 점수를 도전해요! | 반사 |
-| [⚡ 번개 피하기 (lightning-dodge)](./lightning-dodge) | 먹구름 신호를 보고 3갈래 길에서 번개를 피하고 별을 모으는 30초 반사 게임 | 반사 |
-| [🌱 식물 키우기 (watering-plant)](./watering-plant) | 물뿌리개로 목표 구간에 딱 맞게 물을 줘서 씨앗을 꽃까지 키우는 6라운드 타이밍 게임 | 인지/타이밍 |
-| [🔮 구슬 미로 굴리기 (marble-roll)](./marble-roll) | 화면을 드래그해서 구슬을 굴려 미로 속 별까지 이동! 5라운드, 구멍에 빠지면 처음부터 다시 도전 | 물리/타이밍 |
-| [🁣 도미노 잇기 (domino-chain)](./domino-chain) | 번호가 매겨진 도미노를 순서대로 터치하면 자동으로 연쇄 넘어짐! 라운드마다 도미노 개수 증가(5→8→12개) | 인지/순서 |
-| [🦔 아기 고슴도치의 데굴데굴 가을 밤송이](hedgehog-chestnut-roll/index.html) | 가을 숲길에서 굴러오는 알밤과 도토리를 바구니에 담는 터치 아케이드 | 아케이드 | 4~7세 |
-| [🦉 부엉이 박사님의 반짝반짝 별자리 잇기](owl-star-constellation/index.html) | 밤하늘 별들을 콕콕 이어 가을 별자리를 완성하는 감성 터치 퍼즐 | 퍼즐/학습 | 4~8세 |
-| [🦦 아기 수달의 퐁당퐁당 조개 잡기](otter-river-clam-catch/index.html) | 맑은 시냇물에서 조개와 진주를 잡고 바위를 피하는 힐링 터치 놀이 | 아케이드 | 4~7세 |
-| [🐲 아기 용의 말랑말랑 불꽃 과일 굽기](dragon-baby-fire-fruit/index.html) | 아기 용의 따뜻한 불꽃으로 마시멜로와 과일을 노릇노릇 굽는 힐링 타이밍 아케이드 | 아케이드 | 4~8세 |
+| [🐧 아기 펭귄의 북극 오로라 미끄럼틀 (penguin-aurora-slide)](./penguin-aurora-slide/index.html) | 신비로운 북극 하늘에 펼쳐진 무지개 오로라 레일을 타고 부드럽게 미끄러지며 반짝이는 별빛 크리스탈을 모으는 스와이프 힐링 아케이드 미니게임입니다. | 어린이/아케이드 |
+| [🦔 아기 고슴도치의 달콤 딸기 굴리기 (hedgehog-strawberry-roll)](./hedgehog-strawberry-roll/index.html) | 가시를 동글게 말고 과수원 언덕을 데굴데굴 굴러가며 달콤한 딸기를 콕콕 모으고 돌멩이를 퐁퐁 뛰어넘는 귀여운 터치 점프 아케이드 미니게임입니다. | 어린이/아케이드 |
+| [🐳 아기 고래의 오색 무지개 물뿜기 (whale-rainbow-fountain)](./whale-rainbow-fountain/index.html) | 푸른 바다를 헤엄치는 귀여운 아기 고래로 시원한 오색 무지개 물줄기를 뿜어 하늘의 별구름과 음표 방울을 터뜨리는 힐링 타이밍 아케이드 미니게임입니다. | 어린이/아케이드 |
+| [🐿️ 아기 다람쥐의 도토리 굴리기 대작전 (squirrel-acorn-bowling)](./squirrel-acorn-bowling/index.html) | 귀여운 아기 다람쥐와 함께 황금 도토리를 조준하여 굴려 솔방울 핀들을 퐁퐁 쓰러뜨리는 숲속 볼링 터치 아케이드 미니게임입니다. | 어린이/아케이드 |
+| [🐲 아기 용의 말랑말랑 불꽃 과일 굽기 (dragon-baby-fire-fruit)](./dragon-baby-fire-fruit/index.html) | 귀여운 아기 용의 따뜻한 불꽃을 톡톡 뿜어내어 둥실 떠오르는 달콤한 마시멜로와 과일을 노릇노릇 알맞게 굽는 힐링 타이밍 아케이드 미니게임입니다. | 어린이/아케이드 |
+| [🦦 아기 수달의 퐁당퐁당 조개 잡기 (otter-river-clam-catch)](./otter-river-clam-catch/index.html) | 맑고 투명한 시냇물에서 헤엄치는 귀여운 아기 수달을 좌우로 조종하여 떠내려오는 반짝반짝 조개와 진주조개를 잡고 강돌을 피하는 힐링 터치 미니게임입니다. | 어린이/아케이드 |
+| [🦉 부엉이 박사님의 반짝반짝 별자리 잇기 (owl-star-constellation)](./owl-star-constellation/index.html) | 가을 밤하늘의 빛나는 별들을 순서대로 이어 신비로운 별자리와 신화를 완성하는 감성 터치 퍼즐 미니게임입니다. | 어린이/아케이드 |
+| [🦔 아기 고슴도치의 데굴데굴 가을 밤송이 (hedgehog-chestnut-roll)](./hedgehog-chestnut-roll/index.html) | 귀여운 아기 고슴도치와 함께 가을 숲길을 달리며 알밤과 도토리를 쏙쏙 바구니에 담는 터치 아케이드 미니게임입니다. | 어린이/아케이드 |
+| [🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 (chameleon-color-leaf-hide)](./chameleon-color-leaf-hide/index.html) | 나뭇가지 위에 앉은 사랑스러운 아기 카멜레온이 주변 나뭇잎 색깔 변화(빨강, 노랑, 초록, 보라)에 맞춰 자신을 감쪽같이 위장하는 색채 인지 매칭 퍼즐 놀이입니다. | 어린이/아케이드 |
+| [🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 (autumn-squirrel-acorn-bounce)](./autumn-squirrel-acorn-bounce/index.html) | 가을 단풍나무 아래로 톡톡 떨어지는 황금 도토리와 알밤을 귀여운 아기 다람쥐 바구니로 통통 받아내며 낙엽 파티를 즐기는 캐주얼 터치 놀이입니다. | 어린이/아케이드 |
+| [🏮 마법 호롱불 반딧불이 길 (magic-crystal-lantern-trail)](./magic-crystal-lantern-trail/index.html) | 신비로운 밤숲의 버드나무 호롱불이 연주하는 영롱한 펜타토닉 멜로디 순서를 기억하고 터치해 꼬마 반딧불이의 밤길을 환하게 밝히는 감성 기억 퍼즐 놀이입니다. | 어린이/아케이드 |
+| [🐝 꿀벌의 꽃밭 꿀방울 모으기 (honey-bee-flower-flight)](./honey-bee-flower-flight/index.html) | 화사한 봄 꽃밭에서 귀여운 아기 꿀벌과 함께 향기로운 꽃들을 유영하며 달콤한 꿀방울을 모으고 무지개 꽃가루 파워를 발동하는 힐링 비행 놀이입니다. | 어린이/아케이드 |
+| [🐧 꼬마 펭귄의 빙하 퐁당퐁당 (polar-penguin-ice-hop)](./polar-penguin-ice-hop/index.html) | 바다 위를 둥실둥실 떠내려오는 시원한 얼음 유빙을 타이밍 맞춰 퐁당퐁당 건너며 반짝이는 크릴새우와 은빛 물고기를 모으는 귀여운 빙하 점프 모험 놀이입니다. | 어린이/아케이드 |
+| [🍓 무지개 과일 스무디 바 (rainbow-fruit-smoothie-bar)](./rainbow-fruit-smoothie-bar/index.html) | 하늘에서 퐁퐁 떨어지는 신선한 딸기, 바나나, 키위, 블루베리를 톡톡 터치해 믹서기에 갈아 넣고 알록달록 무지개 스무디 잔을 가득 채우는 달콤한 터치 놀이입니다. | 어린이/아케이드 |
+| [🌌 반짝 별자리 잇기 (constellation-star-catcher)](./constellation-star-catcher/index.html) | 신비로운 밤하늘의 별들을 1, 2, 3 번호 순서대로 터치해 선을 잇고 왕관자리, 아기곰자리, 백조자리 등 아름다운 마법 별자리를 완성하는 감성 별빛 퍼즐 놀이입니다. | 어린이/아케이드 |
+| [🪼 해파리의 퐁퐁 방울 터뜨리기 (jellyfish-bubble-pop)](./jellyfish-bubble-pop/index.html) | 알록달록 깊은 바닷속에서 아기 해파리와 함께 퐁퐁 떠오르는 오색 비눗방울을 톡톡 터뜨리고 황금 별과 조개 진주를 모으는 경쾌한 탭 & 팝 아케이드 놀이입니다. | 어린이/아케이드 |
+| [🦊 사막여우의 모래언덕 통통 (desert-fennic-dune-bounce)](./desert-fennic-dune-bounce/index.html) | 귀여운 아기 사막여우와 함께 바람결에 흔들리는 모래 언덕 발판을 퐁퐁 밟고 뛰어오르며 오아시스 물방울을 모으고 선인장 가시를 피해 더 높은 하늘로 도약하는 버티컬 점프 놀이입니다. | 어린이/아케이드 |
+| [✨ 마법 가마솥의 퐁당 물약 (magic-potion-cauldron)](./magic-potion-cauldron/index.html) | 신비로운 밤하늘 아래 별가루, 달빛 방울, 반짝 버섯 등 마법 재료를 가마솥으로 쏙쏙 받아내며 검은 연기 폭탄을 피하고 오색 무지개 물약을 완성하는 캐주얼 캐치 놀이입니다. | 어린이/아케이드 |
+| [❄️ 오로라 북극곰의 얼음 썰매 (aurora-polar-bear-slide)](./aurora-polar-bear-slide/index.html) | 눈부신 오로라 아래 빙판길을 썰매 타고 씽씽 미끄러지며 좌우로 레인을 바꾸고 점프하여 반짝이는 눈송이와 얼음 생선을 모으는 슬라이딩 런 놀이입니다. | 어린이/아케이드 |
+| [🍬 달콤 젤리 사탕 공장 (sweet-jelly-candy-factory)](./sweet-jelly-candy-factory/index.html) | 컨베이어 벨트를 타고 오는 알록달록 무지개 젤리 사탕을 포장 구역 타이밍에 맞춰 올바른 선물 상자에 쏙쏙 담아 포장하는 리듬 패킹 아케이드 놀이입니다. | 어린이/아케이드 |
+| [🚀 우주 탐사차의 크리스탈 대쉬 (space-rover-crystal-dash)](./space-rover-crystal-dash/index.html) | 달과 화성의 신비로운 분화구를 누비는 꼬마 우주 탐사차 루나 1호와 함께 저중력 부스터 점프로 장애물을 뛰어넘고 우주 에너지 크리스탈을 모으는 점프 런 놀이입니다. | 어린이/아케이드 |
+| [🌈 무지개 카멜레온의 색깔 냠냠 (rainbow-chameleon-catch)](./rainbow-chameleon-catch/index.html) | 날아오는 곤충 젤리의 색깔에 맞춰 카멜레온의 몸 색을 바꾸고 기다란 혀를 뻗어 맛있는 젤리를 냠냠 낚아채는 색채 반응형 아케이드 놀이입니다. | 어린이/아케이드 |
+| [🐋 방울 고래의 심해 다이빙 (bubble-whale-ocean-dive)](./bubble-whale-ocean-dive/index.html) | 귀여운 아기 고래와 함께 신비로운 바닷속으로 잠수하며 뽀글뽀글 산소 방울을 마시고 반짝이는 조개 진주를 모으는 신나는 심해 어드벤처 놀이입니다. | 어린이/아케이드 |
+| [✨ 반짝 별자리 엮기 (star-constellation-weaver)](./star-constellation-weaver/index.html) | 아름다운 밤하늘의 빛나는 별들을 손가락으로 이어 카시오페이아, 북두칠성, 백조자리, 오리온자리를 완성하고 별빛 오로라 마법을 피워내는 힐링 퍼즐 놀이입니다. | 어린이/아케이드 |
+| [💎 반짝 보석 광산 열차 (gemstone-mine-cart-run)](./gemstone-mine-cart-run/index.html) | 신비로운 보석 광산의 반짝이는 레일을 달리며 좌우로 레일을 척척 바꾸고 루비, 사파이어, 에메랄드, 다이아몬드를 가득 싣는 신나는 3레일 어드벤처 놀이입니다. | 어린이/아케이드 |
+| [🦋 햇살 나비의 마법 정원 (solar-butterfly-garden)](./solar-butterfly-garden/index.html) | 따사로운 햇살 가득한 정원에서 알록달록 무지개 날개를 펄럭이며 향긋한 꿀방울과 황금 꽃가루를 모아 눈부신 마법 만개 축제를 완성하는 힐링 터치 비행 놀이입니다. | 어린이/아케이드 |
+| [🐳 몽실몽실 구름고래의 꿈나라 비행 (cloud-whale-dream-voyage)](./cloud-whale-dream-voyage/index.html) | 밤하늘을 자유롭게 유영하는 귀여운 핑크 구름고래를 터치/드래그하여 반짝이는 별빛 링을 통과하고 황금 별사탕을 모아 신비로운 오로라를 완성하는 힐링 플라잉 놀이입니다. | 어린이/아케이드 |
+| [🧁 달콤 마법 베이커리 파티시에 (magical-bakery-patissier)](./magical-bakery-patissier/index.html) | 하늘에서 솔솔 내려오는 알록달록 무지개 생크림, 달콤한 딸기, 별사탕 토핑을 황금 케이크 받침대로 쏙쏙 받아 화려한 마법 케이크를 완성하는 터치 베이킹 놀이입니다. | 어린이/아케이드 |
+| [🚀 250호 기념 우주 별자리 레인저 (space-constellation-ranger)](./space-constellation-ranger/index.html) | 반짝이는 은하계 밤하늘을 우주선으로 비행하며 250개의 별빛 크리스탈을 모으고 신비로운 12별자리를 완성하는 250회 기념 스페이스 어드벤처 놀이입니다. | 어린이/아케이드 |
+| [🧋 버블티 펄 퐁퐁 (bubble-tea-pop)](./bubble-tea-pop/index.html) | 화면 아래에서 퐁퐁 떠오르는 달콤한 타피오카 펄과 과일 젤리를 쏙 터치해 컵에 담아 맛있는 무지개 버블티를 완성하는 힐링 터치 놀이입니다. | 어린이/아케이드 |
+| [🫧 반짝반짝 심해 잠수함 탐험 (twinkle-deepsea-submarine)](./twinkle-deepsea-submarine/index.html) | 신비로운 심해 바닷속을 노란 잠수함으로 유영하며 해파리와 산호초를 피해 반짝이는 진주조개와 황금 보물상자를 쏙쏙 모으는 힐링 수중 탐험 놀이입니다. | 어린이/아케이드 |
+| [🍮 말랑말랑 젤리 트램펄린 (sweet-jelly-trampoline)](./sweet-jelly-trampoline/index.html) | 말랑말랑 통통 튀는 무지개 푸딩 젤리 트램펄린을 좌우로 움직여 하늘에서 떨어지는 아기 곰 인형과 별사탕을 높이높이 튕겨 올리는 경쾌한 터치 바운스 놀이입니다. | 어린이/아케이드 |
+| [✨ 우주 별자리 잇기 탐험 (cosmic-star-weaver)](./cosmic-star-weaver/index.html) | 은하수에 흩어진 반짝이는 별들을 순서대로 이어 신비한 동물 별자리를 완성해보세요! | 어린이/아케이드 |
+| [🐧 오로라 펭귄의 눈썰매 슬라이드 (aurora-penguin-slide)](./aurora-penguin-slide/index.html) | 반짝이는 오로라 하늘 아래 귀여운 펭귄과 함께 달리는 눈썰매 질주! | 어린이/아케이드 |
+| [🐿️ 도토리 퐁퐁 발사기 (forest-acorn-catapult)](./forest-acorn-catapult/index.html) | 다람쥐의 도토리를 당겨서 나뭇잎 바구니에 퐁! | 어린이/아케이드 |
+| [🐳 별빛 고래의 하늘 비행 (starlight-whale-flight)](./starlight-whale-flight/index.html) | 은하수 밤하늘을 헤엄치며 반짝이는 별빛을 모아주세요! | 어린이/아케이드 |
+| [🍪 아기 몬스터 쿠키 먹이기 (monster-cookie-feed)](./monster-cookie-feed/index.html) | 알록달록 맛있는 쿠키를 몬스터에게 쏙! | 어린이/아케이드 |
+| [🌊 해저 진주 조개 찾기 (ocean-pearl-diver)](./ocean-pearl-diver/index.html) | 반짝이는 조개 속 진주를 모아보세요! | 어린이/아케이드 |
+| [☁️ 구름 바람길 탐험 (windy-cloud-postman)](./windy-cloud-postman/index.html) | 바람개비를 드래그한 방향으로 구름을 직접 움직여 빛나는 하늘문까지 안내하는 놀이 | 어린이/아케이드 |
+| [🍹 주스 따르기 파티 (juice-pour-party)](./juice-pour-party/index.html) | 색깔 주전자를 알맞은 컵 위로 드래그해 45초 동안 맛있는 주스를 따라 보는 놀이 | 어린이/아케이드 |
+| [🦖 공룡 뼈 발굴 (dino-bone-dig)](./dino-bone-dig/index.html) | 흙 타일을 탭하여 공룡 뼈(🦴) 5개를 전부 찾아내고 멋진 공룡을 조립하는 탐험. | 어린이/아케이드 |
+| [🚒 소방차 불 끄기 (firetruck-fire-out)](./firetruck-fire-out/index.html) | 활활 타는 불(🔥)을 터치해 꺼주세요! 30초 동안 마을을 구하는 소방대장 미션. | 어린이/아케이드 |
+| [냉장고 정리하기 (fridge-sort)](./fridge-sort/index.html) | 음식을 냉장·냉동·실온에 드래그 분류 | 어린이/아케이드 |
+| [자전거 균형 타기 (bicycle-balance)](./bicycle-balance/index.html) | 균형 맞추며 페달 밟아 멀리 달리기 | 어린이/아케이드 |
+| [🐾 그림자 발자국 탐정 (shadow-trail-match)](./shadow-trail-match/index.html) | 발자국 단서와 흐릿한 그림자를 보고 숨어 있는 동물을 찾는 8라운드 관찰 놀이예요! | 어린이/아케이드 |
+| [🚀 로켓 순서 발사 (rocket-sequence-launch)](./rocket-sequence-launch/index.html) | 관제사가 보여주는 그림 명령을 기억하고 같은 순서로 눌러 6라운드 로켓을 발사해요! | 어린이/아케이드 |
+| [🔦 거울빛 구조대 (mirror-beam-rescue)](./mirror-beam-rescue/index.html) | 거울을 돌려 반사광을 별까지 이어 주는 7단계 빛의 길 퍼즐이에요! | 어린이/아케이드 |
+| [📄 종이 접기 연구소 (paper-fold-lab)](./paper-fold-lab/index.html) | 접는 방향을 예측하고 구멍을 찍은 뒤 펼쳐 4개·8개 대칭 무늬를 완성해요! | 어린이/아케이드 |
+| [도미노 잇기 (domino-chain)](./domino-chain/index.html) | 순서대로 터치해 도미노 연쇄 넘어뜨리기 | 어린이/아케이드 |
+| [구슬 미로 굴리기 (marble-roll)](./marble-roll/index.html) | 드래그로 구슬을 굴려 미로 통과 | 어린이/아케이드 |
+| [🌱 식물 키우기 (watering-plant)](./watering-plant/index.html) | 물뿌리개로 딱 맞게 물을 줘서 씨앗을 활짝 핀 꽃까지 키워요! | 어린이/아케이드 |
+| [⚡ 번개 피하기 (lightning-dodge)](./lightning-dodge/index.html) | 먹구름 신호를 보고 3갈래 길에서 번개를 피하고 별을 모아요! | 어린이/아케이드 |
+| [🍎 떨어지는 사과 담기 (apple-basket)](./apple-basket/index.html) | 바구니를 움직여 맛있는 빨간 사과를 쏙! 폭탄을 피해 점수를 도전해요! | 어린이/아케이드 |
+| [🎈 풍선 터트리기 (balloon-pop)](./balloon-pop/index.html) | 하늘로 올라가는 알록달록 풍선을 톡톡 터트려요! 별 풍선을 보너스! | 어린이/아케이드 |
+| [🧸 곰돌이 옷 입히기 (teddy-dress)](./teddy-dress/index.html) | 미션에 맞는 옷을 탭해 곰돌이를 꾸며요! 10라운드 콤보 점수 도전 | 어린이/아케이드 |
+| [🍀 네잎클로버 찾기 (clover-find)](./clover-find/index.html) | 밭에 숨은 네잎클로버를 찾아라! 오탭 시 시간 감소, 레벨업으로 난이도 상승 | 어린이/아케이드 |
+| [📮 편지 배달 놀이 (letter-delivery)](./letter-delivery/index.html) | 번호가 같은 우체통으로 편지를 끌어다 배달하는 40초 드래그 게임 | 어린이/아케이드 |
+| [🩹 반창고 동물병원 (bandage-doctor)](./bandage-doctor/index.html) | 증상에 맞는 치료 도구를 골라 다친 동물을 치료하는 45초 반응 게임 | 어린이/아케이드 |
+| [👣 사방치기 콩콩 (sabangchigi-hop)](./sabangchigi-hop/index.html) | 목표 칸에 던지고 그 칸만 피해 순서대로 콩콩 밟는 전통놀이, 5판 도전 | 어린이/아케이드 |
+| [🪥 곰돌이 이 닦기 (bear-tooth-brush)](./bear-tooth-brush/index.html) | 드래그로 곰돌이의 이를 깨끗이 닦는 5판 생활 습관 게임 | 어린이/아케이드 |
+| [⛵ 종이배 항해 (paper-boat-sail)](./paper-boat-sail/index.html) | 좌우로 종이배를 조종해 별을 모으고 바위를 피하는 강물 항해 게임 | 어린이/아케이드 |
+| [🪨 공기놀이 (gonggi-nori)](./gonggi-nori/index.html) | 떨어지는 돌 잡기 전 바닥 알을 모으는 전통놀이, 알 개수 늘어나는 5판 도전 | 어린이/아케이드 |
+| [🪨 비석치기 걷기 (stone-balance-walk)](./stone-balance-walk/index.html) | 머리 위 돌 균형을 좌우 탭으로 맞추며 목표까지 걸어가는 전통놀이, 5판 도전 | 어린이/아케이드 |
+| [🪢 줄넘기 놀이 (jump-rope-rhythm)](./jump-rope-rhythm/index.html) | 돌아가는 줄이 발밑에 올 때 딱 맞춰 탭! 콤보를 쌓는 리듬 타이밍 게임 | 어린이/아케이드 |
+| [⚖️ 저울 균형 맞추기 (scale-balance)](./scale-balance/index.html) | 숫자 블록을 저울에 드래그해 목표 숫자와 균형을 맞추는 덧셈 퍼즐, 5레벨 | 어린이/아케이드 |
+| [🎴 딱지치기 (ddakji-flip)](./ddakji-flip/index.html) | 딱지를 힘차게 아래로 스와이프해 상대 딱지를 뒤집는 전통놀이, 5판 도전 | 어린이/아케이드 |
+| [🪀 팽이 돌리기 대결 (top-spin-duel)](./top-spin-duel/index.html) | 탭탭탭 파워 충전 후 상대 팽이와 회전력 대결! 부스트 3회, 5판 승부 | 어린이/아케이드 |
+| [🪁 제기차기 (jegi-kick)](./jegi-kick/index.html) | 드래그로 이동해 떨어지는 제기를 발밑에서 차올리는 전통놀이 리듬 게임. 연속 기록 도전 | 어린이/아케이드 |
+| [🫧 비눗방울 잡기 (soap-bubble-catch)](./soap-bubble-catch/index.html) | 드래그로 채집망을 움직여 비눗방울 잡기! 작을수록 고득점, 무지개 방울은 왕대박, 40초 도전 | 어린이/아케이드 |
+| [🏹 화살 풍선 맞추기 (archery-balloon)](./archery-balloon/index.html) | 드래그로 활 당겨 풍선 명중! 폭탄 피하고 황금풍선 노려요, 화살 8발 | 어린이/아케이드 |
+| [강아지 뼈다귀 찾기 (puppy-bone-hunt)](./puppy-bone-hunt/index.html) | 흙더미 파서 숨은 뼈다귀 찾기, 두더지 피하기 | 어린이/아케이드 |
+| [오리 목욕 놀이 (rubber-duck-bath)](./rubber-duck-bath/index.html) | 욕조 오리 콕 눌러 점수 모으기, 황금오리 5점 | 어린이/아케이드 |
+| [🐞 무당벌레 잎사귀 건너기 (ladybug-leaf-hop)](./ladybug-leaf-hop/index.html) | 반짝이는 잎사귀를 순서대로 탭해 폴짝폴짝 건너기! 목숨 3개 | 어린이/아케이드 |
+| [🐹 햄스터 쳇바퀴 달리기 (hamster-wheel-run)](./hamster-wheel-run/index.html) | 빠르게 탭해서 쳇바퀴를 굴려요! 도토리 탭하면 보너스, 30초 도전 | 어린이/아케이드 |
+| [🍣 회전초밥 주문받기 (sushi-conveyor)](./sushi-conveyor/index.html) | 손님 주문과 같은 초밥이 벨트로 올 때 탭! 콤보 보너스, 50초 도전 | 어린이/아케이드 |
+| [🐸 개구리 파리 잡기 (frog-tongue-catch)](./frog-tongue-catch/index.html) | 날아다니는 곤충을 탭하면 개구리 혀가 뻗어 잡아먹어요! 벌은 감점, 40초 도전 | 어린이/아케이드 |
+| [🚂 색깔 기차 잇기 (color-train-match)](./color-train-match/index.html) | 기차 색깔과 같은 칸을 탭해서 칙칙폭폭 기차를 길게 연결해요! 레벨이 오를수록 색도 많아져요 | 어린이/아케이드 |
+| [⭐ 별 쌓기 밤하늘 탑 (star-stacker)](./star-stacker/index.html) | 화면 위를 좌우로 움직이는 별을 탭하면 아래로 떨어져 쌓여요! 잘 맞추면 높이 점수 상승, 밤하늘 별 탑 만들기 | 어린이/아케이드 |
+| [⭐ 별 잇기 숫자놀이 (star-trace-number)](./star-trace-number/index.html) | 1번부터 순서대로 별을 탭해 별자리를 완성! 1~10 숫자 학습 5단계 | 어린이/아케이드 |
+| [🚒 소방차 출동 (firetruck-rescue)](./firetruck-rescue/index.html) | 불(🔥)을 탭하면 물줄기로 꺼져요! 라운드마다 빨라지는 불 끄기 도전 | 어린이/아케이드 |
+| [🎂 케이크 꾸미기 (cake-decor)](./cake-decor/index.html) | 레시피대로 케이크에 크림·과일·초코를 올려 완성! 10가지 케이크 도전 | 어린이/아케이드 |
+| [🌊 바다 청소부 (ocean-cleanup)](./ocean-cleanup/index.html) | 잠수함을 드래그해 바닷속 쓰레기를 모으고 물고기는 피하세요! 40초 환경 도전 | 어린이/아케이드 |
+| [도넛 탑 옮기기 (tower-rings)](./tower-rings/index.html) | 하노이 탑 7살 버전 — 도넛을 규칙대로 옮기는 논리 퍼즐 | 어린이/아케이드 |
+| [별 새총 쏘기 (star-slingshot)](./star-slingshot/index.html) | 새총을 당겨 별을 발사해 풍선을 맞히는 조준 게임 | 어린이/아케이드 |
+| [그림 밀기 퍼즐 (slide-puzzle)](./slide-puzzle/index.html) | 3x3 조각을 밀어 그림·숫자를 순서대로 맞추는 퍼즐 | 어린이/아케이드 |
+| [큐큐 기차역 (queue-train)](./queue-train/index.html) | 맨 앞 칸을 보고 같은 색 역으로 보내는 자료구조 Queue 놀이 게임 | 어린이/아케이드 |
+| [기차 길 잇기 (train-track)](./train-track/index.html) | 선로 타일을 돌려 출발역에서 도착역까지 길을 잇는 퍼즐 | 어린이/아케이드 |
+| [미니골프 (mini-golf)](./mini-golf/index.html) | 공을 당겨 굴려 홀에 넣는 미니골프 | 어린이/아케이드 |
+| [페널티킥 (penalty-kick)](./penalty-kick/index.html) | 공을 스와이프해 골키퍼를 피해 골을 넣어요 | 어린이/아케이드 |
+| [강아지 산책 (dog-walk)](./dog-walk/index.html) | 강아지를 좌우로 이동해 장애물을 피하고 뼈다귀를 모아요! 30초 산책 도전 | 어린이/아케이드 |
+| [벽돌 깨기 (brick-break)](./brick-break/index.html) | 공을 튕겨 벽돌을 모두 깨요! 패들을 좌우로 움직여 공을 받아내세요. 30초 스피드 도전! | 어린이/아케이드 |
+| [당근 뽑기 (carrot-pull)](./carrot-pull/index.html) | 꾹 누르다 딱 맞게 손 떼면 쑥! 황금 당근도 찾아봐요 | 어린이/아케이드 |
+| [신호등 달리기 (green-light-run)](./green-light-run/index.html) | 무궁화꽃이 피었습니다! 초록불엔 달리고 빨간불엔 멈춰요 | 어린이/아케이드 |
+| [🍦 아이스크림 스쿱 (ice-cream-scoop)](./ice-cream-scoop/index.html) | 콘을 좌우로 움직여 떨어지는 아이스크림 스쿱을 받아 높이 쌓아요! | 어린이/아케이드 |
+| [🤿 진주 잠수부 (pearl-diver)](./pearl-diver/index.html) | 잠수부를 터치로 움직여 바닷속 진주를 모으고 해파리를 피해요! 수면에서 공기 충전 | 어린이/아케이드 |
+| [🛗 엘리베이터 층 맞추기 (elevator-floor)](./elevator-floor/index.html) | 동물 손님이 원하는 층 버튼을 눌러 엘리베이터를 보내줘요! 숫자 1~5 인식 | 어린이/아케이드 |
+| [☂️ 우산 캐치 (umbrella-catch)](./umbrella-catch/index.html) | 우산으로 사탕·별을 받고 번개·먹구름은 피하는 낙하 게임 | 어린이/아케이드 |
+| [달팽이 경주 (snail-race)](./snail-race/index.html) | 내 달팽이를 골라 탭탭탭! 결승선에 1등으로 달려가자! | 어린이/아케이드 |
+| [솜사탕 만들기 (cotton-candy)](./cotton-candy/index.html) | 빙글빙글 돌려 솜사탕을 만들어 손님에게 전달! | 어린이/아케이드 |
+| [🎆 불꽃 폭죽 (fireworks-tap)](./fireworks-tap/index.html) | 화면을 탭하면 폭죽이 팡팡! 콤보로 점수를 올려봐요. 60초 도전 | 어린이/아케이드 |
+| [🎁 인형뽑기 (claw-machine)](./claw-machine/index.html) | 집게를 좌우로 움직여 탭! 귀여운 인형을 뽑아봐요. 5번 도전 | 어린이/아케이드 |
+| [🌈 무지개 분류 (rainbow-sort)](./rainbow-sort/index.html) | 색깔 공을 같은 색 컵에 끌어다 분류! 8레벨 | 어린이/아케이드 |
+| [🥁 동물 비트 (beat-animals)](./beat-animals/index.html) | 박자에 맞춰 반짝이는 동물을 탭! 콤보로 고득점 | 어린이/아케이드 |
+| [🔶 탱그램 퍼즐 (tangram-puzzle)](./tangram-puzzle/index.html) | 7가지 조각을 끌어다 놓아 목표 모양을 완성해요! 공간 감각 퍼즐 | 어린이/아케이드 |
+| [⭐ 별 더하기 (star-adder)](./star-adder/index.html) | 두 그룹의 별을 탭해서 바구니에 넣고 덧셈을 익혀요! 5레벨, 목숨 3개 | 어린이/아케이드 |
+| [🐬 돌고래 점프 (dolphin-jump)](./dolphin-jump/index.html) | 탭해서 점프! 돌고래가 물에서 뛰어올라 링을 통과해요. 타이밍이 핵심! | 어린이/아케이드 |
+| [🍄 버섯 바구니 (mushroom-pick)](./mushroom-pick/index.html) | 바구니를 좌우로 움직여 착한 버섯은 받고 독버섯(☠️)은 피해요! 금버섯은 3배 점수, 40초 도전 | 어린이/아케이드 |
+| [🍯 꿀 받기 (honey-drip)](./honey-drip/index.html) | 곰을 드래그해 떨어지는 꿀을 받고 벌은 피해요! 콤보로 고득점, 40초 도전 | 어린이/아케이드 |
+| [성 쌓기 (castle-builder)](./castle-builder/index.html) | 블록을 탭해서 딱 맞게 쌓아 성을 완성하는 퍼즐 게임 | 어린이/아케이드 |
+| [대포 쏘기 (cannon-ball)](./cannon-ball/index.html) | 날아오는 몬스터를 탭해서 맞춰요! 반응 속도 액션 게임 | 어린이/아케이드 |
+| [⛏️ 광물 캐기 (mine-craft-dig)](./mine-craft-dig/index.html) | 블록을 탭해서 광물을 캐요! 깊이 파고들수록 석탄→철→금→다이아몬드→에메랄드가 나와요. 곡괭이를 업그레이드해서 더 빨리 캐세요! | 어린이/아케이드 |
+| [사과 받기 (apple-catch-basket)](./apple-catch-basket/index.html) | 위에서 떨어지는 사과를 바구니로 받아요! 터치로 바구니를 좌우로 움직이세요. | 어린이/아케이드 |
+| [도형 따라 그리기 (shape-trace)](./shape-trace/index.html) | 점선으로 그려진 도형을 손가락으로 따라 그려 완성해요! 별, 하트, 동그라미 등 6가지 도형 | 어린이/아케이드 |
+| [등대 불빛 (lighthouse-guide)](./lighthouse-guide/index.html) | 등대를 회전시켜 불빛으로 밤바다 배들을 항구로 안내해요! | 어린이/아케이드 |
+| [낙엽 잡기 (leaf-catch)](./leaf-catch/index.html) | 바람에 흔들리며 떨어지는 낙엽을 바구니로 받아요! 황금잎 보너스! | 어린이/아케이드 |
+| [화산 점프 (volcano-hop)](./volcano-hop/index.html) | 화산에서 솟는 용암 돌멩이를 피해 플랫폼을 좌우로 점프! 생존 도전 | 어린이/아케이드 |
+| [보석 모으기 (gem-collect)](./gem-collect/index.html) | 떨어지는 보석을 바구니로 받아요! 폭탄은 피하세요 | 어린이/아케이드 |
+| [❄️ 눈덩이 피하기 (snow-dodge)](./snow-dodge/index.html) | 하늘에서 떨어지는 눈덩이를 피해요! 30초 생존 도전 | 어린이/아케이드 |
+| [🪁 연 날리기 (kite-fly)](./kite-fly/index.html) | 손가락으로 연을 조종해 구름과 별을 터치! 30초 도전 | 어린이/아케이드 |
+| [🚀 색깔 로켓 (color-rocket)](./color-rocket/index.html) | 떨어지는 색깔 별을 같은 색 로켓으로 드래그! 콤보 연결로 고득점, 40초 도전 | 어린이/아케이드 |
+| [🤿 보물 잠수 (treasure-dive)](./treasure-dive/index.html) | 화면 탭으로 잠수! 보물을 잡고 공기방울로 숨 채우고 상어는 피해요 | 어린이/아케이드 |
+| [🎪 고리 던지기 (ring-toss)](./ring-toss/index.html) | 탭해서 고리를 날려 막대기에 올려요! 콤보 연결로 보너스 점수, 40초 도전 | 어린이/아케이드 |
+| [🦁 동물원 탈출 (zoo-escape)](./zoo-escape/index.html) | 동물이 탈출할 올바른 문을 탭! 30초 안에 최대한 많이 탈출시켜요 | 어린이/아케이드 |
+| [🏗️ 블록 탑 쌓기 (balance-tower)](./balance-tower/index.html) | 좌우로 움직이는 블록을 딱 맞게 탭해서 최대한 높이 쌓아보세요! | 어린이/아케이드 |
+| [🌙 반딧불이 잡기 (firefly-catch)](./firefly-catch/index.html) | 밤하늘에서 반짝이는 반딧불이를 탭해서 잡아요! 30초 안에 최대한 많이! | 어린이/아케이드 |
+| [👑 공주 옷 입히기 (princess-dressup)](./princess-dressup/index.html) | 공주에게 예쁜 옷과 액세서리를 입혀 나만의 스타일을 만들어요! | 어린이/아케이드 |
+| [🧠 순서 기억하기 (memory-sequence)](./memory-sequence/index.html) | 반짝이는 색깔 순서를 기억하고 따라 눌러요! 단계가 올라갈수록 길어지는 기억력 게임 | 어린이/아케이드 |
+| [🌊 잠수함 피하기 (submarine-dodge)](./submarine-dodge/index.html) | 드래그로 잠수함을 조종해 바위와 물고기를 피하며 30초 생존하세요! | 어린이/아케이드 |
+| [풍선 색깔 섞기 (balloon-color-mix)](./balloon-color-mix/index.html) | 색깔 풍선을 섞어서 목표 색깔을 만들어요! 빨강+노랑=주황? 직접 확인해 보세요 | 어린이/아케이드 |
+| [공룡 화석 발굴 (fossil-dig)](./fossil-dig/index.html) | 모래를 손가락으로 쓸어서 숨겨진 공룡 화석을 발굴해요! 솔과 곡갱이 도구 선택 | 어린이/아케이드 |
+| [🥁 드럼 비트 (drum-beat)](./drum-beat/index.html) | 6개 드럼 패드를 탭해서 연주! 자유 연주와 비트 따라치기 2가지 모드 | 어린이/아케이드 |
+| [✨ 마법 지팡이 (magic-wand)](./magic-wand/index.html) | 손가락으로 동그라미를 그리면 별이 탄생해요! 마법 색을 바꿔가며 별 모으기 | 어린이/아케이드 |
+| [🐝 꿀벌 꽃가루 (bee-pollen)](./bee-pollen/index.html) | 꿀벌을 드래그해 꽃 모두 방문하고 벌집으로! | 어린이/아케이드 |
+| [🍔 햄버거 쌓기 (burger-stack)](./burger-stack/index.html) | 재료가 떨어질 때 탭! 타이밍 맞춰 햄버거 쌓기 | 어린이/아케이드 |
+| [🚦 동물 길 건너기 (traffic-cross)](./traffic-cross/index.html) | 동물을 골라 한 칸씩 위로! 자동차 5차선을 피해 안전지대까지 | 어린이/아케이드 |
+| [🚀 로켓 발사 (rocket-launch)](./rocket-launch/index.html) | 좌우 게이지가 초록존에 올 때 탭! 3단계 누적 정확도로 행성에 도달 | 어린이/아케이드 |
+| [🐾 동물 친구 밥주기 (pet-feed)](./pet-feed/index.html) | 동물 친구가 좋아하는 음식을 끌어다 줘봐요! | 어린이/아케이드 |
+| [⭐ 별자리 잇기 (constellation-draw)](./constellation-draw/index.html) | 밤하늘의 별을 번호 순서대로 이어 별자리를 완성해요! | 어린이/아케이드 |
+| [🎯 공 던지기 (ball-throw)](./ball-throw/index.html) | 드래그로 방향 조준, 움직이는 과녁에 공을 던져요! | 어린이/아케이드 |
+| [🍳 소꿉놀이 요리사 (pretend-play)](./pretend-play/index.html) | 레시피 보고 재료를 순서대로 접시에 올려요! | 어린이/아케이드 |
+| [🎹 색깔 피아노 (color-piano)](./color-piano/index.html) | 7색 건반을 탭해서 음계를 연주해요! 자유 연주·따라치기 2가지 모드, Web Audio API | 어린이/아케이드 |
+| [🔵 미로 탈출 (maze-escape)](./maze-escape/index.html) | DFS로 생성된 미로에서 보라 공을 드래그해 탈출! 4레벨 난이도, 시간 제한 없이 완주 | 어린이/아케이드 |
+| [🧲 자석 낚시 (magnet-fish)](./magnet-fish/index.html) | 자석을 드래그해서 물고기를 끌어당겨 잡아요! 폭탄은 피하고 목숨 3개, 40초 도전 | 어린이/아케이드 |
+| [🫧 뽁뽁이 터뜨리기 (bubble-wrap)](./bubble-wrap/index.html) | 뽁뽁이를 전부 탭해서 터뜨려요! 레벨이 오를수록 크기 증가, 30초 도전 | 어린이/아케이드 |
+| [🦘 캥거루 점프 (kangaroo-jump)](./kangaroo-jump/index.html) | 꾹 누를수록 높이 점프! 별을 먹고 가시를 피해 플랫폼을 뛰어다녀요 | 어린이/아케이드 |
+| [🍕 피자 만들기 (pizza-maker)](./pizza-maker/index.html) | 레시피를 보고 재료를 피자에 드래그! 60초 동안 피자 5판 완성 도전 | 어린이/아케이드 |
+| [🔫 물총 싸움 (water-gun)](./water-gun/index.html) | 화면에 나타나는 귀여운 적 캐릭터를 탭해서 물총을 쏴요! 30초 타임어택 | 어린이/아케이드 |
+| [⛄ 눈사람 만들기 (build-snowman)](./build-snowman/index.html) | 눈, 코, 입, 모자, 목도리를 골라 나만의 귀여운 눈사람을 완성해요! | 어린이/아케이드 |
+| [🦑 오징어 잡기 (squid-catch)](./squid-catch/index.html) | 그물을 위아래로 움직여 헤엄치는 오징어를 잡아요! 5번 놓치면 끝 | 어린이/아케이드 |
+| [☃️ 눈싸움 (snowball-fight)](./snowball-fight/index.html) | 터치로 눈사람을 움직여 날아오는 눈덩이를 피하세요! 40초 생존 도전 | 어린이/아케이드 |
+| [🐣 달걀 부화시키기 (hatch-egg)](./hatch-egg/index.html) | 달걀을 탭탭탭 눌러서 부화시키고 나온 동물을 맞혀요! 5마리 부화 60초 도전 | 어린이/아케이드 |
+| [🌧️ 빗방울 피하기 (rain-dodge)](./rain-dodge/index.html) | 우산을 드래그해서 빗방울을 피하고 햇살을 잡아요! 목숨 3개, 40초 도전 | 어린이/아케이드 |
+| [서커스 저글링 (juggle-circus)](./juggle-circus/index.html) | 화면을 탭해서 광대를 움직여 공을 튕겨요! 목숨 3개, 콤보로 점수 올리기 | 어린이/아케이드 |
+| [나비 꽃밭 (butterfly-garden)](./butterfly-garden/index.html) | 꽃을 탭하면 나비가 날아가 꿀을 먹어요! 시들기 전에 빠르게 탭, 40초 도전 | 어린이/아케이드 |
+| [🛡️ 운석 막기 (meteor-shield)](./meteor-shield/index.html) | 화면을 드래그해서 방패를 돌려 운석에서 행성을 지켜요! 40초 타임어택 | 어린이/아케이드 |
+| [🚂 기차 피하기 (train-dodge)](./train-dodge/index.html) | 달려오는 기차를 탭해서 점프로 피해요! 30초 동안 최대한 많이 피하기 도전 | 어린이/아케이드 |
+| [📝 우리말 쇼다운 (urimal-showdown)](./urimal-showdown/index.html) | 말뜻, 순화어, 맞춤법, 속담을 밝은 카드 화면에서 차근차근 풀어보는 어린이용 우리말 퀴즈 | 어린이/아케이드 |
+| [👨‍🍳 이모지 요리사 (emoji-chef)](./emoji-chef/index.html) | 레시피를 보고 재료를 순서대로 냄비에 넣어 요리를 완성! 10가지 레시피, 순서 기억+인지 복합 게임, 60초 도전 | 어린이/아케이드 |
+| [🎣 얼음 낚시 (ice-fishing)](./ice-fishing/index.html) | 낚싯줄이 얼음 구멍 아래로 자동 하강! 물고기가 바늘 근처에 오면 탭해서 잡아요. 💣 폭탄은 피하고 목숨 3개 도전, 30초 타임어택 | 어린이/아케이드 |
+| [🍪 쿠키 낚아채기 (cookie-grab)](./cookie-grab/index.html) | 화면에 나타나는 쿠키를 빠르게 탭해서 모아요! 🌶️ 고추는 피하고, 콤보 연결, 30초 도전 | 어린이/아케이드 |
+| [🎠 빙글빙글 색 맞추기 (spin-color)](./spin-color/index.html) | 빙글빙글 돌아가는 원판! 화살표가 가리키는 색깔 버튼을 빠르게 탭, 콤보 보너스 | 어린이/아케이드 |
+| [🎭 표정 맞추기 (face-match)](./face-match/index.html) | 제시된 표정과 같은 얼굴을 골라요! 10문제 빠른 터치 퀴즈 | 어린이/아케이드 |
+| [🌈 색깔 거품 잡기 (color-bubble-catch)](./color-bubble-catch/index.html) | 목표 색 거품만 터치! 다른 색은 피해요. 난이도 3단계 | 어린이/아케이드 |
+| [🔍 다른 그림 찾기 (spot-difference)](./spot-difference/index.html) | 두 이모지 그림을 비교해서 다른 곳을 찾아 탭! 레벨마다 다른 칸 수가 늘어나요 | 어린이/아케이드 |
+| [🍉 과일 자르기 (fruit-slice)](./fruit-slice/index.html) | 날아오는 과일을 손가락으로 슬라이드해서 잘라요! 폭탄 피하고 콤보 연결, 60초 도전 | 어린이/아케이드 |
+| [☁️ 구름 점프 (cloud-jump)](./cloud-jump/index.html) | 탭해서 점프! 구름을 밟아 하늘 높이 올라가요. 목숨 3개 도전 | 어린이/아케이드 |
+| [🐾 동물 소리 맞추기 (animal-sound)](./animal-sound/index.html) | 이모지 동물을 보고 울음소리를 맞혀요! 20종 동물, 10문제 퀴즈, 연속 정답 보너스 | 어린이/아케이드 |
+| [🌊 파도 서핑 (wave-surf)](./wave-surf/index.html) | 서퍼를 드래그해서 바위·해파리를 피해요! 별을 먹으면 보너스, 멀리 달려라 | 어린이/아케이드 |
+| [🎨 색칠 놀이 (color-fill)](./color-fill/index.html) | 색을 골라서 그림을 탭으로 색칠해요! 5가지 그림 완성 도전 | 어린이/아케이드 |
+| [🥕 채소 텃밭 (vegetable-garden)](./vegetable-garden/index.html) | 씨앗을 심고 물을 줘서 채소를 키워요! 5레벨 수확 목표 달성 도전 | 어린이/아케이드 |
+| [🦕 공룡 달리기 (dino-run)](./dino-run/index.html) | 탭해서 점프! 선인장과 새를 피해 멀리멀리 달려요. 목숨 3개 도전 | 어린이/아케이드 |
+| [🌑 그림자 맞추기 (shadow-match)](./shadow-match/index.html) | 그림자를 보고 어떤 그림인지 맞혀요! 동물·탈것·음식 40가지 | 어린이/아케이드 |
+| [🔢 숫자 퀴즈 (math-quiz)](./math-quiz/index.html) | 더하기·빼기 문제를 풀어봐요! 3가지 난이도, 10문제 퀴즈 | 어린이/아케이드 |
+| [🔷 모양 분류 놀이 (shape-sort)](./shape-sort/index.html) | 나타나는 도형을 모양·색깔 바구니에 빠르게 분류! 레벨이 오를수록 제한 시간이 줄어들어요 | 어린이/아케이드 |
+| [🎹 피아노 놀이 (piano-tiles)](./piano-tiles/index.html) | 건반을 탭해서 음악을 연주해요! 자유 연주 모드와 악보 따라하기 모드(나비야·반짝반짝 등 4곡) | 어린이/아케이드 |
+| [⚫⚪ 아기 바둑 (baby-go)](./baby-go/index.html) | 9x9 / 13x13 / 19x19 입문 바둑: 잡기·내 땅 계산·쉬운 바둑말 가이드 | 어린이/아케이드 |
+| [🔮 색깔 기억 패턴 (color-memory)](./color-memory/index.html) | 버튼이 켜지는 순서를 기억했다가 같은 순서로 탭! 단계가 오를수록 길어져요 | 어린이/아케이드 |
+| [🐸 개구리 점프 (frog-jump)](./frog-jump/index.html) | 탭하면 개구리가 점프! 수련잎 위에 착지하면 점수, 물에 빠지면 목숨 차감 | 어린이/아케이드 |
+| [🐛 애벌레 먹이주기 (caterpillar-feed)](./caterpillar-feed/index.html) | 애벌레를 끌어서 반짝이는 나뭇잎을 먹여요! 레벨이 오를수록 잎이 많아져요 | 어린이/아케이드 |
+| [🌈 같은 색 버블 팡팡 (bubble-pop-color)](./bubble-pop-color/index.html) | 같은 색 버블 3개를 순서대로 터치해서 팡팡 터트려요! 콤보로 점수 올리기 | 어린이/아케이드 |
+| [🧩 퍼즐 조각 맞추기 (jigsaw-mini)](./jigsaw-mini/index.html) | 흩어진 이모지 조각을 끌어서 제자리에 맞춰요! 2x2·3x3 레벨업 | 어린이/아케이드 |
+| [🐟 물고기 잡기 (fish-catch)](./fish-catch/index.html) | 잠자리채를 드래그해 물고기를 잡고 폭탄은 피하세요! 30초 도전 | 어린이/아케이드 |
+| [⭐ 별자리 잇기 (star-connect)](./star-connect/index.html) | 숫자 순서대로 별을 탭해 별자리를 완성해요! 8가지 별자리 도전 | 어린이/아케이드 |
+| [🏀 농구공 드리블 (bounce-ball)](./bounce-ball/index.html) | 공이 바닥에 닿기 전에 탭해서 튀겨요! 콤보 연결로 최고 점수 도전 | 어린이/아케이드 |
+| [🖼️ 그림 단어 맞추기 (word-picture-match)](./word-picture-match/index.html) | 이모지 그림에 맞는 한글 단어를 골라요! 10문제 퀴즈, 연속 정답 보너스 | 어린이/아케이드 |
+| [🍎 과일 받기 (fruit-catch)](./fruit-catch/index.html) | 떨어지는 과일을 바구니로 받아요! 폭탄 피하고 콤보 연결, 30초 도전 | 어린이/아케이드 |
+| [🎯 과녁 맞추기 (target-hit)](./target-hit/index.html) | 이동하는 과녁을 탭! 정중앙을 맞추면 100점, 30초 도전 | 어린이/아케이드 |
+| [🎵 리듬 탭 (rhythm-tap)](./rhythm-tap/index.html) | 내려오는 노트를 박자에 맞춰 탭! 폭탄은 피하고 콤보를 이어가요 | 어린이/아케이드 |
+| [🚀 우주 슈팅 (space-shooter)](./space-shooter/index.html) | 우주선으로 적을 격파하라! 웨이브를 버텨내고 최고 점수에 도전! | 어린이/아케이드 |
+| [🤖 로봇 배틀 (robot-game)](./robot-game/index.html) | 내 로봇으로 적 로봇을 물리쳐라! 공격과 방어 타이밍이 핵심! | 어린이/아케이드 |
+| [🐰 토끼 당근 미로 (rabbit-maze)](./rabbit-maze/index.html) | 토끼가 당근을 찾아 미로를 탈출하도록 도와주세요! | 어린이/아케이드 |
+| [⭐ 별 세기 숫자 놀이 (star-counting)](./star-counting/index.html) | 별을 세며 숫자를 맞추는 재미있는 퍼즐! | 어린이/아케이드 |
+| [🐾 동물 색칠 놀이 (animal-coloring)](./animal-coloring/index.html) | 귀여운 동물을 원하는 색으로 색칠해봐요! | 어린이/아케이드 |
+| [🔢 숫자 순서 맞추기 (number-order)](./number-order/index.html) | 흩어진 숫자를 1부터 순서대로 빠르게 터치! 레벨 클리어 도전 | 어린이/아케이드 |
+| [우봉고 (ubongo)](./ubongo/index.html) | 폴리오미노 조각으로 목표 모양을 완성하는 속도 퍼즐 게임 (9라운드) | 어린이/아케이드 |
+| [스도쿠 (sudoku)](./sudoku/index.html) | 숫자 퍼즐 게임 - 난이도 선택, 타이머, Lives 시스템 포함 | 어린이/아케이드 |
+| [2048 퍼즐 (2048)](./2048/index.html) | 2048 숫자 퍼즐 게임 (오픈소스) | 어린이/아케이드 |
+| [자바스크립트 테트리스 (tetris)](./tetris/index.html) | 클래식 테트리스 게임 (자바스크립트) | 어린이/아케이드 |
+| [장윤 한글 타이핑 (웹) (typing-web)](./https://shinjaehyun20.github.io/02-hangul-typing-game/#home) | 한글 단어를 입력하는 타자 연습 게임 (GitHub Pages) | 어린이/아케이드 |
+| [장윤 한글 타이핑 (로컬) (typing)](./typing/index.html) | 한글 단어를 입력하는 타자 연습 게임 (로컬 실행) | 어린이/아케이드 |
+| [색깔 맞추기 (color-tap)](./color-tap/index.html) | 글자가 어떤 색으로 쓰여있는지 골라요! 내용이 아닌 색깔을! | 어린이/아케이드 |
+| [기억력 카드 (memory-match)](./memory-match/index.html) | 같은 이모지 카드 두 장을 기억해서 찾아보세요. 쉬움/보통/어려움 | 어린이/아케이드 |
+| [두더지 잡기 (whack-a-mole)](./whack-a-mole/index.html) | 올라오는 두더지를 빠르게 탭해서 잡아요! 연속 콤보 보너스 | 어린이/아케이드 |
+| [달리는 장윤이 (runner-game)](./runner-game/index.html) | 좌우 스크롤에서 위/아래로 이동하며 아이템을 모으세요 | 어린이/아케이드 |
+| [우주 장윤이(별 먹기) (space-catcher)](./space-catcher/index.html) | 장윤이 이미지를 모아서 점수를 얻는 간단한 게임 | 어린이/아케이드 |
+| [자동차 경주 (car-race)](./car-race/index.html) | 차선을 바꿔 적 차를 피하고 코인을 모으는 스피드 레이싱! | 어린이/아케이드 |
+| [펭귄 얼음 미끄럼틀 (penguin-slide)](./penguin-slide/index.html) | 얼음 경사를 미끄러져 내려오며 물고기를 먹고 바위를 피해요! | 어린이/아케이드 |
+| [다람쥐 도토리 모으기 (acorn-squirrel)](./acorn-squirrel/index.html) | 탭해서 점프! 나뭇가지를 밟고 도토리를 모으고 돌을 피해요 | 어린이/아케이드 |
+| [양말 짝 맞추기 (sock-match)](./sock-match/index.html) | 같은 색·무늬 양말 2짝을 찾아 짝 맞추기! 색/무늬 인지 매칭 게임 | 어린이/아케이드 |
+| [민들레 홀씨 날리기 (dandelion)](./dandelion/index.html) | 민들레를 탭하거나 쓸어서 홀씨를 바람에 날려요! | 어린이/아케이드 |
+| [슈퍼 점프 모험 (super-mario)](./super-mario/index.html) | 5스테이지+보스 성 옆스크롤 플랫포머! 버섯·불꽃·별, 숨은 블록·파이프 비밀길, 숙이기·보스 도끼 | 어린이/아케이드 |
+| [소원등 띄우기 (lantern-float)](./lantern-float/index.html) | 탭해서 소원등에 불을 켜고 밤하늘로 두둥실 띄워 보내요! | 어린이/아케이드 |
+| [버블티 만들기 (bubble-tea-maker)](./bubble-tea-maker/index.html) | 손님 주문대로 시럽 붓고 펄·토핑 올려서 버블티를 완성해요! | 어린이/아케이드 |
+| [과일 짝 맞추기 (fruit-pair)](./fruit-pair/index.html) | 같은 과일 카드 두 장을 찾아요! 4단계 난이도, 연속 콤보 보너스, 60초 도전 | 어린이/아케이드 |
+| [공룡알 탭탭 (dinosaur-tap)](./dinosaur-tap/index.html) | 화면에 나타나는 공룡알을 빠르게 탭해서 아기 공룡을 부화시켜요! 5색 알·8종 공룡·콤보 보너스·30초 도전 | 어린이/아케이드 |
+| [낙하산 착륙 (parachute-drop)](./parachute-drop/index.html) | 낙하산을 조종해 착륙 패드에 안전하게 내려요! 바람·새 피하기, 레벨업 | 어린이/아케이드 |
+| [볼링 (bowling)](./bowling/index.html) | 스와이프로 공을 굴려 핀을 쓰러뜨려요! 스트라이크·스페어, 10프레임 볼링 | 어린이/아케이드 |
+| [🤖 코덱스 로봇 연구소 (codex-robot-lab)](./codex-robot-lab/index.html) | 명령 카드를 순서대로 골라 계획→수정→검증→커밋/푸시 파이프라인을 완성해요! | 어린이/아케이드 |
+| [🌙 달 로켓 연료 계산 (moon-rocket-math)](./moon-rocket-math/index.html) | 덧셈·뺄셈 정답 연료를 골라 로켓을 달까지 보내는 45초 숫자 게임 | 어린이/아케이드 |
+| [🫧 눈방울 구조대 (bubble-snow-rescue)](./bubble-snow-rescue/index.html) | 조이스틱으로 움직여 눈방울을 쏘고 5스테이지를 클리어해요! | 어린이/아케이드 |
+| [🌈 무지개 레일 공방 (rainbow-rail-builder)](./rainbow-rail-builder/index.html) | 빈 판에 손가락으로 레일을 직접 그려 미션역을 순서대로 잇는 5레벨 드로잉 퍼즐 | 어린이/아케이드 |
+| [🥕 두더지 텃밭 (mole-garden)](./mole-garden/index.html) | 두더지가 올라오면 탭해서 당근·무·양배추를 지켜요! 콤보 보너스 + 45초 도전 | 어린이/아케이드 |
+| [🐧 펭귄 물고기 던지기 (penguin-fish-toss)](./penguin-fish-toss/index.html) | 헤엄치는 물고기를 탭해서 펭귄이 먹이를 던져 잡아요! 60초 안에 최대한 많이! | 어린이/아케이드 |
+| [🤿 다이빙대 점프 (diving-board-jump)](./diving-board-jump/index.html) | 타이밍 맞춰 점프! 물결 링 중앙에 정확히 착수하면 고득점, 5회 도전 | 어린이/아케이드 |
+| [🌀 터널 달리기 (tunnel-dash)](./tunnel-dash/index.html) | 3D 터널을 달리며 좌우로 장애물 피하고 보석 모으기! 30초 도전 | 어린이/아케이드 |
+| [🎯 몬스터 파크 (monster-park)](./monster-park/index.html) | 공원에 나타나는 몬스터를 탭해서 포획! 도감 12종 수집 + 레벨업, 45초 도전 | 어린이/아케이드 |
+| [✈️ 종이비행기 날리기 (paper-airplane-fly)](./paper-airplane-fly/index.html) | 톡톡 터치로 날아올라 별은 모으고 먹구름은 피하는 비행 게임, 40초 도전 | 어린이/아케이드 |
+| [🧶 고양이 낚싯대 놀이 (cat-teaser-play)](./cat-teaser-play/index.html) | 드래그로 깃털을 움직여 고양이를 실뭉치로 이끄는 놀이, 40초 도전 | 어린이/아케이드 |
+| [🌱 씨앗 새싹 달리기 (seed-sprout-race)](./seed-sprout-race/index.html) | 표시된 물과 햇빛 버튼을 빠르게 골라 40초 동안 꽃을 피우는 새싹 게임 | 어린이/아케이드 |
+| [🐇 그림자 손놀이 (shadow-puppet)](./shadow-puppet/index.html) | 빛나는 동물 그림자 순서를 기억해 같은 순서로 탭하는 5막 기억 공연 | 어린이/아케이드 |
+| [🧺 빨래 색깔 분류 (laundry-sort)](./laundry-sort/index.html) | 옷 색을 보고 같은 색 바구니를 골라 40초 동안 빨래를 정리하는 생활 학습 게임 | 어린이/아케이드 |
+| [🥪 샌드위치 주문 (sandwich-order)](./sandwich-order/index.html) | 주문표의 재료 순서를 기억해 45초 동안 샌드위치를 완성하는 순서 기억 게임 | 어린이/아케이드 |
+| [🎭 패턴 퍼레이드 (pattern-parade)](./pattern-parade/index.html) | 반복되는 동물 규칙의 빈칸을 찾는 50초 패턴 놀이 | 어린이/아케이드 |
+| [⏰ 시계 바늘 맞추기 (clock-hands)](./clock-hands/index.html) | 시·분 버튼으로 목표 시간을 맞추는 60초 시계 학습 | 어린이/아케이드 |
+| [🌙 달빛 순서 탐험 (moon-phase-quest)](./moon-phase-quest/index.html) | 달 모양을 어두운 순서부터 이어 보는 5단계 우주 학습 | 어린이/아케이드 |
+| [♻️ 분리수거 구조대 (recycle-rescue)](./recycle-rescue/index.html) | 물건을 알맞은 통으로 끌어 넣는 40초 환경 학습 | 어린이/아케이드 |
+| [🎣 받침 낚시왕 (batchim-fishing)](./batchim-fishing/index.html) | 낱말을 소리 내어 읽고 알맞은 받침을 골라 물고기 10마리를 잡는 한글 놀이 | 어린이/아케이드 |
+| [🥋 태권도 품새 리듬 (taekwondo-poomsae)](./taekwondo-poomsae/index.html) | 표시된 지르기·앞차기·막기·서기 동작을 맞추는 45초 리듬 수련 | 어린이/아케이드 |
+| [🎟️ 기차표 도장 찍기 (train-ticket-stamp)](./train-ticket-stamp/index.html) | 움직이는 기차표의 별표가 가운데 올 때 도장을 꾹 눌렀다 떼는 hold-to-punch 타이밍 게임 | 어린이/아케이드 |
+| [🪐 행성 궤도 주차 (planet-orbit-park)](./planet-orbit-park/index.html) | 손가락으로 달을 원형 드래그해 초록 궤도 구역에 주차하는 7라운드 각도 감각 게임 | 어린이/아케이드 |
+| [🪞 마음 거울 (emotion-mirror)](./emotion-mirror/index.html) | 생활 장면을 읽고 주인공의 감정 표정을 골라 마음 어휘를 익히는 8라운드 사회정서 게임 | 어린이/아케이드 |
+| [🌦️ 날씨 옷장 탐험 (weather-outfit)](./weather-outfit/index.html) | 날씨 장면을 보고 알맞은 옷을 골라 45초 동안 생활 판단을 연습하는 무감점 선택 게임 | 어린이/아케이드 |
+| [🫧 숨결 비눗방울 (breath-bubble)](./breath-bubble/index.html) | 버튼을 꾹 눌러 방울을 키우고 목표 원 크기에서 떼는 8라운드 hold-to-release 게임 | 어린이/아케이드 |
+| [🚦 신호등 안전 건너기 (traffic-light-crossing)](./traffic-light-crossing/index.html) | 빨간불·노란불에는 기다리고 초록불에만 건너기를 누르는 45초 안전 판단 게임 | 어린이/아케이드 |
+| [🌟 제미니 별빛 스파크 (gemini-star-spark)](./gemini-star-spark/index.html) | 밤하늘에 반짝이는 별과 마법 보석을 탭해 별빛 점수를 모으는 40초 터치 반응 게임 | 어린이/아케이드 |
+| [🫧 제미니 우주 방울 팡팡 (gemini-space-bubble)](./gemini-space-bubble/index.html) | 무중력 우주로 올라가는 방울을 톡톡 탭해서 40초 동안 구조하는 터치 판단 게임 | 어린이/아케이드 |
+| [📦 색깔 상자 쌓기 (color-box-stack)](./color-box-stack/index.html) | 화면을 터치해서 움직이는 상자를 떨어뜨려 높이 쌓아보세요! | 어린이/아케이드 |
+| [🚀 우주 쓰레기 청소부 (space-garbage-collector)](./space-garbage-collector/index.html) | 30초 동안 우주 쓰레기를 모으고 운석을 피하세요! | 어린이/아케이드 |
+| [🐾 동물 소리 퀴즈 (animal-sound-quiz)](./animal-sound-quiz/index.html) | 동물 이모지를 보고 이름과 울음소리를 맞혀보세요! 10초 안에 답해야 해요. | 어린이/아케이드 |
+| [🎨 색깔 기억 챌린지 (color-memory-challenge)](./color-memory-challenge/index.html) | 색깔 패턴을 기억하고 같은 순서로 탭해보세요! 레벨이 올라갈수록 패턴이 길어져요. | 어린이/아케이드 |
+| [🎵 리듬 터치 타임 (rhythm-touch-beat)](./rhythm-touch-beat/index.html) | 동그란 박자 링이 작아져 노란 원에 닿는 순간 탭! 콤보를 이어가며 리듬감을 키워봐요. | 어린이/아케이드 |
+| [🔍 숨은 그림 찾기 챌린지 (hidden-object-hunt)](./hidden-object-hunt/index.html) | 그림 속에 숨겨진 5개의 물건을 찾아 탭하세요! 45초 안에 모두 찾아내는 관찰력 퍼즐. | 어린이/아케이드 |
+| [🍂 계절 옷장 분류 (season-sort)](./season-sort/index.html) | 옷과 물건을 알맞은 계절 칸으로 드래그! 40초 안에 최대한 많이 분류하세요. | 어린이/아케이드 |
+| [🥁 동물 밴드 연주 (percussion-band)](./percussion-band/index.html) | 악기가 울리는 순서를 기억하고 똑같이 따라 눌러보세요! 라운드마다 순서가 늘어나요. | 어린이/아케이드 |
+| [🍎 과일 짝 맞추기 (fruit-match)](./fruit-match/index.html) | 카드 뒤에 숨겨진 같은 모양의 과일 짝을 찾아 연속으로 맞춰보세요! 8쌍 매칭 완료 도전. | 어린이/아케이드 |
+| [🚀 우주선 피하기 챌린지 (space-dodge)](./space-dodge/index.html) | 좌우로 우주선을 조종해 떨어지는 운석을 피하세요! 20초간 충돌 없이 버티는 회피 미션. | 어린이/아케이드 |
+| [🌈 색상 파동 맞추기 (color-wave-harmony)](./color-wave-harmony/index.html) | 회전하는 바늘이 타겟 색상을 가리키는 정확한 타이밍에 탭하세요! 리듬 타이밍 챌린지. | 어린이/아케이드 |
+| [⭐ 별자리 산수 짝 맞추기 (star-match-math)](./star-match-math/index.html) | 화면의 별들을 선택하여 숫자의 합이 목표값과 정확히 일치하도록 하세요! 별자리를 잇는 연산 퍼즐. | 어린이/아케이드 |
+| [🪵 숲속 구슬길 (woodland-marble-slide)](./woodland-marble-slide/index.html) | 나무 블록과 숲속 길을 이리저리 슬라이드해 구슬이 🏁 결승점까지 굴러가도록 경로를 완성하세요! | 어린이/아케이드 |
+| [🌱 루미 이슬정원 (lumi-dew-garden)](./lumi-dew-garden/index.html) | 이슬을 굴려 정원의 꽃과 풀을 싹틔우세요! 꽃잎과 잎새를 조화롭게 피워내는 힐링 물리 퍼즐. | 어린이/아케이드 |
+| [🥐 우주 별빛 베이커리 (cosmic-star-baker)](./cosmic-star-baker/index.html) | 외계인 손님들의 주문 순서에 맞춰 별빛 반죽, 행성 시럽, 별가루 토핑을 올려 맛있는 우주 디저트를 구워내세요! | 어린이/아케이드 |
+| [🐢 바다거북 비눗방울 구출 (turtle-bubble-rescue)](./turtle-bubble-rescue/index.html) | 비눗방울에 갇힌 아기 바다거북과 물고기 친구들을 톡톡 터치해 안전한 산호초 둥지로 구출해주세요! | 어린이/아케이드 |
+| [🧪 숲속 마법 물약방 (potion-magic-shop)](./potion-magic-shop/index.html) | 숲속 요정 손님들의 주문 순서에 맞춰 이슬, 풀잎, 별가루, 꽃잎을 플라스크에 넣어 신비한 마법 물약을 조제하세요! | 어린이/아케이드 |
+| [🐳 아기별고래 우주 유영 (star-whale-voyage)](./star-whale-voyage/index.html) | 은하수 바다를 헤엄치는 아기별고래를 부드럽게 유영시켜 반짝이는 별가루를 모으고 우주 오로라를 펼치세요! | 어린이/아케이드 |
+| [🥁 쿵치딱 리듬 버블 밴드 (beat-bubble-drummer)](./beat-bubble-drummer/index.html) | 신나는 8비트 드럼 비트에 맞춰 떨어지는 컬러 음표를 터치하고 콤보를 이어가는 동물 악단 리듬 액션 게임! | 어린이/아케이드 |
+| [🧲 중력 구슬 건축가 (gravity-ball-architect)](./gravity-ball-architect/index.html) | 스프링, 가속판, 포털을 직접 배치해 구슬이 모든 별을 먹고 골인하도록 트랙을 설계하는 창의적 물리 롤러코스터 퍼즐! | 어린이/아케이드 |
+| [⛏️ 픽셀 던전 광산 탐험가 (pixel-dungeon-miner)](./pixel-dungeon-miner/index.html) | 미지의 지하 동굴을 파고 내려가 진귀한 광석을 채굴하고, 산소를 관리하며 지상 베이스 캠프에서 장비를 업그레이드하세요! | 어린이/아케이드 |
+| [🚁 사이버 드론 택배 비행사 (cyber-drone-delivery)](./cyber-drone-delivery/index.html) | 메가시티의 강풍과 회전 레이저를 뚫고 드론의 양쪽 로터와 부스터를 제어해 지정된 헬리패드에 안전하게 화물을 배송하세요! | 어린이/아케이드 |
+| [🐒 정글 덩굴 스윙 타잔 (jungle-vine-swinger)](./jungle-vine-swinger/index.html) | 화면을 터치해 덩굴을 잡고 반동을 실어 날아가며 정글의 바나나와 별을 모으는 스윙 액션 놀이! | 어린이/아케이드 |
+| [⚡ 네온 회로 연결사 (neon-circuit-connect)](./neon-circuit-connect/index.html) | 타일을 회전시켜 발전소에서 아기 로봇까지 네온 전선을 연결하고 번쩍이는 에너지를 충전하세요! | 어린이/아케이드 |
+| [⚡ 꼬마 로봇 건전지 충전 (circuit-robot-battery)](./circuit-robot-battery/index.html) | 꼬마 로봇에게 건전지와 번개를 충전해주는 게임입니다. | 어린이/아케이드 |
+| [🎈 무지개 풍선 팡팡 (balloon-rainbow-pop)](./balloon-rainbow-pop/index.html) | 떠오르는 무지개 풍선을 터치하여 팡팡 터뜨리는 게임입니다. | 어린이/아케이드 |
+| [🔔 멜로디 크리스탈 차임 (melody-crystal-chime)](./melody-crystal-chime/index.html) | 내려오는 크리스탈 음표에 맞춰 오색 찬란한 종을 탭하여 맑고 고운 멜로디를 연주하는 리듬 힐링 게임입니다. | 어린이/아케이드 |
+| [🚀 우주 운석 대시 (cosmic-meteor-dash)](./cosmic-meteor-dash/index.html) | 우주선을 좌우로 조종해 쏟아지는 불타는 운석을 피하고 별 보석과 보호막을 모으는 스릴 넘치는 액션 게임입니다. | 어린이/아케이드 |
+| [💎 무지개 보석 광산 열차 (rainbow-gem-minecart)](./rainbow-gem-minecart/index.html) | 쏟아지는 오색 영롱한 보석들을 레일을 달리는 광차를 좌우로 조종해 쏙쏙 담아 점수를 모으는 경쾌한 레일 액션 게임입니다. | 어린이/아케이드 |
+| [✨ 반짝반짝 반딧불이 호롱불 (sparkle-firefly-lamp)](./sparkle-firefly-lamp/index.html) | 어두운 밤하늘 숲속을 날아다니는 황금빛·에메랄드빛 반딧불이를 톡톡 터치해 호롱불에 빛을 모아 환하게 밝히는 힐링 터치 놀이입니다. | 어린이/아케이드 |
+| [🔮 반짝반짝 마법 수정 동굴 탐험 (magic-crystal-cave)](./magic-crystal-cave/index.html) | 신비로운 보석 동굴에서 쏟아지는 루비·사파이어·에메랄드 크리스탈을 마법 카트로 쏙쏙 받아내고 무지개 프리즘 파워를 발동하는 힐링 아케이드 놀이입니다. | 어린이/아케이드 |
+| [🌈 알록달록 무지개 비눗방울 팡팡 (rainbow-bubble-popper)](./rainbow-bubble-popper/index.html) | 화면 가득 둥실둥실 떠오르는 영롱한 무지개 비눗방울과 보석·과일을 퐁퐁 터뜨려 신나는 콤보와 점수를 모으는 경쾌한 힐링 터치 놀이입니다. | 어린이/아케이드 |
+
 </details>
 
 ## 프로젝트 구조
@@ -476,26 +476,26 @@ VS Code `Live Server` 확장을 써도 된다.
 ## 최근 변경사항 (2026-09)
 - 2026-09-26: [🦔 아기 고슴도치의 달콤 딸기 굴리기](hedgehog-strawberry-roll/index.html), [🐧 아기 펭귄의 북극 오로라 미끄럼틀](penguin-aurora-slide/index.html) (총 278개)
 
-- 2026-09-24: [🐿️ 아기 다람쥐의 도토리 굴리기 대작전](squirrel-acorn-bowling/index.html), [🐳 아기 고래의 오색 무지개 물뿜기](whale-rainbow-fountain/index.html) (총 276개)
-- 2026-09-23: [🦦 아기 수달의 퐁당퐁당 조개 잡기](otter-river-clam-catch/index.html), [🐲 아기 용의 말랑말랑 불꽃 과일 굽기](dragon-baby-fire-fruit/index.html) (총 274개)
-- 2026-09-22: [🦔 아기 고슴도치의 데굴데굴 가을 밤송이](hedgehog-chestnut-roll/index.html), [🦉 부엉이 박사님의 반짝반짝 별자리 잇기](owl-star-constellation/index.html) (총 272개)
-- **🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 · 🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 추가 (2026-09-21)** — 단풍나무 아래 도토리 바구니 캐치 아케이드와 나뭇잎 색채 변화 위장 매칭 퍼즐 미니게임 2종 추가 (총 270개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
-- **🐝 꿀벌의 꽃밭 꿀방울 모으기 · 🏮 마법 호롱불 반딧불이 길 추가 (2026-09-19)** — 꽃밭 꿀방울 수집 힐링 비행 아케이드와 밤숲 호롱불 멜로디 기억 순서 퍼즐 미니게임 2종 추가 (총 268개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
-- **🍓 무지개 과일 스무디 바 · 🐧 꼬마 펭귄의 빙하 퐁당퐁당 추가 (2026-09-18)** — 떨어지는 과일을 터치해 무지개 스무디 잔을 채우는 힐링 아케이드와 얼음 유빙을 건너는 타이밍 점프 모험 미니게임 2종 추가 (총 266개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
-- **🪼 해파리의 퐁퐁 방울 터뜨리기 · 🌌 반짝 별자리 잇기 추가 (2026-09-17)** — 바닷속 오색 비눗방울 탭 팝 아케이드와 밤하늘 번호 순서 별자리 완성 감성 퍼즐 미니게임 2종 추가 (총 264개). 단일 HTML, 외부 의존성 없음, Web Audio 효과음.
-- **✨ 마법 가마솥의 퐁당 물약 · 🦊 사막여우의 모래언덕 통통 추가 (2026-09-16)** — 별가루와 마법 재료를 받는 가마솥 캐치와 모래 언덕 발판을 도약하는 버티컬 점프 미니게임 2종 추가 (총 262개). 단일 HTML, 외부 의존성 없음.
-- **🍬 달콤 젤리 사탕 공장 · ❄️ 오로라 북극곰의 얼음 썰매 추가 (2026-09-15)** — 컨베이어 벨트 젤리 사탕 리듬 패킹과 오로라 빙판길 3레인 슬라이딩 런 미니게임 2종 추가 (총 260개). 단일 HTML, 외부 의존성 없음.
-- **🌈 무지개 카멜레온의 색깔 냠냠 · 🚀 우주 탐사차의 크리스탈 대쉬 추가 (2026-09-14)** — 날아오는 곤충 젤리 색채 반응 아케이드와 저중력 부스터 분화구 점프 런 미니게임 2종 추가 (총 258개). 단일 HTML, 외부 의존성 없음.
-- **✨ 반짝 별자리 엮기 · 🐋 방울 고래의 심해 다이빙 추가 (2026-09-13)** — 밤하늘 별들을 잇는 챠임 멜로디 힐링 퍼즐과 아기 고래 심해 다이빙 해양 어드벤처 미니게임 2종 추가 (총 256개). 단일 HTML, 외부 의존성 없음.
-- **🦋 햇살 나비의 마법 정원 · 💎 반짝 보석 광산 열차 추가 (2026-09-12)** — 꿀방울 수집 힐링 터치 비행과 3레일 보석 수집 스피드 레일 아케이드 미니게임 2종 추가 (총 254개). 단일 HTML, 외부 의존성 없음.
-- **🧁 달콤 마법 베이커리 파티시에 · 🐳 몽실몽실 구름고래의 꿈나라 비행 추가 (2026-09-11)** — 무지개 생크림 토핑 3단 케이크 베이킹과 밤하늘 핑크 구름고래 플라잉 어드벤처 미니게임 2종 추가 (총 252개). 단일 HTML, 외부 의존성 없음.
+- 2026-09-24: [🐿️ 아기 다람쥐의 도토리 굴리기 대작전](squirrel-acorn-bowling/index.html), [🐳 아기 고래의 오색 무지개 물뿜기](whale-rainbow-fountain/index.html) (총 278개)
+- 2026-09-23: [🦦 아기 수달의 퐁당퐁당 조개 잡기](otter-river-clam-catch/index.html), [🐲 아기 용의 말랑말랑 불꽃 과일 굽기](dragon-baby-fire-fruit/index.html) (총 278개)
+- 2026-09-22: [🦔 아기 고슴도치의 데굴데굴 가을 밤송이](hedgehog-chestnut-roll/index.html), [🦉 부엉이 박사님의 반짝반짝 별자리 잇기](owl-star-constellation/index.html) (총 278개)
+- **🐿️ 다람쥐의 가을 도토리 퐁퐁 바구니 · 🦎 꼬마 카멜레온의 알록달록 나뭇잎 숨바꼭질 추가 (2026-09-21)** — 단풍나무 아래 도토리 바구니 캐치 아케이드와 나뭇잎 색채 변화 위장 매칭 퍼즐 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
+- **🐝 꿀벌의 꽃밭 꿀방울 모으기 · 🏮 마법 호롱불 반딧불이 길 추가 (2026-09-19)** — 꽃밭 꿀방울 수집 힐링 비행 아케이드와 밤숲 호롱불 멜로디 기억 순서 퍼즐 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
+- **🍓 무지개 과일 스무디 바 · 🐧 꼬마 펭귄의 빙하 퐁당퐁당 추가 (2026-09-18)** — 떨어지는 과일을 터치해 무지개 스무디 잔을 채우는 힐링 아케이드와 얼음 유빙을 건너는 타이밍 점프 모험 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
+- **🪼 해파리의 퐁퐁 방울 터뜨리기 · 🌌 반짝 별자리 잇기 추가 (2026-09-17)** — 바닷속 오색 비눗방울 탭 팝 아케이드와 밤하늘 번호 순서 별자리 완성 감성 퍼즐 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음, Web Audio 효과음.
+- **✨ 마법 가마솥의 퐁당 물약 · 🦊 사막여우의 모래언덕 통통 추가 (2026-09-16)** — 별가루와 마법 재료를 받는 가마솥 캐치와 모래 언덕 발판을 도약하는 버티컬 점프 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
+- **🍬 달콤 젤리 사탕 공장 · ❄️ 오로라 북극곰의 얼음 썰매 추가 (2026-09-15)** — 컨베이어 벨트 젤리 사탕 리듬 패킹과 오로라 빙판길 3레인 슬라이딩 런 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
+- **🌈 무지개 카멜레온의 색깔 냠냠 · 🚀 우주 탐사차의 크리스탈 대쉬 추가 (2026-09-14)** — 날아오는 곤충 젤리 색채 반응 아케이드와 저중력 부스터 분화구 점프 런 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
+- **✨ 반짝 별자리 엮기 · 🐋 방울 고래의 심해 다이빙 추가 (2026-09-13)** — 밤하늘 별들을 잇는 챠임 멜로디 힐링 퍼즐과 아기 고래 심해 다이빙 해양 어드벤처 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
+- **🦋 햇살 나비의 마법 정원 · 💎 반짝 보석 광산 열차 추가 (2026-09-12)** — 꿀방울 수집 힐링 터치 비행과 3레일 보석 수집 스피드 레일 아케이드 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
+- **🧁 달콤 마법 베이커리 파티시에 · 🐳 몽실몽실 구름고래의 꿈나라 비행 추가 (2026-09-11)** — 무지개 생크림 토핑 3단 케이크 베이킹과 밤하늘 핑크 구름고래 플라잉 어드벤처 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
 - **🧋 버블티 펄 퐁퐁 · 🚀 250호 기념 우주 별자리 레인저 추가 (2026-09-09)** — 타피오카 펄 버블티 제조 힐링 터치 놀이와 250회 기념 우주 별자리 완성 스페이스 어드벤처 미니게임 2종 추가 (총 250개 대기록 달성). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, Pointer Events 최적화.
-- **🍮 말랑말랑 젤리 트램펄린 · 🫧 반짝반짝 심해 잠수함 탐험 추가 (2026-09-08)** — 푸딩 젤리 트램펄린 바운스 놀이와 심해 잠수함 유영 탐험 미니게임 2종 추가 (총 248개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, 터치 반응형 최적화.
-- **🐧 오로라 펭귄의 눈썰매 슬라이드 · ✨ 우주 별자리 잇기 탐험 추가 (2026-09-06)** — 오로라 빙판길을 미끄러지는 스피드 슬라이드와 우주 별들을 선으로 잇는 별자리 지각 미니게임 2종 추가 (총 246개). 단일 HTML, 외부 의존성 없음, Pointer Events 통합 조작.
-- **🌈 알록달록 무지개 비눗방울 팡팡 · 🔮 반짝반짝 마법 수정 동굴 탐험 추가 (2026-09-05)** — 화면 가득 떠오르는 비눗방울 터치 놀이와 보석 카트 수집 아케이드 미니게임 2종 추가 (총 244개). 단일 HTML, 외부 의존성 없음.
-- **🐳 별빛 고래의 하늘 비행 · 🐿️ 도토리 퐁퐁 발사기 추가 (2026-09-03)** — 은하수 밤하늘을 헤엄치는 비행 놀이와 다람쥐 도토리 물리 조준 골인 미니게임 2종 추가 (총 242개). 단일 HTML, 외부 의존성 없음.
-- **✨ 반짝반짝 반딧불이 호롱불 · 💎 무지개 보석 광산 열차 추가 (2026-09-02)** — 밤하늘 반딧불이 힐링 터치 놀이와 쏟아지는 오색 보석 광차 레일 액션 미니게임 2종 추가 (총 240개). 단일 HTML, 외부 의존성 없음.
-- **🌊 해저 진주 조개 찾기 · 🍪 아기 몬스터 쿠키 먹이기 추가 (2026-09-02)** — 조개 터치 진주 수집 액션과 쿠키 맞춤 드래그 수집 미니게임 2종 추가 (총 238개). 단일 HTML, 외부 의존성 없음.
+- **🍮 말랑말랑 젤리 트램펄린 · 🫧 반짝반짝 심해 잠수함 탐험 추가 (2026-09-08)** — 푸딩 젤리 트램펄린 바운스 놀이와 심해 잠수함 유영 탐험 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 CDN 의존성 없음, Web Audio 효과음, 터치 반응형 최적화.
+- **🐧 오로라 펭귄의 눈썰매 슬라이드 · ✨ 우주 별자리 잇기 탐험 추가 (2026-09-06)** — 오로라 빙판길을 미끄러지는 스피드 슬라이드와 우주 별들을 선으로 잇는 별자리 지각 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음, Pointer Events 통합 조작.
+- **🌈 알록달록 무지개 비눗방울 팡팡 · 🔮 반짝반짝 마법 수정 동굴 탐험 추가 (2026-09-05)** — 화면 가득 떠오르는 비눗방울 터치 놀이와 보석 카트 수집 아케이드 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
+- **🐳 별빛 고래의 하늘 비행 · 🐿️ 도토리 퐁퐁 발사기 추가 (2026-09-03)** — 은하수 밤하늘을 헤엄치는 비행 놀이와 다람쥐 도토리 물리 조준 골인 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
+- **✨ 반짝반짝 반딧불이 호롱불 · 💎 무지개 보석 광산 열차 추가 (2026-09-02)** — 밤하늘 반딧불이 힐링 터치 놀이와 쏟아지는 오색 보석 광차 레일 액션 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
+- **🌊 해저 진주 조개 찾기 · 🍪 아기 몬스터 쿠키 먹이기 추가 (2026-09-02)** — 조개 터치 진주 수집 액션과 쿠키 맞춤 드래그 수집 미니게임 2종 추가 (총 278개). 단일 HTML, 외부 의존성 없음.
 
 ## 최근 변경사항 (2026-08)
 
