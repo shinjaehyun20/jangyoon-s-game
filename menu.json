@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "alpaca-rainbow-cloud-jump",
+        "title": "🦙 보들보들 아기 알파카의 무지개 구름점프",
+        "path": "alpaca-rainbow-cloud-jump/index.html"
+      },
+      {
+        "id": "koala-eucalyptus-leaf-glide",
+        "title": "🐨 꼬마 코알라의 살랑살랑 유칼립투스 글라이더",
+        "path": "koala-eucalyptus-leaf-glide/index.html"
+      },
+      {
         "id": "hedgehog-strawberry-roll",
         "title": "🦔 아기 고슴도치의 달콤 딸기 굴리기",
         "path": "hedgehog-strawberry-roll/index.html"

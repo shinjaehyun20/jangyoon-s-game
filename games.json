@@ -2222,5 +2222,21 @@
     "description": "신비로운 북극 하늘에 펼쳐진 무지개 오로라 레일을 타고 부드럽게 미끄러지며 반짝이는 별빛 크리스탈을 모으는 스와이프 힐링 아케이드 미니게임입니다.",
     "thumbnail": "penguin-aurora-slide/thumb.svg",
     "path": "penguin-aurora-slide/index.html"
+  },
+  {
+    "id": "koala-eucalyptus-leaf-glide",
+    "title": "Baby Koala Eucalyptus Glide",
+    "title_ko": "🐨 꼬마 코알라의 살랑살랑 유칼립투스 글라이더",
+    "description": "초록빛 숲속에서 유칼립투스 잎사귀를 타고 바람을 가르며 부드럽게 하늘을 날아오르는 힐링 터치 글라이딩 미니게임입니다.",
+    "thumbnail": "koala-eucalyptus-leaf-glide/thumb.svg",
+    "path": "koala-eucalyptus-leaf-glide/index.html"
+  },
+  {
+    "id": "alpaca-rainbow-cloud-jump",
+    "title": "Baby Alpaca Rainbow Cloud Jump",
+    "title_ko": "🦙 보들보들 아기 알파카의 무지개 구름점프",
+    "description": "폭신폭신한 무지개 구름을 퐁퐁 딛고 하늘 높이 올라가며 별풍선 슈퍼 점프를 즐기는 귀여운 힐링 바운스 아케이드 미니게임입니다.",
+    "thumbnail": "alpaca-rainbow-cloud-jump/thumb.svg",
+    "path": "alpaca-rainbow-cloud-jump/index.html"
   }
 ]
