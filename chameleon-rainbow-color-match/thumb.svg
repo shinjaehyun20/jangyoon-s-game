@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="jungleBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#064E3B"/>
+      <stop offset="50%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="chamRainbow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F43F5E"/>
+      <stop offset="35%" stop-color="#FBBF24"/>
+      <stop offset="70%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="30" fill="url(#jungleBg)"/>
+
+  <!-- Jungle Leaves -->
+  <path d="M 0 50 Q 50 20 80 60 Q 40 80 0 50 Z" fill="#059669" opacity="0.6"/>
+  <path d="M 140 20 Q 180 10 200 45 Q 160 60 140 20 Z" fill="#059669" opacity="0.6"/>
+
+  <!-- Curved Tree Branch -->
+  <path d="M 20 160 Q 80 120 180 145" stroke="#78350F" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <path d="M 20 160 Q 80 120 180 145" stroke="#92400E" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+  <!-- Chameleon Body & Curled Tail -->
+  <g transform="translate(100, 115)">
+    <!-- Curled Tail -->
+    <path d="M -25 15 C -45 15 -50 -10 -35 -20 C -25 -25 -20 -10 -30 -5" stroke="url(#chamRainbow)" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+    <!-- Main Oval Body -->
+    <ellipse cx="0" cy="5" rx="28" ry="20" fill="url(#chamRainbow)"/>
+    <ellipse cx="0" cy="5" rx="20" ry="14" fill="#FFFFFF" opacity="0.2"/>
+
+    <!-- Chameleon Head -->
+    <ellipse cx="22" cy="-4" rx="16" ry="14" fill="url(#chamRainbow)"/>
+    <!-- Crest / Horn -->
+    <path d="M 12 -16 Q 22 -24 28 -14 Z" fill="url(#chamRainbow)"/>
+
+    <!-- Big Round Turret Eye -->
+    <circle cx="24" cy="-5" r="7" fill="#FEF08A"/>
+    <circle cx="26" cy="-5" r="3.5" fill="#1E293B"/>
+    <circle cx="27" cy="-6" r="1.2" fill="#FFFFFF"/>
+
+    <!-- Cute Smiling Mouth -->
+    <path d="M 28 3 Q 34 5 36 1" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+    <!-- Little Claws Gripping Branch -->
+    <ellipse cx="-10" cy="22" rx="4" ry="5" fill="#10B981"/>
+    <ellipse cx="12" cy="22" rx="4" ry="5" fill="#10B981"/>
+  </g>
+
+  <!-- Floating Color Bubbles -->
+  <circle cx="50" cy="45" r="9" fill="#EF4444"/>
+  <circle cx="48" cy="43" r="2.5" fill="#FFF"/>
+  <circle cx="105" cy="35" r="8" fill="#F59E0B"/>
+  <circle cx="103" cy="33" r="2" fill="#FFF"/>
+  <circle cx="155" cy="50" r="10" fill="#3B82F6"/>
+  <circle cx="152" cy="47" r="2.5" fill="#FFF"/>
+</svg>

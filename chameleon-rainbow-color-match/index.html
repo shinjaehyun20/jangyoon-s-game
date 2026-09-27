@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🦎 꼬마 카멜레온의 알록달록 색깔 맞추기</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #064E3B 0%, #047857 50%, #10B981 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #022c22;
+      box-shadow: 0 10px 35px rgba(16, 185, 129, 0.3);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(6, 78, 59, 0.85);
+      color: #A7F3D0;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+      backdrop-filter: blur(8px);
+    }
+    .home-btn {
+      color: #D1FAE5;
+      text-decoration: none;
+      font-size: 14px;
+      background: rgba(16, 185, 129, 0.25);
+      padding: 5px 12px;
+      border-radius: 14px;
+      transition: background 0.2s;
+    }
+    .badge {
+      background: rgba(16, 185, 129, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #6EE7B7;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #022c22;
+    }
+    #color-dock {
+      height: 90px;
+      background: rgba(6, 78, 59, 0.95);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 20px;
+      border-top: 2px solid rgba(16, 185, 129, 0.3);
+      z-index: 10;
+    }
+    .color-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 4px solid #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .color-btn:active {
+      transform: scale(0.9);
+    }
+    .btn-red { background: linear-gradient(135deg, #EF4444, #B91C1C); }
+    .btn-yellow { background: linear-gradient(135deg, #FBBF24, #D97706); }
+    .btn-green { background: linear-gradient(135deg, #10B981, #047857); }
+    .btn-blue { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 44, 34, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      color: white;
+      text-align: center;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+    .overlay h1 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #6EE7B7;
+      text-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+    }
+    .overlay p {
+      font-size: 15px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+      color: #A7F3D0;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      transition: transform 0.1s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../index.html" class="home-btn">🏠 아케이드</a>
+      <div id="score-display">점수: 0</div>
+      <div class="badge" id="combo-display">콤보 x0</div>
+    </header>
+    <canvas id="gameCanvas"></canvas>
+    <div id="color-dock">
+      <button class="color-btn btn-red" data-color="red"></button>
+      <button class="color-btn btn-yellow" data-color="yellow"></button>
+      <button class="color-btn btn-green" data-color="green"></button>
+      <button class="color-btn btn-blue" data-color="blue"></button>
+    </div>
+
+    <div id="start-overlay" class="overlay">
+      <h1>🦎 꼬마 카멜레온의 색깔 맞추기</h1>
+      <p>하늘에서 알록달록 무지개 과일이 떨어져요!<br>과일이 카멜레온에게 닿기 전에 아래 4가지 색깔 버튼을 눌러 카멜레온의 몸 색깔을 맞춰주세요!</p>
+      <button class="start-btn" id="start-btn">게임 시작!</button>
+    </div>
+
+    <div id="gameover-overlay" class="overlay" style="display: none;">
+      <h1>✨ 미션 완료!</h1>
+      <p id="gameover-msg">카멜레온과 즐겁게 놀았어요!</p>
+      <button class="start-btn" id="restart-btn">다시 놀기</button>
+    </div>
+  </div>
+
+  <script>
+    const COLORS = {
+      red: '#EF4444',
+      yellow: '#FBBF24',
+      green: '#10B981',
+      blue: '#3B82F6'
+    };
+    const COLOR_KEYS = ['red', 'yellow', 'green', 'blue'];
+
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    function playChime(success = true) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = success ? 'triangle' : 'sawtooth';
+        const freq = success ? 523.25 : 220;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        if (success) {
+          osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.15);
+        }
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      } catch (e) {}
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score-display');
+    const comboDisplay = document.getElementById('combo-display');
+    const startOverlay = document.getElementById('start-overlay');
+    const gameoverOverlay = document.getElementById('gameover-overlay');
+    const gameoverMsg = document.getElementById('gameover-msg');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    let width, height;
+    function resize() {
+      width = canvas.parentElement.clientWidth;
+      height = canvas.parentElement.clientHeight - 150;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let isPlaying = false;
+    let score = 0;
+    let combo = 0;
+    let currentColor = 'green';
+    let fruits = [];
+    let particles = [];
+    let spawnTimer = 0;
+    let tongueAnim = 0;
+
+    function addParticles(x, y, color, count = 10) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 6,
+          vy: (Math.random() - 0.5) * 6,
+          color,
+          radius: 3 + Math.random() * 3,
+          life: 1
+        });
+      }
+    }
+
+    function resetGame() {
+      score = 0;
+      combo = 0;
+      currentColor = 'green';
+      fruits = [];
+      particles = [];
+      spawnTimer = 0;
+      scoreDisplay.textContent = '점수: 0';
+      comboDisplay.textContent = '콤보 x0';
+    }
+
+    function spawnFruit() {
+      const col = COLOR_KEYS[Math.floor(Math.random() * COLOR_KEYS.length)];
+      fruits.push({
+        x: width / 2 + (Math.random() - 0.5) * 80,
+        y: -20,
+        color: col,
+        speed: 2.2 + Math.min(score * 0.005, 3.5),
+        radius: 18
+      });
+    }
+
+    function update() {
+      if (!isPlaying) return;
+
+      spawnTimer++;
+      if (spawnTimer % 65 === 0) spawnFruit();
+
+      const chamY = height - 60;
+      const chamX = width / 2;
+
+      for (let i = fruits.length - 1; i >= 0; i--) {
+        const f = fruits[i];
+        f.y += f.speed;
+
+        // Catch threshold
+        if (f.y >= chamY - 35) {
+          tongueAnim = 15;
+          if (f.color === currentColor) {
+            combo++;
+            score += 10 * combo;
+            playChime(true);
+            addParticles(chamX, chamY - 30, COLORS[f.color], 12);
+          } else {
+            combo = 0;
+            playChime(false);
+            addParticles(chamX, chamY - 30, '#94A3B8', 6);
+          }
+          scoreDisplay.textContent = `점수: ${score}`;
+          comboDisplay.textContent = `콤보 x${combo}`;
+          fruits.splice(i, 1);
+        }
+      }
+
+      if (tongueAnim > 0) tongueAnim--;
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.04;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Jungle Twilight Gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, height);
+      grad.addColorStop(0, '#064E3B');
+      grad.addColorStop(0.7, '#047857');
+      grad.addColorStop(1, '#065F46');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Tree Branch
+      const branchY = height - 50;
+      ctx.strokeStyle = '#78350F';
+      ctx.lineWidth = 16;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(30, branchY);
+      ctx.quadraticCurveTo(width / 2, branchY - 10, width - 30, branchY);
+      ctx.stroke();
+
+      // Falling Fruits
+      for (let f of fruits) {
+        ctx.fillStyle = COLORS[f.color];
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(f.x - 5, f.y - 5, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Chameleon
+      const chamX = width / 2;
+      const chamY = height - 65;
+
+      // Tongue Catch Animation
+      if (tongueAnim > 0) {
+        ctx.strokeStyle = '#F43F5E';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(chamX, chamY - 15);
+        ctx.lineTo(chamX, chamY - 35);
+        ctx.stroke();
+      }
+
+      // Body
+      ctx.fillStyle = COLORS[currentColor];
+      ctx.beginPath();
+      ctx.ellipse(chamX, chamY, 32, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Tail
+      ctx.strokeStyle = COLORS[currentColor];
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(chamX - 35, chamY - 4, 12, 0, Math.PI * 1.5);
+      ctx.stroke();
+
+      // Head
+      ctx.beginPath();
+      ctx.ellipse(chamX + 24, chamY - 8, 18, 15, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#FEF08A';
+      ctx.beginPath();
+      ctx.arc(chamX + 25, chamY - 10, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0F172A';
+      ctx.beginPath();
+      ctx.arc(chamX + 27, chamY - 10, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.arc(chamX + 28, chamY - 11, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Particles
+      for (let p of particles) {
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+    // Color Dock Event Listeners
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        initAudio();
+        const col = e.target.getAttribute('data-color');
+        if (col && COLORS[col]) {
+          currentColor = col;
+        }
+      });
+    });
+
+    startBtn.addEventListener('click', () => {
+      initAudio();
+      startOverlay.style.display = 'none';
+      resetGame();
+      isPlaying = true;
+    });
+
+    restartBtn.addEventListener('click', () => {
+      initAudio();
+      gameoverOverlay.style.display = 'none';
+      resetGame();
+      isPlaying = true;
+    });
+  </script>
+</body>
+</html>

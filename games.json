@@ -2238,5 +2238,21 @@
     "description": "폭신폭신한 무지개 구름을 퐁퐁 딛고 하늘 높이 올라가며 별풍선 슈퍼 점프를 즐기는 귀여운 힐링 바운스 아케이드 미니게임입니다.",
     "thumbnail": "alpaca-rainbow-cloud-jump/thumb.svg",
     "path": "alpaca-rainbow-cloud-jump/index.html"
+  },
+  {
+    "id": "chameleon-rainbow-color-match",
+    "title": "Baby Chameleon Rainbow Match",
+    "title_ko": "🦎 꼬마 카멜레온의 알록달록 색깔 맞추기",
+    "description": "하늘에서 떨어지는 알록달록 무지개 과일에 맞춰 4가지 색깔 버튼으로 카멜레온의 몸 색깔을 퐁퐁 바꾸는 직관적인 컬러 매칭 터치 아케이드 미니게임입니다.",
+    "thumbnail": "chameleon-rainbow-color-match/thumb.svg",
+    "path": "chameleon-rainbow-color-match/index.html"
+  },
+  {
+    "id": "meerkat-desert-gem-scout",
+    "title": "Baby Meerkat Desert Gem Scout",
+    "title_ko": "🐿️ 꼬마 미어캣의 요리조리 사막 보석 탐험",
+    "description": "사막 모래 언덕 굴에서 쏙쏙 고개를 내밀며 반짝이는 보석을 톡톡 터치하여 모으는 귀여운 타이밍 순발력 아케이드 미니게임입니다.",
+    "thumbnail": "meerkat-desert-gem-scout/thumb.svg",
+    "path": "meerkat-desert-gem-scout/index.html"
   }
 ]

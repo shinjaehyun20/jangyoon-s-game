@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "meerkat-desert-gem-scout",
+        "title": "🐿️ 꼬마 미어캣의 요리조리 사막 보석 탐험",
+        "path": "meerkat-desert-gem-scout/index.html"
+      },
+      {
+        "id": "chameleon-rainbow-color-match",
+        "title": "🦎 꼬마 카멜레온의 알록달록 색깔 맞추기",
+        "path": "chameleon-rainbow-color-match/index.html"
+      },
+      {
         "id": "alpaca-rainbow-cloud-jump",
         "title": "🦙 보들보들 아기 알파카의 무지개 구름점프",
         "path": "alpaca-rainbow-cloud-jump/index.html"
