@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "happy-quokka-sunny-flower-catch",
+        "title": "🐾 행복한 아기 쿼카의 햇살 꽃송이 모으기",
+        "path": "happy-quokka-sunny-flower-catch/index.html"
+      },
+      {
+        "id": "fawn-forest-firefly-dance",
+        "title": "🦌 아기 꽃사슴의 반딧불이 밤숲 댄스",
+        "path": "fawn-forest-firefly-dance/index.html"
+      },
+      {
         "id": "meerkat-desert-gem-scout",
         "title": "🐿️ 꼬마 미어캣의 요리조리 사막 보석 탐험",
         "path": "meerkat-desert-gem-scout/index.html"

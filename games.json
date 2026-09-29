@@ -2254,5 +2254,21 @@
     "description": "사막 모래 언덕 굴에서 쏙쏙 고개를 내밀며 반짝이는 보석을 톡톡 터치하여 모으는 귀여운 타이밍 순발력 아케이드 미니게임입니다.",
     "thumbnail": "meerkat-desert-gem-scout/thumb.svg",
     "path": "meerkat-desert-gem-scout/index.html"
+  },
+  {
+    "id": "fawn-forest-firefly-dance",
+    "title": "Baby Fawn Forest Firefly Dance",
+    "title_ko": "🦌 아기 꽃사슴의 반딧불이 밤숲 댄스",
+    "description": "달빛 비치는 신비로운 밤의 숲속에서 꽃화관을 쓴 사랑스러운 아기 사슴과 함께 반짝이는 오색 반딧불이를 모아 아름다운 별자리 멜로디를 만드는 힐링 터치 미니게임입니다.",
+    "thumbnail": "fawn-forest-firefly-dance/thumb.svg",
+    "path": "fawn-forest-firefly-dance/index.html"
+  },
+  {
+    "id": "happy-quokka-sunny-flower-catch",
+    "title": "Happy Quokka Sunny Flower Catch",
+    "title_ko": "🐾 행복한 아기 쿼카의 햇살 꽃송이 모으기",
+    "description": "호주 로트네스트 섬의 따스한 햇살 아래, 늘 활짝 웃는 귀여운 아기 쿼카와 함께 하늘에서 살랑살랑 떨어지는 알록달록 꽃송이와 달콤한 유칼립투스 잎을 모으는 힐링 미니게임입니다.",
+    "thumbnail": "happy-quokka-sunny-flower-catch/thumb.svg",
+    "path": "happy-quokka-sunny-flower-catch/index.html"
   }
 ]

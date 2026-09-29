@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🦌 아기 꽃사슴의 반딧불이 밤숲 댄스</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #090A1A 0%, #1E1B4B 50%, #312E81 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #0f172a;
+      box-shadow: 0 10px 35px rgba(49, 46, 129, 0.45);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.85);
+      color: #DDD6FE;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+      border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+      backdrop-filter: blur(8px);
+    }
+    .home-btn {
+      color: #F5F3FF;
+      text-decoration: none;
+      font-size: 14px;
+      background: rgba(139, 92, 246, 0.3);
+      padding: 5px 12px;
+      border-radius: 14px;
+      transition: background 0.2s;
+    }
+    .badge {
+      background: rgba(139, 92, 246, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #DDD6FE;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+    .screen-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      z-index: 20;
+      color: #F5F3FF;
+      backdrop-filter: blur(6px);
+    }
+    .screen-overlay h1 {
+      font-size: 27px;
+      margin-bottom: 14px;
+      color: #DDD6FE;
+      text-shadow: 0 3px 12px rgba(167, 139, 250, 0.5);
+      line-height: 1.3;
+    }
+    .screen-overlay p {
+      font-size: 15px;
+      color: #EDE9FE;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+      color: #FFF;
+      border: none;
+      padding: 14px 38px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../index.html" class="home-btn">🏠 홈</a>
+      <span class="badge" id="score-display">반딧불: 0</span>
+      <span class="badge" id="timer-display">시간: 45초</span>
+    </header>
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="start-screen" class="screen-overlay">
+      <h1>🦌 아기 꽃사슴의<br>반딧불이 밤숲 댄스</h1>
+      <p>
+        신비로운 달빛 밤하늘 아래에서<br>
+        꽃화관을 쓴 아기 꽃사슴과 함께 뛰놀며<br>
+        반짝이는 <strong>오색 반딧불이</strong>들을 모아보세요!<br>
+        아름다운 별자리 멜로디가 울려 퍼져요 ✨
+      </p>
+      <button class="start-btn" id="start-btn">밤숲 산책 시작! 🌙</button>
+    </div>
+
+    <div id="gameover-screen" class="screen-overlay hidden">
+      <h1 id="gameover-title">별빛 댄스 파티 완료! ✨</h1>
+      <p id="gameover-desc">
+        오늘 모은 반딧불 빛: <strong id="final-score" style="font-size: 24px; color: #FDE047;">0</strong>점<br>
+        <span id="best-score" style="font-size: 14px; opacity: 0.9;">최고 기록: 0점</span>
+      </p>
+      <button class="start-btn" id="restart-btn">다시 산책하기 🦌</button>
+    </div>
+  </div>
+
+  <script>
+    // Musical Pentatonic Chime Synthesizer
+    class ChimeSynthesizer {
+      constructor() {
+        this.ctx = null;
+        // Pentatonic Scale: C5, D5, E5, G5, A5, C6
+        this.pitches = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playNote(index = 0) {
+        if (!this.ctx) return;
+        const freq = this.pitches[index % this.pitches.length];
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.28, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.45);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.45);
+      }
+      playStarChime() {
+        if (!this.ctx) return;
+        [0, 2, 4, 5].forEach((n, i) => {
+          setTimeout(() => {
+            this.playNote(n);
+          }, i * 70);
+        });
+      }
+    }
+
+    const sound = new ChimeSynthesizer();
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score-display');
+    const timerDisplay = document.getElementById('timer-display');
+    const startScreen = document.getElementById('start-screen');
+    const gameoverScreen = document.getElementById('gameover-screen');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const finalScoreEl = document.getElementById('final-score');
+    const bestScoreEl = document.getElementById('best-score');
+
+    let width, height;
+    function resize() {
+      width = canvas.width = canvas.clientWidth;
+      height = canvas.height = canvas.clientHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let isPlaying = false;
+    let score = 0;
+    let timeLeft = 45;
+    let timerId = null;
+    let bestScore = parseInt(localStorage.getItem('jangyoon_fawn_best') || '0', 10);
+
+    // Player: Baby Fawn
+    const fawn = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      targetY: 0,
+      facing: 1,
+      hopAnim: 0,
+      tailWag: 0
+    };
+
+    let fireflies = [];
+    let sparkles = [];
+    let backgroundStars = [];
+    let constellationLines = [];
+    let lastFireflySpawn = 0;
+
+    // Generate Background Stars
+    for (let i = 0; i < 40; i++) {
+      backgroundStars.push({
+        x: Math.random() * 450,
+        y: Math.random() * 500,
+        r: 0.8 + Math.random() * 1.5,
+        twinkle: Math.random() * Math.PI
+      });
+    }
+
+    function initGame() {
+      score = 0;
+      timeLeft = 45;
+      fireflies = [];
+      sparkles = [];
+      constellationLines = [];
+      fawn.x = width / 2;
+      fawn.y = height * 0.75;
+      fawn.targetX = width / 2;
+      fawn.targetY = height * 0.75;
+      updateHeader();
+
+      if (timerId) clearInterval(timerId);
+      timerId = setInterval(() => {
+        if (isPlaying) {
+          timeLeft--;
+          updateHeader();
+          if (timeLeft <= 0) {
+            clearInterval(timerId);
+            gameOver();
+          }
+        }
+      }, 1000);
+    }
+
+    function updateHeader() {
+      scoreDisplay.innerText = `반딧불: ${score}`;
+      timerDisplay.innerText = `시간: ${timeLeft}초`;
+    }
+
+    function spawnFirefly() {
+      const colors = [
+        { name: 'yellow', glow: '#FDE047', core: '#FEF08A', pitch: 0 },
+        { name: 'cyan', glow: '#67E8F9', core: '#A5F3FC', pitch: 1 },
+        { name: 'purple', glow: '#C084FC', core: '#E9D5FF', pitch: 2 },
+        { name: 'pink', glow: '#F472B6', core: '#FBCFE8', pitch: 3 },
+        { name: 'gold', glow: '#FBBF24', core: '#FFFBEB', pitch: 5, isGold: true }
+      ];
+      const isGolden = Math.random() < 0.15;
+      const col = isGolden ? colors[4] : colors[Math.floor(Math.random() * 4)];
+
+      fireflies.push({
+        x: 30 + Math.random() * (width - 60),
+        y: 40 + Math.random() * (height * 0.75),
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: (Math.random() - 0.5) * 1.2,
+        r: col.isGold ? 8 : 6,
+        color: col,
+        pulse: Math.random() * Math.PI,
+        aliveTime: 0
+      });
+    }
+
+    function createSparkle(x, y, color = '#FDE047', count = 12) {
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 1.5 + Math.random() * 3.5;
+        sparkles.push({
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          r: 1.5 + Math.random() * 2.5,
+          color,
+          alpha: 1,
+          decay: 0.02 + Math.random() * 0.02
+        });
+      }
+    }
+
+    // Input Handlers
+    function handlePointer(e) {
+      if (!isPlaying) return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      fawn.targetX = clientX - rect.left;
+      fawn.targetY = Math.max(height * 0.4, Math.min(height - 40, clientY - rect.top));
+
+      if (fawn.targetX > fawn.x + 5) fawn.facing = 1;
+      else if (fawn.targetX < fawn.x - 5) fawn.facing = -1;
+    }
+
+    canvas.addEventListener('mousemove', handlePointer);
+    canvas.addEventListener('touchmove', handlePointer, { passive: true });
+    canvas.addEventListener('touchstart', (e) => {
+      sound.init();
+      handlePointer(e);
+    }, { passive: true });
+
+    startBtn.addEventListener('click', () => {
+      sound.init();
+      startScreen.classList.add('hidden');
+      gameoverScreen.classList.add('hidden');
+      initGame();
+      isPlaying = true;
+    });
+
+    restartBtn.addEventListener('click', () => {
+      sound.init();
+      gameoverScreen.classList.add('hidden');
+      initGame();
+      isPlaying = true;
+    });
+
+    // Game Loop
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = now - lastTime;
+      lastTime = now;
+
+      // Draw Night Sky Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, '#090A1A');
+      skyGrad.addColorStop(0.5, '#1E1B4B');
+      skyGrad.addColorStop(0.85, '#312E81');
+      skyGrad.addColorStop(1, '#042F2E');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Moon & Moon Glow
+      const moonX = width - 70;
+      const moonY = 80;
+      const moonGlow = ctx.createRadialGradient(moonX, moonY, 10, moonX, moonY, 50);
+      moonGlow.addColorStop(0, 'rgba(254, 240, 138, 0.45)');
+      moonGlow.addColorStop(1, 'rgba(254, 240, 138, 0)');
+      ctx.fillStyle = moonGlow;
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, 50, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#FEF08A';
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, 22, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Twinkling Stars
+      backgroundStars.forEach(s => {
+        s.twinkle += 0.03;
+        const alpha = 0.3 + Math.sin(s.twinkle) * 0.4;
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, alpha)})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Distant Forest Hills
+      ctx.fillStyle = '#090A1A';
+      ctx.beginPath();
+      ctx.moveTo(0, height * 0.82);
+      ctx.quadraticCurveTo(width * 0.25, height * 0.77, width * 0.5, height * 0.81);
+      ctx.quadraticCurveTo(width * 0.75, height * 0.85, width, height * 0.8);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      // Grassy Meadow Foreground
+      ctx.fillStyle = '#064E3B';
+      ctx.beginPath();
+      ctx.moveTo(0, height * 0.88);
+      ctx.quadraticCurveTo(width * 0.5, height * 0.85, width, height * 0.89);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      // Constellation Lines between recently collected points
+      for (let i = constellationLines.length - 1; i >= 0; i--) {
+        const line = constellationLines[i];
+        line.alpha -= 0.015;
+        if (line.alpha <= 0) {
+          constellationLines.splice(i, 1);
+          continue;
+        }
+        ctx.strokeStyle = `rgba(254, 240, 138, ${line.alpha})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(line.x1, line.y1);
+        ctx.lineTo(line.x2, line.y2);
+        ctx.stroke();
+      }
+
+      if (isPlaying) {
+        // Spawn fireflies
+        if (fireflies.length < 8 && now - lastFireflySpawn > 700) {
+          spawnFirefly();
+          lastFireflySpawn = now;
+        }
+
+        // Fawn Movement & Animation
+        const dx = fawn.targetX - fawn.x;
+        const dy = fawn.targetY - fawn.y;
+        fawn.x += dx * 0.14;
+        fawn.y += dy * 0.14;
+        const moving = Math.hypot(dx, dy) > 2;
+        fawn.hopAnim = moving ? Math.sin(now * 0.012) * 5 : Math.sin(now * 0.003) * 2;
+        fawn.tailWag = Math.sin(now * 0.01) * 0.3;
+
+        // Fireflies Update
+        for (let i = fireflies.length - 1; i >= 0; i--) {
+          const f = fireflies[i];
+          f.pulse += 0.05;
+          f.x += f.vx + Math.sin(f.pulse) * 0.4;
+          f.y += f.vy + Math.cos(f.pulse) * 0.3;
+
+          // Gentle bounds
+          if (f.x < 20 || f.x > width - 20) f.vx *= -1;
+          if (f.y < 30 || f.y > height * 0.85) f.vy *= -1;
+
+          // Distance to fawn snout/flower crown
+          const dist = Math.hypot(f.x - fawn.x, f.y - (fawn.y - 20 + fawn.hopAnim));
+          if (dist < f.r + 34) {
+            // Collected!
+            const pts = f.color.isGold ? 300 : 100;
+            score += pts;
+            updateHeader();
+
+            if (f.color.isGold) {
+              sound.playStarChime();
+              createSparkle(f.x, f.y, '#FDE047', 20);
+            } else {
+              sound.playNote(f.color.pitch);
+              createSparkle(f.x, f.y, f.color.glow, 12);
+            }
+
+            // Add constellation link
+            if (fireflies.length > 1) {
+              const other = fireflies[(i + 1) % fireflies.length];
+              constellationLines.push({
+                x1: f.x, y1: f.y,
+                x2: other.x, y2: other.y,
+                alpha: 0.8
+              });
+            }
+
+            fireflies.splice(i, 1);
+            continue;
+          }
+        }
+      }
+
+      // Draw Fireflies with glowing halos
+      fireflies.forEach(f => {
+        ctx.save();
+        const glowRadius = f.r * (2.4 + Math.sin(f.pulse) * 0.4);
+
+        // Radial Glow
+        const rad = ctx.createRadialGradient(f.x, f.y, 1, f.x, f.y, glowRadius);
+        rad.addColorStop(0, f.color.core);
+        rad.addColorStop(0.5, f.color.glow);
+        rad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = rad;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tiny Core
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Little gossamer wings
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.beginPath();
+        ctx.ellipse(f.x - 3, f.y - 4, 3, 1.5, -0.4, 0, Math.PI * 2);
+        ctx.ellipse(f.x + 3, f.y - 4, 3, 1.5, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      // Draw Baby Fawn
+      drawFawn(fawn.x, fawn.y + fawn.hopAnim, fawn.facing);
+
+      // Draw Sparkles
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        const p = sparkles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) {
+          sparkles.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function drawFawn(x, y, facing) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(facing, 1);
+
+      // Shadow on Grass
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.beginPath();
+      ctx.ellipse(0, 16, 26, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Fawn Body
+      ctx.fillStyle = '#D97706';
+      ctx.beginPath();
+      ctx.ellipse(-4, 0, 20, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cute White Spots
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      [-10, -4, 2].forEach((sx, idx) => {
+        ctx.beginPath();
+        ctx.arc(sx, -4 + (idx % 2) * 4, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Slender Legs
+      ctx.fillStyle = '#B45309';
+      ctx.fillRect(-14, 8, 3.5, 12);
+      ctx.fillRect(-4, 8, 3.5, 12);
+      ctx.fillRect(4, 8, 3.5, 12);
+      ctx.fillRect(10, 8, 3.5, 12);
+      // Hooves
+      ctx.fillStyle = '#1C1917';
+      [-14, -4, 4, 10].forEach(lx => {
+        ctx.fillRect(lx, 18, 4, 2.5);
+      });
+
+      // Tail with wag
+      ctx.save();
+      ctx.translate(-22, -2);
+      ctx.rotate(fawn.tailWag);
+      ctx.fillStyle = '#D97706';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 4, 6, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FEF3C7';
+      ctx.beginPath();
+      ctx.ellipse(1, 0, 2.5, 4, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Graceful Neck & Head
+      ctx.fillStyle = '#D97706';
+      ctx.beginPath();
+      ctx.moveTo(4, -4);
+      ctx.lineTo(12, -18);
+      ctx.lineTo(20, -14);
+      ctx.lineTo(12, 2);
+      ctx.closePath();
+      ctx.fill();
+
+      // Head
+      ctx.beginPath();
+      ctx.arc(16, -18, 12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Snout
+      ctx.fillStyle = '#FEF3C7';
+      ctx.beginPath();
+      ctx.ellipse(24, -16, 7, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Black Nose
+      ctx.fillStyle = '#1C1917';
+      ctx.beginPath();
+      ctx.ellipse(29, -17, 2.5, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Big Gentle Doe Eye
+      ctx.fillStyle = '#0F172A';
+      ctx.beginPath();
+      ctx.ellipse(18, -20, 3.5, 4.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.arc(17, -21.5, 1.4, 0, Math.PI * 2);
+      ctx.arc(19, -19.5, 0.7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ear
+      ctx.fillStyle = '#D97706';
+      ctx.beginPath();
+      ctx.ellipse(8, -26, 4, 9, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FEF3C7';
+      ctx.beginPath();
+      ctx.ellipse(8, -26, 2, 6, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Colorful Flower Crown
+      ctx.fillStyle = '#EC4899';
+      ctx.beginPath();
+      ctx.arc(12, -28, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#38BDF8';
+      ctx.beginPath();
+      ctx.arc(17, -29, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FACC15';
+      ctx.beginPath();
+      ctx.arc(22, -27, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function gameOver() {
+      isPlaying = false;
+      if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem('jangyoon_fawn_best', bestScore);
+      }
+      finalScoreEl.innerText = score;
+      bestScoreEl.innerText = `최고 기록: ${bestScore}점`;
+      gameoverScreen.classList.remove('hidden');
+    }
+
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

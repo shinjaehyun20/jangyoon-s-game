@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nightSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="50%" stop-color="#1E1B4B"/>
+      <stop offset="100%" stop-color="#312E81"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FEF08A" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#FDE047" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#FEF08A" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fawnCoat" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="30" fill="url(#nightSky)"/>
+
+  <!-- Glowing Full Moon & Mist -->
+  <circle cx="150" cy="50" r="38" fill="url(#moonGlow)"/>
+  <circle cx="150" cy="50" r="20" fill="#FEF08A"/>
+
+  <!-- Distant Forest Pine Silhouettes -->
+  <path d="M 0 160 L 25 125 L 50 160 L 75 120 L 105 160 L 140 128 L 175 160 L 200 135 L 200 200 L 0 200 Z" fill="#090A1A" opacity="0.7"/>
+  <path d="M 0 170 Q 100 155 200 170 L 200 200 L 0 200 Z" fill="#042F2E"/>
+
+  <!-- Adorable Baby Fawn with Flower Crown -->
+  <g transform="translate(90, 115)">
+    <!-- Body -->
+    <ellipse cx="12" cy="22" rx="24" ry="16" fill="url(#fawnCoat)"/>
+    <!-- Cute White Spots on Back -->
+    <circle cx="6" cy="16" r="1.8" fill="#FFF" opacity="0.9"/>
+    <circle cx="14" cy="14" r="1.8" fill="#FFF" opacity="0.9"/>
+    <circle cx="22" cy="18" r="1.8" fill="#FFF" opacity="0.9"/>
+    <circle cx="15" cy="24" r="1.6" fill="#FFF" opacity="0.9"/>
+
+    <!-- Slender Legs -->
+    <rect x="0" y="32" width="4.5" height="20" rx="2" fill="#B45309"/>
+    <rect x="18" y="32" width="4.5" height="20" rx="2" fill="#B45309"/>
+    <rect x="4" y="50" width="5" height="3" fill="#1C1917"/>
+    <rect x="22" y="50" width="5" height="3" fill="#1C1917"/>
+
+    <!-- Cute Fluffy Tail -->
+    <ellipse cx="34" cy="15" rx="5" ry="7" transform="rotate(30 34 15)" fill="#D97706"/>
+    <ellipse cx="36" cy="15" rx="3" ry="5" transform="rotate(30 36 15)" fill="#FEF3C7"/>
+
+    <!-- Slender Graceful Neck & Head -->
+    <path d="M -2 20 L -8 0 L 2 0 L 6 20 Z" fill="url(#fawnCoat)"/>
+    <circle cx="-6" cy="-4" r="15" fill="url(#fawnCoat)"/>
+
+    <!-- Snout & Nose -->
+    <ellipse cx="-16" cy="-1" rx="8" ry="6" fill="#FEF3C7"/>
+    <ellipse cx="-20" cy="-3" rx="2.8" ry="2" fill="#1C1917"/>
+
+    <!-- Large Doe Eyes -->
+    <ellipse cx="-9" cy="-6" rx="4" ry="5" fill="#0F172A"/>
+    <circle cx="-10" cy="-7.5" r="1.5" fill="#FFF"/>
+    <circle cx="-7.5" cy="-5" r="0.8" fill="#FFF"/>
+
+    <!-- Ears -->
+    <ellipse cx="3" cy="-14" rx="4.5" ry="11" transform="rotate(25 3 -14)" fill="#D97706"/>
+    <ellipse cx="3" cy="-14" rx="2.5" ry="8" transform="rotate(25 3 -14)" fill="#FEF3C7"/>
+
+    <!-- Tiny Little Antlers & Flower Crown -->
+    <circle cx="-8" cy="-15" r="3" fill="#EC4899"/>
+    <circle cx="-3" cy="-16" r="3" fill="#38BDF8"/>
+    <circle cx="2" cy="-15" r="3" fill="#FACC15"/>
+    <circle cx="-1" cy="-15" r="1.5" fill="#FFF"/>
+  </g>
+
+  <!-- Glowing Fireflies Floating Around -->
+  <!-- Yellow Firefly -->
+  <g transform="translate(45, 90)">
+    <circle cx="0" cy="0" r="7" fill="#FDE047" opacity="0.4"/>
+    <circle cx="0" cy="0" r="3.5" fill="#FEF08A"/>
+    <ellipse cx="-2" cy="-4" rx="2.5" ry="1" fill="#FFF" opacity="0.7"/>
+    <ellipse cx="2" cy="-4" rx="2.5" ry="1" fill="#FFF" opacity="0.7"/>
+  </g>
+  <!-- Aqua Firefly -->
+  <g transform="translate(145, 130)">
+    <circle cx="0" cy="0" r="6" fill="#67E8F9" opacity="0.4"/>
+    <circle cx="0" cy="0" r="3" fill="#A5F3FC"/>
+  </g>
+  <!-- Pink Firefly -->
+  <g transform="translate(50, 45)">
+    <circle cx="0" cy="0" r="6" fill="#F472B6" opacity="0.4"/>
+    <circle cx="0" cy="0" r="3" fill="#FBCFE8"/>
+  </g>
+</svg>
