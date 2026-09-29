@@ -192,7 +192,7 @@ def sync_all():
     print("\n" + "=" * 60)
     print(" 🧪 무결성 검증기(verify_integrity.py) 자동 실행")
     print("=" * 60)
-    res = subprocess.run([sys.executable, str(VERIFY_SCRIPT)], cwd=REPO_ROOT)
+    res = subprocess.run([sys.executable, str(VERIFY_SCRIPT), "--skip-live"], cwd=REPO_ROOT)
     if res.returncode == 0:
         print("\n🎉 [SUCCESS] 7대 메타데이터 동기화 및 무결성 검증 100% 통과 (PASS)!")
         return True

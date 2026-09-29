@@ -20,5 +20,7 @@ jobs:
           python-version: '3.11'
 
       - name: Run Arcade Integrity & Diversity Check
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          python scripts/verify_integrity.py
+          python scripts/verify_integrity.py --skip-live

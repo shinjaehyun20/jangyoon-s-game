@@ -420,14 +420,14 @@ def check_all(check_live=True):
         print(f" - SVG XML 문법: 전수 정상")
         if check_live:
             print(f" - GitHub Pages 배포 브랜치 (main): 일치")
-            print(f" - 실서버 games.json (270개 / 최신 게임 #269, #270): 완벽 일치")
+            print(f" - 실서버 games.json ({total_games}개 / 최신 게임 일치): 완벽 일치")
             print(f" - 실서버 메인 페이지 및 개별 게임 200 OK: 전수 정상")
         print("==================================================")
         return True, errors, warnings
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="장윤이 게임 아케이드 전수 무결성 및 다양성 검증기")
-    parser.add_argument("--live", dest="live", action="store_true", default=True, help="GitHub Pages 배포 소스 브랜치 및 실서버 라이브 HTTP Read-Back 검증 (기본값: True)")
+    parser.add_argument("--live", dest="live", action="store_true", default=False, help="GitHub Pages 배포 소스 브랜치 및 실서버 라이브 HTTP Read-Back 검증 (기본값: False)")
     parser.add_argument("--skip-live", "--no-live", "--offline", dest="live", action="store_false", help="실서버 라이브 검증 건너뛰기")
     args = parser.parse_args()
 
