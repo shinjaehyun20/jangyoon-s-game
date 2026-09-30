@@ -2270,5 +2270,21 @@
     "description": "호주 로트네스트 섬의 따스한 햇살 아래, 늘 활짝 웃는 귀여운 아기 쿼카와 함께 하늘에서 살랑살랑 떨어지는 알록달록 꽃송이와 달콤한 유칼립투스 잎을 모으는 힐링 미니게임입니다.",
     "thumbnail": "happy-quokka-sunny-flower-catch/thumb.svg",
     "path": "happy-quokka-sunny-flower-catch/index.html"
+  },
+  {
+    "id": "red-panda-bamboo-lantern-float",
+    "title": "Baby Red Panda Bamboo Lantern Float",
+    "title_ko": "🏮 아기 레서판다의 대나무 풍등 띄우기",
+    "description": "달빛 비치는 신비로운 대나무 숲에서 귀여운 아기 레서판다와 함께 따스한 소원을 담은 알록달록 오색 풍등을 밤하늘 높이 띄우는 힐링 인터랙티브 터치 게임입니다.",
+    "thumbnail": "red-panda-bamboo-lantern-float/thumb.svg",
+    "path": "red-panda-bamboo-lantern-float/index.html"
+  },
+  {
+    "id": "sea-turtle-coral-reef-swim",
+    "title": "Baby Sea Turtle Coral Reef Swim",
+    "title_ko": "🐢 아기 바다거북의 산호초 무지개 헤엄",
+    "description": "에메랄드빛 맑고 투명한 열대 바닷속에서 아기 바다거북과 함께 오색 빛깔 산호초 사이를 유영하며 반짝이는 바다 진주와 마법 물방울을 모으는 힐링 터치 미니게임입니다.",
+    "thumbnail": "sea-turtle-coral-reef-swim/thumb.svg",
+    "path": "sea-turtle-coral-reef-swim/index.html"
   }
 ]

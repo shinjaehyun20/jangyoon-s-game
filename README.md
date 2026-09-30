@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 284개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 286개.
 
-[![Games](https://img.shields.io/badge/games-284-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-286-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![284개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![286개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,10 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 284개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 286개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🐢 아기 바다거북의 산호초 무지개 헤엄 (sea-turtle-coral-reef-swim)](./sea-turtle-coral-reef-swim/index.html) | 에메랄드빛 맑고 투명한 열대 바닷속에서 아기 바다거북과 함께 오색 빛깔 산호초 사이를 유영하며 반짝이는 바다 진주와 마법 물방울을 모으는 힐링 터치 미니게임입니다. | 어린이/아케이드 |
+| [🏮 아기 레서판다의 대나무 풍등 띄우기 (red-panda-bamboo-lantern-float)](./red-panda-bamboo-lantern-float/index.html) | 달빛 비치는 신비로운 대나무 숲에서 귀여운 아기 레서판다와 함께 따스한 소원을 담은 알록달록 오색 풍등을 밤하늘 높이 띄우는 힐링 인터랙티브 터치 게임입니다. | 어린이/아케이드 |
 | [🐾 행복한 아기 쿼카의 햇살 꽃송이 모으기 (happy-quokka-sunny-flower-catch)](./happy-quokka-sunny-flower-catch/index.html) | 호주 로트네스트 섬의 따스한 햇살 아래, 늘 활짝 웃는 귀여운 아기 쿼카와 함께 하늘에서 살랑살랑 떨어지는 알록달록 꽃송이와 달콤한 유칼립투스 잎을 모으는 힐링 미니게임입니다. | 어린이/아케이드 |
 | [🦌 아기 꽃사슴의 반딧불이 밤숲 댄스 (fawn-forest-firefly-dance)](./fawn-forest-firefly-dance/index.html) | 달빛 비치는 신비로운 밤의 숲속에서 꽃화관을 쓴 사랑스러운 아기 사슴과 함께 반짝이는 오색 반딧불이를 모아 아름다운 별자리 멜로디를 만드는 힐링 터치 미니게임입니다. | 어린이/아케이드 |
 | [🐿️ 꼬마 미어캣의 요리조리 사막 보석 탐험 (meerkat-desert-gem-scout)](./meerkat-desert-gem-scout/index.html) | 사막 모래 언덕 굴에서 쏙쏙 고개를 내밀며 반짝이는 보석을 톡톡 터치하여 모으는 귀여운 타이밍 순발력 아케이드 미니게임입니다. | 어린이/아케이드 |
@@ -480,6 +482,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-09)
+- 2026-09-30: [🏮 아기 레서판다의 대나무 풍등 띄우기](red-panda-bamboo-lantern-float/index.html), [🐢 아기 바다거북의 산호초 무지개 헤엄](sea-turtle-coral-reef-swim/index.html) (총 286개)
+
 - 2026-09-29: [🦌 아기 꽃사슴의 반딧불이 밤숲 댄스](fawn-forest-firefly-dance/index.html), [🐾 행복한 아기 쿼카의 햇살 꽃송이 모으기](happy-quokka-sunny-flower-catch/index.html) (총 284개)
 
 - 2026-09-28: [🦎 꼬마 카멜레온의 알록달록 색깔 맞추기](chameleon-rainbow-color-match/index.html), [🐿️ 꼬마 미어캣의 요리조리 사막 보석 탐험](meerkat-desert-gem-scout/index.html) (총 284개)

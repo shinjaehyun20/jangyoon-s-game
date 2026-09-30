@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "sea-turtle-coral-reef-swim",
+        "title": "🐢 아기 바다거북의 산호초 무지개 헤엄",
+        "path": "sea-turtle-coral-reef-swim/index.html"
+      },
+      {
+        "id": "red-panda-bamboo-lantern-float",
+        "title": "🏮 아기 레서판다의 대나무 풍등 띄우기",
+        "path": "red-panda-bamboo-lantern-float/index.html"
+      },
+      {
         "id": "happy-quokka-sunny-flower-catch",
         "title": "🐾 행복한 아기 쿼카의 햇살 꽃송이 모으기",
         "path": "happy-quokka-sunny-flower-catch/index.html"

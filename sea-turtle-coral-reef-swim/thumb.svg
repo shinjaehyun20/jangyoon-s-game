@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="60%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#0F766E"/>
+    </linearGradient>
+    <linearGradient id="turtleShell" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="50%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="turtleSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="pearlGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#E0E7FF"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+    <filter id="oceanGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Ocean Background -->
+  <rect width="200" height="200" rx="24" fill="url(#oceanGrad)"/>
+
+  <!-- Sun Rays in water -->
+  <polygon points="40,0 70,0 120,200 80,200" fill="#FFF" opacity="0.08"/>
+  <polygon points="110,0 150,0 180,200 130,200" fill="#FFF" opacity="0.07"/>
+
+  <!-- Corals on Ocean Floor -->
+  <path d="M 10 200 Q 15 155 30 160 Q 40 165 42 200 Z" fill="#F43F5E" opacity="0.85"/>
+  <path d="M 28 200 Q 38 145 52 155 Q 60 165 58 200 Z" fill="#FB7185" opacity="0.75"/>
+
+  <!-- Anemone / Brain coral right -->
+  <path d="M 140 200 Q 155 150 170 165 Q 185 155 195 200 Z" fill="#A855F7" opacity="0.85"/>
+  <circle cx="165" cy="165" r="14" fill="#C084FC" opacity="0.6"/>
+
+  <!-- Seaweed -->
+  <path d="M 80 200 Q 75 160 85 140 Q 92 120 86 100" stroke="#10B981" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <path d="M 95 200 Q 105 165 95 135 Q 90 115 98 90" stroke="#059669" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Bubbles -->
+  <circle cx="45" cy="90" r="4" fill="#E0F2FE" opacity="0.6"/>
+  <circle cx="48" cy="70" r="2.5" fill="#E0F2FE" opacity="0.7"/>
+  <circle cx="165" cy="110" r="5" fill="#E0F2FE" opacity="0.5"/>
+  <circle cx="160" cy="85" r="3" fill="#E0F2FE" opacity="0.6"/>
+  <circle cx="110" cy="40" r="3.5" fill="#E0F2FE" opacity="0.6"/>
+
+  <!-- Shiny Pearl floating -->
+  <g transform="translate(145, 60)" filter="url(#oceanGlow)">
+    <circle cx="0" cy="0" r="8" fill="url(#pearlGlow)"/>
+    <circle cx="-2" cy="-2" r="2.5" fill="#FFF"/>
+  </g>
+
+  <!-- Baby Sea Turtle -->
+  <g transform="translate(95, 95) rotate(-15)">
+    <!-- Back Flippers -->
+    <ellipse cx="-18" cy="22" rx="6" ry="12" fill="url(#turtleSkin)" transform="rotate(-30, -18, 22)"/>
+    <ellipse cx="18" cy="22" rx="6" ry="12" fill="url(#turtleSkin)" transform="rotate(30, 18, 22)"/>
+
+    <!-- Front Flippers (large graceful wings) -->
+    <path d="M -16 -6 C -35 -18 -48 -2 -34 16 C -24 18 -16 6 -16 -6 Z" fill="url(#turtleSkin)"/>
+    <path d="M 16 -6 C 35 -18 48 -2 34 16 C 24 18 16 6 16 -6 Z" fill="url(#turtleSkin)"/>
+
+    <!-- Shell / Carapace -->
+    <ellipse cx="0" cy="4" rx="24" ry="28" fill="url(#turtleShell)"/>
+    <!-- Shell Pattern / Scutes -->
+    <ellipse cx="0" cy="0" rx="8" ry="10" fill="#047857"/>
+    <polygon points="0,-16 -12,-8 -8,6 0,2" fill="#059669" opacity="0.7"/>
+    <polygon points="0,-16 12,-8 8,6 0,2" fill="#059669" opacity="0.7"/>
+    <polygon points="-8,6 0,2 8,6 0,18" fill="#059669" opacity="0.7"/>
+    <!-- Shell rim -->
+    <ellipse cx="0" cy="4" rx="25" ry="29" fill="none" stroke="#6EE7B7" stroke-width="1.8" opacity="0.7"/>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="-28" rx="11" ry="13" fill="url(#turtleSkin)"/>
+    <!-- Big cute eyes -->
+    <circle cx="-6" cy="-30" r="3.8" fill="#064E3B"/>
+    <circle cx="-7" cy="-31" r="1.3" fill="#FFF"/>
+    <circle cx="6" cy="-30" r="3.8" fill="#064E3B"/>
+    <circle cx="5" cy="-31" r="1.3" fill="#FFF"/>
+    <!-- Cheeks -->
+    <ellipse cx="-8" cy="-25" rx="2.5" ry="1.5" fill="#F43F5E" opacity="0.5"/>
+    <ellipse cx="8" cy="-25" rx="2.5" ry="1.5" fill="#F43F5E" opacity="0.5"/>
+    <!-- Smile -->
+    <path d="M -3 -24 Q 0 -22 3 -24" stroke="#064E3B" stroke-width="1" fill="none"/>
+
+    <!-- Tiny tail -->
+    <polygon points="-2,32 2,32 0,38" fill="url(#turtleSkin)"/>
+  </g>
+</svg>

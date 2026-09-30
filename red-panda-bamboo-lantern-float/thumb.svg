@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nightSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="60%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#064E3B"/>
+    </linearGradient>
+    <linearGradient id="pandaFur" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EA580C"/>
+      <stop offset="100%" stop-color="#9A3412"/>
+    </linearGradient>
+    <linearGradient id="lanternGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="40%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#DC2626"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Night Background -->
+  <rect width="200" height="200" rx="24" fill="url(#nightSky)"/>
+
+  <!-- Stars -->
+  <circle cx="35" cy="25" r="1" fill="#FEF08A" opacity="0.8"/>
+  <circle cx="85" cy="18" r="1.5" fill="#FEF08A" opacity="0.9"/>
+  <circle cx="165" cy="30" r="1.2" fill="#FEF08A" opacity="0.7"/>
+  <circle cx="140" cy="50" r="1" fill="#FEF08A" opacity="0.6"/>
+
+  <!-- Moon -->
+  <path d="M 160 20 A 14 14 0 1 0 178 38 A 12 12 0 1 1 160 20 Z" fill="#FDE047" opacity="0.9" filter="url(#glow)"/>
+
+  <!-- Bamboo Stems Background -->
+  <rect x="18" y="10" width="8" height="190" rx="3" fill="#047857" opacity="0.5"/>
+  <line x1="18" y1="60" x2="26" y2="60" stroke="#064E3B" stroke-width="2"/>
+  <line x1="18" y1="120" x2="26" y2="120" stroke="#064E3B" stroke-width="2"/>
+
+  <rect x="175" y="40" width="10" height="160" rx="4" fill="#047857" opacity="0.5"/>
+  <line x1="175" y1="90" x2="185" y2="90" stroke="#064E3B" stroke-width="2"/>
+  <line x1="175" y1="150" x2="185" y2="150" stroke="#064E3B" stroke-width="2"/>
+
+  <!-- Floating Lanterns -->
+  <!-- Left Lantern -->
+  <g transform="translate(40, 60)" filter="url(#glow)">
+    <rect x="-10" y="-14" width="20" height="28" rx="6" fill="url(#lanternGlow)"/>
+    <ellipse cx="0" cy="-14" rx="8" ry="2" fill="#78350F"/>
+    <ellipse cx="0" cy="14" rx="8" ry="2" fill="#78350F"/>
+    <line x1="0" y1="14" x2="0" y2="22" stroke="#DC2626" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="4" fill="#FFF" opacity="0.8"/>
+  </g>
+
+  <!-- Right Lantern -->
+  <g transform="translate(145, 80)" filter="url(#glow)">
+    <rect x="-12" y="-16" width="24" height="32" rx="7" fill="url(#lanternGlow)"/>
+    <ellipse cx="0" cy="-16" rx="9" ry="2.5" fill="#78350F"/>
+    <ellipse cx="0" cy="16" rx="9" ry="2.5" fill="#78350F"/>
+    <line x1="0" y1="16" x2="0" y2="26" stroke="#DC2626" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="5" fill="#FFF" opacity="0.85"/>
+  </g>
+
+  <!-- Red Panda Tail -->
+  <g transform="translate(130, 150) rotate(-25)">
+    <ellipse cx="0" cy="0" rx="14" ry="32" fill="#EA580C"/>
+    <!-- Stripes -->
+    <path d="M -13 -10 Q 0 -5 13 -10 Q 13 0 0 5 Q -13 0 -13 -10 Z" fill="#7C2D12"/>
+    <path d="M -13 10 Q 0 15 13 10 Q 13 20 0 25 Q -13 20 -13 10 Z" fill="#7C2D12"/>
+    <ellipse cx="0" cy="30" rx="10" ry="7" fill="#FEF3C7"/>
+  </g>
+
+  <!-- Red Panda Body -->
+  <ellipse cx="100" cy="155" rx="30" ry="26" fill="url(#pandaFur)"/>
+  <ellipse cx="100" cy="160" rx="20" ry="16" fill="#1C1917" opacity="0.8"/>
+
+  <!-- Ears -->
+  <polygon points="72,112 60,90 85,98" fill="#EA580C"/>
+  <polygon points="72,110 65,95 81,100" fill="#FFF"/>
+  <polygon points="128,112 140,90 115,98" fill="#EA580C"/>
+  <polygon points="128,110 135,95 119,100" fill="#FFF"/>
+
+  <!-- Head -->
+  <ellipse cx="100" cy="120" rx="28" ry="22" fill="url(#pandaFur)"/>
+
+  <!-- Face Markings -->
+  <ellipse cx="84" cy="126" rx="6" ry="7" fill="#FFF"/>
+  <ellipse cx="116" cy="126" rx="6" ry="7" fill="#FFF"/>
+  <path d="M 88 128 Q 100 132 112 128 Q 100 136 88 128 Z" fill="#FFF"/>
+
+  <!-- Eyes -->
+  <circle cx="88" cy="118" r="4.5" fill="#1C1917"/>
+  <circle cx="86" cy="116" r="1.5" fill="#FFF"/>
+  <circle cx="112" cy="118" r="4.5" fill="#1C1917"/>
+  <circle cx="110" cy="116" r="1.5" fill="#FFF"/>
+
+  <!-- Nose & Smile -->
+  <polygon points="98,124 102,124 100,127" fill="#1C1917"/>
+  <path d="M 97 127 Q 100 130 103 127" stroke="#1C1917" stroke-width="1.2" fill="none"/>
+
+  <!-- Cute Cheeks -->
+  <ellipse cx="80" cy="125" rx="4" ry="2.5" fill="#FB7185" opacity="0.6"/>
+  <ellipse cx="120" cy="125" rx="4" ry="2.5" fill="#FB7185" opacity="0.6"/>
+
+  <!-- Paws holding a mini lantern -->
+  <circle cx="86" cy="148" r="6" fill="#1C1917"/>
+  <circle cx="114" cy="148" r="6" fill="#1C1917"/>
+
+  <!-- Center Lantern held -->
+  <g transform="translate(100, 145)" filter="url(#glow)">
+    <rect x="-9" y="-12" width="18" height="24" rx="5" fill="#FBBF24"/>
+    <ellipse cx="0" cy="-12" rx="7" ry="2" fill="#B45309"/>
+    <ellipse cx="0" cy="12" rx="7" ry="2" fill="#B45309"/>
+    <circle cx="0" cy="0" r="4.5" fill="#FFF" opacity="0.9"/>
+  </g>
+</svg>

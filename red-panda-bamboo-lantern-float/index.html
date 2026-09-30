@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🏮 아기 레서판다의 대나무 풍등 띄우기</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #0F172A 0%, #1E293B 50%, #064E3B 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #091E2A;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.85);
+      color: #FEF08A;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+      border-bottom: 1px solid rgba(254, 240, 138, 0.2);
+      backdrop-filter: blur(8px);
+    }
+    .home-btn {
+      color: #FEF3C7;
+      text-decoration: none;
+      font-size: 14px;
+      background: rgba(234, 88, 12, 0.35);
+      padding: 5px 12px;
+      border-radius: 14px;
+      transition: background 0.2s;
+      border: 1px solid rgba(234, 88, 12, 0.5);
+    }
+    .badge {
+      background: rgba(6, 78, 59, 0.6);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #6EE7B7;
+      border: 1px solid rgba(110, 231, 183, 0.3);
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+    .screen-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.93);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      z-index: 20;
+      color: #F8FAFC;
+      backdrop-filter: blur(6px);
+    }
+    .screen-overlay h1 {
+      font-size: 26px;
+      margin-bottom: 14px;
+      color: #FDE047;
+      text-shadow: 0 3px 14px rgba(250, 204, 21, 0.5);
+      line-height: 1.3;
+    }
+    .screen-overlay p {
+      font-size: 15px;
+      color: #CBD5E1;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
+      color: #FFF;
+      border: none;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+    .stats-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(254, 240, 138, 0.3);
+      border-radius: 16px;
+      padding: 16px 28px;
+      margin-bottom: 20px;
+      color: #FEF08A;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../" class="home-btn">← 목록</a>
+      <span class="badge" id="score-display">점수: 0</span>
+      <span class="badge" id="timer-display">시간: 60초</span>
+    </header>
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen-overlay">
+      <div style="font-size: 60px; margin-bottom: 12px; filter: drop-shadow(0 0 16px rgba(249, 115, 22, 0.8));">🏮</div>
+      <h1>아기 레서판다의<br>대나무 풍등 띄우기</h1>
+      <p>달빛 비치는 신비로운 밤숲에서<br>올라오는 소원 풍등을 터치하여<br>밤하늘 가득 밝혀보세요!</p>
+      <button class="start-btn" id="start-button">소원 띄우기 시작</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen-overlay" style="display: none;">
+      <div style="font-size: 54px; margin-bottom: 10px;">✨🏮✨</div>
+      <h1>축하합니다!</h1>
+      <p id="gameover-desc">아기 레서판다와 함께 밤하늘을 환하게 밝혔어요!</p>
+      <div class="stats-card">
+        <div>최종 점수: <b id="final-score" style="color: #FBBF24; font-size: 22px;">0</b> 점</div>
+        <div>최대 연속 콤보: <b id="final-combo" style="color: #38BDF8;">0</b> 회</div>
+      </div>
+      <button class="start-btn" id="restart-button">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Audio Synthesis (Web Audio API Pentatonic Chimes) ---
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99]; // Pentatonic
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playChime(combo = 0) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        const noteIdx = (combo % this.notes.length);
+        const freq = this.notes[noteIdx];
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 1.2);
+
+        // Harmonics shimmer
+        const shimmer = this.ctx.createOscillator();
+        const sGain = this.ctx.createGain();
+        shimmer.type = 'triangle';
+        shimmer.frequency.setValueAtTime(freq * 2, now);
+        sGain.gain.setValueAtTime(0.1, now);
+        sGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        shimmer.connect(sGain);
+        sGain.connect(this.ctx.destination);
+        shimmer.start(now);
+        shimmer.stop(now + 0.8);
+      }
+      playSparkle() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.exponentialRampToValueAtTime(1760, now + 0.3);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    // --- Canvas & Game State ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score-display');
+    const timerDisplay = document.getElementById('timer-display');
+    const startScreen = document.getElementById('start-screen');
+    const gameoverScreen = document.getElementById('gameover-screen');
+    const startButton = document.getElementById('start-button');
+    const restartButton = document.getElementById('restart-button');
+    const finalScoreEl = document.getElementById('final-score');
+    const finalComboEl = document.getElementById('final-combo');
+
+    let width = 0;
+    let height = 0;
+    let isPlaying = false;
+    let score = 0;
+    let combo = 0;
+    let maxCombo = 0;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let animationId = null;
+
+    let lanterns = [];
+    let particles = [];
+    let fireflies = [];
+    let spawnTimer = 0;
+
+    // Bamboo stalks
+    let stalks = [];
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      // Re-init background bamboo stalks
+      stalks = [];
+      const numStalks = 7;
+      for (let i = 0; i < numStalks; i++) {
+        stalks.push({
+          x: (width / (numStalks - 1)) * i + (Math.random() * 20 - 10),
+          width: 8 + Math.random() * 8,
+          alpha: 0.15 + Math.random() * 0.25,
+          color: i % 2 === 0 ? '#047857' : '#065F46'
+        });
+      }
+    }
+    window.addEventListener('resize', resize);
+
+    // --- Lantern Class ---
+    const LANTERN_PALETTES = [
+      { fill: '#F97316', glow: '#FDE047', label: '소원' },
+      { fill: '#EF4444', glow: '#FCA5A5', label: '행복' },
+      { fill: '#EC4899', glow: '#FBCFE8', label: '사랑' },
+      { fill: '#8B5CF6', glow: '#DDD6FE', label: '평온' },
+      { fill: '#EAB308', glow: '#FEF08A', label: '기적', isBonus: true },
+      { fill: '#10B981', glow: '#A7F3D0', label: '건강' }
+    ];
+
+    class Lantern {
+      constructor() {
+        this.radius = 24 + Math.random() * 6;
+        this.x = this.radius + Math.random() * (width - this.radius * 2);
+        this.y = height + this.radius + 10;
+        this.palette = LANTERN_PALETTES[Math.floor(Math.random() * LANTERN_PALETTES.length)];
+        this.speed = 1.2 + Math.random() * 1.4;
+        this.swaySpeed = 0.02 + Math.random() * 0.02;
+        this.swayAngle = Math.random() * Math.PI * 2;
+        this.swayAmount = 15 + Math.random() * 10;
+        this.isBonus = !!this.palette.isBonus;
+        this.lit = false;
+        this.alpha = 1;
+      }
+      update() {
+        this.y -= this.speed;
+        this.swayAngle += this.swaySpeed;
+        this.curX = this.x + Math.sin(this.swayAngle) * this.swayAmount;
+        return this.y > -50;
+      }
+      draw(c) {
+        c.save();
+        c.translate(this.curX, this.y);
+
+        // Glow
+        c.shadowColor = this.palette.glow;
+        c.shadowBlur = this.isBonus ? 24 : 14;
+
+        // Lantern Body
+        c.fillStyle = this.palette.fill;
+        c.beginPath();
+        c.roundRect(-this.radius, -this.radius * 1.2, this.radius * 2, this.radius * 2.4, 12);
+        c.fill();
+
+        // Inner Light Core
+        const grad = c.createRadialGradient(0, 0, 2, 0, 0, this.radius);
+        grad.addColorStop(0, '#FFFFFF');
+        grad.addColorStop(0.4, this.palette.glow);
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        c.fillStyle = grad;
+        c.beginPath();
+        c.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+        c.fill();
+
+        // Caps
+        c.shadowBlur = 0;
+        c.fillStyle = '#78350F';
+        c.beginPath();
+        c.roundRect(-this.radius * 0.7, -this.radius * 1.25, this.radius * 1.4, 4, 2);
+        c.roundRect(-this.radius * 0.7, this.radius * 1.2, this.radius * 1.4, 4, 2);
+        c.fill();
+
+        // Tassel
+        c.strokeStyle = '#DC2626';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.moveTo(0, this.radius * 1.25);
+        c.lineTo(0, this.radius * 1.25 + 16);
+        c.stroke();
+
+        // Label
+        c.fillStyle = '#FEF3C7';
+        c.font = 'bold 11px sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(this.palette.label, 0, 0);
+
+        c.restore();
+      }
+      checkHit(px, py) {
+        const dx = px - this.curX;
+        const dy = py - this.y;
+        return (dx * dx + dy * dy) < (this.radius * 1.6) ** 2;
+      }
+    }
+
+    // --- Particle Class ---
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random() * 4;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = 0.02 + Math.random() * 0.02;
+        this.size = 3 + Math.random() * 3;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.05; // soft gravity
+        this.alpha -= this.decay;
+        return this.alpha > 0;
+      }
+      draw(c) {
+        c.save();
+        c.globalAlpha = Math.max(0, this.alpha);
+        c.fillStyle = this.color;
+        c.shadowColor = this.color;
+        c.shadowBlur = 8;
+        c.beginPath();
+        c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    // --- Firefly Class ---
+    class Firefly {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = 1.5 + Math.random() * 2;
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = (Math.random() - 0.5) * 0.8;
+        this.pulse = Math.random() * Math.PI * 2;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.pulse += 0.04;
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
+      }
+      draw(c) {
+        const a = 0.3 + Math.sin(this.pulse) * 0.4;
+        c.save();
+        c.globalAlpha = Math.max(0, a);
+        c.fillStyle = '#FDE047';
+        c.shadowColor = '#FDE047';
+        c.shadowBlur = 8;
+        c.beginPath();
+        c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    // Init fireflies
+    function initFireflies() {
+      fireflies = [];
+      for (let i = 0; i < 25; i++) {
+        fireflies.push(new Firefly());
+      }
+    }
+
+    // --- Baby Red Panda Mascot Drawing ---
+    let pandaX = 240;
+    let pandaBounce = 0;
+
+    function drawBabyRedPanda(c) {
+      c.save();
+      const baseY = height - 30;
+      const curY = baseY + Math.sin(pandaBounce) * 4;
+
+      c.translate(pandaX, curY);
+
+      // Tail with stripes
+      c.save();
+      c.rotate(0.35 + Math.sin(pandaBounce * 1.2) * 0.15);
+      c.fillStyle = '#EA580C';
+      c.beginPath();
+      c.ellipse(32, -10, 12, 28, Math.PI / 4, 0, Math.PI * 2);
+      c.fill();
+      // Stripe rings
+      c.fillStyle = '#7C2D12';
+      c.beginPath();
+      c.ellipse(36, -8, 8, 5, Math.PI / 4, 0, Math.PI * 2);
+      c.ellipse(26, -18, 9, 6, Math.PI / 4, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+
+      // Body
+      c.fillStyle = '#EA580C';
+      c.beginPath();
+      c.ellipse(0, 5, 24, 20, 0, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#1C1917';
+      c.beginPath();
+      c.ellipse(0, 10, 16, 12, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Ears
+      c.fillStyle = '#EA580C';
+      c.beginPath();
+      c.moveTo(-20, -18);
+      c.lineTo(-30, -38);
+      c.lineTo(-8, -28);
+      c.fill();
+      c.fillStyle = '#FFF';
+      c.beginPath();
+      c.moveTo(-18, -20);
+      c.lineTo(-26, -34);
+      c.lineTo(-10, -28);
+      c.fill();
+
+      c.fillStyle = '#EA580C';
+      c.beginPath();
+      c.moveTo(20, -18);
+      c.lineTo(30, -38);
+      c.lineTo(8, -28);
+      c.fill();
+      c.fillStyle = '#FFF';
+      c.beginPath();
+      c.moveTo(18, -20);
+      c.lineTo(26, -34);
+      c.lineTo(10, -28);
+      c.fill();
+
+      // Head
+      c.fillStyle = '#EA580C';
+      c.beginPath();
+      c.ellipse(0, -15, 22, 18, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // White cheek markings
+      c.fillStyle = '#FFFFFF';
+      c.beginPath();
+      c.ellipse(-12, -10, 6, 7, 0, 0, Math.PI * 2);
+      c.ellipse(12, -10, 6, 7, 0, 0, Math.PI * 2);
+      c.fill();
+      c.beginPath();
+      c.ellipse(0, -8, 8, 6, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Eyes
+      c.fillStyle = '#1C1917';
+      c.beginPath();
+      c.arc(-8, -15, 3.5, 0, Math.PI * 2);
+      c.arc(8, -15, 3.5, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#FFF';
+      c.beginPath();
+      c.arc(-9, -16, 1.2, 0, Math.PI * 2);
+      c.arc(7, -16, 1.2, 0, Math.PI * 2);
+      c.fill();
+
+      // Cute Pink Cheeks
+      c.fillStyle = 'rgba(251, 113, 133, 0.6)';
+      c.beginPath();
+      c.ellipse(-14, -11, 4, 2.5, 0, 0, Math.PI * 2);
+      c.ellipse(14, -11, 4, 2.5, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Nose & Smile
+      c.fillStyle = '#1C1917';
+      c.beginPath();
+      c.arc(0, -10, 2, 0, Math.PI * 2);
+      c.fill();
+
+      c.restore();
+    }
+
+    // --- Input Handling ---
+    function handlePointer(clientX, clientY) {
+      if (!isPlaying) return;
+      sound.init();
+
+      const rect = canvas.getBoundingClientRect();
+      const px = clientX - rect.left;
+      const py = clientY - rect.top;
+
+      pandaX = Math.max(40, Math.min(width - 40, px));
+
+      let hit = false;
+      for (let i = lanterns.length - 1; i >= 0; i--) {
+        const l = lanterns[i];
+        if (l.checkHit(px, py)) {
+          hit = true;
+          combo++;
+          if (combo > maxCombo) maxCombo = combo;
+
+          const pts = l.isBonus ? (200 + combo * 20) : (100 + combo * 10);
+          score += pts;
+          scoreDisplay.textContent = `점수: ${score}`;
+
+          sound.playChime(combo);
+          if (l.isBonus) sound.playSparkle();
+
+          // Spawn celebration sparkles
+          const count = l.isBonus ? 30 : 18;
+          for (let p = 0; p < count; p++) {
+            particles.push(new Particle(l.curX, l.y, l.palette.glow));
+          }
+
+          lanterns.splice(i, 1);
+          break;
+        }
+      }
+
+      if (!hit && combo > 0) {
+        combo = 0; // Miss reset combo
+      }
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      handlePointer(e.clientX, e.clientY);
+    });
+
+    // --- Main Game Loop ---
+    function gameLoop() {
+      if (!isPlaying) return;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw Moon
+      ctx.save();
+      ctx.fillStyle = '#FDE047';
+      ctx.shadowColor = '#FDE047';
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.arc(width - 60, 60, 26, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#091E2A';
+      ctx.beginPath();
+      ctx.arc(width - 72, 54, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // 2. Background Bamboo Stalks
+      for (let s of stalks) {
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = s.alpha;
+        ctx.fillRect(s.x, 0, s.width, height);
+        // Stalk joints
+        ctx.strokeStyle = '#064E3B';
+        ctx.lineWidth = 3;
+        for (let j = 50; j < height; j += 70) {
+          ctx.beginPath();
+          ctx.moveTo(s.x - 2, j);
+          ctx.lineTo(s.x + s.width + 2, j);
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      // 3. Fireflies
+      for (let f of fireflies) {
+        f.update();
+        f.draw(ctx);
+      }
+
+      // 4. Spawn Lanterns
+      spawnTimer++;
+      if (spawnTimer > 35) {
+        lanterns.push(new Lantern());
+        spawnTimer = 0;
+      }
+
+      // 5. Update & Draw Lanterns
+      for (let i = lanterns.length - 1; i >= 0; i--) {
+        const l = lanterns[i];
+        if (l.update()) {
+          l.draw(ctx);
+        } else {
+          lanterns.splice(i, 1);
+          combo = 0; // Escaped lantern resets combo
+        }
+      }
+
+      // 6. Update & Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (p.update()) {
+          p.draw(ctx);
+        } else {
+          particles.splice(i, 1);
+        }
+      }
+
+      // 7. Draw Red Panda Mascot
+      pandaBounce += 0.08;
+      drawBabyRedPanda(ctx);
+
+      // 8. Combo Indicator
+      if (combo >= 2) {
+        ctx.save();
+        ctx.fillStyle = '#FDE047';
+        ctx.shadowColor = '#F59E0B';
+        ctx.shadowBlur = 10;
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`✨ ${combo} COMBO! ✨`, width / 2, 45);
+        ctx.restore();
+      }
+
+      animationId = requestAnimationFrame(gameLoop);
+    }
+
+    // --- Game Control ---
+    function startGame() {
+      sound.init();
+      resize();
+      initFireflies();
+
+      score = 0;
+      combo = 0;
+      maxCombo = 0;
+      timeLeft = 60;
+      lanterns = [];
+      particles = [];
+      spawnTimer = 0;
+      isPlaying = true;
+
+      scoreDisplay.textContent = `점수: 0`;
+      timerDisplay.textContent = `시간: 60초`;
+      startScreen.style.display = 'none';
+      gameoverScreen.style.display = 'none';
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `시간: ${timeLeft}초`;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      cancelAnimationFrame(animationId);
+      animationId = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(timerInterval);
+      cancelAnimationFrame(animationId);
+
+      finalScoreEl.textContent = score.toLocaleString();
+      finalComboEl.textContent = maxCombo;
+      gameoverScreen.style.display = 'flex';
+    }
+
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', startGame);
+
+    // Initial resize
+    resize();
+    initFireflies();
+  </script>
+</body>
+</html>
