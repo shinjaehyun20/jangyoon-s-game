@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐨 아기 코알라의 살랑살랑 유칼립투스 바람</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #6EE7B7 0%, #10B981 50%, #065F46 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #064E3B;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(4, 120, 87, 0.85);
+      color: #ECFDF5;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+      border-bottom: 1px solid rgba(167, 243, 208, 0.25);
+      backdrop-filter: blur(8px);
+    }
+    .home-btn {
+      color: #F0FDF4;
+      text-decoration: none;
+      font-size: 14px;
+      background: rgba(16, 185, 129, 0.4);
+      padding: 5px 12px;
+      border-radius: 14px;
+      transition: background 0.2s;
+      border: 1px solid rgba(110, 231, 183, 0.5);
+    }
+    .badge {
+      background: rgba(5, 150, 105, 0.35);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #D1FAE5;
+      border: 1px solid rgba(167, 243, 208, 0.3);
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+    .screen-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(6, 78, 59, 0.93);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      z-index: 20;
+      color: #F0FDF4;
+      backdrop-filter: blur(6px);
+    }
+    .screen-overlay h1 {
+      font-size: 26px;
+      margin-bottom: 14px;
+      color: #FEF08A;
+      text-shadow: 0 3px 14px rgba(234, 179, 8, 0.5);
+      line-height: 1.3;
+    }
+    .screen-overlay p {
+      font-size: 15px;
+      color: #D1FAE5;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: #FFF;
+      border: none;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+    .stats-card {
+      background: rgba(4, 120, 87, 0.4);
+      border: 1px solid rgba(110, 231, 183, 0.3);
+      border-radius: 16px;
+      padding: 16px 28px;
+      margin-bottom: 20px;
+      color: #D1FAE5;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../" class="home-btn">← 목록</a>
+      <span class="badge" id="score-display">점수: 0</span>
+      <span class="badge" id="timer-display">시간: 60초</span>
+    </header>
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen-overlay">
+      <div style="font-size: 60px; margin-bottom: 12px; filter: drop-shadow(0 0 16px rgba(110, 231, 183, 0.8));">🐨</div>
+      <h1>아기 코알라의<br>살랑살랑 유칼립투스 바람</h1>
+      <p>햇살 비치는 평화로운 호주 숲속,<br>바람결에 흩날리는 유칼립투스 잎과<br>맑은 이슬방울을 톡톡 모아보세요!</p>
+      <button class="start-btn" id="start-button">숲속 산책 시작</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen-overlay" style="display: none;">
+      <div style="font-size: 54px; margin-bottom: 10px;">🍃🐨✨</div>
+      <h1>포근한 숲속 힐링 완료!</h1>
+      <p id="gameover-desc">아기 코알라가 향긋한 유칼립투스 잎을 한가득 모았어요!</p>
+      <div class="stats-card">
+        <div>모은 숲의 선물: <b id="final-score" style="color: #FEF08A; font-size: 22px;">0</b> 점</div>
+        <div>최대 연속 콤보: <b id="final-combo" style="color: #6EE7B7;">0</b> 회</div>
+      </div>
+      <button class="start-btn" id="restart-button">다시 산책하기</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Audio Synthesis (Marimba & Dew Drop Plop) ---
+    class ForestAudio {
+      constructor() {
+        this.ctx = null;
+        this.notes = [261.63, 329.63, 392.00, 440.00, 523.25, 659.25, 783.99, 880.00]; // Pentatonic C Major
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playMarimba(combo = 0) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        const freq = this.notes[combo % this.notes.length];
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.45);
+      }
+      playDewDrop() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.15);
+      }
+    }
+
+    const audio = new ForestAudio();
+
+    // --- Canvas & State ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score-display');
+    const timerDisplay = document.getElementById('timer-display');
+    const startScreen = document.getElementById('start-screen');
+    const gameoverScreen = document.getElementById('gameover-screen');
+    const startButton = document.getElementById('start-button');
+    const restartButton = document.getElementById('restart-button');
+    const finalScoreEl = document.getElementById('final-score');
+    const finalComboEl = document.getElementById('final-combo');
+
+    let width = 0;
+    let height = 0;
+    let isPlaying = false;
+    let score = 0;
+    let combo = 0;
+    let maxCombo = 0;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let animationId = null;
+
+    let items = [];
+    let particles = [];
+    let sunRays = [];
+    let spawnTimer = 0;
+
+    // Koala character on branch
+    const koala = {
+      x: 240,
+      y: 650,
+      targetX: 240,
+      blink: 0,
+      speed: 0.1
+    };
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      koala.y = height - 90;
+      if (!isPlaying) {
+        koala.x = width / 2;
+        koala.targetX = width / 2;
+      }
+    }
+    window.addEventListener('resize', resize);
+
+    // --- Falling Collectibles ---
+    const ITEM_CONFIGS = [
+      { type: 'leaf', points: 100, color: '#34D399', glow: '#A7F3D0', size: 16, label: '나뭇잎' },
+      { type: 'gold', points: 200, color: '#FDE047', glow: '#FEF08A', size: 17, label: '황금잎', isBonus: true },
+      { type: 'dew', points: 150, color: '#67E8F9', glow: '#BAE6FD', size: 13, label: '이슬' },
+      { type: 'flower', points: 300, color: '#F472B6', glow: '#FBCFE8', size: 18, label: '꽃송이', isBonus: true }
+    ];
+
+    class LeafItem {
+      constructor() {
+        const rand = Math.random();
+        if (rand < 0.15) this.info = ITEM_CONFIGS[3]; // flower
+        else if (rand < 0.35) this.info = ITEM_CONFIGS[1]; // gold
+        else if (rand < 0.6) this.info = ITEM_CONFIGS[2]; // dew
+        else this.info = ITEM_CONFIGS[0]; // leaf
+
+        this.radius = this.info.size;
+        this.x = 35 + Math.random() * (width - 70);
+        this.y = -30;
+        this.speed = 1.8 + Math.random() * 2.2;
+        this.sway = Math.random() * Math.PI * 2;
+        this.swaySpeed = 0.03 + Math.random() * 0.03;
+        this.angle = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.08;
+      }
+      update() {
+        this.y += this.speed;
+        this.sway += this.swaySpeed;
+        this.angle += this.rotSpeed;
+        this.curX = this.x + Math.sin(this.sway) * 22;
+        return this.y < height + 40;
+      }
+      draw(c) {
+        c.save();
+        c.translate(this.curX, this.y);
+        c.rotate(this.angle);
+        c.shadowColor = this.info.glow;
+        c.shadowBlur = 12;
+
+        if (this.info.type === 'leaf' || this.info.type === 'gold') {
+          c.fillStyle = this.info.color;
+          c.beginPath();
+          c.ellipse(0, 0, this.radius * 0.6, this.radius * 1.3, 0, 0, Math.PI * 2);
+          c.fill();
+          // Leaf vein
+          c.strokeStyle = this.info.type === 'gold' ? '#CA8A04' : '#059669';
+          c.lineWidth = 1.2;
+          c.beginPath();
+          c.moveTo(0, -this.radius * 1.1);
+          c.lineTo(0, this.radius * 1.1);
+          c.stroke();
+        } else if (this.info.type === 'dew') {
+          // Dew Drop
+          const grad = c.createRadialGradient(-2, -2, 1, 0, 0, this.radius);
+          grad.addColorStop(0, '#FFFFFF');
+          grad.addColorStop(0.5, '#A5F3FC');
+          grad.addColorStop(1, '#06B6D4');
+          c.fillStyle = grad;
+          c.beginPath();
+          c.arc(0, 0, this.radius, 0, Math.PI * 2);
+          c.fill();
+        } else {
+          // Pink Flower
+          c.fillStyle = '#F472B6';
+          for (let p = 0; p < 5; p++) {
+            c.save();
+            c.rotate((Math.PI * 2 / 5) * p);
+            c.beginPath();
+            c.ellipse(0, -this.radius * 0.7, this.radius * 0.45, this.radius * 0.7, 0, 0, Math.PI * 2);
+            c.fill();
+            c.restore();
+          }
+          c.fillStyle = '#FEF08A';
+          c.beginPath();
+          c.arc(0, 0, this.radius * 0.4, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        c.restore();
+      }
+      checkHit(kx, ky, kr) {
+        const dx = kx - this.curX;
+        const dy = ky - this.y;
+        return (dx * dx + dy * dy) < (this.radius + kr) ** 2;
+      }
+    }
+
+    // --- Particle Swirl ---
+    class LeafSparkle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 1.2 + Math.random() * 3.5;
+        this.vx = Math.cos(ang) * spd;
+        this.vy = Math.sin(ang) * spd;
+        this.alpha = 1;
+        this.size = 3 + Math.random() * 3;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.04;
+        this.alpha -= 0.025;
+        return this.alpha > 0;
+      }
+      draw(c) {
+        c.save();
+        c.globalAlpha = Math.max(0, this.alpha);
+        c.fillStyle = this.color;
+        c.shadowColor = this.color;
+        c.shadowBlur = 8;
+        c.beginPath();
+        c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    // --- Draw Baby Koala on Eucalyptus Branch ---
+    function drawKoala(c) {
+      c.save();
+      c.translate(koala.x, koala.y);
+
+      // Fluffy Body
+      c.fillStyle = '#94A3B8';
+      c.beginPath();
+      c.ellipse(0, 10, 26, 20, 0, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#E2E8F0';
+      c.beginPath();
+      c.ellipse(0, 14, 18, 14, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Paws holding branch
+      c.fillStyle = '#475569';
+      c.beginPath();
+      c.arc(-16, 24, 6, 0, Math.PI * 2);
+      c.arc(16, 24, 6, 0, Math.PI * 2);
+      c.fill();
+
+      // Big Fluffy Ears
+      c.fillStyle = '#94A3B8';
+      c.beginPath();
+      c.arc(-24, -20, 12, 0, Math.PI * 2);
+      c.arc(24, -20, 12, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#F8FAFC';
+      c.beginPath();
+      c.arc(-24, -20, 7, 0, Math.PI * 2);
+      c.arc(24, -20, 7, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#FDA4AF';
+      c.beginPath();
+      c.arc(-24, -20, 4, 0, Math.PI * 2);
+      c.arc(24, -20, 4, 0, Math.PI * 2);
+      c.fill();
+
+      // Head
+      c.fillStyle = '#94A3B8';
+      c.beginPath();
+      c.ellipse(0, -12, 20, 18, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Signature Big Oval Black Nose
+      c.fillStyle = '#1E293B';
+      c.beginPath();
+      c.ellipse(0, -10, 8, 10, 0, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#64748B';
+      c.beginPath();
+      c.ellipse(-2, -13, 2, 3, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Sleepy Smiling Eyes
+      c.strokeStyle = '#0F172A';
+      c.lineWidth = 1.8;
+      c.lineCap = 'round';
+      c.beginPath();
+      c.arc(-9, -15, 3, 0.2, Math.PI - 0.2);
+      c.arc(9, -15, 3, 0.2, Math.PI - 0.2);
+      c.stroke();
+
+      // Cheeks
+      c.fillStyle = 'rgba(251, 113, 133, 0.6)';
+      c.beginPath();
+      c.ellipse(-14, -10, 4, 2.5, 0, 0, Math.PI * 2);
+      c.ellipse(14, -10, 4, 2.5, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Gentle smile
+      c.beginPath();
+      c.arc(0, -1, 3, 0.1, Math.PI - 0.1);
+      c.stroke();
+
+      c.restore();
+    }
+
+    // --- Input Handling ---
+    function setKoalaX(clientX) {
+      if (!isPlaying) return;
+      audio.init();
+
+      const rect = canvas.getBoundingClientRect();
+      const px = clientX - rect.left;
+      koala.targetX = Math.max(40, Math.min(width - 40, px));
+    }
+
+    canvas.addEventListener('pointerdown', (e) => setKoalaX(e.clientX));
+    canvas.addEventListener('pointermove', (e) => {
+      if (e.buttons > 0) setKoalaX(e.clientX);
+    });
+
+    // --- Game Loop ---
+    function gameLoop() {
+      if (!isPlaying) return;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Sunbeams
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.beginPath();
+      ctx.moveTo(width * 0.2, 0);
+      ctx.lineTo(width * 0.5, 0);
+      ctx.lineTo(width * 0.8, height);
+      ctx.lineTo(width * 0.3, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // 2. Eucalyptus Trees Background
+      ctx.save();
+      ctx.fillStyle = '#065F46';
+      ctx.beginPath();
+      ctx.rect(30, 0, 24, height);
+      ctx.rect(width - 50, 0, 28, height);
+      ctx.fill();
+
+      // Big Horizontal Branch
+      const bGrad = ctx.createLinearGradient(0, height - 70, 0, height - 30);
+      bGrad.addColorStop(0, '#B45309');
+      bGrad.addColorStop(1, '#78350F');
+      ctx.fillStyle = bGrad;
+      ctx.beginPath();
+      ctx.roundRect(-20, height - 75, width + 40, 28, 14);
+      ctx.fill();
+      ctx.restore();
+
+      // 3. Update Koala
+      const dx = koala.targetX - koala.x;
+      koala.x += dx * koala.speed;
+
+      // 4. Spawn Leaves
+      spawnTimer++;
+      if (spawnTimer > 35) {
+        items.push(new LeafItem());
+        spawnTimer = 0;
+      }
+
+      // 5. Update & Draw Items + Collision
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        if (item.update()) {
+          item.draw(ctx);
+
+          if (item.checkHit(koala.x, koala.y, 28)) {
+            combo++;
+            if (combo > maxCombo) maxCombo = combo;
+
+            const pts = item.info.points + combo * 15;
+            score += pts;
+            scoreDisplay.textContent = `점수: ${score}`;
+
+            if (item.info.type === 'dew') audio.playDewDrop();
+            else audio.playMarimba(combo);
+
+            // Sparkles
+            for (let p = 0; p < 16; p++) {
+              particles.push(new LeafSparkle(item.curX, item.y, item.info.color));
+            }
+
+            items.splice(i, 1);
+          }
+        } else {
+          items.splice(i, 1);
+          if (combo > 0) combo = 0; // Miss
+        }
+      }
+
+      // 6. Update & Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (p.update()) {
+          p.draw(ctx);
+        } else {
+          particles.splice(i, 1);
+        }
+      }
+
+      // 7. Draw Koala
+      drawKoala(ctx);
+
+      // 8. Combo Display
+      if (combo >= 2) {
+        ctx.save();
+        ctx.fillStyle = '#FEF08A';
+        ctx.shadowColor = '#F59E0B';
+        ctx.shadowBlur = 10;
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`🍃 ${combo} COMBO! 🍃`, width / 2, 45);
+        ctx.restore();
+      }
+
+      animationId = requestAnimationFrame(gameLoop);
+    }
+
+    // --- Start / Stop ---
+    function startGame() {
+      audio.init();
+      resize();
+
+      score = 0;
+      combo = 0;
+      maxCombo = 0;
+      timeLeft = 60;
+      items = [];
+      particles = [];
+      spawnTimer = 0;
+      isPlaying = true;
+
+      koala.x = width / 2;
+      koala.targetX = width / 2;
+
+      scoreDisplay.textContent = `점수: 0`;
+      timerDisplay.textContent = `시간: 60초`;
+      startScreen.style.display = 'none';
+      gameoverScreen.style.display = 'none';
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `시간: ${timeLeft}초`;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      cancelAnimationFrame(animationId);
+      animationId = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(timerInterval);
+      cancelAnimationFrame(animationId);
+
+      finalScoreEl.textContent = score.toLocaleString();
+      finalComboEl.textContent = maxCombo;
+      gameoverScreen.style.display = 'flex';
+    }
+
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', startGame);
+
+    resize();
+  </script>
+</body>
+</html>

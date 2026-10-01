@@ -2286,5 +2286,21 @@
     "description": "에메랄드빛 맑고 투명한 열대 바닷속에서 아기 바다거북과 함께 오색 빛깔 산호초 사이를 유영하며 반짝이는 바다 진주와 마법 물방울을 모으는 힐링 터치 미니게임입니다.",
     "thumbnail": "sea-turtle-coral-reef-swim/thumb.svg",
     "path": "sea-turtle-coral-reef-swim/index.html"
+  },
+  {
+    "id": "polar-bear-aurora-ice-slide",
+    "title": "Baby Polar Bear Aurora Ice Slide",
+    "title_ko": "🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드",
+    "description": "오색찬란한 오로라가 춤추는 신비로운 북극의 밤, 털이 보송보송한 아기 북극곰과 함께 매끄러운 얼음 슬라이드를 미끄러지며 반짝이는 별조각과 물고기 젤리를 모으는 힐링 아케이드 터치 게임입니다.",
+    "thumbnail": "polar-bear-aurora-ice-slide/thumb.svg",
+    "path": "polar-bear-aurora-ice-slide/index.html"
+  },
+  {
+    "id": "koala-eucalyptus-leaf-breeze",
+    "title": "Baby Koala Eucalyptus Leaf Breeze",
+    "title_ko": "🐨 아기 코알라의 살랑살랑 유칼립투스 바람",
+    "description": "초록빛 평화로운 숲속 유칼립투스 나무 위에서 졸린 눈을 깜빡이는 귀여운 아기 코알라와 함께 바람결에 흩날리는 황금 유칼립투스 잎과 촉촉한 이슬 방울을 톡톡 터뜨리며 모으는 포근한 힐링 미니게임입니다.",
+    "thumbnail": "koala-eucalyptus-leaf-breeze/thumb.svg",
+    "path": "koala-eucalyptus-leaf-breeze/index.html"
   }
 ]

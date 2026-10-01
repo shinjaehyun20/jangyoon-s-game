@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="forestBreeze" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A7F3D0"/>
+      <stop offset="50%" stop-color="#6EE7B7"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="koalaFur" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#94A3B8"/>
+      <stop offset="100%" stop-color="#64748B"/>
+    </linearGradient>
+    <linearGradient id="eucalyptusBranch" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+    <linearGradient id="goldenLeaf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+    <filter id="breezeGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Sunny Forest Background -->
+  <rect width="200" height="200" rx="24" fill="url(#forestBreeze)"/>
+
+  <!-- Sunbeams through canopy -->
+  <polygon points="50,0 90,0 140,200 90,200" fill="#FFF" opacity="0.15"/>
+  <polygon points="120,0 160,0 190,200 140,200" fill="#FFF" opacity="0.12"/>
+
+  <!-- Background Tree Trunks & Foliage -->
+  <rect x="25" y="0" width="16" height="200" rx="5" fill="#047857" opacity="0.3"/>
+  <rect x="165" y="0" width="20" height="200" rx="6" fill="#047857" opacity="0.35"/>
+  <circle cx="30" cy="40" r="35" fill="#10B981" opacity="0.4"/>
+  <circle cx="170" cy="60" r="40" fill="#10B981" opacity="0.4"/>
+
+  <!-- Slanted Main Eucalyptus Branch -->
+  <path d="M -10 160 Q 80 140 210 110 L 210 135 Q 80 165 -10 185 Z" fill="url(#eucalyptusBranch)"/>
+
+  <!-- Eucalyptus Leaves attached to branch -->
+  <path d="M 40 145 C 20 130 15 105 30 115 C 45 125 45 140 40 145 Z" fill="#059669"/>
+  <path d="M 160 118 C 185 105 195 85 178 95 C 160 105 160 115 160 118 Z" fill="#059669"/>
+
+  <!-- Floating Golden Breeze Leaves -->
+  <g transform="translate(140, 50) rotate(25)" filter="url(#breezeGlow)">
+    <path d="M 0 0 C 12 -15 25 -5 15 15 C 5 25 -5 10 0 0 Z" fill="url(#goldenLeaf)"/>
+    <line x1="2" y1="2" x2="12" y2="12" stroke="#A16207" stroke-width="1"/>
+  </g>
+
+  <g transform="translate(50, 75) rotate(-35)" filter="url(#breezeGlow)">
+    <path d="M 0 0 C 10 -12 20 -4 12 12 C 4 20 -4 8 0 0 Z" fill="url(#goldenLeaf)"/>
+  </g>
+
+  <!-- Dew Drops -->
+  <circle cx="75" cy="45" r="4.5" fill="#E0F2FE" opacity="0.8"/>
+  <circle cx="74" cy="43" r="1.5" fill="#FFF"/>
+
+  <circle cx="170" cy="140" r="3.5" fill="#E0F2FE" opacity="0.8"/>
+
+  <!-- Baby Koala Hugging Branch -->
+  <g transform="translate(105, 125) rotate(-8)">
+    <!-- Fluffy Body -->
+    <ellipse cx="0" cy="4" rx="24" ry="20" fill="url(#koalaFur)"/>
+    <ellipse cx="0" cy="8" rx="17" ry="13" fill="#E2E8F0" opacity="0.6"/>
+
+    <!-- Paws Hugging Branch -->
+    <circle cx="-16" cy="18" r="6" fill="#475569"/>
+    <circle cx="16" cy="18" r="6" fill="#475569"/>
+
+    <!-- Front Arms -->
+    <ellipse cx="-18" cy="4" rx="6" ry="10" fill="url(#koalaFur)" transform="rotate(20, -18, 4)"/>
+    <ellipse cx="18" cy="4" rx="6" ry="10" fill="url(#koalaFur)" transform="rotate(-20, 18, 4)"/>
+
+    <!-- Big Fluffy Ears -->
+    <circle cx="-22" cy="-22" r="11" fill="url(#koalaFur)"/>
+    <circle cx="-22" cy="-22" r="7" fill="#F8FAFC"/>
+    <circle cx="-22" cy="-22" r="4" fill="#FDA4AF"/>
+
+    <circle cx="22" cy="-22" r="11" fill="url(#koalaFur)"/>
+    <circle cx="22" cy="-22" r="7" fill="#F8FAFC"/>
+    <circle cx="22" cy="-22" r="4" fill="#FDA4AF"/>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="-14" rx="19" ry="16" fill="url(#koalaFur)"/>
+
+    <!-- Signature Big Oval Black Nose -->
+    <ellipse cx="0" cy="-11" rx="7.5" ry="9.5" fill="#1E293B"/>
+    <ellipse cx="-2" cy="-14" rx="2" ry="3" fill="#64748B" opacity="0.6"/>
+
+    <!-- Sleepy / Smiling Eyes -->
+    <path d="M -11 -16 Q -8 -20 -5 -16" stroke="#0F172A" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M 5 -16 Q 8 -20 11 -16" stroke="#0F172A" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+    <!-- Cute Cheeks -->
+    <ellipse cx="-13" cy="-11" rx="4" ry="2.5" fill="#FB7185" opacity="0.6"/>
+    <ellipse cx="13" cy="-11" rx="4" ry="2.5" fill="#FB7185" opacity="0.6"/>
+
+    <!-- Sweet gentle smile -->
+    <path d="M -3 -3 Q 0 -1 3 -3" stroke="#0F172A" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

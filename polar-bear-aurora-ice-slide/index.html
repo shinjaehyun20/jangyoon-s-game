@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #0B132B 0%, #1C2541 50%, #3A506B 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #09172A;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(11, 19, 43, 0.85);
+      color: #BAE6FD;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+      backdrop-filter: blur(8px);
+    }
+    .home-btn {
+      color: #F0FDF4;
+      text-decoration: none;
+      font-size: 14px;
+      background: rgba(14, 165, 233, 0.3);
+      padding: 5px 12px;
+      border-radius: 14px;
+      transition: background 0.2s;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+    .badge {
+      background: rgba(6, 182, 212, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #A5F3FC;
+      border: 1px solid rgba(165, 243, 252, 0.3);
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: ew-resize;
+    }
+    .screen-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 19, 43, 0.93);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      z-index: 20;
+      color: #F8FAFC;
+      backdrop-filter: blur(6px);
+    }
+    .screen-overlay h1 {
+      font-size: 26px;
+      margin-bottom: 14px;
+      color: #7DD3FC;
+      text-shadow: 0 3px 14px rgba(56, 189, 248, 0.5);
+      line-height: 1.3;
+    }
+    .screen-overlay p {
+      font-size: 15px;
+      color: #CBD5E1;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      color: #FFF;
+      border: none;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+    .stats-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(125, 211, 252, 0.3);
+      border-radius: 16px;
+      padding: 16px 28px;
+      margin-bottom: 20px;
+      color: #E0F2FE;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../" class="home-btn">← 목록</a>
+      <span class="badge" id="score-display">점수: 0</span>
+      <span class="badge" id="timer-display">시간: 60초</span>
+    </header>
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen-overlay">
+      <div style="font-size: 60px; margin-bottom: 12px; filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.8));">🐻‍❄️</div>
+      <h1>아기 북극곰의<br>오로라 빙하 슬라이드</h1>
+      <p>오색 오로라가 반짝이는 북극 밤하늘 아래,<br>화면을 좌우로 터치해 아기 곰을 움직여<br>달콤한 별과 물고기 젤리를 모아보세요!</p>
+      <button class="start-btn" id="start-button">얼음 슬라이드 출발</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen-overlay" style="display: none;">
+      <div style="font-size: 54px; margin-bottom: 10px;">❄️🐻‍❄️✨</div>
+      <h1>신나는 빙하 슬라이드 완주!</h1>
+      <p id="gameover-desc">아기 북극곰이 오로라 별빛 아래서 행복한 여행을 마쳤어요!</p>
+      <div class="stats-card">
+        <div>최종 얼음 점수: <b id="final-score" style="color: #7DD3FC; font-size: 22px;">0</b> 점</div>
+        <div>최대 연속 콤보: <b id="final-combo" style="color: #FBBF24;">0</b> 회</div>
+      </div>
+      <button class="start-btn" id="restart-button">다시 슬라이드 타기</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Audio Synthesis (Crystalline Chimes & Glissando) ---
+    class ArcticAudio {
+      constructor() {
+        this.ctx = null;
+        this.notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51]; // High Crystal
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playCrystal(combo = 0) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        const freq = this.notes[combo % this.notes.length];
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.6);
+
+        // Overtone sparkle
+        const shimmer = this.ctx.createOscillator();
+        const sGain = this.ctx.createGain();
+        shimmer.type = 'triangle';
+        shimmer.frequency.setValueAtTime(freq * 1.5, now);
+        sGain.gain.setValueAtTime(0.08, now);
+        sGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        shimmer.connect(sGain);
+        sGain.connect(this.ctx.destination);
+        shimmer.start(now);
+        shimmer.stop(now + 0.4);
+      }
+      playWoosh() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+    }
+
+    const sound = new ArcticAudio();
+
+    // --- Canvas & State ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score-display');
+    const timerDisplay = document.getElementById('timer-display');
+    const startScreen = document.getElementById('start-screen');
+    const gameoverScreen = document.getElementById('gameover-screen');
+    const startButton = document.getElementById('start-button');
+    const restartButton = document.getElementById('restart-button');
+    const finalScoreEl = document.getElementById('final-score');
+    const finalComboEl = document.getElementById('final-combo');
+
+    let width = 0;
+    let height = 0;
+    let isPlaying = false;
+    let score = 0;
+    let combo = 0;
+    let maxCombo = 0;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let animationId = null;
+
+    let items = [];
+    let particles = [];
+    let snowflakes = [];
+    let auroraPhase = 0;
+    let spawnTimer = 0;
+
+    // Polar Bear Character
+    const bear = {
+      x: 240,
+      targetX: 240,
+      y: 640,
+      tilt: 0,
+      speed: 0.15
+    };
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      bear.y = height - 90;
+      if (!isPlaying) {
+        bear.x = width / 2;
+        bear.targetX = width / 2;
+      }
+
+      // Snowflakes
+      snowflakes = [];
+      for (let i = 0; i < 35; i++) {
+        snowflakes.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: 1 + Math.random() * 2.5,
+          speed: 1 + Math.random() * 2,
+          sway: Math.random() * Math.PI * 2
+        });
+      }
+    }
+    window.addEventListener('resize', resize);
+
+    // --- Collectible Items ---
+    const ITEM_TYPES = [
+      { type: 'star', points: 100, color: '#FDE047', glow: '#FEF08A', size: 14, label: '별' },
+      { type: 'jelly', points: 150, color: '#F43F5E', glow: '#FDA4AF', size: 15, label: '젤리' },
+      { type: 'crystal', points: 250, color: '#38BDF8', glow: '#BAE6FD', size: 16, label: '크리스탈', isBonus: true }
+    ];
+
+    class SlideItem {
+      constructor() {
+        const rand = Math.random();
+        this.info = rand < 0.2 ? ITEM_TYPES[2] : (rand < 0.6 ? ITEM_TYPES[0] : ITEM_TYPES[1]);
+        this.radius = this.info.size;
+        this.x = 40 + Math.random() * (width - 80);
+        this.y = -30;
+        this.speed = 3.5 + Math.random() * 2.0;
+        this.sway = Math.random() * Math.PI * 2;
+        this.swaySpeed = 0.04 + Math.random() * 0.02;
+      }
+      update() {
+        this.y += this.speed;
+        this.sway += this.swaySpeed;
+        this.curX = this.x + Math.sin(this.sway) * 8;
+        return this.y < height + 40;
+      }
+      draw(c) {
+        c.save();
+        c.translate(this.curX, this.y);
+        c.shadowColor = this.info.glow;
+        c.shadowBlur = 14;
+
+        if (this.info.type === 'star') {
+          c.fillStyle = '#FDE047';
+          c.beginPath();
+          for (let i = 0; i < 5; i++) {
+            const rot = (Math.PI * 2 / 5) * i - Math.PI / 2;
+            const innerRot = rot + Math.PI / 5;
+            const r1 = this.radius * 1.2;
+            const r2 = this.radius * 0.55;
+            if (i === 0) c.moveTo(Math.cos(rot) * r1, Math.sin(rot) * r1);
+            else c.lineTo(Math.cos(rot) * r1, Math.sin(rot) * r1);
+            c.lineTo(Math.cos(innerRot) * r2, Math.sin(innerRot) * r2);
+          }
+          c.closePath();
+          c.fill();
+        } else if (this.info.type === 'jelly') {
+          // Fish Jelly
+          c.fillStyle = '#F43F5E';
+          c.beginPath();
+          c.ellipse(0, 0, this.radius * 0.9, this.radius * 0.6, 0, 0, Math.PI * 2);
+          c.fill();
+          c.beginPath();
+          c.moveTo(-this.radius * 0.8, 0);
+          c.lineTo(-this.radius * 1.3, -this.radius * 0.5);
+          c.lineTo(-this.radius * 1.3, this.radius * 0.5);
+          c.closePath();
+          c.fill();
+          // Cute white eye
+          c.fillStyle = '#FFF';
+          c.beginPath();
+          c.arc(this.radius * 0.4, -this.radius * 0.15, 2, 0, Math.PI * 2);
+          c.fill();
+        } else {
+          // Aurora Crystal Diamond
+          c.fillStyle = '#38BDF8';
+          c.beginPath();
+          c.moveTo(0, -this.radius * 1.3);
+          c.lineTo(this.radius * 0.9, 0);
+          c.lineTo(0, this.radius * 1.3);
+          c.lineTo(-this.radius * 0.9, 0);
+          c.closePath();
+          c.fill();
+          c.fillStyle = '#E0F2FE';
+          c.beginPath();
+          c.moveTo(0, -this.radius * 0.8);
+          c.lineTo(this.radius * 0.5, 0);
+          c.lineTo(0, this.radius * 0.8);
+          c.lineTo(-this.radius * 0.5, 0);
+          c.closePath();
+          c.fill();
+        }
+        c.restore();
+      }
+      checkHit(bx, by, br) {
+        const dx = bx - this.curX;
+        const dy = by - this.y;
+        return (dx * dx + dy * dy) < (this.radius + br) ** 2;
+      }
+    }
+
+    // --- Particle Effect ---
+    class IceSparkle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 1.5 + Math.random() * 4;
+        this.vx = Math.cos(ang) * spd;
+        this.vy = Math.sin(ang) * spd;
+        this.alpha = 1;
+        this.size = 2.5 + Math.random() * 3;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.08;
+        this.alpha -= 0.03;
+        return this.alpha > 0;
+      }
+      draw(c) {
+        c.save();
+        c.globalAlpha = Math.max(0, this.alpha);
+        c.fillStyle = this.color;
+        c.shadowColor = this.color;
+        c.shadowBlur = 8;
+        c.beginPath();
+        c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    // --- Draw Baby Polar Bear ---
+    function drawPolarBear(c) {
+      c.save();
+      c.translate(bear.x, bear.y);
+      c.rotate(bear.tilt * 0.2);
+
+      // Ice Spray under bear
+      c.save();
+      c.fillStyle = 'rgba(224, 242, 254, 0.4)';
+      c.beginPath();
+      c.ellipse(0, 22, 28, 8, 0, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+
+      // Fluffy Body
+      c.fillStyle = '#F8FAFC';
+      c.beginPath();
+      c.ellipse(0, 4, 22, 18, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Back Paws
+      c.fillStyle = '#E2E8F0';
+      c.beginPath();
+      c.ellipse(-14, 16, 7, 5, -0.2, 0, Math.PI * 2);
+      c.ellipse(14, 16, 7, 5, 0.2, 0, Math.PI * 2);
+      c.fill();
+
+      // Tail
+      c.fillStyle = '#F8FAFC';
+      c.beginPath();
+      c.arc(0, 20, 6, 0, Math.PI * 2);
+      c.fill();
+
+      // Head
+      c.fillStyle = '#FFFFFF';
+      c.beginPath();
+      c.ellipse(0, -14, 16, 14, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Round Fluffy Ears
+      c.fillStyle = '#FFFFFF';
+      c.beginPath();
+      c.arc(-13, -24, 5, 0, Math.PI * 2);
+      c.arc(13, -24, 5, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#FDA4AF';
+      c.beginPath();
+      c.arc(-13, -24, 2.5, 0, Math.PI * 2);
+      c.arc(13, -24, 2.5, 0, Math.PI * 2);
+      c.fill();
+
+      // Snout
+      c.fillStyle = '#F1F5F9';
+      c.beginPath();
+      c.ellipse(0, -10, 7, 5.5, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Nose
+      c.fillStyle = '#0F172A';
+      c.beginPath();
+      c.ellipse(0, -12, 3, 2, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Eyes (Joyful arches)
+      c.strokeStyle = '#0F172A';
+      c.lineWidth = 1.8;
+      c.beginPath();
+      c.arc(-6, -15, 2.5, Math.PI, 0);
+      c.arc(6, -15, 2.5, Math.PI, 0);
+      c.stroke();
+
+      // Cheeks
+      c.fillStyle = 'rgba(251, 113, 133, 0.6)';
+      c.beginPath();
+      c.ellipse(-10, -10, 3.5, 2, 0, 0, Math.PI * 2);
+      c.ellipse(10, -10, 3.5, 2, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Red Scarf fluttering
+      c.fillStyle = '#EF4444';
+      c.beginPath();
+      c.roundRect(-10, -5, 20, 6, 3);
+      c.fill();
+      // Fluttering tail
+      c.beginPath();
+      c.moveTo(6, -2);
+      c.lineTo(16, 4);
+      c.lineTo(12, 14);
+      c.lineTo(4, 4);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = '#FEF08A';
+      c.lineWidth = 1.2;
+      c.beginPath();
+      c.moveTo(8, 2);
+      c.lineTo(14, 8);
+      c.stroke();
+
+      c.restore();
+    }
+
+    // --- Input Handling ---
+    function setPosition(clientX) {
+      if (!isPlaying) return;
+      sound.init();
+
+      const rect = canvas.getBoundingClientRect();
+      const px = clientX - rect.left;
+      bear.targetX = Math.max(35, Math.min(width - 35, px));
+    }
+
+    canvas.addEventListener('pointerdown', (e) => setPosition(e.clientX));
+    canvas.addEventListener('pointermove', (e) => {
+      if (e.buttons > 0) setPosition(e.clientX);
+    });
+
+    // --- Game Loop ---
+    function gameLoop() {
+      if (!isPlaying) return;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Aurora Borealis Sky
+      auroraPhase += 0.02;
+      ctx.save();
+      const aGrad = ctx.createLinearGradient(0, 0, width, height * 0.4);
+      aGrad.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
+      aGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.4)');
+      aGrad.addColorStop(1, 'rgba(139, 92, 246, 0.3)');
+      ctx.fillStyle = aGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 80 + Math.sin(auroraPhase) * 20);
+      ctx.bezierCurveTo(
+        width * 0.3, 30 + Math.cos(auroraPhase) * 25,
+        width * 0.7, 120 + Math.sin(auroraPhase * 1.2) * 20,
+        width, 60 + Math.cos(auroraPhase * 0.8) * 20
+      );
+      ctx.lineTo(width, 0);
+      ctx.lineTo(0, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // 2. Ice Glacier Slopes
+      ctx.save();
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.moveTo(0, height * 0.5);
+      ctx.lineTo(width * 0.25, height * 0.35);
+      ctx.lineTo(width * 0.6, height * 0.55);
+      ctx.lineTo(width, height * 0.4);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      ctx.fill();
+
+      // Smooth Ice Runway
+      const rGrad = ctx.createLinearGradient(0, 0, width, 0);
+      rGrad.addColorStop(0, '#0284C7');
+      rGrad.addColorStop(0.5, '#38BDF8');
+      rGrad.addColorStop(1, '#0284C7');
+      ctx.fillStyle = rGrad;
+      ctx.beginPath();
+      ctx.moveTo(width * 0.1, 0);
+      ctx.lineTo(width * 0.9, 0);
+      ctx.lineTo(width * 0.98, height);
+      ctx.lineTo(width * 0.02, height);
+      ctx.closePath();
+      ctx.fill();
+
+      // Ice Track Glow lines
+      ctx.strokeStyle = '#BAE6FD';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(width * 0.15, 0);
+      ctx.lineTo(width * 0.05, height);
+      ctx.moveTo(width * 0.85, 0);
+      ctx.lineTo(width * 0.95, height);
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. Falling Snowflakes
+      for (let s of snowflakes) {
+        s.y += s.speed;
+        s.sway += 0.03;
+        s.x += Math.sin(s.sway) * 0.6;
+        if (s.y > height) {
+          s.y = -5;
+          s.x = Math.random() * width;
+        }
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 4. Update Bear
+      const dx = bear.targetX - bear.x;
+      bear.x += dx * bear.speed;
+      bear.tilt = dx * 0.04;
+
+      // 5. Spawn Slide Items
+      spawnTimer++;
+      if (spawnTimer > 32) {
+        items.push(new SlideItem());
+        spawnTimer = 0;
+      }
+
+      // 6. Update & Draw Items + Collision
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        if (item.update()) {
+          item.draw(ctx);
+
+          if (item.checkHit(bear.x, bear.y, 24)) {
+            combo++;
+            if (combo > maxCombo) maxCombo = combo;
+
+            const pts = item.info.points + combo * 15;
+            score += pts;
+            scoreDisplay.textContent = `점수: ${score}`;
+
+            sound.playCrystal(combo);
+            if (item.info.isBonus) sound.playWoosh();
+
+            // Sparkles
+            for (let p = 0; p < 18; p++) {
+              particles.push(new IceSparkle(item.curX, item.y, item.info.color));
+            }
+
+            items.splice(i, 1);
+          }
+        } else {
+          items.splice(i, 1);
+          if (combo > 0) combo = 0; // Miss
+        }
+      }
+
+      // 7. Update & Draw Sparkles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (p.update()) {
+          p.draw(ctx);
+        } else {
+          particles.splice(i, 1);
+        }
+      }
+
+      // 8. Draw Polar Bear
+      drawPolarBear(ctx);
+
+      // 9. Combo Display
+      if (combo >= 2) {
+        ctx.save();
+        ctx.fillStyle = '#FDE047';
+        ctx.shadowColor = '#F59E0B';
+        ctx.shadowBlur = 10;
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`❄️ ${combo} COMBO! ❄️`, width / 2, 45);
+        ctx.restore();
+      }
+
+      animationId = requestAnimationFrame(gameLoop);
+    }
+
+    // --- Start / Stop ---
+    function startGame() {
+      sound.init();
+      resize();
+
+      score = 0;
+      combo = 0;
+      maxCombo = 0;
+      timeLeft = 60;
+      items = [];
+      particles = [];
+      spawnTimer = 0;
+      isPlaying = true;
+
+      bear.x = width / 2;
+      bear.targetX = width / 2;
+
+      scoreDisplay.textContent = `점수: 0`;
+      timerDisplay.textContent = `시간: 60초`;
+      startScreen.style.display = 'none';
+      gameoverScreen.style.display = 'none';
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `시간: ${timeLeft}초`;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      cancelAnimationFrame(animationId);
+      animationId = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(timerInterval);
+      cancelAnimationFrame(animationId);
+
+      finalScoreEl.textContent = score.toLocaleString();
+      finalComboEl.textContent = maxCombo;
+      gameoverScreen.style.display = 'flex';
+    }
+
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', startGame);
+
+    resize();
+  </script>
+</body>
+</html>

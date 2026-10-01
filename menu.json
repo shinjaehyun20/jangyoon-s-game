@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "koala-eucalyptus-leaf-breeze",
+        "title": "🐨 아기 코알라의 살랑살랑 유칼립투스 바람",
+        "path": "koala-eucalyptus-leaf-breeze/index.html"
+      },
+      {
+        "id": "polar-bear-aurora-ice-slide",
+        "title": "🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드",
+        "path": "polar-bear-aurora-ice-slide/index.html"
+      },
+      {
         "id": "sea-turtle-coral-reef-swim",
         "title": "🐢 아기 바다거북의 산호초 무지개 헤엄",
         "path": "sea-turtle-coral-reef-swim/index.html"
