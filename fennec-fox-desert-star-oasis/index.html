@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🦊 사막여우의 별빛 오아시스</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #0F172A 0%, #1E1B4B 50%, #312E81 100%);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 800px;
+      background: #0B0F19;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.85);
+      color: #F8FAFC;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 10;
+      border-bottom: 1px solid rgba(254, 240, 138, 0.2);
+    }
+    .header-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #FFF;
+      padding: 6px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hud {
+      display: flex;
+      gap: 12px;
+    }
+    .hud-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 20;
+      color: #FFF;
+    }
+    .overlay.hidden {
+      display: none;
+    }
+    .overlay h1 {
+      font-size: 26px;
+      margin-bottom: 12px;
+      color: #FDE047;
+      text-shadow: 0 0 15px rgba(253, 224, 71, 0.5);
+    }
+    .overlay p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #E2E8F0;
+      margin-bottom: 24px;
+    }
+    .guide-box {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: left;
+      border: 1px solid rgba(253, 224, 71, 0.2);
+    }
+    .guide-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      color: #FFF;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 14px 36px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-start:active {
+      transform: scale(0.96);
+    }
+    .score-display {
+      font-size: 38px;
+      font-weight: 800;
+      color: #FDE047;
+      margin-bottom: 10px;
+      text-shadow: 0 0 20px rgba(253, 224, 71, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../index.html" class="header-btn">🏠 홈</a>
+      <div class="hud">
+        <div class="hud-item">⭐ <span id="score-text">0</span></div>
+        <div class="hud-item">❤️ <span id="lives-text">3</span></div>
+        <div class="hud-item">⏳ <span id="timer-text">45</span>s</div>
+      </div>
+    </header>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Overlay -->
+    <div id="start-overlay" class="overlay">
+      <div style="font-size: 64px; margin-bottom: 10px;">🦊✨</div>
+      <h1>사막여우의 별빛 오아시스</h1>
+      <p>신비로운 밤 사막 오아시스에 오신 것을 환영해요!<br>하늘에서 쏟아지는 별빛과 물방울을 모아보세요.</p>
+      <div class="guide-box">
+        <div class="guide-row">⭐ <strong>황금 별조각</strong>: +10점 획득</div>
+        <div class="guide-row">💧 <strong>오아시스 이슬</strong>: +20점 & 콤보 부스터</div>
+        <div class="guide-row">☄️ <strong>무지개 혜성</strong>: +50점 슈퍼 보너스</div>
+        <div class="guide-row">🌪️ <strong>모래 폭풍</strong>: 조심하세요! 하트가 줄어들어요</div>
+      </div>
+      <button class="btn-start" id="start-btn">별빛 모험 시작! 🚀</button>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="overlay hidden">
+      <div style="font-size: 64px; margin-bottom: 10px;" id="result-emoji">🌟</div>
+      <h1 id="result-title">별빛 오아시스 축제 완료!</h1>
+      <div class="score-display" id="final-score">0점</div>
+      <p id="result-msg">사막여우와 함께 오아시스를 환하게 밝혔어요!</p>
+      <button class="btn-start" id="restart-btn">다시 놀기 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // Web Audio Synthesizer
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new AudioCtx();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'star') {
+        // Pentatonic Chime
+        const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        const f = freqs[Math.floor(Math.random() * freqs.length)];
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, now);
+        osc.frequency.exponentialRampToValueAtTime(f * 1.5, now + 0.15);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'dew') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(1400, now + 0.18);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.22);
+      } else if (type === 'comet') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.linearRampToValueAtTime(880, now + 0.1);
+        osc.frequency.linearRampToValueAtTime(1760, now + 0.3);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'hit') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(70, now + 0.25);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'win') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, now + idx * 0.1);
+          g.gain.setValueAtTime(0.2, now + idx * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.25);
+          o.start(now + idx * 0.1);
+          o.stop(now + idx * 0.1 + 0.25);
+        });
+      }
+    }
+
+    // Canvas & Game State
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreText = document.getElementById('score-text');
+    const livesText = document.getElementById('lives-text');
+    const timerText = document.getElementById('timer-text');
+    const startOverlay = document.getElementById('start-overlay');
+    const gameoverOverlay = document.getElementById('gameover-overlay');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const finalScore = document.getElementById('final-score');
+    const resultTitle = document.getElementById('result-title');
+    const resultMsg = document.getElementById('result-msg');
+    const resultEmoji = document.getElementById('result-emoji');
+
+    let width = 0;
+    let height = 0;
+    let score = 0;
+    let lives = 3;
+    let timeLeft = 45;
+    let isRunning = false;
+    let lastTime = 0;
+    let timerInterval = null;
+
+    // Fennec Fox Player
+    const player = {
+      x: 0,
+      y: 0,
+      width: 70,
+      height: 70,
+      targetX: 0,
+      tailWag: 0
+    };
+
+    // Game Items & Particles
+    let items = [];
+    let particles = [];
+    let backgroundStars = [];
+    let spawnTimer = 0;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      width = canvas.width = rect.width;
+      height = canvas.height = rect.height;
+      player.y = height - 90;
+      if (player.x === 0) {
+        player.x = width / 2;
+        player.targetX = width / 2;
+      }
+      initBackgroundStars();
+    }
+    window.addEventListener('resize', resize);
+
+    function initBackgroundStars() {
+      backgroundStars = [];
+      for (let i = 0; i < 40; i++) {
+        backgroundStars.push({
+          x: Math.random() * width,
+          y: Math.random() * (height * 0.7),
+          radius: Math.random() * 1.8 + 0.5,
+          alpha: Math.random() * 0.7 + 0.3,
+          twinkleSpeed: Math.random() * 0.03 + 0.01
+        });
+      }
+    }
+
+    // Touch / Pointer handling
+    function handlePointerMove(e) {
+      if (!isRunning) return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      if (clientX !== undefined) {
+        player.targetX = Math.max(35, Math.min(width - 35, clientX - rect.left));
+      }
+    }
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('touchmove', handlePointerMove, { passive: true });
+
+    function spawnItem() {
+      const types = [
+        { type: 'star', char: '⭐', points: 10, speed: 2.2, size: 28, prob: 0.55 },
+        { type: 'dew', char: '💧', points: 20, speed: 2.8, size: 26, prob: 0.22 },
+        { type: 'comet', char: '☄️', points: 50, speed: 3.8, size: 32, prob: 0.08 },
+        { type: 'storm', char: '🌪️', points: -1, speed: 2.5, size: 30, prob: 0.15 }
+      ];
+
+      const r = Math.random();
+      let cumulative = 0;
+      let selected = types[0];
+      for (const t of types) {
+        cumulative += t.prob;
+        if (r <= cumulative) {
+          selected = t;
+          break;
+        }
+      }
+
+      items.push({
+        x: Math.random() * (width - 60) + 30,
+        y: -30,
+        speed: selected.speed + Math.random() * 0.8,
+        type: selected.type,
+        char: selected.char,
+        points: selected.points,
+        size: selected.size,
+        wobble: Math.random() * Math.PI * 2
+      });
+    }
+
+    function addParticles(x, y, color, count = 8) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 5,
+          vy: (Math.random() - 0.5) * 5 - 2,
+          radius: Math.random() * 3 + 2,
+          color: color,
+          alpha: 1,
+          decay: Math.random() * 0.03 + 0.02
+        });
+      }
+    }
+
+    function drawFennecFox(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      player.tailWag += 0.08;
+      const tailAngle = Math.sin(player.tailWag) * 0.25;
+
+      // Fluffy Tail
+      ctx.save();
+      ctx.translate(15, 15);
+      ctx.rotate(tailAngle);
+      ctx.fillStyle = '#FED7AA';
+      ctx.beginPath();
+      ctx.ellipse(15, -10, 16, 26, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFFBEB';
+      ctx.beginPath();
+      ctx.ellipse(22, -18, 9, 12, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Giant Big Ears
+      // Left Ear
+      ctx.fillStyle = '#FED7AA';
+      ctx.beginPath();
+      ctx.ellipse(-20, -22, 11, 24, -Math.PI / 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#F472B6';
+      ctx.beginPath();
+      ctx.ellipse(-20, -22, 6, 16, -Math.PI / 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Right Ear
+      ctx.fillStyle = '#FED7AA';
+      ctx.beginPath();
+      ctx.ellipse(20, -22, 11, 24, Math.PI / 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#F472B6';
+      ctx.beginPath();
+      ctx.ellipse(20, -22, 6, 16, Math.PI / 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Body
+      ctx.fillStyle = '#FED7AA';
+      ctx.beginPath();
+      ctx.ellipse(0, 14, 22, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFFBEB';
+      ctx.beginPath();
+      ctx.ellipse(0, 16, 14, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head
+      ctx.fillStyle = '#FED7AA';
+      ctx.beginPath();
+      ctx.arc(0, -4, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      // White Cheeks
+      ctx.fillStyle = '#FFFBEB';
+      ctx.beginPath();
+      ctx.ellipse(-9, 1, 9, 8, 0, 0, Math.PI * 2);
+      ctx.ellipse(9, 1, 9, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cute Eyes
+      ctx.fillStyle = '#0F172A';
+      ctx.beginPath();
+      ctx.arc(-7, -5, 3.5, 0, Math.PI * 2);
+      ctx.arc(7, -5, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.arc(-6, -6.5, 1.3, 0, Math.PI * 2);
+      ctx.arc(8, -6.5, 1.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Nose & Smile
+      ctx.fillStyle = '#0F172A';
+      ctx.beginPath();
+      ctx.arc(0, 1, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#0F172A';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(0, 3, 3, 0.2, Math.PI - 0.2);
+      ctx.stroke();
+
+      // Pink Blush
+      ctx.fillStyle = 'rgba(244, 114, 182, 0.6)';
+      ctx.beginPath();
+      ctx.ellipse(-12, 1, 3.5, 2, 0, 0, Math.PI * 2);
+      ctx.ellipse(12, 1, 3.5, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function update(dt) {
+      // Smooth movement towards touch
+      player.x += (player.targetX - player.x) * 0.2;
+
+      // Spawn falling items
+      spawnTimer += dt;
+      if (spawnTimer > 0.65) {
+        spawnItem();
+        spawnTimer = 0;
+      }
+
+      // Update items
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.y += item.speed * 60 * dt;
+        item.wobble += 0.05;
+        const currentX = item.x + Math.sin(item.wobble) * 15;
+
+        // Collision check with fennec fox
+        const dx = currentX - player.x;
+        const dy = item.y - player.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < 42) {
+          if (item.type === 'storm') {
+            lives--;
+            livesText.textContent = lives;
+            playSound('hit');
+            addParticles(currentX, item.y, '#94A3B8', 12);
+            if (lives <= 0) {
+              endGame(false);
+              return;
+            }
+          } else {
+            score += item.points;
+            scoreText.textContent = score;
+            playSound(item.type);
+            const colorMap = { star: '#FDE047', dew: '#38BDF8', comet: '#F472B6' };
+            addParticles(currentX, item.y, colorMap[item.type] || '#FFF', 10);
+          }
+          items.splice(i, 1);
+          continue;
+        }
+
+        // Out of screen
+        if (item.y > height + 40) {
+          items.splice(i, 1);
+        }
+      }
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Night Sky Background Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, '#090D16');
+      skyGrad.addColorStop(0.5, '#131A2E');
+      skyGrad.addColorStop(1, '#231B42');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Twinkling Stars
+      for (const s of backgroundStars) {
+        s.alpha += Math.sin(Date.now() * s.twinkleSpeed) * 0.02;
+        ctx.fillStyle = `rgba(254, 240, 138, ${Math.max(0.2, Math.min(1, s.alpha))})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 3. Desert Dunes in Distance
+      ctx.fillStyle = '#653E17';
+      ctx.beginPath();
+      ctx.moveTo(0, height - 140);
+      ctx.quadraticCurveTo(width * 0.4, height - 180, width, height - 130);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      ctx.fillStyle = '#9A5816';
+      ctx.beginPath();
+      ctx.moveTo(0, height - 110);
+      ctx.quadraticCurveTo(width * 0.6, height - 140, width, height - 90);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      // 4. Shimmering Oasis Pool
+      const poolGrad = ctx.createLinearGradient(0, height - 70, width, height - 30);
+      poolGrad.addColorStop(0, 'rgba(14, 165, 233, 0.85)');
+      poolGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.95)');
+      poolGrad.addColorStop(1, 'rgba(2, 132, 199, 0.85)');
+      ctx.fillStyle = poolGrad;
+      ctx.beginPath();
+      ctx.ellipse(width / 2, height - 35, width * 0.45, 25, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pool shimmer rings
+      ctx.strokeStyle = 'rgba(224, 242, 254, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(width / 2, height - 35, width * 0.35, 16, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 5. Draw Falling Items
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      for (const item of items) {
+        const drawX = item.x + Math.sin(item.wobble) * 15;
+        ctx.font = `${item.size}px sans-serif`;
+        ctx.fillText(item.char, drawX, item.y);
+      }
+
+      // 6. Draw Player (Fennec Fox)
+      drawFennecFox(player.x, player.y);
+
+      // 7. Draw Particles
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function gameLoop(timestamp) {
+      if (!isRunning) return;
+      if (!lastTime) lastTime = timestamp;
+      const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+      lastTime = timestamp;
+
+      update(dt);
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      lives = 3;
+      timeLeft = 45;
+      items = [];
+      particles = [];
+      scoreText.textContent = score;
+      livesText.textContent = lives;
+      timerText.textContent = timeLeft;
+
+      startOverlay.classList.add('hidden');
+      gameoverOverlay.classList.add('hidden');
+      isRunning = true;
+      lastTime = performance.now();
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!isRunning) return;
+        timeLeft--;
+        timerText.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          endGame(true);
+        }
+      }, 1000);
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function endGame(isClear) {
+      isRunning = false;
+      clearInterval(timerInterval);
+
+      if (isClear) {
+        playSound('win');
+        resultEmoji.textContent = '🌟🦊🎉';
+        resultTitle.textContent = '별빛 오아시스 축제 완성!';
+        resultMsg.textContent = `사막여우와 함께 오아시스를 환하게 밝혔어요!`;
+      } else {
+        resultEmoji.textContent = '🥺🏜️';
+        resultTitle.textContent = '사막의 모래바람이 불어왔어요!';
+        resultMsg.textContent = `조금만 더 조심해서 다시 도전해봐요!`;
+      }
+
+      finalScore.textContent = `${score}점`;
+      gameoverOverlay.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    // Initial setup
+    resize();
+    draw();
+  </script>
+</body>
+</html>

@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 288개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 290개.
 
-[![Games](https://img.shields.io/badge/games-288-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-290-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![288개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![290개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,10 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 288개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 290개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🫧 친칠라의 구름 방울 퐁퐁 (chinchilla-cloud-bubble-hop)](./chinchilla-cloud-bubble-hop/index.html) | 몽실몽실 털이 귀여운 아기 친칠라와 함께 퐁퐁 떠오르는 파스텔 무지개 구름 방울을 사뿐사뿐 밟고 뛰어오르며 별빛 젤리와 무지개 방울을 모으는 포근한 힐링 바운스 아케이드입니다. | 어린이/아케이드 |
+| [🦊 사막여우의 별빛 오아시스 (fennec-fox-desert-star-oasis)](./fennec-fox-desert-star-oasis/index.html) | 별빛이 쏟아지는 신비로운 밤 사막의 오아시스에서 귀여운 아기 사막여우와 함께 하늘에서 살랑살랑 내려오는 반짝이는 별조각과 맑은 이슬방울을 모으고 모래 폭풍을 피하는 힐링 터치 미니게임입니다. | 어린이/아케이드 |
 | [🐨 아기 코알라의 살랑살랑 유칼립투스 바람 (koala-eucalyptus-leaf-breeze)](./koala-eucalyptus-leaf-breeze/index.html) | 초록빛 평화로운 숲속 유칼립투스 나무 위에서 졸린 눈을 깜빡이는 귀여운 아기 코알라와 함께 바람결에 흩날리는 황금 유칼립투스 잎과 촉촉한 이슬 방울을 톡톡 터뜨리며 모으는 포근한 힐링 미니게임입니다. | 어린이/아케이드 |
 | [🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드 (polar-bear-aurora-ice-slide)](./polar-bear-aurora-ice-slide/index.html) | 오색찬란한 오로라가 춤추는 신비로운 북극의 밤, 털이 보송보송한 아기 북극곰과 함께 매끄러운 얼음 슬라이드를 미끄러지며 반짝이는 별조각과 물고기 젤리를 모으는 힐링 아케이드 터치 게임입니다. | 어린이/아케이드 |
 | [🐢 아기 바다거북의 산호초 무지개 헤엄 (sea-turtle-coral-reef-swim)](./sea-turtle-coral-reef-swim/index.html) | 에메랄드빛 맑고 투명한 열대 바닷속에서 아기 바다거북과 함께 오색 빛깔 산호초 사이를 유영하며 반짝이는 바다 진주와 마법 물방울을 모으는 힐링 터치 미니게임입니다. | 어린이/아케이드 |
@@ -484,6 +486,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-02: [🦊 사막여우의 별빛 오아시스](fennec-fox-desert-star-oasis/index.html), [🫧 친칠라의 구름 방울 퐁퐁](chinchilla-cloud-bubble-hop/index.html) (총 290개)
+
 - 2026-10-01: [🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드](polar-bear-aurora-ice-slide/index.html), [🐨 아기 코알라의 살랑살랑 유칼립투스 바람](koala-eucalyptus-leaf-breeze/index.html) (총 288개)
 
 

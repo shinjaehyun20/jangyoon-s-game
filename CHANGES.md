@@ -1,3 +1,7 @@
+## 2026-10-02 — fennec-fox-desert-star-oasis, chinchilla-cloud-bubble-hop (총 290개)
+- **[🦊 사막여우의 별빛 오아시스 (fennec-fox-desert-star-oasis)]** — 별빛이 쏟아지는 밤 사막 오아시스에서 사막여우와 함께 별조각과 이슬방울을 모으고 모래폭풍을 피하는 힐링 터치 아케이드 (외부 의존성 0).
+- **[🫧 친칠라의 구름 방울 퐁퐁 (chinchilla-cloud-bubble-hop)]** — 보송보송 친칠라와 함께 두둥실 떠오르는 무지개 구름 방울과 별빛 젤리를 톡톡 터뜨리며 모으는 힐링 바운스 아케이드 (외부 의존성 0).
+
 ## 2026-09-26 — hedgehog-strawberry-roll, penguin-aurora-slide (총 288개)
 - **[🦔 아기 고슴도치의 달콤 딸기 굴리기 (hedgehog-strawberry-roll)]** — 가시를 동글게 말고 과수원 언덕을 굴러가며 달콤한 딸기를 모으고 돌멩이를 뛰어넘는 타이밍 점프 아케이드 (외부 의존성 0).
 - **[🐧 아기 펭귄의 북극 오로라 미끄럼틀 (penguin-aurora-slide)]** — 신비로운 북극 오로라 무지개 레일을 타고 미끄러지며 반짝이는 별빛 크리스탈을 모으는 스와이프 힐링 아케이드 (외부 의존성 0).

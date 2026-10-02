@@ -2302,5 +2302,21 @@
     "description": "초록빛 평화로운 숲속 유칼립투스 나무 위에서 졸린 눈을 깜빡이는 귀여운 아기 코알라와 함께 바람결에 흩날리는 황금 유칼립투스 잎과 촉촉한 이슬 방울을 톡톡 터뜨리며 모으는 포근한 힐링 미니게임입니다.",
     "thumbnail": "koala-eucalyptus-leaf-breeze/thumb.svg",
     "path": "koala-eucalyptus-leaf-breeze/index.html"
+  },
+  {
+    "id": "fennec-fox-desert-star-oasis",
+    "title": "Fennec Fox Desert Star Oasis",
+    "title_ko": "🦊 사막여우의 별빛 오아시스",
+    "description": "별빛이 쏟아지는 신비로운 밤 사막의 오아시스에서 귀여운 아기 사막여우와 함께 하늘에서 살랑살랑 내려오는 반짝이는 별조각과 맑은 이슬방울을 모으고 모래 폭풍을 피하는 힐링 터치 미니게임입니다.",
+    "thumbnail": "fennec-fox-desert-star-oasis/thumb.svg",
+    "path": "fennec-fox-desert-star-oasis/index.html"
+  },
+  {
+    "id": "chinchilla-cloud-bubble-hop",
+    "title": "Chinchilla Cloud Bubble Hop",
+    "title_ko": "🫧 친칠라의 구름 방울 퐁퐁",
+    "description": "몽실몽실 털이 귀여운 아기 친칠라와 함께 퐁퐁 떠오르는 파스텔 무지개 구름 방울을 사뿐사뿐 밟고 뛰어오르며 별빛 젤리와 무지개 방울을 모으는 포근한 힐링 바운스 아케이드입니다.",
+    "thumbnail": "chinchilla-cloud-bubble-hop/thumb.svg",
+    "path": "chinchilla-cloud-bubble-hop/index.html"
   }
 ]

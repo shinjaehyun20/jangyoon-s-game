@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "chinchilla-cloud-bubble-hop",
+        "title": "🫧 친칠라의 구름 방울 퐁퐁",
+        "path": "chinchilla-cloud-bubble-hop/index.html"
+      },
+      {
+        "id": "fennec-fox-desert-star-oasis",
+        "title": "🦊 사막여우의 별빛 오아시스",
+        "path": "fennec-fox-desert-star-oasis/index.html"
+      },
+      {
         "id": "koala-eucalyptus-leaf-breeze",
         "title": "🐨 아기 코알라의 살랑살랑 유칼립투스 바람",
         "path": "koala-eucalyptus-leaf-breeze/index.html"
