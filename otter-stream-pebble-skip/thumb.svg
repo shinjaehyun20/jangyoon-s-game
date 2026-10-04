@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#70d6ff" />
+      <stop offset="40%" stop-color="#a0e7e5" />
+      <stop offset="70%" stop-color="#b4f8c8" />
+      <stop offset="100%" stop-color="#fbe7c6" />
+    </linearGradient>
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4ea8de" />
+      <stop offset="50%" stop-color="#56cfe1" />
+      <stop offset="100%" stop-color="#48bfe3" />
+    </linearGradient>
+    <linearGradient id="otterFur" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#936639" />
+      <stop offset="100%" stop-color="#654321" />
+    </linearGradient>
+    <linearGradient id="otterBelly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5ebe0" />
+      <stop offset="100%" stop-color="#e3d5ca" />
+    </linearGradient>
+    <linearGradient id="pebbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d6ccc2" />
+      <stop offset="100%" stop-color="#8d99ae" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Background Sky & Hills -->
+  <rect width="512" height="512" rx="48" fill="url(#bgGrad)" />
+
+  <!-- River Stream -->
+  <path d="M0 260 Q130 220 260 250 T512 240 L512 512 L0 512 Z" fill="url(#waterGrad)" />
+
+  <!-- Water Waves / Ripples -->
+  <ellipse cx="280" cy="330" rx="90" ry="24" fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.7" />
+  <ellipse cx="280" cy="330" rx="60" ry="16" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.8" />
+  <ellipse cx="280" cy="330" rx="30" ry="8" fill="#ffffff" fill-opacity="0.6" />
+
+  <ellipse cx="400" cy="300" rx="60" ry="16" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.6" />
+  <ellipse cx="400" cy="300" rx="40" ry="10" fill="none" stroke="#ffffff" stroke-width="2" stroke-opacity="0.7" />
+
+  <ellipse cx="180" cy="370" rx="70" ry="18" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.6" />
+
+  <!-- River Bank Grass / Stones -->
+  <path d="M0 320 Q60 300 130 350 Q90 440 0 460 Z" fill="#74c69d" />
+  <path d="M0 350 Q50 340 100 380 Q60 470 0 490 Z" fill="#52b788" />
+
+  <!-- Skipping Pebble Arc & Pebble -->
+  <path d="M120 280 Q200 180 280 325 Q340 220 400 295 Q440 250 480 285" fill="none" stroke="#ffffff" stroke-width="4" stroke-dasharray="8 8" stroke-linecap="round" />
+  
+  <!-- Flying Pebble -->
+  <ellipse cx="280" cy="325" rx="18" ry="10" fill="url(#pebbleGrad)" filter="url(#shadow)" transform="rotate(-15 280 325)" />
+  <ellipse cx="277" cy="322" rx="14" ry="7" fill="#f8f9fa" opacity="0.6" transform="rotate(-15 280 325)" />
+
+  <!-- Splash droplets -->
+  <circle cx="270" cy="310" r="4" fill="#ffffff" />
+  <circle cx="292" cy="312" r="5" fill="#ffffff" />
+  <circle cx="285" cy="300" r="3.5" fill="#ffffff" />
+
+  <!-- Baby Otter Character -->
+  <g transform="translate(45, 230)" filter="url(#shadow)">
+    <!-- Otter Tail -->
+    <path d="M-10 120 Q-30 140 -20 160 Q-5 160 15 135 Z" fill="#654321" />
+
+    <!-- Otter Body -->
+    <ellipse cx="60" cy="110" rx="48" ry="58" fill="url(#otterFur)" />
+    <!-- Belly -->
+    <ellipse cx="65" cy="115" rx="30" ry="40" fill="url(#otterBelly)" />
+
+    <!-- Otter Head -->
+    <circle cx="75" cy="45" r="42" fill="url(#otterFur)" />
+
+    <!-- Ears -->
+    <circle cx="42" cy="18" r="12" fill="#654321" />
+    <circle cx="43" cy="18" r="7" fill="#ffb4a2" />
+    <circle cx="108" cy="18" r="12" fill="#654321" />
+    <circle cx="107" cy="18" r="7" fill="#ffb4a2" />
+
+    <!-- Muzzle / Snout -->
+    <ellipse cx="80" cy="55" rx="20" ry="14" fill="url(#otterBelly)" />
+    <ellipse cx="80" cy="48" rx="7" ry="5" fill="#2b2d42" />
+
+    <!-- Cute Eyes -->
+    <circle cx="62" cy="40" r="6" fill="#1b1b1e" />
+    <circle cx="60" cy="38" r="2.5" fill="#ffffff" />
+    <circle cx="95" cy="40" r="6" fill="#1b1b1e" />
+    <circle cx="93" cy="38" r="2.5" fill="#ffffff" />
+
+    <!-- Blushing Cheeks -->
+    <circle cx="50" cy="52" r="7" fill="#ff9aa2" opacity="0.65" />
+    <circle cx="106" cy="52" r="7" fill="#ff9aa2" opacity="0.65" />
+
+    <!-- Mouth -->
+    <path d="M75 54 Q80 58 85 54" fill="none" stroke="#2b2d42" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Paw Thrown Forward -->
+    <ellipse cx="115" cy="75" rx="14" ry="10" fill="url(#otterFur)" transform="rotate(-20 115 75)" />
+    <!-- Left Paw holding belly stone -->
+    <ellipse cx="40" cy="95" rx="12" ry="10" fill="url(#otterFur)" />
+    <ellipse cx="42" cy="94" rx="7" ry="5" fill="#adb5bd" />
+  </g>
+
+  <!-- Sparkles & Sunshine -->
+  <g fill="#ffea00">
+    <path d="M440 80 Q440 95 445 100 Q440 105 440 120 Q440 105 435 100 Q440 95 440 80 Z" opacity="0.9" />
+    <path d="M370 110 Q370 120 373 124 Q370 128 370 138 Q370 128 367 124 Q370 120 370 110 Z" opacity="0.75" />
+    <circle cx="465" cy="130" r="3" />
+    <circle cx="340" cy="150" r="4" fill="#ffffff" opacity="0.8" />
+  </g>
+
+  <!-- Title Banner (SVG native) -->
+  <rect x="136" y="440" width="240" height="44" rx="22" fill="#ffffff" fill-opacity="0.9" filter="url(#shadow)" />
+  <text x="256" y="468" text-anchor="middle" font-family="'Noto Sans KR', sans-serif" font-weight="800" font-size="20" fill="#2b2d42">물수제비 퐁당퐁!</text>
+</svg>

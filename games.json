@@ -2318,5 +2318,21 @@
     "description": "몽실몽실 털이 귀여운 아기 친칠라와 함께 퐁퐁 떠오르는 파스텔 무지개 구름 방울을 사뿐사뿐 밟고 뛰어오르며 별빛 젤리와 무지개 방울을 모으는 포근한 힐링 바운스 아케이드입니다.",
     "thumbnail": "chinchilla-cloud-bubble-hop/thumb.svg",
     "path": "chinchilla-cloud-bubble-hop/index.html"
+  },
+  {
+    "id": "panda-bamboo-wind-chime",
+    "title": "Baby Panda Bamboo Wind Chime",
+    "title_ko": "🎋 아기 판다의 대나무 풍경 소리",
+    "description": "산들바람이 부는 맑고 평화로운 초록 대나무 숲속에서 사랑스러운 아기 판다와 함께 5가지 펜타토닉 음계의 대나무 풍경과 은은한 유리 풍경을 톡톡 울리며 포근한 힐링 멜로디를 연주하는 감성 사운드 미니게임입니다.",
+    "thumbnail": "panda-bamboo-wind-chime/thumb.svg",
+    "path": "panda-bamboo-wind-chime/index.html"
+  },
+  {
+    "id": "otter-stream-pebble-skip",
+    "title": "Baby Otter Stream Pebble Skip",
+    "title_ko": "🦦 아기 수달의 물수제비 놀이",
+    "description": "반짝이는 맑은 시냇가에서 귀여운 아기 수달과 함께 매끄러운 조약돌을 퐁당퐁당 던져 물수제비를 띄우는 경쾌한 타이밍 리듬 아케이드입니다. 수면 파문에 맞춰 터치하여 1단부터 10단 이상까지 멋진 물수제비 기록을 세워보세요!",
+    "thumbnail": "otter-stream-pebble-skip/thumb.svg",
+    "path": "otter-stream-pebble-skip/index.html"
   }
 ]

@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>아기 수달의 물수제비 놀이</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4ea8de;
+      --primary-dark: #1d3557;
+      --accent: #ffd166;
+      --otter-fur: #855832;
+      --water-top: #70d6ff;
+      --water-mid: #56cfe1;
+      --water-deep: #48bfe3;
+      --font-game: 'Jua', 'Noto Sans KR', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: linear-gradient(180deg, #b8f2e6 0%, #70d6ff 40%, #56cfe1 75%, #48bfe3 100%);
+      font-family: var(--font-game);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      height: 100%;
+      max-height: 950px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #a0e7e5 0%, #70d6ff 35%, #4ea8de 70%, #0077b6 100%);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* UI Header */
+    .ui-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .home-btn {
+      pointer-events: auto;
+      background: white;
+      border: 3px solid #e2eafc;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-family: var(--font-game);
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.15s;
+    }
+
+    .home-btn:active {
+      transform: scale(0.92);
+    }
+
+    .score-badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid #ffbe0b;
+      border-radius: 24px;
+      padding: 6px 18px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #3a5a40;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-badge span {
+      color: #d90429;
+      font-size: 24px;
+    }
+
+    /* Timing / Action Overlay */
+    #action-prompt {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.92);
+      border: 4px solid #ffbe0b;
+      border-radius: 30px;
+      padding: 12px 28px;
+      font-size: 22px;
+      color: #1d3557;
+      font-weight: bold;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      pointer-events: none;
+      z-index: 20;
+      animation: pulse 1.2s infinite ease-in-out;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.08); }
+    }
+
+    /* Pebble Selection Bar */
+    .pebble-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 8px 16px;
+      border-radius: 28px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+    .pebble-item {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      background: #e9ecef;
+      transition: all 0.2s;
+    }
+
+    .pebble-item.active {
+      border-color: #ffbe0b;
+      transform: scale(1.15);
+      box-shadow: 0 4px 10px rgba(255,190,11,0.5);
+      background: #fff;
+    }
+
+    /* Result Modal */
+    #result-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    .result-card {
+      background: #ffffff;
+      border-radius: 36px;
+      border: 6px solid #4ea8de;
+      padding: 30px 24px;
+      text-align: center;
+      width: 85%;
+      max-width: 360px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .result-title {
+      font-size: 28px;
+      color: #1d3557;
+      margin-bottom: 8px;
+    }
+
+    .result-score {
+      font-size: 48px;
+      color: #e63946;
+      font-weight: 900;
+      margin: 12px 0;
+    }
+
+    .result-desc {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .btn-again {
+      background: linear-gradient(135deg, #ffbe0b, #fb5607);
+      border: none;
+      border-radius: 28px;
+      padding: 14px 36px;
+      font-family: var(--font-game);
+      font-size: 22px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(251,86,7,0.4);
+      transition: transform 0.15s;
+    }
+
+    .btn-again:active {
+      transform: scale(0.92);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-top">
+      <button class="home-btn" onclick="location.href='../index.html'">
+        <span>🏠</span> 장윤이 홈
+      </button>
+      <div class="score-badge">
+        물수제비: <span id="skip-count">0</span>단
+      </div>
+    </div>
+
+    <div id="action-prompt">화면을 터치해서 조약돌 던지기! 🪨</div>
+
+    <div class="pebble-bar">
+      <div class="pebble-item active" data-type="river" title="강돌">🪨</div>
+      <div class="pebble-item" data-type="heart" title="하트돌">💖</div>
+      <div class="pebble-item" data-type="gold" title="황금돌">🌟</div>
+      <div class="pebble-item" data-type="rainbow" title="무지개돌">🌈</div>
+    </div>
+
+    <div id="result-modal">
+      <div class="result-card">
+        <div style="font-size: 52px; margin-bottom: 8px;">🦦🎉</div>
+        <div class="result-title">멋진 물수제비!</div>
+        <div class="result-score" id="final-skips">0단</div>
+        <div class="result-desc" id="final-desc">수달 친구가 신나게 춤을 춥니다!</div>
+        <button class="btn-again" id="btn-replay">한 번 더 던지기!</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Web Audio Synth ---
+    class SoundFx {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playThrow() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(140, this.ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+      }
+      playSkip(count) {
+        this.init();
+        const baseFreq = 440;
+        const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+        const freq = notes[Math.min(count, notes.length - 1)];
+
+        // Water Plop
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq * 1.5, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(freq, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.25);
+
+        // Crystal Ring
+        const ring = this.ctx.createOscillator();
+        const ringGain = this.ctx.createGain();
+        ring.type = 'sine';
+        ring.frequency.setValueAtTime(freq * 2, this.ctx.currentTime);
+        ringGain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        ringGain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+        ring.connect(ringGain);
+        ringGain.connect(this.ctx.destination);
+        ring.start();
+        ring.stop(this.ctx.currentTime + 0.35);
+      }
+      playCheer() {
+        this.init();
+        const chords = [523.25, 659.25, 783.99, 1046.50];
+        chords.forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.07);
+          gain.gain.setValueAtTime(0.25, this.ctx.currentTime + i * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.07 + 0.4);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + i * 0.07);
+          osc.stop(this.ctx.currentTime + i * 0.07 + 0.4);
+        });
+      }
+    }
+
+    const sound = new SoundFx();
+
+    // --- Canvas & Game State ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('game-container');
+    const skipCountEl = document.getElementById('skip-count');
+    const promptEl = document.getElementById('action-prompt');
+    const resultModal = document.getElementById('result-modal');
+    const finalSkipsEl = document.getElementById('final-skips');
+    const finalDescEl = document.getElementById('final-desc');
+    const btnReplay = document.getElementById('btn-replay');
+
+    let width = 0;
+    let height = 0;
+    let dpr = window.devicePixelRatio || 1;
+
+    function resize() {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Game Variables
+    let gameState = 'AIM'; // 'AIM', 'THROWING', 'TIMING_WINDOW', 'RESULT'
+    let skips = 0;
+    let maxSkips = 0;
+    let selectedPebble = 'river';
+
+    // Otter Character
+    const otter = {
+      x: 80,
+      y: 0,
+      armAngle: 0,
+      cheerOffset: 0,
+      isCheering: false
+    };
+
+    // Pebble Object
+    const pebble = {
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      gravity: 0.38,
+      active: false,
+      rotation: 0
+    };
+
+    // Particles & Ripples
+    let ripples = [];
+    let particles = [];
+
+    // Timing Ring for Skipping
+    const timingRing = {
+      active: false,
+      x: 0,
+      y: 0,
+      currentRadius: 60,
+      targetRadius: 28,
+      speed: 1.8,
+      accuracy: 0
+    };
+
+    // River background wave time
+    let riverTime = 0;
+
+    // Pebble selector click
+    document.querySelectorAll('.pebble-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sound.init();
+        document.querySelectorAll('.pebble-item').forEach(p => p.classList.remove('active'));
+        item.classList.add('active');
+        selectedPebble = item.dataset.type;
+      });
+    });
+
+    // Tap/Click Controller
+    function handleUserAction() {
+      sound.init();
+
+      if (gameState === 'AIM') {
+        // First throw
+        gameState = 'THROWING';
+        promptEl.textContent = '물이 닿을 때 원에 맞춰 터치! ⭕';
+        promptEl.style.borderColor = '#4ea8de';
+
+        sound.playThrow();
+        otter.armAngle = -0.8;
+        setTimeout(() => { otter.armAngle = 0.5; }, 120);
+
+        skips = 0;
+        skipCountEl.textContent = skips;
+
+        pebble.x = otter.x + 50;
+        pebble.y = otter.y + 40;
+        pebble.vx = width * 0.0075 + 1.2;
+        pebble.vy = -5.5;
+        pebble.active = true;
+
+        // Schedule first water contact
+        prepareTimingRing(otter.x + width * 0.28, height * 0.65);
+
+      } else if (gameState === 'TIMING_WINDOW') {
+        // User tapped during timing ring
+        const diff = Math.abs(timingRing.currentRadius - timingRing.targetRadius);
+        if (diff < 22) {
+          // Successful skip!
+          skips++;
+          skipCountEl.textContent = skips;
+          sound.playSkip(skips);
+
+          // Add ripples & splash
+          createSplash(pebble.x, pebble.y, skips);
+
+          // Visual feedback
+          let gradeText = '굿! 💧';
+          if (diff < 8) gradeText = '완벽해! ✨ 퐁당!';
+          else if (diff < 15) gradeText = '나이스! 🌊';
+          promptEl.textContent = `${skips}단! ${gradeText}`;
+
+          // Bounce pebble up and forward
+          pebble.vy = -(5.2 - Math.min(skips * 0.2, 2.5));
+          pebble.vx = Math.max(pebble.vx * 0.92, 2.0);
+
+          timingRing.active = false;
+          gameState = 'THROWING';
+
+          // If still has river space, schedule next skip ring
+          const nextTargetX = pebble.x + width * (0.24 - Math.min(skips * 0.015, 0.12));
+          if (nextTargetX < width - 40 && skips < 12) {
+            prepareTimingRing(nextTargetX, height * (0.64 + Math.sin(skips) * 0.03));
+          } else {
+            // End of river reached!
+            setTimeout(() => finishGame(), 1000);
+          }
+        } else {
+          // Missed timing: pebble sinks!
+          createSink(pebble.x, pebble.y);
+          timingRing.active = false;
+          pebble.active = false;
+          gameState = 'RESULT';
+          promptEl.textContent = '조약돌이 가라앉았어요! 퐁~';
+          setTimeout(() => finishGame(), 700);
+        }
+      }
+    }
+
+    container.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.home-btn') || e.target.closest('.pebble-bar') || e.target.closest('#result-modal')) return;
+      handleUserAction();
+    });
+
+    function prepareTimingRing(targetX, targetY) {
+      setTimeout(() => {
+        if (gameState !== 'THROWING') return;
+        gameState = 'TIMING_WINDOW';
+        timingRing.active = true;
+        timingRing.x = targetX;
+        timingRing.y = targetY;
+        timingRing.currentRadius = 65;
+        timingRing.targetRadius = 26;
+      }, 350);
+    }
+
+    function createSplash(x, y, count) {
+      // Ripples
+      ripples.push({ x, y, r: 10, maxR: 70 + count * 8, alpha: 0.9, color: '#ffffff' });
+      ripples.push({ x, y, r: 5, maxR: 45 + count * 6, alpha: 0.7, color: '#a0e7e5' });
+
+      // Particles
+      for (let i = 0; i < 16; i++) {
+        const angle = Math.PI + (Math.random() - 0.5) * 2.2;
+        const speed = Math.random() * 4 + 2;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1.5,
+          life: 1,
+          decay: 0.03 + Math.random() * 0.02,
+          size: Math.random() * 5 + 3,
+          color: selectedPebble === 'rainbow' ? `hsl(${Math.random()*360},90%,60%)` : '#ffffff'
+        });
+      }
+    }
+
+    function createSink(x, y) {
+      ripples.push({ x, y, r: 8, maxR: 50, alpha: 0.8, color: '#70d6ff' });
+      for (let i = 0; i < 10; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -Math.random() * 3,
+          life: 1,
+          decay: 0.04,
+          size: 4,
+          color: '#b8f2e6'
+        });
+      }
+    }
+
+    function finishGame() {
+      gameState = 'RESULT';
+      pebble.active = false;
+      timingRing.active = false;
+      otter.isCheering = true;
+      sound.playCheer();
+
+      finalSkipsEl.textContent = `${skips}단!`;
+      let desc = '아기 수달이 박수를 치며 즐거워해요! 👏';
+      if (skips >= 7) desc = '물수제비의 달인! 수달이 신나게 춤을 춥니다! 🏆';
+      else if (skips >= 4) desc = '강 건너편까지 경쾌하게 통통 튀었어요! 🌊';
+      finalDescEl.textContent = desc;
+
+      resultModal.style.display = 'flex';
+    }
+
+    btnReplay.addEventListener('click', () => {
+      resultModal.style.display = 'none';
+      gameState = 'AIM';
+      otter.isCheering = false;
+      promptEl.textContent = '화면을 터치해서 조약돌 던지기! 🪨';
+      promptEl.style.borderColor = '#ffbe0b';
+      skipCountEl.textContent = '0';
+      skips = 0;
+    });
+
+    // --- Game Render Loop ---
+    function update() {
+      riverTime += 0.03;
+
+      otter.y = height * 0.62;
+
+      // Otter animation
+      if (otter.isCheering) {
+        otter.cheerOffset = Math.sin(riverTime * 8) * 8;
+      } else {
+        otter.cheerOffset = Math.sin(riverTime * 2) * 2;
+      }
+
+      // Pebble Physics
+      if (pebble.active) {
+        pebble.x += pebble.vx;
+        pebble.y += pebble.vy;
+        pebble.vy += pebble.gravity;
+        pebble.rotation += 0.15;
+
+        // Auto fail if dropped below water line without timing window
+        if (pebble.y > height * 0.85) {
+          pebble.active = false;
+          if (gameState !== 'RESULT') {
+            finishGame();
+          }
+        }
+      }
+
+      // Timing Ring Animation
+      if (timingRing.active) {
+        timingRing.currentRadius -= timingRing.speed;
+        if (timingRing.currentRadius <= timingRing.targetRadius - 16) {
+          // Expired timing window
+          createSink(timingRing.x, timingRing.y);
+          timingRing.active = false;
+          pebble.active = false;
+          promptEl.textContent = '타이밍을 놓쳤어요! 퐁당~';
+          setTimeout(() => finishGame(), 600);
+        }
+      }
+
+      // Update Ripples
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const r = ripples[i];
+        r.r += (r.maxR - r.r) * 0.08 + 0.6;
+        r.alpha -= 0.018;
+        if (r.alpha <= 0) ripples.splice(i, 1);
+      }
+
+      // Update Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15; // particle gravity
+        p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Sky & Sun
+      const sunGradient = ctx.createRadialGradient(width * 0.8, height * 0.2, 5, width * 0.8, height * 0.2, 60);
+      sunGradient.addColorStop(0, '#fff3b0');
+      sunGradient.addColorStop(0.5, '#ffd166');
+      sunGradient.addColorStop(1, 'rgba(255, 209, 102, 0)');
+      ctx.fillStyle = sunGradient;
+      ctx.beginPath();
+      ctx.arc(width * 0.8, height * 0.2, 60, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Distant mountains
+      ctx.fillStyle = '#90e0ef';
+      ctx.beginPath();
+      ctx.moveTo(0, height * 0.45);
+      ctx.quadraticCurveTo(width * 0.3, height * 0.38, width * 0.6, height * 0.46);
+      ctx.quadraticCurveTo(width * 0.85, height * 0.4, width, height * 0.44);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      // 2. River Surface
+      const riverGrad = ctx.createLinearGradient(0, height * 0.45, 0, height);
+      riverGrad.addColorStop(0, '#56cfe1');
+      riverGrad.addColorStop(0.4, '#48bfe3');
+      riverGrad.addColorStop(0.8, '#0096c7');
+      riverGrad.addColorStop(1, '#023e8a');
+      ctx.fillStyle = riverGrad;
+
+      ctx.beginPath();
+      ctx.moveTo(0, height * 0.48);
+      for (let x = 0; x <= width; x += 30) {
+        const yWave = Math.sin(x * 0.015 + riverTime) * 6;
+        ctx.lineTo(x, height * 0.48 + yWave);
+      }
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      // River flow sparkles
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      for (let i = 0; i < 7; i++) {
+        const sx = ((i * 110 + riverTime * 45) % (width + 60)) - 30;
+        const sy = height * 0.52 + (i * 45) % (height * 0.35);
+        ctx.beginPath();
+        ctx.ellipse(sx, sy, 25, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 3. Ripples
+      ripples.forEach(r => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, r.alpha);
+        ctx.strokeStyle = r.color;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.ellipse(r.x, r.y, r.r, r.r * 0.35, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // 4. Timing Ring
+      if (timingRing.active) {
+        ctx.save();
+        // Target fixed ring (Green/Gold)
+        ctx.strokeStyle = '#ffd166';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.ellipse(timingRing.x, timingRing.y, timingRing.targetRadius, timingRing.targetRadius * 0.4, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Shrinking ring
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.ellipse(timingRing.x, timingRing.y, timingRing.currentRadius, timingRing.currentRadius * 0.4, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Center beacon point
+        ctx.fillStyle = '#ffbe0b';
+        ctx.beginPath();
+        ctx.arc(timingRing.x, timingRing.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 5. River Bank Grass
+      ctx.fillStyle = '#70e000';
+      ctx.beginPath();
+      ctx.moveTo(0, height * 0.6);
+      ctx.quadraticCurveTo(120, height * 0.62, 160, height * 0.85);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      ctx.fillStyle = '#38b000';
+      ctx.beginPath();
+      ctx.moveTo(0, height * 0.68);
+      ctx.quadraticCurveTo(100, height * 0.72, 130, height * 0.95);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      // 6. Draw Baby Otter
+      drawOtter(otter.x, otter.y + otter.cheerOffset);
+
+      // 7. Draw Flying Pebble
+      if (pebble.active) {
+        drawPebble(pebble.x, pebble.y, pebble.rotation);
+      }
+
+      // 8. Draw Splash Particles
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function drawOtter(ox, oy) {
+      ctx.save();
+      ctx.translate(ox, oy);
+
+      // Tail
+      ctx.fillStyle = '#654321';
+      ctx.beginPath();
+      ctx.ellipse(-30, 20, 25, 12, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Body
+      ctx.fillStyle = '#855832';
+      ctx.beginPath();
+      ctx.ellipse(0, 10, 34, 42, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Belly
+      ctx.fillStyle = '#f5ebe0';
+      ctx.beginPath();
+      ctx.ellipse(4, 14, 20, 28, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head
+      ctx.fillStyle = '#855832';
+      ctx.beginPath();
+      ctx.arc(10, -32, 28, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ears
+      ctx.fillStyle = '#654321';
+      ctx.beginPath();
+      ctx.arc(-12, -48, 8, 0, Math.PI * 2);
+      ctx.arc(32, -48, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffb4a2';
+      ctx.beginPath();
+      ctx.arc(-12, -48, 4, 0, Math.PI * 2);
+      ctx.arc(32, -48, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Snout
+      ctx.fillStyle = '#f5ebe0';
+      ctx.beginPath();
+      ctx.ellipse(14, -26, 14, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#2b2d42';
+      ctx.beginPath();
+      ctx.arc(14, -30, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cute Eyes
+      ctx.fillStyle = '#1b1b1e';
+      ctx.beginPath();
+      ctx.arc(3, -36, 4.5, 0, Math.PI * 2);
+      ctx.arc(24, -36, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      // Eye reflections
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(1.5, -37.5, 1.8, 0, Math.PI * 2);
+      ctx.arc(22.5, -37.5, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cheeks
+      ctx.fillStyle = '#ff9aa2';
+      ctx.beginPath();
+      ctx.arc(-4, -28, 5, 0, Math.PI * 2);
+      ctx.arc(30, -28, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Throwing Arm
+      ctx.save();
+      ctx.translate(18, -10);
+      ctx.rotate(otter.armAngle);
+      ctx.fillStyle = '#855832';
+      ctx.beginPath();
+      ctx.ellipse(14, 0, 16, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    function drawPebble(px, py, rot) {
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(rot);
+
+      if (selectedPebble === 'river') {
+        ctx.fillStyle = '#6c757d';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 12, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#adb5bd';
+        ctx.beginPath();
+        ctx.ellipse(-2, -2, 8, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (selectedPebble === 'heart') {
+        ctx.fillStyle = '#ff4d6d';
+        ctx.beginPath();
+        ctx.arc(-5, -4, 6, Math.PI, 0, false);
+        ctx.arc(5, -4, 6, Math.PI, 0, false);
+        ctx.lineTo(0, 9);
+        ctx.closePath();
+        ctx.fill();
+      } else if (selectedPebble === 'gold') {
+        ctx.fillStyle = '#ffbe0b';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 12, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff3b0';
+        ctx.beginPath();
+        ctx.arc(0, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (selectedPebble === 'rainbow') {
+        const rGrad = ctx.createLinearGradient(-10, -5, 10, 5);
+        rGrad.addColorStop(0, '#ff0054');
+        rGrad.addColorStop(0.3, '#ffbe0b');
+        rGrad.addColorStop(0.7, '#00f5d4');
+        rGrad.addColorStop(1, '#7b2cbf');
+        ctx.fillStyle = rGrad;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 13, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>

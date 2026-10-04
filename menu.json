@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "otter-stream-pebble-skip",
+        "title": "🦦 아기 수달의 물수제비 놀이",
+        "path": "otter-stream-pebble-skip/index.html"
+      },
+      {
+        "id": "panda-bamboo-wind-chime",
+        "title": "🎋 아기 판다의 대나무 풍경 소리",
+        "path": "panda-bamboo-wind-chime/index.html"
+      },
+      {
         "id": "chinchilla-cloud-bubble-hop",
         "title": "🫧 친칠라의 구름 방울 퐁퐁",
         "path": "chinchilla-cloud-bubble-hop/index.html"

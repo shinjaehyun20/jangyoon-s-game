@@ -1,3 +1,7 @@
+## 2026-10-04 — panda-bamboo-wind-chime, otter-stream-pebble-skip (총 292개)
+- **[🎋 아기 판다의 대나무 풍경 소리 (panda-bamboo-wind-chime)]** — 산들바람 부는 대나무 숲에서 5가지 펜타토닉 음계 대나무·유리 풍경을 울리며 힐링 멜로디를 연주하는 감성 사운드 미니게임 (외부 의존성 0).
+- **[🦦 아기 수달의 물수제비 놀이 (otter-stream-pebble-skip)]** — 반짝이는 시냇가에서 귀여운 아기 수달과 함께 조약돌을 퐁당퐁당 던져 물수제비를 띄우는 타이밍 리듬 아케이드 (외부 의존성 0).
+
 ## 2026-10-02 — fennec-fox-desert-star-oasis, chinchilla-cloud-bubble-hop (총 290개)
 - **[🦊 사막여우의 별빛 오아시스 (fennec-fox-desert-star-oasis)]** — 별빛이 쏟아지는 밤 사막 오아시스에서 사막여우와 함께 별조각과 이슬방울을 모으고 모래폭풍을 피하는 힐링 터치 아케이드 (외부 의존성 0).
 - **[🫧 친칠라의 구름 방울 퐁퐁 (chinchilla-cloud-bubble-hop)]** — 보송보송 친칠라와 함께 두둥실 떠오르는 무지개 구름 방울과 별빛 젤리를 톡톡 터뜨리며 모으는 힐링 바운스 아케이드 (외부 의존성 0).
