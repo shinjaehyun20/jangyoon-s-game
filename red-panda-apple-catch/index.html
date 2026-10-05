@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>아기 레서판다의 데굴데굴 사과 받기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e05738;
+      --accent: #ffd166;
+      --font-game: 'Jua', 'Noto Sans KR', sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: linear-gradient(180deg, #ffedd8 0%, #ffd8be 50%, #84a98c 100%);
+      font-family: var(--font-game);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      height: 100%;
+      max-height: 950px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #ffedd8 0%, #ffe5d9 40%, #d8e2dc 75%, #84a98c 100%);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    /* Header UI */
+    .ui-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: white;
+      border: 3px solid #fcd5ce;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-family: var(--font-game);
+      font-size: 16px;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.92);
+    }
+    .stats-box {
+      display: flex;
+      gap: 10px;
+    }
+    .badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid #ffb5a7;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #2b2d42;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .badge span {
+      color: #e05738;
+      font-size: 20px;
+    }
+    /* Touch Guide */
+    #touch-guide {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-size: 15px;
+      color: #555;
+      pointer-events: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      animation: pulse 1.5s infinite;
+      white-space: nowrap;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 0.5; }
+    }
+    /* Result Modal */
+    #result-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .modal-card {
+      background: white;
+      border-radius: 36px;
+      border: 6px solid #e05738;
+      padding: 32px 24px;
+      text-align: center;
+      width: 85%;
+      max-width: 360px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+      animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes pop {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-title {
+      font-size: 26px;
+      color: #2b2d42;
+      margin-bottom: 6px;
+    }
+    .modal-score {
+      font-size: 46px;
+      color: #e05738;
+      font-weight: 900;
+      margin: 10px 0;
+    }
+    .modal-desc {
+      font-size: 17px;
+      color: #666;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+    .btn-restart {
+      background: linear-gradient(135deg, #e05738, #f4a261);
+      border: none;
+      border-radius: 24px;
+      padding: 14px 36px;
+      font-family: var(--font-game);
+      font-size: 20px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(224,87,56,0.4);
+      transition: transform 0.15s;
+    }
+    .btn-restart:active {
+      transform: scale(0.92);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-top">
+      <button class="home-btn" onclick="location.href='../index.html'">
+        <span>🏠</span> 장윤이 홈
+      </button>
+      <div class="stats-box">
+        <div class="badge">남은시간: <span id="time-left">45</span>초</div>
+        <div class="badge">점수: <span id="score-val">0</span></div>
+      </div>
+    </div>
+
+    <div id="touch-guide">화면을 좌우로 터치하거나 드래그해 사과를 바구니로 받아요! 🍎</div>
+
+    <div id="result-modal">
+      <div class="modal-card">
+        <div style="font-size: 52px; margin-bottom: 6px;">🐾🍎</div>
+        <div class="modal-title">풍성한 가을 사과 수확!</div>
+        <div class="modal-score" id="final-score">0점</div>
+        <div class="modal-desc" id="final-desc">레서판다가 바구니 가득 달콤한 사과를 모았어요!</div>
+        <button class="btn-restart" id="btn-restart">다시 수확하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Web Audio Synth ---
+    class SoundFx {
+      constructor() { this.ctx = null; }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      playApple() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+        osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+      }
+      playGold() {
+        this.init();
+        [659.25, 880, 1046.5].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.06);
+          gain.gain.setValueAtTime(0.25, this.ctx.currentTime + i * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.06 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + i * 0.06);
+          osc.stop(this.ctx.currentTime + i * 0.06 + 0.25);
+        });
+      }
+      playBurr() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
+      }
+      playFanfare() {
+        this.init();
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.09);
+          gain.gain.setValueAtTime(0.3, this.ctx.currentTime + i * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.09 + 0.4);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + i * 0.09);
+          osc.stop(this.ctx.currentTime + i * 0.09 + 0.4);
+        });
+      }
+    }
+
+    const sound = new SoundFx();
+
+    // Canvas Setup
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('game-container');
+    const scoreVal = document.getElementById('score-val');
+    const timeLeft = document.getElementById('time-left');
+    const resultModal = document.getElementById('result-modal');
+    const finalScore = document.getElementById('final-score');
+    const finalDesc = document.getElementById('final-desc');
+    const btnRestart = document.getElementById('btn-restart');
+
+    let width = 0;
+    let height = 0;
+    let dpr = window.devicePixelRatio || 1;
+
+    function resize() {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Game Variables
+    let isGameOver = false;
+    let score = 0;
+    let gameTimer = 45;
+    let combo = 0;
+    let items = [];
+    let particles = [];
+    let spawnCounter = 0;
+
+    // Red Panda Player
+    const player = {
+      x: width / 2,
+      y: 0,
+      targetX: width / 2,
+      width: 70,
+      basketWidth: 80,
+      speed: 0.18,
+      facing: 1, // 1 right, -1 left
+      animTime: 0
+    };
+
+    // Input handlers
+    function setTarget(clientX) {
+      sound.init();
+      const rect = container.getBoundingClientRect();
+      const relX = clientX - rect.left;
+      player.targetX = Math.max(player.basketWidth / 2, Math.min(width - player.basketWidth / 2, relX));
+    }
+
+    container.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.home-btn') || e.target.closest('#result-modal')) return;
+      setTarget(e.clientX);
+    });
+
+    container.addEventListener('pointermove', (e) => {
+      if (e.buttons > 0) {
+        setTarget(e.clientX);
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      sound.init();
+      if (e.key === 'ArrowLeft' || e.key === 'a') {
+        player.targetX = Math.max(player.basketWidth / 2, player.targetX - 40);
+      } else if (e.key === 'ArrowRight' || e.key === 'd') {
+        player.targetX = Math.min(width - player.basketWidth / 2, player.targetX + 40);
+      }
+    });
+
+    // Spawn falling items
+    function spawnItem() {
+      const rand = Math.random();
+      let type = 'apple';
+      if (rand < 0.18) type = 'gold_apple';
+      else if (rand < 0.35) type = 'leaf';
+      else if (rand < 0.50) type = 'burr';
+
+      const x = Math.random() * (width - 60) + 30;
+      const speed = Math.random() * 1.5 + 2.5;
+
+      items.push({
+        x,
+        y: -30,
+        type,
+        speed,
+        rot: Math.random() * Math.PI,
+        rotSpeed: (Math.random() - 0.5) * 0.08
+      });
+    }
+
+    // Floating text particle
+    function addTextParticle(x, y, text, color) {
+      particles.push({
+        x, y,
+        text,
+        color,
+        vy: -2,
+        life: 1,
+        decay: 0.025
+      });
+    }
+
+    // Sparkle particle
+    function addSparkles(x, y, color) {
+      for (let i = 0; i < 8; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3 + 1;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: Math.random() * 4 + 2,
+          color,
+          life: 1,
+          decay: 0.04
+        });
+      }
+    }
+
+    // Main Game Timer
+    const timerInterval = setInterval(() => {
+      if (isGameOver) return;
+      gameTimer--;
+      timeLeft.textContent = gameTimer;
+      if (gameTimer <= 0) {
+        endGame();
+      }
+    }, 1000);
+
+    function endGame() {
+      isGameOver = true;
+      sound.playFanfare();
+      finalScore.textContent = `${score}점`;
+
+      let desc = '아기 레서판다가 싱싱한 사과를 맛있게 먹어요! 🍎';
+      if (score >= 350) desc = '사과 수확의 마스터! 황금빛 잔치가 열렸어요! 🏆';
+      else if (score >= 200) desc = '바구니가 넘치도록 달콤한 사과를 가득 채웠어요! 🌟';
+      finalDesc.textContent = desc;
+
+      resultModal.style.display = 'flex';
+    }
+
+    btnRestart.addEventListener('click', () => {
+      resultModal.style.display = 'none';
+      score = 0;
+      gameTimer = 45;
+      combo = 0;
+      items = [];
+      particles = [];
+      scoreVal.textContent = '0';
+      timeLeft.textContent = '45';
+      isGameOver = false;
+    });
+
+    // Update
+    function update() {
+      if (isGameOver) return;
+
+      player.y = height - 90;
+      player.animTime += 0.05;
+
+      // Smooth move
+      const dx = player.targetX - player.x;
+      if (Math.abs(dx) > 1) {
+        player.facing = dx > 0 ? 1 : -1;
+      }
+      player.x += dx * player.speed;
+
+      // Spawn
+      spawnCounter++;
+      if (spawnCounter > 38) {
+        spawnItem();
+        spawnCounter = 0;
+      }
+
+      // Items update
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.y += item.speed;
+        item.rot += item.rotSpeed;
+
+        // Basket collision
+        const basketY = player.y - 10;
+        const basketLeft = player.x - player.basketWidth / 2;
+        const basketRight = player.x + player.basketWidth / 2;
+
+        if (item.y >= basketY - 15 && item.y <= basketY + 25 && item.x >= basketLeft && item.x <= basketRight) {
+          // Catch!
+          if (item.type === 'apple') {
+            combo++;
+            const pts = 10 + Math.min(combo * 2, 20);
+            score += pts;
+            sound.playApple();
+            addTextParticle(item.x, item.y, `+${pts} 🍎`, '#e05738');
+            addSparkles(item.x, item.y, '#ff4d6d');
+          } else if (item.type === 'gold_apple') {
+            combo += 2;
+            const pts = 30 + Math.min(combo * 3, 30);
+            score += pts;
+            sound.playGold();
+            addTextParticle(item.x, item.y, `+${pts} ✨`, '#f4a261');
+            addSparkles(item.x, item.y, '#ffd166');
+          } else if (item.type === 'leaf') {
+            score += 5;
+            sound.playApple();
+            addTextParticle(item.x, item.y, '+5 🍃', '#2a9d8f');
+          } else if (item.type === 'burr') {
+            combo = 0;
+            score = Math.max(0, score - 15);
+            sound.playBurr();
+            addTextParticle(item.x, item.y, '-15 🌰', '#6c584c');
+            addSparkles(item.x, item.y, '#8b5e3c');
+          }
+          scoreVal.textContent = score;
+          items.splice(i, 1);
+          continue;
+        }
+
+        // Out of bounds
+        if (item.y > height + 40) {
+          if (item.type === 'apple' || item.type === 'gold_apple') {
+            combo = 0; // Miss reset
+          }
+          items.splice(i, 1);
+        }
+      }
+
+      // Particles update
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (p.text) {
+          p.y += p.vy;
+        } else {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.1;
+        }
+        p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    // Render
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Autumn Sky & Trees
+      ctx.fillStyle = '#f4a261';
+      ctx.beginPath();
+      ctx.arc(width * 0.15, 80, 70, 0, Math.PI * 2);
+      ctx.arc(width * 0.5, 60, 90, 0, Math.PI * 2);
+      ctx.arc(width * 0.85, 90, 80, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hill
+      ctx.fillStyle = '#84a98c';
+      ctx.beginPath();
+      ctx.moveTo(0, height - 70);
+      ctx.quadraticCurveTo(width * 0.5, height - 100, width, height - 70);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.fill();
+
+      // 2. Falling Items
+      items.forEach(item => {
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.rotate(item.rot);
+
+        if (item.type === 'apple') {
+          // Red Apple
+          ctx.fillStyle = '#ff4d6d';
+          ctx.beginPath();
+          ctx.arc(0, 0, 16, 0, Math.PI * 2);
+          ctx.fill();
+          // Leaf
+          ctx.fillStyle = '#52b788';
+          ctx.beginPath();
+          ctx.ellipse(6, -16, 6, 3, -0.4, 0, Math.PI * 2);
+          ctx.fill();
+          // Stem
+          ctx.strokeStyle = '#583101';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(0, -14);
+          ctx.lineTo(2, -20);
+          ctx.stroke();
+        } else if (item.type === 'gold_apple') {
+          // Golden Apple
+          ctx.fillStyle = '#ffbe0b';
+          ctx.beginPath();
+          ctx.arc(0, 0, 18, 0, Math.PI * 2);
+          ctx.fill();
+          // Sparkle highlight
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(-5, -5, 4, 0, Math.PI * 2);
+          ctx.fill();
+          // Leaf
+          ctx.fillStyle = '#06d6a0';
+          ctx.beginPath();
+          ctx.ellipse(6, -18, 7, 4, -0.4, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (item.type === 'leaf') {
+          // Maple Leaf
+          ctx.fillStyle = '#e76f51';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 14, 8, 0.4, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (item.type === 'burr') {
+          // Chestnut Burr
+          ctx.fillStyle = '#6f4e37';
+          ctx.beginPath();
+          ctx.arc(0, 0, 15, 0, Math.PI * 2);
+          ctx.fill();
+          // Prickles
+          ctx.strokeStyle = '#3d2614';
+          ctx.lineWidth = 2;
+          for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(a) * 14, Math.sin(a) * 14);
+            ctx.lineTo(Math.cos(a) * 21, Math.sin(a) * 21);
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+      });
+
+      // 3. Draw Player: Red Panda with Basket
+      drawRedPanda(player.x, player.y, player.facing);
+
+      // 4. Particles & Float text
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        if (p.text) {
+          ctx.font = 'bold 22px Jua, sans-serif';
+          ctx.fillStyle = p.color;
+          ctx.textAlign = 'center';
+          ctx.fillText(p.text, p.x, p.y);
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      });
+    }
+
+    function drawRedPanda(px, py, facing) {
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.scale(facing, 1);
+
+      // Striped Tail behind
+      ctx.save();
+      const tailWag = Math.sin(player.animTime * 3) * 0.15;
+      ctx.rotate(tailWag);
+      ctx.fillStyle = '#e05738';
+      ctx.beginPath();
+      ctx.ellipse(-38, 20, 32, 14, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      // White tail rings
+      ctx.fillStyle = '#f8edeb';
+      ctx.beginPath();
+      ctx.ellipse(-46, 22, 6, 12, -0.3, 0, Math.PI * 2);
+      ctx.ellipse(-30, 18, 6, 13, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Body
+      ctx.fillStyle = '#b03a1e';
+      ctx.beginPath();
+      ctx.ellipse(0, 16, 26, 30, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Dark Belly
+      ctx.fillStyle = '#2b2d42';
+      ctx.beginPath();
+      ctx.ellipse(0, 20, 18, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head
+      ctx.fillStyle = '#e05738';
+      ctx.beginPath();
+      ctx.arc(0, -20, 26, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pointy Ears
+      ctx.fillStyle = '#b03a1e';
+      ctx.beginPath();
+      ctx.moveTo(-22, -38);
+      ctx.lineTo(-32, -18);
+      ctx.lineTo(-12, -26);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(-20, -35);
+      ctx.lineTo(-28, -20);
+      ctx.lineTo(-14, -25);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#b03a1e';
+      ctx.beginPath();
+      ctx.moveTo(22, -38);
+      ctx.lineTo(32, -18);
+      ctx.lineTo(12, -26);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(20, -35);
+      ctx.lineTo(28, -20);
+      ctx.lineTo(14, -25);
+      ctx.closePath();
+      ctx.fill();
+
+      // White Eyebrow Patches & Snout
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-10, -28, 4.5, 0, Math.PI * 2);
+      ctx.arc(10, -28, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      // White muzzle
+      ctx.beginPath();
+      ctx.ellipse(0, -12, 14, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dark Nose & Mouth
+      ctx.fillStyle = '#1d1e2c';
+      ctx.beginPath();
+      ctx.arc(0, -15, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cute Eyes
+      ctx.beginPath();
+      ctx.arc(-8, -20, 3.5, 0, Math.PI * 2);
+      ctx.arc(8, -20, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-9, -21, 1.2, 0, Math.PI * 2);
+      ctx.arc(7, -21, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Rosy Cheeks
+      ctx.fillStyle = '#ff758f';
+      ctx.beginPath();
+      ctx.arc(-16, -14, 4, 0, Math.PI * 2);
+      ctx.arc(16, -14, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Woven Basket
+      ctx.fillStyle = '#bc6c25';
+      ctx.beginPath();
+      ctx.moveTo(-36, -5);
+      ctx.lineTo(36, -5);
+      ctx.lineTo(26, 26);
+      ctx.lineTo(-26, 26);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = '#dda15e';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Front Paws holding basket
+      ctx.fillStyle = '#2b2d42';
+      ctx.beginPath();
+      ctx.ellipse(-26, 0, 6, 8, 0, 0, Math.PI * 2);
+      ctx.ellipse(26, 0, 6, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>

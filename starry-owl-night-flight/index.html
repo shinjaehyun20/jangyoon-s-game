@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>꼬마 부엉이의 밤하늘 별빛 비행</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7b2cbf;
+      --accent: #ffd166;
+      --font-game: 'Jua', 'Noto Sans KR', sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: linear-gradient(180deg, #10002b 0%, #240046 50%, #3c096c 100%);
+      font-family: var(--font-game);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      height: 100%;
+      max-height: 950px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #10002b 0%, #240046 40%, #3c096c 75%, #5a189a 100%);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    /* Top Bar */
+    .ui-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .home-btn {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.9);
+      border: 3px solid #c77dff;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-family: var(--font-game);
+      font-size: 16px;
+      color: #240046;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.15s;
+    }
+    .home-btn:active {
+      transform: scale(0.92);
+    }
+    .stats-box {
+      display: flex;
+      gap: 10px;
+    }
+    .badge {
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid #ffd166;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #240046;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .badge span {
+      color: #9d4edd;
+      font-size: 20px;
+    }
+    /* Touch Prompt */
+    #touch-guide {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 22px;
+      padding: 8px 22px;
+      font-size: 16px;
+      color: #240046;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: pulse 1.5s infinite;
+      white-space: nowrap;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.95; transform: translateX(-50%) scale(1); }
+      50% { opacity: 0.6; transform: translateX(-50%) scale(1.04); }
+    }
+    /* Modal */
+    #result-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(5px);
+    }
+    .modal-card {
+      background: #ffffff;
+      border-radius: 36px;
+      border: 6px solid #7b2cbf;
+      padding: 32px 24px;
+      text-align: center;
+      width: 85%;
+      max-width: 360px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes pop {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-title {
+      font-size: 26px;
+      color: #240046;
+      margin-bottom: 6px;
+    }
+    .modal-score {
+      font-size: 46px;
+      color: #7b2cbf;
+      font-weight: 900;
+      margin: 10px 0;
+    }
+    .modal-desc {
+      font-size: 17px;
+      color: #555;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+    .btn-restart {
+      background: linear-gradient(135deg, #7b2cbf, #c77dff);
+      border: none;
+      border-radius: 24px;
+      padding: 14px 36px;
+      font-family: var(--font-game);
+      font-size: 20px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(123,44,191,0.4);
+      transition: transform 0.15s;
+    }
+    .btn-restart:active {
+      transform: scale(0.92);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-top">
+      <button class="home-btn" onclick="location.href='../index.html'">
+        <span>🏠</span> 장윤이 홈
+      </button>
+      <div class="stats-box">
+        <div class="badge">별빛: <span id="stars-val">0</span></div>
+        <div class="badge">거리: <span id="dist-val">0</span>m</div>
+      </div>
+    </div>
+
+    <div id="touch-guide">화면을 꾹 누르면 위로 날아오르고 떼면 부드럽게 활강해요! 🌟</div>
+
+    <div id="result-modal">
+      <div class="modal-card">
+        <div style="font-size: 52px; margin-bottom: 6px;">🦉✨</div>
+        <div class="modal-title">아름다운 밤하늘 비행!</div>
+        <div class="modal-score" id="final-score">0점</div>
+        <div class="modal-desc" id="final-desc">부엉이가 달빛을 받으며 기분 좋게 노래해요!</div>
+        <button class="btn-restart" id="btn-restart">다시 비행하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Web Audio Synth ---
+    class SoundFx {
+      constructor() { this.ctx = null; }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      playFlap() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(110, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.12);
+      }
+      playStar() {
+        this.init();
+        const notes = [659.25, 783.99, 987.77, 1046.50, 1318.51];
+        const freq = notes[Math.floor(Math.random() * notes.length)];
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.25);
+      }
+      playRing() {
+        this.init();
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f * 1.5, this.ctx.currentTime + i * 0.05);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.05 + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + i * 0.05);
+          osc.stop(this.ctx.currentTime + i * 0.05 + 0.3);
+        });
+      }
+      playBump() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
+      }
+      playFanfare() {
+        this.init();
+        [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.08);
+          gain.gain.setValueAtTime(0.25, this.ctx.currentTime + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.08 + 0.4);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + i * 0.08);
+          osc.stop(this.ctx.currentTime + i * 0.08 + 0.4);
+        });
+      }
+    }
+
+    const sound = new SoundFx();
+
+    // Canvas
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('game-container');
+    const starsVal = document.getElementById('stars-val');
+    const distVal = document.getElementById('dist-val');
+    const resultModal = document.getElementById('result-modal');
+    const finalScore = document.getElementById('final-score');
+    const finalDesc = document.getElementById('final-desc');
+    const btnRestart = document.getElementById('btn-restart');
+
+    let width = 0;
+    let height = 0;
+    let dpr = window.devicePixelRatio || 1;
+
+    function resize() {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Game Variables
+    let isGameOver = false;
+    let isPressing = false;
+    let distance = 0;
+    let stars = 0;
+    let scrollSpeed = 3.2;
+
+    // Owl Player
+    const owl = {
+      x: 90,
+      y: height / 2,
+      vy: 0,
+      gravity: 0.35,
+      lift: -0.65,
+      radius: 26,
+      wingAngle: 0,
+      wingDir: 1
+    };
+
+    // World Elements
+    let bgStars = [];
+    let clouds = [];
+    let items = []; // stars, rings, stormclouds
+    let particles = [];
+    let spawnTimer = 0;
+
+    // Init background stars
+    for (let i = 0; i < 40; i++) {
+      bgStars.push({
+        x: Math.random() * 600,
+        y: Math.random() * 900,
+        r: Math.random() * 2 + 1,
+        speed: Math.random() * 0.6 + 0.4,
+        alpha: Math.random() * 0.6 + 0.4
+      });
+    }
+
+    // Input handlers
+    function pressStart() {
+      sound.init();
+      if (isGameOver) return;
+      isPressing = true;
+      sound.playFlap();
+    }
+    function pressEnd() {
+      isPressing = false;
+    }
+
+    container.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.home-btn') || e.target.closest('#result-modal')) return;
+      pressStart();
+    });
+    window.addEventListener('pointerup', pressEnd);
+    window.addEventListener('pointercancel', pressEnd);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.key === 'ArrowUp') {
+        pressStart();
+      }
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'Space' || e.key === 'ArrowUp') {
+        pressEnd();
+      }
+    });
+
+    // Spawn elements
+    function spawnObstacleOrReward() {
+      const rand = Math.random();
+      const spawnY = Math.random() * (height - 220) + 110;
+
+      if (rand < 0.45) {
+        // Twinkle Star
+        items.push({
+          type: 'star',
+          x: width + 40,
+          y: spawnY,
+          r: 14,
+          pts: 10
+        });
+      } else if (rand < 0.70) {
+        // Star Ring (fly through)
+        items.push({
+          type: 'ring',
+          x: width + 50,
+          y: spawnY,
+          r: 38,
+          pts: 50,
+          passed: false
+        });
+      } else if (rand < 0.90) {
+        // Moon Shard
+        items.push({
+          type: 'moon',
+          x: width + 40,
+          y: spawnY,
+          r: 16,
+          pts: 25
+        });
+      } else {
+        // Soft Storm Cloud
+        items.push({
+          type: 'cloud',
+          x: width + 60,
+          y: spawnY,
+          w: 70,
+          h: 40
+        });
+      }
+    }
+
+    function addSparkles(x, y, color) {
+      for (let i = 0; i < 8; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const sp = Math.random() * 3 + 1;
+        particles.push({
+          x, y,
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp,
+          size: Math.random() * 4 + 2,
+          color,
+          life: 1,
+          decay: 0.04
+        });
+      }
+    }
+
+    function addTextParticle(x, y, text, color) {
+      particles.push({
+        x, y,
+        text,
+        color,
+        vy: -2,
+        life: 1,
+        decay: 0.025
+      });
+    }
+
+    function endGame() {
+      isGameOver = true;
+      sound.playFanfare();
+      const totalScore = distance + stars * 10;
+      finalScore.textContent = `${totalScore}점`;
+
+      let desc = '아기 부엉이가 반짝이는 밤하늘을 기분 좋게 날았어요! 🌙';
+      if (totalScore >= 600) desc = '전설의 밤하늘 마스터! 은하수를 가로질렀어요! 🏆';
+      else if (totalScore >= 350) desc = '달빛과 별빛을 가득 모은 멋진 비행이었어요! 🌟';
+      finalDesc.textContent = desc;
+
+      resultModal.style.display = 'flex';
+    }
+
+    btnRestart.addEventListener('click', () => {
+      resultModal.style.display = 'none';
+      distance = 0;
+      stars = 0;
+      owl.y = height / 2;
+      owl.vy = 0;
+      items = [];
+      particles = [];
+      starsVal.textContent = '0';
+      distVal.textContent = '0';
+      isGameOver = false;
+    });
+
+    // Update
+    function update() {
+      if (isGameOver) return;
+
+      distance += 1;
+      distVal.textContent = Math.floor(distance / 5);
+
+      // Owl Physics
+      if (isPressing) {
+        owl.vy += owl.lift;
+        owl.wingAngle += 0.35;
+      } else {
+        owl.vy += owl.gravity;
+        owl.wingAngle += 0.1;
+      }
+      owl.vy = Math.max(-7, Math.min(owl.vy, 6.5));
+      owl.y += owl.vy;
+
+      // Screen Bounds
+      if (owl.y < 50) {
+        owl.y = 50;
+        owl.vy = 0;
+      }
+      if (owl.y > height - 70) {
+        owl.y = height - 70;
+        owl.vy = 0;
+        endGame();
+      }
+
+      // BG Stars Scroll
+      bgStars.forEach(s => {
+        s.x -= s.speed;
+        if (s.x < -10) s.x = width + 10;
+      });
+
+      // Spawn
+      spawnTimer++;
+      if (spawnTimer > 45) {
+        spawnObstacleOrReward();
+        spawnTimer = 0;
+      }
+
+      // Items Scroll & Collide
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.x -= scrollSpeed;
+
+        // Collision with Owl
+        const dx = owl.x - item.x;
+        const dy = owl.y - item.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (item.type === 'star') {
+          if (dist < owl.radius + item.r) {
+            stars += 1;
+            starsVal.textContent = stars;
+            sound.playStar();
+            addTextParticle(item.x, item.y, '+10 ⭐', '#ffd166');
+            addSparkles(item.x, item.y, '#ffd166');
+            items.splice(i, 1);
+            continue;
+          }
+        } else if (item.type === 'moon') {
+          if (dist < owl.radius + item.r) {
+            stars += 3;
+            starsVal.textContent = stars;
+            sound.playStar();
+            addTextParticle(item.x, item.y, '+25 🌙', '#e0aaff');
+            addSparkles(item.x, item.y, '#e0aaff');
+            items.splice(i, 1);
+            continue;
+          }
+        } else if (item.type === 'ring') {
+          if (!item.passed && Math.abs(item.x - owl.x) < 20 && Math.abs(item.y - owl.y) < item.r) {
+            item.passed = true;
+            stars += 5;
+            starsVal.textContent = stars;
+            sound.playRing();
+            addTextParticle(item.x, item.y, '+50 💫', '#c77dff');
+            addSparkles(item.x, item.y, '#ffffff');
+          }
+        } else if (item.type === 'cloud') {
+          if (Math.abs(item.x - owl.x) < item.w / 2 && Math.abs(item.y - owl.y) < item.h / 2) {
+            sound.playBump();
+            addSparkles(owl.x, owl.y, '#7b2cbf');
+            owl.vy = 4;
+            addTextParticle(owl.x, owl.y, '쿵! ☁️', '#9d4edd');
+            items.splice(i, 1);
+            continue;
+          }
+        }
+
+        if (item.x < -100) {
+          items.splice(i, 1);
+        }
+      }
+
+      // Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (p.text) p.y += p.vy;
+        else {
+          p.x += p.vx;
+          p.y += p.vy;
+        }
+        p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    // Draw
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Crescent Moon in Background
+      ctx.fillStyle = '#fff3b0';
+      ctx.beginPath();
+      ctx.arc(width - 80, 100, 36, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#10002b';
+      ctx.beginPath();
+      ctx.arc(width - 66, 92, 34, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. BG Stars
+      bgStars.forEach(s => {
+        ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3. Items (Stars, Rings, Clouds)
+      items.forEach(item => {
+        ctx.save();
+        if (item.type === 'star') {
+          ctx.fillStyle = '#ffe66d';
+          ctx.beginPath();
+          drawStar(ctx, item.x, item.y, 5, item.r, item.r / 2);
+          ctx.fill();
+        } else if (item.type === 'moon') {
+          ctx.fillStyle = '#e0aaff';
+          ctx.beginPath();
+          ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#240046';
+          ctx.beginPath();
+          ctx.arc(item.x + 6, item.y - 3, item.r * 0.9, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (item.type === 'ring') {
+          ctx.strokeStyle = item.passed ? '#c77dff' : '#ffd166';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.ellipse(item.x, item.y, 16, item.r, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (item.type === 'cloud') {
+          ctx.fillStyle = '#480ca8';
+          ctx.beginPath();
+          ctx.arc(item.x - 20, item.y, 18, 0, Math.PI * 2);
+          ctx.arc(item.x, item.y - 10, 24, 0, Math.PI * 2);
+          ctx.arc(item.x + 20, item.y, 18, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      });
+
+      // 4. Owl Character
+      drawOwl(owl.x, owl.y, owl.wingAngle);
+
+      // 5. Particles
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        if (p.text) {
+          ctx.font = 'bold 22px Jua, sans-serif';
+          ctx.fillStyle = p.color;
+          ctx.textAlign = 'center';
+          ctx.fillText(p.text, p.x, p.y);
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      });
+    }
+
+    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      let step = Math.PI / spikes;
+
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+      }
+      ctx.lineTo(cx, cy - outerRadius);
+      ctx.closePath();
+    }
+
+    function drawOwl(ox, oy, wingA) {
+      ctx.save();
+      ctx.translate(ox, oy);
+
+      // Flapping Wings
+      const flap = Math.sin(wingA) * 16;
+      ctx.fillStyle = '#9d4edd';
+      // Left Wing
+      ctx.beginPath();
+      ctx.ellipse(-14, 4 + flap * 0.4, 20, 10, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      // Right Wing
+      ctx.beginPath();
+      ctx.ellipse(14, 4 - flap * 0.4, 20, 10, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Body
+      ctx.fillStyle = '#5a189a';
+      ctx.beginPath();
+      ctx.ellipse(0, 4, 22, 26, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Belly
+      ctx.fillStyle = '#c77dff';
+      ctx.beginPath();
+      ctx.ellipse(0, 8, 14, 16, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ear Tufts
+      ctx.fillStyle = '#5a189a';
+      ctx.beginPath();
+      ctx.moveTo(-15, -16);
+      ctx.lineTo(-24, -28);
+      ctx.lineTo(-8, -20);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(15, -16);
+      ctx.lineTo(24, -28);
+      ctx.lineTo(8, -20);
+      ctx.closePath();
+      ctx.fill();
+
+      // Large Glowing Eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-8, -6, 9, 0, Math.PI * 2);
+      ctx.arc(8, -6, 9, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffd166';
+      ctx.beginPath();
+      ctx.arc(-8, -6, 7, 0, Math.PI * 2);
+      ctx.arc(8, -6, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pupils
+      ctx.fillStyle = '#10002b';
+      ctx.beginPath();
+      ctx.arc(-7, -6, 4, 0, Math.PI * 2);
+      ctx.arc(9, -6, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-8, -8, 1.5, 0, Math.PI * 2);
+      ctx.arc(8, -8, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Beak
+      ctx.fillStyle = '#fb5607';
+      ctx.beginPath();
+      ctx.moveTo(-3, 1);
+      ctx.lineTo(3, 1);
+      ctx.lineTo(0, 7);
+      ctx.closePath();
+      ctx.fill();
+
+      // Cheeks
+      ctx.fillStyle = '#ff758f';
+      ctx.beginPath();
+      ctx.arc(-14, 1, 3.5, 0, Math.PI * 2);
+      ctx.arc(14, 1, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>

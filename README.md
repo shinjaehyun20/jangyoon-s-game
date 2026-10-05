@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 292개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 294개.
 
-[![Games](https://img.shields.io/badge/games-292-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-294-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![292개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![294개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,10 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 292개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 294개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🌌 꼬마 부엉이의 밤하늘 별빛 비행 (starry-owl-night-flight)](./starry-owl-night-flight/index.html) | 몽환적인 보랏빛 밤하늘을 날아오르는 귀여운 꼬마 부엉이와 함께 날개를 살랑살랑 저어 별빛 고리를 통과하고 반짝이는 별조각을 모으는 감성 비행 힐링 게임입니다. | 어린이/아케이드 |
+| [🍎 아기 레서판다의 데굴데굴 사과 받기 (red-panda-apple-catch)](./red-panda-apple-catch/index.html) | 가을빛으로 물든 숲속 언덕에서 귀여운 아기 레서판다와 함께 나무에서 떨어지는 달콤한 사과와 황금 사과를 바구니로 받아내며 밤송이를 피하는 힐링 터치 캐치 아케이드입니다. | 어린이/아케이드 |
 | [🦦 아기 수달의 물수제비 놀이 (otter-stream-pebble-skip)](./otter-stream-pebble-skip/index.html) | 반짝이는 맑은 시냇가에서 귀여운 아기 수달과 함께 매끄러운 조약돌을 퐁당퐁당 던져 물수제비를 띄우는 경쾌한 타이밍 리듬 아케이드입니다. 수면 파문에 맞춰 터치하여 1단부터 10단 이상까지 멋진 물수제비 기록을 세워보세요! | 어린이/아케이드 |
 | [🎋 아기 판다의 대나무 풍경 소리 (panda-bamboo-wind-chime)](./panda-bamboo-wind-chime/index.html) | 산들바람이 부는 맑고 평화로운 초록 대나무 숲속에서 사랑스러운 아기 판다와 함께 5가지 펜타토닉 음계의 대나무 풍경과 은은한 유리 풍경을 톡톡 울리며 포근한 힐링 멜로디를 연주하는 감성 사운드 미니게임입니다. | 어린이/아케이드 |
 | [🫧 친칠라의 구름 방울 퐁퐁 (chinchilla-cloud-bubble-hop)](./chinchilla-cloud-bubble-hop/index.html) | 몽실몽실 털이 귀여운 아기 친칠라와 함께 퐁퐁 떠오르는 파스텔 무지개 구름 방울을 사뿐사뿐 밟고 뛰어오르며 별빛 젤리와 무지개 방울을 모으는 포근한 힐링 바운스 아케이드입니다. | 어린이/아케이드 |
@@ -488,6 +490,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-05: [🍎 아기 레서판다의 데굴데굴 사과 받기](red-panda-apple-catch/index.html), [🌌 꼬마 부엉이의 밤하늘 별빛 비행](starry-owl-night-flight/index.html) (총 294개)
+
 - 2026-10-04: [🎋 아기 판다의 대나무 풍경 소리](panda-bamboo-wind-chime/index.html), [🦦 아기 수달의 물수제비 놀이](otter-stream-pebble-skip/index.html) (총 292개)
 
 - 2026-10-02: [🦊 사막여우의 별빛 오아시스](fennec-fox-desert-star-oasis/index.html), [🫧 친칠라의 구름 방울 퐁퐁](chinchilla-cloud-bubble-hop/index.html) (총 290개)

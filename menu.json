@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "starry-owl-night-flight",
+        "title": "🌌 꼬마 부엉이의 밤하늘 별빛 비행",
+        "path": "starry-owl-night-flight/index.html"
+      },
+      {
+        "id": "red-panda-apple-catch",
+        "title": "🍎 아기 레서판다의 데굴데굴 사과 받기",
+        "path": "red-panda-apple-catch/index.html"
+      },
+      {
         "id": "otter-stream-pebble-skip",
         "title": "🦦 아기 수달의 물수제비 놀이",
         "path": "otter-stream-pebble-skip/index.html"

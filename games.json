@@ -2334,5 +2334,21 @@
     "description": "반짝이는 맑은 시냇가에서 귀여운 아기 수달과 함께 매끄러운 조약돌을 퐁당퐁당 던져 물수제비를 띄우는 경쾌한 타이밍 리듬 아케이드입니다. 수면 파문에 맞춰 터치하여 1단부터 10단 이상까지 멋진 물수제비 기록을 세워보세요!",
     "thumbnail": "otter-stream-pebble-skip/thumb.svg",
     "path": "otter-stream-pebble-skip/index.html"
+  },
+  {
+    "id": "red-panda-apple-catch",
+    "title": "Baby Red Panda Apple Catch",
+    "title_ko": "🍎 아기 레서판다의 데굴데굴 사과 받기",
+    "description": "가을빛으로 물든 숲속 언덕에서 귀여운 아기 레서판다와 함께 나무에서 떨어지는 달콤한 사과와 황금 사과를 바구니로 받아내며 밤송이를 피하는 힐링 터치 캐치 아케이드입니다.",
+    "thumbnail": "red-panda-apple-catch/thumb.svg",
+    "path": "red-panda-apple-catch/index.html"
+  },
+  {
+    "id": "starry-owl-night-flight",
+    "title": "Starry Owl Night Flight",
+    "title_ko": "🌌 꼬마 부엉이의 밤하늘 별빛 비행",
+    "description": "몽환적인 보랏빛 밤하늘을 날아오르는 귀여운 꼬마 부엉이와 함께 날개를 살랑살랑 저어 별빛 고리를 통과하고 반짝이는 별조각을 모으는 감성 비행 힐링 게임입니다.",
+    "thumbnail": "starry-owl-night-flight/thumb.svg",
+    "path": "starry-owl-night-flight/index.html"
   }
 ]
