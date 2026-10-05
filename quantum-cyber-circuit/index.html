@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>⚡ 찌릿찌릿 사이버 회로 연결 놀이</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+    body {
+      background: radial-gradient(circle at center, #101c3d 0%, #080d1e 100%);
+      font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      overflow: hidden;
+      padding: 16px;
+    }
+    header {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .back-btn {
+      background: rgba(0, 240, 255, 0.15);
+      border: 1px solid #00f0ff;
+      color: #00f0ff;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .back-btn:active { transform: scale(0.95); background: rgba(0, 240, 255, 0.3); }
+    .stats {
+      display: flex;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+    .stat-badge {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .game-container {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 1 / 1;
+      background: rgba(6, 12, 28, 0.85);
+      border: 2px solid #00f0ff;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .tile {
+      background: #111a33;
+      border: 2px solid #1c2b52;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s, border-color 0.3s;
+    }
+    .tile:active { transform: scale(0.92); }
+    .tile.powered {
+      border-color: #00f0ff;
+      background: #162a4d;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.4) inset;
+    }
+    .tile canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .footer-desc {
+      max-width: 480px;
+      text-align: center;
+      font-size: 14px;
+      color: #8da4d0;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+    .win-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 20, 45, 0.92);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 10;
+    }
+    .win-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .win-title {
+      font-size: 26px;
+      font-weight: bold;
+      color: #ffea00;
+      text-shadow: 0 0 15px rgba(255, 234, 0, 0.6);
+      margin-bottom: 8px;
+    }
+    .win-sub {
+      font-size: 15px;
+      color: #00f0ff;
+      margin-bottom: 20px;
+    }
+    .next-btn {
+      background: linear-gradient(135deg, #00f0ff, #7000ff);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+      transition: transform 0.2s;
+    }
+    .next-btn:active { transform: scale(0.95); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="back-btn">⬅ 홈으로</a>
+    <div class="stats">
+      <div class="stat-badge">스테이지: <span id="stage-num" style="color:#00f0ff;">1</span></div>
+      <div class="stat-badge">점수: <span id="score-num" style="color:#ffea00;">0</span></div>
+    </div>
+  </header>
+
+  <div style="font-size: 18px; font-weight: bold; color: #00f0ff; margin-bottom: 6px;">⚡ 회로 타일을 눌러 전기를 연결하세요!</div>
+
+  <div class="game-container" id="grid">
+    <div class="win-overlay" id="win-overlay">
+      <div class="win-title">✨ 회로 연결 완료! ✨</div>
+      <div class="win-sub">양자 코어에 전력이 완벽히 공급되었습니다!</div>
+      <button class="next-btn" id="next-btn">다음 스테이지 ⚡</button>
+    </div>
+  </div>
+
+  <div class="footer-desc">
+    💡 시작점(⚡)에서 도착점(💡)까지 타일을 터치해 회전시키며 전선을 이어주세요!
+  </div>
+
+  <script>
+    // Web Audio API Sound Synthesizer
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playClickSound() {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.09);
+      } catch (e) {}
+    }
+
+    function playWinSound() {
+      try {
+        const ctx = getAudioCtx();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime + idx * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.1);
+          osc.stop(ctx.currentTime + idx * 0.1 + 0.45);
+        });
+      } catch (e) {}
+    }
+
+    // Circuit Puzzle Engine (3x3 Grid)
+    // Conduits: [top, right, bottom, left] boolean
+    // 0: Start (0,0) -> right & bottom
+    // 8: End (2,2) -> top & left
+    let stage = 1;
+    let score = 0;
+    const gridEl = document.getElementById('grid');
+    const winOverlay = document.getElementById('win-overlay');
+    const stageEl = document.getElementById('stage-num');
+    const scoreEl = document.getElementById('score-num');
+
+    // Tile Types:
+    // 'line': connects top & bottom [1,0,1,0]
+    // 'corner': connects top & right [1,1,0,0]
+    // 't-junction': connects left, top, right [1,1,0,1]
+    // 'cross': connects all 4 [1,1,1,1]
+
+    let board = [];
+
+    function rotateConduits(conduits, times) {
+      let res = [...conduits];
+      for (let i = 0; i < times; i++) {
+        res.unshift(res.pop());
+      }
+      return res;
+    }
+
+    function initStage(s) {
+      winOverlay.classList.remove('active');
+      board = [];
+      gridEl.querySelectorAll('.tile').forEach(t => t.remove());
+
+      // Create predefined or procedural 3x3 layout
+      // Path: (0,0) -> (1,0) -> (1,1) -> (2,1) -> (2,2)
+      const baseTypes = [
+        { type: 'corner', base: [0, 1, 1, 0], rot: Math.floor(Math.random() * 4), isStart: true },
+        { type: 'line',   base: [0, 1, 0, 1], rot: Math.floor(Math.random() * 4) },
+        { type: 'corner', base: [0, 0, 1, 1], rot: Math.floor(Math.random() * 4) },
+        { type: 'line',   base: [1, 0, 1, 0], rot: Math.floor(Math.random() * 4) },
+        { type: 't-junction', base: [1, 1, 1, 0], rot: Math.floor(Math.random() * 4) },
+        { type: 'line',   base: [1, 0, 1, 0], rot: Math.floor(Math.random() * 4) },
+        { type: 'corner', base: [1, 1, 0, 0], rot: Math.floor(Math.random() * 4) },
+        { type: 'line',   base: [0, 1, 0, 1], rot: Math.floor(Math.random() * 4) },
+        { type: 'corner', base: [1, 0, 0, 1], rot: Math.floor(Math.random() * 4), isEnd: true }
+      ];
+
+      baseTypes.forEach((data, idx) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        const canvas = document.createElement('canvas');
+        canvas.width = 120;
+        canvas.height = 120;
+        tile.appendChild(canvas);
+
+        const tileData = {
+          idx,
+          type: data.type,
+          base: data.base,
+          rot: data.rot,
+          isStart: !!data.isStart,
+          isEnd: !!data.isEnd,
+          powered: false,
+          el: tile,
+          canvas: canvas
+        };
+
+        tile.addEventListener('click', () => {
+          playClickSound();
+          tileData.rot = (tileData.rot + 1) % 4;
+          drawTile(tileData);
+          checkPowerFlow();
+        });
+
+        board.push(tileData);
+        gridEl.appendChild(tile);
+        drawTile(tileData);
+      });
+
+      checkPowerFlow();
+    }
+
+    function drawTile(tile) {
+      const ctx = tile.canvas.getContext('2d');
+      ctx.clearRect(0, 0, 120, 120);
+
+      const conduits = rotateConduits(tile.base, tile.rot);
+      const isPow = tile.powered;
+      const glowColor = isPow ? '#00f0ff' : '#2b4478';
+      const coreColor = isPow ? '#ffffff' : '#4667aa';
+
+      ctx.lineWidth = 14;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = glowColor;
+
+      // Draw Center
+      ctx.beginPath();
+      ctx.arc(60, 60, 12, 0, Math.PI * 2);
+      ctx.fillStyle = glowColor;
+      ctx.fill();
+
+      // Top
+      if (conduits[0]) {
+        ctx.beginPath();
+        ctx.moveTo(60, 60); ctx.lineTo(60, 0); ctx.stroke();
+      }
+      // Right
+      if (conduits[1]) {
+        ctx.beginPath();
+        ctx.moveTo(60, 60); ctx.lineTo(120, 60); ctx.stroke();
+      }
+      // Bottom
+      if (conduits[2]) {
+        ctx.beginPath();
+        ctx.moveTo(60, 60); ctx.lineTo(60, 120); ctx.stroke();
+      }
+      // Left
+      if (conduits[3]) {
+        ctx.beginPath();
+        ctx.moveTo(60, 60); ctx.lineTo(0, 60); ctx.stroke();
+      }
+
+      // Draw Core line
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = coreColor;
+      if (conduits[0]) { ctx.beginPath(); ctx.moveTo(60, 60); ctx.lineTo(60, 0); ctx.stroke(); }
+      if (conduits[1]) { ctx.beginPath(); ctx.moveTo(60, 60); ctx.lineTo(120, 60); ctx.stroke(); }
+      if (conduits[2]) { ctx.beginPath(); ctx.moveTo(60, 60); ctx.lineTo(60, 120); ctx.stroke(); }
+      if (conduits[3]) { ctx.beginPath(); ctx.moveTo(60, 60); ctx.lineTo(0, 60); ctx.stroke(); }
+
+      // Start / End Icons
+      if (tile.isStart) {
+        ctx.font = '24px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⚡', 60, 60);
+      } else if (tile.isEnd) {
+        ctx.font = '24px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('💡', 60, 60);
+      }
+
+      if (isPow) {
+        tile.el.classList.add('powered');
+      } else {
+        tile.el.classList.remove('powered');
+      }
+    }
+
+    function checkPowerFlow() {
+      // Reset all powered
+      board.forEach(t => t.powered = false);
+
+      // BFS from (0,0)
+      const queue = [0];
+      board[0].powered = true;
+      const visited = new Set([0]);
+
+      while (queue.length > 0) {
+        const curr = queue.shift();
+        const r = Math.floor(curr / 3);
+        const c = curr % 3;
+        const cond = rotateConduits(board[curr].base, board[curr].rot);
+
+        // Neighbors: Top (r-1, c), Right (r, c+1), Bottom (r+1, c), Left (r, c-1)
+        const neighbors = [
+          { r: r - 1, c: c, outSide: 0, inSide: 2 },
+          { r: r, c: c + 1, outSide: 1, inSide: 3 },
+          { r: r + 1, c: c, outSide: 2, inSide: 0 },
+          { r: r, c: c - 1, outSide: 3, inSide: 1 }
+        ];
+
+        neighbors.forEach(n => {
+          if (n.r >= 0 && n.r < 3 && n.c >= 0 && n.c < 3) {
+            const nextIdx = n.r * 3 + n.c;
+            const nextCond = rotateConduits(board[nextIdx].base, board[nextIdx].rot);
+            if (cond[n.outSide] && nextCond[n.inSide]) {
+              if (!visited.has(nextIdx)) {
+                visited.add(nextIdx);
+                board[nextIdx].powered = true;
+                queue.push(nextIdx);
+              }
+            }
+          }
+        });
+      }
+
+      // Redraw all tiles with updated power state
+      board.forEach(t => drawTile(t));
+
+      // Win Condition: End tile (8) is powered!
+      if (board[8].powered) {
+        playWinSound();
+        score += 100 * stage;
+        scoreEl.innerText = score;
+        setTimeout(() => {
+          winOverlay.classList.add('active');
+        }, 300);
+      }
+    }
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      stage++;
+      stageEl.innerText = stage;
+      initStage(stage);
+    });
+
+    initStage(1);
+  </script>
+</body>
+</html>

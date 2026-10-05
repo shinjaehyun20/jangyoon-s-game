@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "robot-pet-grooming",
+        "title": "🤖 삐리삐리 로봇 강아지 목욕 대작전",
+        "path": "robot-pet-grooming/index.html"
+      },
+      {
+        "id": "quantum-cyber-circuit",
+        "title": "⚡ 찌릿찌릿 사이버 회로 연결 놀이",
+        "path": "quantum-cyber-circuit/index.html"
+      },
+      {
         "id": "starry-owl-night-flight",
         "title": "🌌 꼬마 부엉이의 밤하늘 별빛 비행",
         "path": "starry-owl-night-flight/index.html"

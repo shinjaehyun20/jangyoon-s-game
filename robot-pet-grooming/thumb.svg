@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="spaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff0f5"/>
+      <stop offset="100%" stop-color="#e6f0fa"/>
+    </linearGradient>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eaf2f8"/>
+      <stop offset="50%" stop-color="#d4e6f1"/>
+      <stop offset="100%" stop-color="#aed6f1"/>
+    </linearGradient>
+    <radialGradient id="bubbleSpa" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#d6eaf8" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#aed6f1" stop-opacity="0.4"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#spaBg)"/>
+
+  <!-- Bathtub / Spa Pod -->
+  <ellipse cx="200" cy="245" rx="160" ry="40" fill="#85c1e9"/>
+  <ellipse cx="200" cy="240" rx="155" ry="35" fill="#ebf5fb"/>
+
+  <!-- Robot Puppy Head -->
+  <rect x="135" y="85" width="130" height="110" rx="40" fill="url(#metalGrad)" stroke="#5dade2" stroke-width="4"/>
+
+  <!-- Antenna -->
+  <line x1="200" y1="85" x2="200" y2="55" stroke="#5dade2" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="200" cy="48" r="14" fill="#f39c12"/>
+  <circle cx="200" cy="48" r="6" fill="#fef9e7"/>
+
+  <!-- Robot Ears -->
+  <rect x="105" y="105" width="30" height="50" rx="15" fill="#5dade2"/>
+  <rect x="265" y="105" width="30" height="50" rx="15" fill="#5dade2"/>
+
+  <!-- LED Heart Screen Eyes -->
+  <circle cx="165" cy="130" r="18" fill="#1b4f72"/>
+  <text x="165" y="137" font-size="16" fill="#00f0ff" text-anchor="middle">💙</text>
+
+  <circle cx="235" cy="130" r="18" fill="#1b4f72"/>
+  <text x="235" y="137" font-size="16" fill="#00f0ff" text-anchor="middle">💙</text>
+
+  <!-- Cheerful Smile Nose -->
+  <ellipse cx="200" cy="155" rx="8" ry="6" fill="#34495e"/>
+  <path d="M190 168 Q200 178 210 168" stroke="#34495e" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Blush -->
+  <circle cx="150" cy="155" r="10" fill="#f1948a" opacity="0.6"/>
+  <circle cx="250" cy="155" r="10" fill="#f1948a" opacity="0.6"/>
+
+  <!-- Fluffy Soap Bubbles -->
+  <circle cx="140" cy="80" r="26" fill="url(#bubbleSpa)" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="260" cy="75" r="28" fill="url(#bubbleSpa)" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="205" cy="65" r="20" fill="url(#bubbleSpa)" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="85" cy="200" r="22" fill="url(#bubbleSpa)" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="315" cy="180" r="24" fill="url(#bubbleSpa)" stroke="#ffffff" stroke-width="2"/>
+
+  <!-- Sponge & Brush Sparkle -->
+  <text x="320" y="110" font-size="34">🧽</text>
+  <text x="70" y="130" font-size="32">✨</text>
+  <text x="200" y="30" font-size="24">💖</text>
+
+  <!-- Title Badge -->
+  <rect x="70" y="246" width="260" height="38" rx="19" fill="#ffffff" stroke="#5dade2" stroke-width="2"/>
+  <text x="200" y="271" fill="#2980b9" font-size="16" font-family="'Malgun Gothic', sans-serif" font-weight="bold" text-anchor="middle">🤖 로봇 강아지 목욕 대작전</text>
+</svg>

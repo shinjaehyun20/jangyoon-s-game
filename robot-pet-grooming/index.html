@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🤖 삐리삐리 로봇 강아지 목욕 대작전</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+    body {
+      background: radial-gradient(circle at center, #e8f4fc 0%, #cce5f7 100%);
+      font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      color: #2c3e50;
+      overflow: hidden;
+      padding: 16px;
+    }
+    header {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .back-btn {
+      background: #ffffff;
+      border: 2px solid #5dade2;
+      color: #2980b9;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(93, 173, 226, 0.2);
+    }
+    .back-btn:active { transform: scale(0.95); }
+    .status-badge {
+      background: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #2980b9;
+      box-shadow: 0 4px 10px rgba(93, 173, 226, 0.2);
+    }
+    .spa-stage {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      height: 380px;
+      background: #ffffff;
+      border-radius: 30px;
+      box-shadow: 0 10px 30px rgba(52, 152, 219, 0.15);
+      border: 3px solid #ebf5fb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+    .robot-puppy {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease;
+    }
+    .robot-puppy.happy {
+      animation: bounce 0.6s infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-12px) scale(1.03); }
+    }
+    .antenna {
+      width: 8px;
+      height: 30px;
+      background: #5dade2;
+      border-radius: 4px;
+      position: relative;
+    }
+    .antenna-ball {
+      width: 22px;
+      height: 22px;
+      background: #f39c12;
+      border-radius: 50%;
+      position: absolute;
+      top: -16px;
+      left: -7px;
+      box-shadow: 0 0 10px #f39c12;
+      transition: background 0.3s;
+    }
+    .head {
+      width: 150px;
+      height: 120px;
+      background: linear-gradient(135deg, #eaf2f8, #aed6f1);
+      border: 4px solid #5dade2;
+      border-radius: 36px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .ear-left, .ear-right {
+      position: absolute;
+      top: 15px;
+      width: 26px;
+      height: 50px;
+      background: #5dade2;
+      border-radius: 14px;
+    }
+    .ear-left { left: -22px; }
+    .ear-right { right: -22px; }
+    .eyes {
+      display: flex;
+      gap: 36px;
+      margin-bottom: 6px;
+    }
+    .eye {
+      width: 30px;
+      height: 30px;
+      background: #1b4f72;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .nose {
+      font-size: 18px;
+    }
+    .bow {
+      position: absolute;
+      top: -12px;
+      font-size: 38px;
+      display: none;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+    }
+    .tools-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .tool-btn {
+      background: #ffffff;
+      border: 2px solid #d4e6f1;
+      width: 65px;
+      height: 65px;
+      border-radius: 20px;
+      font-size: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      transition: all 0.2s;
+    }
+    .tool-btn span { font-size: 11px; font-weight: bold; margin-top: 2px; color: #7f8c8d; }
+    .tool-btn.active {
+      border-color: #3498db;
+      background: #ebf5fb;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(52, 152, 219, 0.3);
+    }
+    .bubble-particle, .sparkle-particle {
+      position: absolute;
+      pointer-events: none;
+      animation: floatUp 1s forwards ease-out;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: scale(0.6) translateY(0); }
+      100% { opacity: 0; transform: scale(1.4) translateY(-80px); }
+    }
+    .clean-gauge {
+      width: 100%;
+      max-width: 360px;
+      height: 16px;
+      background: #d4e6f1;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .clean-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #5dade2, #2ecc71);
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="back-btn">⬅ 홈으로</a>
+    <div class="status-badge" id="step-label">1단계: 거품 퐁퐁 비누칠 🧽</div>
+  </header>
+
+  <div class="spa-stage" id="stage">
+    <div class="robot-puppy" id="puppy">
+      <div class="antenna"><div class="antenna-ball" id="ant-ball"></div></div>
+      <div class="ear-left"></div>
+      <div class="ear-right"></div>
+      <div class="head">
+        <div class="bow" id="bow">🎀</div>
+        <div class="eyes">
+          <div class="eye" id="eye-l">💙</div>
+          <div class="eye" id="eye-r">💙</div>
+        </div>
+        <div class="nose">🐶</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="clean-gauge">
+    <div class="clean-fill" id="fill"></div>
+  </div>
+
+  <div class="tools-bar">
+    <div class="tool-btn active" id="tool-sponge" onclick="selectTool('sponge')">
+      🧽<span>비누</span>
+    </div>
+    <div class="tool-btn" id="tool-shower" onclick="selectTool('shower')">
+      🚿<span>샤워</span>
+    </div>
+    <div class="tool-btn" id="tool-towel" onclick="selectTool('towel')">
+      ✨<span>광택</span>
+    </div>
+    <div class="tool-btn" id="tool-bow" onclick="selectTool('bow')">
+      🎀<span>리본</span>
+    </div>
+  </div>
+
+  <script>
+    // Web Audio Synthesizer
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function getCtx() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playSound(type) {
+      try {
+        const ctx = getCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'soap') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600 + Math.random() * 300, ctx.currentTime);
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+          osc.start(); osc.stop(ctx.currentTime + 0.09);
+        } else if (type === 'shower') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(400, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(800, ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+          osc.start(); osc.stop(ctx.currentTime + 0.16);
+        } else if (type === 'shine') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1046.5, ctx.currentTime);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+          osc.start(); osc.stop(ctx.currentTime + 0.22);
+        } else if (type === 'fanfare') {
+          [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((f, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = 'sine';
+            o.frequency.setValueAtTime(f, ctx.currentTime + i * 0.08);
+            g.gain.setValueAtTime(0.18, ctx.currentTime + i * 0.08);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.35);
+            o.connect(g); g.connect(ctx.destination);
+            o.start(ctx.currentTime + i * 0.08); o.stop(ctx.currentTime + i * 0.08 + 0.4);
+          });
+        }
+      } catch (e) {}
+    }
+
+    let currentTool = 'sponge';
+    let progress = { sponge: 0, shower: 0, towel: 0, bow: 0 };
+    const maxProg = 15;
+
+    function selectTool(tool) {
+      currentTool = tool;
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tool-' + tool).classList.add('active');
+
+      const labels = {
+        sponge: '1단계: 거품 퐁퐁 비누칠 🧽',
+        shower: '2단계: 깨끗하게 물 샤워 🚿',
+        towel: '3단계: 반짝반짝 광택 내기 ✨',
+        bow: '4단계: 예쁜 리본 달아주기 🎀'
+      };
+      document.getElementById('step-label').innerText = labels[tool];
+    }
+
+    const stageEl = document.getElementById('stage');
+    const puppyEl = document.getElementById('puppy');
+    const fillEl = document.getElementById('fill');
+    const eyeLEl = document.getElementById('eye-l');
+    const eyeREl = document.getElementById('eye-r');
+    const bowEl = document.getElementById('bow');
+    const antBallEl = document.getElementById('ant-ball');
+
+    function interact(e) {
+      const rect = stageEl.getBoundingClientRect();
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+      if (currentTool === 'sponge') {
+        progress.sponge = Math.min(maxProg, progress.sponge + 1);
+        playSound('soap');
+        createBubble(x, y, '🫧');
+      } else if (currentTool === 'shower') {
+        if (progress.sponge >= maxProg) {
+          progress.shower = Math.min(maxProg, progress.shower + 1);
+          playSound('shower');
+          createBubble(x, y, '💧');
+        }
+      } else if (currentTool === 'towel') {
+        if (progress.shower >= maxProg) {
+          progress.towel = Math.min(maxProg, progress.towel + 1);
+          playSound('shine');
+          createBubble(x, y, '✨');
+        }
+      } else if (currentTool === 'bow') {
+        if (progress.towel >= maxProg) {
+          progress.bow = 1;
+          bowEl.style.display = 'block';
+          playSound('fanfare');
+          puppyEl.classList.add('happy');
+          eyeLEl.innerText = '💖';
+          eyeREl.innerText = '💖';
+          antBallEl.style.background = '#e91e63';
+          document.getElementById('step-label').innerText = '🎉 완벽하게 예뻐졌어요! 최고야! 🎉';
+        }
+      }
+
+      updateGauge();
+    }
+
+    function createBubble(x, y, icon) {
+      const el = document.createElement('div');
+      el.className = 'bubble-particle';
+      el.innerText = icon;
+      el.style.left = (x - 12) + 'px';
+      el.style.top = (y - 12) + 'px';
+      el.style.fontSize = (20 + Math.random() * 16) + 'px';
+      stageEl.appendChild(el);
+      setTimeout(() => el.remove(), 1000);
+    }
+
+    function updateGauge() {
+      const totalProg = progress.sponge + progress.shower + progress.towel + (progress.bow * maxProg);
+      const pct = Math.min(100, Math.floor((totalProg / (maxProg * 4)) * 100));
+      fillEl.style.width = pct + '%';
+
+      if (progress.sponge >= maxProg && currentTool === 'sponge') {
+        selectTool('shower');
+      } else if (progress.shower >= maxProg && currentTool === 'shower') {
+        selectTool('towel');
+      } else if (progress.towel >= maxProg && currentTool === 'towel') {
+        selectTool('bow');
+      }
+    }
+
+    stageEl.addEventListener('pointerdown', interact);
+  </script>
+</body>
+</html>

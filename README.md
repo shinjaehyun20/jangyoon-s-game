@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 294개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 296개.
 
-[![Games](https://img.shields.io/badge/games-294-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-296-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![294개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![296개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,10 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 294개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 296개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🤖 삐리삐리 로봇 강아지 목욕 대작전 (robot-pet-grooming)](./robot-pet-grooming/index.html) | 반짝이는 메탈 로봇 강아지를 비누 거품으로 퐁퐁 씻기고 시원한 물 샤워와 광택을 낸 뒤 예쁜 리본을 달아주는 힐링 터치 놀이입니다. | 어린이/아케이드 |
+| [⚡ 찌릿찌릿 사이버 회로 연결 놀이 (quantum-cyber-circuit)](./quantum-cyber-circuit/index.html) | 네온 빛으로 번쩍이는 사이버 회로 타일을 터치해 전선을 이어주고 시작점에서 도착점까지 전력을 공급하는 두뇌 힐링 퍼즐 게임입니다. | 어린이/아케이드 |
 | [🌌 꼬마 부엉이의 밤하늘 별빛 비행 (starry-owl-night-flight)](./starry-owl-night-flight/index.html) | 몽환적인 보랏빛 밤하늘을 날아오르는 귀여운 꼬마 부엉이와 함께 날개를 살랑살랑 저어 별빛 고리를 통과하고 반짝이는 별조각을 모으는 감성 비행 힐링 게임입니다. | 어린이/아케이드 |
 | [🍎 아기 레서판다의 데굴데굴 사과 받기 (red-panda-apple-catch)](./red-panda-apple-catch/index.html) | 가을빛으로 물든 숲속 언덕에서 귀여운 아기 레서판다와 함께 나무에서 떨어지는 달콤한 사과와 황금 사과를 바구니로 받아내며 밤송이를 피하는 힐링 터치 캐치 아케이드입니다. | 어린이/아케이드 |
 | [🦦 아기 수달의 물수제비 놀이 (otter-stream-pebble-skip)](./otter-stream-pebble-skip/index.html) | 반짝이는 맑은 시냇가에서 귀여운 아기 수달과 함께 매끄러운 조약돌을 퐁당퐁당 던져 물수제비를 띄우는 경쾌한 타이밍 리듬 아케이드입니다. 수면 파문에 맞춰 터치하여 1단부터 10단 이상까지 멋진 물수제비 기록을 세워보세요! | 어린이/아케이드 |
@@ -490,6 +492,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-06: [⚡ 찌릿찌릿 사이버 회로 연결 놀이](quantum-cyber-circuit/index.html), [🤖 삐리삐리 로봇 강아지 목욕 대작전](robot-pet-grooming/index.html) (총 296개)
+
 - 2026-10-05: [🍎 아기 레서판다의 데굴데굴 사과 받기](red-panda-apple-catch/index.html), [🌌 꼬마 부엉이의 밤하늘 별빛 비행](starry-owl-night-flight/index.html) (총 294개)
 
 - 2026-10-04: [🎋 아기 판다의 대나무 풍경 소리](panda-bamboo-wind-chime/index.html), [🦦 아기 수달의 물수제비 놀이](otter-stream-pebble-skip/index.html) (총 292개)

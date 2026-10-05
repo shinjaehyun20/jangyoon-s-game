@@ -2350,5 +2350,21 @@
     "description": "몽환적인 보랏빛 밤하늘을 날아오르는 귀여운 꼬마 부엉이와 함께 날개를 살랑살랑 저어 별빛 고리를 통과하고 반짝이는 별조각을 모으는 감성 비행 힐링 게임입니다.",
     "thumbnail": "starry-owl-night-flight/thumb.svg",
     "path": "starry-owl-night-flight/index.html"
+  },
+  {
+    "id": "quantum-cyber-circuit",
+    "title": "Quantum Cyber Circuit",
+    "title_ko": "⚡ 찌릿찌릿 사이버 회로 연결 놀이",
+    "description": "네온 빛으로 번쩍이는 사이버 회로 타일을 터치해 전선을 이어주고 시작점에서 도착점까지 전력을 공급하는 두뇌 힐링 퍼즐 게임입니다.",
+    "thumbnail": "quantum-cyber-circuit/thumb.svg",
+    "path": "quantum-cyber-circuit/index.html"
+  },
+  {
+    "id": "robot-pet-grooming",
+    "title": "Robot Pet Grooming",
+    "title_ko": "🤖 삐리삐리 로봇 강아지 목욕 대작전",
+    "description": "반짝이는 메탈 로봇 강아지를 비누 거품으로 퐁퐁 씻기고 시원한 물 샤워와 광택을 낸 뒤 예쁜 리본을 달아주는 힐링 터치 놀이입니다.",
+    "thumbnail": "robot-pet-grooming/thumb.svg",
+    "path": "robot-pet-grooming/index.html"
   }
 ]
