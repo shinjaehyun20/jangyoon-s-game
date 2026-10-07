@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 298개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 300개.
 
-[![Games](https://img.shields.io/badge/games-298-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-300-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![298개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![300개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 298개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 300개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -327,6 +327,8 @@
 | [✨ 반짝반짝 반딧불이 호롱불 (sparkle-firefly-lamp)](./sparkle-firefly-lamp/index.html) | 어두운 밤하늘 숲속을 날아다니는 황금빛·에메랄드빛 반딧불이를 톡톡 터치해 호롱불에 빛을 모아 환하게 밝히는 힐링 터치 놀이입니다. | 어린이/아케이드 |
 | [🔮 반짝반짝 마법 수정 동굴 탐험 (magic-crystal-cave)](./magic-crystal-cave/index.html) | 신비로운 보석 동굴에서 쏟아지는 루비·사파이어·에메랄드 크리스탈을 마법 카트로 쏙쏙 받아내고 무지개 프리즘 파워를 발동하는 힐링 아케이드 놀이입니다. | 어린이/아케이드 |
 | [🌈 알록달록 무지개 비눗방울 팡팡 (rainbow-bubble-popper)](./rainbow-bubble-popper/index.html) | 화면 가득 둥실둥실 떠오르는 영롱한 무지개 비눗방울과 보석·과일을 퐁퐁 터뜨려 신나는 콤보와 점수를 모으는 경쾌한 힐링 터치 놀이입니다. | 어린이/아케이드 |
+| [🎣 황금 별자리 낚시터 (golden-star-catcher)](./golden-star-catcher/index.html) | 밤하늘을 날아다니는 황금빛·에메랄드빛 별자리 스타들을 마법 낚싯줄로 톡톡 낚아 올리고 신나는 피버 타임을 즐기는 영롱한 터치 아케이드 놀이입니다. | 어린이/아케이드 |
+| [🎆 300회 축제! 무지개 불꽃놀이 대축제 (grand-carnival-fireworks)](./grand-carnival-fireworks/index.html) | 장윤이의 게임세상 300회 대기록 기념! 밤하늘을 터치해 환상적인 오색 불꽃과 축하 폭죽을 펑펑 쏘아 올리고 그랜드 피날레를 즐기는 힐링 축제 놀이입니다. | 어린이/아케이드 |
 
 </details>
 
@@ -494,17 +496,17 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
-- 2026-10-07: [✨ 별밤 반딧불이 동산](starry-firefly-night/index.html), [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html) (총 298개)
+- 2026-10-07: [✨ 별밤 반딧불이 동산](starry-firefly-night/index.html), [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html) (총 300개)
 
-- 2026-10-06: [⚡ 찌릿찌릿 사이버 회로 연결 놀이](quantum-cyber-circuit/index.html), [🤖 삐리삐리 로봇 강아지 목욕 대작전](robot-pet-grooming/index.html) (총 296개)
+- 2026-10-06: [⚡ 찌릿찌릿 사이버 회로 연결 놀이](quantum-cyber-circuit/index.html), [🤖 삐리삐리 로봇 강아지 목욕 대작전](robot-pet-grooming/index.html) (총 300개)
 
-- 2026-10-05: [🍎 아기 레서판다의 데굴데굴 사과 받기](red-panda-apple-catch/index.html), [🌌 꼬마 부엉이의 밤하늘 별빛 비행](starry-owl-night-flight/index.html) (총 294개)
+- 2026-10-05: [🍎 아기 레서판다의 데굴데굴 사과 받기](red-panda-apple-catch/index.html), [🌌 꼬마 부엉이의 밤하늘 별빛 비행](starry-owl-night-flight/index.html) (총 300개)
 
-- 2026-10-04: [🎋 아기 판다의 대나무 풍경 소리](panda-bamboo-wind-chime/index.html), [🦦 아기 수달의 물수제비 놀이](otter-stream-pebble-skip/index.html) (총 292개)
+- 2026-10-04: [🎋 아기 판다의 대나무 풍경 소리](panda-bamboo-wind-chime/index.html), [🦦 아기 수달의 물수제비 놀이](otter-stream-pebble-skip/index.html) (총 300개)
 
-- 2026-10-02: [🦊 사막여우의 별빛 오아시스](fennec-fox-desert-star-oasis/index.html), [🫧 친칠라의 구름 방울 퐁퐁](chinchilla-cloud-bubble-hop/index.html) (총 290개)
+- 2026-10-02: [🦊 사막여우의 별빛 오아시스](fennec-fox-desert-star-oasis/index.html), [🫧 친칠라의 구름 방울 퐁퐁](chinchilla-cloud-bubble-hop/index.html) (총 300개)
 
-- 2026-10-01: [🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드](polar-bear-aurora-ice-slide/index.html), [🐨 아기 코알라의 살랑살랑 유칼립투스 바람](koala-eucalyptus-leaf-breeze/index.html) (총 288개)
+- 2026-10-01: [🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드](polar-bear-aurora-ice-slide/index.html), [🐨 아기 코알라의 살랑살랑 유칼립투스 바람](koala-eucalyptus-leaf-breeze/index.html) (총 300개)
 
 
 ## 최근 변경사항 (2026-09)

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>황금 별자리 낚시터 - 장윤이의 게임세상 #299</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: radial-gradient(circle at 50% 30%, #1a1a3a 0%, #0d0d21 60%, #050510 100%);
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 840px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      background: linear-gradient(180deg, #090a1e 0%, #151838 50%, #201845 100%);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #hud {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+    .badge {
+      background: rgba(18, 22, 48, 0.8);
+      border: 1.5px solid #f1c40f;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #ffd32a;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
+    }
+    #fever-bar-container {
+      position: absolute;
+      top: 68px;
+      left: 20px;
+      right: 20px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      pointer-events: none;
+    }
+    #fever-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #f39c12, #f1c40f, #ff7675);
+      transition: width 0.2s ease;
+    }
+    #guide-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 10, 24, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      cursor: pointer;
+    }
+    #guide-overlay h1 {
+      font-size: 28px;
+      color: #ffd32a;
+      margin-bottom: 12px;
+      text-shadow: 0 0 15px rgba(255, 211, 42, 0.6);
+    }
+    #guide-overlay p {
+      font-size: 16px;
+      color: #dfe6e9;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #f1c40f, #e67e22);
+      border: none;
+      padding: 14px 36px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #1e272e;
+      box-shadow: 0 6px 20px rgba(243, 156, 18, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="hud">
+      <div class="badge" id="score-badge">⭐ 점수: 0</div>
+      <div class="badge" id="combo-badge">🔥 콤보: 0</div>
+    </div>
+    <div id="fever-bar-container">
+      <div id="fever-bar"></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="guide-overlay">
+      <h1>🎣 황금 별자리 낚시터</h1>
+      <p>밤하늘을 날아다니는 반짝반짝 별들을<br>터치하여 낚싯줄로 쏙쏙 낚아보세요!<br>황금별을 모으면 신나는 피버 타임 발동!</p>
+      <button class="btn-start">낚시 시작하기 ⭐</button>
+    </div>
+  </div>
+
+  <script>
+    // Web Audio Synthesizer
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playChime(freq, type = 'sine', duration = 0.4) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playCatchSound(combo) {
+      const scale = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51];
+      const note = scale[(combo - 1) % scale.length];
+      playChime(note, 'triangle', 0.35);
+      setTimeout(() => playChime(note * 1.5, 'sine', 0.3), 60);
+    }
+
+    function playFeverSound() {
+      [523.25, 659.25, 783.99, 1046.50].forEach((f, idx) => {
+        setTimeout(() => playChime(f, 'sine', 0.5), idx * 80);
+      });
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('game-container');
+    const guide = document.getElementById('guide-overlay');
+    const scoreBadge = document.getElementById('score-badge');
+    const comboBadge = document.getElementById('combo-badge');
+    const feverBar = document.getElementById('fever-bar');
+
+    let width, height;
+    function resize() {
+      width = canvas.width = container.clientWidth;
+      height = canvas.height = container.clientHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let score = 0;
+    let combo = 0;
+    let feverPoints = 0;
+    let isFever = false;
+    let feverTimer = 0;
+    let gameActive = false;
+
+    // Constellation Stars
+    const stars = [];
+    const particles = [];
+    const hook = { x: width / 2, y: height - 120, targetX: width / 2, targetY: height - 120, active: false };
+
+    const starTypes = [
+      { emoji: '⭐', color: '#ffd32a', points: 100, radius: 24, speed: 1.2 },
+      { emoji: '🌟', color: '#ff9f43', points: 200, radius: 28, speed: 1.5 },
+      { emoji: '💎', color: '#00d2d3', points: 300, radius: 22, speed: 1.8 },
+      { emoji: '👑', color: '#ff6b6b', points: 500, radius: 30, speed: 2.2 },
+      { emoji: '✨', color: '#54a0ff', points: 150, radius: 20, speed: 1.4 }
+    ];
+
+    function spawnStar() {
+      const type = starTypes[Math.floor(Math.random() * starTypes.length)];
+      stars.push({
+        x: Math.random() * (width - 60) + 30,
+        y: -40,
+        type: type,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (isFever ? 3.5 : 1.8) * (0.8 + Math.random() * 0.5),
+        rot: 0,
+        vrot: (Math.random() - 0.5) * 0.05,
+        scale: 1.0,
+        pulse: Math.random() * 6.28
+      });
+    }
+
+    function createSparkles(x, y, color) {
+      for (let i = 0; i < 16; i++) {
+        const ang = Math.random() * 6.28;
+        const spd = 2 + Math.random() * 5;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          color: color,
+          alpha: 1.0,
+          radius: 3 + Math.random() * 4,
+          life: 30
+        });
+      }
+    }
+
+    function catchStar(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const tx = clientX - rect.left;
+      const ty = clientY - rect.top;
+
+      hook.targetX = tx;
+      hook.targetY = ty;
+      hook.active = true;
+
+      for (let i = stars.length - 1; i >= 0; i--) {
+        const s = stars[i];
+        const dist = Math.hypot(s.x - tx, s.y - ty);
+        if (dist < s.type.radius * 1.8) {
+          combo++;
+          const pts = s.type.points * (1 + Math.floor(combo / 3));
+          score += pts;
+          feverPoints = Math.min(100, feverPoints + 15);
+
+          createSparkles(s.x, s.y, s.type.color);
+          playCatchSound(combo);
+          stars.splice(i, 1);
+
+          scoreBadge.textContent = `⭐ 점수: ${score.toLocaleString()}`;
+          comboBadge.textContent = `🔥 콤보: ${combo}`;
+          feverBar.style.width = `${feverPoints}%`;
+
+          if (feverPoints >= 100 && !isFever) {
+            triggerFever();
+          }
+          break;
+        }
+      }
+    }
+
+    function triggerFever() {
+      isFever = true;
+      feverTimer = 240; // 4 seconds @ 60fps
+      playFeverSound();
+    }
+
+    // Touch & Mouse
+    container.addEventListener('pointerdown', (e) => {
+      if (!gameActive) return;
+      initAudio();
+      catchStar(e.clientX, e.clientY);
+    });
+
+    container.addEventListener('pointermove', (e) => {
+      if (!gameActive || !e.buttons) return;
+      catchStar(e.clientX, e.clientY);
+    });
+
+    guide.addEventListener('click', () => {
+      initAudio();
+      guide.style.display = 'none';
+      gameActive = true;
+    });
+
+    let spawnTimer = 0;
+    function update() {
+      if (!gameActive) return;
+
+      spawnTimer++;
+      const rate = isFever ? 15 : 40;
+      if (spawnTimer >= rate) {
+        spawnStar();
+        spawnTimer = 0;
+      }
+
+      if (isFever) {
+        feverTimer--;
+        feverBar.style.width = `${(feverTimer / 240) * 100}%`;
+        if (feverTimer <= 0) {
+          isFever = false;
+          feverPoints = 0;
+          feverBar.style.width = '0%';
+        }
+      }
+
+      // Update stars
+      for (let i = stars.length - 1; i >= 0; i--) {
+        const s = stars[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.rot += s.vrot;
+        s.pulse += 0.08;
+        if (s.y > height + 60) {
+          stars.splice(i, 1);
+          if (combo > 0 && !isFever) {
+            combo = 0;
+            comboBadge.textContent = '🔥 콤보: 0';
+          }
+        }
+      }
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 1 / p.life;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      // Smooth hook motion
+      hook.x += (hook.targetX - hook.x) * 0.2;
+      hook.y += (hook.targetY - hook.y) * 0.2;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Background ambient stars
+      ctx.fillStyle = isFever ? 'rgba(120, 20, 60, 0.25)' : 'rgba(255, 255, 255, 0.05)';
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw fishing line
+      ctx.beginPath();
+      ctx.moveTo(width / 2, height);
+      ctx.quadraticCurveTo(width / 2, (height + hook.y) / 2, hook.x, hook.y);
+      ctx.strokeStyle = isFever ? '#ff7675' : '#74b9ff';
+      ctx.lineWidth = isFever ? 4 : 2;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw Fishing Bobber / Hook
+      ctx.beginPath();
+      ctx.arc(hook.x, hook.y, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffd32a';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw Stars
+      for (const s of stars) {
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.rotate(s.rot);
+        const pScale = 1.0 + 0.12 * Math.sin(s.pulse);
+        ctx.scale(pScale, pScale);
+
+        // Glow ring
+        ctx.beginPath();
+        ctx.arc(0, 0, s.type.radius * 1.3, 0, Math.PI * 2);
+        ctx.fillStyle = s.type.color;
+        ctx.globalAlpha = 0.25;
+        ctx.fill();
+
+        ctx.globalAlpha = 1.0;
+        ctx.font = `${s.type.radius * 1.8}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(s.type.emoji, 0, 0);
+
+        ctx.restore();
+      }
+
+      // Draw Particles
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>

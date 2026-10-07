@@ -1,5 +1,21 @@
 [
   {
+    "id": "grand-carnival-fireworks",
+    "title": "Grand Carnival Fireworks",
+    "title_ko": "🎆 300회 축제! 무지개 불꽃놀이 대축제",
+    "description": "장윤이의 게임세상 300회 대기록 기념! 밤하늘을 터치해 환상적인 오색 불꽃과 축하 폭죽을 펑펑 쏘아 올리고 그랜드 피날레를 즐기는 힐링 축제 놀이입니다.",
+    "thumbnail": "grand-carnival-fireworks/thumb.svg",
+    "path": "grand-carnival-fireworks/index.html"
+  },
+  {
+    "id": "golden-star-catcher",
+    "title": "Golden Star Catcher",
+    "title_ko": "🎣 황금 별자리 낚시터",
+    "description": "밤하늘을 날아다니는 황금빛·에메랄드빛 별자리 스타들을 마법 낚싯줄로 톡톡 낚아 올리고 신나는 피버 타임을 즐기는 영롱한 터치 아케이드 놀이입니다.",
+    "thumbnail": "golden-star-catcher/thumb.svg",
+    "path": "golden-star-catcher/index.html"
+  },
+  {
     "id": "rainbow-bubble-popper",
     "title": "Rainbow Bubble Popper",
     "title_ko": "🌈 알록달록 무지개 비눗방울 팡팡",

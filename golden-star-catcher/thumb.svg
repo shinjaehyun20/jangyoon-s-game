@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="nightSky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1026"/>
+      <stop offset="50%" stop-color="#1b2447"/>
+      <stop offset="100%" stop-color="#2d1b4e"/>
+    </linearGradient>
+    <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff8db" stop-opacity="1"/>
+      <stop offset="40%" stop-color="#ffd700" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffa500" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonGlow" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#fff3a1"/>
+      <stop offset="100%" stop-color="#ffd23f"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Night Sky -->
+  <rect width="400" height="300" fill="url(#nightSky)"/>
+
+  <!-- Nebula Dust -->
+  <ellipse cx="200" cy="180" rx="180" ry="80" fill="#6c5ce7" opacity="0.25"/>
+  <ellipse cx="280" cy="100" rx="100" ry="50" fill="#fd79a8" opacity="0.2"/>
+
+  <!-- Constellation Lines -->
+  <path d="M 60,70 L 120,50 L 170,90 L 140,140 Z" fill="none" stroke="#74b9ff" stroke-width="2" stroke-dasharray="4,4" opacity="0.7"/>
+  <circle cx="60" cy="70" r="4" fill="#a29bfe"/>
+  <circle cx="120" cy="50" r="5" fill="#dfe6e9"/>
+  <circle cx="170" cy="90" r="4" fill="#a29bfe"/>
+  <circle cx="140" cy="140" r="4" fill="#74b9ff"/>
+
+  <!-- Smiling Crescent Moon -->
+  <circle cx="320" cy="70" r="35" fill="url(#moonGlow)"/>
+  <circle cx="335" cy="60" r="30" fill="#0b1026"/>
+  <circle cx="310" cy="70" r="3" fill="#ffeaa7"/>
+
+  <!-- Golden Fishing Rod & Line -->
+  <path d="M 40,260 Q 140,180 230,120" fill="none" stroke="#f39c12" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 230,120 Q 250,150 240,210" fill="none" stroke="#00cec9" stroke-width="2.5" stroke-dasharray="3,3"/>
+
+  <!-- Golden Catch Star -->
+  <circle cx="240" cy="210" r="42" fill="url(#starGlow)"/>
+  <text x="240" y="225" font-size="44" text-anchor="middle">⭐</text>
+
+  <!-- Floating Star Jewels -->
+  <g transform="translate(100, 210)">
+    <circle cx="0" cy="0" r="22" fill="#ffeaa7" opacity="0.3"/>
+    <text x="0" y="8" font-size="26" text-anchor="middle">🌟</text>
+  </g>
+  <g transform="translate(320, 200)">
+    <circle cx="0" cy="0" r="24" fill="#fdcb6e" opacity="0.3"/>
+    <text x="0" y="9" font-size="28" text-anchor="middle">✨</text>
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="50" y="250" width="300" height="38" rx="19" fill="#1e272e" opacity="0.9" stroke="#f1c40f" stroke-width="2"/>
+  <text x="200" y="275" font-family="'Malgun Gothic', sans-serif" font-weight="bold" font-size="16" fill="#ffd32a" text-anchor="middle">🎣 황금 별자리 낚시터</text>
+</svg>

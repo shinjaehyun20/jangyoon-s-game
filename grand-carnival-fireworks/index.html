@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>300회 축제! 무지개 불꽃놀이 대축제 - 장윤이의 게임세상 #300</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #060312;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 840px;
+      box-shadow: 0 12px 50px rgba(0, 0, 0, 0.9);
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 20%, #1e0b36 0%, #0d061e 50%, #05020c 100%);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #hud {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .badge {
+      background: rgba(25, 12, 45, 0.85);
+      border: 1.5px solid #ff3838;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #ffd32a;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(255, 56, 56, 0.4);
+    }
+    #milestone-pill {
+      background: linear-gradient(135deg, #ff3838, #ff9f43);
+      color: #fff;
+      border: none;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+    #carnival-bar-container {
+      position: absolute;
+      top: 66px;
+      left: 20px;
+      right: 20px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 215, 0, 0.5);
+      pointer-events: none;
+      z-index: 10;
+    }
+    #carnival-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff3838, #ffd32a, #00d2d3, #ff9ff3);
+      transition: width 0.15s ease;
+    }
+    #guide-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 4, 18, 0.88);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      cursor: pointer;
+      z-index: 20;
+    }
+    #guide-overlay h1 {
+      font-size: 27px;
+      color: #ffd32a;
+      margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(255, 211, 42, 0.8);
+    }
+    #guide-overlay h2 {
+      font-size: 18px;
+      color: #ff6b6b;
+      margin-bottom: 16px;
+    }
+    #guide-overlay p {
+      font-size: 15px;
+      color: #dfe6e9;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #ff3838, #ffd32a);
+      border: none;
+      padding: 14px 40px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #1a0b2e;
+      box-shadow: 0 8px 25px rgba(255, 56, 56, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="hud">
+      <div class="badge" id="milestone-pill">🏆 300회 축제!</div>
+      <div class="badge" id="score-badge">🎆 불꽃: 0</div>
+      <div class="badge" id="combo-badge">🔥 콤보: 0</div>
+    </div>
+    <div id="carnival-bar-container">
+      <div id="carnival-bar"></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="guide-overlay">
+      <h2>🎉 장윤이의 게임세상 300회 대기록 기념! 🎉</h2>
+      <h1>🎆 밤하늘 무지개 불꽃놀이 대축제</h1>
+      <p>화면을 톡톡 터치하거나 스와이프하여<br>영롱한 축제 불꽃들을 펑펑 터뜨려보세요!<br>카니발 게이지를 채우면 화려한 그랜드 피날레 발동!</p>
+      <button class="btn-start">불꽃 축제 시작! 🚀</button>
+    </div>
+  </div>
+
+  <script>
+    // Web Audio Synthesizer for Fireworks
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playWhistle() {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        const now = audioCtx.currentTime;
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(1400, now + 0.3);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(now + 0.3);
+      } catch (e) {}
+    }
+
+    function playBoom(fever = false) {
+      if (!audioCtx) return;
+      try {
+        // Deep sub-bass boom
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(fever ? 180 : 130, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
+        gain.gain.setValueAtTime(fever ? 0.35 : 0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(now + 0.5);
+
+        // Crackle harmonics
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        const chime = notes[Math.floor(Math.random() * notes.length)];
+        const cOsc = audioCtx.createOscillator();
+        const cGain = audioCtx.createGain();
+        cOsc.type = 'sine';
+        cOsc.frequency.setValueAtTime(chime, now + 0.05);
+        cGain.gain.setValueAtTime(0.12, now + 0.05);
+        cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        cOsc.connect(cGain);
+        cGain.connect(audioCtx.destination);
+        cOsc.start(now + 0.05);
+        cOsc.stop(now + 0.4);
+      } catch (e) {}
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('game-container');
+    const guide = document.getElementById('guide-overlay');
+    const scoreBadge = document.getElementById('score-badge');
+    const comboBadge = document.getElementById('combo-badge');
+    const carnivalBar = document.getElementById('carnival-bar');
+
+    let width, height;
+    function resize() {
+      width = canvas.width = container.clientWidth;
+      height = canvas.height = container.clientHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let score = 0;
+    let combo = 0;
+    let carnivalMeter = 0;
+    let isFinale = false;
+    let finaleTimer = 0;
+    let gameActive = false;
+
+    const rockets = [];
+    const particles = [];
+    const floatingHearts = [];
+
+    const palette = [
+      '#ff3838', '#ff9f43', '#ffd32a', '#00d2d3', '#54a0ff',
+      '#ff9ff3', '#1dd1a1', '#feca57', '#5f27cd', '#ffffff'
+    ];
+
+    function launchRocket(targetX, targetY) {
+      playWhistle();
+      const startX = targetX + (Math.random() - 0.5) * 60;
+      rockets.push({
+        x: startX,
+        y: height + 10,
+        tx: targetX,
+        ty: targetY,
+        vx: (targetX - startX) / 22,
+        vy: (targetY - (height + 10)) / 22,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        life: 22
+      });
+    }
+
+    function explode(x, y, baseColor) {
+      playBoom(isFinale);
+      combo++;
+      score += 100 * (1 + Math.floor(combo / 5));
+      carnivalMeter = Math.min(100, carnivalMeter + 12);
+
+      scoreBadge.textContent = `🎆 불꽃: ${score.toLocaleString()}`;
+      comboBadge.textContent = `🔥 콤보: ${combo}`;
+      carnivalBar.style.width = `${carnivalMeter}%`;
+
+      if (carnivalMeter >= 100 && !isFinale) {
+        triggerGrandFinale();
+      }
+
+      // Spark explosion
+      const sparkCount = isFinale ? 65 : 40;
+      for (let i = 0; i < sparkCount; i++) {
+        const angle = (Math.PI * 2 * i) / sparkCount + (Math.random() - 0.5) * 0.2;
+        const speed = (2.5 + Math.random() * 5.5) * (isFinale ? 1.4 : 1.0);
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: Math.random() < 0.3 ? '#ffffff' : (Math.random() < 0.5 ? baseColor : palette[Math.floor(Math.random() * palette.length)]),
+          alpha: 1.0,
+          gravity: 0.08,
+          friction: 0.96,
+          radius: 2.5 + Math.random() * 2.5,
+          life: 40 + Math.random() * 20
+        });
+      }
+
+      // 300 Celebration Floating Emoticon
+      floatingHearts.push({
+        x: x,
+        y: y,
+        text: Math.random() < 0.35 ? '🏆300' : (Math.random() < 0.5 ? '✨' : '💖'),
+        vy: -2,
+        alpha: 1.0
+      });
+    }
+
+    function triggerGrandFinale() {
+      isFinale = true;
+      finaleTimer = 300; // 5 seconds of automatic multi-burst cascade
+    }
+
+    function handlePointer(clientX, clientY) {
+      if (!gameActive) return;
+      initAudio();
+      const rect = canvas.getBoundingClientRect();
+      const tx = clientX - rect.left;
+      const ty = Math.min(rect.height * 0.65, Math.max(80, clientY - rect.top));
+      launchRocket(tx, ty);
+    }
+
+    container.addEventListener('pointerdown', (e) => handlePointer(e.clientX, e.clientY));
+    container.addEventListener('pointermove', (e) => {
+      if (e.buttons && Math.random() < 0.35) handlePointer(e.clientX, e.clientY);
+    });
+
+    guide.addEventListener('click', () => {
+      initAudio();
+      guide.style.display = 'none';
+      gameActive = true;
+      // Launch initial celebration salvo
+      launchRocket(width * 0.3, height * 0.3);
+      launchRocket(width * 0.7, height * 0.25);
+    });
+
+    let autoTimer = 0;
+    function update() {
+      if (!gameActive) return;
+
+      autoTimer++;
+      if (isFinale) {
+        finaleTimer--;
+        carnivalBar.style.width = `${(finaleTimer / 300) * 100}%`;
+        if (autoTimer % 10 === 0) {
+          launchRocket(Math.random() * (width - 80) + 40, Math.random() * (height * 0.5) + 60);
+        }
+        if (finaleTimer <= 0) {
+          isFinale = false;
+          carnivalMeter = 0;
+          carnivalBar.style.width = '0%';
+        }
+      } else if (autoTimer % 65 === 0) {
+        // Occasional ambient rocket
+        launchRocket(Math.random() * (width - 80) + 40, Math.random() * (height * 0.4) + 80);
+      }
+
+      // Update rockets
+      for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        r.x += r.vx;
+        r.y += r.vy;
+        r.life--;
+        // Trail particle
+        particles.push({
+          x: r.x,
+          y: r.y,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: Math.random() * 1.5,
+          color: '#ffd32a',
+          alpha: 0.7,
+          gravity: 0.05,
+          friction: 0.95,
+          radius: 1.5,
+          life: 14
+        });
+        if (r.life <= 0) {
+          explode(r.tx, r.ty, r.color);
+          rockets.splice(i, 1);
+        }
+      }
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.vx *= p.friction;
+        p.vy *= p.friction;
+        p.vy += p.gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 1 / p.life;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      // Update floating texts
+      for (let i = floatingHearts.length - 1; i >= 0; i--) {
+        const h = floatingHearts[i];
+        h.y += h.vy;
+        h.alpha -= 0.02;
+        if (h.alpha <= 0) floatingHearts.splice(i, 1);
+      }
+    }
+
+    function draw() {
+      // Trail effect
+      ctx.fillStyle = isFinale ? 'rgba(15, 6, 28, 0.28)' : 'rgba(6, 3, 18, 0.22)';
+      ctx.fillRect(0, 0, width, height);
+
+      // Distant castle silhouette
+      ctx.fillStyle = '#0c071a';
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.lineTo(0, height - 60);
+      ctx.lineTo(40, height - 70);
+      ctx.lineTo(80, height - 55);
+      ctx.lineTo(130, height - 85);
+      ctx.lineTo(160, height - 50);
+      ctx.lineTo(210, height - 95);
+      ctx.lineTo(250, height - 60);
+      ctx.lineTo(310, height - 80);
+      ctx.lineTo(360, height - 55);
+      ctx.lineTo(width, height - 70);
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw rockets
+      for (const r of rockets) {
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = r.color;
+        ctx.fill();
+      }
+
+      // Draw particles
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Draw floating celebration text
+      for (const h of floatingHearts) {
+        ctx.save();
+        ctx.globalAlpha = h.alpha;
+        ctx.font = 'bold 22px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffd32a';
+        ctx.fillText(h.text, h.x, h.y);
+        ctx.restore();
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>
