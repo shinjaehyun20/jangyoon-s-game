@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "rainbow-bubble-pop",
+        "title": "🫧 알록달록 무지개 버블 팡팡",
+        "path": "rainbow-bubble-pop/index.html"
+      },
+      {
+        "id": "starry-firefly-night",
+        "title": "✨ 별밤 반딧불이 동산",
+        "path": "starry-firefly-night/index.html"
+      },
+      {
         "id": "robot-pet-grooming",
         "title": "🤖 삐리삐리 로봇 강아지 목욕 대작전",
         "path": "robot-pet-grooming/index.html"

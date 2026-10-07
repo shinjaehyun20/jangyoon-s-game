@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>✨ 별밤 반딧불이 동산</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    body {
+      background: #080d24;
+      font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      overflow: hidden;
+      touch-action: none;
+    }
+    header {
+      width: 100%;
+      max-width: 600px;
+      padding: 14px 16px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 235, 59, 0.4);
+      color: #ffe875;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-btn:active {
+      transform: scale(0.94);
+      background: rgba(255, 235, 59, 0.25);
+    }
+    .stats {
+      display: flex;
+      gap: 8px;
+    }
+    .stat-badge {
+      background: rgba(15, 25, 55, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .stat-val {
+      color: #ffe600;
+    }
+    #gameCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .guide-banner {
+      position: relative;
+      z-index: 10;
+      background: rgba(10, 20, 45, 0.65);
+      backdrop-filter: blur(8px);
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 13px;
+      color: #b8c8f0;
+      pointer-events: none;
+      margin-bottom: 12px;
+      animation: pulseGuide 3s infinite ease-in-out;
+    }
+    @keyframes pulseGuide {
+      0%, 100% { opacity: 0.85; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-3px); }
+    }
+    .celebration-toast {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(18, 30, 70, 0.95);
+      border: 2px solid #ffe600;
+      border-radius: 24px;
+      padding: 20px 32px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(255, 230, 0, 0.4);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .celebration-toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .toast-icon {
+      font-size: 44px;
+      margin-bottom: 8px;
+    }
+    .toast-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ffe600;
+      margin-bottom: 4px;
+    }
+    .toast-desc {
+      font-size: 14px;
+      color: #d0e0ff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../index.html" class="back-btn">⬅ 홈으로</a>
+    <div class="stats">
+      <div class="stat-badge">🌟 <span class="stat-val" id="scoreVal">0</span></div>
+      <div class="stat-badge">🫙 <span class="stat-val" id="jarVal">0/10</span></div>
+      <div class="stat-badge">✨ <span class="stat-val" id="constVal">0</span></div>
+    </div>
+  </header>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="celebration-toast" id="toast">
+    <div class="toast-icon">✨🌌✨</div>
+    <div class="toast-title" id="toastTitle">별자리가 환하게 빛나요!</div>
+    <div class="toast-desc" id="toastDesc">유리병에 반딧불이 10마리를 가득 모았습니다</div>
+  </div>
+
+  <div class="guide-banner">
+    ✨ 밤하늘을 나는 반딧불이를 터치해 유리병에 모아보세요!
+  </div>
+
+  <script>
+    // Web Audio API Synthesizer (Zero External Dependencies)
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    const pentatonic = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66]; // C5 ~ D6
+    function playChime(freqIndex = 0) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const now = audioCtx.currentTime;
+        const freq = pentatonic[freqIndex % pentatonic.length];
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.02, now + 0.3);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.65);
+      } catch (e) {}
+    }
+
+    function playConstellationChord() {
+      if (!audioCtx) return;
+      try {
+        const chord = [523.25, 659.25, 783.99, 1046.50];
+        chord.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          const now = audioCtx.currentTime + idx * 0.08;
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 1.3);
+        });
+      } catch (e) {}
+    }
+
+    // Canvas Setup
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0, height = 0;
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      initBackgroundStars();
+    }
+    window.addEventListener('resize', resize);
+
+    // Game State
+    let score = 0;
+    let jarCount = 0;
+    let constellationCount = 0;
+    const scoreVal = document.getElementById('scoreVal');
+    const jarVal = document.getElementById('jarVal');
+    const constVal = document.getElementById('constVal');
+    const toast = document.getElementById('toast');
+
+    // Background Stars
+    let bgStars = [];
+    function initBackgroundStars() {
+      bgStars = [];
+      const numStars = Math.floor((width * height) / 4500);
+      for (let i = 0; i < numStars; i++) {
+        bgStars.push({
+          x: Math.random() * width,
+          y: Math.random() * height * 0.75,
+          r: Math.random() * 1.5 + 0.6,
+          baseAlpha: Math.random() * 0.5 + 0.3,
+          twinkleSpeed: Math.random() * 0.03 + 0.01,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    // Firefly Class
+    const FIREFLY_COLORS = [
+      { glow: 'rgba(255, 240, 80, ', core: '#ffffff', hex: '#fff050' },  // Golden Yellow
+      { glow: 'rgba(164, 248, 50, ', core: '#ffffff', hex: '#a4f832' },  // Emerald Lime
+      { glow: 'rgba(80, 240, 255, ', core: '#ffffff', hex: '#50f0ff' },  // Cyan Breeze
+      { glow: 'rgba(255, 140, 220, ', core: '#ffffff', hex: '#ff8cdc' }  // Pink Fairy
+    ];
+
+    class Firefly {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * (width - 60) + 30;
+        this.y = Math.random() * (height * 0.65 - 80) + 70;
+        this.vx = (Math.random() - 0.5) * 1.2;
+        this.vy = (Math.random() - 0.5) * 1.2;
+        this.baseRadius = Math.random() * 2.5 + 4;
+        this.color = FIREFLY_COLORS[Math.floor(Math.random() * FIREFLY_COLORS.length)];
+        this.pulsePhase = Math.random() * Math.PI * 2;
+        this.pulseSpeed = Math.random() * 0.04 + 0.02;
+        this.flutterPhase = Math.random() * Math.PI * 2;
+        this.targetJar = false;
+        this.caughtTime = 0;
+      }
+
+      update() {
+        if (this.targetJar) {
+          // Fly smoothly toward jar position (bottom right)
+          const targetX = width - 70;
+          const targetY = height - 90;
+          const dx = targetX - this.x;
+          const dy = targetY - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 15) {
+            return false; // Reached jar
+          }
+          this.x += (dx / dist) * Math.min(dist * 0.12, 14);
+          this.y += (dy / dist) * Math.min(dist * 0.12, 14);
+          this.flutterPhase += 0.3;
+          return true;
+        }
+
+        this.pulsePhase += this.pulseSpeed;
+        this.flutterPhase += 0.08;
+
+        this.vx += (Math.random() - 0.5) * 0.2;
+        this.vy += (Math.random() - 0.5) * 0.2;
+        this.vx = Math.max(-1.8, Math.min(1.8, this.vx));
+        this.vy = Math.max(-1.8, Math.min(1.8, this.vy));
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Soft screen bounce
+        const margin = 20;
+        if (this.x < margin) { this.x = margin; this.vx *= -0.8; }
+        if (this.x > width - margin) { this.x = width - margin; this.vx *= -0.8; }
+        if (this.y < 70) { this.y = 70; this.vy *= -0.8; }
+        if (this.y > height * 0.72) { this.y = height * 0.72; this.vy *= -0.8; }
+
+        return true;
+      }
+
+      draw() {
+        const pulse = (Math.sin(this.pulsePhase) + 1) * 0.5; // 0 to 1
+        const alpha = 0.3 + pulse * 0.6;
+        const glowRadius = this.baseRadius * (2.8 + pulse * 2.2);
+
+        // Soft outer radial glow
+        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
+        grad.addColorStop(0, this.color.glow + alpha + ')');
+        grad.addColorStop(0.4, this.color.glow + (alpha * 0.4) + ')');
+        grad.addColorStop(1, this.color.glow + '0)');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Wings flutter
+        const wingOffset = Math.sin(this.flutterPhase) * 4;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.beginPath();
+        ctx.ellipse(this.x - 3, this.y - 2 + wingOffset, 3.5, 2, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(this.x + 3, this.y - 2 - wingOffset, 3.5, 2, Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bright Core
+        ctx.fillStyle = this.color.core;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.baseRadius * 0.65, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Sparkle Particle Class
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.vx = (Math.random() - 0.5) * 4;
+        this.vy = (Math.random() - 0.5) * 4 - 1.5;
+        this.life = 1.0;
+        this.decay = Math.random() * 0.03 + 0.02;
+        this.size = Math.random() * 3 + 2;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.05; // slight gravity
+        this.life -= this.decay;
+        return this.life > 0;
+      }
+      draw() {
+        ctx.fillStyle = this.color.glow + this.life + ')';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * this.life, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Jar & Constellation Configuration
+    const fireflies = [];
+    const particles = [];
+    const MAX_FIREFLIES = 14;
+
+    function populateFireflies() {
+      while (fireflies.length < MAX_FIREFLIES) {
+        fireflies.push(new Firefly());
+      }
+    }
+
+    // Constellations in the sky
+    const constellations = [
+      { name: "큰곰자리 (북두칠성)", stars: [[0.15, 0.2], [0.22, 0.23], [0.30, 0.22], [0.38, 0.27], [0.42, 0.35], [0.34, 0.36], [0.38, 0.27]] },
+      { name: "오리온자리", stars: [[0.65, 0.2], [0.75, 0.18], [0.68, 0.28], [0.71, 0.28], [0.74, 0.28], [0.66, 0.38], [0.77, 0.37]] },
+      { name: "카시오페이아", stars: [[0.45, 0.14], [0.52, 0.18], [0.55, 0.12], [0.61, 0.16], [0.67, 0.11]] }
+    ];
+
+    function drawConstellation(cIdx) {
+      if (cIdx >= constellations.length) return;
+      const c = constellations[cIdx];
+      const pts = c.stars.map(p => ({ x: p[0] * width, y: p[1] * height }));
+
+      // Draw faint lines
+      ctx.strokeStyle = 'rgba(255, 235, 120, 0.55)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      pts.forEach((pt, i) => {
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.stroke();
+
+      // Draw stars
+      pts.forEach(pt => {
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 230, 50, 0.7)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+    }
+
+    // Glass Jar Rendering
+    function drawJar() {
+      const jarX = width - 85;
+      const jarY = height - 125;
+      const jarW = 65;
+      const jarH = 85;
+
+      // Glow inside jar based on fill level
+      if (jarCount > 0) {
+        const fillRatio = jarCount / 10;
+        const jarGlow = ctx.createRadialGradient(
+          jarX + jarW / 2, jarY + jarH - (jarH * fillRatio * 0.5), 0,
+          jarX + jarW / 2, jarY + jarH - (jarH * fillRatio * 0.5), jarW * 0.8
+        );
+        jarGlow.addColorStop(0, `rgba(255, 235, 70, ${0.4 + fillRatio * 0.5})`);
+        jarGlow.addColorStop(0.6, `rgba(164, 248, 50, ${0.2 + fillRatio * 0.3})`);
+        jarGlow.addColorStop(1, 'rgba(255, 235, 70, 0)');
+
+        ctx.fillStyle = jarGlow;
+        ctx.beginPath();
+        ctx.roundRect(jarX, jarY + jarH * (1 - fillRatio), jarW, jarH * fillRatio, 10);
+        ctx.fill();
+      }
+
+      // Jar Glass Body
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.lineWidth = 2.5;
+      ctx.fillStyle = 'rgba(200, 235, 255, 0.08)';
+      ctx.beginPath();
+      ctx.roundRect(jarX, jarY + 12, jarW, jarH - 12, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      // Jar Neck & Cork
+      ctx.fillStyle = '#c08a50';
+      ctx.beginPath();
+      ctx.roundRect(jarX + 12, jarY, jarW - 24, 12, 3);
+      ctx.fill();
+      ctx.strokeStyle = '#8d5a2b';
+      ctx.stroke();
+
+      // Fireflies captured dots
+      for (let i = 0; i < jarCount; i++) {
+        const dotX = jarX + 14 + (i % 3) * 18 + Math.sin(Date.now() * 0.003 + i) * 3;
+        const dotY = jarY + jarH - 16 - Math.floor(i / 3) * 20 + Math.cos(Date.now() * 0.003 + i) * 3;
+        ctx.fillStyle = '#fff9a5';
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Touch & Click Interaction
+    function handlePointer(clientX, clientY) {
+      initAudio();
+      let hit = false;
+
+      for (let i = fireflies.length - 1; i >= 0; i--) {
+        const f = fireflies[i];
+        if (f.targetJar) continue;
+
+        const dx = clientX - f.x;
+        const dy = clientY - f.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Touch radius generous for kids (44px)
+        if (dist < 44) {
+          hit = true;
+          f.targetJar = true;
+          score++;
+          jarCount++;
+          scoreVal.textContent = score;
+          jarVal.textContent = `${jarCount}/10`;
+
+          playChime(score % 7);
+
+          // Burst sparkles
+          for (let p = 0; p < 8; p++) {
+            particles.push(new Particle(f.x, f.y, f.color));
+          }
+
+          // Check Jar Full
+          if (jarCount >= 10) {
+            jarCount = 0;
+            constellationCount++;
+            constVal.textContent = constellationCount;
+            jarVal.textContent = `0/10`;
+
+            playConstellationChord();
+            showCelebrationToast();
+
+            // Big celebratory fireworks
+            for (let p = 0; p < 35; p++) {
+              particles.push(new Particle(width / 2, height * 0.3, FIREFLY_COLORS[p % FIREFLY_COLORS.length]));
+            }
+          }
+          break;
+        }
+      }
+
+      if (!hit) {
+        // Spawn subtle click ripples
+        for (let p = 0; p < 3; p++) {
+          particles.push(new Particle(clientX, clientY, FIREFLY_COLORS[0]));
+        }
+      }
+    }
+
+    function showCelebrationToast() {
+      const cIdx = (constellationCount - 1) % constellations.length;
+      document.getElementById('toastTitle').textContent = `✨ ${constellations[cIdx].name} 완성!`;
+      document.getElementById('toastDesc').textContent = `유리병의 빛으로 밤하늘 별자리를 밝혔습니다!`;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      handlePointer(e.clientX, e.clientY);
+    });
+
+    // Main Game Loop
+    function gameLoop() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Night Sky Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, '#060a1c');
+      skyGrad.addColorStop(0.65, '#0c1633');
+      skyGrad.addColorStop(1, '#15243e');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Twinkling Background Stars
+      const now = Date.now() * 0.001;
+      bgStars.forEach(s => {
+        const twinkle = Math.sin(now * (s.twinkleSpeed * 100) + s.phase) * 0.35 + s.baseAlpha;
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, twinkle)})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Active Constellations
+      for (let c = 0; c < constellationCount; c++) {
+        drawConstellation(c % constellations.length);
+      }
+
+      // Gentle Hill Silhouette
+      ctx.fillStyle = '#081120';
+      ctx.beginPath();
+      ctx.moveTo(0, height - 60);
+      ctx.quadraticCurveTo(width * 0.3, height - 90, width * 0.65, height - 65);
+      ctx.quadraticCurveTo(width * 0.85, height - 50, width, height - 70);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      ctx.fill();
+
+      // Update & Draw Fireflies
+      for (let i = fireflies.length - 1; i >= 0; i--) {
+        const f = fireflies[i];
+        const alive = f.update();
+        if (!alive) {
+          fireflies.splice(i, 1);
+        } else {
+          f.draw();
+        }
+      }
+      populateFireflies();
+
+      // Update & Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (!p.update()) {
+          particles.splice(i, 1);
+        } else {
+          p.draw();
+        }
+      }
+
+      // Draw Glass Jar
+      drawJar();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Start
+    resize();
+    populateFireflies();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

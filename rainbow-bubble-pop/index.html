@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🫧 알록달록 무지개 버블 팡팡</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    body {
+      background: linear-gradient(180deg, #dcf4ff 0%, #ffe9f3 50%, #fff9e6 100%);
+      font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      touch-action: none;
+      color: #334;
+    }
+    header {
+      width: 100%;
+      max-width: 600px;
+      padding: 14px 16px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 105, 180, 0.4);
+      color: #e91e63;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-btn:active {
+      transform: scale(0.94);
+      background: #ffecf5;
+    }
+    .stats {
+      display: flex;
+      gap: 8px;
+    }
+    .stat-badge {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .stat-val {
+      color: #ff3366;
+    }
+    #gameCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .fever-container {
+      position: relative;
+      z-index: 10;
+      width: 90%;
+      max-width: 320px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .fever-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 105, 180, 0.3);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    .fever-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
+      transition: width 0.2s;
+    }
+    .fever-label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #7a507b;
+    }
+    .combo-toast {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      font-size: 28px;
+      font-weight: 900;
+      color: #ff2a7a;
+      text-shadow: 0 0 10px #fff, 0 4px 12px rgba(255, 42, 122, 0.4);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .combo-toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.15);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../index.html" class="back-btn">⬅ 홈으로</a>
+    <div class="stats">
+      <div class="stat-badge">🫧 <span class="stat-val" id="scoreVal">0</span></div>
+      <div class="stat-badge">⚡ <span class="stat-val" id="comboVal">x1</span></div>
+      <div class="stat-badge">🏆 <span class="stat-val" id="bestVal">0</span></div>
+    </div>
+  </header>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="combo-toast" id="comboToast">COMBO x2!</div>
+
+  <div class="fever-container">
+    <div class="fever-bar-bg">
+      <div class="fever-bar-fill" id="feverFill"></div>
+    </div>
+    <div class="fever-label" id="feverText">🫧 비눗방울을 팡팡 터뜨려 피버를 채워보세요!</div>
+  </div>
+
+  <script>
+    // Web Audio API Synthesizer (Zero External Dependencies)
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playPopSound(combo = 1) {
+      if (!audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // Base frequency steps with combo
+        const baseFreq = Math.min(1200, 480 + combo * 60);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(baseFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + 0.12);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.13);
+
+        // Subtle pop click noise burst
+        const bufferSize = audioCtx.sampleRate * 0.02;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.12, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+        noise.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+        noise.start(now);
+      } catch (e) {}
+    }
+
+    function playFeverFanfare() {
+      if (!audioCtx) return;
+      try {
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        notes.forEach((freq, idx) => {
+          const now = audioCtx.currentTime + idx * 0.09;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        });
+      } catch (e) {}
+    }
+
+    // Canvas Setup
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0, height = 0;
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+
+    // Cute animal icons inside bubbles
+    const ANIMAL_ICONS = ['🐱', '🐶', '🐰', '🐻', '🐼', '🦊', '🐥', '🦄', '🐨', '🐸'];
+
+    // Game State
+    let score = 0;
+    let combo = 1;
+    let lastPopTime = 0;
+    let fever = 0; // 0 to 100
+    let isFeverMode = false;
+    let feverEndTime = 0;
+
+    const savedBest = localStorage.getItem('jangyoon_bubble_best') || 0;
+    let bestScore = parseInt(savedBest, 10);
+
+    const scoreVal = document.getElementById('scoreVal');
+    const comboVal = document.getElementById('comboVal');
+    const bestVal = document.getElementById('bestVal');
+    const feverFill = document.getElementById('feverFill');
+    const feverText = document.getElementById('feverText');
+    const comboToast = document.getElementById('comboToast');
+    bestVal.textContent = bestScore;
+
+    // Bubble Class
+    class Bubble {
+      constructor(isGolden = false) {
+        this.reset(isGolden);
+      }
+
+      reset(isGolden = false) {
+        this.radius = Math.random() * 22 + (isGolden ? 40 : 36); // 36 ~ 58
+        this.x = Math.random() * (width - this.radius * 2) + this.radius;
+        this.y = height + this.radius + Math.random() * 80;
+        this.vy = -(Math.random() * 1.5 + (isGolden ? 2.5 : 1.2));
+        this.wobblePhase = Math.random() * Math.PI * 2;
+        this.wobbleSpeed = Math.random() * 0.04 + 0.02;
+        this.wobbleAmp = Math.random() * 1.6 + 0.8;
+        this.animal = isGolden ? '👑' : ANIMAL_ICONS[Math.floor(Math.random() * ANIMAL_ICONS.length)];
+        this.isGolden = isGolden;
+      }
+
+      update() {
+        this.wobblePhase += this.wobbleSpeed;
+        this.y += this.vy;
+        this.x += Math.sin(this.wobblePhase) * this.wobbleAmp;
+
+        // Soft wall containment
+        if (this.x < this.radius) this.x = this.radius;
+        if (this.x > width - this.radius) this.x = width - this.radius;
+
+        return this.y > -this.radius * 2; // Keep while on screen
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        // Draw iridescent bubble body
+        const grad = ctx.createRadialGradient(
+          -this.radius * 0.35, -this.radius * 0.35, this.radius * 0.1,
+          0, 0, this.radius
+        );
+
+        if (this.isGolden) {
+          grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+          grad.addColorStop(0.3, 'rgba(255, 235, 59, 0.6)');
+          grad.addColorStop(0.7, 'rgba(255, 193, 7, 0.4)');
+          grad.addColorStop(1, 'rgba(255, 152, 0, 0.8)');
+          ctx.strokeStyle = 'rgba(255, 240, 100, 0.95)';
+        } else {
+          grad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+          grad.addColorStop(0.4, 'rgba(255, 182, 193, 0.35)');
+          grad.addColorStop(0.7, 'rgba(135, 206, 250, 0.35)');
+          grad.addColorStop(0.9, 'rgba(152, 251, 152, 0.35)');
+          grad.addColorStop(1, 'rgba(255, 218, 185, 0.6)');
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+        }
+
+        ctx.fillStyle = grad;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Bubble Highlight Reflection (top-left crescent)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.beginPath();
+        ctx.ellipse(-this.radius * 0.35, -this.radius * 0.35, this.radius * 0.28, this.radius * 0.14, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Animal Emoji Inside
+        ctx.font = `${Math.floor(this.radius * 0.9)}px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.animal, 0, 2);
+
+        ctx.restore();
+      }
+    }
+
+    // Floating Text & Pop Effect
+    class FloatingEffect {
+      constructor(x, y, text, color = '#ff2a7a') {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.color = color;
+        this.life = 1.0;
+        this.vy = -2.2;
+      }
+      update() {
+        this.y += this.vy;
+        this.life -= 0.025;
+        return this.life > 0;
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.font = "bold 20px 'Malgun Gothic', sans-serif";
+        ctx.fillStyle = this.color;
+        ctx.textAlign = 'center';
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    // Rainbow Sparkle Particles
+    class Sparkle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.life = 1.0;
+        this.size = Math.random() * 5 + 3;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.12; // gravity
+        this.life -= 0.035;
+        return this.life > 0;
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * this.life, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    const bubbles = [];
+    const effects = [];
+    const sparkles = [];
+    const SPARKLE_COLORS = ['#ff4081', '#00e5ff', '#ffeb3b', '#76ff03', '#e040fb', '#ff9100'];
+
+    function populateBubbles() {
+      const targetCount = isFeverMode ? 18 : 10;
+      while (bubbles.length < targetCount) {
+        bubbles.push(new Bubble(isFeverMode));
+      }
+    }
+
+    // Pointer Handler (Generous Touch Area)
+    function handlePointer(clientX, clientY) {
+      initAudio();
+      const now = Date.now();
+
+      // Combo Timing (< 1.2s)
+      if (now - lastPopTime < 1200) {
+        combo = Math.min(10, combo + 1);
+      } else {
+        combo = 1;
+      }
+      lastPopTime = now;
+      comboVal.textContent = `x${combo}`;
+
+      if (combo >= 3) {
+        comboToast.textContent = `⚡ COMBO x${combo}!`;
+        comboToast.classList.add('show');
+        setTimeout(() => comboToast.classList.remove('show'), 600);
+      }
+
+      let popped = false;
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        const dx = clientX - b.x;
+        const dy = clientY - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Touch leeway +15px
+        if (dist <= b.radius + 15) {
+          popped = true;
+          bubbles.splice(i, 1);
+
+          const points = (b.isGolden ? 300 : 100) * combo;
+          score += points;
+          scoreVal.textContent = score;
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestVal.textContent = bestScore;
+            localStorage.setItem('jangyoon_bubble_best', bestScore);
+          }
+
+          playPopSound(combo);
+
+          // Spawn Floating Pop Text & Emoji
+          effects.push(new FloatingEffect(b.x, b.y - 10, `${b.animal} +${points}`, b.isGolden ? '#ff9800' : '#ff2a7a'));
+
+          // Spawn Rainbow Confetti
+          for (let s = 0; s < 14; s++) {
+            sparkles.push(new Sparkle(b.x, b.y, SPARKLE_COLORS[s % SPARKLE_COLORS.length]));
+          }
+
+          // Fever increase
+          if (!isFeverMode) {
+            fever = Math.min(100, fever + 9);
+            feverFill.style.width = `${fever}%`;
+
+            if (fever >= 100) {
+              triggerFever();
+            }
+          }
+          break;
+        }
+      }
+    }
+
+    function triggerFever() {
+      isFeverMode = true;
+      feverEndTime = Date.now() + 6000; // 6s fever
+      feverText.textContent = "🌈 무지개 피버 타임! 황금 방울이 팡팡!";
+      feverFill.style.background = "linear-gradient(90deg, #ff0055, #ffeb3b, #00e5ff)";
+      playFeverFanfare();
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      handlePointer(e.clientX, e.clientY);
+    });
+
+    // Main Game Loop
+    function gameLoop() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Check Fever Countdown
+      if (isFeverMode) {
+        const remain = feverEndTime - Date.now();
+        if (remain <= 0) {
+          isFeverMode = false;
+          fever = 0;
+          feverFill.style.width = '0%';
+          feverFill.style.background = "linear-gradient(90deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%)";
+          feverText.textContent = "🫧 비눗방울을 팡팡 터뜨려 피버를 채워보세요!";
+        } else {
+          feverFill.style.width = `${(remain / 6000) * 100}%`;
+        }
+      }
+
+      // Combo Reset check
+      if (combo > 1 && Date.now() - lastPopTime > 1300) {
+        combo = 1;
+        comboVal.textContent = 'x1';
+      }
+
+      // Update & Draw Bubbles
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        if (!b.update()) {
+          bubbles.splice(i, 1);
+        } else {
+          b.draw();
+        }
+      }
+      populateBubbles();
+
+      // Update & Draw Sparkles
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        const s = sparkles[i];
+        if (!s.update()) {
+          sparkles.splice(i, 1);
+        } else {
+          s.draw();
+        }
+      }
+
+      // Update & Draw Floating Effects
+      for (let i = effects.length - 1; i >= 0; i--) {
+        const ef = effects[i];
+        if (!ef.update()) {
+          effects.splice(i, 1);
+        } else {
+          ef.draw();
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Init
+    resize();
+    populateBubbles();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

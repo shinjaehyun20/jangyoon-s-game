@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#bbf2f6"/>
+      <stop offset="50%" stop-color="#e0f7fa"/>
+      <stop offset="100%" stop-color="#fff1f5"/>
+    </linearGradient>
+    <radialGradient id="bubbleRainbow" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.9)"/>
+      <stop offset="40%" stop-color="rgba(255,200,240,0.4)"/>
+      <stop offset="70%" stop-color="rgba(160,230,255,0.4)"/>
+      <stop offset="90%" stop-color="rgba(190,255,200,0.5)"/>
+      <stop offset="100%" stop-color="rgba(255,220,150,0.7)"/>
+    </radialGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,100,200,0.15)"/>
+    </filter>
+  </defs>
+
+  <!-- Bright Pastel Background -->
+  <rect width="400" height="300" fill="url(#skyGrad)"/>
+
+  <!-- Fluffy Cloud Silhouettes -->
+  <path d="M-20 260 Q40 220 100 245 T220 230 T340 240 T420 255 L420 300 L-20 300 Z" fill="#ffffff" opacity="0.6"/>
+  <path d="M-20 280 Q60 260 160 270 T360 265 T420 275 L420 300 L-20 300 Z" fill="#ffffff"/>
+
+  <!-- Little Background Sparkles -->
+  <circle cx="60" cy="80" r="4" fill="#ffb6c1"/>
+  <circle cx="340" cy="60" r="5" fill="#ffd700"/>
+  <circle cx="110" cy="180" r="3" fill="#87cefa"/>
+  <circle cx="330" cy="200" r="4" fill="#98fb98"/>
+
+  <!-- Left Bubble: Cute Cat -->
+  <g transform="translate(90, 160)" filter="url(#softShadow)">
+    <circle cx="0" cy="0" r="50" fill="url(#bubbleRainbow)" stroke="rgba(255,255,255,0.9)" stroke-width="2.5"/>
+    <ellipse cx="-16" cy="-20" rx="14" ry="7" fill="rgba(255,255,255,0.85)" transform="rotate(-30, -16, -20)"/>
+    <text x="0" y="16" font-size="42" text-anchor="middle">🐱</text>
+  </g>
+
+  <!-- Center Bubble (Big): Cute Bunny -->
+  <g transform="translate(200, 115)" filter="url(#softShadow)">
+    <circle cx="0" cy="0" r="68" fill="url(#bubbleRainbow)" stroke="rgba(255,255,255,0.95)" stroke-width="3"/>
+    <ellipse cx="-24" cy="-30" rx="20" ry="10" fill="rgba(255,255,255,0.85)" transform="rotate(-30, -24, -30)"/>
+    <text x="0" y="24" font-size="62" text-anchor="middle">🐰</text>
+  </g>
+
+  <!-- Right Bubble: Cute Bear -->
+  <g transform="translate(310, 150)" filter="url(#softShadow)">
+    <circle cx="0" cy="0" r="48" fill="url(#bubbleRainbow)" stroke="rgba(255,255,255,0.9)" stroke-width="2.5"/>
+    <ellipse cx="-15" cy="-18" rx="12" ry="6" fill="rgba(255,255,255,0.85)" transform="rotate(-30, -15, -18)"/>
+    <text x="0" y="14" font-size="38" text-anchor="middle">🐻</text>
+  </g>
+
+  <!-- Mini Bubbles Floating -->
+  <circle cx="160" cy="210" r="16" fill="url(#bubbleRainbow)" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
+  <circle cx="260" cy="50" r="14" fill="url(#bubbleRainbow)" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
+  <circle cx="45" cy="100" r="10" fill="url(#bubbleRainbow)" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
+
+  <!-- Title Badge -->
+  <rect x="20" y="22" width="168" height="34" rx="17" fill="rgba(255,255,255,0.85)" stroke="#ff85c0" stroke-width="1.5" filter="url(#softShadow)"/>
+  <text x="32" y="45" font-family="'Malgun Gothic', sans-serif" font-size="14" font-weight="bold" fill="#ff4081">🫧 무지개 버블 팡팡</text>
+</svg>

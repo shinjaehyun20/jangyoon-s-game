@@ -2366,5 +2366,21 @@
     "description": "반짝이는 메탈 로봇 강아지를 비누 거품으로 퐁퐁 씻기고 시원한 물 샤워와 광택을 낸 뒤 예쁜 리본을 달아주는 힐링 터치 놀이입니다.",
     "thumbnail": "robot-pet-grooming/thumb.svg",
     "path": "robot-pet-grooming/index.html"
+  },
+  {
+    "id": "starry-firefly-night",
+    "title": "Starry Firefly Night",
+    "title_ko": "✨ 별밤 반딧불이 동산",
+    "description": "밤하늘 은하수 아래 반짝반짝 날아다니는 오색 반딧불이를 터치해 유리병에 모으고 별자리 불빛을 환하게 밝히는 서정적인 힐링 터치 아케이드 놀이입니다.",
+    "thumbnail": "starry-firefly-night/thumb.svg",
+    "path": "starry-firefly-night/index.html"
+  },
+  {
+    "id": "rainbow-bubble-pop",
+    "title": "Rainbow Bubble Pop",
+    "title_ko": "🫧 알록달록 무지개 버블 팡팡",
+    "description": "둥실둥실 떠오르는 투명하고 영롱한 무지개 방울들을 톡톡 터뜨리면 귀여운 아기 동물들이 까꿍 인사하며 점수와 별빛이 팡팡 터지는 신나는 힐링 터치 놀이입니다.",
+    "thumbnail": "rainbow-bubble-pop/thumb.svg",
+    "path": "rainbow-bubble-pop/index.html"
   }
 ]
