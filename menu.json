@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "rainbow-cloud-jumper",
+        "title": "🌈 무지개 구름 퐁퐁 점퍼",
+        "path": "rainbow-cloud-jumper/index.html"
+      },
+      {
         "id": "rainbow-bubble-pop",
         "title": "🫧 알록달록 무지개 버블 팡팡",
         "path": "rainbow-bubble-pop/index.html"

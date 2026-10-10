@@ -1,4 +1,4 @@
-## 2026-10-06 — quantum-cyber-circuit, robot-pet-grooming (총 300개)
+## 2026-10-06 — quantum-cyber-circuit, robot-pet-grooming (총 301개)
 - **[⚡ 찌릿찌릿 사이버 회로 연결 놀이 (quantum-cyber-circuit)]** — 네온 빛으로 번쩍이는 사이버 회로 타일을 터치해 전선을 이어주고 시작점에서 도착점까지 전력을 공급하는 두뇌 힐링 퍼즐 게임 (외부 의존성 0).
 - **[🤖 삐리삐리 로봇 강아지 목욕 대작전 (robot-pet-grooming)]** — 반짝이는 메탈 로봇 강아지를 비누 거품으로 퐁퐁 씻기고 시원한 물 샤워와 광택을 낸 뒤 예쁜 리본을 달아주는 힐링 터치 놀이 (외부 의존성 0).
 

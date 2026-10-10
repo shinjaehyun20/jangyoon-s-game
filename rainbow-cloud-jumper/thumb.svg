@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rainbowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="25%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="75%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="400" height="300" fill="url(#skyGrad)"/>
+
+  <!-- Background Sparkles -->
+  <circle cx="50" cy="40" r="2.5" fill="#fff" opacity="0.8"/>
+  <circle cx="90" cy="80" r="3" fill="#fde047" opacity="0.9"/>
+  <circle cx="340" cy="50" r="3" fill="#fff" opacity="0.8"/>
+  <circle cx="310" cy="110" r="2" fill="#fde047" opacity="0.7"/>
+  <circle cx="60" cy="200" r="2.5" fill="#fff" opacity="0.6"/>
+  <circle cx="350" cy="220" r="3" fill="#fde047" opacity="0.8"/>
+
+  <!-- Rainbow Arc in background -->
+  <path d="M 40,260 Q 200,60 360,260" fill="none" stroke="url(#rainbowGrad)" stroke-width="16" opacity="0.45" stroke-linecap="round"/>
+
+  <!-- Lower Clouds -->
+  <g opacity="0.85">
+    <ellipse cx="80" cy="250" rx="60" ry="25" fill="#ffffff"/>
+    <ellipse cx="60" cy="240" rx="35" ry="25" fill="#ffffff"/>
+    <ellipse cx="105" cy="240" rx="40" ry="28" fill="#ffffff"/>
+  </g>
+  <g opacity="0.85">
+    <ellipse cx="320" cy="250" rx="60" ry="25" fill="#ffffff"/>
+    <ellipse cx="300" cy="240" rx="35" ry="25" fill="#ffffff"/>
+    <ellipse cx="345" cy="240" rx="40" ry="28" fill="#ffffff"/>
+  </g>
+
+  <!-- Main Rainbow Cloud Platform -->
+  <g transform="translate(130, 190)">
+    <!-- Shadow -->
+    <rect x="0" y="8" width="140" height="36" rx="18" fill="rgba(0,0,0,0.15)"/>
+    <!-- Main Cloud Platform -->
+    <rect x="0" y="0" width="140" height="36" rx="18" fill="url(#rainbowGrad)"/>
+    <rect x="5" y="4" width="130" height="14" rx="7" fill="rgba(255,255,255,0.4)"/>
+    <!-- Sparkles on Cloud -->
+    <circle cx="25" cy="18" r="4" fill="#fff"/>
+    <circle cx="115" cy="18" r="4" fill="#fff"/>
+  </g>
+
+  <!-- Jumping Cute Bunny -->
+  <g transform="translate(200, 110)">
+    <!-- Motion lines -->
+    <path d="M -15,45 Q -20,65 -25,80" fill="none" stroke="#fde047" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <path d="M 0,50 Q 0,70 0,85" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity="0.9"/>
+    <path d="M 15,45 Q 20,65 25,80" fill="none" stroke="#fde047" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Bunny Ears -->
+    <ellipse cx="-10" cy="-35" rx="7" ry="18" fill="#fffbeb" transform="rotate(-10 -10 -35)"/>
+    <ellipse cx="-10" cy="-35" rx="4" ry="12" fill="#f472b6" transform="rotate(-10 -10 -35)"/>
+    <ellipse cx="10" cy="-35" rx="7" ry="18" fill="#fffbeb" transform="rotate(10 10 -35)"/>
+    <ellipse cx="10" cy="-35" rx="4" ry="12" fill="#f472b6" transform="rotate(10 10 -35)"/>
+
+    <!-- Bunny Body -->
+    <ellipse cx="0" cy="5" rx="28" ry="30" fill="#fffbeb"/>
+
+    <!-- Cheeks -->
+    <circle cx="-14" cy="8" r="5" fill="#fca5a5" opacity="0.7"/>
+    <circle cx="14" cy="8" r="5" fill="#fca5a5" opacity="0.7"/>
+
+    <!-- Happy Eyes -->
+    <path d="M -18,0 Q -13,-5 -8,0" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 8,0 Q 13,-5 18,0" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Bunny Nose & Mouth -->
+    <ellipse cx="0" cy="6" rx="2" ry="1.5" fill="#f472b6"/>
+    <path d="M -4,11 Q 0,15 4,11" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Bunny Hands (excited) -->
+    <circle cx="-25" cy="2" r="7" fill="#fffbeb"/>
+    <circle cx="25" cy="2" r="7" fill="#fffbeb"/>
+  </g>
+
+  <!-- Floating Golden Star (Top Target) -->
+  <g transform="translate(200, 35)">
+    <circle cx="0" cy="0" r="28" fill="url(#sunGlow)"/>
+    <text x="0" y="10" font-size="32" text-anchor="middle">⭐</text>
+  </g>
+
+  <!-- Title Badge -->
+  <g transform="translate(200, 275)">
+    <rect x="-105" y="-14" width="210" height="28" rx="14" fill="rgba(15,23,42,0.75)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="0" y="5" font-family="'Pretendard', sans-serif" font-size="14" font-weight="bold" fill="#f8fafc" text-anchor="middle">🌈 무지개 구름 퐁퐁 점퍼</text>
+  </g>
+</svg>

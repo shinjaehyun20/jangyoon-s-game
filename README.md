@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 300개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 301개.
 
-[![Games](https://img.shields.io/badge/games-300-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-301-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![300개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![301개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,10 +25,11 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 300개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 301개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🌈 무지개 구름 퐁퐁 점퍼 (rainbow-cloud-jumper)](./rainbow-cloud-jumper/index.html) | 귀여운 아기 토끼와 함께 알록달록 무지개 구름을 퐁퐁 밟고 하늘 높이 점프하며, 반짝이는 황금별을 모으고 신나는 연속 콤보를 달성하는 힐링 점핑 아케이드 놀이입니다. | 어린이/아케이드 |
 | [🫧 알록달록 무지개 버블 팡팡 (rainbow-bubble-pop)](./rainbow-bubble-pop/index.html) | 둥실둥실 떠오르는 투명하고 영롱한 무지개 방울들을 톡톡 터뜨리면 귀여운 아기 동물들이 까꿍 인사하며 점수와 별빛이 팡팡 터지는 신나는 힐링 터치 놀이입니다. | 어린이/아케이드 |
 | [✨ 별밤 반딧불이 동산 (starry-firefly-night)](./starry-firefly-night/index.html) | 밤하늘 은하수 아래 반짝반짝 날아다니는 오색 반딧불이를 터치해 유리병에 모으고 별자리 불빛을 환하게 밝히는 서정적인 힐링 터치 아케이드 놀이입니다. | 어린이/아케이드 |
 | [🤖 삐리삐리 로봇 강아지 목욕 대작전 (robot-pet-grooming)](./robot-pet-grooming/index.html) | 반짝이는 메탈 로봇 강아지를 비누 거품으로 퐁퐁 씻기고 시원한 물 샤워와 광택을 낸 뒤 예쁜 리본을 달아주는 힐링 터치 놀이입니다. | 어린이/아케이드 |
@@ -496,6 +497,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-10: [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html), [🌈 무지개 구름 퐁퐁 점퍼](rainbow-cloud-jumper/index.html) (총 301개)
+
 - 2026-10-07: [✨ 별밤 반딧불이 동산](starry-firefly-night/index.html), [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html) (총 300개)
 
 - 2026-10-06: [⚡ 찌릿찌릿 사이버 회로 연결 놀이](quantum-cyber-circuit/index.html), [🤖 삐리삐리 로봇 강아지 목욕 대작전](robot-pet-grooming/index.html) (총 300개)

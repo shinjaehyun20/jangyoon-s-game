@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🌈 무지개 구름 퐁퐁 점퍼 - 장윤이의 게임 #301</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: linear-gradient(180deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 14px 16px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+    }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 105, 180, 0.4);
+      color: #e11d48;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stats {
+      display: flex;
+      gap: 8px;
+    }
+    .stat-badge {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      backdrop-filter: blur(8px);
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 440px;
+      height: 100vh;
+      max-height: 840px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      z-index: 30;
+    }
+    .overlay.hidden {
+      display: none;
+    }
+    .btn-action {
+      background: linear-gradient(135deg, #fbbf24 0%, #f43f5e 100%);
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      padding: 14px 36px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4);
+      margin-top: 18px;
+      transition: transform 0.1s;
+    }
+    .btn-action:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../index.html" class="back-btn">⬅ 홈으로</a>
+      <div class="stats">
+        <div class="stat-badge">⭐ <span id="scoreText" style="color:#fde047;">0</span></div>
+        <div class="stat-badge">🏆 <span id="highScoreText" style="color:#a7f3d0;">0</span></div>
+      </div>
+    </header>
+
+    <canvas id="gameCanvas" width="400" height="650"></canvas>
+
+    <div id="startOverlay" class="overlay">
+      <div style="font-size: 56px; margin-bottom: 8px;">🐰</div>
+      <h1 style="font-size: 26px; font-weight: 800; margin-bottom: 8px;">무지개 구름 퐁퐁 점퍼</h1>
+      <p style="font-size: 14px; color: #bae6fd; line-height: 1.6; margin-bottom: 12px;">
+        좌우로 마우스 / 터치 / 방향키를 움직여<br>
+        무지개 구름을 밟고 하늘 높이 솟아올라요!
+      </p>
+      <button id="startBtn" class="btn-action">점프 시작하기 🚀</button>
+    </div>
+
+    <div id="gameOverOverlay" class="overlay hidden">
+      <div style="font-size: 52px; margin-bottom: 8px;">✨</div>
+      <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 8px;">점프 완료!</h2>
+      <p id="finalScoreText" style="font-size: 20px; color: #fde047; font-weight: bold; margin-bottom: 6px;">최종 점수: 0점</p>
+      <p id="finalComboText" style="font-size: 14px; color: #cbd5e1; margin-bottom: 12px;">최고 콤보: 0연속 점프</p>
+      <button id="restartBtn" class="btn-action">다시 점프하기 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreText = document.getElementById('scoreText');
+    const highScoreText = document.getElementById('highScoreText');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const finalScoreText = document.getElementById('finalScoreText');
+    const finalComboText = document.getElementById('finalComboText');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let audioCtx = null;
+    const pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playNote(freq, type = 'sine', duration = 0.25, vol = 0.15) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    let highScore = parseInt(localStorage.getItem('jangyoon_game301_high') || '0', 10);
+    highScoreText.textContent = highScore;
+
+    let gameState = 'START';
+    let score = 0;
+    let combo = 0;
+    let maxCombo = 0;
+    let cameraY = 0;
+    let particles = [];
+    let clouds = [];
+
+    const player = {
+      x: 200,
+      y: 500,
+      radius: 20,
+      vx: 0,
+      vy: 0,
+      jumpPower: -12.5,
+      facing: 1
+    };
+
+    const keys = { left: false, right: false };
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+    });
+
+    let isPointerDown = false;
+    canvas.addEventListener('pointerdown', (e) => {
+      isPointerDown = true;
+      handlePointer(e);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (isPointerDown) handlePointer(e);
+    });
+    window.addEventListener('pointerup', () => isPointerDown = false);
+
+    function handlePointer(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      if (x < player.x - 15) {
+        keys.left = true;
+        keys.right = false;
+      } else if (x > player.x + 15) {
+        keys.right = true;
+        keys.left = false;
+      } else {
+        keys.left = false;
+        keys.right = false;
+      }
+    }
+
+    const cloudColors = [
+      { fill: '#f43f5e', light: '#fda4af' },
+      { fill: '#f59e0b', light: '#fde68a' },
+      { fill: '#10b981', light: '#a7f3d0' },
+      { fill: '#06b6d4', light: '#a5f3fc' },
+      { fill: '#8b5cf6', light: '#ddd6fe' }
+    ];
+
+    function createCloud(y) {
+      const color = cloudColors[Math.floor(Math.random() * cloudColors.length)];
+      return {
+        x: Math.random() * (canvas.width - 80) + 10,
+        y: y,
+        w: 75,
+        h: 20,
+        color: color,
+        star: Math.random() < 0.35
+      };
+    }
+
+    function initGame() {
+      score = 0;
+      combo = 0;
+      maxCombo = 0;
+      cameraY = 0;
+      particles = [];
+      clouds = [];
+      scoreText.textContent = '0';
+
+      player.x = 200;
+      player.y = 500;
+      player.vx = 0;
+      player.vy = -8;
+
+      clouds.push({ x: 160, y: 560, w: 90, h: 22, color: cloudColors[3], star: false });
+      for (let y = 460; y > -800; y -= 60) {
+        clouds.push(createCloud(y));
+      }
+    }
+
+    function addParticles(x, y, color, count = 10) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3.5 + 1;
+        particles.push({
+          x: x, y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius: Math.random() * 3.5 + 2,
+          color: color,
+          alpha: 1,
+          life: 0.03
+        });
+      }
+    }
+
+    function update() {
+      if (gameState !== 'PLAYING') return;
+
+      if (keys.left) {
+        player.vx = -5;
+        player.facing = -1;
+      } else if (keys.right) {
+        player.vx = 5;
+        player.facing = 1;
+      } else {
+        player.vx *= 0.86;
+      }
+
+      player.x += player.vx;
+      if (player.x < -15) player.x = canvas.width + 15;
+      if (player.x > canvas.width + 15) player.x = -15;
+
+      player.vy += 0.42;
+      player.y += player.vy;
+
+      if (player.y < cameraY + 300) {
+        const diff = (cameraY + 300) - player.y;
+        cameraY -= diff;
+        score += Math.floor(diff);
+        scoreText.textContent = score;
+
+        const topCloudY = clouds.reduce((min, c) => Math.min(min, c.y), canvas.height);
+        if (topCloudY > cameraY - 180) {
+          clouds.push(createCloud(topCloudY - (Math.random() * 30 + 55)));
+        }
+      }
+
+      if (player.vy > 0) {
+        for (let c of clouds) {
+          if (
+            player.x + 14 > c.x &&
+            player.x - 14 < c.x + c.w &&
+            player.y + player.radius >= c.y &&
+            player.y + player.radius <= c.y + 16
+          ) {
+            player.vy = player.jumpPower;
+            combo++;
+            maxCombo = Math.max(maxCombo, combo);
+
+            const noteIdx = Math.min(combo, pentatonic.length - 1);
+            playNote(pentatonic[noteIdx], 'triangle', 0.2, 0.18);
+            addParticles(player.x, c.y, c.color.light, 12);
+
+            if (c.star) {
+              c.star = false;
+              score += 150;
+              scoreText.textContent = score;
+              playNote(987.77, 'sine', 0.3, 0.25);
+              addParticles(c.x + c.w / 2, c.y - 10, '#fde047', 16);
+            }
+            break;
+          }
+        }
+      }
+
+      clouds = clouds.filter(c => c.y < cameraY + canvas.height + 60);
+
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.life;
+      }
+      particles = particles.filter(p => p.alpha > 0);
+
+      if (player.y > cameraY + canvas.height + 60) {
+        gameOver();
+      }
+    }
+
+    function gameOver() {
+      gameState = 'GAMEOVER';
+      playNote(196.00, 'sawtooth', 0.5, 0.2);
+
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('jangyoon_game301_high', highScore.toString());
+        highScoreText.textContent = highScore;
+      }
+
+      finalScoreText.textContent = `최종 점수: ${score}점`;
+      finalComboText.textContent = `최고 콤보: ${maxCombo}연속 구름 점프`;
+      gameOverOverlay.classList.remove('hidden');
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.translate(0, -cameraY);
+
+      // Stars
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      for (let i = 0; i < 35; i++) {
+        const sx = ((i * 79) % canvas.width);
+        const sy = (cameraY - ((i * 131) % 900));
+        ctx.fillRect(sx, sy, 2.5, 2.5);
+      }
+
+      // Clouds
+      for (let c of clouds) {
+        ctx.fillStyle = 'rgba(0,0,0,0.12)';
+        ctx.beginPath();
+        ctx.roundRect(c.x + 2, c.y + 4, c.w, c.h, 11);
+        ctx.fill();
+
+        ctx.fillStyle = c.color.fill;
+        ctx.beginPath();
+        ctx.roundRect(c.x, c.y, c.w, c.h, 11);
+        ctx.fill();
+
+        ctx.fillStyle = c.color.light;
+        ctx.beginPath();
+        ctx.roundRect(c.x + 3, c.y + 2, c.w - 6, c.h / 2, 7);
+        ctx.fill();
+
+        if (c.star) {
+          ctx.font = '18px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('⭐', c.x + c.w / 2, c.y - 4);
+        }
+      }
+
+      // Particles
+      for (let p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Bunny Player
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      if (player.facing === -1) ctx.scale(-1, 1);
+
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#fffbeb';
+      ctx.beginPath();
+      ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Ears
+      ctx.fillStyle = '#fffbeb';
+      ctx.beginPath();
+      ctx.ellipse(-7, -player.radius - 7, 4.5, 10, -0.15, 0, Math.PI * 2);
+      ctx.ellipse(7, -player.radius - 7, 4.5, 10, 0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#f472b6';
+      ctx.beginPath();
+      ctx.ellipse(-7, -player.radius - 7, 2.5, 7, -0.15, 0, Math.PI * 2);
+      ctx.ellipse(7, -player.radius - 7, 2.5, 7, 0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cheeks
+      ctx.fillStyle = '#fca5a5';
+      ctx.beginPath();
+      ctx.arc(-9, 3, 3.5, 0, Math.PI * 2);
+      ctx.arc(9, 3, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eyes
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(-5, -2, 2.8, 0, Math.PI * 2);
+      ctx.arc(5, -2, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Smile
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(0, 4, 3.5, 0.2, Math.PI - 0.2);
+      ctx.stroke();
+
+      ctx.restore();
+      ctx.restore();
+
+      if (combo > 1 && gameState === 'PLAYING') {
+        ctx.font = 'bold 18px sans-serif';
+        ctx.fillStyle = '#fde047';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 8;
+        ctx.fillText(`🔥 ${combo} COMBO!`, canvas.width / 2, 80);
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    startBtn.addEventListener('click', () => {
+      initAudio();
+      startOverlay.classList.add('hidden');
+      initGame();
+      gameState = 'PLAYING';
+    });
+
+    restartBtn.addEventListener('click', () => {
+      initAudio();
+      gameOverOverlay.classList.add('hidden');
+      initGame();
+      gameState = 'PLAYING';
+    });
+
+    initGame();
+    gameLoop();
+  </script>
+</body>
+</html>
