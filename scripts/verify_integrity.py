@@ -289,8 +289,29 @@ def check_all(check_live=True):
                 ["gh", "api", "repos/shinjaehyun20/jangyoon-s-game/pages"],
                 capture_output=True, text=True, timeout=10
             )
+            pages_info = None
             if gh_pages.returncode == 0:
                 pages_info = json.loads(gh_pages.stdout)
+            else:
+                # SSL / network fallback using gh auth token + urllib
+                token_run = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, timeout=5)
+                if token_run.returncode == 0 and token_run.stdout.strip():
+                    import ssl
+                    ctx = ssl.create_default_context()
+                    ctx.check_hostname = False
+                    ctx.verify_mode = ssl.CERT_NONE
+                    req_pages = urllib.request.Request(
+                        "https://api.github.com/repos/shinjaehyun20/jangyoon-s-game/pages",
+                        headers={
+                            "User-Agent": "Mozilla/5.0 JangyoonVerifier/1.0",
+                            "Authorization": f"Bearer {token_run.stdout.strip()}",
+                            "Accept": "application/vnd.github+json"
+                        }
+                    )
+                    with urllib.request.urlopen(req_pages, context=ctx, timeout=10) as r_pages:
+                        pages_info = json.loads(r_pages.read().decode("utf-8"))
+
+            if pages_info:
                 source_branch = pages_info.get("source", {}).get("branch", "")
                 pages_status = pages_info.get("status", "")
                 if source_branch != "main":
