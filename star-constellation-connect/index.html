@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🪐 우주 별자리 잇기 - 장윤이의 게임 #302</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 60%, #030712 100%);
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 14px 16px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+    }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #f8fafc;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      backdrop-filter: blur(8px);
+    }
+    .stats {
+      display: flex;
+      gap: 8px;
+    }
+    .stat-badge {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 440px;
+      height: 100vh;
+      max-height: 840px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      z-index: 30;
+    }
+    .overlay.hidden {
+      display: none;
+    }
+    .btn-action {
+      background: linear-gradient(135deg, #a855f7 0%, #6366f1 50%, #38bdf8 100%);
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      padding: 14px 36px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+      margin-top: 18px;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-action:active {
+      transform: scale(0.95);
+    }
+    .stage-title {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+      pointer-events: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../index.html" class="back-btn">⬅ 홈으로</a>
+      <div class="stats">
+        <div class="stat-badge">🌟 <span id="scoreText" style="color:#fde047;">0</span></div>
+        <div class="stat-badge">🪐 <span id="stageText" style="color:#c084fc;">1/6</span></div>
+      </div>
+    </header>
+
+    <canvas id="gameCanvas" width="400" height="650"></canvas>
+    <div id="stageInfo" class="stage-title">반짝이는 별들을 1번부터 차례대로 이어보세요! ✨</div>
+
+    <div id="startOverlay" class="overlay">
+      <div style="font-size: 56px; margin-bottom: 8px;">🪐</div>
+      <h1 style="font-size: 26px; font-weight: 800; margin-bottom: 8px;">우주 별자리 잇기</h1>
+      <p style="font-size: 14px; color: #bae6fd; line-height: 1.6; margin-bottom: 12px;">
+        신비로운 밤하늘의 빛나는 별들을 순서대로 터치해<br>
+        숨겨진 아름다운 별자리들을 밝혀주세요!
+      </p>
+      <button id="startBtn" class="btn-action">별자리 탐험 시작 🚀</button>
+    </div>
+
+    <div id="gameOverOverlay" class="overlay hidden">
+      <div style="font-size: 52px; margin-bottom: 8px;">✨</div>
+      <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 8px;">모든 별자리 완성!</h2>
+      <p id="finalScoreText" style="font-size: 20px; color: #fde047; font-weight: bold; margin-bottom: 6px;">우주 탐험 점수: 0점</p>
+      <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 12px;">은하계의 모든 별자리가 눈부시게 빛납니다!</p>
+      <button id="restartBtn" class="btn-action">다시 탐험하기 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // Audio Context for ethereal chimes
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playChime(freq, type = 'sine', duration = 0.4) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playSuccessChord() {
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        setTimeout(() => playChime(freq, 'triangle', 0.8), idx * 120);
+      });
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreText = document.getElementById('scoreText');
+    const stageText = document.getElementById('stageText');
+    const stageInfo = document.getElementById('stageInfo');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const finalScoreText = document.getElementById('finalScoreText');
+
+    // 별자리 데이터 (상대 좌표 0~1)
+    const CONSTELLATIONS = [
+      {
+        name: "카시오페이아 (W)",
+        symbol: "👑",
+        nodes: [
+          {x: 0.18, y: 0.35},
+          {x: 0.34, y: 0.52},
+          {x: 0.50, y: 0.38},
+          {x: 0.68, y: 0.55},
+          {x: 0.82, y: 0.32}
+        ]
+      },
+      {
+        name: "북두칠성 (큰곰자리 국자)",
+        symbol: "🐻",
+        nodes: [
+          {x: 0.20, y: 0.30},
+          {x: 0.38, y: 0.32},
+          {x: 0.52, y: 0.42},
+          {x: 0.68, y: 0.45},
+          {x: 0.80, y: 0.58},
+          {x: 0.72, y: 0.70},
+          {x: 0.54, y: 0.65}
+        ]
+      },
+      {
+        name: "오리온의 허리띠와 별",
+        symbol: "🏹",
+        nodes: [
+          {x: 0.25, y: 0.30},
+          {x: 0.40, y: 0.48},
+          {x: 0.50, y: 0.50},
+          {x: 0.60, y: 0.52},
+          {x: 0.75, y: 0.32},
+          {x: 0.72, y: 0.70},
+          {x: 0.28, y: 0.68}
+        ]
+      },
+      {
+        name: "백조자리 (데네브 십자가)",
+        symbol: "🦢",
+        nodes: [
+          {x: 0.50, y: 0.25},
+          {x: 0.50, y: 0.45},
+          {x: 0.20, y: 0.48},
+          {x: 0.50, y: 0.45},
+          {x: 0.80, y: 0.48},
+          {x: 0.50, y: 0.45},
+          {x: 0.50, y: 0.72}
+        ]
+      },
+      {
+        name: "페가수스 사각형",
+        symbol: "🦄",
+        nodes: [
+          {x: 0.30, y: 0.35},
+          {x: 0.70, y: 0.35},
+          {x: 0.75, y: 0.65},
+          {x: 0.25, y: 0.65},
+          {x: 0.30, y: 0.35},
+          {x: 0.15, y: 0.20}
+        ]
+      },
+      {
+        name: "황소자리 뿔과 플레이아데스",
+        symbol: "🐂",
+        nodes: [
+          {x: 0.25, y: 0.25},
+          {x: 0.45, y: 0.45},
+          {x: 0.60, y: 0.42},
+          {x: 0.75, y: 0.22},
+          {x: 0.60, y: 0.42},
+          {x: 0.55, y: 0.65},
+          {x: 0.38, y: 0.60}
+        ]
+      }
+    ];
+
+    let currentStage = 0;
+    let score = 0;
+    let nextNodeIdx = 0;
+    let connectedLines = [];
+    let particles = [];
+    let backgroundStars = [];
+    let isStageComplete = false;
+    let stageTimer = 0;
+
+    // 배경 별 생성
+    for (let i = 0; i < 80; i++) {
+      backgroundStars.push({
+        x: Math.random() * 400,
+        y: Math.random() * 650,
+        radius: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.8 + 0.2,
+        speed: Math.random() * 0.02 + 0.01
+      });
+    }
+
+    function createDust(x, y, count = 15, color = '#38bdf8') {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3 + 1;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius: Math.random() * 2.5 + 1,
+          alpha: 1,
+          decay: Math.random() * 0.03 + 0.015,
+          color: color
+        });
+      }
+    }
+
+    function resetStage() {
+      nextNodeIdx = 0;
+      connectedLines = [];
+      isStageComplete = false;
+      const c = CONSTELLATIONS[currentStage];
+      stageInfo.textContent = `${c.symbol} ${c.name} 별자리를 잇는 중...`;
+      stageText.textContent = `${currentStage + 1}/${CONSTELLATIONS.length}`;
+    }
+
+    function startGame() {
+      currentStage = 0;
+      score = 0;
+      scoreText.textContent = score;
+      resetStage();
+      startOverlay.classList.add('hidden');
+      gameOverOverlay.classList.add('hidden');
+    }
+
+    function handleInteraction(clientX, clientY) {
+      if (isStageComplete) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (clientX - rect.left) * scaleX;
+      const y = (clientY - rect.top) * scaleY;
+
+      const c = CONSTELLATIONS[currentStage];
+      const targetNode = c.nodes[nextNodeIdx];
+      const targetX = targetNode.x * canvas.width;
+      const targetY = targetNode.y * canvas.height;
+
+      const dist = Math.hypot(x - targetX, y - targetY);
+      if (dist < 32) { // 판정 반경 32px
+        // 성공 연결
+        createDust(targetX, targetY, 20, '#fde047');
+        playChime(350 + nextNodeIdx * 70, 'sine', 0.35);
+
+        if (nextNodeIdx > 0) {
+          const prev = c.nodes[nextNodeIdx - 1];
+          connectedLines.push({
+            x1: prev.x * canvas.width,
+            y1: prev.y * canvas.height,
+            x2: targetX,
+            y2: targetY
+          });
+        }
+
+        score += 150;
+        scoreText.textContent = score;
+        nextNodeIdx++;
+
+        if (nextNodeIdx >= c.nodes.length) {
+          // 스테이지 완료
+          isStageComplete = true;
+          stageTimer = 100;
+          playSuccessChord();
+          createDust(canvas.width / 2, canvas.height / 2, 60, '#c084fc');
+          stageInfo.textContent = `🎉 멋져요! ${c.name} 완성!`;
+        }
+      }
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      handleInteraction(e.clientX, e.clientY);
+    });
+
+    function update() {
+      // 배경 별 반짝임
+      backgroundStars.forEach(s => {
+        s.alpha += s.speed;
+        if (s.alpha > 1 || s.alpha < 0.2) s.speed = -s.speed;
+      });
+
+      // 파티클
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      if (isStageComplete) {
+        stageTimer--;
+        if (stageTimer <= 0) {
+          currentStage++;
+          if (currentStage >= CONSTELLATIONS.length) {
+            finalScoreText.textContent = `우주 탐험 점수: ${score}점!`;
+            gameOverOverlay.classList.remove('hidden');
+          } else {
+            resetStage();
+          }
+        }
+      }
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 1. 밤하늘 성운 그라데이션
+      const grad = ctx.createRadialGradient(200, 325, 40, 200, 325, 350);
+      grad.addColorStop(0, '#1e1b4b');
+      grad.addColorStop(0.5, '#0f172a');
+      grad.addColorStop(1, '#020617');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 2. 배경 별
+      backgroundStars.forEach(s => {
+        ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3. 연결된 별자리 선 (네온 글로우)
+      ctx.save();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 12;
+      connectedLines.forEach(l => {
+        ctx.beginPath();
+        ctx.moveTo(l.x1, l.y1);
+        ctx.lineTo(l.x2, l.y2);
+        ctx.stroke();
+      });
+      ctx.restore();
+
+      // 4. 별 노드 렌더링
+      if (currentStage < CONSTELLATIONS.length) {
+        const c = CONSTELLATIONS[currentStage];
+        c.nodes.forEach((node, idx) => {
+          const nx = node.x * canvas.width;
+          const ny = node.y * canvas.height;
+          const isDone = idx < nextNodeIdx;
+          const isNext = idx === nextNodeIdx;
+
+          // 노드 후광
+          ctx.save();
+          if (isDone) {
+            ctx.fillStyle = '#fde047';
+            ctx.shadowColor = '#fde047';
+            ctx.shadowBlur = 15;
+          } else if (isNext) {
+            const pulse = 1 + Math.sin(Date.now() / 150) * 0.25;
+            ctx.fillStyle = '#a855f7';
+            ctx.shadowColor = '#c084fc';
+            ctx.shadowBlur = 20 * pulse;
+            // 타겟 원 표시
+            ctx.strokeStyle = 'rgba(192, 132, 252, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(nx, ny, 22 * pulse, 0, Math.PI * 2);
+            ctx.stroke();
+          } else {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.shadowBlur = 0;
+          }
+
+          ctx.beginPath();
+          ctx.arc(nx, ny, isNext ? 9 : 7, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 별 번호
+          ctx.fillStyle = isDone ? '#000' : '#fff';
+          ctx.font = 'bold 11px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(idx + 1, nx, ny);
+          ctx.restore();
+        });
+      }
+
+      // 5. 파티클
+      particles.forEach(p => {
+        ctx.save();
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      requestAnimationFrame(() => {
+        update();
+        render();
+      });
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('restartBtn').addEventListener('click', startGame);
+
+    render();
+  </script>
+</body>
+</html>

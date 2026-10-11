@@ -2406,5 +2406,21 @@
     "description": "귀여운 아기 토끼와 함께 알록달록 무지개 구름을 퐁퐁 밟고 하늘 높이 점프하며, 반짝이는 황금별을 모으고 신나는 연속 콤보를 달성하는 힐링 점핑 아케이드 놀이입니다.",
     "thumbnail": "rainbow-cloud-jumper/thumb.svg",
     "path": "rainbow-cloud-jumper/index.html"
+  },
+  {
+    "id": "star-constellation-connect",
+    "title": "Star Constellation Connect",
+    "title_ko": "🪐 우주 별자리 잇기",
+    "description": "신비로운 밤하늘의 빛나는 별들을 순서대로 터치하고 연결하여 숨겨진 아름다운 별자리들을 완성하는 감성 힐링 우주 퍼즐 놀이입니다.",
+    "thumbnail": "star-constellation-connect/thumb.svg",
+    "path": "star-constellation-connect/index.html"
+  },
+  {
+    "id": "fluffy-macaron-tower",
+    "title": "Fluffy Macaron Tower",
+    "title_ko": "🧁 퐁실퐁실 마카롱 타워",
+    "description": "좌우로 흔들리며 다가오는 알록달록 달콤한 마카롱을 완벽한 타이밍에 탭하여 하늘 높이높이 쓰러지지 않게 쌓아 올리는 아케이드 타이밍 타워 쌓기 놀이입니다.",
+    "thumbnail": "fluffy-macaron-tower/thumb.svg",
+    "path": "fluffy-macaron-tower/index.html"
   }
 ]
