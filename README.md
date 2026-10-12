@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 303개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 305개.
 
-[![Games](https://img.shields.io/badge/games-303-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-305-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![303개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![305개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,10 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 303개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 305개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [반짝반짝 별 잡기 🌟 (star-catcher)](./star-catcher/index.html) | 밤하늘에서 떨어지는 알록달록한 별들을 빠르게 터치하여 화려한 폭죽 효과와 연속 콤보 점수를 올리는 신나는 터치 아케이드 놀이입니다. | 어린이/아케이드 |
+| [바다 친구들 짝맞추기 🌊 (sea-friends-match)](./sea-friends-match/index.html) | 귀여운 쭈꾸미, 도다리, 아귀, 멍게 친구들의 짝을 기억해서 맞춰보는 영롱하고 재미있는 두뇌 짝맞추기 터치 놀이입니다. | 어린이/아케이드 |
 | [🧁 퐁실퐁실 마카롱 타워 (fluffy-macaron-tower)](./fluffy-macaron-tower/index.html) | 좌우로 흔들리며 다가오는 알록달록 달콤한 마카롱을 완벽한 타이밍에 탭하여 하늘 높이높이 쓰러지지 않게 쌓아 올리는 아케이드 타이밍 타워 쌓기 놀이입니다. | 어린이/아케이드 |
 | [🪐 우주 별자리 잇기 (star-constellation-connect)](./star-constellation-connect/index.html) | 신비로운 밤하늘의 빛나는 별들을 순서대로 터치하고 연결하여 숨겨진 아름다운 별자리들을 완성하는 감성 힐링 우주 퍼즐 놀이입니다. | 어린이/아케이드 |
 | [🌈 무지개 구름 퐁퐁 점퍼 (rainbow-cloud-jumper)](./rainbow-cloud-jumper/index.html) | 귀여운 아기 토끼와 함께 알록달록 무지개 구름을 퐁퐁 밟고 하늘 높이 점프하며, 반짝이는 황금별을 모으고 신나는 연속 콤보를 달성하는 힐링 점핑 아케이드 놀이입니다. | 어린이/아케이드 |
@@ -499,6 +501,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-12: [바다 친구들 짝맞추기 🌊](sea-friends-match/index.html), [반짝반짝 별 잡기 🌟](star-catcher/index.html) (총 305개)
+
 - 2026-10-11: [🪐 우주 별자리 잇기](star-constellation-connect/index.html), [🧁 퐁실퐁실 마카롱 타워](fluffy-macaron-tower/index.html) (총 303개)
 
 - 2026-10-10: [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html), [🌈 무지개 구름 퐁퐁 점퍼](rainbow-cloud-jumper/index.html) (총 301개)

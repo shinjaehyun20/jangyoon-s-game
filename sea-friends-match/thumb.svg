@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f7fa"/>
+      <stop offset="50%" stop-color="#80deea"/>
+      <stop offset="100%" stop-color="#26c6da"/>
+    </linearGradient>
+    <radialGradient id="bubbleGlow" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#b2ebf2" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#00acc1" stop-opacity="0.2"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ocean Background -->
+  <rect width="400" height="300" fill="url(#oceanGrad)"/>
+
+  <!-- Bubbles -->
+  <circle cx="60" cy="80" r="25" fill="url(#bubbleGlow)"/>
+  <circle cx="340" cy="60" r="18" fill="url(#bubbleGlow)"/>
+  <circle cx="80" cy="220" r="20" fill="url(#bubbleGlow)"/>
+  <circle cx="320" cy="230" r="30" fill="url(#bubbleGlow)"/>
+
+  <!-- Card 1 (Octopus) -->
+  <rect x="50" y="70" width="130" height="150" rx="15" fill="#ffffff" stroke="#00838f" stroke-width="4"/>
+  <text x="115" y="145" font-size="55" text-anchor="middle">🐙</text>
+  <text x="115" y="195" font-size="20" font-family="'Comic Sans MS', sans-serif" font-weight="bold" fill="#006064" text-anchor="middle">쭈꾸미</text>
+
+  <!-- Card 2 (Fish) -->
+  <rect x="220" y="70" width="130" height="150" rx="15" fill="#4dd0e1" stroke="#00838f" stroke-width="4"/>
+  <text x="285" y="160" font-size="60" font-family="'Comic Sans MS', sans-serif" font-weight="bold" fill="#ffffff" text-anchor="middle">?</text>
+
+  <!-- Header Banner -->
+  <rect x="40" y="15" width="320" height="40" rx="20" fill="#00838f" opacity="0.9"/>
+  <text x="200" y="42" font-size="20" font-family="'Comic Sans MS', sans-serif" font-weight="bold" fill="#ffffff" text-anchor="middle">바다 친구들 짝맞추기 🌊</text>
+</svg>

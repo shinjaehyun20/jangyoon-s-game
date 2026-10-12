@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "star-catcher",
+        "title": "반짝반짝 별 잡기 🌟",
+        "path": "star-catcher/index.html"
+      },
+      {
+        "id": "sea-friends-match",
+        "title": "바다 친구들 짝맞추기 🌊",
+        "path": "sea-friends-match/index.html"
+      },
+      {
         "id": "fluffy-macaron-tower",
         "title": "🧁 퐁실퐁실 마카롱 타워",
         "path": "fluffy-macaron-tower/index.html"

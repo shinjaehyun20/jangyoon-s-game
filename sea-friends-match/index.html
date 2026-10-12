@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>바다 친구들 짝맞추기 🌊</title>
+  <style>
+    body { margin: 0; padding: 0; background: #e0f7fa; font-family: 'Comic Sans MS', sans-serif; overflow: hidden; touch-action: none; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+    #scoreBoard { position: absolute; top: 5%; font-size: 24px; font-weight: bold; color: #006064; text-shadow: 1px 1px 2px #fff; text-align: center; z-index: 10; }
+    canvas { background: transparent; max-width: 100%; max-height: 80vh; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-radius: 15px; }
+  </style>
+</head>
+<body>
+  <div id="scoreBoard">점수: <span id="score">0</span> <br><small style="font-size:16px;">콤보: <span id="combo">0</span></small></div>
+  <canvas id="gameCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const comboEl = document.getElementById('combo');
+    
+    // Audio Context Setup
+    let audioCtx;
+    function playSound(type) {
+      if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      if (type === 'flip') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1); gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.start(); osc.stop(audioCtx.currentTime + 0.1); }
+      else if (type === 'match') { osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.4); osc.start(); osc.stop(audioCtx.currentTime + 0.4); }
+      else if (type === 'fail') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.2); gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2); osc.start(); osc.stop(audioCtx.currentTime + 0.2); }
+    }
+
+    let width, height;
+    const cols = 4, rows = 4;
+    let cardW, cardH;
+    let cards = [];
+    let firstCard = null, secondCard = null;
+    let lockBoard = false;
+    let score = 0, combo = 0;
+    
+    const icons = ['🐙', '🐟', '🐡', '🐚', '🦀', '🐬', '🐢', '🐳']; // 쭈꾸미, 도다리, 아귀, 멍게 등
+    const cardLabels = ['쭈꾸미', '도다리', '아귀', '멍게', '꽃게', '돌고래', '거북이', '고래'];
+    
+    function resize() {
+      let size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.7);
+      canvas.width = size;
+      canvas.height = size;
+      width = size; height = size;
+      cardW = (width - 50) / cols;
+      cardH = (height - 50) / rows;
+      drawBoard();
+    }
+
+    function initGame() {
+      let deck = [...icons, ...icons];
+      let labelDeck = [...cardLabels, ...cardLabels];
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+        [labelDeck[i], labelDeck[j]] = [labelDeck[j], labelDeck[i]];
+      }
+      cards = [];
+      for(let r=0; r<rows; r++) {
+        for(let c=0; c<cols; c++) {
+          cards.push({ x: 10 + c*(cardW+10), y: 10 + r*(cardH+10), w: cardW, h: cardH, icon: deck[r*cols+c], label: labelDeck[r*cols+c], isFlipped: false, isMatched: false });
+        }
+      }
+      score = 0; combo = 0; updateScore();
+      resize();
+    }
+
+    function drawBoard() {
+      ctx.clearRect(0, 0, width, height);
+      cards.forEach(card => {
+        ctx.fillStyle = card.isMatched ? '#b2ebf2' : (card.isFlipped ? '#ffffff' : '#4dd0e1');
+        ctx.beginPath();
+        ctx.roundRect(card.x, card.y, card.w, card.h, 10);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#00838f';
+        ctx.stroke();
+
+        if (card.isFlipped || card.isMatched) {
+          ctx.fillStyle = '#000';
+          ctx.font = `${card.w * 0.4}px Arial`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(card.icon, card.x + card.w/2, card.y + card.h/2 - 10);
+          ctx.font = `bold ${card.w * 0.15}px sans-serif`;
+          ctx.fillText(card.label, card.x + card.w/2, card.y + card.h/2 + card.h*0.3);
+        } else {
+          ctx.fillStyle = '#fff';
+          ctx.font = `bold ${card.w * 0.3}px Arial`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('?', card.x + card.w/2, card.y + card.h/2);
+        }
+      });
+    }
+
+    function updateScore() {
+      scoreEl.innerText = score;
+      comboEl.innerText = combo;
+    }
+
+    function handleInteraction(clientX, clientY) {
+      if (lockBoard) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      let clickedCard = cards.find(c => x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h);
+      if (!clickedCard || clickedCard.isFlipped || clickedCard.isMatched) return;
+
+      playSound('flip');
+      clickedCard.isFlipped = true;
+      drawBoard();
+
+      if (!firstCard) {
+        firstCard = clickedCard;
+      } else {
+        secondCard = clickedCard;
+        checkForMatch();
+      }
+    }
+
+    function checkForMatch() {
+      let isMatch = firstCard.icon === secondCard.icon;
+      if (isMatch) {
+        playSound('match');
+        firstCard.isMatched = true; secondCard.isMatched = true;
+        combo++;
+        score += 100 * combo;
+        updateScore();
+        resetBoard();
+      } else {
+        lockBoard = true;
+        combo = 0; updateScore();
+        setTimeout(() => {
+          playSound('fail');
+          firstCard.isFlipped = false; secondCard.isFlipped = false;
+          drawBoard();
+          resetBoard();
+        }, 800);
+      }
+    }
+
+    function resetBoard() { [firstCard, secondCard, lockBoard] = [null, null, false]; drawBoard(); }
+
+    window.addEventListener('resize', resize);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleInteraction(e.touches[0].clientX, e.touches[0].clientY); }, {passive: false});
+    canvas.addEventListener('mousedown', (e) => { handleInteraction(e.clientX, e.clientY); });
+    
+    initGame();
+  </script>
+</body>
+</html>

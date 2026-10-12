@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="nightSky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f2027"/>
+      <stop offset="50%" stop-color="#203a43"/>
+      <stop offset="100%" stop-color="#2c5364"/>
+    </linearGradient>
+    <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#ffeb3b"/>
+      <stop offset="100%" stop-color="#ff9800" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Night Sky -->
+  <rect width="400" height="300" fill="url(#nightSky)"/>
+
+  <!-- Big Central Star Glow -->
+  <circle cx="200" cy="140" r="70" fill="url(#starGlow)" opacity="0.6"/>
+
+  <!-- Big Golden Star -->
+  <polygon points="200,65 220,115 275,118 232,152 248,205 200,175 152,205 168,152 125,118 180,115" fill="#ffeb3b" stroke="#ffffff" stroke-width="4"/>
+
+  <!-- Smaller Stars -->
+  <polygon points="80,70 88,90 110,92 93,105 100,125 80,112 60,125 67,105 50,92 72,90" fill="#ff7675" stroke="#ffffff" stroke-width="2"/>
+  <polygon points="320,190 327,208 347,210 332,222 338,240 320,228 302,240 308,222 293,210 313,208" fill="#74b9ff" stroke="#ffffff" stroke-width="2"/>
+
+  <!-- Title Banner -->
+  <rect x="50" y="240" width="300" height="42" rx="21" fill="#1e272e" opacity="0.85" stroke="#ffeb3b" stroke-width="2"/>
+  <text x="200" y="268" font-size="20" font-family="'Comic Sans MS', sans-serif" font-weight="bold" fill="#ffeb3b" text-anchor="middle">반짝반짝 별 잡기 🌟</text>
+</svg>

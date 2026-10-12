@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>반짝반짝 별 잡기 🌟</title>
+  <style>
+    body { margin: 0; padding: 0; background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); overflow: hidden; font-family: 'Comic Sans MS', sans-serif; touch-action: none; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    #ui { position: absolute; top: 20px; left: 20px; color: white; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); pointer-events: none; }
+    #comboAlert { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ffeb3b; font-size: 60px; font-weight: bold; text-shadow: 0 0 20px #ff9800; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="ui">SCORE: <span id="score">0</span><br>COMBO: <span id="combo">0</span></div>
+  <div id="comboAlert">SUPER COMBO!</div>
+  <canvas id="gameCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const comboEl = document.getElementById('combo');
+    const comboAlert = document.getElementById('comboAlert');
+
+    let width, height;
+    let stars = [];
+    let particles = [];
+    let score = 0, combo = 0;
+    let frames = 0;
+    
+    // Audio Context Setup
+    let audioCtx;
+    function playPop(comboCount) {
+      if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      // Pitch goes up with combo
+      const baseFreq = 400 + Math.min(comboCount * 20, 400);
+      osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function resize() {
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = width; canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Star {
+      constructor() {
+        this.r = Math.random() * 20 + 20;
+        this.x = Math.random() * (width - this.r * 2) + this.r;
+        this.y = -this.r;
+        this.speed = Math.random() * 3 + 2 + (score * 0.001); // Speeds up over time
+        this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+        this.points = 5;
+        this.rot = Math.random() * Math.PI;
+        this.rotSpeed = (Math.random() - 0.5) * 0.1;
+      }
+      update() {
+        this.y += this.speed;
+        this.rot += this.rotSpeed;
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rot);
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * this.r, -Math.sin((18 + i * 72) * Math.PI / 180) * this.r);
+          ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (this.r/2), -Math.sin((54 + i * 72) * Math.PI / 180) * (this.r/2));
+        }
+        ctx.closePath();
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x; this.y = y; this.color = color;
+        this.vx = (Math.random() - 0.5) * 10;
+        this.vy = (Math.random() - 0.5) * 10;
+        this.life = 1;
+        this.decay = Math.random() * 0.05 + 0.02;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy; this.life -= this.decay;
+      }
+      draw() {
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, 5, 0, Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function createExplosion(x, y, color) {
+      for(let i=0; i<15; i++) particles.push(new Particle(x, y, color));
+    }
+
+    function loop() {
+      ctx.clearRect(0, 0, width, height);
+      frames++;
+      
+      if (frames % Math.max(20, 60 - Math.floor(score/500)) === 0) stars.push(new Star());
+
+      for (let i = stars.length - 1; i >= 0; i--) {
+        let s = stars[i];
+        s.update(); s.draw();
+        if (s.y - s.r > height) {
+          stars.splice(i, 1);
+          combo = 0; updateUI(); // Missed a star, reset combo
+        }
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.update(); p.draw();
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+      requestAnimationFrame(loop);
+    }
+
+    function updateUI() {
+      scoreEl.innerText = score;
+      comboEl.innerText = combo;
+      if(combo > 0 && combo % 10 === 0) {
+        comboAlert.style.opacity = 1;
+        comboAlert.style.transform = `translate(-50%, -50%) scale(1.5)`;
+        setTimeout(() => { comboAlert.style.opacity = 0; comboAlert.style.transform = `translate(-50%, -50%) scale(1)`; }, 500);
+      }
+    }
+
+    function handleInput(clientX, clientY) {
+      for (let i = stars.length - 1; i >= 0; i--) {
+        let s = stars[i];
+        let dx = clientX - s.x; let dy = clientY - s.y;
+        if (Math.sqrt(dx*dx + dy*dy) < s.r * 1.5) {
+          combo++;
+          score += 10 * (1 + Math.floor(combo/5));
+          playPop(combo);
+          createExplosion(s.x, s.y, s.color);
+          stars.splice(i, 1);
+          updateUI();
+          break; // Only pop one per touch
+        }
+      }
+    }
+
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) handleInput(e.changedTouches[i].clientX, e.changedTouches[i].clientY); }, {passive: false});
+    canvas.addEventListener('mousedown', (e) => { handleInput(e.clientX, e.clientY); });
+
+    loop();
+  </script>
+</body>
+</html>

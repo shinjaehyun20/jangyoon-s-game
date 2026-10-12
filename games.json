@@ -2422,5 +2422,21 @@
     "description": "좌우로 흔들리며 다가오는 알록달록 달콤한 마카롱을 완벽한 타이밍에 탭하여 하늘 높이높이 쓰러지지 않게 쌓아 올리는 아케이드 타이밍 타워 쌓기 놀이입니다.",
     "thumbnail": "fluffy-macaron-tower/thumb.svg",
     "path": "fluffy-macaron-tower/index.html"
+  },
+  {
+    "id": "sea-friends-match",
+    "title": "Sea Friends Match",
+    "title_ko": "바다 친구들 짝맞추기 🌊",
+    "description": "귀여운 쭈꾸미, 도다리, 아귀, 멍게 친구들의 짝을 기억해서 맞춰보는 영롱하고 재미있는 두뇌 짝맞추기 터치 놀이입니다.",
+    "thumbnail": "sea-friends-match/thumb.svg",
+    "path": "sea-friends-match/index.html"
+  },
+  {
+    "id": "star-catcher",
+    "title": "Star Catcher",
+    "title_ko": "반짝반짝 별 잡기 🌟",
+    "description": "밤하늘에서 떨어지는 알록달록한 별들을 빠르게 터치하여 화려한 폭죽 효과와 연속 콤보 점수를 올리는 신나는 터치 아케이드 놀이입니다.",
+    "thumbnail": "star-catcher/thumb.svg",
+    "path": "star-catcher/index.html"
   }
 ]
