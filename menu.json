@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "alpaca-rainbow-wool-knitting",
+        "title": "🦙 보송보송 알파카 무지개 털실 공방",
+        "path": "alpaca-rainbow-wool-knitting/index.html"
+      },
+      {
+        "id": "koala-eucalyptus-melody",
+        "title": "🐨 아기 코알라의 유칼립투스 멜로디 나무",
+        "path": "koala-eucalyptus-melody/index.html"
+      },
+      {
         "id": "star-catcher",
         "title": "반짝반짝 별 잡기 🌟",
         "path": "star-catcher/index.html"

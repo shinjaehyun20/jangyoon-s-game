@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="forestSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f2027"/>
+      <stop offset="50%" stop-color="#203a43"/>
+      <stop offset="100%" stop-color="#2c5364"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff9c4"/>
+      <stop offset="50%" stop-color="#ffd54f" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ffd54f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#69f0ae"/>
+      <stop offset="100%" stop-color="#00bfa5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Night Forest Background -->
+  <rect width="400" height="300" fill="url(#forestSky)"/>
+
+  <!-- Glowing Moon & Stars -->
+  <circle cx="315" cy="75" r="55" fill="url(#moonGlow)"/>
+  <circle cx="315" cy="75" r="24" fill="#fff59d"/>
+  <circle cx="80" cy="50" r="2.5" fill="#ffffff" opacity="0.9"/>
+  <circle cx="145" cy="35" r="3" fill="#ffe082" opacity="0.8"/>
+  <circle cx="240" cy="48" r="2" fill="#ffffff" opacity="0.85"/>
+  <circle cx="55" cy="115" r="2.5" fill="#b9f6ca" opacity="0.8"/>
+
+  <!-- Eucalyptus Tree Trunk & Branch -->
+  <path d="M 45,300 L 65,120 Q 170,135 280,105 L 285,125 Q 170,155 85,148 L 95,300 Z" fill="#6d4c41"/>
+
+  <!-- Glowing Musical Eucalyptus Leaves -->
+  <g transform="translate(135, 85) rotate(-18)">
+    <ellipse cx="0" cy="0" rx="26" ry="14" fill="url(#leafGrad)" stroke="#fff" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="16" fill="#004d40" font-weight="bold" text-anchor="middle">♪</text>
+  </g>
+  <g transform="translate(215, 72) rotate(15)">
+    <ellipse cx="0" cy="0" rx="26" ry="14" fill="#ffd54f" stroke="#fff" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="16" fill="#5d4037" font-weight="bold" text-anchor="middle">♫</text>
+  </g>
+  <g transform="translate(285, 155) rotate(-12)">
+    <ellipse cx="0" cy="0" rx="24" ry="13" fill="#ff80ab" stroke="#fff" stroke-width="1.5"/>
+    <text x="0" y="5" font-size="15" fill="#880e4f" font-weight="bold" text-anchor="middle">♬</text>
+  </g>
+
+  <!-- Cute Baby Koala on the Branch -->
+  <g transform="translate(175, 145)">
+    <!-- Fluffy Ears -->
+    <circle cx="-28" cy="-22" r="16" fill="#90a4ae" stroke="#eceff1" stroke-width="3"/>
+    <circle cx="-28" cy="-22" r="9" fill="#f8bbd0"/>
+    <circle cx="28" cy="-22" r="16" fill="#90a4ae" stroke="#eceff1" stroke-width="3"/>
+    <circle cx="28" cy="-22" r="9" fill="#f8bbd0"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="24" rx="28" ry="25" fill="#90a4ae"/>
+    <ellipse cx="0" cy="26" rx="18" ry="17" fill="#eceff1"/>
+    <!-- Head -->
+    <circle cx="0" cy="-6" r="26" fill="#b0bec5"/>
+    <!-- Eyes & Blush -->
+    <circle cx="-10" cy="-8" r="3.5" fill="#263238"/>
+    <circle cx="10" cy="-8" r="3.5" fill="#263238"/>
+    <ellipse cx="-14" cy="-1" rx="5" ry="3" fill="#ff8a80" opacity="0.7"/>
+    <ellipse cx="14" cy="-1" rx="5" ry="3" fill="#ff8a80" opacity="0.7"/>
+    <!-- Koala Oval Nose -->
+    <ellipse cx="0" cy="-4" rx="5" ry="8" fill="#37474f"/>
+  </g>
+
+  <!-- Floating Musical Sound Waves -->
+  <circle cx="175" cy="140" r="65" fill="none" stroke="#69f0ae" stroke-width="2" stroke-dasharray="6,6" opacity="0.65"/>
+  <text x="105" y="195" font-size="24">✨</text>
+  <text x="255" y="195" font-size="24">🎵</text>
+
+  <!-- Bottom Title Banner -->
+  <rect x="30" y="246" width="340" height="40" rx="20" fill="#102830" opacity="0.95" stroke="#69f0ae" stroke-width="2.5"/>
+  <text x="200" y="272" font-family="'Malgun Gothic', sans-serif" font-weight="bold" font-size="15" fill="#ffffff" text-anchor="middle">🐨 아기 코알라의 유칼립투스 멜로디 나무</text>
+</svg>
