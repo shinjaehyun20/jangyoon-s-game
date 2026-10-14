@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "flying-squirrel-star-glide",
+        "title": "🐿️ 하늘다람쥐의 은하수 활강 비행",
+        "path": "flying-squirrel-star-glide/index.html"
+      },
+      {
+        "id": "capybara-hotspring-yuzu-bath",
+        "title": "♨️ 느긋한 카피바라의 향긋 유자 온천",
+        "path": "capybara-hotspring-yuzu-bath/index.html"
+      },
+      {
         "id": "alpaca-rainbow-wool-knitting",
         "title": "🦙 보송보송 알파카 무지개 털실 공방",
         "path": "alpaca-rainbow-wool-knitting/index.html"

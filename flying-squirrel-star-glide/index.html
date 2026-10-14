@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐿️ 하늘다람쥐의 은하수 활강 비행 - 장윤이의 게임세상 #309</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #12002b;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    #game-wrap {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 860px;
+      background: linear-gradient(180deg, #10002b 0%, #240046 35%, #3c096c 70%, #5a189a 100%);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.75);
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #hud {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hud-box {
+      background: rgba(36, 0, 70, 0.85);
+      border: 2px solid #00f5d4;
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #e0aaff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+    }
+    #combo-box {
+      color: #ffd54f;
+      border-color: #ffd54f;
+      transition: transform 0.1s ease;
+    }
+    #overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 0, 43, 0.88);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 20;
+      backdrop-filter: blur(6px);
+    }
+    #overlay h1 {
+      font-size: 25px;
+      margin-bottom: 12px;
+      color: #00f5d4;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    #overlay p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #e0aaff;
+      margin-bottom: 24px;
+    }
+    .btn {
+      background: linear-gradient(135deg, #7209b7 0%, #4361ee 100%);
+      color: #fff;
+      border: 2px solid #00f5d4;
+      border-radius: 28px;
+      padding: 14px 38px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 245, 212, 0.4);
+      transition: transform 0.15s ease;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    #fever-banner {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      background: linear-gradient(90deg, #00f5d4, #b5179e, #ffb703);
+      color: #12002b;
+      font-weight: 900;
+      font-size: 16px;
+      padding: 6px 18px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 245, 212, 0.6);
+      pointer-events: none;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 15;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="cvs"></canvas>
+    <div id="hud">
+      <div class="hud-box" id="score-box">🌰 0점</div>
+      <div class="hud-box" id="combo-box">콤보 0x</div>
+      <div class="hud-box" id="time-box">⏱️ 45초</div>
+    </div>
+    <div id="fever-banner">✨ 은하수 활공 피버! (2배 점수) ✨</div>
+    <div id="overlay">
+      <h1 id="title-text">🐿️ 하늘다람쥐의 은하수 활강</h1>
+      <p id="desc-text">
+        밤하늘을 날아가는 귀여운 하늘다람쥐를 조종하세요!<br>
+        화면을 <strong>터치/드래그하여 활강 고도를 조절</strong>하며<br>
+        <strong>황금 도토리</strong>와 <strong>별사탕</strong>을 모으세요!
+      </p>
+      <button class="btn" id="start-btn">비행 시작!</button>
+    </div>
+  </div>
+
+  <script>
+    const cvs = document.getElementById('cvs');
+    const ctx = cvs.getContext('2d');
+    const scoreBox = document.getElementById('score-box');
+    const comboBox = document.getElementById('combo-box');
+    const timeBox = document.getElementById('time-box');
+    const feverBanner = document.getElementById('fever-banner');
+    const overlay = document.getElementById('overlay');
+    const startBtn = document.getElementById('start-btn');
+    const titleText = document.getElementById('title-text');
+    const descText = document.getElementById('desc-text');
+
+    let W = 400;
+    let H = 700;
+
+    function resize() {
+      const wrap = document.getElementById('game-wrap');
+      W = wrap.clientWidth;
+      H = wrap.clientHeight;
+      cvs.width = W;
+      cvs.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Sound
+    let actx = null;
+    function playSound(type) {
+      if (!actx) {
+        try {
+          actx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch(e) { return; }
+      }
+      if (actx.state === 'suspended') actx.resume();
+
+      const now = actx.currentTime;
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.connect(gain);
+      gain.connect(actx.destination);
+
+      if (type === 'flap') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.exponentialRampToValueAtTime(520, now + 0.12);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } else if (type === 'acorn') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.setValueAtTime(900, now + 0.08);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'star') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(784, now);
+        osc.frequency.setValueAtTime(1046, now + 0.07);
+        osc.frequency.setValueAtTime(1568, now + 0.15);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'fever') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.08);
+        osc.frequency.setValueAtTime(783.99, now + 0.16);
+        osc.frequency.setValueAtTime(1046.50, now + 0.24);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        osc.start(now);
+        osc.stop(now + 0.4);
+      }
+    }
+
+    let gameState = 'ready';
+    let score = 0;
+    let combo = 0;
+    let maxCombo = 0;
+    let timeLeft = 45;
+    let feverTime = 0;
+
+    const squirrel = {
+      x: 80,
+      y: 350,
+      targetY: 350,
+      r: 25,
+      tilt: 0
+    };
+
+    let items = [];
+    let particles = [];
+    let stars = [];
+    let clouds = [];
+    let spawnTimer = 0;
+    let lastTime = 0;
+
+    // Background Stars
+    for (let i = 0; i < 40; i++) {
+      stars.push({
+        x: Math.random() * 480,
+        y: Math.random() * 860,
+        r: Math.random() * 2 + 1,
+        spd: Math.random() * 60 + 40
+      });
+    }
+
+    class GlideItem {
+      constructor() {
+        this.x = W + 40;
+        this.y = Math.random() * (H - 180) + 90;
+        this.type = Math.random() < 0.25 ? 'rainbow_star' : (Math.random() < 0.45 ? 'star' : 'acorn');
+        this.r = this.type === 'rainbow_star' ? 22 : 18;
+        this.speed = (Math.random() * 60 + 220) * (feverTime > 0 ? 1.3 : 1);
+        this.alive = true;
+      }
+      update(dt) {
+        this.x -= this.speed * dt;
+        if (this.x < -40) this.alive = false;
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        if (this.type === 'acorn') {
+          // Golden Acorn
+          ctx.beginPath();
+          ctx.ellipse(0, 4, this.r * 0.8, this.r, 0, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffb300';
+          ctx.fill();
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = '#ffe082';
+          ctx.stroke();
+
+          // Cap
+          ctx.beginPath();
+          ctx.arc(0, -this.r * 0.4, this.r * 0.85, Math.PI, 0);
+          ctx.fillStyle = '#5d4037';
+          ctx.fill();
+
+          // Stem
+          ctx.beginPath();
+          ctx.moveTo(0, -this.r * 0.4);
+          ctx.lineTo(0, -this.r * 0.9);
+          ctx.strokeStyle = '#4e342e';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        } else if (this.type === 'rainbow_star') {
+          // Rainbow Star
+          ctx.beginPath();
+          drawStar(ctx, 0, 0, 5, this.r * 1.2, this.r * 0.6);
+          const g = ctx.createLinearGradient(-15, -15, 15, 15);
+          g.addColorStop(0, '#00f5d4');
+          g.addColorStop(0.5, '#b5179e');
+          g.addColorStop(1, '#ffbe0b');
+          ctx.fillStyle = g;
+          ctx.fill();
+          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = '#ffffff';
+          ctx.stroke();
+        } else {
+          // Yellow Star
+          ctx.beginPath();
+          drawStar(ctx, 0, 0, 5, this.r, this.r * 0.5);
+          ctx.fillStyle = '#ffd54f';
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#fff9c4';
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+
+    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      const step = Math.PI / spikes;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+      }
+      ctx.lineTo(cx, cy - outerRadius);
+      ctx.closePath();
+    }
+
+    function addParticles(x, y, color, count = 12) {
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 150 + 40;
+        particles.push({
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          r: Math.random() * 4 + 2,
+          color,
+          alpha: 1,
+          life: 0.45
+        });
+      }
+    }
+
+    function drawSquirrel() {
+      // Smooth movement
+      const dy = squirrel.targetY - squirrel.y;
+      squirrel.y += dy * 0.14;
+      squirrel.tilt = Math.max(-0.35, Math.min(0.35, dy * 0.02));
+
+      ctx.save();
+      ctx.translate(squirrel.x, squirrel.y);
+      ctx.rotate(squirrel.tilt);
+
+      // Motion Trail
+      ctx.strokeStyle = 'rgba(0, 245, 212, 0.6)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-45, -6);
+      ctx.lineTo(-20, -6);
+      ctx.moveTo(-50, 8);
+      ctx.lineTo(-24, 8);
+      ctx.stroke();
+
+      // Gliding Membrane (Patagium Wings)
+      ctx.beginPath();
+      ctx.moveTo(-25, -20);
+      ctx.quadraticCurveTo(0, -32, 25, -16);
+      ctx.quadraticCurveTo(15, 30, -25, 24);
+      ctx.closePath();
+      ctx.fillStyle = '#bcaaa4';
+      ctx.fill();
+      ctx.strokeStyle = '#d7ccc8';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Inner membrane belly highlight
+      ctx.beginPath();
+      ctx.moveTo(-20, -14);
+      ctx.quadraticCurveTo(0, -24, 20, -12);
+      ctx.quadraticCurveTo(12, 22, -20, 18);
+      ctx.closePath();
+      ctx.fillStyle = '#f5f5f5';
+      ctx.fill();
+
+      // Fluffy Body
+      ctx.beginPath();
+      ctx.ellipse(0, 2, 24, 15, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#8d6e63';
+      ctx.fill();
+
+      // Big Fluffy Tail
+      ctx.beginPath();
+      ctx.moveTo(-20, 8);
+      ctx.quadraticCurveTo(-45, 18, -40, -4);
+      ctx.quadraticCurveTo(-30, -10, -20, 2);
+      ctx.closePath();
+      ctx.fillStyle = '#795548';
+      ctx.fill();
+
+      // Head
+      ctx.beginPath();
+      ctx.arc(22, -2, 15, 0, Math.PI * 2);
+      ctx.fillStyle = '#a1887f';
+      ctx.fill();
+
+      // Big Kawaii Eyes
+      ctx.beginPath();
+      ctx.arc(26, -5, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#212121';
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(28, -7, 2.5, 0, Math.PI * 2);
+      ctx.arc(25, -3, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cute Ears
+      ctx.beginPath();
+      ctx.arc(14, -15, 5, 0, Math.PI * 2);
+      ctx.arc(26, -15, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#6d4c41';
+      ctx.fill();
+
+      // Pink Nose
+      ctx.beginPath();
+      ctx.arc(34, -1, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff80ab';
+      ctx.fill();
+
+      // Blushing Cheeks
+      ctx.fillStyle = 'rgba(255, 138, 128, 0.85)';
+      ctx.beginPath();
+      ctx.arc(22, 4, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function handlePointer(y) {
+      if (gameState !== 'playing') return;
+      squirrel.targetY = Math.max(70, Math.min(H - 70, y));
+      playSound('flap');
+    }
+
+    cvs.addEventListener('pointerdown', (e) => {
+      const rect = cvs.getBoundingClientRect();
+      handlePointer(e.clientY - rect.top);
+    });
+
+    cvs.addEventListener('pointermove', (e) => {
+      if (e.buttons > 0) {
+        const rect = cvs.getBoundingClientRect();
+        handlePointer(e.clientY - rect.top);
+      }
+    });
+
+    function startGame() {
+      score = 0;
+      combo = 0;
+      maxCombo = 0;
+      timeLeft = 45;
+      feverTime = 0;
+      items = [];
+      particles = [];
+      squirrel.y = H / 2;
+      squirrel.targetY = H / 2;
+
+      scoreBox.textContent = '🌰 0점';
+      comboBox.textContent = '콤보 0x';
+      timeBox.textContent = '⏱️ 45초';
+      feverBanner.style.transform = 'translateX(-50%) scale(0)';
+      overlay.style.display = 'none';
+      gameState = 'playing';
+      lastTime = performance.now();
+      requestAnimationFrame(gameLoop);
+    }
+
+    startBtn.addEventListener('click', startGame);
+
+    let secondTimer = 0;
+    function gameLoop(timestamp) {
+      if (gameState !== 'playing') return;
+
+      const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+      lastTime = timestamp;
+
+      // Timer
+      secondTimer += dt;
+      if (secondTimer >= 1.0) {
+        secondTimer -= 1.0;
+        timeLeft--;
+        timeBox.textContent = `⏱️ ${timeLeft}초`;
+        if (timeLeft <= 0) {
+          endGame();
+          return;
+        }
+      }
+
+      // Fever
+      if (feverTime > 0) {
+        feverTime -= dt;
+        feverBanner.style.transform = 'translateX(-50%) scale(1)';
+        if (feverTime <= 0) {
+          feverBanner.style.transform = 'translateX(-50%) scale(0)';
+        }
+      }
+
+      // Spawning
+      spawnTimer += dt;
+      const rate = feverTime > 0 ? 0.35 : 0.6;
+      if (spawnTimer >= rate) {
+        spawnTimer = 0;
+        items.push(new GlideItem());
+      }
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Starfield parallax
+      for (const s of stars) {
+        s.x -= s.spd * dt;
+        if (s.x < 0) s.x = W + 10;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fill();
+      }
+
+      // Items update & collision
+      for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i];
+        it.update(dt);
+        if (!it.alive) {
+          items.splice(i, 1);
+          continue;
+        }
+        it.draw();
+
+        // Collision with squirrel
+        const dist = Math.hypot(squirrel.x - it.x, squirrel.y - it.y);
+        if (dist < squirrel.r + it.r) {
+          it.alive = false;
+          combo++;
+          if (combo > maxCombo) maxCombo = combo;
+          comboBox.textContent = `콤보 ${combo}x`;
+          comboBox.style.transform = 'scale(1.25)';
+          setTimeout(() => comboBox.style.transform = 'scale(1)', 100);
+
+          let pts = it.type === 'rainbow_star' ? 30 : (it.type === 'star' ? 20 : 10);
+          if (feverTime > 0) pts *= 2;
+          score += pts;
+          scoreBox.textContent = `🌰 ${score}점`;
+
+          if (it.type === 'rainbow_star') {
+            playSound('fever');
+            addParticles(it.x, it.y, '#00f5d4', 20);
+            feverTime = 7.0;
+          } else if (it.type === 'star') {
+            playSound('star');
+            addParticles(it.x, it.y, '#ffd54f', 14);
+          } else {
+            playSound('acorn');
+            addParticles(it.x, it.y, '#ffb300', 10);
+          }
+        }
+      }
+
+      // Squirrel
+      drawSquirrel();
+
+      // Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.alpha -= dt / p.life;
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      gameState = 'gameover';
+      titleText.textContent = '🐿️ 은하수 활강 완주!';
+      descText.innerHTML = `
+        하늘다람쥐가 은하수를 쌩쌩 활강했어요!<br><br>
+        <strong>최종 점수:</strong> <span style="color:#00f5d4; font-size:22px;">${score}점</span><br>
+        <strong>최대 콤보:</strong> <span style="color:#ffd54f; font-size:18px;">${maxCombo} 연속!</span>
+      `;
+      startBtn.textContent = '다시 날기!';
+      overlay.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

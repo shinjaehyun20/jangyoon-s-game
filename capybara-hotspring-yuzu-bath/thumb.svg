@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="spaSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffcc80"/>
+      <stop offset="50%" stop-color="#ffab91"/>
+      <stop offset="100%" stop-color="#bcaaa4"/>
+    </linearGradient>
+    <linearGradient id="hotSpringWater" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#80deea" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#00838f" stop-opacity="0.95"/>
+    </linearGradient>
+    <radialGradient id="yuzuGlow" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#fff59d"/>
+      <stop offset="100%" stop-color="#fbc02d"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Sunset Spa Background -->
+  <rect width="400" height="300" fill="url(#spaSky)"/>
+
+  <!-- Hotspring Rocks -->
+  <ellipse cx="200" cy="270" rx="190" ry="70" fill="#5d4037"/>
+  <ellipse cx="70" cy="240" rx="60" ry="40" fill="#795548"/>
+  <ellipse cx="330" cy="240" rx="65" ry="42" fill="#795548"/>
+  <ellipse cx="200" cy="260" rx="170" ry="55" fill="url(#hotSpringWater)"/>
+
+  <!-- Steam Clouds -->
+  <path d="M 120,180 Q 110,140 130,120 Q 150,100 135,70" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.45"/>
+  <path d="M 280,180 Q 290,140 270,110 Q 250,90 265,60" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.45"/>
+  <path d="M 200,160 Q 210,120 190,90" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Floating Golden Yuzu Citrus -->
+  <g transform="translate(100, 230)">
+    <circle cx="0" cy="0" r="16" fill="url(#yuzuGlow)" stroke="#f57f17" stroke-width="1.5"/>
+    <path d="M 0,-16 Q 4,-22 8,-20" fill="none" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="4" cy="-2" r="2" fill="#fff" opacity="0.8"/>
+  </g>
+  <g transform="translate(300, 235)">
+    <circle cx="0" cy="0" r="15" fill="url(#yuzuGlow)" stroke="#f57f17" stroke-width="1.5"/>
+    <path d="M 0,-15 Q -4,-21 -8,-19" fill="none" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Cute Relaxed Capybara in Hot Spring -->
+  <g transform="translate(200, 190)">
+    <!-- Water ripples around Capybara -->
+    <ellipse cx="0" cy="40" rx="65" ry="18" fill="#4dd0e1" opacity="0.6"/>
+
+    <!-- Capybara Body -->
+    <ellipse cx="0" cy="30" rx="55" ry="32" fill="#8d6e63"/>
+
+    <!-- Head -->
+    <rect x="-35" y="-35" width="70" height="60" rx="25" fill="#a1887f"/>
+
+    <!-- Small Cute Ears -->
+    <ellipse cx="-34" cy="-30" rx="8" ry="6" fill="#6d4c41"/>
+    <ellipse cx="34" cy="-30" rx="8" ry="6" fill="#6d4c41"/>
+
+    <!-- Peaceful Closed Eyes (Sleeping/Relaxing) -->
+    <path d="M -24,-12 Q -16,-6 -8,-12" fill="none" stroke="#3e2723" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 8,-12 Q 16,-6 24,-12" fill="none" stroke="#3e2723" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Big Square Snout/Nose -->
+    <ellipse cx="0" cy="8" rx="18" ry="12" fill="#6d4c41"/>
+    <!-- Nostrils -->
+    <ellipse cx="-6" cy="6" rx="2.5" ry="4" fill="#3e2723"/>
+    <ellipse cx="6" cy="6" rx="2.5" ry="4" fill="#3e2723"/>
+
+    <!-- Rosy Cheeks -->
+    <circle cx="-25" cy="5" r="6" fill="#ff8a80" opacity="0.75"/>
+    <circle cx="25" cy="5" r="6" fill="#ff8a80" opacity="0.75"/>
+
+    <!-- Yuzu on Capybara's Head! -->
+    <g transform="translate(0, -42)">
+      <circle cx="0" cy="0" r="14" fill="url(#yuzuGlow)" stroke="#f57f17" stroke-width="1.5"/>
+      <path d="M 0,-14 Q 4,-20 8,-18" fill="none" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="-3" cy="-4" r="2" fill="#fff" opacity="0.8"/>
+      <!-- Sparkle -->
+      <text x="18" y="-4" font-size="14" fill="#fbc02d">✨</text>
+    </g>
+
+    <!-- Warm towel on head (optional folded bath towel) -->
+    <rect x="-24" y="-38" width="48" height="8" rx="4" fill="#fff9c4" opacity="0.85"/>
+  </g>
+
+  <!-- Title Banner -->
+  <rect x="25" y="16" width="350" height="38" rx="19" fill="#3e2723" opacity="0.85" stroke="#ffe082" stroke-width="2"/>
+  <text x="200" y="41" font-size="16" font-family="'Pretendard', sans-serif" font-weight="bold" fill="#fff9c4" text-anchor="middle">♨️ 느긋한 카피바라의 유자 온천 #308</text>
+</svg>

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="galaxySky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#12002b"/>
+      <stop offset="50%" stop-color="#280b54"/>
+      <stop offset="100%" stop-color="#4a154b"/>
+    </linearGradient>
+    <linearGradient id="auroraMist" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f5d4" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#b5179e" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#7209b7" stop-opacity="0.75"/>
+    </linearGradient>
+    <radialGradient id="starAcorn" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#ffe082"/>
+      <stop offset="100%" stop-color="#ffb300"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Deep Galaxy Sky -->
+  <rect width="400" height="300" fill="url(#galaxySky)"/>
+
+  <!-- Glowing Nebula Waves -->
+  <path d="M 0,60 Q 120,20 220,80 T 400,40 L 400,160 Q 280,110 160,145 T 0,120 Z" fill="url(#auroraMist)" opacity="0.6"/>
+  <path d="M 0,140 Q 140,90 260,160 T 400,120 L 400,240 Q 260,180 120,220 T 0,190 Z" fill="url(#auroraMist)" opacity="0.4"/>
+
+  <!-- Twinkling Galaxy Stars -->
+  <circle cx="60" cy="40" r="2.5" fill="#fff" opacity="0.9"/>
+  <circle cx="140" cy="25" r="3" fill="#ffe082" opacity="0.85"/>
+  <circle cx="280" cy="35" r="2" fill="#fff" opacity="0.8"/>
+  <circle cx="350" cy="65" r="3.5" fill="#80d8ff" opacity="0.9"/>
+  <circle cx="190" cy="18" r="1.5" fill="#fff" opacity="0.75"/>
+  <circle cx="85" cy="110" r="2" fill="#ffd54f" opacity="0.85"/>
+  <circle cx="330" cy="140" r="2.5" fill="#fff" opacity="0.8"/>
+
+  <!-- Floating Star Candies & Golden Acorn -->
+  <g transform="translate(100, 180)">
+    <!-- Golden Acorn -->
+    <ellipse cx="0" cy="5" rx="14" ry="17" fill="url(#starAcorn)" stroke="#ffd54f" stroke-width="1.5"/>
+    <path d="M -14,0 Q 0,-14 14,0 Z" fill="#6d4c41"/>
+    <path d="M 0,-10 L 0,-16" stroke="#5d4037" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="18" y="-4" font-size="14" fill="#ffd54f">✨</text>
+  </g>
+  <g transform="translate(310, 190)">
+    <polygon points="0,-12 3,-3 12,-3 5,3 8,12 0,6 -8,12 -5,3 -12,-3 -3,-3" fill="#00f5d4" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="2" fill="#fff"/>
+  </g>
+
+  <!-- Flying Squirrel Soaring Through the Galaxy -->
+  <g transform="translate(200, 140) rotate(-12)">
+    <!-- Motion Trails -->
+    <line x1="-70" y1="-8" x2="-45" y2="-8" stroke="#00f5d4" stroke-width="2.5" opacity="0.8"/>
+    <line x1="-80" y1="12" x2="-50" y2="12" stroke="#ffffff" stroke-width="2" opacity="0.85"/>
+    <line x1="-65" y1="28" x2="-40" y2="28" stroke="#ff80ab" stroke-width="2.5" opacity="0.75"/>
+
+    <!-- Gliding Membrane (Patagium Wings) -->
+    <path d="M -35,-24 Q 0,-38 35,-20 Q 20,38 -35,32 Z" fill="#bcaaa4" stroke="#d7ccc8" stroke-width="2"/>
+    <path d="M -30,-18 Q 0,-30 30,-15 Q 16,30 -30,26 Z" fill="#f5f5f5" opacity="0.85"/>
+
+    <!-- Furry Body -->
+    <ellipse cx="0" cy="4" rx="30" ry="18" fill="#8d6e63"/>
+    <ellipse cx="2" cy="5" rx="20" ry="12" fill="#efebe9"/>
+
+    <!-- Big Fluffy Tail Swept Back -->
+    <path d="M -26,12 Q -60,25 -52,-5 Q -40,-12 -28,4 Z" fill="#795548" stroke="#5d4037" stroke-width="1.5"/>
+
+    <!-- Head -->
+    <circle cx="28" cy="-2" r="18" fill="#a1887f"/>
+    <!-- Giant Cute Sparkling Eyes -->
+    <circle cx="34" cy="-5" r="7.5" fill="#212121"/>
+    <circle cx="36" cy="-7" r="3" fill="#ffffff"/>
+    <circle cx="33" cy="-3" r="1.5" fill="#ffffff"/>
+
+    <!-- Cute Round Ears -->
+    <circle cx="18" cy="-18" r="7" fill="#6d4c41"/>
+    <circle cx="18" cy="-18" r="4" fill="#ffcdd2"/>
+    <circle cx="32" cy="-18" r="6" fill="#6d4c41"/>
+    <circle cx="32" cy="-18" r="3" fill="#ffcdd2"/>
+
+    <!-- Tiny Pink Nose & Mouth -->
+    <ellipse cx="43" cy="-1" rx="2.5" ry="2" fill="#ff80ab"/>
+
+    <!-- Rosy Blushing Cheek -->
+    <ellipse cx="28" cy="4" rx="4.5" ry="3" fill="#ff8a80" opacity="0.85"/>
+
+    <!-- Tiny Paws stretched forward -->
+    <circle cx="44" cy="-15" r="4.5" fill="#6d4c41"/>
+    <circle cx="38" cy="22" r="4.5" fill="#6d4c41"/>
+  </g>
+
+  <!-- Title Banner -->
+  <rect x="25" y="16" width="350" height="38" rx="19" fill="#240046" opacity="0.88" stroke="#00f5d4" stroke-width="2"/>
+  <text x="200" y="41" font-size="16" font-family="'Pretendard', sans-serif" font-weight="bold" fill="#00f5d4" text-anchor="middle">🐿️ 하늘다람쥐의 은하수 활강 #309</text>
+</svg>

@@ -2454,5 +2454,21 @@
     "description": "안데스 고원의 귀여운 아기 알파카가 원하는 무지개 목도리 주문서 패턴 순서에 맞춰 알록달록 구름 털실을 톡톡 터치해 포근한 목도리를 완성하는 색채 패턴 창의 공방 놀이입니다.",
     "thumbnail": "alpaca-rainbow-wool-knitting/thumb.svg",
     "path": "alpaca-rainbow-wool-knitting/index.html"
+  },
+  {
+    "id": "capybara-hotspring-yuzu-bath",
+    "title": "Capybara Hotspring Yuzu Bath",
+    "title_ko": "♨️ 느긋한 카피바라의 향긋 유자 온천",
+    "description": "모락모락 김이 피어나는 따뜻한 노천 온천에서 느긋하게 휴식하는 카피바라 머리 위로 동동 떠오르는 황금 유자와 오색 꽃잎을 쏙쏙 받아 담는 힐링 터치 놀이입니다.",
+    "thumbnail": "capybara-hotspring-yuzu-bath/thumb.svg",
+    "path": "capybara-hotspring-yuzu-bath/index.html"
+  },
+  {
+    "id": "flying-squirrel-star-glide",
+    "title": "Flying Squirrel Star Glide",
+    "title_ko": "🐿️ 하늘다람쥐의 은하수 활강 비행",
+    "description": "반짝이는 보랏빛 은하수 밤하늘을 활공하는 날다람쥐를 조종해 별빛 구름 사이를 누비며 황금 도토리와 별사탕을 모으는 경쾌한 비행 아케이드 놀이입니다.",
+    "thumbnail": "flying-squirrel-star-glide/thumb.svg",
+    "path": "flying-squirrel-star-glide/index.html"
   }
 ]
