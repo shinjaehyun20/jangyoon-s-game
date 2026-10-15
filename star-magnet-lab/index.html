@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>별빛 자석 실험실 - N극 S극 끌어당기기</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
+    background: radial-gradient(circle at 50% 20%, #1e1b4b, #090d16 80%);
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    color: #f8fafc; touch-action: none; user-select: none;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .wrap {
+    width: 100%; max-width: 480px; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 12px; position: relative; overflow: hidden;
+  }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(15, 23, 42, 0.85); border: 1.5px solid rgba(148, 163, 184, 0.25);
+    border-radius: 14px; padding: 8px 12px; z-index: 5; flex-shrink: 0; gap: 6px;
+  }
+  .home-link {
+    color: #93c5fd; text-decoration: none; font-size: 14px; font-weight: 800;
+    padding: 8px 10px; border-radius: 10px; background: rgba(30, 58, 138, 0.45);
+    min-height: 44px; display: inline-flex; align-items: center;
+  }
+  .hud-metrics { display: flex; gap: 10px; font-size: 14px; font-weight: 800; align-items: center; }
+  .metric-box { background: rgba(30, 41, 59, 0.9); padding: 6px 10px; border-radius: 10px; }
+  .metric-box span { color: #fde047; }
+  .icon-btn {
+    min-width: 44px; min-height: 44px; border-radius: 10px; border: 1.5px solid #475569;
+    background: #1e293b; color: #fff; font-size: 16px; font-weight: 800; cursor: pointer;
+  }
+  .canvas-area {
+    flex: 1 1 0; min-height: 0; margin: 8px 0; border-radius: 18px;
+    border: 2px solid rgba(96, 165, 250, 0.35); background: rgba(9, 13, 22, 0.75);
+    position: relative; overflow: hidden;
+  }
+  canvas { width: 100%; height: 100%; display: block; }
+  .controls {
+    flex-shrink: 0; display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 8px;
+    padding-bottom: 2px;
+  }
+  .ctrl-btn {
+    min-height: 54px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.2);
+    font-size: 16px; font-weight: 900; color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  }
+  .ctrl-move { background: linear-gradient(135deg, #334155, #1e293b); }
+  .ctrl-pole-n { background: linear-gradient(135deg, #ef4444, #b91c1c); border-color: #fca5a5; }
+  .ctrl-pole-s { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-color: #93c5fd; }
+  .overlay {
+    position: absolute; inset: 0; background: rgba(9, 13, 22, 0.92);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 24px; text-align: center; z-index: 20;
+  }
+  .overlay.hidden { display: none; }
+  .card {
+    background: #1e293b; border: 2px solid #60a5fa; border-radius: 22px;
+    padding: 22px 18px; width: 100%; max-width: 380px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+  }
+  .card h1 { font-size: 24px; color: #fde047; margin-bottom: 8px; }
+  .card p { font-size: 15px; line-height: 1.5; color: #e2e8f0; margin-bottom: 14px; }
+  .rule-badge {
+    background: #0f172a; border: 1.5px solid #475569; border-radius: 12px;
+    padding: 10px; margin-bottom: 16px; font-size: 14px; text-align: left; color: #cbd5e1;
+  }
+  .rule-badge strong { color: #38bdf8; }
+  .primary-btn {
+    width: 100%; min-height: 52px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff;
+    font-size: 18px; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="home">
+  <div class="hud">
+    <a class="home-link" href="#home" id="homeBtn">← 홈으로</a>
+    <div class="hud-metrics">
+      <div class="metric-box">점수 <span id="scoreVal">0</span></div>
+      <div class="metric-box">최고 <span id="bestVal">0</span></div>
+      <div class="metric-box">시간 <span id="timeVal">45</span>s</div>
+    </div>
+    <button class="icon-btn" id="muteBtn" aria-label="소리 켜기/끄기">🔊</button>
+  </div>
+
+  <div class="canvas-area" id="canvasBox">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn ctrl-move" id="leftBtn">◀ 왼쪽</button>
+    <button class="ctrl-btn ctrl-pole-n" id="poleBtn">🔴 현재: N극 (바꾸기)</button>
+    <button class="ctrl-btn ctrl-move" id="rightBtn">오른쪽 ▶</button>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="card">
+      <h1>🧲 별빛 자석 실험실</h1>
+      <p>장윤이의 과학 실험! 자석의 같은 극끼리는 밀어내고(척력), 다른 극끼리는 끌어당겨요(인력)!</p>
+      <div class="rule-badge">
+        • <strong>다른 극(N↔S)</strong> 별자석을 만나면 쏙 끌어당겨 <strong>+10점!</strong><br>
+        • <strong>같은 극(N↔N, S↔S)</strong> 번개자석은 튕겨내야 해요!<br>
+        • 가운데 버튼이나 우주선을 터치해 <strong>N극(빨강)/S극(파랑)</strong>을 바꾸세요!
+      </div>
+      <button class="primary-btn" id="startBtn">실험 시작하기!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="card">
+      <h1 id="endTitle">🎉 실험 완료!</h1>
+      <p id="endSummary">오늘 모은 별빛 자석 에너지: 0점</p>
+      <div class="rule-badge" id="scienceTip">
+        💡 <strong>장윤이 과학 박사 노트</strong>: N극과 S극처럼 서로 다른 극은 끌어당기고(인력), N극-N극처럼 같은 극은 밀어내요(척력)!
+      </div>
+      <button class="primary-btn" id="restartBtn">다시 도전하기!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const BEST_KEY = 'star-magnet-lab_best';
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const canvasBox = document.getElementById('canvasBox');
+  const scoreVal = document.getElementById('scoreVal');
+  const bestVal = document.getElementById('bestVal');
+  const timeVal = document.getElementById('timeVal');
+  const poleBtn = document.getElementById('poleBtn');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const endSummary = document.getElementById('endSummary');
+  const muteBtn = document.getElementById('muteBtn');
+  const homeBtn = document.getElementById('homeBtn');
+
+  let audioCtx = null;
+  let muted = false;
+  let bestScore = 0;
+  try { bestScore = parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0; } catch (e) { bestScore = 0; }
+  bestVal.textContent = bestScore;
+
+  function playTone(freq, dur, type) {
+    if (muted) return;
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  let state = {
+    running: false,
+    score: 0,
+    timeLeft: 45,
+    pole: 'N',
+    shipX: 200,
+    targetX: 200,
+    moveDir: 0,
+    items: [],
+    particles: [],
+    rafId: null,
+    timerId: null,
+    lastSpawn: 0
+  };
+
+  function resizeCanvas() {
+    const rect = canvasBox.getBoundingClientRect();
+    canvas.width = Math.max(280, Math.floor(rect.width));
+    canvas.height = Math.max(300, Math.floor(rect.height));
+    if (!state.running) {
+      state.shipX = canvas.width / 2;
+      state.targetX = canvas.width / 2;
+      drawScene();
+    }
+  }
+
+  function updatePoleUI() {
+    if (state.pole === 'N') {
+      poleBtn.className = 'ctrl-btn ctrl-pole-n';
+      poleBtn.textContent = '🔴 현재: N극 (바꾸기)';
+    } else {
+      poleBtn.className = 'ctrl-btn ctrl-pole-s';
+      poleBtn.textContent = '🔵 현재: S극 (바꾸기)';
+    }
+  }
+
+  function togglePole() {
+    if (!state.running) return;
+    state.pole = state.pole === 'N' ? 'S' : 'N';
+    updatePoleUI();
+    playTone(state.pole === 'N' ? 520 : 660, 0.12, 'triangle');
+  }
+
+  function spawnItem() {
+    const pole = Math.random() < 0.5 ? 'N' : 'S';
+    const x = 36 + Math.random() * (canvas.width - 72);
+    state.items.push({
+      x: x,
+      y: -25,
+      r: 22,
+      pole: pole,
+      vy: 2.2 + Math.random() * 1.6
+    });
+  }
+
+  function addParticles(x, y, color) {
+    for (let i = 0; i < 10; i++) {
+      const ang = (Math.PI * 2 * i) / 10;
+      state.particles.push({
+        x: x, y: y,
+        vx: Math.cos(ang) * (2 + Math.random() * 2),
+        vy: Math.sin(ang) * (2 + Math.random() * 2),
+        life: 20, color: color
+      });
+    }
+  }
+
+  function updateGame(ts) {
+    if (!state.running) return;
+    if (ts - state.lastSpawn > 750) {
+      spawnItem();
+      state.lastSpawn = ts;
+    }
+
+    if (state.moveDir !== 0) {
+      state.shipX += state.moveDir * 6.5;
+    } else {
+      state.shipX += (state.targetX - state.shipX) * 0.22;
+    }
+    state.shipX = Math.max(36, Math.min(canvas.width - 36, state.shipX));
+    const shipY = canvas.height - 54;
+
+    for (let i = state.items.length - 1; i >= 0; i--) {
+      const it = state.items[i];
+      const dx = state.shipX - it.x;
+      const dy = shipY - it.y;
+      const dist = Math.hypot(dx, dy);
+
+      // Magnetic force within 140px
+      if (dist < 140 && dist > 1) {
+        const isOpposite = it.pole !== state.pole;
+        const force = (140 - dist) / 140;
+        if (isOpposite) {
+          // Attraction (인력)
+          it.x += (dx / dist) * force * 4.2;
+          it.y += (dy / dist) * force * 2.5;
+        } else {
+          // Repulsion (척력)
+          it.x -= (dx / dist) * force * 3.0;
+        }
+      }
+
+      it.y += it.vy;
+
+      if (dist < 42) {
+        if (it.pole !== state.pole) {
+          state.score += 10;
+          scoreVal.textContent = state.score;
+          if (state.score > bestScore) {
+            bestScore = state.score;
+            bestVal.textContent = bestScore;
+            try { localStorage.setItem(BEST_KEY, String(bestScore)); } catch (e) {}
+          }
+          addParticles(it.x, it.y, '#fde047');
+          playTone(880, 0.16, 'sine');
+          state.items.splice(i, 1);
+          continue;
+        } else {
+          // Same pole bounce
+          it.vy = -3.5;
+          addParticles(it.x, it.y, '#f87171');
+          playTone(240, 0.15, 'sawtooth');
+        }
+      }
+
+      if (it.y > canvas.height + 40 || it.y < -60) {
+        state.items.splice(i, 1);
+      }
+    }
+
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+      const p = state.particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life--;
+      if (p.life <= 0) state.particles.splice(i, 1);
+    }
+
+    drawScene();
+    state.rafId = requestAnimationFrame(updateGame);
+  }
+
+  function drawScene() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Subtle magnetic field rings around ship
+    const shipY = canvas.height - 54;
+    ctx.save();
+    ctx.strokeStyle = state.pole === 'N' ? 'rgba(239,68,68,0.22)' : 'rgba(59,130,246,0.22)';
+    ctx.lineWidth = 2;
+    for (let r = 45; r <= 115; r += 35) {
+      ctx.beginPath();
+      ctx.arc(state.shipX, shipY, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Draw falling magnet stars
+    for (const it of state.items) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+      ctx.fillStyle = it.pole === 'N' ? '#ef4444' : '#3b82f6';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(it.pole + '극', it.x, it.y);
+      ctx.restore();
+    }
+
+    // Draw particles
+    for (const p of state.particles) {
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Draw player U-magnet ship
+    ctx.save();
+    ctx.translate(state.shipX, shipY);
+    ctx.fillStyle = state.pole === 'N' ? '#ef4444' : '#3b82f6';
+    ctx.strokeStyle = '#fde047';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(-34, -22, 68, 44, 14);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 17px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('내 자석: ' + state.pole, 0, 0);
+    ctx.restore();
+  }
+
+  function startGame() {
+    if (state.rafId) cancelAnimationFrame(state.rafId);
+    if (state.timerId) clearInterval(state.timerId);
+    state.running = true;
+    state.score = 0;
+    state.timeLeft = 45;
+    state.pole = 'N';
+    state.items = [];
+    state.particles = [];
+    state.shipX = canvas.width / 2;
+    state.targetX = canvas.width / 2;
+    state.lastSpawn = performance.now();
+    scoreVal.textContent = '0';
+    timeVal.textContent = '45';
+    updatePoleUI();
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    playTone(587.33, 0.18, 'sine');
+
+    state.timerId = setInterval(function() {
+      if (!state.running) return;
+      state.timeLeft--;
+      timeVal.textContent = String(state.timeLeft);
+      if (state.timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+
+    state.rafId = requestAnimationFrame(updateGame);
+  }
+
+  function endGame() {
+    state.running = false;
+    if (state.rafId) cancelAnimationFrame(state.rafId);
+    if (state.timerId) clearInterval(state.timerId);
+    endSummary.textContent = '오늘 모은 별빛 자석 에너지: ' + state.score + '점 (최고 기록: ' + bestScore + '점)';
+    endOverlay.classList.remove('hidden');
+    playTone(783.99, 0.28, 'triangle');
+  }
+
+  // Unified Pointer Events
+  canvas.addEventListener('pointerdown', function(e) {
+    if (!state.running) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (Math.hypot(x - state.shipX, y - (canvas.height - 54)) < 48) {
+      togglePole();
+    } else {
+      state.targetX = x;
+    }
+  });
+  canvas.addEventListener('pointermove', function(e) {
+    if (!state.running || e.buttons === 0) return;
+    const rect = canvas.getBoundingClientRect();
+    state.targetX = e.clientX - rect.left;
+  });
+
+  const leftBtn = document.getElementById('leftBtn');
+  const rightBtn = document.getElementById('rightBtn');
+  leftBtn.addEventListener('pointerdown', function() { state.moveDir = -1; });
+  leftBtn.addEventListener('pointerup', function() { state.moveDir = 0; });
+  leftBtn.addEventListener('pointerleave', function() { state.moveDir = 0; });
+  rightBtn.addEventListener('pointerdown', function() { state.moveDir = 1; });
+  rightBtn.addEventListener('pointerup', function() { state.moveDir = 0; });
+  rightBtn.addEventListener('pointerleave', function() { state.moveDir = 0; });
+
+  poleBtn.addEventListener('pointerdown', function(e) {
+    e.preventDefault();
+    togglePole();
+  });
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('restartBtn').addEventListener('click', startGame);
+  muteBtn.addEventListener('click', function() {
+    muted = !muted;
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+  });
+  homeBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    state.running = false;
+    if (state.rafId) cancelAnimationFrame(state.rafId);
+    if (state.timerId) clearInterval(state.timerId);
+    startOverlay.classList.remove('hidden');
+    endOverlay.classList.add('hidden');
+  });
+
+  window.addEventListener('keydown', function(e) {
+    if (!state.running) return;
+    if (e.key === 'ArrowLeft') state.moveDir = -1;
+    if (e.key === 'ArrowRight') state.moveDir = 1;
+    if (e.key === ' ' || e.key === 'ArrowUp') togglePole();
+  });
+  window.addEventListener('keyup', function(e) {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') state.moveDir = 0;
+  });
+
+  window.addEventListener('resize', resizeCanvas);
+  window.onload = resizeCanvas;
+})();
+</script>
+</body>
+</html>

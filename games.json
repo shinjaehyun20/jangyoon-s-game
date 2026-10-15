@@ -1,5 +1,35 @@
 [
   {
+    "id": "compass-treasure-safari",
+    "title": "동서남북 보물 탐험대",
+    "subtitle": "COMPASS TREASURE SAFARI",
+    "category": "kids",
+    "tags": [
+      "사회",
+      "4방위표",
+      "길찾기",
+      "장윤이"
+    ],
+    "created": "2026-10-16",
+    "path": "compass-treasure-safari/index.html",
+    "thumb": "compass-treasure-safari/thumb.svg"
+  },
+  {
+    "id": "star-magnet-lab",
+    "title": "별빛 자석 실험실",
+    "subtitle": "STAR MAGNET LAB",
+    "category": "kids",
+    "tags": [
+      "과학",
+      "자석",
+      "인력과척력",
+      "장윤이"
+    ],
+    "created": "2026-10-16",
+    "path": "star-magnet-lab/index.html",
+    "thumb": "star-magnet-lab/thumb.svg"
+  },
+  {
     "id": "grand-carnival-fireworks",
     "title": "Grand Carnival Fireworks",
     "title_ko": "🎆 300회 축제! 무지개 불꽃놀이 대축제",

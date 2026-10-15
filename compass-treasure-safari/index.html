@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>동서남북 보물 탐험대 - 4방위표 길찾기</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
+    background: linear-gradient(160deg, #064e3b, #0f172a 85%);
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    color: #f8fafc; touch-action: manipulation; user-select: none;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .wrap {
+    width: 100%; max-width: 480px; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 12px; position: relative; overflow: hidden;
+  }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(15, 23, 42, 0.88); border: 1.5px solid rgba(110, 231, 183, 0.3);
+    border-radius: 14px; padding: 8px 12px; flex-shrink: 0; gap: 6px;
+  }
+  .home-link {
+    color: #6ee7b7; text-decoration: none; font-size: 14px; font-weight: 800;
+    padding: 8px 10px; border-radius: 10px; background: rgba(6, 78, 59, 0.65);
+    min-height: 44px; display: inline-flex; align-items: center;
+  }
+  .hud-metrics { display: flex; gap: 8px; font-size: 14px; font-weight: 800; }
+  .metric-box { background: rgba(30, 41, 59, 0.9); padding: 6px 10px; border-radius: 10px; }
+  .metric-box span { color: #fde047; }
+  .icon-btn {
+    min-width: 44px; min-height: 44px; border-radius: 10px; border: 1.5px solid #475569;
+    background: #1e293b; color: #fff; font-size: 16px; cursor: pointer;
+  }
+  .mission-banner {
+    background: rgba(15, 23, 42, 0.9); border: 2px solid #fbbf24;
+    border-radius: 14px; padding: 10px 14px; margin-top: 8px; text-align: center; flex-shrink: 0;
+  }
+  .mission-banner h2 { font-size: 17px; color: #fde047; margin-bottom: 3px; }
+  .mission-banner p { font-size: 13px; color: #cbd5e1; }
+  .canvas-area {
+    flex: 1 1 0; min-height: 0; margin: 8px 0; border-radius: 18px;
+    border: 2px solid rgba(110, 231, 183, 0.35); background: rgba(9, 18, 28, 0.85);
+    position: relative; overflow: hidden;
+  }
+  canvas { width: 100%; height: 100%; display: block; }
+  .dir-grid {
+    flex-shrink: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .dir-btn {
+    min-height: 54px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.22);
+    background: linear-gradient(135deg, #059669, #047857); color: #fff;
+    font-size: 18px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+  }
+  .dir-btn:active { transform: scale(0.96); }
+  .overlay {
+    position: absolute; inset: 0; background: rgba(9, 13, 22, 0.92);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 24px; text-align: center; z-index: 20;
+  }
+  .overlay.hidden { display: none; }
+  .card {
+    background: #1e293b; border: 2px solid #34d399; border-radius: 22px;
+    padding: 22px 18px; width: 100%; max-width: 380px;
+  }
+  .card h1 { font-size: 24px; color: #6ee7b7; margin-bottom: 8px; }
+  .card p { font-size: 15px; line-height: 1.5; color: #e2e8f0; margin-bottom: 14px; }
+  .rule-badge {
+    background: #0f172a; border: 1.5px solid #475569; border-radius: 12px;
+    padding: 10px; margin-bottom: 16px; font-size: 14px; text-align: left; color: #cbd5e1;
+  }
+  .primary-btn {
+    width: 100%; min-height: 52px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #10b981, #059669); color: #fff;
+    font-size: 18px; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="home">
+  <div class="hud">
+    <a class="home-link" href="#home" id="homeBtn">← 홈으로</a>
+    <div class="hud-metrics">
+      <div class="metric-box">보물 <span id="scoreVal">0</span></div>
+      <div class="metric-box">최고 <span id="bestVal">0</span></div>
+      <div class="metric-box">시간 <span id="timeVal">45</span>s</div>
+    </div>
+    <button class="icon-btn" id="muteBtn" aria-label="소리 켜기/끄기">🔊</button>
+  </div>
+
+  <div class="mission-banner">
+    <h2 id="missionText">🧭 방위표를 보고 보물이 있는 방향을 눌러요!</h2>
+    <p id="subMissionText">빨간 화살표(북쪽)를 기준으로 동·서·남·북을 찾아보세요!</p>
+  </div>
+
+  <div class="canvas-area" id="canvasBox">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <div class="dir-grid">
+    <button class="dir-btn" data-dir="북">⬆️ 북쪽</button>
+    <button class="dir-btn" data-dir="동">➡️ 동쪽</button>
+    <button class="dir-btn" data-dir="남">⬇️ 남쪽</button>
+    <button class="dir-btn" data-dir="서">⬅️ 서쪽</button>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="card">
+      <h1>🧭 동서남북 보물 탐험대</h1>
+      <p>장윤이의 우리 동네 4방위표 탐험! 지도에 그려진 <strong>4방위표(북쪽 화살표)</strong>를 기준으로 보물상자가 어느 쪽에 있는지 맞춰보세요!</p>
+      <div class="rule-badge">
+        • <strong>북(N)</strong>을 바라볼 때 오른쪽은 <strong>동</strong>, 왼쪽은 <strong>서</strong>, 아래쪽은 <strong>남</strong>!<br>
+        • 레벨이 올라가면 방위표가 90도 회전하는 응용 문제가 나와요!
+      </div>
+      <button class="primary-btn" id="startBtn">탐험 출발하기!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="card">
+      <h1>🏆 보물 탐험 성공!</h1>
+      <p id="endSummary">찾아낸 황금 보물상자: 0점</p>
+      <div class="rule-badge">
+        💡 <strong>장윤이 사회 박사 노트</strong>: 지도 위쪽이 무조건 북쪽이 아니에요! 언제나 지도에 그려진 <strong>4방위표의 북쪽 화살표</strong>를 먼저 확인해요!
+      </div>
+      <button class="primary-btn" id="restartBtn">다시 탐험하기!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const BEST_KEY = 'compass-treasure-safari_best';
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const canvasBox = document.getElementById('canvasBox');
+  const scoreVal = document.getElementById('scoreVal');
+  const bestVal = document.getElementById('bestVal');
+  const timeVal = document.getElementById('timeVal');
+  const missionText = document.getElementById('missionText');
+  const subMissionText = document.getElementById('subMissionText');
+  const startOverlay = document.getElementById('startOverlay');
+  const endOverlay = document.getElementById('endOverlay');
+  const endSummary = document.getElementById('endSummary');
+  const muteBtn = document.getElementById('muteBtn');
+  const homeBtn = document.getElementById('homeBtn');
+
+  let audioCtx = null;
+  let muted = false;
+  let bestScore = 0;
+  try { bestScore = parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0; } catch (e) { bestScore = 0; }
+  bestVal.textContent = bestScore;
+
+  function playTone(freq, dur, type) {
+    if (muted) return;
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  // Screen slots: 0=Top, 1=Right, 2=Bottom, 3=Left
+  // Compass rotation: 0 means North is Top(0), 1 means North is Right(1), 3 means North is Left(3)
+  const DIRS = ['북', '동', '남', '서'];
+  let state = {
+    running: false,
+    score: 0,
+    timeLeft: 45,
+    northSlot: 0,
+    treasureSlot: 1,
+    correctDir: '동',
+    feedback: '',
+    feedbackColor: '#fde047',
+    timerId: null
+  };
+
+  function nextQuestion() {
+    // After 40 points, allow rotated compass rose (North on Right or Left)
+    if (state.score >= 40 && Math.random() < 0.45) {
+      state.northSlot = Math.random() < 0.5 ? 1 : 3;
+    } else {
+      state.northSlot = 0;
+    }
+    state.treasureSlot = Math.floor(Math.random() * 4);
+    const relIdx = (state.treasureSlot - state.northSlot + 4) % 4;
+    state.correctDir = DIRS[relIdx];
+
+    if (state.northSlot === 0) {
+      missionText.textContent = '🧭 보물상자(💎)는 학교에서 어느 쪽에 있을까요?';
+      subMissionText.textContent = '기본 방위표: 위쪽이 빨간색 [북쪽]이에요!';
+    } else {
+      missionText.textContent = '🌟 응용 문제! 회전한 4방위표의 [북쪽]을 먼저 보세요!';
+      subMissionText.textContent = '빨간 화살표가 가리키는 곳이 북쪽일 때 보물의 방향은?';
+    }
+    drawMap();
+  }
+
+  function resizeCanvas() {
+    const rect = canvasBox.getBoundingClientRect();
+    canvas.width = Math.max(280, Math.floor(rect.width));
+    canvas.height = Math.max(260, Math.floor(rect.height));
+    drawMap();
+  }
+
+  function drawCompassRose(cx, cy) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+    ctx.strokeStyle = '#6ee7b7';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 42, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.rotate((state.northSlot * Math.PI) / 2);
+    // Cross lines
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -28); ctx.lineTo(0, 28);
+    ctx.moveTo(-28, 0); ctx.lineTo(28, 0);
+    ctx.stroke();
+
+    // Red North arrow
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.moveTo(0, -32);
+    ctx.lineTo(-8, -12);
+    ctx.lineTo(8, -12);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#fde047';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('북', 0, -20);
+    ctx.restore();
+  }
+
+  function drawMap() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2 + 10;
+    const dist = Math.min(canvas.width, canvas.height) * 0.31;
+
+    // Grid roads
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - dist - 20); ctx.lineTo(cx, cy + dist + 20);
+    ctx.moveTo(cx - dist - 20, cy); ctx.lineTo(cx + dist + 20, cy);
+    ctx.stroke();
+
+    // Center hub (School)
+    ctx.fillStyle = '#3b82f6';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🏫 기준', cx, cy);
+
+    const offsets = [
+      { x: 0, y: -dist },
+      { x: dist, y: 0 },
+      { x: 0, y: dist },
+      { x: -dist, y: 0 }
+    ];
+
+    for (let i = 0; i < 4; i++) {
+      const px = cx + offsets[i].x;
+      const py = cy + offsets[i].y;
+      const isTreasure = i === state.treasureSlot;
+      ctx.fillStyle = isTreasure ? '#f59e0b' : '#1e293b';
+      ctx.strokeStyle = isTreasure ? '#fde047' : '#64748b';
+      ctx.lineWidth = isTreasure ? 3.5 : 2;
+      ctx.beginPath();
+      ctx.roundRect(px - 32, py - 24, 64, 48, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = isTreasure ? 'bold 16px sans-serif' : 'bold 13px sans-serif';
+      ctx.fillText(isTreasure ? '💎 보물!' : '🌲 숲', px, py);
+    }
+
+    drawCompassRose(54, 52);
+
+    if (state.feedback) {
+      ctx.fillStyle = state.feedbackColor;
+      ctx.font = 'bold 18px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(state.feedback, canvas.width - 16, 34);
+    }
+  }
+
+  function handleAnswer(chosenDir) {
+    if (!state.running) return;
+    if (chosenDir === state.correctDir) {
+      state.score += 10;
+      scoreVal.textContent = String(state.score);
+      if (state.score > bestScore) {
+        bestScore = state.score;
+        bestVal.textContent = String(bestScore);
+        try { localStorage.setItem(BEST_KEY, String(bestScore)); } catch (e) {}
+      }
+      state.feedback = '⭕ 정답! (' + chosenDir + '쪽 +10점)';
+      state.feedbackColor = '#34d399';
+      playTone(880, 0.16, 'sine');
+      nextQuestion();
+    } else {
+      state.feedback = '❌ 아쉬워요! 북쪽 화살표를 다시 확인해요!';
+      state.feedbackColor = '#f87171';
+      playTone(260, 0.18, 'sawtooth');
+      drawMap();
+    }
+  }
+
+  function startGame() {
+    if (state.timerId) clearInterval(state.timerId);
+    state.running = true;
+    state.score = 0;
+    state.timeLeft = 45;
+    state.feedback = '';
+    scoreVal.textContent = '0';
+    timeVal.textContent = '45';
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    playTone(523.25, 0.16, 'sine');
+    nextQuestion();
+
+    state.timerId = setInterval(function() {
+      if (!state.running) return;
+      state.timeLeft--;
+      timeVal.textContent = String(state.timeLeft);
+      if (state.timeLeft <= 0) {
+        state.running = false;
+        clearInterval(state.timerId);
+        endSummary.textContent = '찾아낸 황금 보물상자: ' + state.score + '점 (최고 기록: ' + bestScore + '점)';
+        endOverlay.classList.remove('hidden');
+        playTone(783.99, 0.25, 'triangle');
+      }
+    }, 1000);
+  }
+
+  document.querySelectorAll('.dir-btn').forEach(function(btn) {
+    btn.addEventListener('pointerdown', function(e) {
+      e.preventDefault();
+      handleAnswer(btn.getAttribute('data-dir'));
+    });
+  });
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('restartBtn').addEventListener('click', startGame);
+  muteBtn.addEventListener('click', function() {
+    muted = !muted;
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+  });
+  homeBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    state.running = false;
+    if (state.timerId) clearInterval(state.timerId);
+    startOverlay.classList.remove('hidden');
+    endOverlay.classList.add('hidden');
+  });
+
+  window.addEventListener('resize', resizeCanvas);
+  window.onload = resizeCanvas;
+})();
+</script>
+</body>
+</html>
