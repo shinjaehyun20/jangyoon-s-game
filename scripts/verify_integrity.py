@@ -49,6 +49,22 @@ def recent_games(games):
     return games[-2:]
 
 
+def catalog_content_errors(games):
+    """Reject replayed English placeholders and duplicate IDs before synchronization."""
+    errors = []
+    counts = Counter(g.get("id") for g in games)
+    for gid, count in counts.items():
+        if not gid or count > 1:
+            errors.append(f"games.json duplicate or empty ID: {gid}")
+    protected = {"compass-treasure-safari", "star-magnet-lab"}
+    latest_ids = {g.get("id") for g in recent_games(games)}
+    for game in games:
+        if game.get("id") in protected | latest_ids:
+            if not re.search(r"[가-힣]", str(game.get("description", ""))):
+                errors.append(f"games.json [{game.get('id')}] description must contain Korean instructions")
+    return errors
+
+
 def menu_consistency_errors(games, menu):
     registered = {g["id"]: g for g in games}
     items = [item for section in menu for item in section.get("items", [])]
@@ -107,6 +123,7 @@ def check_all(check_live=True):
         errors.append("[치명적] games.json 루트는 배열(list)이어야 합니다.")
         return False, errors, warnings
 
+    errors.extend(catalog_content_errors(games))
     total_games = len(games)
     print(f"[*] 등록된 총 게임 수: {total_games}개")
 

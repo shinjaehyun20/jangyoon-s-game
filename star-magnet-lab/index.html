@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>별빛 자석 실험실 - N극 S극 끌어당기기</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -10,7 +10,7 @@
     width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
     background: radial-gradient(circle at 50% 20%, #1e1b4b, #090d16 80%);
     font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-    color: #f8fafc; touch-action: none; user-select: none;
+    color: #f8fafc; touch-action: manipulation; user-select: none;
     display: flex; justify-content: center; align-items: center;
   }
   .wrap {
@@ -40,7 +40,7 @@
     border: 2px solid rgba(96, 165, 250, 0.35); background: rgba(9, 13, 22, 0.75);
     position: relative; overflow: hidden;
   }
-  canvas { width: 100%; height: 100%; display: block; }
+  canvas { width: 100%; height: 100%; display: block; touch-action: none; }
   .controls {
     flex-shrink: 0; display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 8px;
     padding-bottom: 2px;
@@ -77,12 +77,31 @@
     background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff;
     font-size: 18px; font-weight: 900; cursor: pointer;
   }
+  .overlay { overflow-y: auto; overscroll-behavior: contain; justify-content: flex-start; }
+  .card { flex-shrink: 0; margin: auto; }
+  .overlay-home { justify-content: center; margin-top: 8px; }
+  .ctrl-btn { touch-action: none; }
+  @media (max-width: 420px) {
+    .hud { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
+    .home-link { justify-self: start; }
+    .hud-metrics { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; font-size: 13px; }
+    .metric-box { padding: 6px 8px; white-space: nowrap; }
+    .hud .icon-btn { grid-column: 2; grid-row: 1; }
+    .ctrl-btn { font-size: 14px; padding: 6px; line-height: 1.3; }
+  }
+  @media (max-height: 640px) {
+    .overlay { padding: 12px; }
+    .card { padding: 16px 12px; }
+    .card h1 { font-size: 20px; }
+    .card p { font-size: 14px; line-height: 1.4; margin-bottom: 10px; }
+    .rule-badge { font-size: 13px; margin-bottom: 12px; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap" id="home">
   <div class="hud">
-    <a class="home-link" href="#home" id="homeBtn">← 홈으로</a>
+    <a class="home-link" href="../index.html" id="homeBtn">← 홈으로</a>
     <div class="hud-metrics">
       <div class="metric-box">점수 <span id="scoreVal">0</span></div>
       <div class="metric-box">최고 <span id="bestVal">0</span></div>
@@ -111,6 +130,7 @@
         • 가운데 버튼이나 우주선을 터치해 <strong>N극(빨강)/S극(파랑)</strong>을 바꾸세요!
       </div>
       <button class="primary-btn" id="startBtn">실험 시작하기!</button>
+      <a class="home-link overlay-home" href="../index.html">← 게임 목록</a>
     </div>
   </div>
 
@@ -122,6 +142,7 @@
         💡 <strong>장윤이 과학 박사 노트</strong>: N극과 S극처럼 서로 다른 극은 끌어당기고(인력), N극-N극처럼 같은 극은 밀어내요(척력)!
       </div>
       <button class="primary-btn" id="restartBtn">다시 도전하기!</button>
+      <a class="home-link overlay-home" href="../index.html">← 게임 목록</a>
     </div>
   </div>
 </div>
@@ -447,12 +468,9 @@
     muteBtn.textContent = muted ? '🔇' : '🔊';
   });
   homeBtn.addEventListener('click', function(e) {
-    e.preventDefault();
     state.running = false;
     if (state.rafId) cancelAnimationFrame(state.rafId);
     if (state.timerId) clearInterval(state.timerId);
-    startOverlay.classList.remove('hidden');
-    endOverlay.classList.add('hidden');
   });
 
   window.addEventListener('keydown', function(e) {

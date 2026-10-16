@@ -21,6 +21,7 @@ import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
+from verify_integrity import recent_games, catalog_content_errors
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GAMES_JSON = REPO_ROOT / "games.json"
@@ -44,11 +45,17 @@ def sync_all():
     with open(GAMES_JSON, "r", encoding="utf-8") as f:
         games = json.load(f)
 
+    errors = catalog_content_errors(games)
+    if errors:
+        for error in errors:
+            print(f"[ERROR] {error}")
+        return False
+
     total_games = len(games)
     count_str = str(total_games)
     print(f"[*] 총 등록 게임 수: {total_games}개")
 
-    latest_games = games[-2:] if len(games) >= 2 else games
+    latest_games = recent_games(games)
     today_str = datetime.now().strftime("%Y-%m-%d")
     year_month = datetime.now().strftime("%Y-%m")
 

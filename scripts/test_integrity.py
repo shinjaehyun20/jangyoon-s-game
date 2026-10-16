@@ -2,9 +2,13 @@
 import copy
 import json
 import unittest
+import tempfile
+import shutil
+from unittest.mock import patch
+import sync_metadata
 from pathlib import Path
 
-from verify_integrity import menu_consistency_errors, recent_games, live_metadata_errors
+from verify_integrity import menu_consistency_errors, recent_games, live_metadata_errors, catalog_content_errors
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -41,7 +45,7 @@ class RegistrationTests(unittest.TestCase):
 
     def test_live_metadata_cannot_pass_on_count_and_old_tail_alone(self):
         live = copy.deepcopy(self.games)
-        live[0]["description"] = "COMPASS TREASURE SAFARI"
+        live[0]["description"] += " [stale deployment fixture]"
         self.assertTrue(any("description" in e for e in live_metadata_errors(self.games, live)))
         self.assertEqual([], live_metadata_errors(self.games, list(reversed(self.games))))
 
@@ -57,6 +61,53 @@ class RegistrationTests(unittest.TestCase):
             self.assertIn(game["description"], readme)
             html = (ROOT / game["path"]).read_text(encoding="utf-8")
             self.assertIn('href="../index.html" id="homeBtn"', html)
+            self.assertEqual(3, html.count('href="../index.html"'))
+            self.assertNotIn('maximum-scale=1', html)
+            self.assertIn('overflow-y: auto', html)
+            self.assertIn('@media (max-width: 420px)', html)
+            self.assertIn('@media (max-height: 640px)', html)
+
+    def test_replayed_placeholder_and_duplicate_catalog_are_rejected(self):
+        games = copy.deepcopy(self.games)
+        games[0]["description"] = "COMPASS TREASURE SAFARI"
+        self.assertTrue(any("description" in e for e in catalog_content_errors(games)))
+        games = copy.deepcopy(self.games)
+        games.append(copy.deepcopy(games[0]))
+        self.assertTrue(any("duplicate" in e for e in catalog_content_errors(games)))
+
+    def test_sync_preserves_existing_games_and_is_idempotent(self):
+        names = ("GAMES_JSON", "MENU_JSON", "README_MD", "INDEX_HTML", "GITHUB_ABOUT", "HERO_SVG", "CHANGES_MD")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in names:
+                source = getattr(sync_metadata, name)
+                target = root / source.relative_to(ROOT)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, target)
+            for game in self.games[:2]:
+                target = root / game["path"]
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT / game["path"], target)
+            from contextlib import ExitStack
+            with ExitStack() as stack:
+                for name in names:
+                    stack.enter_context(patch.object(sync_metadata, name, root / getattr(sync_metadata, name).relative_to(ROOT)))
+                stack.enter_context(patch.object(sync_metadata, "REPO_ROOT", root))
+                runner = stack.enter_context(patch.object(sync_metadata.subprocess, "run"))
+                runner.return_value.returncode = 0
+                before = {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+                self.assertTrue(sync_metadata.sync_all())
+                first = {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+                for path in [Path("games.json"), Path("menu.json")] + [Path(g["path"]) for g in self.games[:2]]:
+                    self.assertEqual(before[path], first[path])
+                self.assertTrue(sync_metadata.sync_all())
+                self.assertEqual(first, {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()})
+                games = json.loads((root / "games.json").read_text(encoding="utf-8"))
+                games[0]["description"] = "COMPASS TREASURE SAFARI"
+                (root / "games.json").write_text(json.dumps(games), encoding="utf-8")
+                before_rejected = {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+                self.assertFalse(sync_metadata.sync_all())
+                self.assertEqual(before_rejected, {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()})
 
 
 if __name__ == "__main__":
