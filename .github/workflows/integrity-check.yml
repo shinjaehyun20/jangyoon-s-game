@@ -5,23 +5,70 @@ on:
     branches: [ master, main ]
   pull_request:
     branches: [ master, main ]
+  workflow_dispatch:
+    inputs:
+      gate_failure_test:
+        description: "Exercise deployment gate with invalid metadata in the runner only"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
 
 jobs:
   verify:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
+      - name: Inject invalid metadata for deployment gate test
+        if: github.event_name == 'workflow_dispatch' && inputs.gate_failure_test
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("games.json")
+          games = json.loads(p.read_text(encoding="utf-8"))
+          target = next(g for g in games if g["id"] == "compass-treasure-safari")
+          target["description"] = "COMPASS TREASURE SAFARI"
+          p.write_text(json.dumps(games, ensure_ascii=False, indent=2), encoding="utf-8")
+          PY
       - name: Run Arcade Integrity & Diversity Check
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           python -m unittest discover -s scripts -p 'test_*.py'
           python scripts/verify_integrity.py --skip-live
+
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      - name: Deploy verified site
+        id: deployment
+        uses: actions/deploy-pages@v4
