@@ -55,6 +55,7 @@ body {
 }
 
 /* ----- 사이드바 ----- */
+.menu-toggle { display: none; }
 .sidebar {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -252,8 +253,46 @@ body {
     gap: 16px;
     padding: 16px 12px;
   }
-  /* 모바일에서는 사이드바 숨김 (그리드 하단에 게임 목록과 중복될 수 있음) */
+  .menu-toggle {
+    display: block;
+    min-height: 48px;
+    padding: 10px 16px;
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius);
+    background: var(--panel);
+    color: var(--text);
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    touch-action: manipulation;
+  }
+  .menu-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .sidebar { display: none; }
+  .sidebar.is-open {
+    display: block;
+    position: static;
+    min-height: 0;
+    max-height: 60vh;
+    max-height: 60dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px;
+  }
+  .menu-items a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .game-description {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    font-size: 14px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
   .content-title { font-size: 24px; }
 }
 

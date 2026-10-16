@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>동서남북 보물 탐험대 - 4방위표 길찾기</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -78,6 +78,24 @@
     background: linear-gradient(135deg, #10b981, #059669); color: #fff;
     font-size: 18px; font-weight: 900; cursor: pointer;
   }
+  .overlay { overflow-y: auto; overscroll-behavior: contain; justify-content: flex-start; }
+  .card { flex-shrink: 0; margin: auto; }
+  .overlay-home { justify-content: center; margin-top: 8px; }
+  @media (max-width: 420px) {
+    .hud { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
+    .home-link { justify-self: start; }
+    .hud-metrics { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; font-size: 13px; }
+    .metric-box { padding: 6px 8px; white-space: nowrap; }
+    .hud .icon-btn { grid-column: 2; grid-row: 1; }
+    .dir-btn { font-size: 16px; }
+  }
+  @media (max-height: 640px) {
+    .overlay { padding: 12px; }
+    .card { padding: 16px 12px; }
+    .card h1 { font-size: 20px; }
+    .card p { font-size: 14px; line-height: 1.4; margin-bottom: 10px; }
+    .rule-badge { font-size: 13px; margin-bottom: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -117,6 +135,7 @@
         • 레벨이 올라가면 방위표가 90도 회전하는 응용 문제가 나와요!
       </div>
       <button class="primary-btn" id="startBtn">탐험 출발하기!</button>
+      <a class="home-link overlay-home" href="../index.html">← 게임 목록</a>
     </div>
   </div>
 
@@ -128,6 +147,7 @@
         💡 <strong>장윤이 사회 박사 노트</strong>: 지도 위쪽이 무조건 북쪽이 아니에요! 언제나 지도에 그려진 <strong>4방위표의 북쪽 화살표</strong>를 먼저 확인해요!
       </div>
       <button class="primary-btn" id="restartBtn">다시 탐험하기!</button>
+      <a class="home-link overlay-home" href="../index.html">← 게임 목록</a>
     </div>
   </div>
 </div>

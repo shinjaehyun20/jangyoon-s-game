@@ -16,7 +16,28 @@
     grid: document.getElementById('gameGrid'),
     count: document.getElementById('gameCount'),
     sidebar: document.getElementById('sidebarNav'),
+    menuPanel: document.getElementById('gameMenu'),
+    menuToggle: document.getElementById('menuToggle'),
   };
+
+  function setMenuOpen(open) {
+    ROOT.menuPanel.classList.toggle('is-open', open);
+    ROOT.menuToggle.setAttribute('aria-expanded', String(open));
+    ROOT.menuToggle.textContent = open ? '✕ 메뉴 닫기' : '☰ 게임 메뉴';
+  }
+
+  ROOT.menuToggle.addEventListener('click', () => {
+    setMenuOpen(ROOT.menuToggle.getAttribute('aria-expanded') !== 'true');
+  });
+  ROOT.sidebar.addEventListener('click', event => {
+    if (event.target.closest('a')) setMenuOpen(false);
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && ROOT.menuToggle.getAttribute('aria-expanded') === 'true') {
+      setMenuOpen(false);
+      ROOT.menuToggle.focus();
+    }
+  });
 
   /** 안전한 JSON fetch — 실패 시 null 반환 */
   async function loadJSON(path) {
