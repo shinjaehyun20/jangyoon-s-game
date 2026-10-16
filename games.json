@@ -2,18 +2,38 @@
   {
     "id": "compass-treasure-safari",
     "title": "Compass Treasure Safari",
-    "title_ko": "🧭 동서남북 보물 탐험대",
-    "description": "4방위표의 북쪽(N) 화살표를 기준으로 학교에서 보물상자가 있는 동·서·남·북 방위를 찾아내는 초등 사회 연계 탐험 놀이입니다.",
-    "thumbnail": "compass-treasure-safari/thumb.svg",
-    "path": "compass-treasure-safari/index.html"
+    "subtitle": "COMPASS TREASURE SAFARI",
+    "category": "kids",
+    "tags": [
+      "사회",
+      "4방위표",
+      "길찾기",
+      "장윤이"
+    ],
+    "created": "2026-10-16",
+    "path": "compass-treasure-safari/index.html",
+    "thumb": "compass-treasure-safari/thumb.svg",
+    "title_ko": "🎮 동서남북 보물 탐험대",
+    "description": "COMPASS TREASURE SAFARI",
+    "thumbnail": "compass-treasure-safari/thumb.svg"
   },
   {
     "id": "star-magnet-lab",
     "title": "Star Magnet Lab",
-    "title_ko": "🧲 별빛 자석 실험실",
-    "description": "우주선의 N극과 S극 자석 극성을 터치로 전환해 다른 극 별자석은 끌어당기고 같은 극은 튕겨내는 초등 과학 연계 아케이드 놀이입니다.",
-    "thumbnail": "star-magnet-lab/thumb.svg",
-    "path": "star-magnet-lab/index.html"
+    "subtitle": "STAR MAGNET LAB",
+    "category": "kids",
+    "tags": [
+      "과학",
+      "자석",
+      "인력과척력",
+      "장윤이"
+    ],
+    "created": "2026-10-16",
+    "path": "star-magnet-lab/index.html",
+    "thumb": "star-magnet-lab/thumb.svg",
+    "title_ko": "🎮 별빛 자석 실험실",
+    "description": "STAR MAGNET LAB",
+    "thumbnail": "star-magnet-lab/thumb.svg"
   },
   {
     "id": "grand-carnival-fireworks",
