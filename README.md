@@ -338,8 +338,8 @@
 | [🌈 알록달록 무지개 비눗방울 팡팡 (rainbow-bubble-popper)](./rainbow-bubble-popper/index.html) | 화면 가득 둥실둥실 떠오르는 영롱한 무지개 비눗방울과 보석·과일을 퐁퐁 터뜨려 신나는 콤보와 점수를 모으는 경쾌한 힐링 터치 놀이입니다. | 어린이/아케이드 |
 | [🎣 황금 별자리 낚시터 (golden-star-catcher)](./golden-star-catcher/index.html) | 밤하늘을 날아다니는 황금빛·에메랄드빛 별자리 스타들을 마법 낚싯줄로 톡톡 낚아 올리고 신나는 피버 타임을 즐기는 영롱한 터치 아케이드 놀이입니다. | 어린이/아케이드 |
 | [🎆 300회 축제! 무지개 불꽃놀이 대축제 (grand-carnival-fireworks)](./grand-carnival-fireworks/index.html) | 장윤이의 게임세상 300회 대기록 기념! 밤하늘을 터치해 환상적인 오색 불꽃과 축하 폭죽을 펑펑 쏘아 올리고 그랜드 피날레를 즐기는 힐링 축제 놀이입니다. | 어린이/아케이드 |
-| [🧲 별빛 자석 실험실 (star-magnet-lab)](./star-magnet-lab/index.html) | 우주선의 N극과 S극 자석 극성을 터치로 전환해 다른 극 별자석은 끌어당기고 같은 극은 튕겨내는 초등 과학 연계 아케이드 놀이입니다. | 어린이/아케이드 |
-| [🧭 동서남북 보물 탐험대 (compass-treasure-safari)](./compass-treasure-safari/index.html) | 4방위표의 북쪽(N) 화살표를 기준으로 학교에서 보물상자가 있는 동·서·남·북 방위를 찾아내는 초등 사회 연계 탐험 놀이입니다. | 어린이/아케이드 |
+| [🎮 별빛 자석 실험실 (star-magnet-lab)](./star-magnet-lab/index.html) | STAR MAGNET LAB | 어린이/아케이드 |
+| [🎮 동서남북 보물 탐험대 (compass-treasure-safari)](./compass-treasure-safari/index.html) | COMPASS TREASURE SAFARI | 어린이/아케이드 |
 
 </details>
 
