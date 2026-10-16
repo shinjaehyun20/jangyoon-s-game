@@ -4,6 +4,291 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "compass-treasure-safari",
+        "title": "🧭 동서남북 보물 탐험대",
+        "path": "compass-treasure-safari/index.html"
+      },
+      {
+        "id": "star-magnet-lab",
+        "title": "🧲 별빛 자석 실험실",
+        "path": "star-magnet-lab/index.html"
+      },
+      {
+        "id": "grand-carnival-fireworks",
+        "title": "🎆 300회 축제! 무지개 불꽃놀이 대축제",
+        "path": "grand-carnival-fireworks/index.html"
+      },
+      {
+        "id": "golden-star-catcher",
+        "title": "🎣 황금 별자리 낚시터",
+        "path": "golden-star-catcher/index.html"
+      },
+      {
+        "id": "cosmic-meteor-dash",
+        "title": "🚀 우주 운석 대시",
+        "path": "cosmic-meteor-dash/index.html"
+      },
+      {
+        "id": "melody-crystal-chime",
+        "title": "🔔 멜로디 크리스탈 차임",
+        "path": "melody-crystal-chime/index.html"
+      },
+      {
+        "id": "gravity-ball-architect",
+        "title": "🧲 중력 구슬 건축가",
+        "path": "gravity-ball-architect/index.html"
+      },
+      {
+        "id": "beat-bubble-drummer",
+        "title": "🥁 쿵치딱 리듬 버블 밴드",
+        "path": "beat-bubble-drummer/index.html"
+      },
+      {
+        "id": "star-match-math",
+        "title": "⭐ 별자리 산수 짝 맞추기",
+        "path": "star-match-math/index.html"
+      },
+      {
+        "id": "color-wave-harmony",
+        "title": "🌈 색상 파동 맞추기",
+        "path": "color-wave-harmony/index.html"
+      },
+      {
+        "id": "hidden-object-hunt",
+        "title": "🔍 숨은 그림 찾기 챌린지",
+        "path": "hidden-object-hunt/index.html"
+      },
+      {
+        "id": "rhythm-touch-beat",
+        "title": "🎵 리듬 터치 타임",
+        "path": "rhythm-touch-beat/index.html"
+      },
+      {
+        "id": "color-memory-challenge",
+        "title": "🎨 색깔 기억 챌린지",
+        "path": "color-memory-challenge/index.html"
+      },
+      {
+        "id": "animal-sound-quiz",
+        "title": "🐾 동물 소리 퀴즈",
+        "path": "animal-sound-quiz/index.html"
+      },
+      {
+        "id": "space-garbage-collector",
+        "title": "🚀 우주 쓰레기 청소부",
+        "path": "space-garbage-collector/index.html"
+      },
+      {
+        "id": "color-box-stack",
+        "title": "📦 색깔 상자 쌓기",
+        "path": "color-box-stack/index.html"
+      },
+      {
+        "id": "gemini-space-bubble",
+        "title": "🫧 제미니 우주 방울 팡팡",
+        "path": "gemini-space-bubble/index.html"
+      },
+      {
+        "id": "gemini-star-spark",
+        "title": "🌟 제미니 별빛 스파크",
+        "path": "gemini-star-spark/index.html"
+      },
+      {
+        "id": "penguin-fish-toss",
+        "title": "🐧 펭귄 물고기 던지기",
+        "path": "penguin-fish-toss/index.html"
+      },
+      {
+        "id": "mole-garden",
+        "title": "🥕 두더지 텃밭",
+        "path": "mole-garden/index.html"
+      },
+      {
+        "id": "animal-coloring",
+        "title": "🐾 동물 색칠 놀이",
+        "path": "animal-coloring/index.html"
+      },
+      {
+        "id": "star-counting",
+        "title": "⭐ 별 세기 숫자 놀이",
+        "path": "star-counting/index.html"
+      },
+      {
+        "id": "rabbit-maze",
+        "title": "🐰 토끼 당근 미로",
+        "path": "rabbit-maze/index.html"
+      },
+      {
+        "id": "robot-game",
+        "title": "🤖 로봇 배틀",
+        "path": "robot-game/index.html"
+      },
+      {
+        "id": "space-shooter",
+        "title": "🚀 우주 슈팅",
+        "path": "space-shooter/index.html"
+      },
+      {
+        "id": "bubble-pop-color",
+        "title": "🌈 같은 색 버블 팡팡",
+        "path": "bubble-pop-color/index.html"
+      },
+      {
+        "id": "caterpillar-feed",
+        "title": "🐛 애벌레 먹이주기",
+        "path": "caterpillar-feed/index.html"
+      },
+      {
+        "id": "math-quiz",
+        "title": "🔢 숫자 퀴즈",
+        "path": "math-quiz/index.html"
+      },
+      {
+        "id": "shadow-match",
+        "title": "🌑 그림자 맞추기",
+        "path": "shadow-match/index.html"
+      },
+      {
+        "id": "train-dodge",
+        "title": "🚂 기차 피하기",
+        "path": "train-dodge/index.html"
+      },
+      {
+        "id": "meteor-shield",
+        "title": "🛡️ 운석 막기",
+        "path": "meteor-shield/index.html"
+      },
+      {
+        "id": "butterfly-garden",
+        "title": "나비 꽃밭",
+        "path": "butterfly-garden/index.html"
+      },
+      {
+        "id": "juggle-circus",
+        "title": "서커스 저글링",
+        "path": "juggle-circus/index.html"
+      },
+      {
+        "id": "maze-escape",
+        "title": "🔵 미로 탈출",
+        "path": "maze-escape/index.html"
+      },
+      {
+        "id": "color-piano",
+        "title": "🎹 색깔 피아노",
+        "path": "color-piano/index.html"
+      },
+      {
+        "id": "pretend-play",
+        "title": "🍳 소꿉놀이 요리사",
+        "path": "pretend-play/index.html"
+      },
+      {
+        "id": "ball-throw",
+        "title": "🎯 공 던지기",
+        "path": "ball-throw/index.html"
+      },
+      {
+        "id": "constellation-draw",
+        "title": "⭐ 별자리 잇기",
+        "path": "constellation-draw/index.html"
+      },
+      {
+        "id": "pet-feed",
+        "title": "🐾 동물 친구 밥주기",
+        "path": "pet-feed/index.html"
+      },
+      {
+        "id": "fossil-dig",
+        "title": "공룡 화석 발굴",
+        "path": "fossil-dig/index.html"
+      },
+      {
+        "id": "balloon-color-mix",
+        "title": "풍선 색깔 섞기",
+        "path": "balloon-color-mix/index.html"
+      },
+      {
+        "id": "princess-dressup",
+        "title": "👑 공주 옷 입히기",
+        "path": "princess-dressup/index.html"
+      },
+      {
+        "id": "mine-craft-dig",
+        "title": "⛏️ 광물 캐기",
+        "path": "mine-craft-dig/index.html"
+      },
+      {
+        "id": "castle-builder",
+        "title": "성 쌓기",
+        "path": "castle-builder/index.html"
+      },
+      {
+        "id": "mushroom-pick",
+        "title": "🍄 버섯 바구니",
+        "path": "mushroom-pick/index.html"
+      },
+      {
+        "id": "brick-break",
+        "title": "벽돌 깨기",
+        "path": "brick-break/index.html"
+      },
+      {
+        "id": "dog-walk",
+        "title": "강아지 산책",
+        "path": "dog-walk/index.html"
+      },
+      {
+        "id": "train-track",
+        "title": "기차 길 잇기",
+        "path": "train-track/index.html"
+      },
+      {
+        "id": "slide-puzzle",
+        "title": "그림 밀기 퍼즐",
+        "path": "slide-puzzle/index.html"
+      },
+      {
+        "id": "star-slingshot",
+        "title": "별 새총 쏘기",
+        "path": "star-slingshot/index.html"
+      },
+      {
+        "id": "tower-rings",
+        "title": "도넛 탑 옮기기",
+        "path": "tower-rings/index.html"
+      },
+      {
+        "id": "star-stacker",
+        "title": "⭐ 별 쌓기 밤하늘 탑",
+        "path": "star-stacker/index.html"
+      },
+      {
+        "id": "color-train-match",
+        "title": "🚂 색깔 기차 잇기",
+        "path": "color-train-match/index.html"
+      },
+      {
+        "id": "clover-find",
+        "title": "🍀 네잎클로버 찾기",
+        "path": "clover-find/index.html"
+      },
+      {
+        "id": "teddy-dress",
+        "title": "🧸 곰돌이 옷 입히기",
+        "path": "teddy-dress/index.html"
+      },
+      {
+        "id": "starlight-whale-flight",
+        "title": "🐳 별빛 고래의 하늘 비행",
+        "path": "starlight-whale-flight/index.html"
+      },
+      {
+        "id": "forest-acorn-catapult",
+        "title": "🐿️ 도토리 퐁퐁 발사기",
+        "path": "forest-acorn-catapult/index.html"
+      },
+      {
         "id": "flying-squirrel-star-glide",
         "title": "🐿️ 하늘다람쥐의 은하수 활강 비행",
         "path": "flying-squirrel-star-glide/index.html"
@@ -388,7 +673,8 @@
           "빛",
           "힐링"
         ],
-        "icon": "✨"
+        "icon": "✨",
+        "path": "sparkle-firefly-lamp/index.html"
       },
       {
         "id": "rainbow-gem-minecart",
@@ -402,7 +688,8 @@
           "보석",
           "광산"
         ],
-        "icon": "💎"
+        "icon": "💎",
+        "path": "rainbow-gem-minecart/index.html"
       },
       {
         "id": "ocean-pearl-diver",

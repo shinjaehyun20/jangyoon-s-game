@@ -40,6 +40,49 @@ CHANGES_MD = REPO_ROOT / "CHANGES.md"
 REQUIRED_GAME_FIELDS = ["id", "title", "title_ko", "description", "thumbnail", "path"]
 EXCLUDED_DIRS = {".git", ".claude", ".github", "__pycache__", "_candidates", "docs", "games", "marketing", "output", "scripts"}
 
+def recent_games(games):
+    """Prefer explicit creation dates; array position is not a chronology."""
+    dated = [g for g in games if re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(g.get("created", "")))]
+    if dated:
+        newest = max(g["created"] for g in dated)
+        return [g for g in dated if g["created"] == newest]
+    return games[-2:]
+
+
+def menu_consistency_errors(games, menu):
+    registered = {g["id"]: g for g in games}
+    items = [item for section in menu for item in section.get("items", [])]
+    counts = Counter(item.get("id") for item in items)
+    errors = []
+    for gid in sorted(registered.keys() - counts.keys()):
+        errors.append(f"menu.json 동기화 누락: 게임 '{gid}'가 menu.json 항목에 등록되지 않았습니다.")
+    for item in items:
+        gid = item.get("id")
+        if gid not in registered:
+            errors.append(f"menu.json 미등록 ID: '{gid}'")
+        elif item.get("path") != registered[gid].get("path"):
+            errors.append(f"menu.json [{gid}] games.json과 메뉴 경로 불일치")
+    for gid, count in counts.items():
+        if count > 1:
+            errors.append(f"menu.json 중복 ID: '{gid}' ({count}개)")
+    return errors
+
+
+def live_metadata_errors(games, live_games):
+    local_ids = {g["id"] for g in games}
+    live_by_id = {g["id"]: g for g in live_games}
+    errors = []
+    if local_ids != live_by_id.keys():
+        errors.append("[실서버 라이브 검증] 실서버 games.json 등록 ID 집합 불일치")
+    for game in recent_games(games):
+        gid = game["id"]
+        live = live_by_id.get(gid, {})
+        changed = [key for key in REQUIRED_GAME_FIELDS if game.get(key) != live.get(key)]
+        if changed:
+            errors.append(f"[실서버 라이브 검증] '{gid}' 등록정보 미반영/불일치: {', '.join(changed)}")
+    return errors
+
+
 def check_all(check_live=True):
     errors = []
     warnings = []
@@ -134,16 +177,13 @@ def check_all(check_live=True):
                         if not mtarget.exists():
                             errors.append(f"menu.json [{item.get('id')}] 404 메뉴 경로: {mpath}")
             
-            # 최신 게임 ID가 menu.json에 등록되어 있는지 검증 (메뉴 누락 방지)
-            if len(games) >= 2:
-                recent_ids = [g.get("id") for g in games[-2:]]
-                for rid in recent_ids:
-                    if rid and rid not in menu_ids:
-                        errors.append(f"menu.json 동기화 누락: 최신 게임 '{rid}'가 menu.json 항목에 등록되지 않았습니다.")
+            errors.extend(menu_consistency_errors(games, menu))
             
-            print(f"[*] menu.json 검증 완료 (총 {menu_item_count}개 메뉴 항목 검사, 최신 게임 등록 확인)")
+            print(f"[*] menu.json 검증 완료 (총 {menu_item_count}개 메뉴 항목, 전체 등록 ID·중복·경로 대사)")
         except Exception as e:
             errors.append(f"menu.json 파싱 오류: {e}")
+    else:
+        errors.append("menu.json 파일이 존재하지 않습니다.")
 
     # [3] 물리 디렉토리 구조 검증 (오배치, 미등록 게임 검출)
     subdirs = [d for d in os.listdir(REPO_ROOT) if (REPO_ROOT / d).is_dir() and d not in EXCLUDED_DIRS]
@@ -341,13 +381,10 @@ def check_all(check_live=True):
                     else:
                         print(f"[*] GitHub Pages 실서버 games.json 게임 수 완벽 일치 ({live_count}/{total_games}개)")
 
-                    if len(games) >= 2 and len(live_games) >= 2:
-                        expected_recent = [g.get("id") for g in games[-2:]]
-                        live_recent = [g.get("id") for g in live_games[-2:]]
-                        if expected_recent != live_recent:
-                            errors.append(f"[실서버 라이브 검증] 실서버 games.json 최신 게임 ID 불일치: 실서버({live_recent}) != 로컬({expected_recent})")
-                        else:
-                            print(f"[*] GitHub Pages 실서버 최신 게임 ID 일치 확인 ({live_recent})")
+                    metadata_errors = live_metadata_errors(games, live_games)
+                    errors.extend(metadata_errors)
+                    if not metadata_errors:
+                        print(f"[*] 실서버 전체 ID·최신 게임 필수 등록정보 일치 ({[g['id'] for g in recent_games(games)]})")
         except Exception as e:
             errors.append(f"[실서버 라이브 검증] 실서버 games.json HTTP 요청 실패: {e}")
 
@@ -370,9 +407,9 @@ def check_all(check_live=True):
         except Exception as e:
             errors.append(f"[실서버 라이브 검증] 실서버 메인 페이지 HTTP 요청 실패: {e}")
 
-        # 5-4. 최신 게임 2종 실서버 개별 페이지 HTTP GET 200 OK 검증
-        if len(games) >= 2:
-            for g in games[-2:]:
+        # 5-4. 실제 최신 게임의 실서버 개별 페이지 검증
+        if games:
+            for g in recent_games(games):
                 gid = g.get("id")
                 gpath = g.get("path", "")
                 if gid and gpath and not gpath.startswith("http"):
@@ -442,7 +479,7 @@ def check_all(check_live=True):
         if check_live:
             print(f" - GitHub Pages 배포 브랜치 (main): 일치")
             print(f" - 실서버 games.json ({total_games}개 / 최신 게임 일치): 완벽 일치")
-            print(f" - 실서버 메인 페이지 및 개별 게임 200 OK: 전수 정상")
+            print(f" - 실서버 메인 페이지 및 최신 게임 {len(recent_games(games))}개 200 OK: 정상")
         print("==================================================")
         return True, errors, warnings
 

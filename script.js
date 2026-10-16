@@ -123,7 +123,7 @@
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = item.path || '#';
-        a.textContent = item.label || item.id || '';
+        a.textContent = item.label || item.title || item.id || '';
         if (/^https?:\/\//.test(item.path)) {
           a.target = '_blank';
           a.rel = 'noopener noreferrer';

@@ -82,7 +82,7 @@
 <body>
 <div class="wrap" id="home">
   <div class="hud">
-    <a class="home-link" href="#home" id="homeBtn">← 홈으로</a>
+    <a class="home-link" href="../index.html" id="homeBtn">← 홈으로</a>
     <div class="hud-metrics">
       <div class="metric-box">점수 <span id="scoreVal">0</span></div>
       <div class="metric-box">최고 <span id="bestVal">0</span></div>
@@ -447,12 +447,9 @@
     muteBtn.textContent = muted ? '🔇' : '🔊';
   });
   homeBtn.addEventListener('click', function(e) {
-    e.preventDefault();
     state.running = false;
     if (state.rafId) cancelAnimationFrame(state.rafId);
     if (state.timerId) clearInterval(state.timerId);
-    startOverlay.classList.remove('hidden');
-    endOverlay.classList.add('hidden');
   });
 
   window.addEventListener('keydown', function(e) {
