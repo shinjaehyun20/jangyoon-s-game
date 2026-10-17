@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 311개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 315개.
 
-[![Games](https://img.shields.io/badge/games-311-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-315-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![311개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![315개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 311개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 315개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -340,6 +340,10 @@
 | [🎆 300회 축제! 무지개 불꽃놀이 대축제 (grand-carnival-fireworks)](./grand-carnival-fireworks/index.html) | 장윤이의 게임세상 300회 대기록 기념! 밤하늘을 터치해 환상적인 오색 불꽃과 축하 폭죽을 펑펑 쏘아 올리고 그랜드 피날레를 즐기는 힐링 축제 놀이입니다. | 어린이/아케이드 |
 | [🧲 별빛 자석 실험실 (star-magnet-lab)](./star-magnet-lab/index.html) | 우주선의 N극과 S극 자석 극성을 터치로 전환해 다른 극 별자석은 끌어당기고 같은 극은 튕겨내는 초등 과학 연계 아케이드 놀이입니다. | 어린이/아케이드 |
 | [🧭 동서남북 보물 탐험대 (compass-treasure-safari)](./compass-treasure-safari/index.html) | 4방위표의 북쪽(N) 화살표를 기준으로 학교에서 보물상자가 있는 동·서·남·북 방위를 찾아내는 초등 사회 연계 탐험 놀이입니다. | 어린이/아케이드 |
+| [🎮 달콤한 텐프레임 빵집 (ten-frame-bakery)](./ten-frame-bakery/index.html) | 10칸 텐프레임 상자에 빵을 채워 10 만들기 짝꿍수를 찾는 초1 수학 퍼즐 게임 | 어린이/아케이드 |
+| [🎮 한글 별자리 탐험대 (hangul-star-constellation-050)](./hangul-star-constellation-050/index.html) | 밤하늘 별자리를 이어 한글 자음과 모음을 완성하는 초1 국어 낱자 낱말 탐험 게임 | 어린이/아케이드 |
+| [🎮 째깍째깍 시계 탐험대 (clock-time-runner)](./clock-time-runner/index.html) | 아날로그 시계의 시침과 분침을 보고 몇 시, 몇 시 30분을 맞추는 초1 시계 보기 게임 | 어린이/아케이드 |
+| [🎮 도토리 수 저울 (acorn-number-scale-049)](./acorn-number-scale-049/index.html) | 양팔저울의 왼쪽과 오른쪽 도토리 개수를 똑같이 맞추는 초1 수 가르기·모으기 균형 퍼즐 게임 | 어린이/아케이드 |
 
 </details>
 
@@ -507,6 +511,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-17: [🎮 도토리 수 저울](acorn-number-scale-049/index.html), [🎮 째깍째깍 시계 탐험대](clock-time-runner/index.html), [🎮 한글 별자리 탐험대](hangul-star-constellation-050/index.html), [🎮 달콤한 텐프레임 빵집](ten-frame-bakery/index.html) (총 315개)
+
 - 2026-10-15: [♨️ 느긋한 카피바라의 향긋 유자 온천](capybara-hotspring-yuzu-bath/index.html), [🐿️ 하늘다람쥐의 은하수 활강 비행](flying-squirrel-star-glide/index.html) (총 311개)
 
 - 2026-10-14: [🐨 아기 코알라의 유칼립투스 멜로디 나무](koala-eucalyptus-melody/index.html), [🦙 보송보송 알파카 무지개 털실 공방](alpaca-rainbow-wool-knitting/index.html) (총 311개)

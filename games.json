@@ -1,5 +1,77 @@
 [
   {
+    "id": "acorn-number-scale-049",
+    "title": "도토리 수 저울",
+    "desc": "양팔저울의 왼쪽과 오른쪽 도토리 개수를 똑같이 맞추는 초1 수 가르기·모으기 균형 퍼즐 게임",
+    "category": "수학",
+    "tags": [
+      "수학",
+      "1학년",
+      "저울",
+      "등식",
+      "연산"
+    ],
+    "created": "2026-10-17",
+    "title_ko": "🎮 도토리 수 저울",
+    "description": "양팔저울의 왼쪽과 오른쪽 도토리 개수를 똑같이 맞추는 초1 수 가르기·모으기 균형 퍼즐 게임",
+    "thumbnail": "acorn-number-scale-049/thumb.svg",
+    "path": "acorn-number-scale-049/index.html"
+  },
+  {
+    "id": "clock-time-runner",
+    "title": "째깍째깍 시계 탐험대",
+    "desc": "아날로그 시계의 시침과 분침을 보고 몇 시, 몇 시 30분을 맞추는 초1 시계 보기 게임",
+    "category": "수학",
+    "tags": [
+      "수학",
+      "1학년",
+      "시계",
+      "시간",
+      "시침분침"
+    ],
+    "created": "2026-10-17",
+    "title_ko": "🎮 째깍째깍 시계 탐험대",
+    "description": "아날로그 시계의 시침과 분침을 보고 몇 시, 몇 시 30분을 맞추는 초1 시계 보기 게임",
+    "thumbnail": "clock-time-runner/thumb.svg",
+    "path": "clock-time-runner/index.html"
+  },
+  {
+    "id": "hangul-star-constellation-050",
+    "title": "한글 별자리 탐험대",
+    "desc": "밤하늘 별자리를 이어 한글 자음과 모음을 완성하는 초1 국어 낱자 낱말 탐험 게임",
+    "category": "국어",
+    "tags": [
+      "국어",
+      "1학년",
+      "한글",
+      "자음모음",
+      "별자리"
+    ],
+    "created": "2026-10-17",
+    "title_ko": "🎮 한글 별자리 탐험대",
+    "description": "밤하늘 별자리를 이어 한글 자음과 모음을 완성하는 초1 국어 낱자 낱말 탐험 게임",
+    "thumbnail": "hangul-star-constellation-050/thumb.svg",
+    "path": "hangul-star-constellation-050/index.html"
+  },
+  {
+    "id": "ten-frame-bakery",
+    "title": "달콤한 텐프레임 빵집",
+    "desc": "10칸 텐프레임 상자에 빵을 채워 10 만들기 짝꿍수를 찾는 초1 수학 퍼즐 게임",
+    "category": "수학",
+    "tags": [
+      "수학",
+      "1학년",
+      "10만들기",
+      "텐프레임",
+      "연산"
+    ],
+    "created": "2026-10-17",
+    "title_ko": "🎮 달콤한 텐프레임 빵집",
+    "description": "10칸 텐프레임 상자에 빵을 채워 10 만들기 짝꿍수를 찾는 초1 수학 퍼즐 게임",
+    "thumbnail": "ten-frame-bakery/thumb.svg",
+    "path": "ten-frame-bakery/index.html"
+  },
+  {
     "id": "compass-treasure-safari",
     "title": "Compass Treasure Safari",
     "subtitle": "4방위표의 북쪽(N) 화살표를 기준으로 학교에서 보물상자가 있는 동·서·남·북 방위를 찾아내는 초등 사회 연계 탐험 놀이입니다.",

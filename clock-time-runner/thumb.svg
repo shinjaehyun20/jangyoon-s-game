@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="24" fill="#1e1b4b"/>
+  <circle cx="60" cy="54" r="38" fill="#0f172a" stroke="#38bdf8" stroke-width="4"/>
+  <line x1="60" y1="54" x2="60" y2="28" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+  <line x1="60" y1="54" x2="78" y2="54" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="60" cy="54" r="4" fill="#ffffff"/>
+  <text x="60" y="106" fill="#fde047" font-size="13" font-weight="bold" text-anchor="middle" font-family="sans-serif">시계 탐험대</text>
+</svg>

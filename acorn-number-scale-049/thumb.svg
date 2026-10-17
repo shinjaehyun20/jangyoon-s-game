@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="24" fill="#451a03"/>
+  <line x1="20" y1="60" x2="100" y2="60" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="60,40 50,85 70,85" fill="#64748b"/>
+  <circle cx="60" cy="60" r="6" fill="#fde047"/>
+  <text x="60" y="106" fill="#fde047" font-size="13" font-weight="bold" text-anchor="middle" font-family="sans-serif">도토리 저울</text>
+</svg>

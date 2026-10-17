@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="24" fill="#451a03"/>
+  <rect x="12" y="30" width="96" height="42" rx="10" fill="#1e293b" stroke="#f59e0b" stroke-width="3"/>
+  <circle cx="26" cy="42" r="8" fill="#f59e0b"/>
+  <circle cx="48" cy="42" r="8" fill="#f59e0b"/>
+  <circle cx="70" cy="42" r="8" fill="#f59e0b"/>
+  <circle cx="92" cy="42" r="8" fill="#f59e0b"/>
+  <circle cx="26" cy="60" r="8" fill="#f59e0b"/>
+  <circle cx="48" cy="60" r="8" fill="#f59e0b"/>
+  <text x="60" y="100" fill="#fde047" font-size="14" font-weight="bold" text-anchor="middle" font-family="sans-serif">10 만들기</text>
+</svg>
