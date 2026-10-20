@@ -29,8 +29,6 @@
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
-| [🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수 (platypus-bill-crystal-diver)](./platypus-bill-crystal-diver/index.html) | 신비로운 호수 속을 오리발로 첨벙첨벙 헤엄치는 귀여운 아기 오리너구리가 수초 사이에서 빛나는 에메랄드 보석과 오색 물방울을 쏙쏙 찾는 신나는 수중 탐험 놀이입니다. | 어린이/아케이드 |
-| [🦭 뽀송 하프물범의 빙하 무지개 슬라이드 (harp-seal-iceberg-bubble-slide)](./harp-seal-iceberg-bubble-slide/index.html) | 하얗고 동글동글한 아기 하프물범이 반짝이는 푸른 빙하 미끄럼틀을 슝슝 미끄러지며 공중에 떠오르는 무지개 방울과 하트 얼음을 모으는 신나는 빙하 슬라이드 놀이입니다. | 어린이/아케이드 |
 | [🐿️ 하늘다람쥐의 은하수 활강 비행 (flying-squirrel-star-glide)](./flying-squirrel-star-glide/index.html) | 반짝이는 보랏빛 은하수 밤하늘을 활공하는 날다람쥐를 조종해 별빛 구름 사이를 누비며 황금 도토리와 별사탕을 모으는 경쾌한 비행 아케이드 놀이입니다. | 어린이/아케이드 |
 | [♨️ 느긋한 카피바라의 향긋 유자 온천 (capybara-hotspring-yuzu-bath)](./capybara-hotspring-yuzu-bath/index.html) | 모락모락 김이 피어나는 따뜻한 노천 온천에서 느긋하게 휴식하는 카피바라 머리 위로 동동 떠오르는 황금 유자와 오색 꽃잎을 쏙쏙 받아 담는 힐링 터치 놀이입니다. | 어린이/아케이드 |
 | [🦙 보송보송 알파카 무지개 털실 공방 (alpaca-rainbow-wool-knitting)](./alpaca-rainbow-wool-knitting/index.html) | 안데스 고원의 귀여운 아기 알파카가 원하는 무지개 목도리 주문서 패턴 순서에 맞춰 알록달록 구름 털실을 톡톡 터치해 포근한 목도리를 완성하는 색채 패턴 창의 공방 놀이입니다. | 어린이/아케이드 |
@@ -346,6 +344,8 @@
 | [🎮 한글 별자리 탐험대 (hangul-star-constellation-050)](./hangul-star-constellation-050/index.html) | 밤하늘 별자리를 이어 한글 자음과 모음을 완성하는 초1 국어 낱자 낱말 탐험 게임 | 어린이/아케이드 |
 | [🎮 째깍째깍 시계 탐험대 (clock-time-runner)](./clock-time-runner/index.html) | 아날로그 시계의 시침과 분침을 보고 몇 시, 몇 시 30분을 맞추는 초1 시계 보기 게임 | 어린이/아케이드 |
 | [🎮 도토리 수 저울 (acorn-number-scale-049)](./acorn-number-scale-049/index.html) | 양팔저울의 왼쪽과 오른쪽 도토리 개수를 똑같이 맞추는 초1 수 가르기·모으기 균형 퍼즐 게임 | 어린이/아케이드 |
+| [🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수 (platypus-bill-crystal-diver)](./platypus-bill-crystal-diver/index.html) | 신비로운 호수 속을 오리발로 첨벙첨벙 헤엄치는 귀여운 아기 오리너구리가 수초 사이에서 빛나는 에메랄드 보석과 오색 물방울을 쏙쏙 찾는 신나는 수중 탐험 놀이입니다. | 어린이/아케이드 |
+| [🦭 뽀송 하프물범의 빙하 무지개 슬라이드 (harp-seal-iceberg-bubble-slide)](./harp-seal-iceberg-bubble-slide/index.html) | 하얗고 동글동글한 아기 하프물범이 반짝이는 푸른 빙하 미끄럼틀을 슝슝 미끄러지며 공중에 떠오르는 무지개 방울과 하트 얼음을 모으는 신나는 빙하 슬라이드 놀이입니다. | 어린이/아케이드 |
 
 </details>
 

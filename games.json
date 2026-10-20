@@ -1,5 +1,23 @@
 [
   {
+    "id": "harp-seal-iceberg-bubble-slide",
+    "title": "Harp Seal Iceberg Bubble Slide",
+    "title_ko": "🦭 뽀송 하프물범의 빙하 무지개 슬라이드",
+    "description": "하얗고 동글동글한 아기 하프물범이 반짝이는 푸른 빙하 미끄럼틀을 슝슝 미끄러지며 공중에 떠오르는 무지개 방울과 하트 얼음을 모으는 신나는 빙하 슬라이드 놀이입니다.",
+    "thumbnail": "harp-seal-iceberg-bubble-slide/thumb.svg",
+    "path": "harp-seal-iceberg-bubble-slide/index.html",
+    "created": "2026-10-20"
+  },
+  {
+    "id": "platypus-bill-crystal-diver",
+    "title": "Platypus Bill Crystal Diver",
+    "title_ko": "🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수",
+    "description": "신비로운 호수 속을 오리발로 첨벙첨벙 헤엄치는 귀여운 아기 오리너구리가 수초 사이에서 빛나는 에메랄드 보석과 오색 물방울을 쏙쏙 찾는 신나는 수중 탐험 놀이입니다.",
+    "thumbnail": "platypus-bill-crystal-diver/thumb.svg",
+    "path": "platypus-bill-crystal-diver/index.html",
+    "created": "2026-10-20"
+  },
+  {
     "id": "acorn-number-scale-049",
     "title": "도토리 수 저울",
     "desc": "양팔저울의 왼쪽과 오른쪽 도토리 개수를 똑같이 맞추는 초1 수 가르기·모으기 균형 퍼즐 게임",
@@ -2578,23 +2596,5 @@
     "description": "반짝이는 보랏빛 은하수 밤하늘을 활공하는 날다람쥐를 조종해 별빛 구름 사이를 누비며 황금 도토리와 별사탕을 모으는 경쾌한 비행 아케이드 놀이입니다.",
     "thumbnail": "flying-squirrel-star-glide/thumb.svg",
     "path": "flying-squirrel-star-glide/index.html"
-  },
-  {
-    "id": "harp-seal-iceberg-bubble-slide",
-    "title": "Harp Seal Iceberg Bubble Slide",
-    "title_ko": "🦭 뽀송 하프물범의 빙하 무지개 슬라이드",
-    "description": "하얗고 동글동글한 아기 하프물범이 반짝이는 푸른 빙하 미끄럼틀을 슝슝 미끄러지며 공중에 떠오르는 무지개 방울과 하트 얼음을 모으는 신나는 빙하 슬라이드 놀이입니다.",
-    "thumbnail": "harp-seal-iceberg-bubble-slide/thumb.svg",
-    "path": "harp-seal-iceberg-bubble-slide/index.html",
-    "created": "2026-10-20"
-  },
-  {
-    "id": "platypus-bill-crystal-diver",
-    "title": "Platypus Bill Crystal Diver",
-    "title_ko": "🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수",
-    "description": "신비로운 호수 속을 오리발로 첨벙첨벙 헤엄치는 귀여운 아기 오리너구리가 수초 사이에서 빛나는 에메랄드 보석과 오색 물방울을 쏙쏙 찾는 신나는 수중 탐험 놀이입니다.",
-    "thumbnail": "platypus-bill-crystal-diver/thumb.svg",
-    "path": "platypus-bill-crystal-diver/index.html",
-    "created": "2026-10-20"
   }
 ]
