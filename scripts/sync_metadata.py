@@ -55,9 +55,23 @@ def sync_all():
     count_str = str(total_games)
     print(f"[*] 총 등록 게임 수: {total_games}개")
 
-    latest_games = recent_games(games)
     today_str = datetime.now().strftime("%Y-%m-%d")
     year_month = datetime.now().strftime("%Y-%m")
+
+    # 0. games.json 최신 상위 게임 'created' 필드 자동 보완
+    games_modified = False
+    for g in games[:5]:
+        if not g.get("created"):
+            g["created"] = today_str
+            games_modified = True
+            print(f"[*] games.json 'created' 필드 자동 보완: {g.get('id')} -> {today_str}")
+
+    if games_modified:
+        with open(GAMES_JSON, "w", encoding="utf-8") as f:
+            json.dump(games, f, ensure_ascii=False, indent=2)
+        print("[OK] games.json 'created' 필드 자동 갱신 완료")
+
+    latest_games = recent_games(games)
 
     # 1. menu.json 동기화
     if MENU_JSON.exists():
@@ -195,6 +209,14 @@ def sync_all():
             print(f"[OK] CHANGES.md 카운터 동기화 완료 ({count_str}개)")
         else:
             print("[*] CHANGES.md 이미 최신 카운터 반영됨")
+
+    print("\n" + "=" * 60)
+    print(" 🧪 유닛테스트(test_*.py) 자동 실행")
+    print("=" * 60)
+    test_res = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", str(REPO_ROOT / "scripts"), "-p", "test_*.py"], cwd=REPO_ROOT)
+    if test_res.returncode != 0:
+        print("\n❌ [FAIL] 유닛테스트 실패. 테스트 케이스를 점검하세요.")
+        return False
 
     print("\n" + "=" * 60)
     print(" 🧪 무결성 검증기(verify_integrity.py) 자동 실행")
