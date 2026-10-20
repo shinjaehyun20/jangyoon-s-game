@@ -1,102 +1,129 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#E0F7FA"/>
-      <stop offset="50%" stop-color="#80DEEA"/>
-      <stop offset="100%" stop-color="#26C6DA"/>
+    <linearGradient id="riverSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#bbf2f6"/>
+      <stop offset="60%" stop-color="#e0f7fa"/>
+      <stop offset="100%" stop-color="#80deea"/>
     </linearGradient>
-    <linearGradient id="otterBody" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#8D6E63"/>
-      <stop offset="100%" stop-color="#6D4C41"/>
+    <linearGradient id="riverWater" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4dd0e1"/>
+      <stop offset="40%" stop-color="#00acc1"/>
+      <stop offset="100%" stop-color="#00838f"/>
     </linearGradient>
-    <linearGradient id="clamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFE082"/>
-      <stop offset="100%" stop-color="#FFB300"/>
+    <linearGradient id="otterFur" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a17046"/>
+      <stop offset="60%" stop-color="#795548"/>
+      <stop offset="100%" stop-color="#4e342e"/>
     </linearGradient>
-    <radialGradient id="pearlGrad" cx="35%" cy="35%" r="65%">
-      <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="70%" stop-color="#E1BEE7"/>
-      <stop offset="100%" stop-color="#BA68C8"/>
+    <linearGradient id="otterBelly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe0b2"/>
+      <stop offset="100%" stop-color="#ffcc80"/>
+    </linearGradient>
+    <radialGradient id="pearlGlow" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#f8bbd0"/>
+      <stop offset="100%" stop-color="#e91e63"/>
+    </radialGradient>
+    <radialGradient id="rainbowShell" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fff9c4"/>
+      <stop offset="40%" stop-color="#b2ebf2"/>
+      <stop offset="80%" stop-color="#d1c4e9"/>
+      <stop offset="100%" stop-color="#ff80ab"/>
     </radialGradient>
   </defs>
 
-  <!-- Background with rounded corners -->
-  <rect width="300" height="300" rx="28" fill="url(#bgGrad)"/>
+  <!-- Sky and River Bank -->
+  <rect width="400" height="300" fill="url(#riverSky)"/>
 
-  <!-- Water Wave Ribbons -->
-  <path d="M 0,90 Q 75,75 150,90 T 300,90 L 300,300 L 0,300 Z" fill="rgba(255, 255, 255, 0.15)"/>
-  <path d="M 0,160 Q 75,145 150,160 T 300,160 L 300,300 L 0,300 Z" fill="rgba(255, 255, 255, 0.2)"/>
+  <!-- Lush Green River Banks -->
+  <path d="M 0,0 L 400,0 L 400,85 Q 300,70 200,85 T 0,75 Z" fill="#81c784"/>
+  <path d="M 0,0 L 400,0 L 400,65 Q 280,50 160,65 T 0,55 Z" fill="#66bb6a"/>
 
-  <!-- Bubbles -->
-  <circle cx="50" cy="80" r="8" fill="white" opacity="0.4"/>
-  <circle cx="260" cy="110" r="10" fill="white" opacity="0.4"/>
-  <circle cx="230" cy="70" r="5" fill="white" opacity="0.5"/>
-  <circle cx="70" cy="220" r="9" fill="white" opacity="0.35"/>
+  <!-- Sparkling River -->
+  <path d="M 0,80 Q 120,65 240,82 T 400,75 L 400,300 L 0,300 Z" fill="url(#riverWater)"/>
 
-  <!-- Water Ripples around Otter -->
-  <ellipse cx="150" cy="190" rx="90" ry="32" fill="none" stroke="white" stroke-width="3" opacity="0.7"/>
-  <ellipse cx="150" cy="190" rx="110" ry="40" fill="none" stroke="white" stroke-width="1.5" opacity="0.4"/>
+  <!-- River Flow Waves & Sparkles -->
+  <path d="M 0,120 Q 80,105 180,125 T 400,115" stroke="#e0f7fa" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M 0,165 Q 120,150 250,170 T 400,160" stroke="#e0f7fa" stroke-width="4" fill="none" opacity="0.7"/>
+  <path d="M 0,225 Q 90,210 220,230 T 400,220" stroke="#e0f7fa" stroke-width="3.5" fill="none" opacity="0.65"/>
+  <circle cx="70" cy="140" r="3" fill="#fff" opacity="0.8"/>
+  <circle cx="340" cy="130" r="4" fill="#fff" opacity="0.85"/>
+  <circle cx="120" cy="240" r="3" fill="#fff" opacity="0.9"/>
+  <circle cx="360" cy="240" r="4.5" fill="#fff" opacity="0.85"/>
 
-  <!-- Floating Clam / Pearl -->
-  <g transform="translate(225, 175) rotate(-15)">
-    <!-- Clam shell back -->
-    <path d="M -22,0 C -22,-24 22,-24 22,0 C 22,12 -22,12 -22,0 Z" fill="url(#clamGrad)" stroke="#FFA000" stroke-width="2"/>
-    <!-- Shell ridges -->
-    <path d="M -10,-18 L -3,2 M 0,-21 L 0,2 M 10,-18 L 3,2" stroke="#FF8F00" stroke-width="1.5"/>
-    <!-- Pearl -->
-    <circle cx="0" cy="-2" r="10" fill="url(#pearlGrad)"/>
-    <circle cx="-3" cy="-5" r="3" fill="#FFFFFF"/>
-    <!-- Sparkles -->
-    <path d="M 12,-16 L 15,-13 L 18,-16 L 15,-19 Z" fill="#FFF9C4"/>
+  <!-- Floating Clam and Pebble on River -->
+  <g transform="translate(60, 200) rotate(-10)">
+    <path d="M -16,0 C -16,-18 16,-18 16,0 C 16,10 -16,10 -16,0 Z" fill="url(#rainbowShell)" stroke="#80deea" stroke-width="1.5"/>
+    <line x1="0" y1="-16" x2="0" y2="4" stroke="#fff" stroke-width="1.5" opacity="0.8"/>
+    <line x1="-8" y1="-12" x2="-2" y2="4" stroke="#fff" stroke-width="1.5" opacity="0.8"/>
+    <line x1="8" y1="-12" x2="2" y2="4" stroke="#fff" stroke-width="1.5" opacity="0.8"/>
+    <circle cx="0" cy="1" r="5" fill="url(#pearlGlow)"/>
   </g>
 
-  <!-- Otter Character (Floating on Water) -->
-  <g transform="translate(130, 180)">
+  <!-- Baby Otter Floating on Water -->
+  <g transform="translate(210, 185)">
+    <!-- Water Ripple around Otter -->
+    <ellipse cx="0" cy="20" rx="90" ry="24" fill="#80deea" opacity="0.5"/>
+    <ellipse cx="0" cy="22" rx="75" ry="18" fill="#e0f7fa" opacity="0.6"/>
+
     <!-- Tail -->
-    <path d="M -50,15 C -80,25 -70,40 -40,30 Z" fill="#5D4037"/>
+    <path d="M -70,10 Q -95,20 -90,5 Q -75,0 -60,6 Z" fill="url(#otterFur)"/>
 
-    <!-- Body -->
-    <ellipse cx="0" cy="10" rx="55" ry="35" fill="url(#otterBody)"/>
+    <!-- Otter Body (Back Float) -->
+    <ellipse cx="-10" cy="12" rx="60" ry="28" fill="url(#otterFur)"/>
+    <!-- Otter Cream Belly -->
+    <ellipse cx="-10" cy="12" rx="42" ry="18" fill="url(#otterBelly)"/>
 
-    <!-- Belly (Light Fur) -->
-    <ellipse cx="5" cy="15" rx="35" ry="22" fill="#EFEBE9"/>
+    <!-- Otter Back Paws/Feet -->
+    <ellipse cx="-55" cy="26" rx="10" ry="8" fill="url(#otterFur)"/>
+    <ellipse cx="-40" cy="30" rx="10" ry="8" fill="url(#otterFur)"/>
 
-    <!-- Paws holding chest -->
-    <circle cx="-8" cy="6" r="9" fill="#5D4037"/>
-    <circle cx="18" cy="6" r="9" fill="#5D4037"/>
+    <!-- Front Paws holding pebble & clam -->
+    <ellipse cx="-15" cy="2" rx="9" ry="8" fill="url(#otterFur)"/>
+    <ellipse cx="8" cy="2" rx="9" ry="8" fill="url(#otterFur)"/>
 
-    <!-- Cute Clam in paws -->
-    <path d="M 0,2 C 0,-10 12,-10 12,2 Z" fill="#FFE082" stroke="#FFB300" stroke-width="1.5"/>
+    <!-- Cracked Clam & Shining Pearl on Belly -->
+    <g transform="translate(-4, 0)">
+      <!-- Smooth River Pebble -->
+      <ellipse cx="-14" cy="-4" rx="8" ry="6" fill="#90a4ae" stroke="#546e7a" stroke-width="1"/>
+      <!-- Sparkling Clam -->
+      <path d="M -12,-6 C -12,-20 12,-20 12,-6 C 12,4 -12,4 -12,-6 Z" fill="url(#rainbowShell)" stroke="#00acc1" stroke-width="1.5"/>
+      <circle cx="0" cy="-6" r="6" fill="url(#pearlGlow)"/>
+      <circle cx="-2" cy="-8" r="2" fill="#ffffff"/>
+      <text x="14" y="-12" font-size="16" fill="#ffd54f">✨</text>
+    </g>
 
-    <!-- Head -->
-    <circle cx="35" cy="-15" r="30" fill="url(#otterBody)"/>
-
+    <!-- Otter Head -->
+    <ellipse cx="45" cy="5" rx="24" ry="22" fill="url(#otterFur)"/>
+    <!-- Otter Cream Cheeks / Muzzle -->
+    <ellipse cx="50" cy="10" rx="15" ry="11" fill="url(#otterBelly)"/>
     <!-- Ears -->
-    <circle cx="22" cy="-40" r="7" fill="#5D4037"/>
-    <circle cx="48" cy="-40" r="7" fill="#5D4037"/>
-    <circle cx="22" cy="-40" r="4" fill="#D7CCC8"/>
-    <circle cx="48" cy="-40" r="4" fill="#D7CCC8"/>
+    <circle cx="36" cy="-12" r="6" fill="url(#otterFur)"/>
+    <circle cx="36" cy="-12" r="3.5" fill="#d7ccc8"/>
+    <circle cx="56" cy="-12" r="6" fill="url(#otterFur)"/>
+    <circle cx="56" cy="-12" r="3.5" fill="#d7ccc8"/>
 
-    <!-- Muzzle / Snout -->
-    <ellipse cx="40" cy="-8" rx="14" ry="10" fill="#EFEBE9"/>
-    <ellipse cx="40" cy="-12" rx="5" ry="3.5" fill="#3E2723"/>
+    <!-- Cute Eyes -->
+    <circle cx="43" cy="3" r="3.5" fill="#212121"/>
+    <circle cx="42" cy="2" r="1.2" fill="#ffffff"/>
+    <circle cx="57" cy="3" r="3.5" fill="#212121"/>
+    <circle cx="56" cy="2" r="1.2" fill="#ffffff"/>
 
-    <!-- Eyes (Happy sparkling eyes) -->
-    <circle cx="28" cy="-20" r="4.5" fill="#3E2723"/>
-    <circle cx="29" cy="-22" r="1.5" fill="#FFFFFF"/>
-    <circle cx="46" cy="-20" r="4.5" fill="#3E2723"/>
-    <circle cx="47" cy="-22" r="1.5" fill="#FFFFFF"/>
-
-    <!-- Rosy Cheeks -->
-    <circle cx="22" cy="-10" r="5" fill="#FF8A80" opacity="0.6"/>
-    <circle cx="54" cy="-10" r="5" fill="#FF8A80" opacity="0.6"/>
-
+    <!-- Nose and Mouth -->
+    <ellipse cx="50" cy="9" rx="3.5" ry="2.5" fill="#212121"/>
+    <path d="M 47,13 Q 50,15 53,13" stroke="#212121" stroke-width="1.5" fill="none" stroke-linecap="round"/>
     <!-- Whiskers -->
-    <line x1="48" y1="-8" x2="62" y2="-6" stroke="#BCAAA4" stroke-width="1.5"/>
-    <line x1="48" y1="-5" x2="62" y2="-3" stroke="#BCAAA4" stroke-width="1.5"/>
+    <line x1="38" y1="10" x2="30" y2="8" stroke="#4e342e" stroke-width="1.2"/>
+    <line x1="38" y1="12" x2="28" y2="13" stroke="#4e342e" stroke-width="1.2"/>
+    <line x1="62" y1="10" x2="70" y2="8" stroke="#4e342e" stroke-width="1.2"/>
+    <line x1="62" y1="12" x2="72" y2="13" stroke="#4e342e" stroke-width="1.2"/>
   </g>
 
   <!-- Title Badge -->
-  <rect x="25" y="16" width="250" height="38" rx="19" fill="#00838F" opacity="0.95"/>
-  <text x="150" y="41" font-family="'Pretendard', sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">🦦 아기 수달 조개 잡기</text>
+  <g transform="translate(200, 268)">
+    <rect x="-150" y="-18" width="300" height="34" rx="17" fill="rgba(0, 96, 100, 0.85)" stroke="#4dd0e1" stroke-width="2"/>
+    <text x="0" y="5" font-family="'Pretendard', sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">
+      🦦 조약돌 수달의 조개 캐칭 강물 모험
+    </text>
+  </g>
 </svg>

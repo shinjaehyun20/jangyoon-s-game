@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "platypus-bill-crystal-diver",
+        "title": "🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수",
+        "path": "platypus-bill-crystal-diver/index.html"
+      },
+      {
+        "id": "harp-seal-iceberg-bubble-slide",
+        "title": "🦭 뽀송 하프물범의 빙하 무지개 슬라이드",
+        "path": "harp-seal-iceberg-bubble-slide/index.html"
+      },
+      {
         "id": "ten-frame-bakery",
         "title": "🎮 달콤한 텐프레임 빵집",
         "path": "ten-frame-bakery/index.html"

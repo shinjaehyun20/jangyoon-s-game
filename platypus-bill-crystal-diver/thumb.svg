@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="lakeWater" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4db6ac"/>
+      <stop offset="40%" stop-color="#00897b"/>
+      <stop offset="100%" stop-color="#004d40"/>
+    </linearGradient>
+    <linearGradient id="platypusFur" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8d6e63"/>
+      <stop offset="60%" stop-color="#6d4c41"/>
+      <stop offset="100%" stop-color="#4e342e"/>
+    </linearGradient>
+    <radialGradient id="emeraldGlow" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#69f0ae"/>
+      <stop offset="70%" stop-color="#00e676"/>
+      <stop offset="100%" stop-color="#00b0ff"/>
+    </radialGradient>
+    <linearGradient id="waterReeds" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#004d40"/>
+      <stop offset="100%" stop-color="#81c784"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Clear Emerald Lake Water -->
+  <rect width="400" height="300" fill="url(#lakeWater)"/>
+
+  <!-- Water Surface Ripples & Light Rays -->
+  <polygon points="60,0 120,300 160,300 90,0" fill="#80cbc4" opacity="0.2"/>
+  <polygon points="200,0 270,300 310,300 230,0" fill="#80cbc4" opacity="0.25"/>
+  <polygon points="320,0 370,300 400,300 350,0" fill="#80cbc4" opacity="0.18"/>
+
+  <!-- Aquatic Reeds & Seaweed -->
+  <path d="M 30,300 Q 20,200 45,130 Q 30,80 35,0" stroke="url(#waterReeds)" stroke-width="12" fill="none" opacity="0.7"/>
+  <path d="M 60,300 Q 75,220 55,160 Q 70,110 65,40" stroke="url(#waterReeds)" stroke-width="10" fill="none" opacity="0.6"/>
+  <path d="M 360,300 Q 375,210 350,140 Q 370,90 355,10" stroke="url(#waterReeds)" stroke-width="14" fill="none" opacity="0.75"/>
+  <path d="M 385,300 Q 395,230 380,170" stroke="url(#waterReeds)" stroke-width="10" fill="none" opacity="0.6"/>
+
+  <!-- Floating Crystal Gems on Lakebed -->
+  <g transform="translate(90, 210) rotate(-15)">
+    <polygon points="0,-18 14,-4 9,16 -9,16 -14,-4" fill="url(#emeraldGlow)" stroke="#e0f2f1" stroke-width="1.5"/>
+    <line x1="0" y1="-18" x2="0" y2="16" stroke="#fff" stroke-width="1.2" opacity="0.8"/>
+    <text x="16" y="-8" font-size="16" fill="#ffd54f">✨</text>
+  </g>
+  <g transform="translate(310, 220) rotate(12)">
+    <polygon points="0,-16 12,-3 8,14 -8,14 -12,-3" fill="url(#emeraldGlow)" stroke="#e0f2f1" stroke-width="1.5"/>
+  </g>
+
+  <!-- Water Bubbles -->
+  <circle cx="140" cy="180" r="5" fill="#e0f2f1" opacity="0.6"/>
+  <circle cx="150" cy="160" r="3.5" fill="#e0f2f1" opacity="0.7"/>
+  <circle cx="270" cy="130" r="6" fill="#e0f2f1" opacity="0.65"/>
+  <circle cx="260" cy="105" r="4" fill="#e0f2f1" opacity="0.7"/>
+
+  <!-- Baby Platypus Swimming Downward -->
+  <g transform="translate(200, 145) rotate(12)">
+    <!-- Beaver-like Flat Tail -->
+    <ellipse cx="-55" cy="-8" rx="28" ry="12" fill="#3e2723" transform="rotate(-15 -55 -8)"/>
+    <!-- Tail Cross-Hatch Texture -->
+    <line x1="-70" y1="-14" x2="-40" y2="-2" stroke="#212121" stroke-width="1.2" opacity="0.6"/>
+    <line x1="-70" y1="-2" x2="-40" y2="-14" stroke="#212121" stroke-width="1.2" opacity="0.6"/>
+
+    <!-- Plump Waterproof Body -->
+    <ellipse cx="0" cy="4" rx="46" ry="24" fill="url(#platypusFur)"/>
+    <ellipse cx="0" cy="4" rx="34" ry="16" fill="#a1887f"/>
+
+    <!-- Webbed Hind Feet (Paddle Flippers) -->
+    <ellipse cx="-26" cy="22" rx="14" ry="6" fill="#212121" transform="rotate(30 -26 22)"/>
+    <ellipse cx="-10" cy="24" rx="14" ry="6" fill="#212121" transform="rotate(20 -10 24)"/>
+
+    <!-- Webbed Front Paddling Foot -->
+    <g transform="translate(20, 20) rotate(-20)">
+      <ellipse cx="0" cy="0" rx="15" ry="7" fill="#212121"/>
+      <path d="M -10,6 Q 0,10 10,6" stroke="#424242" stroke-width="1.2" fill="none"/>
+    </g>
+
+    <!-- Head -->
+    <circle cx="34" cy="-2" r="19" fill="url(#platypusFur)"/>
+
+    <!-- Duck-Bill (Rubber-like Leathery Beak) -->
+    <path d="M 42,-6 Q 70,-8 72,2 Q 70,12 42,10 Z" fill="#263238"/>
+    <!-- Bill Ridge & Nostrils -->
+    <path d="M 42,-10 Q 46,2 42,14" stroke="#37474f" stroke-width="2.5" fill="none"/>
+    <circle cx="58" cy="-1" r="1.5" fill="#102027"/>
+    <circle cx="58" cy="4" r="1.5" fill="#102027"/>
+
+    <!-- Cute Eyes with Goggles Reflection -->
+    <circle cx="30" cy="-6" r="4.2" fill="#212121"/>
+    <circle cx="29" cy="-7.5" r="1.5" fill="#ffffff"/>
+    <circle cx="42" cy="-6" r="4.2" fill="#212121"/>
+    <circle cx="41" cy="-7.5" r="1.5" fill="#ffffff"/>
+
+    <!-- Pink Cheeks -->
+    <circle cx="32" cy="4" r="3.5" fill="#ff80ab" opacity="0.5"/>
+
+    <!-- Sparkling Emerald Crystal held in Beak / Hand -->
+    <g transform="translate(74, 8) rotate(20)">
+      <polygon points="0,-12 9,-3 6,11 -6,11 -9,-3" fill="url(#emeraldGlow)" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="0" cy="0" r="2" fill="#fff"/>
+      <text x="10" y="-4" font-size="15" fill="#ffd54f">⭐</text>
+    </g>
+  </g>
+
+  <!-- Title Badge -->
+  <g transform="translate(200, 270)">
+    <rect x="-155" y="-18" width="310" height="34" rx="17" fill="rgba(0, 77, 64, 0.85)" stroke="#69f0ae" stroke-width="2"/>
+    <text x="0" y="5" font-family="'Pretendard', sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">
+      🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수
+    </text>
+  </g>
+</svg>

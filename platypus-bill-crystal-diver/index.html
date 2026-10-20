@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수 - 장윤이의 게임세상 #317</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #004d40;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    #game-wrap {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 860px;
+      background: linear-gradient(180deg, #80cbc4 0%, #26a69a 30%, #00897b 70%, #004d40 100%);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #hud {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hud-box {
+      background: rgba(0, 77, 64, 0.85);
+      border: 2px solid #69f0ae;
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #e0f2f1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+    }
+    #combo-box {
+      color: #ffd54f;
+      border-color: #ffd54f;
+      transition: transform 0.1s ease;
+    }
+    #overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 77, 64, 0.88);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 20;
+      backdrop-filter: blur(6px);
+    }
+    #overlay h1 {
+      font-size: 25px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: #a7ffeb;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    #overlay p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #e0f2f1;
+      margin-bottom: 24px;
+      max-width: 320px;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 260px;
+    }
+    .btn {
+      background: linear-gradient(135deg, #00bfa5 0%, #00796b 100%);
+      color: #fff;
+      border: none;
+      border-radius: 26px;
+      padding: 14px 20px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 191, 165, 0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn-sub {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      box-shadow: none;
+      font-size: 15px;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="gameCanvas"></canvas>
+    <div id="hud">
+      <div class="hud-box" id="score-box">💎 <span id="scoreVal">0</span></div>
+      <div class="hud-box" id="combo-box">🔥 <span id="comboVal">0</span> 콤보</div>
+      <div class="hud-box" id="time-box">⏱️ <span id="timeVal">60</span>s</div>
+    </div>
+    <div id="overlay">
+      <h1 id="overlayTitle">🦆 찰방 오리너구리의 크리스탈 잠수</h1>
+      <p id="overlayDesc">
+        화면을 터치해 아기 오리너구리를 자유롭게 헤엄치게 하세요!<br>
+        호수 바닥에서 떠오르는 반짝이는 에메랄드와 무지개 보석을 쏙쏙 모아보아요! 🌊💎
+      </p>
+      <div class="btn-group">
+        <button class="btn" id="startBtn">잠수 시작! 🦆</button>
+        <a href="../index.html" class="btn btn-sub">다른 게임 하러가기 🏠</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Web Audio Synthesizer
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playCrystalChime() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [587.33, 739.99, 880, 1174.66].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.04);
+          gain.gain.setValueAtTime(0.22, now + i * 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.04);
+          osc.stop(now + i * 0.04 + 0.25);
+        });
+      }
+      playPaddle() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(260, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(140, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.12);
+      }
+    }
+
+    const sound = new SoundEngine();
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreVal = document.getElementById('scoreVal');
+    const comboVal = document.getElementById('comboVal');
+    const timeVal = document.getElementById('timeVal');
+    const overlay = document.getElementById('overlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayDesc = document.getElementById('overlayDesc');
+    const startBtn = document.getElementById('startBtn');
+
+    let width = 0, height = 0;
+    let score = 0, combo = 0, timeLeft = 60;
+    let isPlaying = false;
+    let lastTime = 0, spawnTimer = 0, timerInterval = null;
+
+    // Platypus state
+    const platypus = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      targetY: 0,
+      angle: 0,
+      tailWag: 0
+    };
+
+    let gems = [];
+    let bubbles = [];
+    let seaweed = [];
+
+    function resize() {
+      const wrap = document.getElementById('game-wrap');
+      width = wrap.clientWidth;
+      height = wrap.clientHeight;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      platypus.x = width / 2;
+      platypus.y = height * 0.4;
+      platypus.targetX = platypus.x;
+      platypus.targetY = platypus.y;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Seaweed strands background
+    for (let i = 0; i < 6; i++) {
+      seaweed.push({
+        x: (width / 5) * i,
+        baseY: height,
+        height: 140 + Math.random() * 80,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    function setTarget(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      platypus.targetX = Math.max(30, Math.min(width - 30, clientX - rect.left));
+      platypus.targetY = Math.max(60, Math.min(height - 40, clientY - rect.top));
+    }
+    window.addEventListener('pointerdown', (e) => {
+      sound.init();
+      if (isPlaying) setTarget(e.clientX, e.clientY);
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (isPlaying) setTarget(e.clientX, e.clientY);
+    });
+
+    function spawnGem() {
+      const types = [
+        { type: 'emerald', points: 10, color: '#00e676', glow: '#69f0ae', radius: 17, speed: 2.2 },
+        { type: 'sapphire', points: 15, color: '#00b0ff', glow: '#80d8ff', radius: 17, speed: 2.5 },
+        { type: 'amethyst', points: 25, color: '#e040fb', glow: '#ea80fc', radius: 20, speed: 2.8 },
+        { type: 'star_gem', points: 50, color: '#ffd600', glow: '#fff59d', radius: 22, speed: 3.2 }
+      ];
+      const selected = types[Math.floor(Math.random() * types.length)];
+      gems.push({
+        x: 30 + Math.random() * (width - 60),
+        y: height + 30,
+        ...selected,
+        wobble: Math.random() * Math.PI * 2
+      });
+    }
+
+    function createBubbles(x, y, color) {
+      for (let i = 0; i < 12; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 1.5 + Math.random() * 3.5;
+        bubbles.push({
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - 1,
+          radius: 2 + Math.random() * 3,
+          color: color || '#b2dfdb',
+          alpha: 1,
+          life: 0.5 + Math.random() * 0.3
+        });
+      }
+    }
+
+    function drawPlatypus(x, y, angle) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+
+      // Beaver flat tail
+      ctx.save();
+      const wag = Math.sin(platypus.tailWag) * 0.2;
+      ctx.rotate(wag);
+      ctx.beginPath();
+      ctx.ellipse(-38, 0, 20, 9, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#3e2723';
+      ctx.fill();
+      ctx.restore();
+
+      // Plump Brown Body
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 32, 18, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#6d4c41';
+      ctx.fill();
+
+      // Belly
+      ctx.beginPath();
+      ctx.ellipse(0, 2, 22, 12, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#8d6e63';
+      ctx.fill();
+
+      // Paddling Webbed Feet
+      ctx.beginPath();
+      ctx.ellipse(-12, 16, 10, 5, 0.4, 0, Math.PI * 2);
+      ctx.ellipse(10, 16, 10, 5, -0.2, 0, Math.PI * 2);
+      ctx.ellipse(-12, -16, 10, 5, -0.4, 0, Math.PI * 2);
+      ctx.ellipse(10, -16, 10, 5, 0.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#212121';
+      ctx.fill();
+
+      // Cute Head
+      ctx.beginPath();
+      ctx.arc(24, 0, 14, 0, Math.PI * 2);
+      ctx.fillStyle = '#6d4c41';
+      ctx.fill();
+
+      // Duck-Bill (Beak)
+      ctx.beginPath();
+      ctx.moveTo(30, -7);
+      ctx.quadraticCurveTo(52, -8, 54, 0);
+      ctx.quadraticCurveTo(52, 8, 30, 7);
+      ctx.fillStyle = '#263238';
+      ctx.fill();
+
+      // Nostrils
+      ctx.fillStyle = '#102027';
+      ctx.beginPath();
+      ctx.arc(44, -2, 1, 0, Math.PI * 2);
+      ctx.arc(44, 2, 1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eyes
+      ctx.fillStyle = '#212121';
+      ctx.beginPath();
+      ctx.arc(22, -6, 2.5, 0, Math.PI * 2);
+      ctx.arc(22, 6, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(21, -7, 1, 0, Math.PI * 2);
+      ctx.arc(21, 5, 1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pink Cheeks
+      ctx.fillStyle = 'rgba(255, 128, 171, 0.6)';
+      ctx.beginPath();
+      ctx.arc(22, -9, 2.5, 0, Math.PI * 2);
+      ctx.arc(22, 9, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawGem(g) {
+      ctx.save();
+      ctx.translate(g.x, g.y);
+
+      if (g.type === 'star_gem') {
+        ctx.beginPath();
+        for (let s = 0; s < 5; s++) {
+          const rot = (Math.PI / 5) * s * 2 - Math.PI / 2;
+          const r1 = g.radius, r2 = g.radius * 0.45;
+          const x1 = Math.cos(rot) * r1, y1 = Math.sin(rot) * r1;
+          const x2 = Math.cos(rot + Math.PI / 5) * r2, y2 = Math.sin(rot + Math.PI / 5) * r2;
+          if (s === 0) ctx.moveTo(x1, y1);
+          else ctx.lineTo(x1, y1);
+          ctx.lineTo(x2, y2);
+        }
+        ctx.closePath();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(0, -g.radius);
+        ctx.lineTo(g.radius * 0.9, -g.radius * 0.2);
+        ctx.lineTo(g.radius * 0.55, g.radius);
+        ctx.lineTo(-g.radius * 0.55, g.radius);
+        ctx.lineTo(-g.radius * 0.9, -g.radius * 0.2);
+        ctx.closePath();
+      }
+
+      ctx.fillStyle = g.color;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.shadowColor = g.glow;
+      ctx.shadowBlur = 10;
+
+      ctx.restore();
+    }
+
+    function update(dt) {
+      if (!isPlaying) return;
+
+      // Move platypus towards target
+      const dx = platypus.targetX - platypus.x;
+      const dy = platypus.targetY - platypus.y;
+      platypus.x += dx * 0.14;
+      platypus.y += dy * 0.14;
+
+      const targetAngle = Math.atan2(dy, dx);
+      if (Math.hypot(dx, dy) > 8) {
+        platypus.angle += (targetAngle - platypus.angle) * 0.15;
+        platypus.tailWag += dt * 14;
+      }
+
+      // Spawn gems
+      spawnTimer += dt;
+      if (spawnTimer > 0.7) {
+        spawnGem();
+        spawnTimer = 0;
+      }
+
+      // Update gems (floating upward from lake bed)
+      for (let i = gems.length - 1; i >= 0; i--) {
+        const g = gems[i];
+        g.y -= g.speed;
+        g.wobble += dt * 3;
+        g.x += Math.sin(g.wobble) * 0.6;
+
+        // Collision with platypus beak / body
+        const dist = Math.hypot(g.x - platypus.x, g.y - platypus.y);
+        if (dist < 42) {
+          combo++;
+          const pts = g.points + Math.min(combo * 2, 20);
+          score += pts;
+          scoreVal.textContent = score;
+          comboVal.textContent = combo;
+
+          sound.playCrystalChime();
+          createBubbles(g.x, g.y, g.color);
+
+          gems.splice(i, 1);
+          continue;
+        }
+
+        // Missed gem floating to water surface
+        if (g.y < -30) {
+          combo = 0;
+          comboVal.textContent = 0;
+          gems.splice(i, 1);
+        }
+      }
+
+      // Update bubbles
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.alpha -= dt / b.life;
+        if (b.alpha <= 0) {
+          bubbles.splice(i, 1);
+        }
+      }
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Seaweed swaying in background
+      seaweed.forEach(s => {
+        s.phase += 0.02;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.baseY);
+        const sway = Math.sin(s.phase) * 18;
+        ctx.quadraticCurveTo(s.x + sway, s.baseY - s.height * 0.5, s.x + sway * 1.5, s.baseY - s.height);
+        ctx.strokeStyle = '#2e7d32';
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      });
+
+      // Gems
+      gems.forEach(drawGem);
+
+      // Platypus
+      drawPlatypus(platypus.x, platypus.y, platypus.angle);
+
+      // Water bubble particles
+      bubbles.forEach(b => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, b.alpha);
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function loop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+      lastTime = timestamp;
+
+      update(dt);
+      render();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    function startGame() {
+      sound.init();
+      sound.playPaddle();
+      score = 0;
+      combo = 0;
+      timeLeft = 60;
+      gems = [];
+      bubbles = [];
+      scoreVal.textContent = '0';
+      comboVal.textContent = '0';
+      timeVal.textContent = '60';
+      overlay.style.display = 'none';
+      isPlaying = true;
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timeVal.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(timerInterval);
+      overlayTitle.textContent = '🎉 탐험 완료!';
+      overlayDesc.innerHTML = `환상적이에요! 찰방 오리너구리와 함께 에메랄드를 가득 모았어요!<br><strong style="font-size:20px; color:#ffd54f;">최종 점수: ${score}점</strong><br>다시 잠수해 볼까요? 🦆`;
+      startBtn.textContent = '한 번 더 하기! 🔄';
+      overlay.style.display = 'flex';
+    }
+
+    startBtn.addEventListener('click', startGame);
+  </script>
+</body>
+</html>

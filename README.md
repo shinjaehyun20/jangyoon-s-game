@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 315개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 317개.
 
-[![Games](https://img.shields.io/badge/games-315-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-317-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![315개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![317개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,10 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 315개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 317개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수 (platypus-bill-crystal-diver)](./platypus-bill-crystal-diver/index.html) | 신비로운 호수 속을 오리발로 첨벙첨벙 헤엄치는 귀여운 아기 오리너구리가 수초 사이에서 빛나는 에메랄드 보석과 오색 물방울을 쏙쏙 찾는 신나는 수중 탐험 놀이입니다. | 어린이/아케이드 |
+| [🦭 뽀송 하프물범의 빙하 무지개 슬라이드 (harp-seal-iceberg-bubble-slide)](./harp-seal-iceberg-bubble-slide/index.html) | 하얗고 동글동글한 아기 하프물범이 반짝이는 푸른 빙하 미끄럼틀을 슝슝 미끄러지며 공중에 떠오르는 무지개 방울과 하트 얼음을 모으는 신나는 빙하 슬라이드 놀이입니다. | 어린이/아케이드 |
 | [🐿️ 하늘다람쥐의 은하수 활강 비행 (flying-squirrel-star-glide)](./flying-squirrel-star-glide/index.html) | 반짝이는 보랏빛 은하수 밤하늘을 활공하는 날다람쥐를 조종해 별빛 구름 사이를 누비며 황금 도토리와 별사탕을 모으는 경쾌한 비행 아케이드 놀이입니다. | 어린이/아케이드 |
 | [♨️ 느긋한 카피바라의 향긋 유자 온천 (capybara-hotspring-yuzu-bath)](./capybara-hotspring-yuzu-bath/index.html) | 모락모락 김이 피어나는 따뜻한 노천 온천에서 느긋하게 휴식하는 카피바라 머리 위로 동동 떠오르는 황금 유자와 오색 꽃잎을 쏙쏙 받아 담는 힐링 터치 놀이입니다. | 어린이/아케이드 |
 | [🦙 보송보송 알파카 무지개 털실 공방 (alpaca-rainbow-wool-knitting)](./alpaca-rainbow-wool-knitting/index.html) | 안데스 고원의 귀여운 아기 알파카가 원하는 무지개 목도리 주문서 패턴 순서에 맞춰 알록달록 구름 털실을 톡톡 터치해 포근한 목도리를 완성하는 색채 패턴 창의 공방 놀이입니다. | 어린이/아케이드 |
@@ -511,29 +513,31 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
-- 2026-10-17: [🎮 도토리 수 저울](acorn-number-scale-049/index.html), [🎮 째깍째깍 시계 탐험대](clock-time-runner/index.html), [🎮 한글 별자리 탐험대](hangul-star-constellation-050/index.html), [🎮 달콤한 텐프레임 빵집](ten-frame-bakery/index.html) (총 315개)
+- 2026-10-20: [🦭 뽀송 하프물범의 빙하 무지개 슬라이드](harp-seal-iceberg-bubble-slide/index.html), [🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수](platypus-bill-crystal-diver/index.html) (총 317개)
 
-- 2026-10-15: [♨️ 느긋한 카피바라의 향긋 유자 온천](capybara-hotspring-yuzu-bath/index.html), [🐿️ 하늘다람쥐의 은하수 활강 비행](flying-squirrel-star-glide/index.html) (총 311개)
+- 2026-10-17: [🎮 도토리 수 저울](acorn-number-scale-049/index.html), [🎮 째깍째깍 시계 탐험대](clock-time-runner/index.html), [🎮 한글 별자리 탐험대](hangul-star-constellation-050/index.html), [🎮 달콤한 텐프레임 빵집](ten-frame-bakery/index.html) (총 317개)
 
-- 2026-10-14: [🐨 아기 코알라의 유칼립투스 멜로디 나무](koala-eucalyptus-melody/index.html), [🦙 보송보송 알파카 무지개 털실 공방](alpaca-rainbow-wool-knitting/index.html) (총 311개)
+- 2026-10-15: [♨️ 느긋한 카피바라의 향긋 유자 온천](capybara-hotspring-yuzu-bath/index.html), [🐿️ 하늘다람쥐의 은하수 활강 비행](flying-squirrel-star-glide/index.html) (총 317개)
 
-- 2026-10-12: [바다 친구들 짝맞추기 🌊](sea-friends-match/index.html), [반짝반짝 별 잡기 🌟](star-catcher/index.html) (총 311개)
+- 2026-10-14: [🐨 아기 코알라의 유칼립투스 멜로디 나무](koala-eucalyptus-melody/index.html), [🦙 보송보송 알파카 무지개 털실 공방](alpaca-rainbow-wool-knitting/index.html) (총 317개)
 
-- 2026-10-11: [🪐 우주 별자리 잇기](star-constellation-connect/index.html), [🧁 퐁실퐁실 마카롱 타워](fluffy-macaron-tower/index.html) (총 311개)
+- 2026-10-12: [바다 친구들 짝맞추기 🌊](sea-friends-match/index.html), [반짝반짝 별 잡기 🌟](star-catcher/index.html) (총 317개)
 
-- 2026-10-10: [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html), [🌈 무지개 구름 퐁퐁 점퍼](rainbow-cloud-jumper/index.html) (총 311개)
+- 2026-10-11: [🪐 우주 별자리 잇기](star-constellation-connect/index.html), [🧁 퐁실퐁실 마카롱 타워](fluffy-macaron-tower/index.html) (총 317개)
 
-- 2026-10-07: [✨ 별밤 반딧불이 동산](starry-firefly-night/index.html), [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html) (총 311개)
+- 2026-10-10: [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html), [🌈 무지개 구름 퐁퐁 점퍼](rainbow-cloud-jumper/index.html) (총 317개)
 
-- 2026-10-06: [⚡ 찌릿찌릿 사이버 회로 연결 놀이](quantum-cyber-circuit/index.html), [🤖 삐리삐리 로봇 강아지 목욕 대작전](robot-pet-grooming/index.html) (총 311개)
+- 2026-10-07: [✨ 별밤 반딧불이 동산](starry-firefly-night/index.html), [🫧 알록달록 무지개 버블 팡팡](rainbow-bubble-pop/index.html) (총 317개)
 
-- 2026-10-05: [🍎 아기 레서판다의 데굴데굴 사과 받기](red-panda-apple-catch/index.html), [🌌 꼬마 부엉이의 밤하늘 별빛 비행](starry-owl-night-flight/index.html) (총 311개)
+- 2026-10-06: [⚡ 찌릿찌릿 사이버 회로 연결 놀이](quantum-cyber-circuit/index.html), [🤖 삐리삐리 로봇 강아지 목욕 대작전](robot-pet-grooming/index.html) (총 317개)
 
-- 2026-10-04: [🎋 아기 판다의 대나무 풍경 소리](panda-bamboo-wind-chime/index.html), [🦦 아기 수달의 물수제비 놀이](otter-stream-pebble-skip/index.html) (총 311개)
+- 2026-10-05: [🍎 아기 레서판다의 데굴데굴 사과 받기](red-panda-apple-catch/index.html), [🌌 꼬마 부엉이의 밤하늘 별빛 비행](starry-owl-night-flight/index.html) (총 317개)
 
-- 2026-10-02: [🦊 사막여우의 별빛 오아시스](fennec-fox-desert-star-oasis/index.html), [🫧 친칠라의 구름 방울 퐁퐁](chinchilla-cloud-bubble-hop/index.html) (총 311개)
+- 2026-10-04: [🎋 아기 판다의 대나무 풍경 소리](panda-bamboo-wind-chime/index.html), [🦦 아기 수달의 물수제비 놀이](otter-stream-pebble-skip/index.html) (총 317개)
 
-- 2026-10-01: [🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드](polar-bear-aurora-ice-slide/index.html), [🐨 아기 코알라의 살랑살랑 유칼립투스 바람](koala-eucalyptus-leaf-breeze/index.html) (총 311개)
+- 2026-10-02: [🦊 사막여우의 별빛 오아시스](fennec-fox-desert-star-oasis/index.html), [🫧 친칠라의 구름 방울 퐁퐁](chinchilla-cloud-bubble-hop/index.html) (총 317개)
+
+- 2026-10-01: [🐻‍❄️ 아기 북극곰의 오로라 빙하 슬라이드](polar-bear-aurora-ice-slide/index.html), [🐨 아기 코알라의 살랑살랑 유칼립투스 바람](koala-eucalyptus-leaf-breeze/index.html) (총 317개)
 
 
 ## 최근 변경사항 (2026-09)
