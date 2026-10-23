@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="forestSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a8dadc"/>
+      <stop offset="60%" stop-color="#f1faee"/>
+      <stop offset="100%" stop-color="#d8f3dc"/>
+    </linearGradient>
+    <linearGradient id="basketGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#b08968"/>
+      <stop offset="100%" stop-color="#7f5539"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="400" height="300" fill="url(#forestSky)"/>
+
+  <!-- Clouds -->
+  <circle cx="80" cy="50" r="22" fill="#fff" opacity="0.85"/>
+  <circle cx="105" cy="45" r="28" fill="#fff" opacity="0.9"/>
+  <circle cx="130" cy="52" r="20" fill="#fff" opacity="0.85"/>
+
+  <!-- Background Trees -->
+  <polygon points="40,210 90,110 140,210" fill="#52b788" opacity="0.7"/>
+  <polygon points="110,210 170,90 230,210" fill="#40916c" opacity="0.8"/>
+  <polygon points="260,210 320,100 380,210" fill="#2d6a4f" opacity="0.75"/>
+
+  <!-- Ground -->
+  <rect y="200" width="400" height="100" fill="#74c69d"/>
+  <ellipse cx="200" cy="205" rx="200" ry="15" fill="#52b788"/>
+
+  <!-- 10-Frame Box on Table/Log -->
+  <rect x="70" y="115" width="260" height="65" rx="12" fill="#fff" stroke="#e76f51" stroke-width="4" filter="url(#shadow)"/>
+  <!-- 10 cells (2 rows of 5) -->
+  <g stroke="#e76f51" stroke-width="2" stroke-dasharray="3,3">
+    <line x1="70" y1="147" x2="330" y2="147"/>
+    <line x1="122" y1="115" x2="122" y2="180"/>
+    <line x1="174" y1="115" x2="174" y2="180"/>
+    <line x1="226" y1="115" x2="226" y2="180"/>
+    <line x1="278" y1="115" x2="278" y2="180"/>
+  </g>
+
+  <!-- Colorful Candies in cells -->
+  <!-- Top row (5 candies) -->
+  <circle cx="96" cy="131" r="11" fill="#ff4d6d"/>
+  <circle cx="148" cy="131" r="11" fill="#ffb703"/>
+  <circle cx="200" cy="131" r="11" fill="#06d6a0"/>
+  <circle cx="252" cy="131" r="11" fill="#118ab2"/>
+  <circle cx="304" cy="131" r="11" fill="#8338ec"/>
+
+  <!-- Bottom row (3 candies filled + 2 empty) -->
+  <circle cx="96" cy="163" r="11" fill="#ff758f"/>
+  <circle cx="148" cy="163" r="11" fill="#ffd166"/>
+  <circle cx="200" cy="163" r="11" fill="#48cae4"/>
+
+  <!-- Basket below -->
+  <path d="M 140 195 L 260 195 L 245 250 L 155 250 Z" fill="url(#basketGrad)" filter="url(#shadow)"/>
+  <path d="M 135 195 Q 200 160 265 195" fill="none" stroke="#7f5539" stroke-width="5" stroke-linecap="round"/>
+  <!-- Basket texture -->
+  <line x1="175" y1="195" x2="170" y2="250" stroke="#ddb892" stroke-width="2"/>
+  <line x1="200" y1="195" x2="200" y2="250" stroke="#ddb892" stroke-width="2"/>
+  <line x1="225" y1="195" x2="230" y2="250" stroke="#ddb892" stroke-width="2"/>
+
+  <!-- Candies overflowing in basket -->
+  <circle cx="180" cy="205" r="9" fill="#ffbe0b"/>
+  <circle cx="205" cy="200" r="10" fill="#fb5607"/>
+  <circle cx="225" cy="207" r="8" fill="#ff006e"/>
+
+  <!-- Cute Squirrel character -->
+  <g transform="translate(25, 140)">
+    <!-- Bushy tail -->
+    <path d="M 20 40 C -10 20, -10 -15, 20 -20 C 35 -20, 30 10, 15 30 Z" fill="#d97706"/>
+    <!-- Body -->
+    <ellipse cx="35" cy="40" rx="15" ry="18" fill="#b45309"/>
+    <!-- Head -->
+    <circle cx="35" cy="15" r="14" fill="#b45309"/>
+    <!-- Ears -->
+    <polygon points="26,6 30,-5 36,4" fill="#92400e"/>
+    <polygon points="38,4 44,-5 48,6" fill="#92400e"/>
+    <!-- Eye & cheek -->
+    <circle cx="42" cy="14" r="2.5" fill="#1f2937"/>
+    <circle cx="45" cy="18" r="3" fill="#f87171" opacity="0.8"/>
+    <!-- Nose -->
+    <circle cx="47" cy="15" r="1.5" fill="#000"/>
+    <!-- Hands holding acorn candy -->
+    <ellipse cx="45" cy="35" rx="5" ry="4" fill="#f59e0b"/>
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="55" y="258" width="290" height="34" rx="17" fill="#e76f51" filter="url(#shadow)"/>
+  <text x="200" y="281" font-family="'Pretendard', sans-serif" font-size="16" font-weight="900" fill="#ffffff" text-anchor="middle">🍬 숲속 덧셈 사탕 바구니 #321</text>
+</svg>

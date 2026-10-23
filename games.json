@@ -1,5 +1,23 @@
 [
   {
+    "id": "starlight-clock-master",
+    "title": "Starlight Clock Master",
+    "title_ko": "⭐ 별빛 시계 바늘 맞추기",
+    "description": "반짝이는 밤하늘 아기 별들이 보여주는 시각을 읽고 아날로그 시계의 긴바늘(분침)과 짧은바늘(시침)을 맞추거나 정답 시계를 골라 별자리를 밝히는 초등 1학년 2학기 몇 시, 몇 시 30분 시계 보기 놀이입니다.",
+    "thumbnail": "starlight-clock-master/thumb.svg",
+    "path": "starlight-clock-master/index.html",
+    "created": "2026-10-24"
+  },
+  {
+    "id": "forest-candy-basket-math",
+    "title": "Forest Candy Basket Math",
+    "title_ko": "🍬 숲속 덧셈 사탕 바구니",
+    "description": "숲속 다람쥐와 토끼 친구들이 부탁하는 사탕 개수를 확인하고 10개들이 상자에 사탕을 채운 뒤 남은 낱개 사탕을 더해 맛있는 덧셈 바구니를 완성하는 초등 1학년 2학기 10을 만들어 더하기 수학 놀이입니다.",
+    "thumbnail": "forest-candy-basket-math/thumb.svg",
+    "path": "forest-candy-basket-math/index.html",
+    "created": "2026-10-24"
+  },
+  {
     "id": "word-train-runner",
     "title": "Word Train Runner",
     "title_ko": "🚂 단어 기차 칙칙폭폭",

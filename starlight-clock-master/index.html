@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>⭐ 별빛 시계 바늘 맞추기 - 장윤이의 게임세상 #320</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      background: #0b132b;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      background: radial-gradient(circle at top, #1c2541 0%, #0b132b 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+    }
+    header {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      z-index: 20;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .game-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffd166;
+      text-shadow: 0 0 8px rgba(255, 209, 102, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hud-badges {
+      display: flex;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .badge {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 5px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Starry background canvas */
+    #bg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Main Stage */
+    main {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      z-index: 10;
+      gap: 12px;
+    }
+    .mission-card {
+      background: rgba(255, 255, 255, 0.12);
+      border: 2px solid #ffd166;
+      border-radius: 20px;
+      padding: 12px 24px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(255, 209, 102, 0.25);
+      animation: pulseGlow 2s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 10px rgba(255, 209, 102, 0.3); }
+      to { box-shadow: 0 0 22px rgba(255, 209, 102, 0.6); }
+    }
+    .mission-hint {
+      font-size: 0.9rem;
+      color: #a0c4ff;
+      margin-bottom: 2px;
+    }
+    .target-time {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* Clock Stage */
+    .clock-stage {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      background: #ffffff;
+      border-radius: 50%;
+      border: 8px solid #f77f00;
+      box-shadow: 0 0 25px rgba(247, 127, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .clock-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+    .clock-num {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #1c2541;
+      transform: translate(-50%, -50%);
+    }
+    .hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: 50% 100%;
+      border-radius: 6px;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .hour-hand {
+      width: 6px;
+      height: 62px;
+      background: #e63946;
+      margin-left: -3px;
+      z-index: 5;
+    }
+    .minute-hand {
+      width: 4px;
+      height: 85px;
+      background: #1d3557;
+      margin-left: -2px;
+      z-index: 4;
+    }
+    .center-nut {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 14px;
+      height: 14px;
+      background: #f77f00;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* Choices Area */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      margin-top: 6px;
+    }
+    .choice-btn {
+      background: linear-gradient(135deg, #3a506b 0%, #1c2541 100%);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 12px 10px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.15s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .choice-btn:active {
+      transform: scale(0.96);
+      background: #48cae4;
+      color: #000;
+    }
+    .choice-btn.correct {
+      background: linear-gradient(135deg, #2a9d8f 0%, #21867a 100%);
+      border-color: #52b788;
+      box-shadow: 0 0 16px #52b788;
+      transform: scale(1.03);
+    }
+    .choice-btn.wrong {
+      background: linear-gradient(135deg, #e63946 0%, #b5179e 100%);
+      border-color: #ff4d6d;
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    /* Bottom Control Bar */
+    footer {
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(11, 19, 43, 0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 20;
+    }
+    .btn-action {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: 10px;
+      padding: 8px 14px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .btn-action:active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    /* Level up Modal */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+      text-align: center;
+    }
+    .modal-content {
+      background: linear-gradient(180deg, #1c2541 0%, #0b132b 100%);
+      border: 3px solid #ffd166;
+      border-radius: 24px;
+      padding: 24px;
+      max-width: 360px;
+      box-shadow: 0 0 30px rgba(255, 209, 102, 0.5);
+    }
+    .modal-content h2 {
+      font-size: 1.8rem;
+      color: #ffd166;
+      margin-bottom: 12px;
+    }
+    .modal-content p {
+      font-size: 1.05rem;
+      color: #e0e1dd;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .btn-restart {
+      background: linear-gradient(135deg, #f77f00 0%, #d62828 100%);
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 800;
+      padding: 12px 28px;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(247, 127, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="confetti-canvas"></canvas>
+
+    <header>
+      <div class="game-title">⭐ 별빛 시계 바늘 맞추기</div>
+      <div class="hud-badges">
+        <div class="badge">점수 <span id="score-val" style="color:#ffd166;">0</span></div>
+        <div class="badge">연속 <span id="streak-val" style="color:#48cae4;">0</span></div>
+        <div class="badge">단계 <span id="level-val" style="color:#52b788;">1</span></div>
+      </div>
+    </header>
+
+    <main>
+      <div class="mission-card">
+        <div class="mission-hint">반짝이는 별이 알려주는 시각</div>
+        <div class="target-time" id="target-time-txt">3시</div>
+      </div>
+
+      <div class="clock-stage">
+        <div class="clock-face" id="clock-face">
+          <!-- 12 Hours placed via JS -->
+          <div class="hand hour-hand" id="hour-hand"></div>
+          <div class="hand minute-hand" id="minute-hand"></div>
+          <div class="center-nut"></div>
+        </div>
+      </div>
+
+      <div class="choices-grid" id="choices-grid">
+        <!-- 4 choices generated via JS -->
+      </div>
+    </main>
+
+    <footer>
+      <button class="btn-action" id="btn-sound">🔊 소리 켜짐</button>
+      <div style="font-size:0.85rem; color:#8d99ae;">초등 1학년 2학기 수학</div>
+      <button class="btn-action" id="btn-reset">다시하기</button>
+    </footer>
+
+    <div class="modal-overlay" id="level-modal">
+      <div class="modal-content">
+        <div style="font-size: 3rem; margin-bottom: 8px;">🌟</div>
+        <h2>축하해요, 시계 박사님!</h2>
+        <p id="modal-desc">10문제를 모두 맞혀 밤하늘의 모든 별자리를 완성했어요!</p>
+        <button class="btn-restart" id="btn-modal-restart">신나게 다시하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Audio Synthesis Engine ---
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.2, gainVal = 0.2) {
+      if (!soundEnabled) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playCorrectSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 arpeggio
+      notes.forEach((freq, idx) => {
+        setTimeout(() => playTone(freq, 'triangle', 0.25, 0.25), idx * 70);
+      });
+    }
+
+    function playWrongSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      playTone(220, 'sawtooth', 0.25, 0.2);
+      setTimeout(() => playTone(180, 'sawtooth', 0.3, 0.2), 120);
+    }
+
+    function playLevelUpSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      const fanfare = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+      fanfare.forEach((freq, idx) => {
+        setTimeout(() => playTone(freq, 'sine', 0.4, 0.3), idx * 90);
+      });
+    }
+
+    // --- Starry Canvas Background ---
+    const bgCanvas = document.getElementById('bg-canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    let stars = [];
+
+    function resizeBgCanvas() {
+      bgCanvas.width = bgCanvas.offsetWidth;
+      bgCanvas.height = bgCanvas.offsetHeight;
+      stars = [];
+      for (let i = 0; i < 45; i++) {
+        stars.push({
+          x: Math.random() * bgCanvas.width,
+          y: Math.random() * bgCanvas.height,
+          radius: Math.random() * 2 + 1,
+          alpha: Math.random() * 0.8 + 0.2,
+          speed: Math.random() * 0.02 + 0.01,
+          twinkleDir: Math.random() > 0.5 ? 1 : -1
+        });
+      }
+    }
+    window.addEventListener('resize', resizeBgCanvas);
+    resizeBgCanvas();
+
+    function renderStars() {
+      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      stars.forEach(star => {
+        star.alpha += star.speed * star.twinkleDir;
+        if (star.alpha > 0.95) { star.alpha = 0.95; star.twinkleDir = -1; }
+        if (star.alpha < 0.2) { star.alpha = 0.2; star.twinkleDir = 1; }
+        bgCtx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+        bgCtx.beginPath();
+        bgCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        bgCtx.fill();
+      });
+      requestAnimationFrame(renderStars);
+    }
+    renderStars();
+
+    // --- Clock Face Numbers ---
+    const clockFace = document.getElementById('clock-face');
+    for (let i = 1; i <= 12; i++) {
+      const numDiv = document.createElement('div');
+      numDiv.className = 'clock-num';
+      numDiv.innerText = i;
+      const angle = (i * 30 - 90) * (Math.PI / 180);
+      const r = 90; // radius from center
+      const x = 120 + r * Math.cos(angle);
+      const y = 120 + r * Math.sin(angle);
+      numDiv.style.left = `${x}px`;
+      numDiv.style.top = `${y}px`;
+      clockFace.appendChild(numDiv);
+    }
+
+    // --- Game Logic ---
+    let score = 0;
+    let streak = 0;
+    let level = 1;
+    let currentProblem = null;
+    let isAnswering = false;
+
+    const hourHand = document.getElementById('hour-hand');
+    const minuteHand = document.getElementById('minute-hand');
+    const targetTimeTxt = document.getElementById('target-time-txt');
+    const choicesGrid = document.getElementById('choices-grid');
+    const scoreVal = document.getElementById('score-val');
+    const streakVal = document.getElementById('streak-val');
+    const levelVal = document.getElementById('level-val');
+
+    // Elementary 1st Grade 2nd Semester: "몇 시" & "몇 시 30분"
+    function generateProblem() {
+      const isHalfHour = level >= 2 ? (Math.random() > 0.5) : false;
+      const hour = Math.floor(Math.random() * 12) + 1; // 1 ~ 12
+      const minute = isHalfHour ? 30 : 0;
+      
+      const timeStr = minute === 30 ? `${hour}시 30분` : `${hour}시`;
+      
+      // Calculate hands rotation
+      // Hour hand: 30 deg per hour, + 15 deg if half hour
+      const hourDeg = (hour % 12) * 30 + (minute === 30 ? 15 : 0);
+      // Minute hand: 0 deg for 0 min, 180 deg for 30 min
+      const minuteDeg = minute === 30 ? 180 : 0;
+
+      // 4 choices
+      const choices = [timeStr];
+      while (choices.length < 4) {
+        const randHour = Math.floor(Math.random() * 12) + 1;
+        const randMinute = (level >= 2 && Math.random() > 0.5) ? 30 : 0;
+        const candidate = randMinute === 30 ? `${randHour}시 30분` : `${randHour}시`;
+        if (!choices.includes(candidate)) {
+          choices.push(candidate);
+        }
+      }
+      choices.sort(() => Math.random() - 0.5);
+
+      return {
+        hour,
+        minute,
+        timeStr,
+        hourDeg,
+        minuteDeg,
+        choices
+      };
+    }
+
+    function renderProblem() {
+      isAnswering = false;
+      currentProblem = generateProblem();
+      
+      // Update target prompt
+      targetTimeTxt.innerText = currentProblem.timeStr;
+
+      // Rotate hands to target
+      hourHand.style.transform = `rotate(${currentProblem.hourDeg}deg)`;
+      minuteHand.style.transform = `rotate(${currentProblem.minuteDeg}deg)`;
+
+      // Render choice buttons
+      choicesGrid.innerHTML = '';
+      currentProblem.choices.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = `<span>${choice}</span><span style="font-size:0.75rem; color:#a0c4ff;">선택하기</span>`;
+        btn.addEventListener('click', () => handleChoice(choice, btn));
+        choicesGrid.appendChild(btn);
+      });
+    }
+
+    function handleChoice(selected, btn) {
+      if (isAnswering) return;
+      isAnswering = true;
+      initAudio();
+
+      if (selected === currentProblem.timeStr) {
+        btn.classList.add('correct');
+        playCorrectSound();
+        spawnConfetti();
+        score += 10 + streak * 2;
+        streak++;
+        if (streak % 5 === 0) {
+          level++;
+          playLevelUpSound();
+        }
+      } else {
+        btn.classList.add('wrong');
+        playWrongSound();
+        streak = 0;
+      }
+
+      scoreVal.innerText = score;
+      streakVal.innerText = streak;
+      levelVal.innerText = level;
+
+      if (score >= 100) {
+        setTimeout(showLevelModal, 600);
+        return;
+      }
+
+      setTimeout(() => {
+        renderProblem();
+      }, 700);
+    }
+
+    // --- Confetti FX ---
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const cCtx = confettiCanvas.getContext('2d');
+    let confettis = [];
+
+    function resizeConfetti() {
+      confettiCanvas.width = confettiCanvas.offsetWidth;
+      confettiCanvas.height = confettiCanvas.offsetHeight;
+    }
+    resizeConfetti();
+    window.addEventListener('resize', resizeConfetti);
+
+    function spawnConfetti() {
+      for (let i = 0; i < 40; i++) {
+        confettis.push({
+          x: confettiCanvas.width / 2 + (Math.random() - 0.5) * 60,
+          y: confettiCanvas.height * 0.45,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 1.5) * 7,
+          size: Math.random() * 7 + 4,
+          color: ['#ffd166', '#ff4d6d', '#48cae4', '#52b788', '#fff'][Math.floor(Math.random() * 5)],
+          life: 45
+        });
+      }
+    }
+
+    function updateConfetti() {
+      cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettis = confettis.filter(c => c.life > 0);
+      confettis.forEach(c => {
+        c.x += c.vx;
+        c.y += c.vy;
+        c.vy += 0.25; // gravity
+        c.life--;
+        cCtx.fillStyle = c.color;
+        cCtx.beginPath();
+        cCtx.arc(c.x, c.y, c.size / 2, 0, Math.PI * 2);
+        cCtx.fill();
+      });
+      requestAnimationFrame(updateConfetti);
+    }
+    updateConfetti();
+
+    // --- Modal & Reset Controls ---
+    const levelModal = document.getElementById('level-modal');
+    function showLevelModal() {
+      levelModal.style.display = 'flex';
+      playLevelUpSound();
+    }
+    document.getElementById('btn-modal-restart').addEventListener('click', () => {
+      levelModal.style.display = 'none';
+      score = 0;
+      streak = 0;
+      level = 1;
+      scoreVal.innerText = 0;
+      streakVal.innerText = 0;
+      levelVal.innerText = 1;
+      renderProblem();
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      score = 0;
+      streak = 0;
+      scoreVal.innerText = 0;
+      streakVal.innerText = 0;
+      renderProblem();
+    });
+
+    const btnSound = document.getElementById('btn-sound');
+    btnSound.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      btnSound.innerText = soundEnabled ? '🔊 소리 켜짐' : '🔇 소리 꺼짐';
+    });
+
+    // Start
+    renderProblem();
+  </script>
+</body>
+</html>

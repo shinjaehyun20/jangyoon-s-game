@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "forest-candy-basket-math",
+        "title": "🍬 숲속 덧셈 사탕 바구니",
+        "path": "forest-candy-basket-math/index.html"
+      },
+      {
+        "id": "starlight-clock-master",
+        "title": "⭐ 별빛 시계 바늘 맞추기",
+        "path": "starlight-clock-master/index.html"
+      },
+      {
         "id": "number-block-tower",
         "title": "🧱 수 블록 탑 쌓기",
         "path": "number-block-tower/index.html"
