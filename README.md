@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 317개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 319개.
 
-[![Games](https://img.shields.io/badge/games-317-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-319-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![317개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![319개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 317개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 319개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -346,6 +346,8 @@
 | [🎮 도토리 수 저울 (acorn-number-scale-049)](./acorn-number-scale-049/index.html) | 양팔저울의 왼쪽과 오른쪽 도토리 개수를 똑같이 맞추는 초1 수 가르기·모으기 균형 퍼즐 게임 | 어린이/아케이드 |
 | [🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수 (platypus-bill-crystal-diver)](./platypus-bill-crystal-diver/index.html) | 신비로운 호수 속을 오리발로 첨벙첨벙 헤엄치는 귀여운 아기 오리너구리가 수초 사이에서 빛나는 에메랄드 보석과 오색 물방울을 쏙쏙 찾는 신나는 수중 탐험 놀이입니다. | 어린이/아케이드 |
 | [🦭 뽀송 하프물범의 빙하 무지개 슬라이드 (harp-seal-iceberg-bubble-slide)](./harp-seal-iceberg-bubble-slide/index.html) | 하얗고 동글동글한 아기 하프물범이 반짝이는 푸른 빙하 미끄럼틀을 슝슝 미끄러지며 공중에 떠오르는 무지개 방울과 하트 얼음을 모으는 신나는 빙하 슬라이드 놀이입니다. | 어린이/아케이드 |
+| [🧱 수 블록 탑 쌓기 (number-block-tower)](./number-block-tower/index.html) | 화면 상단의 목표 숫자 카드를 확인하고 아래에서 올라오는 숫자 블록 중 두 개를 골라 합쳐서 정확한 수 블록 탑을 쌓아 올리는 초등 1학년 수학 10 이하 수 가르기와 모으기 놀이입니다. | 어린이/아케이드 |
+| [🚂 단어 기차 칙칙폭폭 (word-train-runner)](./word-train-runner/index.html) | 화면 가운데 달리는 알록달록 기차에 적힌 빈칸 낱말을 보고 선로 위를 굴러오는 3개의 받침 수레 중 올바른 글자를 터치하여 기차를 완성하는 초등 1학년 국어 낱말 놀이입니다. | 어린이/아케이드 |
 
 </details>
 
@@ -513,6 +515,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-23: [🚂 단어 기차 칙칙폭폭](word-train-runner/index.html), [🧱 수 블록 탑 쌓기](number-block-tower/index.html) (총 319개)
+
 - 2026-10-20: [🦭 뽀송 하프물범의 빙하 무지개 슬라이드](harp-seal-iceberg-bubble-slide/index.html), [🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수](platypus-bill-crystal-diver/index.html) (총 317개)
 
 - 2026-10-17: [🎮 도토리 수 저울](acorn-number-scale-049/index.html), [🎮 째깍째깍 시계 탐험대](clock-time-runner/index.html), [🎮 한글 별자리 탐험대](hangul-star-constellation-050/index.html), [🎮 달콤한 텐프레임 빵집](ten-frame-bakery/index.html) (총 317개)

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "number-block-tower",
+        "title": "🧱 수 블록 탑 쌓기",
+        "path": "number-block-tower/index.html"
+      },
+      {
+        "id": "word-train-runner",
+        "title": "🚂 단어 기차 칙칙폭폭",
+        "path": "word-train-runner/index.html"
+      },
+      {
         "id": "platypus-bill-crystal-diver",
         "title": "🦆 찰방 오리너구리의 에메랄드 크리스탈 잠수",
         "path": "platypus-bill-crystal-diver/index.html"

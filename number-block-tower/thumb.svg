@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+    <linearGradient id="block1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7675"/>
+      <stop offset="100%" stop-color="#d63031"/>
+    </linearGradient>
+    <linearGradient id="block2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#74b9ff"/>
+      <stop offset="100%" stop-color="#0984e3"/>
+    </linearGradient>
+    <linearGradient id="block3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#55efc4"/>
+      <stop offset="100%" stop-color="#00b894"/>
+    </linearGradient>
+    <linearGradient id="block4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffeaa7"/>
+      <stop offset="100%" stop-color="#fdcb6e"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#bgGrad)"/>
+
+  <!-- Stars / Particles -->
+  <circle cx="50" cy="60" r="4" fill="#ffffff" opacity="0.8"/>
+  <circle cx="90" cy="110" r="3" fill="#ffd166" opacity="0.9"/>
+  <circle cx="340" cy="80" r="5" fill="#ffffff" opacity="0.7"/>
+  <circle cx="370" cy="140" r="3" fill="#ffeaa7" opacity="0.8"/>
+  <circle cx="310" cy="40" r="4" fill="#55efc4" opacity="0.9"/>
+
+  <!-- Base Platform -->
+  <rect x="80" y="240" width="240" height="24" rx="12" fill="#2d3436" filter="url(#shadow)"/>
+  <rect x="90" y="244" width="220" height="6" rx="3" fill="#636e72"/>
+
+  <!-- Tower Blocks -->
+  <!-- Block 1 (Bottom, size: 4) -->
+  <g filter="url(#shadow)">
+    <rect x="130" y="195" width="140" height="42" rx="8" fill="url(#block2)"/>
+    <text x="200" y="224" font-family="'Pretendard', sans-serif" font-weight="900" font-size="24" fill="#ffffff" text-anchor="middle">4</text>
+  </g>
+
+  <!-- Block 2 (Middle, size: 3) -->
+  <g filter="url(#shadow)">
+    <rect x="145" y="150" width="110" height="42" rx="8" fill="url(#block1)"/>
+    <text x="200" y="179" font-family="'Pretendard', sans-serif" font-weight="900" font-size="24" fill="#ffffff" text-anchor="middle">3</text>
+  </g>
+
+  <!-- Block 3 (Top / Target, size: 7 Crown) -->
+  <g filter="url(#shadow)">
+    <rect x="160" y="105" width="80" height="42" rx="8" fill="url(#block4)"/>
+    <text x="200" y="134" font-family="'Pretendard', sans-serif" font-weight="900" font-size="24" fill="#2d3436" text-anchor="middle">7</text>
+  </g>
+
+  <!-- Crown / Star on top -->
+  <polygon points="200,75 208,95 230,95 212,106 218,126 200,114 182,126 188,106 170,95 192,95" fill="#ffd700" filter="url(#shadow)"/>
+
+  <!-- Math Hint: 4 + 3 = 7 -->
+  <rect x="270" y="145" width="95" height="40" rx="10" fill="rgba(255,255,255,0.9)" filter="url(#shadow)"/>
+  <text x="317" y="170" font-family="'Pretendard', sans-serif" font-weight="800" font-size="16" fill="#2d3436" text-anchor="middle">4 + 3 = 7</text>
+
+  <!-- Title Badge -->
+  <rect x="25" y="15" width="220" height="36" rx="18" fill="rgba(0,0,0,0.5)"/>
+  <text x="135" y="39" font-family="'Pretendard', sans-serif" font-weight="800" font-size="16" fill="#ffffff" text-anchor="middle">🧱 수 블록 탑 쌓기</text>
+</svg>

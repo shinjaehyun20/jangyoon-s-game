@@ -1,5 +1,23 @@
 [
   {
+    "id": "word-train-runner",
+    "title": "Word Train Runner",
+    "title_ko": "🚂 단어 기차 칙칙폭폭",
+    "description": "화면 가운데 달리는 알록달록 기차에 적힌 빈칸 낱말을 보고 선로 위를 굴러오는 3개의 받침 수레 중 올바른 글자를 터치하여 기차를 완성하는 초등 1학년 국어 낱말 놀이입니다.",
+    "thumbnail": "word-train-runner/thumb.svg",
+    "path": "word-train-runner/index.html",
+    "created": "2026-10-23"
+  },
+  {
+    "id": "number-block-tower",
+    "title": "Number Block Tower",
+    "title_ko": "🧱 수 블록 탑 쌓기",
+    "description": "화면 상단의 목표 숫자 카드를 확인하고 아래에서 올라오는 숫자 블록 중 두 개를 골라 합쳐서 정확한 수 블록 탑을 쌓아 올리는 초등 1학년 수학 10 이하 수 가르기와 모으기 놀이입니다.",
+    "thumbnail": "number-block-tower/thumb.svg",
+    "path": "number-block-tower/index.html",
+    "created": "2026-10-23"
+  },
+  {
     "id": "harp-seal-iceberg-bubble-slide",
     "title": "Harp Seal Iceberg Bubble Slide",
     "title_ko": "🦭 뽀송 하프물범의 빙하 무지개 슬라이드",

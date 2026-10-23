@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3a7bd5"/>
+      <stop offset="60%" stop-color="#3a6073"/>
+      <stop offset="100%" stop-color="#1e3c72"/>
+    </linearGradient>
+    <linearGradient id="trainGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff416c"/>
+      <stop offset="100%" stop-color="#ff4b2b"/>
+    </linearGradient>
+    <linearGradient id="cartGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f7b733"/>
+      <stop offset="100%" stop-color="#fc4a1a"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="400" height="300" fill="url(#bgGrad)"/>
+
+  <!-- Clouds -->
+  <circle cx="80" cy="50" r="25" fill="#ffffff" opacity="0.8"/>
+  <circle cx="110" cy="45" r="30" fill="#ffffff" opacity="0.85"/>
+  <circle cx="140" cy="52" r="22" fill="#ffffff" opacity="0.8"/>
+
+  <circle cx="280" cy="70" r="20" fill="#ffffff" opacity="0.75"/>
+  <circle cx="310" cy="65" r="26" fill="#ffffff" opacity="0.8"/>
+  <circle cx="335" cy="72" r="18" fill="#ffffff" opacity="0.75"/>
+
+  <!-- Sun -->
+  <circle cx="350" cy="50" r="30" fill="#ffeb3b" filter="url(#shadow)"/>
+
+  <!-- Mountains -->
+  <polygon points="0,220 90,130 180,220" fill="#4a7c59" opacity="0.5"/>
+  <polygon points="120,220 220,110 320,220" fill="#2d6a4f" opacity="0.6"/>
+  <polygon points="260,220 340,140 400,220" fill="#1b4332" opacity="0.7"/>
+
+  <!-- Ground -->
+  <rect y="210" width="400" height="90" fill="#74c69d"/>
+
+  <!-- Train Tracks -->
+  <rect y="218" width="400" height="8" fill="#555"/>
+  <rect y="232" width="400" height="8" fill="#555"/>
+  <g fill="#8b5a2b">
+    <rect x="10" y="215" width="8" height="28" rx="2"/>
+    <rect x="40" y="215" width="8" height="28" rx="2"/>
+    <rect x="70" y="215" width="8" height="28" rx="2"/>
+    <rect x="100" y="215" width="8" height="28" rx="2"/>
+    <rect x="130" y="215" width="8" height="28" rx="2"/>
+    <rect x="160" y="215" width="8" height="28" rx="2"/>
+    <rect x="190" y="215" width="8" height="28" rx="2"/>
+    <rect x="220" y="215" width="8" height="28" rx="2"/>
+    <rect x="250" y="215" width="8" height="28" rx="2"/>
+    <rect x="280" y="215" width="8" height="28" rx="2"/>
+    <rect x="310" y="215" width="8" height="28" rx="2"/>
+    <rect x="340" y="215" width="8" height="28" rx="2"/>
+    <rect x="370" y="215" width="8" height="28" rx="2"/>
+  </g>
+
+  <!-- Locomotive Steam -->
+  <circle cx="235" cy="115" r="14" fill="#ffffff" opacity="0.7"/>
+  <circle cx="215" cy="95" r="18" fill="#ffffff" opacity="0.6"/>
+  <circle cx="190" cy="80" r="22" fill="#ffffff" opacity="0.4"/>
+
+  <!-- Locomotive -->
+  <rect x="230" y="140" width="110" height="75" rx="10" fill="url(#trainGrad)" filter="url(#shadow)"/>
+  <rect x="300" y="125" width="35" height="35" rx="5" fill="#2c3e50"/>
+  <rect x="305" y="130" width="25" height="20" rx="3" fill="#81d4fa"/>
+  <rect x="245" y="125" width="16" height="20" fill="#333"/>
+  <path d="M 340 185 L 365 215 L 340 215 Z" fill="#e74c3c"/>
+
+  <!-- Cart with Word -->
+  <rect x="90" y="150" width="125" height="65" rx="8" fill="url(#cartGrad)" filter="url(#shadow)"/>
+  <rect x="215" y="180" width="18" height="10" fill="#2c3e50"/>
+
+  <!-- Word Text on Cart: "사[과]" or "호랑[이]" -->
+  <rect x="105" y="160" width="45" height="45" rx="6" fill="#ffffff"/>
+  <text x="127" y="193" font-family="'Pretendard', sans-serif" font-weight="900" font-size="28" fill="#2c3e50" text-anchor="middle">호</text>
+  
+  <rect x="155" y="160" width="45" height="45" rx="6" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="2"/>
+  <text x="177" y="193" font-family="'Pretendard', sans-serif" font-weight="900" font-size="28" fill="#d63031" text-anchor="middle">?</text>
+
+  <!-- Wheels -->
+  <circle cx="120" cy="218" r="14" fill="#2d3436"/>
+  <circle cx="120" cy="218" r="6" fill="#dfe6e9"/>
+  <circle cx="185" cy="218" r="14" fill="#2d3436"/>
+  <circle cx="185" cy="218" r="6" fill="#dfe6e9"/>
+
+  <circle cx="260" cy="218" r="16" fill="#2d3436"/>
+  <circle cx="260" cy="218" r="7" fill="#dfe6e9"/>
+  <circle cx="315" cy="218" r="16" fill="#2d3436"/>
+  <circle cx="315" cy="218" r="7" fill="#dfe6e9"/>
+
+  <!-- Title Badge -->
+  <rect x="25" y="15" width="220" height="36" rx="18" fill="rgba(0,0,0,0.5)"/>
+  <text x="135" y="39" font-family="'Pretendard', sans-serif" font-weight="800" font-size="16" fill="#ffffff" text-anchor="middle">🚂 단어 기차 칙칙폭폭</text>
+</svg>

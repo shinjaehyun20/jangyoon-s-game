@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🧱 수 블록 탑 쌓기 - 장윤이의 게임세상 #319</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      background: #2c3e50;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    #game-wrap {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      background: linear-gradient(180deg, #1f1c2c 0%, #928dab 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    /* HUD */
+    header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .hud-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffd166;
+    }
+    .hud-stats {
+      display: flex;
+      gap: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .badge {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    /* Target & Tower Area */
+    .tower-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 10px 20px;
+    }
+
+    /* Target Card */
+    .target-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .target-label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #dfe6e9;
+      margin-bottom: 6px;
+    }
+    .target-card {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, #ffd700, #ff9f43);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 900;
+      color: #2d3436;
+      box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4), inset 0 3px 6px rgba(255,255,255,0.6);
+      animation: pulseTarget 2s infinite alternate;
+    }
+    @keyframes pulseTarget {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+
+    /* Tower Build Platform */
+    .tower-platform {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 8px;
+      min-height: 140px;
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .base-pedestal {
+      width: 220px;
+      height: 18px;
+      background: #34495e;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      border-bottom: 4px solid #1a252f;
+    }
+
+    /* Selected Block in Tower */
+    .stacked-block {
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #ffffff;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+      animation: dropIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes dropIn {
+      from { transform: translateY(-40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Formula Banner */
+    .formula-banner {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 8px 24px;
+      border-radius: 20px;
+      margin-top: 14px;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Block Selection Area */
+    .blocks-container {
+      padding: 20px 16px 36px 16px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      border-radius: 28px 28px 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .blocks-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #dfe6e9;
+    }
+    .blocks-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .num-btn {
+      height: 72px;
+      background: #ffffff;
+      color: #2d3436;
+      border: none;
+      border-radius: 18px;
+      font-size: 2.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2), 0 3px 0 #b2bec3;
+      transition: transform 0.1s;
+    }
+    .num-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 0 0 #b2bec3;
+    }
+    .num-btn.selected {
+      background: #00cec9;
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(0, 206, 201, 0.5);
+    }
+    .num-btn.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* Modal / Overlay */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .overlay-card {
+      background: #ffffff;
+      color: #2d3436;
+      padding: 32px 24px;
+      border-radius: 24px;
+      text-align: center;
+      max-width: 320px;
+      box-shadow: 0 16px 32px rgba(0,0,0,0.4);
+    }
+    .overlay-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      color: #e17055;
+    }
+    .overlay-card p {
+      font-size: 1.05rem;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      color: #636e72;
+    }
+    .btn-start {
+      background: linear-gradient(135deg, #e17055, #fab1a0);
+      color: #fff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(225, 112, 85, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-wrap">
+    <!-- Header -->
+    <header>
+      <div class="hud-title">🧱 수 블록 탑 쌓기</div>
+      <div class="hud-stats">
+        <div class="badge">⭐ 점수: <span id="score">0</span></div>
+        <div class="badge">🚩 탑: <span id="current-q">1</span>/10</div>
+      </div>
+    </header>
+
+    <!-- Tower Play Area -->
+    <div class="tower-area">
+      <div class="target-container">
+        <div class="target-label">목표 숫자 탑</div>
+        <div class="target-card" id="target-number">7</div>
+      </div>
+
+      <div class="tower-platform" id="tower">
+        <div class="base-pedestal"></div>
+      </div>
+
+      <div class="formula-banner" id="formula-text">두 블록을 합쳐서 탑을 완성해요!</div>
+    </div>
+
+    <!-- Block Controls -->
+    <div class="blocks-container">
+      <div class="blocks-title">두 개의 숫자 블록을 차례로 고르세요!</div>
+      <div class="blocks-grid" id="blocks-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Start / End Overlay -->
+    <div class="overlay" id="overlay">
+      <div class="overlay-card">
+        <h2>🧱 수 블록 탑!</h2>
+        <p>두 개의 숫자 블록을 합쳐서<br>목표 숫자 탑을 알록달록 쌓아 올려요!<br>10 이하 수 모으기 놀이!</p>
+        <button class="btn-start" onclick="startGame()">탑 쌓기 시작! 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, duration, type = 'sine') {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playArpeggio() {
+      if (!audioCtx) return;
+      const notes = [440, 554.37, 659.25, 880];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => playTone(freq, 0.25, 'triangle'), idx * 80);
+      });
+    }
+
+    function playWrongSound() {
+      if (!audioCtx) return;
+      playTone(280, 0.2, 'sawtooth');
+      setTimeout(() => playTone(200, 0.3, 'sawtooth'), 100);
+    }
+
+    // Colors for blocks
+    const blockColors = [
+      'linear-gradient(135deg, #ff7675, #d63031)',
+      'linear-gradient(135deg, #74b9ff, #0984e3)',
+      'linear-gradient(135deg, #55efc4, #00b894)',
+      'linear-gradient(135deg, #ffeaa7, #fdcb6e)',
+      'linear-gradient(135deg, #a29bfe, #6c5ce7)',
+      'linear-gradient(135deg, #fd79a8, #e84393)'
+    ];
+
+    // Questions: target sums (<= 10)
+    const questions = [
+      { target: 5, a: 2, b: 3, choices: [1, 2, 3, 4] },
+      { target: 6, a: 4, b: 2, choices: [2, 3, 4, 5] },
+      { target: 7, a: 3, b: 4, choices: [1, 3, 4, 6] },
+      { target: 8, a: 5, b: 3, choices: [2, 3, 5, 6] },
+      { target: 9, a: 4, b: 5, choices: [1, 4, 5, 7] },
+      { target: 10, a: 6, b: 4, choices: [3, 4, 6, 8] },
+      { target: 7, a: 5, b: 2, choices: [2, 4, 5, 7] },
+      { target: 8, a: 7, b: 1, choices: [1, 3, 6, 7] },
+      { target: 9, a: 6, b: 3, choices: [2, 3, 6, 8] },
+      { target: 10, a: 7, b: 3, choices: [2, 3, 5, 7] }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let selectedBlocks = [];
+    let isProcessing = false;
+
+    function startGame() {
+      initAudio();
+      document.getElementById('overlay').style.display = 'none';
+      currentIdx = 0;
+      score = 0;
+      document.getElementById('score').innerText = score;
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentIdx >= questions.length) {
+        showClear();
+        return;
+      }
+      isProcessing = false;
+      selectedBlocks = [];
+      const q = questions[currentIdx];
+      document.getElementById('current-q').innerText = currentIdx + 1;
+      document.getElementById('target-number').innerText = q.target;
+      document.getElementById('formula-text').innerText = "두 블록을 합쳐서 탑을 완성해요!";
+
+      // Reset tower
+      const tower = document.getElementById('tower');
+      tower.innerHTML = '<div class="base-pedestal"></div>';
+
+      // Render choice buttons
+      const grid = document.getElementById('blocks-grid');
+      grid.innerHTML = '';
+      q.choices.forEach((val, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'num-btn';
+        btn.innerText = val;
+        btn.onclick = () => selectBlock(val, btn, q);
+        grid.appendChild(btn);
+      });
+    }
+
+    function selectBlock(val, btn, q) {
+      if (isProcessing) return;
+
+      playTone(400 + val * 50, 0.15);
+      btn.classList.add('selected');
+      btn.disabled = true;
+
+      selectedBlocks.push({ val, btn });
+
+      // Add block visually to tower
+      const tower = document.getElementById('tower');
+      const bEl = document.createElement('div');
+      bEl.className = 'stacked-block';
+      bEl.style.width = `${100 + val * 16}px`;
+      bEl.style.background = blockColors[(val + currentIdx) % blockColors.length];
+      bEl.innerText = val;
+      tower.appendChild(bEl);
+
+      if (selectedBlocks.length === 1) {
+        document.getElementById('formula-text').innerText = `${selectedBlocks[0].val} + ? = ${q.target}`;
+      } else if (selectedBlocks.length === 2) {
+        isProcessing = true;
+        const sum = selectedBlocks[0].val + selectedBlocks[1].val;
+        document.getElementById('formula-text').innerText = `${selectedBlocks[0].val} + ${selectedBlocks[1].val} = ${sum}`;
+
+        if (sum === q.target) {
+          score += 10;
+          document.getElementById('score').innerText = score;
+          document.getElementById('formula-text').innerText = `대성공! ${sum} 완성! 🌟`;
+          playArpeggio();
+
+          setTimeout(() => {
+            currentIdx++;
+            loadQuestion();
+          }, 1100);
+        } else {
+          playWrongSound();
+          document.getElementById('formula-text').innerText = `아쉬워요! 다시 해볼까요? 💡`;
+          setTimeout(() => {
+            selectedBlocks.forEach(item => {
+              item.btn.classList.remove('selected');
+              item.btn.disabled = false;
+            });
+            selectedBlocks = [];
+            tower.innerHTML = '<div class="base-pedestal"></div>';
+            document.getElementById('formula-text').innerText = "두 블록을 합쳐서 탑을 완성해요!";
+            isProcessing = false;
+          }, 900);
+        }
+      }
+    }
+
+    function showClear() {
+      playArpeggio();
+      setTimeout(playArpeggio, 300);
+
+      const overlay = document.getElementById('overlay');
+      overlay.innerHTML = `
+        <div class="overlay-card">
+          <h2>🏆 멋진 수 블록 건축가!</h2>
+          <p>모든 숫자 탑을 완벽하게 완성했어요!<br>수학 실력이 쑥쑥 자랐네요!<br>최종 점수: <strong>${score}점</strong></p>
+          <button class="btn-start" onclick="startGame()">다시 쌓기 🔄</button>
+        </div>
+      `;
+      overlay.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
