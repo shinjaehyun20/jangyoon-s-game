@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4facfe" />
+      <stop offset="100%" stop-color="#00f2fe" />
+    </linearGradient>
+    <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff7675" />
+      <stop offset="20%" stop-color="#fdcb6e" />
+      <stop offset="40%" stop-color="#ffeaa7" />
+      <stop offset="60%" stop-color="#55efc4" />
+      <stop offset="80%" stop-color="#74b9ff" />
+      <stop offset="100%" stop-color="#a29bfe" />
+    </linearGradient>
+    <radialGradient id="bubble" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.9)" />
+      <stop offset="40%" stop-color="rgba(255,255,255,0.4)" />
+      <stop offset="80%" stop-color="rgba(255,107,129,0.3)" />
+      <stop offset="100%" stop-color="rgba(116,185,255,0.6)" />
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="512" height="512" rx="48" fill="url(#bg)" />
+
+  <!-- Soft Rainbow Arch -->
+  <path d="M 56 380 A 200 200 0 0 1 456 380" stroke="url(#rainbow)" stroke-width="28" fill="none" opacity="0.75" stroke-linecap="round" />
+
+  <!-- Fluffy Cloud -->
+  <path d="M 80 410 C 60 410 40 395 45 375 C 50 355 75 350 85 350 C 95 330 130 325 150 345 C 170 330 200 340 205 360 C 220 365 225 385 215 400 C 210 410 195 410 180 410 Z" fill="#ffffff" opacity="0.9" filter="url(#glow)" />
+  <path d="M 330 420 C 310 420 290 405 295 385 C 300 365 325 360 335 360 C 345 340 380 335 400 355 C 420 340 450 350 455 370 C 470 375 475 395 465 410 C 460 420 445 420 430 420 Z" fill="#ffffff" opacity="0.9" filter="url(#glow)" />
+
+  <!-- Big Glowing Bubbles -->
+  <!-- Bubble 1: ㅏ -->
+  <g transform="translate(140, 180)">
+    <circle cx="0" cy="0" r="62" fill="url(#bubble)" stroke="#ffffff" stroke-width="3" filter="url(#glow)" />
+    <ellipse cx="-20" cy="-22" rx="16" ry="8" fill="#ffffff" opacity="0.8" transform="rotate(-30 -20 -22)" />
+    <text x="0" y="24" font-family="'Pretendard', sans-serif" font-size="64" font-weight="900" fill="#e84393" text-anchor="middle">ㅏ</text>
+  </g>
+
+  <!-- Bubble 2: ㅗ (Center) -->
+  <g transform="translate(256, 120)">
+    <circle cx="0" cy="0" r="76" fill="url(#bubble)" stroke="#ffffff" stroke-width="4" filter="url(#glow)" />
+    <ellipse cx="-25" cy="-28" rx="20" ry="10" fill="#ffffff" opacity="0.8" transform="rotate(-30 -25 -28)" />
+    <text x="0" y="30" font-family="'Pretendard', sans-serif" font-size="78" font-weight="900" fill="#0984e3" text-anchor="middle">ㅗ</text>
+  </g>
+
+  <!-- Bubble 3: ㅣ -->
+  <g transform="translate(372, 190)">
+    <circle cx="0" cy="0" r="58" fill="url(#bubble)" stroke="#ffffff" stroke-width="3" filter="url(#glow)" />
+    <ellipse cx="-18" cy="-20" rx="14" ry="7" fill="#ffffff" opacity="0.8" transform="rotate(-30 -18 -20)" />
+    <text x="0" y="22" font-family="'Pretendard', sans-serif" font-size="60" font-weight="900" fill="#6c5ce7" text-anchor="middle">ㅣ</text>
+  </g>
+
+  <!-- Sparkles -->
+  <path d="M 256 220 L 260 232 L 272 236 L 260 240 L 256 252 L 252 240 L 240 236 L 252 232 Z" fill="#ffeaa7" filter="url(#glow)" />
+  <path d="M 100 120 L 103 130 L 113 133 L 103 136 L 100 146 L 97 136 L 87 133 L 97 130 Z" fill="#ffeaa7" />
+  <path d="M 420 110 L 423 120 L 433 123 L 423 126 L 420 136 L 417 126 L 407 123 L 417 120 Z" fill="#ffeaa7" />
+
+  <!-- Cute Butterfly -->
+  <g transform="translate(256, 290)">
+    <ellipse cx="-18" cy="-14" rx="22" ry="16" fill="#ff7675" opacity="0.9" transform="rotate(-20 -18 -14)" />
+    <ellipse cx="18" cy="-14" rx="22" ry="16" fill="#ff7675" opacity="0.9" transform="rotate(20 18 -14)" />
+    <ellipse cx="-14" cy="12" rx="16" ry="12" fill="#fdcb6e" opacity="0.9" />
+    <ellipse cx="14" cy="12" rx="16" ry="12" fill="#fdcb6e" opacity="0.9" />
+    <rect x="-4" y="-22" width="8" height="42" rx="4" fill="#2d3436" />
+    <circle cx="-6" cy="-28" r="3" fill="#2d3436" />
+    <circle cx="6" cy="-28" r="3" fill="#2d3436" />
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="56" y="420" width="400" height="64" rx="32" fill="#ffffff" filter="url(#glow)" />
+  <text x="256" y="464" font-family="'Pretendard', sans-serif" font-size="28" font-weight="900" fill="#2d3436" text-anchor="middle">무지개 모음 방울 톡톡</text>
+</svg>

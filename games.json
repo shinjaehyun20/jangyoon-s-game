@@ -1,5 +1,23 @@
 [
   {
+    "id": "rainbow-vowel-catcher",
+    "title": "Rainbow Vowel Catcher",
+    "title_ko": "🌈 무지개 모음 방울 톡톡",
+    "description": "하늘에서 두둥실 떠오르는 알록달록 무지개 비눗방울 속 모음자(ㅏ, ㅓ, ㅗ, ㅜ, ㅡ, ㅣ)를 터뜨려 나비, 오리, 사자 등 예쁜 낱말을 완성하는 초등 1학년 국어 모음 조합 놀이입니다.",
+    "thumbnail": "rainbow-vowel-catcher/thumb.svg",
+    "path": "rainbow-vowel-catcher/index.html",
+    "created": "2026-10-25"
+  },
+  {
+    "id": "autumn-leaf-pattern-puzzler",
+    "title": "Autumn Leaf Pattern Puzzler",
+    "title_ko": "🍂 가을 낙엽 패턴 놀이터",
+    "description": "알록달록 단풍잎, 황금빛 은행잎, 또르르 도토리와 솔방울로 이어지는 규칙적인 가을 리본 길을 보고 빈칸(❓)에 들어갈 알맞은 자연물을 쏙 골라내는 초등 1학년 2학기 규칙 찾기 놀이입니다.",
+    "thumbnail": "autumn-leaf-pattern-puzzler/thumb.svg",
+    "path": "autumn-leaf-pattern-puzzler/index.html",
+    "created": "2026-10-25"
+  },
+  {
     "id": "starlight-clock-master",
     "title": "Starlight Clock Master",
     "title_ko": "⭐ 별빛 시계 바늘 맞추기",

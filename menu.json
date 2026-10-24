@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "autumn-leaf-pattern-puzzler",
+        "title": "🍂 가을 낙엽 패턴 놀이터",
+        "path": "autumn-leaf-pattern-puzzler/index.html"
+      },
+      {
+        "id": "rainbow-vowel-catcher",
+        "title": "🌈 무지개 모음 방울 톡톡",
+        "path": "rainbow-vowel-catcher/index.html"
+      },
+      {
         "id": "forest-candy-basket-math",
         "title": "🍬 숲속 덧셈 사탕 바구니",
         "path": "forest-candy-basket-math/index.html"

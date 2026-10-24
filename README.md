@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 321개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 323개.
 
-[![Games](https://img.shields.io/badge/games-321-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-323-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![321개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![323개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 321개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 323개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -350,6 +350,8 @@
 | [🚂 단어 기차 칙칙폭폭 (word-train-runner)](./word-train-runner/index.html) | 화면 가운데 달리는 알록달록 기차에 적힌 빈칸 낱말을 보고 선로 위를 굴러오는 3개의 받침 수레 중 올바른 글자를 터치하여 기차를 완성하는 초등 1학년 국어 낱말 놀이입니다. | 어린이/아케이드 |
 | [🍬 숲속 덧셈 사탕 바구니 (forest-candy-basket-math)](./forest-candy-basket-math/index.html) | 숲속 다람쥐와 토끼 친구들이 부탁하는 사탕 개수를 확인하고 10개들이 상자에 사탕을 채운 뒤 남은 낱개 사탕을 더해 맛있는 덧셈 바구니를 완성하는 초등 1학년 2학기 10을 만들어 더하기 수학 놀이입니다. | 어린이/아케이드 |
 | [⭐ 별빛 시계 바늘 맞추기 (starlight-clock-master)](./starlight-clock-master/index.html) | 반짝이는 밤하늘 아기 별들이 보여주는 시각을 읽고 아날로그 시계의 긴바늘(분침)과 짧은바늘(시침)을 맞추거나 정답 시계를 골라 별자리를 밝히는 초등 1학년 2학기 몇 시, 몇 시 30분 시계 보기 놀이입니다. | 어린이/아케이드 |
+| [🍂 가을 낙엽 패턴 놀이터 (autumn-leaf-pattern-puzzler)](./autumn-leaf-pattern-puzzler/index.html) | 알록달록 단풍잎, 황금빛 은행잎, 또르르 도토리와 솔방울로 이어지는 규칙적인 가을 리본 길을 보고 빈칸(❓)에 들어갈 알맞은 자연물을 쏙 골라내는 초등 1학년 2학기 규칙 찾기 놀이입니다. | 어린이/아케이드 |
+| [🌈 무지개 모음 방울 톡톡 (rainbow-vowel-catcher)](./rainbow-vowel-catcher/index.html) | 하늘에서 두둥실 떠오르는 알록달록 무지개 비눗방울 속 모음자(ㅏ, ㅓ, ㅗ, ㅜ, ㅡ, ㅣ)를 터뜨려 나비, 오리, 사자 등 예쁜 낱말을 완성하는 초등 1학년 국어 모음 조합 놀이입니다. | 어린이/아케이드 |
 
 </details>
 
@@ -517,6 +519,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-25: [🌈 무지개 모음 방울 톡톡](rainbow-vowel-catcher/index.html), [🍂 가을 낙엽 패턴 놀이터](autumn-leaf-pattern-puzzler/index.html) (총 323개)
+
 - 2026-10-24: [⭐ 별빛 시계 바늘 맞추기](starlight-clock-master/index.html), [🍬 숲속 덧셈 사탕 바구니](forest-candy-basket-math/index.html) (총 321개)
 
 - 2026-10-23: [🚂 단어 기차 칙칙폭폭](word-train-runner/index.html), [🧱 수 블록 탑 쌓기](number-block-tower/index.html) (총 319개)

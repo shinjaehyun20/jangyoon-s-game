@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🌈 무지개 모음 방울 톡톡 - 장윤이의 게임세상 #322</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      background: #74b9ff;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2d3436;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      background: radial-gradient(circle at top, #a1c4fd 0%, #c2e9fb 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.2);
+    }
+    header {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 25;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 0 0 20px 20px;
+    }
+    .back-btn {
+      text-decoration: none;
+      color: #0984e3;
+      font-weight: 800;
+      font-size: 0.95rem;
+      background: #e1f0ff;
+      padding: 6px 12px;
+      border-radius: 12px;
+      transition: transform 0.1s;
+    }
+    .back-btn:active {
+      transform: scale(0.95);
+    }
+    .hud-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #2d3436;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hud-stats {
+      display: flex;
+      gap: 8px;
+    }
+    .stat-badge {
+      background: #ffffff;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #0984e3;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    #target-area {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 20;
+    }
+    .word-card {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 24px;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(116, 185, 255, 0.4);
+      border: 3px solid #ffffff;
+      width: 90%;
+      max-width: 360px;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .word-emoji {
+      font-size: 3.2rem;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+    .word-hint {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #747d8c;
+      margin-bottom: 10px;
+    }
+    .word-slots {
+      display: flex;
+      gap: 12px;
+    }
+    .char-slot {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: #f1f2f6;
+      border: 3px dashed #a4b0be;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #2f3542;
+      transition: all 0.25s;
+    }
+    .char-slot.active {
+      border-color: #ff4757;
+      background: #ffeaa7;
+      animation: pulse 1s infinite alternate;
+    }
+    .char-slot.filled {
+      border-style: solid;
+      border-color: #2ed573;
+      background: #ffffff;
+      color: #2ed573;
+      box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+
+    #bubble-canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      overflow: hidden;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #bottom-prompt {
+      padding: 14px 20px;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2f3542;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px 20px 0 0;
+      z-index: 25;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+    }
+    .prompt-highlight {
+      color: #ff4757;
+      font-size: 1.2rem;
+    }
+
+    /* Modal dialog */
+    #celebration-modal {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+    .modal-card {
+      background: #ffffff;
+      border-radius: 30px;
+      padding: 30px 24px;
+      text-align: center;
+      width: 85%;
+      max-width: 340px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-emoji {
+      font-size: 4rem;
+      margin-bottom: 10px;
+    }
+    .modal-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #2ed573;
+      margin-bottom: 8px;
+    }
+    .modal-desc {
+      font-size: 1.05rem;
+      color: #57606f;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .btn-action {
+      background: linear-gradient(135deg, #ff6b81, #ff4757);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(255, 71, 87, 0.4);
+      width: 100%;
+    }
+    .btn-action:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <header>
+      <a href="../index.html" class="back-btn">← 메인</a>
+      <div class="hud-title">🌈 모음 방울 톡톡</div>
+      <div class="hud-stats">
+        <div class="stat-badge" id="hud-round">1 / 8</div>
+        <div class="stat-badge" id="hud-score">⭐ 0</div>
+      </div>
+    </header>
+
+    <div id="target-area">
+      <div class="word-card" id="word-card">
+        <div class="word-emoji" id="target-emoji">🦋</div>
+        <div class="word-hint" id="target-hint">예쁜 날개를 팔랑팔랑</div>
+        <div class="word-slots" id="target-slots">
+          <!-- Slots rendered via JS -->
+        </div>
+      </div>
+    </div>
+
+    <div id="bubble-canvas-container">
+      <canvas id="game-canvas"></canvas>
+    </div>
+
+    <div id="bottom-prompt">
+      <span id="prompt-text">모음 방울을 터뜨려 단어를 완성해봐요!</span>
+    </div>
+
+    <!-- Modal -->
+    <div id="celebration-modal">
+      <div class="modal-card">
+        <div class="modal-emoji" id="modal-emoji">🎉</div>
+        <div class="modal-title" id="modal-title">정말 잘했어요!</div>
+        <div class="modal-desc" id="modal-desc">장윤이의 국어 실력이 쑥쑥 자라나요!</div>
+        <button class="btn-action" id="modal-btn">다음 단어 도전! ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Audio synthesis
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.2) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playPop() {
+      playTone(480 + Math.random() * 120, 'sine', 0.1, 0.25);
+    }
+    function playCorrect() {
+      playTone(523.25, 'triangle', 0.12, 0.2); // C5
+      setTimeout(() => playTone(659.25, 'triangle', 0.15, 0.25), 100); // E5
+      setTimeout(() => playTone(783.99, 'triangle', 0.25, 0.3), 200); // G5
+    }
+    function playWrong() {
+      playTone(220, 'sawtooth', 0.15, 0.15);
+    }
+    function playFanfare() {
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((f, i) => {
+        setTimeout(() => playTone(f, 'sine', 0.3, 0.3), i * 140);
+      });
+    }
+
+    // Vocabulary data (Elementary 1st grade level)
+    const VOCABULARY = [
+      {
+        word: "나비",
+        emoji: "🦋",
+        hint: "꽃 주위를 팔랑팔랑 날아다녀요",
+        parts: [
+          { consonant: "ㄴ", vowel: "ㅏ", full: "나" },
+          { consonant: "ㅂ", vowel: "ㅣ", full: "비" }
+        ]
+      },
+      {
+        word: "오리",
+        emoji: "🦆",
+        hint: "꽥꽥! 물 위를 둥둥 떠다녀요",
+        parts: [
+          { consonant: "ㅇ", vowel: "ㅗ", full: "오" },
+          { consonant: "ㄹ", vowel: "ㅣ", full: "리" }
+        ]
+      },
+      {
+        word: "사자",
+        emoji: "🦁",
+        hint: "어흥! 씩씩한 밀림의 왕이에요",
+        parts: [
+          { consonant: "ㅅ", vowel: "ㅏ", full: "사" },
+          { consonant: "ㅈ", vowel: "ㅏ", full: "자" }
+        ]
+      },
+      {
+        word: "포도",
+        emoji: "🍇",
+        hint: "보랏빛 알갱이가 주렁주렁 달렸어요",
+        parts: [
+          { consonant: "ㅍ", vowel: "ㅗ", full: "포" },
+          { consonant: "ㄷ", vowel: "ㅗ", full: "도" }
+        ]
+      },
+      {
+        word: "우산",
+        emoji: "☂️",
+        hint: "비가 올 때 머리 위에 활짝 펴요",
+        parts: [
+          { consonant: "ㅇ", vowel: "ㅜ", full: "우" },
+          { consonant: "ㅅ", vowel: "ㅏ", full: "산" }
+        ]
+      },
+      {
+        word: "기차",
+        emoji: "🚂",
+        hint: "칙칙폭폭 레일 위를 달려요",
+        parts: [
+          { consonant: "ㄱ", vowel: "ㅣ", full: "기" },
+          { consonant: "ㅊ", vowel: "ㅏ", full: "차" }
+        ]
+      },
+      {
+        word: "나무",
+        emoji: "🌳",
+        hint: "초록 잎사귀가 시원한 그늘을 줘요",
+        parts: [
+          { consonant: "ㄴ", vowel: "ㅏ", full: "나" },
+          { consonant: "ㅁ", vowel: "ㅜ", full: "무" }
+        ]
+      },
+      {
+        word: "무지개",
+        emoji: "🌈",
+        hint: "비 온 뒤 하늘에 뜨는 일곱 빛깔",
+        parts: [
+          { consonant: "ㅁ", vowel: "ㅜ", full: "무" },
+          { consonant: "ㅈ", vowel: "ㅣ", full: "지" },
+          { consonant: "ㄱ", vowel: "ㅐ", full: "개" }
+        ]
+      }
+    ];
+
+    // Game state
+    let currentVocabIdx = 0;
+    let currentPartIdx = 0;
+    let score = 0;
+    let bubbles = [];
+    let particles = [];
+    let canvas, ctx;
+    let animId = null;
+
+    const VOWELS_POOL = ["ㅏ", "ㅓ", "ㅗ", "ㅜ", "ㅡ", "ㅣ", "ㅐ", "ㅔ", "ㅑ", "ㅕ", "ㅛ", "ㅠ"];
+
+    class Bubble {
+      constructor(char, isTarget, x, y, r, speedY) {
+        this.char = char;
+        this.isTarget = isTarget;
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.speedY = speedY;
+        this.speedX = (Math.random() - 0.5) * 1.2;
+        this.hue = Math.floor(Math.random() * 360);
+        this.alpha = 0.85;
+        this.popped = false;
+        this.wobble = Math.random() * Math.PI * 2;
+        this.wobbleSpeed = 0.03 + Math.random() * 0.02;
+      }
+
+      update(width, height) {
+        this.wobble += this.wobbleSpeed;
+        this.x += this.speedX + Math.sin(this.wobble) * 0.7;
+        this.y -= this.speedY; // float up
+
+        // Wrap or respawn
+        if (this.x - this.r < 0) { this.x = this.r; this.speedX *= -1; }
+        if (this.x + this.r > width) { this.x = width - this.r; this.speedX *= -1; }
+
+        if (this.y + this.r < 180) { // top boundary below word card
+          this.y = height + this.r + Math.random() * 40;
+          this.x = this.r + Math.random() * (width - this.r * 2);
+        }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        // Bubble sphere
+        const grad = ctx.createRadialGradient(-this.r * 0.3, -this.r * 0.3, this.r * 0.1, 0, 0, this.r);
+        grad.addColorStop(0, `hsla(${this.hue}, 90%, 95%, 0.95)`);
+        grad.addColorStop(0.5, `hsla(${this.hue}, 80%, 75%, 0.6)`);
+        grad.addColorStop(0.9, `hsla(${this.hue}, 85%, 60%, 0.4)`);
+        grad.addColorStop(1, `hsla(${this.hue}, 90%, 50%, 0.8)`);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = `hsla(${this.hue}, 100%, 80%, 0.85)`;
+        ctx.stroke();
+
+        // Highlight glint
+        ctx.beginPath();
+        ctx.ellipse(-this.r * 0.35, -this.r * 0.35, this.r * 0.28, this.r * 0.14, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        ctx.fill();
+
+        // Text
+        ctx.fillStyle = "#2d3436";
+        ctx.font = `900 ${Math.floor(this.r * 1.05)}px 'Pretendard', sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.shadowColor = "rgba(255,255,255,0.8)";
+        ctx.shadowBlur = 4;
+        ctx.fillText(this.char, 0, 2);
+
+        ctx.restore();
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 8;
+        this.vy = (Math.random() - 0.5) * 8 - 2;
+        this.r = 3 + Math.random() * 5;
+        this.color = color;
+        this.alpha = 1;
+        this.decay = 0.02 + Math.random() * 0.02;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.2; // gravity
+        this.alpha -= this.decay;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function setupCanvas() {
+      canvas = document.getElementById("game-canvas");
+      ctx = canvas.getContext("2d");
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+    }
+
+    function resizeCanvas() {
+      const container = document.getElementById("bubble-canvas-container");
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    }
+
+    function spawnBubbles() {
+      bubbles = [];
+      const v = VOCABULARY[currentVocabIdx];
+      const targetVowel = v.parts[currentPartIdx].vowel;
+
+      const count = 7;
+      const width = canvas.width || 360;
+      const height = canvas.height || 640;
+
+      // Ensure 2 target vowel bubbles
+      bubbles.push(new Bubble(targetVowel, true, width * 0.25, height * 0.65, 36, 1.2));
+      bubbles.push(new Bubble(targetVowel, true, width * 0.75, height * 0.75, 36, 1.4));
+
+      // Other vowels
+      for (let i = 2; i < count; i++) {
+        let randVowel = VOWELS_POOL[Math.floor(Math.random() * VOWELS_POOL.length)];
+        while (randVowel === targetVowel) {
+          randVowel = VOWELS_POOL[Math.floor(Math.random() * VOWELS_POOL.length)];
+        }
+        const x = 40 + Math.random() * (width - 80);
+        const y = height * 0.5 + (i * 65);
+        bubbles.push(new Bubble(randVowel, false, x, y, 34 + Math.random() * 6, 1.1 + Math.random() * 0.6));
+      }
+    }
+
+    function renderWordSlots() {
+      const v = VOCABULARY[currentVocabIdx];
+      document.getElementById("target-emoji").textContent = v.emoji;
+      document.getElementById("target-hint").textContent = v.hint;
+      document.getElementById("hud-round").textContent = `${currentVocabIdx + 1} / ${VOCABULARY.length}`;
+      document.getElementById("hud-score").textContent = `⭐ ${score}`;
+
+      const container = document.getElementById("target-slots");
+      container.innerHTML = "";
+
+      v.parts.forEach((p, idx) => {
+        const slot = document.createElement("div");
+        slot.className = "char-slot";
+        if (idx < currentPartIdx) {
+          slot.classList.add("filled");
+          slot.textContent = p.full;
+        } else if (idx === currentPartIdx) {
+          slot.classList.add("active");
+          slot.textContent = p.consonant + "?";
+        } else {
+          slot.textContent = p.consonant;
+        }
+        container.appendChild(slot);
+      });
+
+      const currentTargetVowel = v.parts[currentPartIdx].vowel;
+      document.getElementById("prompt-text").innerHTML = 
+        `'<strong>${v.parts[currentPartIdx].consonant}</strong>' 에 알맞은 모음 <span class="prompt-highlight">'${currentTargetVowel}'</span> 방울을 터뜨려요!`;
+    }
+
+    function handleBubblePop(bubble, clickX, clickY) {
+      initAudio();
+      playPop();
+
+      // Confetti burst
+      for (let i = 0; i < 16; i++) {
+        particles.push(new Particle(clickX, clickY, `hsl(${bubble.hue}, 90%, 60%)`));
+      }
+
+      if (bubble.isTarget) {
+        playCorrect();
+        score += 20;
+        currentPartIdx++;
+        const v = VOCABULARY[currentVocabIdx];
+
+        if (currentPartIdx >= v.parts.length) {
+          // Word completed!
+          playFanfare();
+          score += 50;
+          document.getElementById("hud-score").textContent = `⭐ ${score}`;
+          renderWordSlots();
+
+          // Big celebration
+          setTimeout(() => {
+            showModal(v);
+          }, 400);
+        } else {
+          renderWordSlots();
+          spawnBubbles();
+        }
+      } else {
+        playWrong();
+        score = Math.max(0, score - 5);
+        document.getElementById("hud-score").textContent = `⭐ ${score}`;
+        // Slight shake
+        const card = document.getElementById("word-card");
+        card.style.transform = "translateX(-8px)";
+        setTimeout(() => card.style.transform = "translateX(8px)", 70);
+        setTimeout(() => card.style.transform = "translateX(0)", 140);
+      }
+    }
+
+    function showModal(v) {
+      const modal = document.getElementById("celebration-modal");
+      const title = document.getElementById("modal-title");
+      const desc = document.getElementById("modal-desc");
+      const emoji = document.getElementById("modal-emoji");
+      const btn = document.getElementById("modal-btn");
+
+      emoji.textContent = v.emoji;
+      title.textContent = `축하해요! '${v.word}' 완성!`;
+      desc.textContent = `장윤이가 모음을 쏙쏙 잘 맞췄어요! (+50점)`;
+
+      if (currentVocabIdx >= VOCABULARY.length - 1) {
+        btn.textContent = "처음부터 다시 놀기 🔄";
+      } else {
+        btn.textContent = "다음 단어로 가자! ➔";
+      }
+
+      modal.style.display = "flex";
+    }
+
+    document.getElementById("modal-btn").addEventListener("click", () => {
+      document.getElementById("celebration-modal").style.display = "none";
+      if (currentVocabIdx >= VOCABULARY.length - 1) {
+        currentVocabIdx = 0;
+        score = 0;
+      } else {
+        currentVocabIdx++;
+      }
+      currentPartIdx = 0;
+      renderWordSlots();
+      spawnBubbles();
+    });
+
+    function checkInteraction(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        const dist = Math.hypot(b.x - x, b.y - y);
+        if (dist <= b.r + 14) { // generous hit radius for little hands
+          handleBubblePop(b, b.x, b.y);
+          bubbles.splice(i, 1);
+          // respawn after 1.5s if not finished
+          setTimeout(() => {
+            if (bubbles.length < 6) {
+              const v = VOCABULARY[currentVocabIdx];
+              const isTarget = Math.random() < 0.45;
+              const char = isTarget ? v.parts[currentPartIdx].vowel : VOWELS_POOL[Math.floor(Math.random() * VOWELS_POOL.length)];
+              bubbles.push(new Bubble(char, isTarget, Math.random() * canvas.width, canvas.height + 40, 35, 1.2));
+            }
+          }, 1500);
+          break;
+        }
+      }
+    }
+
+    function addEvents() {
+      canvas.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        initAudio();
+        const touch = e.touches[0];
+        checkInteraction(touch.clientX, touch.clientY);
+      }, { passive: false });
+
+      canvas.addEventListener("mousedown", (e) => {
+        initAudio();
+        checkInteraction(e.clientX, e.clientY);
+      });
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Update and draw bubbles
+      bubbles.forEach(b => {
+        b.update(canvas.width, canvas.height);
+        b.draw(ctx);
+      });
+
+      // Update and draw particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw(ctx);
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      animId = requestAnimationFrame(gameLoop);
+    }
+
+    window.addEventListener("load", () => {
+      setupCanvas();
+      renderWordSlots();
+      spawnBubbles();
+      addEvents();
+      gameLoop();
+    });
+  </script>
+</body>
+</html>
