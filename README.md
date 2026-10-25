@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 323개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 325개.
 
-[![Games](https://img.shields.io/badge/games-323-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-325-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![323개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![325개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 323개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 325개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -352,6 +352,8 @@
 | [⭐ 별빛 시계 바늘 맞추기 (starlight-clock-master)](./starlight-clock-master/index.html) | 반짝이는 밤하늘 아기 별들이 보여주는 시각을 읽고 아날로그 시계의 긴바늘(분침)과 짧은바늘(시침)을 맞추거나 정답 시계를 골라 별자리를 밝히는 초등 1학년 2학기 몇 시, 몇 시 30분 시계 보기 놀이입니다. | 어린이/아케이드 |
 | [🍂 가을 낙엽 패턴 놀이터 (autumn-leaf-pattern-puzzler)](./autumn-leaf-pattern-puzzler/index.html) | 알록달록 단풍잎, 황금빛 은행잎, 또르르 도토리와 솔방울로 이어지는 규칙적인 가을 리본 길을 보고 빈칸(❓)에 들어갈 알맞은 자연물을 쏙 골라내는 초등 1학년 2학기 규칙 찾기 놀이입니다. | 어린이/아케이드 |
 | [🌈 무지개 모음 방울 톡톡 (rainbow-vowel-catcher)](./rainbow-vowel-catcher/index.html) | 하늘에서 두둥실 떠오르는 알록달록 무지개 비눗방울 속 모음자(ㅏ, ㅓ, ㅗ, ㅜ, ㅡ, ㅣ)를 터뜨려 나비, 오리, 사자 등 예쁜 낱말을 완성하는 초등 1학년 국어 모음 조합 놀이입니다. | 어린이/아케이드 |
+| [🌰 다람쥐 토토의 도토리 덧셈 양팔저울 (acorn-addition-scale)](./acorn-addition-scale/index.html) | 귀여운 다람쥐 토토와 함께 양팔저울의 왼쪽 바구니에 담긴 도토리 숫자(예: 7)를 보고, 오른쪽 바구니에 도토리 주머니들을 쏙 올려 양쪽 저울의 균형을 맞추는 초등 1학년 덧셈과 수 가르기·모으기 저울 놀이입니다. | 어린이/아케이드 |
+| [🚂 칙칙폭폭 끝말잇기 기차 여행 (rhyming-word-train)](./rhyming-word-train/index.html) | 기관사 곰돌이가 운전하는 무지개 기차에 앞선 칸의 마지막 글자로 시작하는 예쁜 단어(바나나 ➔ 나비 ➔ 비누 ➔ 누에)를 쏙쏙 연결하여 긴 화물 열차를 완성하고 기적을 울리는 초등 1학년 국어 끝말잇기 어휘 놀이입니다. | 어린이/아케이드 |
 
 </details>
 
@@ -519,6 +521,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-26: [🚂 칙칙폭폭 끝말잇기 기차 여행](rhyming-word-train/index.html), [🌰 다람쥐 토토의 도토리 덧셈 양팔저울](acorn-addition-scale/index.html) (총 325개)
+
 - 2026-10-25: [🌈 무지개 모음 방울 톡톡](rainbow-vowel-catcher/index.html), [🍂 가을 낙엽 패턴 놀이터](autumn-leaf-pattern-puzzler/index.html) (총 323개)
 
 - 2026-10-24: [⭐ 별빛 시계 바늘 맞추기](starlight-clock-master/index.html), [🍬 숲속 덧셈 사탕 바구니](forest-candy-basket-math/index.html) (총 321개)

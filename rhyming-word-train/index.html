@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🚂 칙칙폭폭 끝말잇기 기차 여행 - 장윤이의 게임세상 #325</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      background: #70a1ff;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2f3542;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      background: radial-gradient(circle at top, #a1c4fd 0%, #c2e9fb 50%, #7bed9f 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.2);
+    }
+    header {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      z-index: 25;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 0 0 20px 20px;
+    }
+    .back-btn {
+      text-decoration: none;
+      color: #eb4d4b;
+      font-weight: 800;
+      font-size: 0.95rem;
+      background: #ffeded;
+      padding: 6px 12px;
+      border-radius: 12px;
+      transition: transform 0.1s;
+    }
+    .back-btn:active {
+      transform: scale(0.95);
+    }
+    .hud-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #c0392b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hud-stats {
+      display: flex;
+      gap: 8px;
+    }
+    .stat-badge {
+      background: #ffffff;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #ff4757;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    #mission-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.85);
+      margin: 6px 16px 0 16px;
+      border-radius: 18px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #2f3542;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .target-char-glow {
+      color: #eb4d4b;
+      font-size: 1.25rem;
+      font-weight: 900;
+      text-decoration: underline;
+      padding: 0 4px;
+    }
+
+    /* Train Track & Visual Arena */
+    #train-arena {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    /* Train Canvas Track Wrapper */
+    .train-track-view {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 10px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .train-track-view::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Train Cars Lineup */
+    .train-lineup {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.4s ease-out;
+    }
+
+    /* Engine Car */
+    .train-engine {
+      background: linear-gradient(135deg, #ff4757 0%, #c0392b 100%);
+      width: 95px;
+      height: 80px;
+      border-radius: 18px 26px 8px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(192, 57, 43, 0.35);
+      position: relative;
+      flex-shrink: 0;
+      border: 2px solid #ffffff;
+    }
+    .engine-chimney {
+      position: absolute;
+      top: -14px;
+      right: 18px;
+      width: 16px;
+      height: 16px;
+      background: #2f3542;
+      border-radius: 4px 4px 0 0;
+    }
+    .engine-smoke {
+      position: absolute;
+      top: -26px;
+      right: 14px;
+      font-size: 1.3rem;
+      animation: puff 1.2s infinite ease-out;
+    }
+    @keyframes puff {
+      0% { transform: translateY(0) scale(0.6); opacity: 0.9; }
+      100% { transform: translateY(-16px) scale(1.4); opacity: 0; }
+    }
+    .engine-wheels {
+      position: absolute;
+      bottom: -10px;
+      display: flex;
+      gap: 16px;
+    }
+    .wheel {
+      width: 20px;
+      height: 20px;
+      background: #2f3542;
+      border: 3px solid #dfe4ea;
+      border-radius: 50%;
+      animation: spinWheel 1s infinite linear;
+    }
+    @keyframes spinWheel {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Connected Cargo Car */
+    .cargo-car {
+      width: 90px;
+      height: 75px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+      border: 2px solid #ffffff;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+      animation: popCar 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popCar {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .cargo-car .car-emoji {
+      font-size: 1.7rem;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .cargo-car .car-text {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #ffffff;
+    }
+    .cargo-car .highlight-char {
+      color: #f1c40f;
+      text-decoration: underline;
+    }
+    .cargo-car .wheels {
+      position: absolute;
+      bottom: -8px;
+      display: flex;
+      gap: 36px;
+    }
+    .coupling-link {
+      width: 10px;
+      height: 6px;
+      background: #57606f;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Empty Target Slot Car */
+    .empty-car-slot {
+      width: 90px;
+      height: 75px;
+      border: 3px dashed #ff4757;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ff4757;
+      flex-shrink: 0;
+      animation: pulseSlot 1.2s infinite alternate;
+    }
+    @keyframes pulseSlot {
+      0% { transform: scale(0.96); opacity: 0.7; }
+      100% { transform: scale(1.02); opacity: 1; }
+    }
+
+    /* Railway Line Under Cars */
+    .railway-line {
+      width: 95%;
+      height: 10px;
+      background: #747d8c;
+      border-radius: 5px;
+      margin-top: 10px;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .railway-line::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: repeating-linear-gradient(90deg, #8c5028, #8c5028 12px, transparent 12px, transparent 24px);
+    }
+
+    /* Progress Indicator */
+    #station-progress {
+      display: flex;
+      gap: 6px;
+      margin-top: 15px;
+    }
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      border: 2px solid #ffffff;
+      transition: all 0.2s;
+    }
+    .dot-active {
+      background: #ff4757;
+      transform: scale(1.2);
+    }
+
+    /* Bottom Selection Cards Tray */
+    #cards-tray {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px 24px 0 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 -8px 25px rgba(47, 53, 66, 0.15);
+      z-index: 20;
+    }
+    .tray-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #57606f;
+      text-align: center;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .word-card-btn {
+      background: #ffffff;
+      border: 2px solid #e4e7eb;
+      border-radius: 20px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .word-card-btn:active {
+      transform: scale(0.94);
+    }
+    .card-icon {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+    .card-text-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .card-word {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #2f3542;
+    }
+    .card-start-char {
+      color: #eb4d4b;
+      font-size: 1.35rem;
+      font-weight: 900;
+    }
+    .card-meaning {
+      font-size: 0.8rem;
+      color: #747d8c;
+      font-weight: 700;
+    }
+
+    /* Modal Overlay */
+    #celebration-modal {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-box {
+      background: #ffffff;
+      border-radius: 32px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-emoji {
+      font-size: 4rem;
+      margin-bottom: 12px;
+      animation: pulse 1s infinite alternate;
+    }
+    .modal-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #eb4d4b;
+      margin-bottom: 8px;
+    }
+    .modal-desc {
+      font-size: 1rem;
+      color: #2f3542;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .next-station-btn {
+      background: linear-gradient(135deg, #ff4757 0%, #eb4d4b 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 20px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(235, 77, 75, 0.4);
+      width: 100%;
+      transition: transform 0.1s;
+    }
+    .next-station-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Header -->
+    <header>
+      <a href="../" class="back-btn">← 목록</a>
+      <div class="hud-title">🚂 끝말잇기 기차</div>
+      <div class="hud-stats">
+        <div class="stat-badge" id="station-badge">역 1/8</div>
+        <div class="stat-badge" id="score-badge">⭐ 0</div>
+      </div>
+    </header>
+
+    <!-- Mission Banner -->
+    <div id="mission-banner">
+      <span>다음 칸:</span>
+      <span class="target-char-glow" id="target-char-display">나</span>
+      <span>(으)로 시작하는 낱말을 골라줘!</span>
+    </div>
+
+    <!-- Train Track Arena -->
+    <div id="train-arena">
+      <div class="train-track-view" id="track-scroll-area">
+        <div class="train-lineup" id="train-lineup">
+          <!-- Engine -->
+          <div class="train-engine">
+            <div class="engine-chimney"></div>
+            <div class="engine-smoke">💨</div>
+            <div style="font-size: 1.6rem; margin-top: 4px;">🐻</div>
+            <div style="font-size: 0.75rem; font-weight: 800;">기관사</div>
+            <div class="engine-wheels">
+              <div class="wheel"></div>
+              <div class="wheel"></div>
+            </div>
+          </div>
+
+          <!-- Dynamic Cargo Cars and Empty Slot injected via JS -->
+        </div>
+      </div>
+
+      <!-- Railway Line -->
+      <div class="railway-line"></div>
+
+      <!-- Station Chain Progress Dots -->
+      <div id="station-progress">
+        <!-- Dots injected via JS -->
+      </div>
+    </div>
+
+    <!-- Cards Selection Tray -->
+    <div id="cards-tray">
+      <div class="tray-title" id="tray-prompt-text">아래 카드 중 연결할 알맞은 낱말을 터치하세요!</div>
+      <div class="cards-grid" id="cards-grid">
+        <!-- 4 Word Options Cards injected via JS -->
+      </div>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div id="celebration-modal">
+      <div class="modal-box">
+        <div class="modal-emoji" id="modal-emoji">🚂🎉</div>
+        <div class="modal-title" id="modal-title">역 도착 성공!</div>
+        <div class="modal-desc" id="modal-desc">와아! 멋진 끝말잇기 기차가 완성되었어요.<br>기차가 기적을 울리며 출발합니다! 뿌우~</div>
+        <button class="next-station-btn" id="next-station-btn">다음 역으로 출발! ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Audio Synthesizer (Web Audio API) ---
+    class SoundFX {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+      }
+      playWhistle() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc1.type = 'sawtooth';
+        osc2.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now); // D5
+        osc2.frequency.setValueAtTime(880, now);    // A5
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.4, now + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.5);
+        osc2.stop(now + 0.5);
+      }
+      playChime() {
+        this.init();
+        const now = this.ctx.currentTime;
+        [659.25, 880, 1174.66].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now + i * 0.08);
+          gain.gain.setValueAtTime(0.25, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.35);
+        });
+      }
+      playWrong() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+    }
+    const sfx = new SoundFX();
+
+    // --- 8 Station Word Chains Data ---
+    const stations = [
+      {
+        name: "과일나라역",
+        chain: [
+          { word: "바나나", emoji: "🍌", desc: "달콤한 노란 과일" },
+          { word: "나비", emoji: "🦋", desc: "꽃을 찾아 훨훨" },
+          { word: "비누", emoji: "🧼", desc: "뽀득뽀득 거품" },
+          { word: "누에", emoji: "🐛", desc: "고치를 짓는 꼬마" }
+        ],
+        distractors: [
+          [{ word: "사과", emoji: "🍎", desc: "빨간 과일" }, { word: "구름", emoji: "☁️", desc: "하늘에 둥둥" }, { word: "토끼", emoji: "🐰", desc: "깡충깡충" }],
+          [{ word: "기차", emoji: "🚆", desc: "칙칙폭폭" }, { word: "사자", emoji: "🦁", desc: "용감한 왕" }, { word: "바다", emoji: "🌊", desc: "푸른 파도" }],
+          [{ word: "우주", emoji: "🚀", desc: "별들의 세상" }, { word: "나무", emoji: "🌳", desc: "초록 그늘" }, { word: "호랑이", emoji: "🐯", desc: "어흥" }]
+        ]
+      },
+      {
+        name: "동물원역",
+        chain: [
+          { word: "호랑이", emoji: "🐯", desc: "어흥 멋진 동물" },
+          { word: "이슬", emoji: "💧", desc: "풀잎 위 반짝" },
+          { word: "슬기", emoji: "💡", desc: "지혜로운 생각" },
+          { word: "기린", emoji: "🦒", desc: "목이 긴 친구" }
+        ],
+        distractors: [
+          [{ word: "오리", emoji: "🦆", desc: "꽥꽥" }, { word: "사탕", emoji: "🍬", desc: "달콤해" }, { word: "포도", emoji: "🍇", desc: "알알이 송이" }],
+          [{ word: "달팽이", emoji: "🐌", desc: "느릿느릿" }, { word: "장미", emoji: "🌹", desc: "향기로운 꽃" }, { word: "다람쥐", emoji: "🐿️", desc: "도토리 냠냠" }],
+          [{ word: "원숭이", emoji: "🐵", desc: "나무 타기" }, { word: "피아노", emoji: "🎹", desc: "도레미파" }, { word: "모자", emoji: "👒", desc: "머리에 쏙" }]
+        ]
+      },
+      {
+        name: "하늘정원역",
+        chain: [
+          { word: "해바라기", emoji: "🌻", desc: "태양을 보는 꽃" },
+          { word: "기차", emoji: "🚂", desc: "칙칙폭폭 달리는" },
+          { word: "차표", emoji: "🎟️", desc: "여행을 떠나는 티켓" },
+          { word: "표범", emoji: "🐆", desc: "날쌘 얼룩무늬" }
+        ],
+        distractors: [
+          [{ word: "별빛", emoji: "⭐", desc: "반짝반짝" }, { word: "풍선", emoji: "🎈", desc: "둥실둥실" }, { word: "수박", emoji: "🍉", desc: "시원한 여름" }],
+          [{ word: "비행기", emoji: "✈️", desc: "하늘 높이" }, { word: "물고기", emoji: "🐟", desc: "어푸어푸" }, { word: "참새", emoji: "🐦", desc: "짹짹" }],
+          [{ word: "고양이", emoji: "🐱", desc: "야옹야옹" }, { word: "우산", emoji: "☂️", desc: "비 올 때 펴요" }, { word: "사슴", emoji: "🦌", desc: "예쁜 뿔" }]
+        ]
+      },
+      {
+        name: "숲속탐험역",
+        chain: [
+          { word: "도토리", emoji: "🌰", desc: "가을 숲 열매" },
+          { word: "리본", emoji: "🎀", desc: "예쁜 선물 매듭" },
+          { word: "본부", emoji: "⛺", desc: "탐험대 기지" },
+          { word: "부엉이", emoji: "🦉", desc: "밤의 파수꾼" }
+        ],
+        distractors: [
+          [{ word: "딸기", emoji: "🍓", desc: "새콤달콤" }, { word: "버섯", emoji: "🍄", desc: "통통한 갓" }, { word: "개구리", emoji: "🐸", desc: "개골개골" }],
+          [{ word: "나침반", emoji: "🧭", desc: "동서남북" }, { word: "안경", emoji: "👓", desc: "잘 보여요" }, { word: "단풍", emoji: "🍁", desc: "빨간 잎" }],
+          [{ word: "강아지", emoji: "🐶", desc: "멍멍 친구" }, { word: "가방", emoji: "🎒", desc: "책 담아 가요" }, { word: "거북이", emoji: "🐢", desc: "엉금엉금" }]
+        ]
+      },
+      {
+        name: "별빛바다역",
+        chain: [
+          { word: "돌고래", emoji: "🐬", desc: "점프하는 바다 친구" },
+          { word: "래퍼", emoji: "🎤", desc: "신나는 노래꾼" },
+          { word: "퍼즐", emoji: "🧩", desc: "조각조각 맞추기" },
+          { word: "즐거움", emoji: "😄", desc: "활짝 웃는 마음" }
+        ],
+        distractors: [
+          [{ word: "고래밥", emoji: "🐳", desc: "맛있는 과자" }, { word: "조개", emoji: "🐚", desc: "모래 속 보물" }, { word: "갈매기", emoji: "🕊️", desc: "끼룩끼룩" }],
+          [{ word: "배", emoji: "⛵", desc: "바다 건너요" }, { word: "오징어", emoji: "🦑", desc: "다리 열 개" }, { word: "불가사리", emoji: "⭐", desc: "별 모양" }],
+          [{ word: "등대", emoji: "🗼", desc: "길을 밝혀요" }, { word: "잠수함", emoji: "🛥️", desc: "물속 탐험" }, { word: "산호초", emoji: "🪸", desc: "알록달록" }]
+        ]
+      },
+      {
+        name: "무지개동산역",
+        chain: [
+          { word: "무지개", emoji: "🌈", desc: "일곱 빛깔 다리" },
+          { word: "개나리", emoji: "🌼", desc: "노란 봄의 전령" },
+          { word: "리코더", emoji: "🪈", desc: "맑은 피리 소리" },
+          { word: "더위", emoji: "☀️", desc: "따뜻한 햇살" }
+        ],
+        distractors: [
+          [{ word: "해님", emoji: "🌞", desc: "반짝" }, { word: "달님", emoji: "🌙", desc: "은은한 밤" }, { word: "바람", emoji: "🌬️", desc: "살랑살랑" }],
+          [{ word: "도화지", emoji: "📄", desc: "그림 그려요" }, { word: "크레파스", emoji: "🖍️", desc: "색칠해요" }, { word: "붓", emoji: "🖌️", desc: "슥슥" }],
+          [{ word: "장화", emoji: "👢", desc: "첨벙첨벙" }, { word: "물뿌리개", emoji: "🚿", desc: "물 줘요" }, { word: "새싹", emoji: "🌱", desc: "파릇파릇" }]
+        ]
+      },
+      {
+        name: "새싹마을역",
+        chain: [
+          { word: "해바라기", emoji: "🌻", desc: "키 큰 꽃" },
+          { word: "기린", emoji: "🦒", desc: "목 긴 친구" },
+          { word: "린스", emoji: "🧴", desc: "부드러운 머릿결" },
+          { word: "스케치북", emoji: "📒", desc: "꿈을 그리는 책" }
+        ],
+        distractors: [
+          [{ word: "사슴", emoji: "🦌", desc: "초원 달리기" }, { word: "치타", emoji: "🐆", desc: "가장 빠른" }, { word: "코끼리", emoji: "🐘", desc: "긴 코 뿜뿜" }],
+          [{ word: "치약", emoji: "🪥", desc: "치카치카" }, { word: "수건", emoji: "🧖", desc: "물기 톡톡" }, { word: "거울", emoji: "🪞", desc: "내 얼굴" }],
+          [{ word: "물감", emoji: "🎨", desc: "알록달록" }, { word: "가위", emoji: "✂️", desc: "싹둑싹둑" }, { word: "풀", emoji: "🧴", desc: "찰떡 딱풀" }]
+        ]
+      },
+      {
+        name: "우주정거장역",
+        chain: [
+          { word: "우주선", emoji: "🚀", desc: "은하수 여행" },
+          { word: "선물", emoji: "🎁", desc: "기분 좋은 상자" },
+          { word: "물뿌리개", emoji: "🚿", desc: "꽃에 촉촉 물주기" },
+          { word: "개구리", emoji: "🐸", desc: "폴짝폴짝 연못왕" }
+        ],
+        distractors: [
+          [{ word: "지구", emoji: "🌍", desc: "푸른 우리 집" }, { word: "달", emoji: "🌕", desc: "토끼 떡방아" }, { word: "화성", emoji: "🪐", desc: "붉은 행성" }],
+          [{ word: "바구니", emoji: "🧺", desc: "물건 담기" }, { word: "리본", emoji: "🎀", desc: "예쁜 매듭" }, { word: "상자", emoji: "📦", desc: "보물 담기" }],
+          [{ word: "올챙이", emoji: "🫧", desc: "꼬물꼬물" }, { word: "연꽃", emoji: "🪷", desc: "연못 위 꽃" }, { word: "잠자리", emoji: "🪰", desc: "가을 하늘" }]
+        ]
+      }
+    ];
+
+    let currentStationIndex = 0;
+    let currentStepInStation = 0; // 0 means starting with word 0, user picks word 1
+    let score = 0;
+
+    // DOM Elements
+    const stationBadge = document.getElementById('station-badge');
+    const scoreBadge = document.getElementById('score-badge');
+    const targetCharDisplay = document.getElementById('target-char-display');
+    const trainLineup = document.getElementById('train-lineup');
+    const trackScrollArea = document.getElementById('track-scroll-area');
+    const stationProgress = document.getElementById('station-progress');
+    const cardsGrid = document.getElementById('cards-grid');
+    const celebrationModal = document.getElementById('celebration-modal');
+    const nextStationBtn = document.getElementById('next-station-btn');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+
+    const carBgColors = [
+      'linear-gradient(135deg, #ffa502 0%, #e67e22 100%)',
+      'linear-gradient(135deg, #2ed573 0%, #26af61 100%)',
+      'linear-gradient(135deg, #1e90ff 0%, #3742fa 100%)',
+      'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)'
+    ];
+
+    function renderStation() {
+      const station = stations[currentStationIndex];
+      stationBadge.textContent = `${station.name} (${currentStationIndex + 1}/8)`;
+      scoreBadge.textContent = `⭐ ${score}`;
+
+      // Render Progress Dots
+      stationProgress.innerHTML = '';
+      for (let i = 0; i < station.chain.length - 1; i++) {
+        const dot = document.createElement('div');
+        dot.className = `progress-dot ${i <= currentStepInStation ? 'dot-active' : ''}`;
+        stationProgress.appendChild(dot);
+      }
+
+      // Render Train Lineup
+      renderTrainCars();
+
+      // Render Word Choice Cards
+      renderChoiceCards();
+    }
+
+    function renderTrainCars() {
+      const station = stations[currentStationIndex];
+      
+      // Preserve Engine
+      const engineHtml = `
+        <div class="train-engine">
+          <div class="engine-chimney"></div>
+          <div class="engine-smoke">💨</div>
+          <div style="font-size: 1.6rem; margin-top: 4px;">🐻</div>
+          <div style="font-size: 0.75rem; font-weight: 800;">기관사</div>
+          <div class="engine-wheels">
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+          </div>
+        </div>
+      `;
+      trainLineup.innerHTML = engineHtml;
+
+      // Add attached cars up to currentStepInStation
+      for (let i = 0; i <= currentStepInStation; i++) {
+        const item = station.chain[i];
+        const link = document.createElement('div');
+        link.className = 'coupling-link';
+        trainLineup.appendChild(link);
+
+        const car = document.createElement('div');
+        car.className = 'cargo-car';
+        car.style.background = carBgColors[i % carBgColors.length];
+
+        const lastChar = item.word.charAt(item.word.length - 1);
+        const prefix = item.word.slice(0, -1);
+
+        car.innerHTML = `
+          <div class="car-emoji">${item.emoji}</div>
+          <div class="car-text">${prefix}<span class="highlight-char">${lastChar}</span></div>
+          <div class="wheels">
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+          </div>
+        `;
+        trainLineup.appendChild(car);
+      }
+
+      // If station not finished, show empty slot car
+      if (currentStepInStation < station.chain.length - 1) {
+        const link = document.createElement('div');
+        link.className = 'coupling-link';
+        trainLineup.appendChild(link);
+
+        const emptyCar = document.createElement('div');
+        emptyCar.className = 'empty-car-slot';
+        const neededChar = getNeededChar();
+        emptyCar.innerHTML = `
+          <div style="font-size: 1.4rem;">❓</div>
+          <div>"${neededChar}" 연결!</div>
+        `;
+        trainLineup.appendChild(emptyCar);
+      }
+
+      // Auto scroll to end
+      setTimeout(() => {
+        trackScrollArea.scrollLeft = trackScrollArea.scrollWidth;
+      }, 100);
+    }
+
+    function getNeededChar() {
+      const station = stations[currentStationIndex];
+      const prevWord = station.chain[currentStepInStation].word;
+      return prevWord.charAt(prevWord.length - 1);
+    }
+
+    function renderChoiceCards() {
+      const station = stations[currentStationIndex];
+      const neededChar = getNeededChar();
+      targetCharDisplay.textContent = neededChar;
+
+      const correctWordObj = station.chain[currentStepInStation + 1];
+      const distractorList = station.distractors[currentStepInStation];
+
+      // Combine and shuffle
+      const pool = [correctWordObj, ...distractorList];
+      pool.sort(() => Math.random() - 0.5);
+
+      cardsGrid.innerHTML = '';
+      pool.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'word-card-btn';
+        
+        const firstChar = item.word.charAt(0);
+        const restWord = item.word.slice(1);
+
+        btn.innerHTML = `
+          <div class="card-icon">${item.emoji}</div>
+          <div class="card-text-box">
+            <div class="card-word">
+              <span class="${firstChar === neededChar ? 'card-start-char' : ''}">${firstChar}</span>${restWord}
+            </div>
+            <div class="card-meaning">${item.desc}</div>
+          </div>
+        `;
+
+        btn.addEventListener('click', () => handleCardChoice(item, correctWordObj, btn));
+        cardsGrid.appendChild(btn);
+      });
+    }
+
+    function handleCardChoice(chosen, correct, btn) {
+      if (chosen.word === correct.word) {
+        // Correct Choice!
+        sfx.playChime();
+        score += 10;
+        scoreBadge.textContent = `⭐ ${score}`;
+        btn.style.borderColor = '#2ed573';
+        btn.style.background = '#eafaf1';
+
+        currentStepInStation++;
+        const station = stations[currentStationIndex];
+
+        if (currentStepInStation >= station.chain.length - 1) {
+          // Finished this station!
+          renderTrainCars();
+          setTimeout(() => {
+            handleStationComplete();
+          }, 450);
+        } else {
+          // Next Word in Station
+          renderStation();
+        }
+      } else {
+        // Incorrect Choice
+        sfx.playWrong();
+        btn.style.borderColor = '#ff4757';
+        btn.style.animation = 'shake 0.3s ease';
+        setTimeout(() => {
+          btn.style.animation = 'none';
+        }, 350);
+      }
+    }
+
+    function handleStationComplete() {
+      sfx.playWhistle();
+      launchConfetti();
+      const station = stations[currentStationIndex];
+      const fullChainText = station.chain.map(c => c.word).join(' ➔ ');
+
+      if (currentStationIndex + 1 >= stations.length) {
+        modalTitle.textContent = "🏆 전국 기차 여행 완주!";
+        modalDesc.innerHTML = `8개 역의 모든 끝말잇기 기차를 완벽하게 연결했어요!<br><strong>최종 점수: ${score}점!</strong><br>기관사 곰돌이가 감사의 황금 기차표를 드립니다! 🐻🚂✨`;
+        nextStationBtn.textContent = "처음부터 다시하기 🔄";
+      } else {
+        modalTitle.textContent = `🎉 ${station.name} 정복!`;
+        modalDesc.innerHTML = `<strong>${fullChainText}</strong><br>기차가 신나게 기적을 울리며 역을 통과합니다! 뿌우~ 🚂💨`;
+        nextStationBtn.textContent = "다음 역으로 출발! ➔";
+      }
+      celebrationModal.style.display = 'flex';
+    }
+
+    nextStationBtn.addEventListener('click', () => {
+      celebrationModal.style.display = 'none';
+      if (currentStationIndex + 1 >= stations.length) {
+        currentStationIndex = 0;
+        score = 0;
+      } else {
+        currentStationIndex++;
+      }
+      currentStepInStation = 0;
+      renderStation();
+    });
+
+    // --- Simple Confetti Animation ---
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const ctx = confettiCanvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function launchConfetti() {
+      particles = [];
+      const colors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#9b59b6', '#f1c40f'];
+      for (let i = 0; i < 65; i++) {
+        particles.push({
+          x: confettiCanvas.width / 2,
+          y: confettiCanvas.height / 2,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.7) * 15,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 10,
+          life: 100
+        });
+      }
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35;
+        p.rot += p.rotSpeed;
+        p.life -= 1.2;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+      requestAnimationFrame(animateConfetti);
+    }
+    animateConfetti();
+
+    // Start First Station
+    renderStation();
+  </script>
+</body>
+</html>

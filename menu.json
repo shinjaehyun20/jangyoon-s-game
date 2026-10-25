@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "acorn-addition-scale",
+        "title": "🌰 다람쥐 토토의 도토리 덧셈 양팔저울",
+        "path": "acorn-addition-scale/index.html"
+      },
+      {
+        "id": "rhyming-word-train",
+        "title": "🚂 칙칙폭폭 끝말잇기 기차 여행",
+        "path": "rhyming-word-train/index.html"
+      },
+      {
         "id": "autumn-leaf-pattern-puzzler",
         "title": "🍂 가을 낙엽 패턴 놀이터",
         "path": "autumn-leaf-pattern-puzzler/index.html"

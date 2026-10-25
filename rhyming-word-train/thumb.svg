@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="train-sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#70a1ff" />
+      <stop offset="50%" stop-color="#a4b0be" />
+      <stop offset="100%" stop-color="#7bed9f" />
+    </linearGradient>
+    <linearGradient id="train-body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff4757" />
+      <stop offset="100%" stop-color="#c0392b" />
+    </linearGradient>
+    <linearGradient id="car-1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffa502" />
+      <stop offset="100%" stop-color="#e67e22" />
+    </linearGradient>
+    <linearGradient id="car-2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2ed573" />
+      <stop offset="100%" stop-color="#26af61" />
+    </linearGradient>
+    <filter id="train-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="rgba(0,0,0,0.18)" />
+    </filter>
+  </defs>
+
+  <!-- Sky & Hills -->
+  <rect width="512" height="512" rx="48" fill="url(#train-sky)" />
+  <path d="M 0 380 Q 140 320 280 370 T 512 360 L 512 512 L 0 512 Z" fill="#2ed573" opacity="0.8" />
+  <path d="M 0 420 Q 180 390 360 430 T 512 410 L 512 512 L 0 512 Z" fill="#26af61" />
+
+  <!-- Railway Tracks -->
+  <line x1="0" y1="440" x2="512" y2="440" stroke="#747d8c" stroke-width="8" />
+  <line x1="0" y1="448" x2="512" y2="448" stroke="#57606f" stroke-width="4" />
+  <!-- Ties -->
+  <g stroke="#8c5028" stroke-width="6">
+    <line x1="30" y1="434" x2="30" y2="454" />
+    <line x1="80" y1="434" x2="80" y2="454" />
+    <line x1="130" y1="434" x2="130" y2="454" />
+    <line x1="180" y1="434" x2="180" y2="454" />
+    <line x1="230" y1="434" x2="230" y2="454" />
+    <line x1="280" y1="434" x2="280" y2="454" />
+    <line x1="330" y1="434" x2="330" y2="454" />
+    <line x1="380" y1="434" x2="380" y2="454" />
+    <line x1="430" y1="434" x2="430" y2="454" />
+    <line x1="480" y1="434" x2="480" y2="454" />
+  </g>
+
+  <!-- Steam Puffs -->
+  <circle cx="120" cy="180" r="22" fill="#ffffff" opacity="0.9" filter="url(#train-shadow)" />
+  <circle cx="150" cy="150" r="30" fill="#ffffff" opacity="0.85" filter="url(#train-shadow)" />
+  <circle cx="200" cy="120" r="42" fill="#ffffff" opacity="0.75" filter="url(#train-shadow)" />
+  <text x="200" y="128" font-family="'Pretendard', sans-serif" font-size="24" font-weight="900" fill="#2f3542" text-anchor="middle">바나나</text>
+
+  <!-- Steam Locomotive Engine (Left) -->
+  <g transform="translate(60, 290)" filter="url(#train-shadow)">
+    <!-- Engine Body -->
+    <rect x="0" y="30" width="100" height="70" rx="12" fill="url(#train-body)" />
+    <!-- Smokestack -->
+    <rect x="50" y="0" width="20" height="32" rx="4" fill="#2f3542" />
+    <polygon points="45,0 75,0 68,12 52,12" fill="#2f3542" />
+    <!-- Cabin -->
+    <rect x="-35" y="0" width="45" height="100" rx="8" fill="#e74c3c" />
+    <rect x="-28" y="14" width="30" height="30" rx="6" fill="#70a1ff" stroke="#ffffff" stroke-width="2" />
+    <!-- Conductor Bear inside window -->
+    <circle cx="-13" cy="30" r="10" fill="#8c5028" />
+    <circle cx="-18" cy="22" r="4" fill="#6a3917" />
+    <circle cx="-8" cy="22" r="4" fill="#6a3917" />
+    <circle cx="-13" cy="31" r="2" fill="#2f3542" />
+    <!-- Cowcatcher in front -->
+    <polygon points="100,100 120,100 100,70" fill="#2f3542" />
+    <!-- Wheels -->
+    <circle cx="-15" cy="105" r="18" fill="#2f3542" stroke="#dfe4ea" stroke-width="4" />
+    <circle cx="25" cy="105" r="14" fill="#2f3542" stroke="#dfe4ea" stroke-width="3" />
+    <circle cx="65" cy="105" r="14" fill="#2f3542" stroke="#dfe4ea" stroke-width="3" />
+    <!-- Coupling -->
+    <line x1="-35" y1="80" x2="-55" y2="80" stroke="#2f3542" stroke-width="6" />
+  </g>
+
+  <!-- Connected Train Car 1: [나비] -->
+  <g transform="translate(225, 320)" filter="url(#train-shadow)">
+    <rect x="0" y="0" width="115" height="70" rx="14" fill="url(#car-1)" stroke="#ffffff" stroke-width="2" />
+    <!-- Emoji and Word -->
+    <text x="58" y="32" font-size="26" text-anchor="middle">🦋</text>
+    <text x="58" y="58" font-family="'Pretendard', sans-serif" font-size="22" font-weight="900" fill="#ffffff" text-anchor="middle">나비</text>
+    <!-- Wheels -->
+    <circle cx="25" cy="75" r="14" fill="#2f3542" stroke="#dfe4ea" stroke-width="3" />
+    <circle cx="90" cy="75" r="14" fill="#2f3542" stroke="#dfe4ea" stroke-width="3" />
+    <!-- Coupling -->
+    <line x1="115" y1="50" x2="135" y2="50" stroke="#2f3542" stroke-width="6" />
+  </g>
+
+  <!-- Connected Train Car 2: [비누] -->
+  <g transform="translate(365, 320)" filter="url(#train-shadow)">
+    <rect x="0" y="0" width="115" height="70" rx="14" fill="url(#car-2)" stroke="#ffffff" stroke-width="2" />
+    <!-- Emoji and Word -->
+    <text x="58" y="32" font-size="26" text-anchor="middle">🧼</text>
+    <text x="58" y="58" font-family="'Pretendard', sans-serif" font-size="22" font-weight="900" fill="#ffffff" text-anchor="middle">비누</text>
+    <!-- Wheels -->
+    <circle cx="25" cy="75" r="14" fill="#2f3542" stroke="#dfe4ea" stroke-width="3" />
+    <circle cx="90" cy="75" r="14" fill="#2f3542" stroke="#dfe4ea" stroke-width="3" />
+  </g>
+
+  <!-- Chain Arrow and Rhyme Highlight -->
+  <g transform="translate(256, 235)">
+    <rect x="-180" y="-20" width="360" height="42" rx="21" fill="rgba(255,255,255,0.95)" filter="url(#train-shadow)" />
+    <text x="0" y="8" font-family="'Pretendard', sans-serif" font-size="18" font-weight="900" fill="#2f3542" text-anchor="middle">
+      바나<tspan fill="#eb4d4b">나</tspan> ➔ <tspan fill="#eb4d4b">나</tspan><tspan fill="#ffa502">비</tspan> ➔ <tspan fill="#ffa502">비</tspan>누 🚂
+    </text>
+  </g>
+
+  <!-- Title Banner -->
+  <rect x="56" y="445" width="400" height="52" rx="26" fill="rgba(255,255,255,0.95)" filter="url(#train-shadow)" />
+  <text x="256" y="480" font-family="'Pretendard', sans-serif" font-size="22" font-weight="900" fill="#c0392b" text-anchor="middle">🚂 칙칙폭폭 끝말잇기 기차</text>
+</svg>
