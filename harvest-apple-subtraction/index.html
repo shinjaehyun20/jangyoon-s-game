@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍎 아기곰 보미의 가을 사과 뺄셈 바구니</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    body {
+      background: linear-gradient(180deg, #74b9ff 0%, #a8e6cf 65%, #ffd3b6 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      color: #2f3542;
+    }
+    header {
+      width: 100%;
+      max-width: 600px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #2f3542;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      display: flex;
+      gap: 12px;
+    }
+    .stat-pill span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .container {
+      width: 100%;
+      max-width: 580px;
+      padding: 10px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    .orchard-card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+      border: 3px solid #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .mission-banner {
+      background: #ff4757;
+      color: white;
+      padding: 6px 20px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(255, 71, 87, 0.35);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+    .math-formula {
+      font-size: 34px;
+      font-weight: 900;
+      color: #2f3542;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .math-formula .num {
+      background: #ffffff;
+      padding: 4px 16px;
+      border-radius: 16px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+      border: 2px solid #e1e2e6;
+    }
+    .math-formula .ans-box {
+      background: #fff0f1;
+      border: 3px dashed #ff4757;
+      color: #ff4757;
+      min-width: 56px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      font-size: 32px;
+    }
+    .tree-stage {
+      width: 100%;
+      height: 220px;
+      background: linear-gradient(180deg, #dff9fb 0%, #c7ecee 70%, #6ab04c 100%);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.7);
+      margin-bottom: 16px;
+    }
+    .tree-trunk {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 90px;
+      background: #8c5028;
+      border-radius: 8px 8px 0 0;
+    }
+    .tree-leaves {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 140px;
+      background: #2ed573;
+      border-radius: 130px / 70px;
+      box-shadow: inset 0 -8px 0 #20bf6b;
+    }
+    .tree-leaves::before {
+      content: '';
+      position: absolute;
+      top: -15px;
+      left: 30px;
+      width: 120px;
+      height: 100px;
+      background: #26de81;
+      border-radius: 50%;
+    }
+    .tree-leaves::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      right: 30px;
+      width: 130px;
+      height: 110px;
+      background: #20bf6b;
+      border-radius: 50%;
+    }
+    .apples-grid {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 250px;
+      height: 130px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      z-index: 2;
+    }
+    .apple-item {
+      font-size: 32px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: inline-block;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+      cursor: pointer;
+    }
+    .apple-item.subtracted {
+      opacity: 0.25;
+      transform: translateY(35px) scale(0.65) rotate(45deg);
+      filter: grayscale(80%);
+    }
+    .story-bubble {
+      font-size: 15px;
+      font-weight: 700;
+      color: #57606f;
+      text-align: center;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .choices-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .choice-btn {
+      background: #ffffff;
+      border: 3px solid #f1f2f6;
+      border-radius: 20px;
+      height: 70px;
+      font-size: 28px;
+      font-weight: 900;
+      color: #2f3542;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .choice-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .choice-btn.correct {
+      background: #2ed573 !important;
+      color: white !important;
+      border-color: #20bf6b !important;
+      transform: scale(1.06);
+    }
+    .choice-btn.wrong {
+      background: #ff4757 !important;
+      color: white !important;
+      border-color: #ee5253 !important;
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .modal-card {
+      background: white;
+      border-radius: 32px;
+      padding: 32px 24px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-card h2 {
+      font-size: 28px;
+      color: #2f3542;
+      margin-bottom: 12px;
+      font-weight: 900;
+    }
+    .modal-card p {
+      font-size: 16px;
+      color: #57606f;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .restart-btn {
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 24px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(255, 71, 87, 0.4);
+    }
+    canvas#confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <header>
+    <a href="../index.html" class="back-btn">⬅ 다른 게임</a>
+    <div class="stat-pill">
+      <span>🎯 라운드 <strong id="round-indicator">1/10</strong></span>
+      <span>⭐ 점수 <strong id="score-indicator">0</strong></span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="orchard-card">
+      <div class="mission-banner">🍎 가을 과수원 사과 뺄셈</div>
+      <div class="math-formula">
+        <span class="num" id="total-val">7</span>
+        <span>-</span>
+        <span class="num" id="sub-val">3</span>
+        <span>=</span>
+        <div class="ans-box" id="ans-box">?</div>
+      </div>
+      <div class="tree-stage">
+        <div class="tree-leaves"></div>
+        <div class="tree-trunk"></div>
+        <div class="apples-grid" id="apples-container"></div>
+      </div>
+      <p class="story-bubble" id="story-text">나무에 사과가 7개 열렸어요. 3개를 바구니에 담으면 몇 개가 남을까요?</p>
+      <div class="choices-grid" id="choices-container"></div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="end-modal">
+    <div class="modal-card">
+      <div style="font-size: 64px; margin-bottom: 12px;">🏆</div>
+      <h2>과수원 수확 완료!</h2>
+      <p id="final-stats">아기곰 보미와 함께 사과 뺄셈 10문제를 완벽하게 풀었어요! 최고예요!</p>
+      <button class="restart-btn" onclick="initGame()">다시 도전하기</button>
+    </div>
+  </div>
+
+  <script>
+    // Audio synthesis via Web Audio API
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let actx = null;
+    function getAudio() {
+      if (!actx) actx = new AudioCtx();
+      if (actx.state === 'suspended') actx.resume();
+      return actx;
+    }
+    function playTone(freq, type, duration, delay = 0) {
+      setTimeout(() => {
+        try {
+          const ctx = getAudio();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + duration);
+        } catch(e) {}
+      }, delay * 1000);
+    }
+    function playCorrect() {
+      playTone(523.25, 'sine', 0.15, 0);    // C5
+      playTone(659.25, 'sine', 0.15, 0.1);  // E5
+      playTone(783.99, 'sine', 0.25, 0.2);  // G5
+      playTone(1046.50, 'triangle', 0.35, 0.3); // C6
+    }
+    function playWrong() {
+      playTone(260, 'sawtooth', 0.2, 0);
+      playTone(220, 'sawtooth', 0.25, 0.15);
+    }
+
+    // Game State
+    let currentRound = 1;
+    let maxRounds = 10;
+    let score = 0;
+    let total = 7;
+    let sub = 3;
+    let correctAns = 4;
+    let isWaiting = false;
+
+    function generateProblem() {
+      // 1st grade math: subtractions within 10
+      total = Math.floor(Math.random() * 8) + 3; // 3 to 10
+      sub = Math.floor(Math.random() * (total - 1)) + 1; // 1 to total - 1
+      correctAns = total - sub;
+
+      document.getElementById('total-val').textContent = total;
+      document.getElementById('sub-val').textContent = sub;
+      document.getElementById('ans-box').textContent = '?';
+      document.getElementById('round-indicator').textContent = `${currentRound}/${maxRounds}`;
+      document.getElementById('story-text').textContent = `나무에 사과가 ${total}개 있었는데, 보미가 ${sub}개를 수확했어요. 나무에 남은 사과는 몇 개일까요?`;
+
+      // Render Apples
+      const container = document.getElementById('apples-container');
+      container.innerHTML = '';
+      for (let i = 0; i < total; i++) {
+        const apple = document.createElement('span');
+        apple.className = 'apple-item';
+        apple.textContent = '🍎';
+        if (i < sub) {
+          // Marking subtracted items
+          apple.classList.add('subtracted');
+        }
+        container.appendChild(apple);
+      }
+
+      // Generate Choices
+      const choicesSet = new Set([correctAns]);
+      while (choicesSet.size < 4) {
+        let fake = correctAns + (Math.floor(Math.random() * 5) - 2);
+        if (fake >= 0 && fake <= 10 && fake !== correctAns) {
+          choicesSet.add(fake);
+        } else {
+          choicesSet.add(Math.floor(Math.random() * 10));
+        }
+      }
+      const choices = Array.from(choicesSet).sort(() => Math.random() - 0.5);
+
+      const choiceBox = document.getElementById('choices-container');
+      choiceBox.innerHTML = '';
+      choices.forEach(val => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = val;
+        btn.onclick = () => handleChoice(val, btn);
+        choiceBox.appendChild(btn);
+      });
+      isWaiting = false;
+    }
+
+    function handleChoice(val, btn) {
+      if (isWaiting) return;
+      isWaiting = true;
+      getAudio();
+
+      if (val === correctAns) {
+        btn.classList.add('correct');
+        document.getElementById('ans-box').textContent = correctAns;
+        score += 10;
+        document.getElementById('score-indicator').textContent = score;
+        playCorrect();
+        fireConfetti();
+
+        setTimeout(() => {
+          if (currentRound < maxRounds) {
+            currentRound++;
+            generateProblem();
+          } else {
+            showEndModal();
+          }
+        }, 1200);
+      } else {
+        btn.classList.add('wrong');
+        playWrong();
+        setTimeout(() => {
+          btn.classList.remove('wrong');
+          isWaiting = false;
+        }, 600);
+      }
+    }
+
+    function showEndModal() {
+      document.getElementById('end-modal').style.display = 'flex';
+      document.getElementById('final-stats').textContent = `총 10문제 중 훌륭하게 모든 사과 뺄셈을 완료했어요! 최종 점수: ${score}점`;
+      fireConfetti(true);
+    }
+
+    function initGame() {
+      document.getElementById('end-modal').style.display = 'none';
+      currentRound = 1;
+      score = 0;
+      document.getElementById('score-indicator').textContent = '0';
+      generateProblem();
+    }
+
+    // Confetti system
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function fireConfetti(burst = false) {
+      const count = burst ? 100 : 35;
+      const colors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#e056fd', '#f1c40f'];
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: canvas.width / 2 + (Math.random() * 200 - 100),
+          y: canvas.height / 3 + (Math.random() * 100 - 50),
+          vx: (Math.random() - 0.5) * 12,
+          vy: Math.random() * -12 - 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 8 + 6,
+          rotation: Math.random() * 360,
+          vr: (Math.random() - 0.5) * 10,
+          alpha: 1
+        });
+      }
+    }
+
+    function renderConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35; // gravity
+        p.rotation += p.vr;
+        p.alpha -= 0.015;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rotation * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+
+        if (p.alpha <= 0 || p.y > canvas.height) {
+          particles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(renderConfetti);
+    }
+    renderConfetti();
+
+    // Start
+    initGame();
+  </script>
+</body>
+</html>

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "harvest-apple-subtraction",
+        "title": "🍎 아기곰 보미의 가을 사과 뺄셈 바구니",
+        "path": "harvest-apple-subtraction/index.html"
+      },
+      {
+        "id": "spelling-animal-puzzle",
+        "title": "🦁 동물 친구 이름 맞추기 받침 퍼즐",
+        "path": "spelling-animal-puzzle/index.html"
+      },
+      {
         "id": "acorn-addition-scale",
         "title": "🌰 다람쥐 토토의 도토리 덧셈 양팔저울",
         "path": "acorn-addition-scale/index.html"

@@ -1,5 +1,23 @@
 [
   {
+    "id": "spelling-animal-puzzle",
+    "title": "Spelling Animal Puzzle",
+    "title_ko": "🦁 동물 친구 이름 맞추기 받침 퍼즐",
+    "description": "숲속 동물 친구들(호랑이, 토끼, 다람쥐, 기린, 코끼리, 사자, 판다 등)의 그림자를 보고 흩어진 한글 낱말 조각을 순서대로 터치하여 올바른 동물 이름을 완성하는 초등 1학년 국어 낱말 완성 어휘 퍼즐 놀이입니다.",
+    "thumbnail": "spelling-animal-puzzle/thumb.svg",
+    "path": "spelling-animal-puzzle/index.html",
+    "created": "2026-10-27"
+  },
+  {
+    "id": "harvest-apple-subtraction",
+    "title": "Harvest Apple Subtraction",
+    "title_ko": "🍎 아기곰 보미의 가을 사과 뺄셈 바구니",
+    "description": "과수원 아기곰 보미와 함께 나무에 주렁주렁 열린 맛있는 사과 개수에서 떨어지거나 선물한 사과를 쏙 빼고, 바구니에 남은 사과의 알맞은 숫자를 맞추는 초등 1학년 2학기 '10 이하의 뺄셈' 과수원 수학 놀이입니다.",
+    "thumbnail": "harvest-apple-subtraction/thumb.svg",
+    "path": "harvest-apple-subtraction/index.html",
+    "created": "2026-10-27"
+  },
+  {
     "id": "rhyming-word-train",
     "title": "Rhyming Word Train",
     "title_ko": "🚂 칙칙폭폭 끝말잇기 기차 여행",

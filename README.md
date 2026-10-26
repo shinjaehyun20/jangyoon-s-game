@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 325개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 327개.
 
-[![Games](https://img.shields.io/badge/games-325-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-327-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![325개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![327개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 325개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 327개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -354,6 +354,8 @@
 | [🌈 무지개 모음 방울 톡톡 (rainbow-vowel-catcher)](./rainbow-vowel-catcher/index.html) | 하늘에서 두둥실 떠오르는 알록달록 무지개 비눗방울 속 모음자(ㅏ, ㅓ, ㅗ, ㅜ, ㅡ, ㅣ)를 터뜨려 나비, 오리, 사자 등 예쁜 낱말을 완성하는 초등 1학년 국어 모음 조합 놀이입니다. | 어린이/아케이드 |
 | [🌰 다람쥐 토토의 도토리 덧셈 양팔저울 (acorn-addition-scale)](./acorn-addition-scale/index.html) | 귀여운 다람쥐 토토와 함께 양팔저울의 왼쪽 바구니에 담긴 도토리 숫자(예: 7)를 보고, 오른쪽 바구니에 도토리 주머니들을 쏙 올려 양쪽 저울의 균형을 맞추는 초등 1학년 덧셈과 수 가르기·모으기 저울 놀이입니다. | 어린이/아케이드 |
 | [🚂 칙칙폭폭 끝말잇기 기차 여행 (rhyming-word-train)](./rhyming-word-train/index.html) | 기관사 곰돌이가 운전하는 무지개 기차에 앞선 칸의 마지막 글자로 시작하는 예쁜 단어(바나나 ➔ 나비 ➔ 비누 ➔ 누에)를 쏙쏙 연결하여 긴 화물 열차를 완성하고 기적을 울리는 초등 1학년 국어 끝말잇기 어휘 놀이입니다. | 어린이/아케이드 |
+| [🍎 아기곰 보미의 가을 사과 뺄셈 바구니 (harvest-apple-subtraction)](./harvest-apple-subtraction/index.html) | 과수원 아기곰 보미와 함께 나무에 주렁주렁 열린 맛있는 사과 개수에서 떨어지거나 선물한 사과를 쏙 빼고, 바구니에 남은 사과의 알맞은 숫자를 맞추는 초등 1학년 2학기 '10 이하의 뺄셈' 과수원 수학 놀이입니다. | 어린이/아케이드 |
+| [🦁 동물 친구 이름 맞추기 받침 퍼즐 (spelling-animal-puzzle)](./spelling-animal-puzzle/index.html) | 숲속 동물 친구들(호랑이, 토끼, 다람쥐, 기린, 코끼리, 사자, 판다 등)의 그림자를 보고 흩어진 한글 낱말 조각을 순서대로 터치하여 올바른 동물 이름을 완성하는 초등 1학년 국어 낱말 완성 어휘 퍼즐 놀이입니다. | 어린이/아케이드 |
 
 </details>
 
@@ -521,6 +523,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-27: [🦁 동물 친구 이름 맞추기 받침 퍼즐](spelling-animal-puzzle/index.html), [🍎 아기곰 보미의 가을 사과 뺄셈 바구니](harvest-apple-subtraction/index.html) (총 327개)
+
 - 2026-10-26: [🚂 칙칙폭폭 끝말잇기 기차 여행](rhyming-word-train/index.html), [🌰 다람쥐 토토의 도토리 덧셈 양팔저울](acorn-addition-scale/index.html) (총 325개)
 
 - 2026-10-25: [🌈 무지개 모음 방울 톡톡](rainbow-vowel-catcher/index.html), [🍂 가을 낙엽 패턴 놀이터](autumn-leaf-pattern-puzzler/index.html) (총 323개)
