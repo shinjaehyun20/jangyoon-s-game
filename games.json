@@ -1,5 +1,23 @@
 [
   {
+    "id": "autumn-mirror-garden",
+    "title": "Autumn Mirror Garden",
+    "title_ko": "🍁 가을 거울 정원",
+    "description": "왼쪽 정원의 잎사귀를 보고 가운데 선에서 같은 거리인 오른쪽 칸을 눌러 거울 무늬를 완성하는 8단계 관찰·공간 놀이예요. 틀린 칸을 살펴 고칠 수 있고 시간 제한이 없어요.",
+    "thumbnail": "autumn-mirror-garden/thumb.svg",
+    "path": "autumn-mirror-garden/index.html",
+    "created": "2026-10-29"
+  },
+  {
+    "id": "robot-acorn-route",
+    "title": "Robot Acorn Route",
+    "title_ko": "🤖 도토리 배달 로봇",
+    "description": "방향 화살표를 차례로 넣어 로봇을 다람쥐 집까지 보내는 6단계 길찾기 놀이예요. 바위를 피해 길을 계획하고 한 칸 지우기·다시 출발로 명령 순서를 고쳐 보세요.",
+    "thumbnail": "robot-acorn-route/thumb.svg",
+    "path": "robot-acorn-route/index.html",
+    "created": "2026-10-29"
+  },
+  {
     "id": "spelling-animal-puzzle",
     "title": "Spelling Animal Puzzle",
     "title_ko": "🦁 동물 친구 이름 맞추기 받침 퍼즐",

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "robot-acorn-route",
+        "title": "🤖 도토리 배달 로봇",
+        "path": "robot-acorn-route/index.html"
+      },
+      {
+        "id": "autumn-mirror-garden",
+        "title": "🍁 가을 거울 정원",
+        "path": "autumn-mirror-garden/index.html"
+      },
+      {
         "id": "harvest-apple-subtraction",
         "title": "🍎 아기곰 보미의 가을 사과 뺄셈 바구니",
         "path": "harvest-apple-subtraction/index.html"
