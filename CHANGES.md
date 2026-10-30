@@ -1,4 +1,4 @@
-## 2026-10-29 — autumn-mirror-garden, robot-acorn-route (총 329개)
+## 2026-10-29 — autumn-mirror-garden, robot-acorn-route (총 331개)
 - **[🍁 가을 거울 정원 (autumn-mirror-garden)]** — 가운데 선을 기준으로 잎사귀 무늬를 완성하는 8단계 거울 정원 놀이.
 - **[🤖 도토리 배달 로봇 (robot-acorn-route)]** — 방향 명령을 차례로 넣고 바위를 피해 다람쥐 집까지 도토리를 보내는 6단계 길찾기 놀이.
 

@@ -1,5 +1,43 @@
 [
   {
+    "id": "coin-piggy-mart",
+    "title": "초1 수학·통합: 100원·50원·10원 동전 세기",
+    "subtitle": "초1 수학·통합: 100원·50원·10원 동전 세기",
+    "category": "math",
+    "grade": "초1",
+    "path": "coin-piggy-mart/index.html",
+    "thumb": "coin-piggy-mart/thumb.svg",
+    "tags": [
+      "수학",
+      "동전세기",
+      "화폐개념",
+      "마트놀이"
+    ],
+    "title_ko": "🎮 차곡차곡 동전 저금통 마트",
+    "description": "초1 수학·통합: 100원·50원·10원 동전 세기",
+    "thumbnail": "coin-piggy-mart/thumb.svg",
+    "created": "2026-10-30"
+  },
+  {
+    "id": "korean-antonym-frog",
+    "title": "초1 국어: 뜻이 반대인 낱말 연못 건너기",
+    "subtitle": "초1 국어: 뜻이 반대인 낱말 연못 건너기",
+    "category": "korean",
+    "grade": "초1",
+    "path": "korean-antonym-frog/index.html",
+    "thumb": "korean-antonym-frog/thumb.svg",
+    "tags": [
+      "국어",
+      "반대말",
+      "어휘력",
+      "연못점프"
+    ],
+    "title_ko": "🎮 폴짝폴짝 반대말 개구리",
+    "description": "초1 국어: 뜻이 반대인 낱말 연못 건너기",
+    "thumbnail": "korean-antonym-frog/thumb.svg",
+    "created": "2026-10-30"
+  },
+  {
     "id": "autumn-mirror-garden",
     "title": "Autumn Mirror Garden",
     "title_ko": "🍁 가을 거울 정원",

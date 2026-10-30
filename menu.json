@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "korean-antonym-frog",
+        "title": "🎮 폴짝폴짝 반대말 개구리",
+        "path": "korean-antonym-frog/index.html"
+      },
+      {
+        "id": "coin-piggy-mart",
+        "title": "🎮 차곡차곡 동전 저금통 마트",
+        "path": "coin-piggy-mart/index.html"
+      },
+      {
         "id": "robot-acorn-route",
         "title": "🤖 도토리 배달 로봇",
         "path": "robot-acorn-route/index.html"
