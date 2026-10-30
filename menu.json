@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "syllable-block-castle",
+        "title": "🎮 차곡차곡 글자 블록 성 쌓기",
+        "path": "syllable-block-castle/index.html"
+      },
+      {
+        "id": "skip-counting-rabbit",
+        "title": "🎮 깡충깡충 뛰어세기 토끼",
+        "path": "skip-counting-rabbit/index.html"
+      },
+      {
         "id": "korean-antonym-frog",
         "title": "🎮 폴짝폴짝 반대말 개구리",
         "path": "korean-antonym-frog/index.html"

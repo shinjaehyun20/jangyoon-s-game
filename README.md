@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 331개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 333개.
 
-[![Games](https://img.shields.io/badge/games-331-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-333-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![331개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![333개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 331개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 333개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -360,6 +360,8 @@
 | [🍁 가을 거울 정원 (autumn-mirror-garden)](./autumn-mirror-garden/index.html) | 왼쪽 정원의 잎사귀를 보고 가운데 선에서 같은 거리인 오른쪽 칸을 눌러 거울 무늬를 완성하는 8단계 관찰·공간 놀이예요. 틀린 칸을 살펴 고칠 수 있고 시간 제한이 없어요. | 어린이/아케이드 |
 | [🎮 폴짝폴짝 반대말 개구리 (korean-antonym-frog)](./korean-antonym-frog/index.html) | 초1 국어: 뜻이 반대인 낱말 연못 건너기 | 어린이/아케이드 |
 | [🎮 차곡차곡 동전 저금통 마트 (coin-piggy-mart)](./coin-piggy-mart/index.html) | 초1 수학·통합: 100원·50원·10원 동전 세기 | 어린이/아케이드 |
+| [🎮 차곡차곡 글자 블록 성 쌓기 (syllable-block-castle)](./syllable-block-castle/index.html) | 초1 국어: 한글 낱자 블록을 순서대로 맞춰 멋진 성 쌓기 | 어린이/아케이드 |
+| [🎮 깡충깡충 뛰어세기 토끼 (skip-counting-rabbit)](./skip-counting-rabbit/index.html) | 초1 수학: 2씩·5씩·10씩 뛰어세기 징검다리 건너기 | 어린이/아케이드 |
 
 </details>
 
@@ -527,6 +529,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-10)
+- 2026-10-30: [🎮 깡충깡충 뛰어세기 토끼](skip-counting-rabbit/index.html), [🎮 차곡차곡 글자 블록 성 쌓기](syllable-block-castle/index.html), [🎮 차곡차곡 동전 저금통 마트](coin-piggy-mart/index.html), [🎮 폴짝폴짝 반대말 개구리](korean-antonym-frog/index.html) (총 333개)
+
 - 2026-10-30: [🎮 차곡차곡 동전 저금통 마트](coin-piggy-mart/index.html), [🎮 폴짝폴짝 반대말 개구리](korean-antonym-frog/index.html) (총 331개)
 
 - 2026-10-29: [🍁 가을 거울 정원](autumn-mirror-garden/index.html), [🤖 도토리 배달 로봇](robot-acorn-route/index.html) (총 329개)

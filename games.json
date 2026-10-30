@@ -1,5 +1,43 @@
 [
   {
+    "id": "skip-counting-rabbit",
+    "title": "초1 수학: 2씩·5씩·10씩 뛰어세기 징검다리 건너기",
+    "subtitle": "초1 수학: 2씩·5씩·10씩 뛰어세기 징검다리 건너기",
+    "category": "math",
+    "grade": "초1",
+    "path": "skip-counting-rabbit/index.html",
+    "thumb": "skip-counting-rabbit/thumb.svg",
+    "tags": [
+      "수학",
+      "뛰어세기",
+      "수규칙",
+      "토끼점프"
+    ],
+    "title_ko": "🎮 깡충깡충 뛰어세기 토끼",
+    "description": "초1 수학: 2씩·5씩·10씩 뛰어세기 징검다리 건너기",
+    "thumbnail": "skip-counting-rabbit/thumb.svg",
+    "created": "2026-10-30"
+  },
+  {
+    "id": "syllable-block-castle",
+    "title": "초1 국어: 한글 낱자 블록을 순서대로 맞춰 멋진 성 쌓기",
+    "subtitle": "초1 국어: 한글 낱자 블록을 순서대로 맞춰 멋진 성 쌓기",
+    "category": "korean",
+    "grade": "초1",
+    "path": "syllable-block-castle/index.html",
+    "thumb": "syllable-block-castle/thumb.svg",
+    "tags": [
+      "국어",
+      "낱말조합",
+      "글자블록",
+      "성쌓기"
+    ],
+    "title_ko": "🎮 차곡차곡 글자 블록 성 쌓기",
+    "description": "초1 국어: 한글 낱자 블록을 순서대로 맞춰 멋진 성 쌓기",
+    "thumbnail": "syllable-block-castle/thumb.svg",
+    "created": "2026-10-30"
+  },
+  {
     "id": "coin-piggy-mart",
     "title": "초1 수학·통합: 100원·50원·10원 동전 세기",
     "subtitle": "초1 수학·통합: 100원·50원·10원 동전 세기",
