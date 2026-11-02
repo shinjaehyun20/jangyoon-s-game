@@ -1,5 +1,43 @@
 [
   {
+    "id": "punctuation-train-safari",
+    "title": "또박또박 문장부호 탐험대",
+    "subtitle": "초1 국어: 문장 끝에 알맞은 마침표(.)·물음표(?)·느낌표(!) 넣기",
+    "category": "korean",
+    "grade": "초1",
+    "path": "punctuation-train-safari/index.html",
+    "thumb": "punctuation-train-safari/thumb.svg",
+    "tags": [
+      "국어",
+      "문장부호",
+      "마침표물음표느낌표",
+      "탐험대"
+    ],
+    "title_ko": "또박또박 문장부호 탐험대",
+    "description": "초1 국어: 문장 끝에 알맞은 마침표(.)·물음표(?)·느낌표(!) 넣기",
+    "thumbnail": "punctuation-train-safari/thumb.svg",
+    "created": "2026-11-03"
+  },
+  {
+    "id": "dice-ten-board",
+    "title": "알록달록 주사위 덧셈 보드",
+    "subtitle": "초1 수학: 두 주사위의 눈을 더해 보드판 골인 지점까지 점프하기",
+    "category": "math",
+    "grade": "초1",
+    "path": "dice-ten-board/index.html",
+    "thumb": "dice-ten-board/thumb.svg",
+    "tags": [
+      "수학",
+      "주사위덧셈",
+      "수세기",
+      "보드게임"
+    ],
+    "title_ko": "알록달록 주사위 덧셈 보드",
+    "description": "초1 수학: 두 주사위의 눈을 더해 보드판 골인 지점까지 점프하기",
+    "thumbnail": "dice-ten-board/thumb.svg",
+    "created": "2026-11-03"
+  },
+  {
     "id": "final-consonant-grape",
     "title": "송이송이 받침 포도 농장",
     "subtitle": "초1 국어: 알맞은 받침(ㄱ·ㄴ·ㄹ·ㅁ·ㅇ) 포도알을 골라 낱말 완성하기",

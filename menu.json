@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "dice-ten-board",
+        "title": "알록달록 주사위 덧셈 보드",
+        "path": "dice-ten-board/index.html"
+      },
+      {
+        "id": "punctuation-train-safari",
+        "title": "또박또박 문장부호 탐험대",
+        "path": "punctuation-train-safari/index.html"
+      },
+      {
         "id": "seesaw-weight-safari",
         "title": "영차영차 시소 무게 비교",
         "path": "seesaw-weight-safari/index.html"
