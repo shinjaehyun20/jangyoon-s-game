@@ -1,5 +1,43 @@
 [
   {
+    "id": "final-consonant-grape",
+    "title": "송이송이 받침 포도 농장",
+    "subtitle": "초1 국어: 알맞은 받침(ㄱ·ㄴ·ㄹ·ㅁ·ㅇ) 포도알을 골라 낱말 완성하기",
+    "category": "korean",
+    "grade": "초1",
+    "path": "final-consonant-grape/index.html",
+    "thumb": "final-consonant-grape/thumb.svg",
+    "tags": [
+      "국어",
+      "받침공부",
+      "낱말완성",
+      "포도농장"
+    ],
+    "title_ko": "송이송이 받침 포도 농장",
+    "description": "초1 국어: 알맞은 받침(ㄱ·ㄴ·ㄹ·ㅁ·ㅇ) 포도알을 골라 낱말 완성하기",
+    "thumbnail": "final-consonant-grape/thumb.svg",
+    "created": "2026-11-02"
+  },
+  {
+    "id": "seesaw-weight-safari",
+    "title": "영차영차 시소 무게 비교",
+    "subtitle": "초1 수학: 세 동물이 탄 시소를 보고 가장 무거운·가벼운 친구 찾기",
+    "category": "math",
+    "grade": "초1",
+    "path": "seesaw-weight-safari/index.html",
+    "thumb": "seesaw-weight-safari/thumb.svg",
+    "tags": [
+      "수학",
+      "무게비교",
+      "창의사고력",
+      "시소놀이"
+    ],
+    "title_ko": "영차영차 시소 무게 비교",
+    "description": "초1 수학: 세 동물이 탄 시소를 보고 가장 무거운·가벼운 친구 찾기",
+    "thumbnail": "seesaw-weight-safari/thumb.svg",
+    "created": "2026-11-02"
+  },
+  {
     "id": "skip-counting-rabbit",
     "title": "초1 수학: 2씩·5씩·10씩 뛰어세기 징검다리 건너기",
     "subtitle": "초1 수학: 2씩·5씩·10씩 뛰어세기 징검다리 건너기",

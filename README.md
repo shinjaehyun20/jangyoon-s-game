@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 333개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 335개.
 
-[![Games](https://img.shields.io/badge/games-333-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-335-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![333개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![335개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 333개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 335개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -362,6 +362,8 @@
 | [🎮 차곡차곡 동전 저금통 마트 (coin-piggy-mart)](./coin-piggy-mart/index.html) | 초1 수학·통합: 100원·50원·10원 동전 세기 | 어린이/아케이드 |
 | [🎮 차곡차곡 글자 블록 성 쌓기 (syllable-block-castle)](./syllable-block-castle/index.html) | 초1 국어: 한글 낱자 블록을 순서대로 맞춰 멋진 성 쌓기 | 어린이/아케이드 |
 | [🎮 깡충깡충 뛰어세기 토끼 (skip-counting-rabbit)](./skip-counting-rabbit/index.html) | 초1 수학: 2씩·5씩·10씩 뛰어세기 징검다리 건너기 | 어린이/아케이드 |
+| [영차영차 시소 무게 비교 (seesaw-weight-safari)](./seesaw-weight-safari/index.html) | 초1 수학: 세 동물이 탄 시소를 보고 가장 무거운·가벼운 친구 찾기 | 어린이/아케이드 |
+| [송이송이 받침 포도 농장 (final-consonant-grape)](./final-consonant-grape/index.html) | 초1 국어: 알맞은 받침(ㄱ·ㄴ·ㄹ·ㅁ·ㅇ) 포도알을 골라 낱말 완성하기 | 어린이/아케이드 |
 
 </details>
 
@@ -527,6 +529,10 @@ VS Code `Live Server` 확장을 써도 된다.
 - **외부 의존성 없음** — CDN 스크립트 로드 없음 (일부 게임의 배경 이미지 제외)
 - **API 사용**: `fetch`, `Canvas 2D`, `Pointer Events`, `localStorage`, `ResizeObserver`
 - **호스팅**: GitHub Pages (정적)
+
+## 최근 변경사항 (2026-11)
+- 2026-11-02: [송이송이 받침 포도 농장](final-consonant-grape/index.html), [영차영차 시소 무게 비교](seesaw-weight-safari/index.html) (총 335개)
+
 
 ## 최근 변경사항 (2026-10)
 - 2026-10-30: [🎮 깡충깡충 뛰어세기 토끼](skip-counting-rabbit/index.html), [🎮 차곡차곡 글자 블록 성 쌓기](syllable-block-castle/index.html), [🎮 차곡차곡 동전 저금통 마트](coin-piggy-mart/index.html), [🎮 폴짝폴짝 반대말 개구리](korean-antonym-frog/index.html) (총 333개)

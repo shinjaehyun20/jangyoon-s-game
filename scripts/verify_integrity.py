@@ -258,7 +258,7 @@ def check_all(check_live=True):
                 print(f"[*] README.md 최근 변경사항 최신 총 게임 카운터 정상 확인 (총 {count_str}개)")
 
             if len(games) >= 2:
-                for g in games[-2:]:
+                for g in recent_games(games):
                     t_ko = g.get("title_ko", "")
                     t_en = g.get("title", "")
                     gid = g.get("id", "")
@@ -318,10 +318,7 @@ def check_all(check_live=True):
         if gh_view.returncode == 0:
             gh_desc = json.loads(gh_view.stdout).get("description", "")
             if count_str not in gh_desc:
-                warnings.append(f"GitHub Repo Description({gh_desc})에 최신 수치({count_str})가 반영되지 않았습니다. 자동 갱신을 실행합니다.")
-                new_desc = f"터치로 바로 즐기는 {count_str}개 어린이 미니게임 아케이드 — 학습, 액션, 퍼즐, 창의 놀이."
-                subprocess.run(["gh", "repo", "edit", "shinjaehyun20/jangyoon-s-game", "--description", new_desc], check=False)
-                print(f"[*] GitHub Repo Description 자동 갱신 완료 -> {new_desc}")
+                warnings.append(f"GitHub Repo Description differs from catalog count {count_str}; remote metadata left unchanged.")
             else:
                 print(f"[*] GitHub Repo Description 최신 일치 확인 -> {gh_desc}")
     except Exception as e:

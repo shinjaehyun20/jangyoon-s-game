@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "seesaw-weight-safari",
+        "title": "영차영차 시소 무게 비교",
+        "path": "seesaw-weight-safari/index.html"
+      },
+      {
+        "id": "final-consonant-grape",
+        "title": "송이송이 받침 포도 농장",
+        "path": "final-consonant-grape/index.html"
+      },
+      {
         "id": "syllable-block-castle",
         "title": "🎮 차곡차곡 글자 블록 성 쌓기",
         "path": "syllable-block-castle/index.html"
