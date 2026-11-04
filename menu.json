@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "mirror-symmetry-art",
+        "title": "🎮 요리조리 거울 대칭 미술관",
+        "path": "mirror-symmetry-art/index.html"
+      },
+      {
+        "id": "hangul-snowman-maker",
+        "title": "🎮 데굴데굴 자음모음 눈사람",
+        "path": "hangul-snowman-maker/index.html"
+      },
+      {
         "id": "dice-ten-board",
         "title": "알록달록 주사위 덧셈 보드",
         "path": "dice-ten-board/index.html"

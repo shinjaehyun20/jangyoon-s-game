@@ -1,5 +1,43 @@
 [
   {
+    "id": "hangul-snowman-maker",
+    "title": "초1 국어: 첫소리 자음 눈뭉치와 가운뎃소리 모음 눈뭉치를 합쳐 글자 눈사람 만들기",
+    "subtitle": "초1 국어: 첫소리 자음 눈뭉치와 가운뎃소리 모음 눈뭉치를 합쳐 글자 눈사람 만들기",
+    "category": "korean",
+    "grade": "초1",
+    "path": "hangul-snowman-maker/index.html",
+    "thumb": "hangul-snowman-maker/thumb.svg",
+    "tags": [
+      "국어",
+      "자음모음결합",
+      "글자만들기",
+      "눈사람"
+    ],
+    "title_ko": "🎮 데굴데굴 자음모음 눈사람",
+    "description": "초1 국어: 첫소리 자음 눈뭉치와 가운뎃소리 모음 눈뭉치를 합쳐 글자 눈사람 만들기",
+    "thumbnail": "hangul-snowman-maker/thumb.svg",
+    "created": "2026-11-04"
+  },
+  {
+    "id": "mirror-symmetry-art",
+    "title": "초1 수학·창의: 왼쪽 그림과 똑같이 마주 보는 거울 대칭 무늬 찾기",
+    "subtitle": "초1 수학·창의: 왼쪽 그림과 똑같이 마주 보는 거울 대칭 무늬 찾기",
+    "category": "math",
+    "grade": "초1",
+    "path": "mirror-symmetry-art/index.html",
+    "thumb": "mirror-symmetry-art/thumb.svg",
+    "tags": [
+      "수학",
+      "거울대칭",
+      "공간감각",
+      "미술관"
+    ],
+    "title_ko": "🎮 요리조리 거울 대칭 미술관",
+    "description": "초1 수학·창의: 왼쪽 그림과 똑같이 마주 보는 거울 대칭 무늬 찾기",
+    "thumbnail": "mirror-symmetry-art/thumb.svg",
+    "created": "2026-11-04"
+  },
+  {
     "id": "punctuation-train-safari",
     "title": "또박또박 문장부호 탐험대",
     "subtitle": "초1 국어: 문장 끝에 알맞은 마침표(.)·물음표(?)·느낌표(!) 넣기",

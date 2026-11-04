@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>요리조리 거울 대칭 미술관 - 초1 수학</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
+    background: radial-gradient(circle at 50% 20%, #4c1d95, #090d16 85%);
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    color: #f8fafc; touch-action: manipulation; user-select: none;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .wrap {
+    width: 100%; max-width: 480px; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 12px;
+  }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(15, 23, 42, 0.9); border: 1.5px solid rgba(196, 181, 253, 0.4);
+    border-radius: 14px; padding: 8px 12px;
+  }
+  .hud-title { font-size: 15px; font-weight: 900; color: #ddd6fe; }
+  .hud-metrics { display: flex; gap: 8px; font-size: 14px; font-weight: 800; }
+  .metric { background: #1e293b; padding: 6px 10px; border-radius: 10px; }
+  .metric span { color: #fde047; }
+  .stage {
+    flex: 1; margin: 10px 0; border-radius: 20px;
+    border: 2px solid #a78bfa; background: rgba(15, 23, 42, 0.85);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 14px; gap: 12px; text-align: center;
+  }
+  .mirror-frame {
+    display: flex; align-items: center; gap: 12px;
+    background: #1e293b; padding: 14px; border-radius: 16px; border: 2px solid #64748b;
+  }
+  .grid3 {
+    display: grid; grid-template-columns: repeat(3, 36px); grid-template-rows: repeat(3, 36px); gap: 4px;
+  }
+  .cell { border-radius: 6px; background: #0f172a; border: 1px solid #334155; }
+  .cell.on { background: #fde047; box-shadow: 0 0 8px rgba(253,224,71,0.6); }
+  .mirror-line { width: 4px; height: 120px; background: #38bdf8; border-radius: 2px; }
+  .hint { font-size: 15px; color: #fde047; font-weight: 800; }
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .choice-btn {
+    padding: 10px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.25);
+    background: #1e293b; color: #fff; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 800;
+  }
+  .mini-grid {
+    display: grid; grid-template-columns: repeat(3, 20px); grid-template-rows: repeat(3, 20px); gap: 3px;
+  }
+  .mini-cell { border-radius: 4px; background: #0f172a; }
+  .mini-cell.on { background: #34d399; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="hud-title">🪞 요리조리 거울 대칭 미술관</div>
+    <div class="hud-metrics">
+      <div class="metric">점수 <span id="score">0</span></div>
+      <div class="metric">최고 <span id="best">0</span></div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="hint" id="msg">파란 거울선을 기준으로 왼쪽 무늬를 반대로 뒤집은 모양을 찾아요!</div>
+    <div class="mirror-frame">
+      <div class="grid3" id="leftGrid"></div>
+      <div class="mirror-line"></div>
+      <div class="grid3" id="rightGrid"></div>
+    </div>
+  </div>
+  <div class="choices" id="choices"></div>
+  <div style="text-align:center"><a id="homeBtn" href="../index.html" style="display:inline-block;padding:8px;color:inherit;font-weight:700">🏠 게임 모음</a></div>
+</div>
+<script>
+(function(){
+  const PATTERNS = [
+    [[1,0,0],[1,1,0],[1,0,0]],
+    [[0,1,1],[0,0,1],[0,1,1]],
+    [[1,1,0],[0,1,1],[0,0,1]],
+    [[1,0,1],[1,1,0],[0,0,1]],
+    [[0,0,1],[0,1,1],[1,1,1]]
+  ];
+  let idx = 0, score = 0, best = parseInt(localStorage.getItem('mirror_best')||'0',10);
+  let roundLocked = false;
+  const elLeft = document.getElementById('leftGrid'), elRight = document.getElementById('rightGrid');
+  const elChoices = document.getElementById('choices'), elMsg = document.getElementById('msg');
+  const elScore = document.getElementById('score'), elBest = document.getElementById('best');
+  elBest.textContent = best;
+
+  function flipH(mat) { return mat.map(row => row.slice().reverse()); }
+  function matKey(mat) { return mat.map(r=>r.join('')).join('|'); }
+  function drawGrid(container, mat, cellCls, emptyUnknown) {
+    container.innerHTML = '';
+    for(let r=0;r<3;r++){
+      for(let c=0;c<3;c++){
+        const d = document.createElement('div');
+        d.className = cellCls + (!emptyUnknown && mat[r][c] ? ' on' : '');
+        container.appendChild(d);
+      }
+    }
+  }
+  function beep(freq, dur) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.frequency.value = freq; g.gain.value = 0.12;
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + dur);
+    } catch(e){}
+  }
+
+  function nextRound() {
+    roundLocked = false;
+    elMsg.textContent = '파란 거울선을 기준으로 왼쪽 무늬를 반대로 뒤집은 모양을 찾아요!';
+    const src = PATTERNS[idx % PATTERNS.length];
+    const ans = flipH(src);
+    drawGrid(elLeft, src, 'cell', false);
+    drawGrid(elRight, ans, 'cell', true);
+    const wrong1 = src; // unflipped
+    const wrong2 = ans.slice().reverse(); // vertical flip
+    const opts = [
+      { mat: ans, ok: true },
+      { mat: matKey(wrong1)===matKey(ans) ? [[1,1,1],[0,1,0],[0,0,1]] : wrong1, ok: false },
+      { mat: matKey(wrong2)===matKey(ans) ? [[0,1,0],[1,0,1],[1,1,0]] : wrong2, ok: false }
+    ].sort(()=>Math.random()-0.5);
+
+    elChoices.innerHTML = '';
+    opts.forEach((o, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      const mg = document.createElement('div');
+      mg.className = 'mini-grid';
+      drawGrid(mg, o.mat, 'mini-cell', false);
+      const lbl = document.createElement('span');
+      lbl.textContent = (i+1) + '번 무늬';
+      btn.appendChild(mg); btn.appendChild(lbl);
+      btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        if (roundLocked) return;
+        if (o.ok) {
+          roundLocked = true;
+          score += 10; elScore.textContent = score;
+          if (score > best) { best = score; elBest.textContent = best; localStorage.setItem('mirror_best', String(best)); }
+          drawGrid(elRight, ans, 'cell', false);
+          elMsg.textContent = '⭕ 정답! 거울에 비친 대칭 무늬를 정확히 찾았어요!';
+          beep(880, 0.15);
+          idx++;
+          setTimeout(nextRound, 700);
+        } else {
+          elMsg.textContent = '❌ 거울선에 가까운 칸끼리 서로 마주 보는지 확인해 봐요!';
+          beep(240, 0.18);
+        }
+      });
+      elChoices.appendChild(btn);
+    });
+  }
+  nextRound();
+})();
+</script>
+</body>
+</html>

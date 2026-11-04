@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>데굴데굴 자음모음 눈사람 - 초1 국어</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
+    background: radial-gradient(circle at 50% 20%, #1e3a8a, #0f172a 85%);
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    color: #f8fafc; touch-action: manipulation; user-select: none;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .wrap {
+    width: 100%; max-width: 480px; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 12px;
+  }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(15, 23, 42, 0.9); border: 1.5px solid rgba(147, 197, 253, 0.4);
+    border-radius: 14px; padding: 8px 12px;
+  }
+  .hud-title { font-size: 15px; font-weight: 900; color: #bae6fd; }
+  .hud-metrics { display: flex; gap: 8px; font-size: 14px; font-weight: 800; }
+  .metric { background: #1e293b; padding: 6px 10px; border-radius: 10px; }
+  .metric span { color: #fde047; }
+  .stage {
+    flex: 1; margin: 10px 0; border-radius: 20px;
+    border: 2px solid #38bdf8; background: rgba(15, 23, 42, 0.85);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 16px; gap: 14px; text-align: center;
+  }
+  .target-word { font-size: 22px; font-weight: 900; color: #fde047; }
+  .snowman { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .snow-head {
+    width: 82px; height: 82px; border-radius: 50%; background: #ffffff; color: #0f172a;
+    display: flex; justify-content: center; align-items: center; font-size: 36px; font-weight: 900;
+    border: 4px solid #38bdf8;
+  }
+  .snow-body {
+    width: 106px; height: 106px; border-radius: 50%; background: #e0f2fe; color: #0369a1;
+    display: flex; justify-content: center; align-items: center; font-size: 44px; font-weight: 900;
+    border: 4px solid #0284c7;
+  }
+  .hint { font-size: 15px; color: #e2e8f0; font-weight: 700; }
+  .choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .choice-btn {
+    min-height: 62px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.25);
+    background: linear-gradient(135deg, #0284c7, #1d4ed8); color: #fff;
+    font-size: 24px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:active { transform: scale(0.95); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="hud-title">⛄ 데굴데굴 자음모음 눈사람</div>
+    <div class="hud-metrics">
+      <div class="metric">점수 <span id="score">0</span></div>
+      <div class="metric">최고 <span id="best">0</span></div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="target-word" id="wordPrompt">🦋 [나]비의 첫 글자 '나'를 만들어요!</div>
+    <div class="snowman">
+      <div class="snow-head" id="headPart">ㄴ + ㅏ</div>
+      <div class="snow-body" id="bodyPart">?</div>
+    </div>
+    <div class="hint" id="hint">자음과 모음 눈뭉치가 합쳐지면 어떤 글자가 될까요?</div>
+  </div>
+  <div class="choices" id="choices"></div>
+  <div style="text-align:center"><a id="homeBtn" href="../index.html" style="display:inline-block;padding:8px;color:inherit;font-weight:700">🏠 게임 모음</a></div>
+</div>
+<script>
+(function(){
+  const ITEMS = [
+    { prompt: "🦋 [나]비의 첫 글자!", formula: "ㄴ + ㅏ", ans: "나", pool: ["나","너","노","누"] },
+    { prompt: "🌲 [소]나무의 첫 글자!", formula: "ㅅ + ㅗ", ans: "소", pool: ["사","서","소","수"] },
+    { prompt: "🚌 [버]스의 첫 글자!", formula: "ㅂ + ㅓ", ans: "버", pool: ["바","버","보","부"] },
+    { prompt: "🌧️ 봄[비]의 글자!", formula: "ㅂ + ㅣ", ans: "비", pool: ["바","버","보","비"] },
+    { prompt: "🎩 [모]자의 첫 글자!", formula: "ㅁ + ㅗ", ans: "모", pool: ["마","머","모","무"] },
+    { prompt: "🍇 [포]도의 첫 글자!", formula: "ㅍ + ㅗ", ans: "포", pool: ["파","퍼","포","푸"] }
+  ];
+  let idx = 0, score = 0, best = parseInt(localStorage.getItem('snow_best')||'0',10);
+  let roundLocked = false;
+  const elPrompt = document.getElementById('wordPrompt');
+  const elHead = document.getElementById('headPart');
+  const elBody = document.getElementById('bodyPart');
+  const elHint = document.getElementById('hint');
+  const elChoices = document.getElementById('choices');
+  const elScore = document.getElementById('score'), elBest = document.getElementById('best');
+  elBest.textContent = best;
+
+  function beep(freq, dur) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.frequency.value = freq; g.gain.value = 0.12;
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + dur);
+    } catch(e){}
+  }
+
+  function render() {
+    roundLocked = false;
+    elHint.textContent = '자음과 모음 눈뭉치가 합쳐지면 어떤 글자가 될까요?';
+    const it = ITEMS[idx % ITEMS.length];
+    elPrompt.textContent = it.prompt;
+    elHead.textContent = it.formula;
+    elBody.textContent = '?';
+    elChoices.innerHTML = '';
+    it.pool.slice().sort(()=>Math.random()-0.5).forEach(ch => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = ch;
+      btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        if (roundLocked) return;
+        if (ch === it.ans) {
+          roundLocked = true;
+          score += 10; elScore.textContent = score;
+          if (score > best) { best = score; elBest.textContent = best; localStorage.setItem('snow_best', String(best)); }
+          elBody.textContent = ch;
+          elHint.textContent = '⭕ 정답! ' + it.formula + ' = [' + ch + '] 눈사람 완성!';
+          beep(880, 0.15);
+          idx++;
+          setTimeout(render, 650);
+        } else {
+          elHint.textContent = '❌ ' + it.formula + ' 소리를 천천히 합쳐 볼까요?';
+          beep(240, 0.18);
+        }
+      });
+      elChoices.appendChild(btn);
+    });
+  }
+  render();
+})();
+</script>
+</body>
+</html>
