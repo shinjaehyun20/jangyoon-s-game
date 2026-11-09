@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "animal-footprint-safari",
+        "title": "🎮 신비한 동물 발자국 사파리",
+        "path": "animal-footprint-safari/index.html"
+      },
+      {
+        "id": "rainbow-shape-stacker",
+        "title": "🎮 알록달록 모양 블록 쌓기",
+        "path": "rainbow-shape-stacker/index.html"
+      },
+      {
         "id": "mirror-symmetry-art",
         "title": "🎮 요리조리 거울 대칭 미술관",
         "path": "mirror-symmetry-art/index.html"

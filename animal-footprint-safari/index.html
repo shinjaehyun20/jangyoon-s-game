@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신비한 동물 발자국 사파리 - 초1 국어 탐구</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
+    background: radial-gradient(circle at 50% 20%, #064e3b, #022c22 90%);
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    color: #f8fafc; touch-action: manipulation; user-select: none;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .wrap {
+    width: 100%; max-width: 480px; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 12px; position: relative; overflow-y: auto;
+  }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(6, 78, 59, 0.9); border: 1.5px solid rgba(52, 211, 153, 0.4);
+    border-radius: 14px; padding: 8px 12px; flex-shrink: 0; gap: 6px;
+  }
+  .home-link {
+    color: #a7f3d0; text-decoration: none; font-size: 14px; font-weight: 800;
+    padding: 8px 10px; border-radius: 10px; background: rgba(4, 120, 87, 0.7);
+    min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(52, 211, 153, 0.3); transition: transform 0.1s;
+  }
+  .home-link:active { transform: scale(0.95); }
+  .hud-metrics { display: flex; gap: 8px; font-size: 14px; font-weight: 800; }
+  .metric-box {
+    background: rgba(2, 44, 34, 0.9); padding: 6px 10px; border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .metric-box span { color: #fde047; }
+  .hud-actions { display: flex; gap: 6px; }
+  .icon-btn {
+    background: rgba(2, 44, 34, 0.9); border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f8fafc; font-size: 16px; border-radius: 10px; min-width: 44px; min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+
+  .stage {
+    flex: 1; margin: 8px 0; border-radius: 18px;
+    border: 2px solid #34d399; background: rgba(6, 78, 59, 0.8);
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 12px; position: relative; overflow: hidden;
+  }
+  .stage-header {
+    width: 100%; display: flex; justify-content: space-between; align-items: center;
+  }
+  .stage-title { font-size: 15px; font-weight: 900; color: #fde047; }
+  .clue-badge {
+    background: rgba(2, 44, 34, 0.85); color: #6ee7b7; font-size: 12px;
+    font-weight: 800; padding: 4px 10px; border-radius: 8px; border: 1px solid #10b981;
+  }
+
+  .safari-trail {
+    position: relative; width: 100%; max-width: 340px; height: 230px;
+    background: radial-gradient(circle, #fef3c7 10%, #d97706 90%);
+    border-radius: 16px; border: 3px solid #b45309;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.35);
+    display: flex; justify-content: center; align-items: center; overflow: hidden;
+  }
+  #footprintSvg { width: 100%; height: 100%; }
+
+  .animal-reveal {
+    position: absolute; inset: 0; background: rgba(6, 78, 59, 0.95);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    z-index: 20;
+  }
+  .animal-reveal.show { opacity: 1; pointer-events: auto; }
+  .reveal-emoji { font-size: 68px; animation: bounce 0.6s infinite alternate; }
+  .reveal-name { font-size: 26px; font-weight: 900; color: #fde047; margin-top: 6px; }
+  .reveal-sfx { font-size: 14px; font-weight: 800; color: #a7f3d0; margin-top: 4px; }
+
+  @keyframes bounce {
+    from { transform: translateY(0) scale(1); }
+    to { transform: translateY(-10px) scale(1.08); }
+  }
+
+  .clue-box {
+    width: 100%; background: rgba(2, 44, 34, 0.9); border-radius: 12px;
+    padding: 8px 12px; border: 1.5px solid rgba(52, 211, 153, 0.3);
+    text-align: center; font-size: 13px; font-weight: 800; color: #e2e8f0;
+  }
+  .clue-box span { color: #fde047; }
+
+  .choice-grid {
+    width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0;
+  }
+  .choice-btn {
+    background: rgba(2, 44, 34, 0.95); border: 2px solid #10b981;
+    color: #ffffff; font-size: 17px; font-weight: 900; border-radius: 14px;
+    padding: 12px 8px; cursor: pointer; min-height: 52px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: transform 0.12s, border-color 0.12s, background-color 0.12s;
+  }
+  .choice-btn:active { transform: scale(0.95); }
+  .choice-btn.correct {
+    background: #047857; border-color: #fde047;
+    box-shadow: 0 0 14px rgba(253, 224, 71, 0.7);
+  }
+  .choice-btn.wrong {
+    background: #7f1d1d; border-color: #f87171;
+  }
+
+  .overlay {
+    position: absolute; inset: 0; background: rgba(2, 44, 34, 0.95);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 24px; border-radius: 18px; z-index: 50; text-align: center; gap: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-badge { font-size: 54px; }
+  .overlay-title { font-size: 24px; font-weight: 900; color: #fde047; }
+  .overlay-desc { font-size: 14px; color: #d1fae5; line-height: 1.6; }
+  .btn-primary {
+    background: linear-gradient(135deg, #10b981, #059669); color: #ffffff;
+    font-size: 16px; font-weight: 900; border: none; border-radius: 14px;
+    padding: 12px 28px; cursor: pointer; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+    min-height: 46px; transition: transform 0.1s;
+  }
+  .btn-primary:active { transform: scale(0.96); }
+
+  @media (max-width: 420px) {
+    .wrap { padding: 6px 8px; }
+    .safari-trail { height: 190px; }
+    .choice-btn { font-size: 15px; min-height: 48px; padding: 8px 4px; }
+    .stage { padding: 8px; margin: 4px 0; }
+  }
+  @media (max-height: 640px) {
+    .safari-trail { height: 160px; }
+    .stage { padding: 6px; margin: 4px 0; }
+    .clue-box { font-size: 11px; padding: 4px 8px; }
+    .choice-btn { font-size: 14px; min-height: 44px; padding: 6px 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- HUD -->
+  <header class="hud">
+    <a href="../index.html" id="homeBtn" class="home-link">🏠 홈</a>
+    <div class="hud-metrics">
+      <div class="metric-box">탐험 <span id="qVal">1</span>/10</div>
+      <div class="metric-box">점수 <span id="scoreVal">0</span></div>
+    </div>
+    <div class="hud-actions">
+      <button class="icon-btn" id="clueBtn" title="돋보기 단서">🔍</button>
+      <button class="icon-btn" id="muteBtn" title="소리 켜기/끄기">🔊</button>
+    </div>
+  </header>
+
+  <!-- GAME STAGE -->
+  <main class="stage">
+    <div class="stage-header">
+      <div class="stage-title" id="trailTheme">🏜️ 모래사장 발자국</div>
+      <div class="clue-badge" id="stepBadge">단서 1</div>
+    </div>
+
+    <div class="safari-trail" id="safariTrail">
+      <svg id="footprintSvg" viewBox="0 0 300 200"></svg>
+      <div class="animal-reveal" id="animalReveal">
+        <div class="reveal-emoji" id="revealEmoji">🦆</div>
+        <div class="reveal-name" id="revealName">오리</div>
+        <div class="reveal-sfx" id="revealSfx">"꽥꽥! 뒤뚱뒤뚱 물가를 걸어요"</div>
+      </div>
+    </div>
+
+    <div class="clue-box" id="clueText">
+      발자국 모양을 관찰하고 알맞은 동물 이름을 골라보세요!
+    </div>
+
+    <div class="choice-grid" id="choiceGrid"></div>
+
+    <!-- START OVERLAY -->
+    <div class="overlay" id="startOverlay">
+      <div class="overlay-badge">🧭</div>
+      <h1 class="overlay-title">신비한 동물 발자국 사파리</h1>
+      <p class="overlay-desc">
+        숲길과 모래사장에 동물들이 발자국을 남겼어요!<br>
+        발가락 개수와 힌트 의성어를 자세히 보고,<br>
+        어떤 동물 친구의 발자국인지 낱말을 찾아보세요! 🐾
+      </p>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-primary" id="startBtn">탐험 시작! 🌲</button>
+        <a href="../index.html" class="home-link" style="font-size:15px; padding:12px 18px;">목록으로</a>
+      </div>
+    </div>
+
+    <!-- CLEAR OVERLAY -->
+    <div class="overlay hidden" id="clearOverlay">
+      <div class="overlay-badge">🎖️</div>
+      <h2 class="overlay-title">사파리 명탐정 마스터!</h2>
+      <p class="overlay-desc" id="clearSummary">발자국 10개를 모두 완벽하게 맞혔어요!</p>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-primary" id="restartBtn">다시 탐험하기 🔄</button>
+        <a href="../index.html" class="home-link" style="font-size:15px; padding:12px 18px;">홈으로</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function() {
+  // Web Audio Synth
+  let audioCtx = null;
+  let muted = false;
+  function getAudioCtx() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playTone(freq, dur, type = 'sine') {
+    if (muted) return;
+    try {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  function playSuccess() {
+    playTone(587.33, 0.1, 'sine'); // D5
+    setTimeout(() => playTone(739.99, 0.12, 'sine'), 80); // F#5
+    setTimeout(() => playTone(880.00, 0.2, 'sine'), 160); // A5
+  }
+
+  function playWrong() {
+    playTone(220, 0.15, 'sawtooth');
+  }
+
+  function playFanfare() {
+    const melody = [523.25, 659.25, 783.99, 1046.5];
+    melody.forEach((f, i) => {
+      setTimeout(() => playTone(f, 0.25, 'triangle'), i * 130);
+    });
+  }
+
+  // 10 Animal questions
+  const ANIMALS = [
+    {
+      id: 'duck',
+      name: '오리',
+      emoji: '🦆',
+      sfx: '꽥꽥! 뒤뚱뒤뚱 물가를 걸어요',
+      terrain: '🌊 연못가 모래사장',
+      clue: '힌트: 세 갈래 뾰족한 물갈퀴 발자국! 꽥꽥 울어요.',
+      drawFootprint: function(svg) {
+        // Webbed bird footprint
+        svg.innerHTML = `
+          <g stroke="#92400e" stroke-width="4" stroke-linecap="round" fill="none">
+            <!-- Left Foot -->
+            <path d="M100,140 Q100,100 100,70" />
+            <path d="M100,120 Q80,95 65,80" />
+            <path d="M100,120 Q120,95 135,80" />
+            <path d="M65,80 Q100,75 100,70" stroke-width="2" stroke-dasharray="3,3" />
+            <path d="M100,70 Q100,75 135,80" stroke-width="2" stroke-dasharray="3,3" />
+            <!-- Right Foot slightly ahead -->
+            <path d="M190,110 Q190,70 190,40" />
+            <path d="M190,90 Q170,65 155,50" />
+            <path d="M190,90 Q210,65 225,50" />
+            <path d="M155,50 Q190,45 190,40" stroke-width="2" stroke-dasharray="3,3" />
+            <path d="M190,40 Q190,45 225,50" stroke-width="2" stroke-dasharray="3,3" />
+          </g>
+        `;
+      },
+      choices: ['오리', '토끼', '사자', '원숭이']
+    },
+    {
+      id: 'tiger',
+      name: '호랑이',
+      emoji: '🐯',
+      sfx: '어흥! 용맹한 숲속의 왕',
+      terrain: '🌲 깊은 산속 흙길',
+      clue: '힌트: 커다란 둥근 발바닥과 4개의 둥근 발가락! 어흥~',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g fill="#78350f">
+            <!-- Main pad -->
+            <ellipse cx="140" cy="120" rx="36" ry="28" />
+            <!-- 4 Toe pads -->
+            <circle cx="105" cy="75" r="14" />
+            <circle cx="128" cy="65" r="15" />
+            <circle cx="152" cy="65" r="15" />
+            <circle cx="175" cy="75" r="14" />
+          </g>
+        `;
+      },
+      choices: ['호랑이', '개구리', '참새', '고래']
+    },
+    {
+      id: 'rabbit',
+      name: '토끼',
+      emoji: '🐰',
+      sfx: '깡충깡충! 긴 귀를 쫑긋 세워요',
+      terrain: '❄️ 새하얀 눈밭',
+      clue: '힌트: 작은 앞발 2개 뒤에 길쭉한 뒷발 2개가 나란히 콩콩!',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g fill="#92400e">
+            <!-- Front feet -->
+            <ellipse cx="130" cy="130" rx="10" ry="14" />
+            <ellipse cx="160" cy="130" rx="10" ry="14" />
+            <!-- Long back feet -->
+            <ellipse cx="105" cy="65" rx="12" ry="32" transform="rotate(-10 105 65)" />
+            <ellipse cx="185" cy="65" rx="12" ry="32" transform="rotate(10 185 65)" />
+          </g>
+        `;
+      },
+      choices: ['토끼', '악어', '하마', '코끼리']
+    },
+    {
+      id: 'bear',
+      name: '곰',
+      emoji: '🐻',
+      sfx: '쿵쿵! 달콤한 꿀을 아주 좋아해요',
+      terrain: '🌲 바위산 동굴 앞',
+      clue: '힌트: 넓고 묵직한 발바닥에 날카로운 발톱 5개가 쏙쏙!',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g fill="#713f12">
+            <!-- Big heal and sole -->
+            <ellipse cx="150" cy="125" rx="42" ry="46" />
+            <!-- 5 Toes with claw marks -->
+            <circle cx="98" cy="68" r="11" />
+            <circle cx="122" cy="55" r="12" />
+            <circle cx="150" cy="50" r="13" />
+            <circle cx="178" cy="55" r="12" />
+            <circle cx="202" cy="68" r="11" />
+            <!-- Claws -->
+            <line x1="98" y1="56" x2="96" y2="40" stroke="#713f12" stroke-width="4" stroke-linecap="round"/>
+            <line x1="122" y1="42" x2="120" y2="26" stroke="#713f12" stroke-width="4" stroke-linecap="round"/>
+            <line x1="150" y1="36" x2="150" y2="20" stroke="#713f12" stroke-width="4" stroke-linecap="round"/>
+            <line x1="178" y1="42" x2="180" y2="26" stroke="#713f12" stroke-width="4" stroke-linecap="round"/>
+            <line x1="202" y1="56" x2="204" y2="40" stroke="#713f12" stroke-width="4" stroke-linecap="round"/>
+          </g>
+        `;
+      },
+      choices: ['곰', '병아리', '다람쥐', '물고기']
+    },
+    {
+      id: 'cat',
+      name: '고양이',
+      emoji: '🐱',
+      sfx: '야옹~ 말랑말랑 젤리 발바닥으로 살금살금',
+      terrain: '🏡 따뜻한 담벼락 길',
+      clue: '힌트: 발톱 자국 없이 쏙 들어간 귀여운 젤리 발바닥! 야옹~',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g fill="#9a3412">
+            <!-- Cute paw pad -->
+            <path d="M130,120 C130,105 170,105 170,120 C170,140 130,140 130,120 Z" />
+            <circle cx="120" cy="95" r="8" />
+            <circle cx="138" cy="85" r="9" />
+            <circle cx="162" cy="85" r="9" />
+            <circle cx="180" cy="95" r="8" />
+          </g>
+        `;
+      },
+      choices: ['고양이', '기린', '독수리', '뱀']
+    },
+    {
+      id: 'sparrow',
+      name: '참새',
+      emoji: '🐦',
+      sfx: '짹짹! 나뭇가지 사이를 통통 날아다녀요',
+      terrain: '🌾 가을 들판 흙길',
+      clue: '힌트: 앞쪽 세 발가락과 뒤쪽 한 발가락! 나뭇가지 모양 발자국.',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g stroke="#92400e" stroke-width="3.5" stroke-linecap="round">
+            <!-- Sparrow tracks hopping -->
+            <line x1="120" y1="120" x2="120" y2="90" />
+            <line x1="120" y1="100" x2="105" y2="85" />
+            <line x1="120" y1="100" x2="135" y2="85" />
+            <line x1="120" y1="120" x2="120" y2="135" />
+
+            <line x1="170" y1="115" x2="170" y2="85" />
+            <line x1="170" y1="95" x2="155" y2="80" />
+            <line x1="170" y1="95" x2="185" y2="80" />
+            <line x1="170" y1="115" x2="170" y2="130" />
+          </g>
+        `;
+      },
+      choices: ['참새', '사자', '돼지', '늑대']
+    },
+    {
+      id: 'elephant',
+      name: '코끼리',
+      emoji: '🐘',
+      sfx: '뿌우~ 거대한 몸집과 긴 코를 가졌어요',
+      terrain: '🌴 아프리카 사파리 평원',
+      clue: '힌트: 커다란 나무통처럼 넓고 둥글넓적한 초대형 발자국!',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g fill="#78350f">
+            <!-- Huge circular pad -->
+            <ellipse cx="150" cy="105" rx="65" ry="55" />
+            <!-- Toe indentations around front rim -->
+            <ellipse cx="105" cy="70" rx="10" ry="12" fill="#451a03" />
+            <ellipse cx="132" cy="55" rx="10" ry="12" fill="#451a03" />
+            <ellipse cx="168" cy="55" rx="10" ry="12" fill="#451a03" />
+            <ellipse cx="195" cy="70" rx="10" ry="12" fill="#451a03" />
+          </g>
+        `;
+      },
+      choices: ['코끼리', '쥐', '나비', '다람쥐']
+    },
+    {
+      id: 'dog',
+      name: '강아지',
+      emoji: '🐶',
+      sfx: '멍멍! 신나게 꼬리를 흔들며 달려와요',
+      terrain: '🌳 잔디밭 산책로',
+      clue: '힌트: 하트 모양 발바닥에 4개의 앙증맞은 발자국! 멍멍~',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g fill="#854d0e">
+            <!-- Heart/triangular pad -->
+            <path d="M125,120 Q150,145 175,120 Q180,95 150,105 Q120,95 125,120 Z" />
+            <ellipse cx="115" cy="85" rx="9" ry="12" transform="rotate(-15 115 85)" />
+            <ellipse cx="138" cy="72" rx="9" ry="13" />
+            <ellipse cx="162" cy="72" rx="9" ry="13" />
+            <ellipse cx="185" cy="85" rx="9" ry="12" transform="rotate(15 185 85)" />
+            <!-- Tiny claw pinpricks -->
+            <circle cx="112" cy="68" r="2.5" fill="#451a03" />
+            <circle cx="138" cy="54" r="2.5" fill="#451a03" />
+            <circle cx="162" cy="54" r="2.5" fill="#451a03" />
+            <circle cx="188" cy="68" r="2.5" fill="#451a03" />
+          </g>
+        `;
+      },
+      choices: ['강아지', '오리', '고슴도치', '물개']
+    },
+    {
+      id: 'frog',
+      name: '개구리',
+      emoji: '🐸',
+      sfx: '개골개골! 연못 속으로 퐁당 뛰어들어요',
+      terrain: '💧 물기 젖은 진흙길',
+      clue: '힌트: 손가락 끝이 동글동글 얇고 긴 물갈퀴 자국! 높이 펄쩍!',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g stroke="#92400e" stroke-width="3" stroke-linecap="round" fill="#92400e">
+            <!-- Hand center -->
+            <circle cx="150" cy="120" r="8" />
+            <!-- 4 slender fingers with round tips -->
+            <line x1="150" y1="120" x2="115" y2="85" />
+            <circle cx="115" cy="85" r="4.5" />
+            <line x1="150" y1="120" x2="135" y2="70" />
+            <circle cx="135" cy="70" r="4.5" />
+            <line x1="150" y1="120" x2="165" y2="70" />
+            <circle cx="165" cy="70" r="4.5" />
+            <line x1="150" y1="120" x2="185" y2="85" />
+            <circle cx="185" cy="85" r="4.5" />
+          </g>
+        `;
+      },
+      choices: ['개구리', '호랑이', '토끼', '펭귄']
+    },
+    {
+      id: 'squirrel',
+      name: '다람쥐',
+      emoji: '🐿️',
+      sfx: '쪼르르! 볼에 도토리를 가득 물고 달려요',
+      terrain: '🍂 낙엽 쌓인 오솔길',
+      clue: '힌트: 작고 가느다란 발가락 5개! 도토리를 모으는 귀요미.',
+      drawFootprint: function(svg) {
+        svg.innerHTML = `
+          <g stroke="#78350f" stroke-width="2.5" stroke-linecap="round" fill="#78350f">
+            <!-- Mini paired tracks -->
+            <!-- Front left -->
+            <circle cx="120" cy="120" r="5" />
+            <line x1="120" y1="120" x2="105" y2="100" />
+            <line x1="120" y1="120" x2="115" y2="95" />
+            <line x1="120" y1="120" x2="128" y2="95" />
+            <line x1="120" y1="120" x2="138" y2="102" />
+            <!-- Front right -->
+            <circle cx="170" cy="115" r="5" />
+            <line x1="170" y1="115" x2="155" y2="95" />
+            <line x1="170" y1="115" x2="165" y2="90" />
+            <line x1="170" y1="115" x2="178" y2="90" />
+            <line x1="170" y1="115" x2="188" y2="97" />
+          </g>
+        `;
+      },
+      choices: ['다람쥐', '곰', '코끼리', '악어']
+    }
+  ];
+
+  // Game State
+  const state = {
+    qIdx: 0,
+    score: 0,
+    answered: false
+  };
+
+  // Elements
+  const qVal = document.getElementById('qVal');
+  const scoreVal = document.getElementById('scoreVal');
+  const trailTheme = document.getElementById('trailTheme');
+  const stepBadge = document.getElementById('stepBadge');
+  const footprintSvg = document.getElementById('footprintSvg');
+  const animalReveal = document.getElementById('animalReveal');
+  const revealEmoji = document.getElementById('revealEmoji');
+  const revealName = document.getElementById('revealName');
+  const revealSfx = document.getElementById('revealSfx');
+  const clueText = document.getElementById('clueText');
+  const choiceGrid = document.getElementById('choiceGrid');
+  const startOverlay = document.getElementById('startOverlay');
+  const clearOverlay = document.getElementById('clearOverlay');
+  const clearSummary = document.getElementById('clearSummary');
+  const muteBtn = document.getElementById('muteBtn');
+  const clueBtn = document.getElementById('clueBtn');
+
+  function loadQuestion(idx) {
+    state.qIdx = idx;
+    state.answered = false;
+    qVal.textContent = String(idx + 1);
+    stepBadge.textContent = `단서 ${idx + 1}`;
+
+    const q = ANIMALS[idx];
+    trailTheme.textContent = q.terrain;
+    clueText.textContent = q.clue;
+
+    // Reset reveal
+    animalReveal.classList.remove('show');
+
+    // Draw footprint SVG
+    q.drawFootprint(footprintSvg);
+
+    // Render choice buttons
+    choiceGrid.innerHTML = '';
+    q.choices.forEach(ch => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = ch;
+      btn.addEventListener('click', () => handleChoice(ch, btn, q));
+      choiceGrid.appendChild(btn);
+    });
+  }
+
+  function handleChoice(selected, btnEl, q) {
+    if (state.answered) return;
+    state.answered = true;
+
+    if (selected === q.name) {
+      // Correct!
+      btnEl.classList.add('correct');
+      state.score += 10;
+      scoreVal.textContent = String(state.score);
+      playSuccess();
+
+      // Reveal animal
+      revealEmoji.textContent = q.emoji;
+      revealName.textContent = q.name;
+      revealSfx.textContent = q.sfx;
+      animalReveal.classList.add('show');
+      clueText.innerHTML = `정답입니다! <span>[${q.name}]</span>의 발자국이었어요! 🎉`;
+
+      setTimeout(() => {
+        if (state.qIdx + 1 < ANIMALS.length) {
+          loadQuestion(state.qIdx + 1);
+        } else {
+          // Finished all!
+          playFanfare();
+          clearSummary.textContent = `10종의 동물 발자국을 모두 찾아냈어요! 총 점수: ${state.score}점`;
+          clearOverlay.classList.remove('hidden');
+        }
+      }, 1500);
+    } else {
+      // Wrong!
+      btnEl.classList.add('wrong');
+      playWrong();
+      clueText.innerHTML = `아쉬워요! 다시 한번 힌트를 자세히 살펴볼까요? 🔍`;
+
+      // Allow retry
+      setTimeout(() => {
+        btnEl.classList.remove('wrong');
+        state.answered = false;
+      }, 700);
+    }
+  }
+
+  // Clue Magnifier
+  clueBtn.addEventListener('click', () => {
+    const q = ANIMALS[state.qIdx];
+    playTone(520, 0.1, 'sine');
+    clueText.innerHTML = `🔎 돋보기 관찰: <span>${q.sfx}</span>`;
+  });
+
+  // Mute
+  muteBtn.addEventListener('click', () => {
+    muted = !muted;
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+  });
+
+  function startGame() {
+    startOverlay.classList.add('hidden');
+    clearOverlay.classList.add('hidden');
+    state.score = 0;
+    scoreVal.textContent = '0';
+    loadQuestion(0);
+    playTone(523.25, 0.15, 'sine');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('restartBtn').addEventListener('click', startGame);
+})();
+</script>
+</body>
+</html>

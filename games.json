@@ -1,5 +1,46 @@
 [
   {
+    "id": "rainbow-shape-stacker",
+    "title": "초1 수학·공간: 알록달록 모양 블록을 설계도에 맞춰 쌓고 나만의 건축물 완성하기",
+    "subtitle": "초1 수학·공간: 알록달록 모양 블록을 설계도에 맞춰 쌓고 나만의 건축물 완성하기",
+    "category": "math",
+    "grade": "초1",
+    "path": "rainbow-shape-stacker/index.html",
+    "thumb": "rainbow-shape-stacker/thumb.svg",
+    "tags": [
+      "수학",
+      "공간감각",
+      "도형",
+      "블록쌓기",
+      "초1"
+    ],
+    "title_ko": "🎮 알록달록 모양 블록 쌓기",
+    "description": "초1 수학·공간: 알록달록 모양 블록을 설계도에 맞춰 쌓고 나만의 건축물 완성하기",
+    "thumbnail": "rainbow-shape-stacker/thumb.svg",
+    "created": "2026-11-09"
+  },
+  {
+    "id": "animal-footprint-safari",
+    "title": "초1 국어·탐구: 흙길과 눈밭의 동물 발자국을 관찰하고 알맞은 동물 낱말 맞히기",
+    "subtitle": "초1 국어·탐구: 흙길과 눈밭의 동물 발자국을 관찰하고 알맞은 동물 낱말 맞히기",
+    "category": "korean",
+    "grade": "초1",
+    "path": "animal-footprint-safari/index.html",
+    "thumb": "animal-footprint-safari/thumb.svg",
+    "tags": [
+      "국어",
+      "낱말학습",
+      "탐구",
+      "동물발자국",
+      "사파리",
+      "초1"
+    ],
+    "title_ko": "🎮 신비한 동물 발자국 사파리",
+    "description": "초1 국어·탐구: 흙길과 눈밭의 동물 발자국을 관찰하고 알맞은 동물 낱말 맞히기",
+    "thumbnail": "animal-footprint-safari/thumb.svg",
+    "created": "2026-11-09"
+  },
+  {
     "id": "hangul-snowman-maker",
     "title": "초1 국어: 첫소리 자음 눈뭉치와 가운뎃소리 모음 눈뭉치를 합쳐 글자 눈사람 만들기",
     "subtitle": "초1 국어: 첫소리 자음 눈뭉치와 가운뎃소리 모음 눈뭉치를 합쳐 글자 눈사람 만들기",
