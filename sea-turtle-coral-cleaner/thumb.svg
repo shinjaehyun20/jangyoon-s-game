@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="24" fill="#006064"/>
+  <circle cx="30" cy="30" r="6" fill="#80deea" opacity="0.4"/>
+  <circle cx="95" cy="45" r="4" fill="#80deea" opacity="0.3"/>
+  <ellipse cx="60" cy="65" rx="30" ry="24" fill="#2e7d32"/>
+  <ellipse cx="60" cy="65" rx="22" ry="17" fill="#81c784"/>
+  <circle cx="60" cy="36" r="13" fill="#4caf50"/>
+  <circle cx="55" cy="33" r="3" fill="#1b5e20"/>
+  <circle cx="65" cy="33" r="3" fill="#1b5e20"/>
+  <ellipse cx="28" cy="56" rx="14" ry="7" transform="rotate(-30 28 56)" fill="#4caf50"/>
+  <ellipse cx="92" cy="56" rx="14" ry="7" transform="rotate(30 92 56)" fill="#4caf50"/>
+  <ellipse cx="36" cy="80" rx="9" ry="5" transform="rotate(25 36 80)" fill="#4caf50"/>
+  <ellipse cx="84" cy="80" rx="9" ry="5" transform="rotate(-25 84 80)" fill="#4caf50"/>
+  <text x="60" y="112" font-size="14" text-anchor="middle" fill="#80deea">🪸✨</text>
+</svg>

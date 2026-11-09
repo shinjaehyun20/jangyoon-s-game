@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "koala-eucalyptus-climb",
+        "title": "🎮 쑥쑥 코알라의 유칼립투스 나무 오르기",
+        "path": "koala-eucalyptus-climb/index.html"
+      },
+      {
+        "id": "sea-turtle-coral-cleaner",
+        "title": "🎮 아기 바다거북의 산호초 바다 지킴이",
+        "path": "sea-turtle-coral-cleaner/index.html"
+      },
+      {
         "id": "animal-footprint-safari",
         "title": "🎮 신비한 동물 발자국 사파리",
         "path": "animal-footprint-safari/index.html"

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐨 쑥쑥 코알라의 유칼립투스 나무 오르기 - 장윤이의 게임세상 #342</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #1b382b;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    #game-wrap {
+      position: relative;
+      width: 100vw;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 860px;
+      background: linear-gradient(180deg, #a8e6cf 0%, #dcedc1 40%, #ffd3b6 80%, #a1887f 100%);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #hud {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hud-card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 800;
+      color: #2e7d32;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #controls {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      z-index: 15;
+    }
+    .ctrl-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      border: 4px solid #4caf50;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: #1b5e20;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.1s;
+    }
+    .ctrl-btn:active {
+      transform: scale(0.92);
+      background: #c8e6c9;
+    }
+    .ctrl-sub {
+      font-size: 12px;
+      font-weight: 700;
+      color: #388e3c;
+    }
+    #quiz-banner {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      border: 4px solid #81c784;
+      border-radius: 28px;
+      padding: 10px 24px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      z-index: 12;
+      min-width: 220px;
+    }
+    #quiz-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #4caf50;
+      margin-bottom: 2px;
+    }
+    #quiz-expr {
+      font-size: 28px;
+      font-weight: 900;
+      color: #1b5e20;
+      letter-spacing: 2px;
+    }
+    #modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 50;
+      text-align: center;
+    }
+    .modal-box {
+      background: #fff;
+      color: #333;
+      padding: 28px 20px;
+      border-radius: 32px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #2e7d32;
+      margin-bottom: 12px;
+    }
+    .modal-desc {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .modal-btn {
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+      color: #fff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(46, 125, 50, 0.35);
+    }
+  </style>
+</head>
+<body>
+<div id="game-wrap">
+  <div id="hud">
+    <div class="hud-card">🌿 <span id="score">0</span> / 8 단계</div>
+    <div class="hud-card">⭐ <span id="streak">연속 0회</span></div>
+  </div>
+
+  <div id="quiz-banner">
+    <div id="quiz-title">나뭇가지를 골라봐요!</div>
+    <div id="quiz-expr">2 + 3 = ?</div>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-left" onclick="choose(0)">
+      <span id="opt-left">5</span>
+      <span class="ctrl-sub">왼쪽 (A)</span>
+    </button>
+    <button class="ctrl-btn" id="btn-right" onclick="choose(1)">
+      <span id="opt-right">6</span>
+      <span class="ctrl-sub">오른쪽 (D)</span>
+    </button>
+  </div>
+
+  <div id="modal">
+    <div class="modal-box">
+      <div style="font-size: 56px; margin-bottom: 8px;">🐨🎉</div>
+      <div class="modal-title" id="m-title">유칼립투스 꼭대기 도착!</div>
+      <div class="modal-desc" id="m-desc">장윤이가 코알라에게 맛있는 잎사귀를 선물했어요!<br>수학 퀴즈를 모두 멋지게 맞췄어요!</div>
+      <button class="modal-btn" onclick="restart()">다시 오르기 🌿</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Web Audio API Synthesizer
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let actx = null;
+  function getAudio() {
+    if (!actx) actx = new AudioCtx();
+    if (actx.state === 'suspended') actx.resume();
+    return actx;
+  }
+  function playBeep(freq, type = 'sine', dur = 0.15) {
+    try {
+      const ctx = getAudio();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+  function playSuccess() {
+    playBeep(523.25, 'triangle', 0.1);
+    setTimeout(() => playBeep(659.25, 'triangle', 0.1), 100);
+    setTimeout(() => playBeep(783.99, 'triangle', 0.2), 200);
+  }
+  function playFail() {
+    playBeep(330, 'sawtooth', 0.15);
+    setTimeout(() => playBeep(260, 'sawtooth', 0.25), 150);
+  }
+  function playFanfare() {
+    [523, 659, 783, 1046].forEach((f, i) => {
+      setTimeout(() => playBeep(f, 'triangle', 0.3), i * 140);
+    });
+  }
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() {
+    W = canvas.width = canvas.parentElement.clientWidth;
+    H = canvas.height = canvas.parentElement.clientHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  let stage = 0;
+  const TOTAL_STAGES = 8;
+  let streak = 0;
+  let koalaY = 0;
+  let targetKoalaY = 0;
+  let koalaSide = 0; // -1: left, 0: center, 1: right
+  let particles = [];
+
+  const quizzes = [
+    { expr: '2 + 3 = ?', ans: 5, wrong: 6 },
+    { expr: '4 + 4 = ?', ans: 8, wrong: 7 },
+    { expr: '7 - 3 = ?', ans: 4, wrong: 5 },
+    { expr: '5 + 4 = ?', ans: 9, wrong: 8 },
+    { expr: '9 - 5 = ?', ans: 4, wrong: 3 },
+    { expr: '6 + 2 = ?', ans: 8, wrong: 9 },
+    { expr: '8 - 6 = ?', ans: 2, wrong: 3 },
+    { expr: '5 + 5 = ?', ans: 10, wrong: 9 }
+  ];
+
+  let currentQuiz = null;
+  let leftAns = 0;
+  let rightAns = 0;
+  let correctSide = 0; // 0: left, 1: right
+
+  function loadStage() {
+    if (stage >= TOTAL_STAGES) {
+      showEnd();
+      return;
+    }
+    currentQuiz = quizzes[stage];
+    correctSide = Math.random() < 0.5 ? 0 : 1;
+    if (correctSide === 0) {
+      leftAns = currentQuiz.ans;
+      rightAns = currentQuiz.wrong;
+    } else {
+      leftAns = currentQuiz.wrong;
+      rightAns = currentQuiz.ans;
+    }
+    document.getElementById('quiz-expr').innerText = currentQuiz.expr;
+    document.getElementById('opt-left').innerText = leftAns;
+    document.getElementById('opt-right').innerText = rightAns;
+    document.getElementById('score').innerText = stage;
+    document.getElementById('streak').innerText = `연속 ${streak}회`;
+  }
+
+  function choose(side) {
+    if (side === correctSide) {
+      playSuccess();
+      streak++;
+      stage++;
+      koalaSide = side === 0 ? -1 : 1;
+      createSparks(W / 2 + (side === 0 ? -80 : 80), H * 0.5);
+      setTimeout(() => {
+        koalaSide = 0;
+        loadStage();
+      }, 350);
+    } else {
+      playFail();
+      streak = 0;
+      document.getElementById('streak').innerText = `연속 0회`;
+      shakeBanner();
+    }
+  }
+
+  function shakeBanner() {
+    const banner = document.getElementById('quiz-banner');
+    banner.style.transform = 'translateX(-60%)';
+    setTimeout(() => banner.style.transform = 'translateX(-40%)', 60);
+    setTimeout(() => banner.style.transform = 'translateX(-55%)', 120);
+    setTimeout(() => banner.style.transform = 'translateX(-50%)', 180);
+  }
+
+  function createSparks(x, y) {
+    for (let i = 0; i < 24; i++) {
+      particles.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.5) * 8 - 2,
+        rad: Math.random() * 6 + 3,
+        color: ['#81c784', '#aed581', '#fff59d', '#ffb74d'][Math.floor(Math.random() * 4)],
+        life: 1
+      });
+    }
+  }
+
+  function showEnd() {
+    playFanfare();
+    document.getElementById('score').innerText = TOTAL_STAGES;
+    document.getElementById('modal').style.display = 'flex';
+  }
+
+  function restart() {
+    stage = 0;
+    streak = 0;
+    document.getElementById('modal').style.display = 'none';
+    loadStage();
+  }
+
+  // Draw Trunk, Branches & Koala
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Tree Trunk
+    ctx.fillStyle = '#6d4c41';
+    ctx.fillRect(W / 2 - 32, 0, 64, H);
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(W / 2 - 28, 0, 12, H);
+
+    // Branch Left
+    ctx.fillStyle = '#795548';
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 20, H * 0.55);
+    ctx.lineTo(W / 2 - 130, H * 0.50);
+    ctx.lineTo(W / 2 - 130, H * 0.53);
+    ctx.lineTo(W / 2 - 20, H * 0.60);
+    ctx.fill();
+
+    // Branch Right
+    ctx.beginPath();
+    ctx.moveTo(W / 2 + 20, H * 0.55);
+    ctx.lineTo(W / 2 + 130, H * 0.50);
+    ctx.lineTo(W / 2 + 130, H * 0.53);
+    ctx.lineTo(W / 2 + 20, H * 0.60);
+    ctx.fill();
+
+    // Eucalyptus Leaves
+    drawLeaves(W / 2 - 135, H * 0.50);
+    drawLeaves(W / 2 + 135, H * 0.50);
+
+    // Koala
+    let kx = W / 2 + koalaSide * 65;
+    let ky = H * 0.54;
+    drawKoala(kx, ky);
+
+    // Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      let p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 0.035;
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.life;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1.0;
+
+    requestAnimationFrame(draw);
+  }
+
+  function drawLeaves(x, y) {
+    ctx.fillStyle = '#4caf50';
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.ellipse(x + (i - 2) * 12, y + Math.sin(i) * 8, 14, 8, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawKoala(x, y) {
+    // Ears
+    ctx.fillStyle = '#9e9e9e';
+    ctx.beginPath();
+    ctx.arc(x - 22, y - 18, 14, 0, Math.PI * 2);
+    ctx.arc(x + 22, y - 18, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#eeeeee';
+    ctx.beginPath();
+    ctx.arc(x - 22, y - 18, 8, 0, Math.PI * 2);
+    ctx.arc(x + 22, y - 18, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Body & Head
+    ctx.fillStyle = '#bdbdbd';
+    ctx.beginPath();
+    ctx.arc(x, y + 10, 24, 0, Math.PI * 2); // Body
+    ctx.arc(x, y - 8, 20, 0, Math.PI * 2); // Head
+    ctx.fill();
+
+    // Eyes
+    ctx.fillStyle = '#212121';
+    ctx.beginPath();
+    ctx.arc(x - 8, y - 10, 3.5, 0, Math.PI * 2);
+    ctx.arc(x + 8, y - 10, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Big Nose
+    ctx.fillStyle = '#424242';
+    ctx.beginPath();
+    ctx.ellipse(x, y - 4, 7, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cheeks
+    ctx.fillStyle = 'rgba(255, 138, 128, 0.6)';
+    ctx.beginPath();
+    ctx.arc(x - 13, y - 3, 4, 0, Math.PI * 2);
+    ctx.arc(x + 13, y - 3, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') choose(0);
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') choose(1);
+  });
+
+  loadStage();
+  requestAnimationFrame(draw);
+</script>
+</body>
+</html>

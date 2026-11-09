@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 341개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 343개.
 
-[![Games](https://img.shields.io/badge/games-341-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-343-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![341개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![343개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,10 +25,12 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 341개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 343개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🐢 아기 바다거북의 산호초 바다 지킴이 (sea-turtle-coral-cleaner)](./sea-turtle-coral-cleaner/index.html) | 푸르고 아름다운 산호초 바다를 헤엄치며 물 위에 떠다니는 플라스틱과 캔 쓰레기를 톡톡 터치해 바다 친구들과 산호를 지켜주는 친환경 바다 정화 터치 놀이입니다. | 어린이/아케이드 |
+| [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기 (koala-eucalyptus-climb)](./koala-eucalyptus-climb/index.html) | 귀여운 아기 코알라와 함께 높은 유칼립투스 나무를 타고 오르며 나뭇가지에 적힌 덧셈과 뺄셈 퀴즈를 맞추고 싱그러운 잎사귀를 모으는 재미있는 수학 클라이밍 놀이입니다. | 어린이/아케이드 |
 | [🐿️ 하늘다람쥐의 은하수 활강 비행 (flying-squirrel-star-glide)](./flying-squirrel-star-glide/index.html) | 반짝이는 보랏빛 은하수 밤하늘을 활공하는 날다람쥐를 조종해 별빛 구름 사이를 누비며 황금 도토리와 별사탕을 모으는 경쾌한 비행 아케이드 놀이입니다. | 어린이/아케이드 |
 | [♨️ 느긋한 카피바라의 향긋 유자 온천 (capybara-hotspring-yuzu-bath)](./capybara-hotspring-yuzu-bath/index.html) | 모락모락 김이 피어나는 따뜻한 노천 온천에서 느긋하게 휴식하는 카피바라 머리 위로 동동 떠오르는 황금 유자와 오색 꽃잎을 쏙쏙 받아 담는 힐링 터치 놀이입니다. | 어린이/아케이드 |
 | [🦙 보송보송 알파카 무지개 털실 공방 (alpaca-rainbow-wool-knitting)](./alpaca-rainbow-wool-knitting/index.html) | 안데스 고원의 귀여운 아기 알파카가 원하는 무지개 목도리 주문서 패턴 순서에 맞춰 알록달록 구름 털실을 톡톡 터치해 포근한 목도리를 완성하는 색채 패턴 창의 공방 놀이입니다. | 어린이/아케이드 |
@@ -537,6 +539,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-11)
+- 2026-11-10: [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기](koala-eucalyptus-climb/index.html), [🐢 아기 바다거북의 산호초 바다 지킴이](sea-turtle-coral-cleaner/index.html) (총 343개)
+
 - 2026-11-09: [🎮 알록달록 모양 블록 쌓기](rainbow-shape-stacker/index.html), [🎮 신비한 동물 발자국 사파리](animal-footprint-safari/index.html) (총 341개)
 
 - 2026-11-04: [🎮 데굴데굴 자음모음 눈사람](hangul-snowman-maker/index.html), [🎮 요리조리 거울 대칭 미술관](mirror-symmetry-art/index.html) (총 341개)

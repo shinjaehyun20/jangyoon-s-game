@@ -2935,5 +2935,23 @@
     "description": "반짝이는 보랏빛 은하수 밤하늘을 활공하는 날다람쥐를 조종해 별빛 구름 사이를 누비며 황금 도토리와 별사탕을 모으는 경쾌한 비행 아케이드 놀이입니다.",
     "thumbnail": "flying-squirrel-star-glide/thumb.svg",
     "path": "flying-squirrel-star-glide/index.html"
+  },
+  {
+    "id": "koala-eucalyptus-climb",
+    "title": "Koala Eucalyptus Climb",
+    "title_ko": "🐨 쑥쑥 코알라의 유칼립투스 나무 오르기",
+    "description": "귀여운 아기 코알라와 함께 높은 유칼립투스 나무를 타고 오르며 나뭇가지에 적힌 덧셈과 뺄셈 퀴즈를 맞추고 싱그러운 잎사귀를 모으는 재미있는 수학 클라이밍 놀이입니다.",
+    "thumbnail": "koala-eucalyptus-climb/thumb.svg",
+    "path": "koala-eucalyptus-climb/index.html",
+    "created": "2026-11-10"
+  },
+  {
+    "id": "sea-turtle-coral-cleaner",
+    "title": "Sea Turtle Coral Cleaner",
+    "title_ko": "🐢 아기 바다거북의 산호초 바다 지킴이",
+    "description": "푸르고 아름다운 산호초 바다를 헤엄치며 물 위에 떠다니는 플라스틱과 캔 쓰레기를 톡톡 터치해 바다 친구들과 산호를 지켜주는 친환경 바다 정화 터치 놀이입니다.",
+    "thumbnail": "sea-turtle-coral-cleaner/thumb.svg",
+    "path": "sea-turtle-coral-cleaner/index.html",
+    "created": "2026-11-10"
   }
 ]
