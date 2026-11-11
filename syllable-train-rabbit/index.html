@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>칙칙폭폭 끝말잇기 기차</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  html, body {
+    width: 100vw; height: 100vh; height: 100dvh; overflow: hidden;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(180deg, #E0F2FE 0%, #7DD3FC 55%, #0284C7 100%);
+    display: flex; justify-content: center; align-items: center; word-break: keep-all;
+  }
+  .wrap {
+    width: 100%; max-width: 480px; height: 100%; padding: 14px;
+    display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+  }
+  .hud {
+    width: 100%; display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.95); padding: 10px 14px; border-radius: 18px;
+    font-weight: 800; font-size: 1rem; color: #0C4A6E; box-shadow: 0 4px 12px rgba(12,74,110,0.16);
+  }
+  .home-link { text-decoration: none; color: #0369A1; font-weight: 900; font-size: 0.95rem; }
+  .station-card {
+    width: 100%; background: #FFFFFF; border: 4px solid #0284C7; border-radius: 26px;
+    padding: 18px 14px; text-align: center; box-shadow: 0 10px 24px rgba(12,74,110,0.18);
+  }
+  .guide-badge {
+    display: inline-block; background: #F0F9FF; color: #0369A1; font-weight: 800;
+    font-size: 0.95rem; padding: 6px 14px; border-radius: 14px; margin-bottom: 14px;
+    border: 2px dashed #38BDF8;
+  }
+  .train-track {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 10px 0; transition: transform 0.35s ease;
+  }
+  .car-box {
+    background: #FEF08A; border: 4px solid #F59E0B; border-radius: 18px;
+    padding: 14px 16px; font-size: 1.45rem; font-weight: 900; color: #78350F;
+    min-width: 120px; position: relative;
+  }
+  .last-char { color: #DC2626; text-decoration: underline; }
+  .link-bar { font-size: 1.5rem; font-weight: 900; color: #0284C7; }
+  .choices {
+    width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .car-btn {
+    min-height: 60px; background: #FFFFFF; border: 4px solid #0284C7; border-radius: 20px;
+    font-size: 1.35rem; font-weight: 900; color: #0C4A6E; cursor: pointer;
+    box-shadow: 0 5px 0 #0369A1;
+  }
+  .car-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0369A1; }
+  .msg {
+    font-size: 1.1rem; font-weight: 800; color: #FFFFFF; text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3); min-height: 32px;
+  }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(12,74,110,0.86);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 20px; z-index: 20;
+  }
+  .modal-card {
+    background: #FFFFFF; border: 5px solid #38BDF8; border-radius: 28px;
+    padding: 26px 20px; text-align: center; max-width: 390px; width: 100%;
+  }
+  .modal-card h2 { font-size: 1.7rem; color: #0C4A6E; margin-bottom: 10px; }
+  .modal-card p { font-size: 1.1rem; color: #334155; margin-bottom: 18px; font-weight: 700; }
+  .action-btn {
+    min-height: 50px; background: #0284C7; color: #FFFFFF; border: none;
+    border-radius: 16px; padding: 12px 26px; font-size: 1.2rem; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <a class="home-link" href="../index.html">← 홈으로</a>
+    <span id="stepTxt">기차역: 1 / 10</span>
+    <span id="bestTxt">최고: 0점</span>
+  </div>
+
+  <div class="station-card">
+    <div class="guide-badge" id="hintTxt">빨간 글자로 시작하는 낱말 칸을 골라요!</div>
+    <div class="train-track" id="trainTrack">
+      <div class="car-box" id="frontCar">🚂 사<span class="last-char">과</span></div>
+      <div class="link-bar">🔗</div>
+      <div class="car-box" id="backCar">❓</div>
+    </div>
+  </div>
+
+  <div class="choices" id="choiceBox"></div>
+  <div class="msg" id="msgTxt">앞 기차의 마지막 글자로 시작하는 낱말을 눌러 주세요!</div>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <div class="modal-card">
+    <h2>🚂 칙칙폭폭 끝말잇기 기차</h2>
+    <p>토끼 기관사님이 모는 기차의 마지막 글자를 보고, 이어질 알맞은 우리말 기차 칸을 연결해 주세요!</p>
+    <button class="action-btn" id="startBtn">기차 출발하기</button>
+  </div>
+</div>
+
+<div class="overlay" id="endOverlay" style="display:none;">
+  <div class="modal-card">
+    <h2>🎉 끝말잇기 기차 여행 성공!</h2>
+    <p id="endSummary">열 개의 기차 칸을 모두 멋지게 연결했어요!</p>
+    <button class="action-btn" id="retryBtn">다시 운행하기</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const STORAGE_KEY = 'syllable-train-rabbit_best';
+  const STAGES = [
+    { pre: '사', last: '과', ans: '과자', hint: '바삭바삭 맛있는 간식이에요', opts: ['과자', '바나나', '구름', '우산'] },
+    { pre: '과', last: '자', ans: '자전거', hint: '페달을 밟아 쌩쌩 달리는 탈것이에요', opts: ['자전거', '비행기', '강아지', '연필'] },
+    { pre: '자전', last: '거', ans: '거북이', hint: '등딱지가 단단하고 엉금엉금 걸어요', opts: ['거북이', '호랑이', '다람쥐', '나비'] },
+    { pre: '거북', last: '이', ans: '이불', hint: '밤에 잠잘 때 따뜻하게 덮어요', opts: ['이불', '베개', '안경', '모자'] },
+    { pre: '이', last: '불', ans: '불꽃', hint: '밤하늘에 펑펑 예쁘게 터져요', opts: ['불꽃', '별빛', '달님', '바람'] },
+    { pre: '불', last: '꽃', ans: '꽃병', hint: '예쁜 꽃을 꽂아 두는 그릇이에요', opts: ['꽃병', '화분', '물통', '바구니'] },
+    { pre: '수', last: '박', ans: '박수', hint: '짝짝짝 두 손을 마주쳐 소리 내요', opts: ['박수', '노래', '춤추기', '웃음'] },
+    { pre: '박', last: '수', ans: '수영', hint: '물속에서 첨벙첨벙 헤엄쳐요', opts: ['수영', '달리기', '줄넘기', '축구'] },
+    { pre: '나', last: '무', ans: '무지개', hint: '비 온 뒤 하늘에 뜨는 일곱 빛깔 다리예요', opts: ['무지개', '소나기', '태양', '번개'] },
+    { pre: '무지', last: '개', ans: '개구리', hint: '연못가에서 개굴개굴 폴짝 뛰어요', opts: ['개구리', '병아리', '코끼리', '송아지'] }
+  ];
+
+  let idx = 0, score = 0, audioCtx = null;
+  let answerLocked = false;
+  const bestEl = document.getElementById('bestTxt');
+  bestEl.textContent = '최고: ' + (localStorage.getItem(STORAGE_KEY) || 0) + '점';
+
+  function beep(freq, dur) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.16, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function render() {
+    answerLocked = false;
+    const s = STAGES[idx];
+    document.getElementById('stepTxt').textContent = '기차역: ' + (idx + 1) + ' / ' + STAGES.length;
+    document.getElementById('hintTxt').textContent = '💡 "' + s.last + '"(으)로 시작하는 말: ' + s.hint;
+    document.getElementById('frontCar').innerHTML = '🚂 ' + s.pre + '<span class="last-char">' + s.last + '</span>';
+    document.getElementById('backCar').textContent = '❓';
+    const box = document.getElementById('choiceBox');
+    box.innerHTML = '';
+    s.opts.slice().sort(function() { return Math.random() - 0.5; }).forEach(function(opt) {
+      const btn = document.createElement('button');
+      btn.className = 'car-btn';
+      btn.textContent = '🚃 ' + opt;
+      btn.addEventListener('pointerdown', function() { check(opt); });
+      box.appendChild(btn);
+    });
+  }
+
+  function check(choice) {
+    if (answerLocked) return;
+    const s = STAGES[idx];
+    const track = document.getElementById('trainTrack');
+    if (choice === s.ans) {
+      answerLocked = true;
+      beep(587.33, 0.1); setTimeout(function() { beep(880, 0.2); }, 110);
+      document.getElementById('backCar').textContent = '🚃 ' + s.ans;
+      document.getElementById('msgTxt').textContent = '✨ 칙칙폭폭! 기차 칸이 멋지게 연결되었어요!';
+      track.style.transform = 'translateX(16px)';
+      score += 10;
+      const prev = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+      if (score > prev) {
+        localStorage.setItem(STORAGE_KEY, String(score));
+        bestEl.textContent = '최고: ' + score + '점';
+      }
+      setTimeout(function() {
+        track.style.transform = 'translateX(0)';
+        idx++;
+        if (idx >= STAGES.length) {
+          document.getElementById('endSummary').textContent = '총점 ' + score + '점으로 끝말잇기 기차 10칸을 모두 완성했어요!';
+          document.getElementById('endOverlay').style.display = 'flex';
+        } else {
+          render();
+        }
+      }, 650);
+    } else {
+      beep(210, 0.22);
+      document.getElementById('msgTxt').textContent = '🐰 "' + s.last + '" 글자로 시작하는 낱말을 다시 찾아볼까요?';
+    }
+  }
+
+  function start() {
+    idx = 0; score = 0;
+    document.getElementById('startOverlay').style.display = 'none';
+    document.getElementById('endOverlay').style.display = 'none';
+    render();
+  }
+
+  document.getElementById('startBtn').addEventListener('pointerdown', start);
+  document.getElementById('retryBtn').addEventListener('pointerdown', start);
+})();
+</script>
+</body>
+</html>

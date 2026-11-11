@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>고슴도치 모양 규칙 찾기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  html, body {
+    width: 100vw; height: 100vh; height: 100dvh; overflow: hidden;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(180deg, #F3E8FF 0%, #C084FC 55%, #7E22CE 100%);
+    display: flex; justify-content: center; align-items: center; word-break: keep-all;
+  }
+  .wrap {
+    width: 100%; max-width: 480px; height: 100%; padding: 14px;
+    display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+  }
+  .hud {
+    width: 100%; display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.95); padding: 10px 14px; border-radius: 18px;
+    font-weight: 800; font-size: 1rem; color: #581C87; box-shadow: 0 4px 12px rgba(88,28,135,0.16);
+  }
+  .home-link { text-decoration: none; color: #7E22CE; font-weight: 900; font-size: 0.95rem; }
+  .puzzle-card {
+    width: 100%; background: #FFFFFF; border: 4px solid #9333EA; border-radius: 26px;
+    padding: 18px 12px; text-align: center; box-shadow: 0 10px 24px rgba(88,28,135,0.18);
+  }
+  .rule-title {
+    display: inline-block; background: #FAF5FF; color: #6B21A8; font-weight: 800;
+    font-size: 0.95rem; padding: 6px 14px; border-radius: 14px; margin-bottom: 14px;
+    border: 2px dashed #A855F7;
+  }
+  .seq-row {
+    display: flex; justify-content: center; align-items: center; gap: 6px;
+    flex-wrap: nowrap; margin: 10px 0;
+  }
+  .seq-item {
+    width: 56px; height: 64px; background: #FEFCE8; border: 3px solid #FACC15;
+    border-radius: 14px; display: flex; flex-direction: column; justify-content: center;
+    align-items: center; font-size: 1.55rem; font-weight: 800; color: #713F12;
+  }
+  .seq-item span { font-size: 0.72rem; margin-top: 2px; }
+  .seq-blank {
+    background: #F3E8FF; border: 3px dashed #9333EA; color: #7E22CE;
+  }
+  .choices {
+    width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .shape-btn {
+    min-height: 62px; background: #FFFFFF; border: 4px solid #9333EA; border-radius: 20px;
+    font-size: 1.25rem; font-weight: 900; color: #581C87; cursor: pointer;
+    box-shadow: 0 5px 0 #6B21A8;
+  }
+  .shape-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #6B21A8; }
+  .msg {
+    font-size: 1.1rem; font-weight: 800; color: #FFFFFF; text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3); min-height: 32px;
+  }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(59,7,100,0.86);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 20px; z-index: 20;
+  }
+  .modal-card {
+    background: #FFFFFF; border: 5px solid #A855F7; border-radius: 28px;
+    padding: 26px 20px; text-align: center; max-width: 390px; width: 100%;
+  }
+  .modal-card h2 { font-size: 1.7rem; color: #581C87; margin-bottom: 10px; }
+  .modal-card p { font-size: 1.1rem; color: #334155; margin-bottom: 18px; font-weight: 700; }
+  .action-btn {
+    min-height: 50px; background: #9333EA; color: #FFFFFF; border: none;
+    border-radius: 16px; padding: 12px 26px; font-size: 1.2rem; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <a class="home-link" href="../index.html">← 홈으로</a>
+    <span id="stepTxt">단계: 1 / 10</span>
+    <span id="bestTxt">최고: 0점</span>
+  </div>
+
+  <div class="puzzle-card">
+    <div class="rule-title" id="ruleHint">🦔 고슴도치와 함께 모양이 반복되는 규칙을 찾아봐요!</div>
+    <div class="seq-row" id="seqRow"></div>
+  </div>
+
+  <div class="choices" id="choiceGrid"></div>
+  <div class="msg" id="msgTxt">물음표 상자에 들어갈 알맞은 모양을 눌러 주세요!</div>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <div class="modal-card">
+    <h2>🦔 고슴도치 모양 규칙 찾기</h2>
+    <p>동그라미, 세모, 네모, 별이 어떤 순서로 반복되는지 살펴보고 물음표 빈칸에 알맞은 모양을 골라요!</p>
+    <button class="action-btn" id="startBtn">퍼즐 시작하기</button>
+  </div>
+</div>
+
+<div class="overlay" id="endOverlay" style="display:none;">
+  <div class="modal-card">
+    <h2>🎉 규칙 찾기 천재 등극!</h2>
+    <p id="endSummary">열 문제를 모두 정확하게 풀었어요!</p>
+    <button class="action-btn" id="retryBtn">다시 도전하기</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const STORAGE_KEY = 'shape-pattern-hedgehog_best';
+  const SHAPES = {
+    '동그라미': '🔴',
+    '세모': '🔺',
+    '네모': '🟦',
+    '노란별': '⭐',
+    '초록하트': '💚'
+  };
+  const PUZZLES = [
+    { seq: ['동그라미', '세모', '동그라미', '세모', '동그라미'], ans: '세모', opts: ['세모', '동그라미', '네모', '노란별'] },
+    { seq: ['네모', '노란별', '네모', '노란별', '네모'], ans: '노란별', opts: ['노란별', '네모', '세모', '초록하트'] },
+    { seq: ['동그라미', '동그라미', '세모', '동그라미', '동그라미'], ans: '세모', opts: ['세모', '동그라미', '네모', '노란별'] },
+    { seq: ['세모', '네모', '노란별', '세모', '네모'], ans: '노란별', opts: ['노란별', '세모', '네모', '동그라미'] },
+    { seq: ['초록하트', '동그라미', '초록하트', '동그라미', '초록하트'], ans: '동그라미', opts: ['동그라미', '초록하트', '네모', '세모'] },
+    { seq: ['네모', '네모', '동그라미', '네모', '네모'], ans: '동그라미', opts: ['동그라미', '네모', '노란별', '초록하트'] },
+    { seq: ['노란별', '세모', '세모', '노란별', '세모'], ans: '세모', opts: ['세모', '노란별', '동그라미', '네모'] },
+    { seq: ['동그라미', '네모', '초록하트', '동그라미', '네모'], ans: '초록하트', opts: ['초록하트', '동그라미', '네모', '세모'] },
+    { seq: ['세모', '동그라미', '동그라미', '세모', '동그라미'], ans: '동그라미', opts: ['동그라미', '세모', '노란별', '네모'] },
+    { seq: ['노란별', '초록하트', '네모', '노란별', '초록하트'], ans: '네모', opts: ['네모', '노란별', '초록하트', '동그라미'] }
+  ];
+
+  let idx = 0, score = 0, audioCtx = null;
+  let answerLocked = false;
+  const bestEl = document.getElementById('bestTxt');
+  bestEl.textContent = '최고: ' + (localStorage.getItem(STORAGE_KEY) || 0) + '점';
+
+  function tone(freq, dur) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.16, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function render() {
+    answerLocked = false;
+    const p = PUZZLES[idx];
+    document.getElementById('stepTxt').textContent = '단계: ' + (idx + 1) + ' / ' + PUZZLES.length;
+    const row = document.getElementById('seqRow');
+    row.innerHTML = '';
+    p.seq.forEach(function(name) {
+      const d = document.createElement('div');
+      d.className = 'seq-item';
+      d.innerHTML = SHAPES[name] + '<span>' + name + '</span>';
+      row.appendChild(d);
+    });
+    const blank = document.createElement('div');
+    blank.className = 'seq-item seq-blank';
+    blank.id = 'blankSlot';
+    blank.innerHTML = '❓<span>빈칸</span>';
+    row.appendChild(blank);
+
+    const grid = document.getElementById('choiceGrid');
+    grid.innerHTML = '';
+    p.opts.slice().sort(function() { return Math.random() - 0.5; }).forEach(function(opt) {
+      const b = document.createElement('button');
+      b.className = 'shape-btn';
+      b.textContent = SHAPES[opt] + ' ' + opt;
+      b.addEventListener('pointerdown', function() { check(opt); });
+      grid.appendChild(b);
+    });
+  }
+
+  function check(choice) {
+    if (answerLocked) return;
+    const p = PUZZLES[idx];
+    if (choice === p.ans) {
+      answerLocked = true;
+      tone(523.25, 0.1); setTimeout(function() { tone(783.99, 0.2); }, 110);
+      const slot = document.getElementById('blankSlot');
+      slot.className = 'seq-item';
+      slot.innerHTML = SHAPES[choice] + '<span>' + choice + '</span>';
+      document.getElementById('msgTxt').textContent = '✨ 정답이에요! 고슴도치가 규칙을 찾았어요!';
+      score += 10;
+      const prev = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+      if (score > prev) {
+        localStorage.setItem(STORAGE_KEY, String(score));
+        bestEl.textContent = '최고: ' + score + '점';
+      }
+      setTimeout(function() {
+        idx++;
+        if (idx >= PUZZLES.length) {
+          document.getElementById('endSummary').textContent = '총점 ' + score + '점으로 모양 규칙 10문제를 모두 맞혔어요!';
+          document.getElementById('endOverlay').style.display = 'flex';
+        } else {
+          render();
+        }
+      }, 650);
+    } else {
+      tone(200, 0.22);
+      document.getElementById('msgTxt').textContent = '🦔 앞쪽 모양들이 어떤 순서로 줄을 섰는지 다시 살펴볼까요?';
+    }
+  }
+
+  function start() {
+    idx = 0; score = 0;
+    document.getElementById('startOverlay').style.display = 'none';
+    document.getElementById('endOverlay').style.display = 'none';
+    render();
+  }
+
+  document.getElementById('startBtn').addEventListener('pointerdown', start);
+  document.getElementById('retryBtn').addEventListener('pointerdown', start);
+})();
+</script>
+</body>
+</html>

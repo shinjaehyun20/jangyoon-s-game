@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "syllable-train-rabbit",
+        "title": "🎮 칙칙폭폭 끝말잇기 기차",
+        "path": "syllable-train-rabbit/index.html"
+      },
+      {
+        "id": "shape-pattern-hedgehog",
+        "title": "🎮 고슴도치 모양 규칙 찾기",
+        "path": "shape-pattern-hedgehog/index.html"
+      },
+      {
         "id": "koala-eucalyptus-climb",
         "title": "🎮 쑥쑥 코알라의 유칼립투스 나무 오르기",
         "path": "koala-eucalyptus-climb/index.html"
