@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+  <defs>
+    <linearGradient id="bgFox" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFF3DF"/>
+      <stop offset="100%" stop-color="#FFD09B"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" rx="24" fill="url(#bgFox)"/>
+  <circle cx="90" cy="105" r="54" fill="#FFFFFF" stroke="#FF8A3D" stroke-width="5"/>
+  <polygon points="55,68 72,32 95,62" fill="#FF7A2F"/>
+  <polygon points="125,68 108,32 85,62" fill="#FF7A2F"/>
+  <circle cx="90" cy="108" r="36" fill="#FF8A3D"/>
+  <circle cx="77" cy="102" r="5" fill="#2D231E"/>
+  <circle cx="103" cy="102" r="5" fill="#2D231E"/>
+  <circle cx="90" cy="116" r="6" fill="#2D231E"/>
+  <circle cx="132" cy="126" r="18" fill="none" stroke="#4A3B32" stroke-width="5"/>
+  <line x1="145" y1="139" x2="162" y2="156" stroke="#4A3B32" stroke-width="6" stroke-linecap="round"/>
+  <rect x="165" y="42" width="135" height="116" rx="18" fill="#FFFFFF" stroke="#FF8A3D" stroke-width="4"/>
+  <text x="232" y="80" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#D95B16">수수께끼 탐정</text>
+  <text x="232" y="110" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="800" fill="#2D231E">☂️ 우산 · ⏰ 시계</text>
+  <text x="232" y="138" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#6E5A4F">초1 국어 낱말 추리</text>
+</svg>

@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "ten-make-frog-pond",
+        "title": "🎮 개구리 연못 10 만들기 점프",
+        "path": "ten-make-frog-pond/index.html"
+      },
+      {
+        "id": "korean-riddle-detective-fox",
+        "title": "🎮 여우 탐정의 수수께끼 단어장",
+        "path": "korean-riddle-detective-fox/index.html"
+      },
+      {
         "id": "syllable-train-rabbit",
         "title": "🎮 칙칙폭폭 끝말잇기 기차",
         "path": "syllable-train-rabbit/index.html"

@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 345개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 347개.
 
-[![Games](https://img.shields.io/badge/games-345-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-347-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![345개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![347개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 345개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 347개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -374,6 +374,8 @@
 | [🎮 알록달록 모양 블록 쌓기 (rainbow-shape-stacker)](./rainbow-shape-stacker/index.html) | 초1 수학·공간: 알록달록 모양 블록을 설계도에 맞춰 쌓고 나만의 건축물 완성하기 | 어린이/아케이드 |
 | [🎮 칙칙폭폭 끝말잇기 기차 (syllable-train-rabbit)](./syllable-train-rabbit/index.html) | 토끼 기관사와 함께 앞 낱말의 마지막 글자로 시작하는 우리말 기차 칸을 연결해 출발시켜요! | 어린이/아케이드 |
 | [🎮 고슴도치 모양 규칙 찾기 (shape-pattern-hedgehog)](./shape-pattern-hedgehog/index.html) | 동그라미, 세모, 네모, 별 모양이 어떤 순서로 줄을 섰는지 규칙을 찾아 빈칸을 채워요! | 어린이/아케이드 |
+| [🎮 개구리 연못 10 만들기 점프 (ten-make-frog-pond)](./ten-make-frog-pond/index.html) | 초1 수학 (텐프레임과 함께 합이 10이 되는 짝 찾기) | 어린이/아케이드 |
+| [🎮 여우 탐정의 수수께끼 단어장 (korean-riddle-detective-fox)](./korean-riddle-detective-fox/index.html) | 초1 국어 (설명 읽고 알맞은 낱말 추리하기) | 어린이/아케이드 |
 
 </details>
 
@@ -541,6 +543,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-11)
+- 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 347개)
+
 - 2026-11-11: [🎮 고슴도치 모양 규칙 찾기](shape-pattern-hedgehog/index.html), [🎮 칙칙폭폭 끝말잇기 기차](syllable-train-rabbit/index.html) (총 345개)
 
 - 2026-11-10: [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기](koala-eucalyptus-climb/index.html), [🐢 아기 바다거북의 산호초 바다 지킴이](sea-turtle-coral-cleaner/index.html) (총 343개)

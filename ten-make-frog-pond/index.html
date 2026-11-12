@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>개구리 연못 10 만들기 점프</title>
+<style>
+  :root {
+    --sky: #E3F8FF;
+    --pond: #BEE9F7;
+    --leaf: #4CD97B;
+    --leaf-dark: #259F50;
+    --gold: #FFB800;
+    --text: #163A24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, var(--sky) 0%, var(--pond) 100%);
+    color: var(--text);
+    display: flex; justify-content: center; align-items: center;
+  }
+  .app {
+    width: min(100vw, 460px); height: 100dvh;
+    padding: 12px 14px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.92);
+    padding: 8px 12px; border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  .home-btn {
+    text-decoration: none; font-weight: 800; font-size: 0.92rem;
+    color: #166E3D; background: #E6FAEE;
+    padding: 6px 11px; border-radius: 12px; border: 2px solid #A3E8BE;
+  }
+  .stats { display: flex; gap: 8px; font-weight: 800; font-size: 0.94rem; }
+  .badge { background: #FFF8D6; padding: 5px 10px; border-radius: 12px; border: 2px solid #FFE27A; }
+  .target-card {
+    background: #FFFFFF; border-radius: 22px; padding: 14px 14px;
+    border: 3px solid #63D297;
+    box-shadow: 0 6px 16px rgba(22,110,61,0.1);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .frog-header {
+    display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 900;
+  }
+  .equation {
+    font-size: 2rem; font-weight: 900; color: #115C32;
+    background: #F0FFF5; padding: 6px 20px; border-radius: 16px; border: 2px dashed #4CD97B;
+  }
+  .ten-frame {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+    background: #F7FCFA; padding: 8px 12px; border-radius: 14px; border: 2px solid #CBEEDD;
+  }
+  .dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 900;
+  }
+  .dot.filled { background: #2EB872; color: #FFF; }
+  .dot.empty { background: #FFF3D1; color: #D98200; border: 2px dashed #F5B041; }
+  .pond-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  }
+  .lily-btn {
+    background: radial-gradient(circle at 35% 30%, #74EE9B, var(--leaf));
+    border: 4px solid var(--leaf-dark);
+    border-radius: 50% 50% 46% 54%;
+    height: 92px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 6px 0 var(--leaf-dark);
+    transition: transform 0.12s;
+  }
+  .lily-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--leaf-dark); }
+  .lily-num { font-size: 2rem; font-weight: 900; color: #0E3B20; }
+  .lily-sub { font-size: 0.84rem; font-weight: 800; color: #17522E; }
+  .lily-btn.correct { background: #FFE66D; border-color: #D49B00; box-shadow: 0 6px 0 #D49B00; }
+  .lily-btn.wrong { background: #FFB8C0; border-color: #C93B4B; box-shadow: 0 6px 0 #C93B4B; }
+  .bottom-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.9); padding: 8px 14px; border-radius: 16px;
+    font-size: 0.9rem; font-weight: 800;
+  }
+  .hint-btn {
+    background: #259F50; color: #FFF; border: none; border-radius: 12px;
+    padding: 7px 12px; font-weight: 800; font-size: 0.88rem; cursor: pointer;
+  }
+  .modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    display: none; justify-content: center; align-items: center; padding: 16px; z-index: 20;
+  }
+  .modal.show { display: flex; }
+  .modal-card {
+    background: #FFF; width: min(92vw, 380px); border-radius: 26px;
+    padding: 22px 18px; text-align: center; border: 4px solid #259F50;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .modal-title { font-size: 1.45rem; font-weight: 900; color: #166E3D; }
+  .modal-desc { font-size: 1rem; font-weight: 700; line-height: 1.45; }
+  .restart-btn {
+    background: #259F50; color: #FFF; border: none; border-radius: 16px;
+    padding: 13px; font-size: 1.1rem; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-bar">
+    <a class="home-btn" href="../index.html">🏠 홈으로</a>
+    <div class="stats">
+      <span class="badge" id="roundText">1 / 10 점프</span>
+      <span class="badge" id="scoreText">🌟 0점</span>
+    </div>
+  </div>
+
+  <div class="target-card">
+    <div class="frog-header">
+      <span style="font-size:2rem;" id="frogIcon">🐸</span>
+      <span id="guideMsg">빈칸(❓)을 채워 합이 10이 되게 점프해요!</span>
+    </div>
+    <div class="equation" id="eqBox">3 + ❓ = 10</div>
+    <div class="ten-frame" id="tenFrame"></div>
+  </div>
+
+  <div class="pond-grid" id="lilyGrid"></div>
+
+  <div class="bottom-bar">
+    <span id="comboText">연속 점프: 0회 🌿</span>
+    <button class="hint-btn" id="countHintBtn" type="button">🟡 노란 빈칸 세어보기</button>
+  </div>
+</div>
+
+<div class="modal" id="finishModal">
+  <div class="modal-card">
+    <div style="font-size:3rem;">🐸👑🎉</div>
+    <div class="modal-title">10 만들기 연못 건너기 성공!</div>
+    <div class="modal-desc" id="finishDesc">장윤이가 개구리를 안전하게 건너게 해 주었어요!</div>
+    <button class="restart-btn" id="againBtn" type="button">🔄 한 번 더 점프하기</button>
+  </div>
+</div>
+
+<script>
+const BASE_NUMS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 5];
+let stages = [];
+let cur = 0;
+let score = 0;
+let combo = 0;
+let busy = false;
+
+function beep(freq, ms) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.frequency.value = freq;
+    o.type = "sine";
+    g.gain.value = 0.12;
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    setTimeout(() => { o.stop(); ctx.close(); }, ms);
+  } catch (e) {}
+}
+
+function shuffle(a) {
+  const arr = a.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function initGame() {
+  stages = shuffle(BASE_NUMS);
+  cur = 0;
+  score = 0;
+  combo = 0;
+  busy = false;
+  document.getElementById("finishModal").classList.remove("show");
+  renderStage();
+}
+
+function renderStage() {
+  busy = false;
+  const given = stages[cur];
+  const need = 10 - given;
+  document.getElementById("roundText").textContent = `${cur + 1} / ${stages.length} 점프`;
+  document.getElementById("scoreText").textContent = `🌟 ${score}점`;
+  document.getElementById("comboText").textContent = `연속 점프: ${combo}회 🌿`;
+  document.getElementById("frogIcon").textContent = "🐸";
+  document.getElementById("guideMsg").textContent = `${given}에 얼마를 더하면 10이 될까요?`;
+  document.getElementById("eqBox").textContent = `${given} + ❓ = 10`;
+
+  const tf = document.getElementById("tenFrame");
+  tf.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    const d = document.createElement("div");
+    if (i <= given) {
+      d.className = "dot filled";
+      d.textContent = "🟢";
+    } else {
+      d.className = "dot empty";
+      d.textContent = "?";
+    }
+    tf.appendChild(d);
+  }
+
+  const cand = new Set([need]);
+  while (cand.size < 4) {
+    const r = Math.floor(Math.random() * 9) + 1;
+    cand.add(r);
+  }
+  const grid = document.getElementById("lilyGrid");
+  grid.innerHTML = "";
+  shuffle(Array.from(cand)).forEach(num => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "lily-btn";
+    btn.innerHTML = `<span class="lily-num">${num}</span><span class="lily-sub">연꽃잎 ${num}칸</span>`;
+    btn.addEventListener("click", () => checkAnswer(btn, num, given, need));
+    grid.appendChild(btn);
+  });
+}
+
+function checkAnswer(btn, picked, given, need) {
+  if (busy) return;
+  if (picked === need) {
+    busy = true;
+    btn.classList.add("correct");
+    combo += 1;
+    score += 10 + Math.min(combo * 2, 10);
+    beep(620, 120);
+    setTimeout(() => beep(840, 160), 110);
+    document.getElementById("frogIcon").textContent = "🐸✨";
+    document.getElementById("eqBox").textContent = `${given} + ${need} = 10!`;
+    document.getElementById("guideMsg").textContent = `폴짝! ${given}와(과) ${need}가 만나 10이 되었어요!`;
+    document.getElementById("scoreText").textContent = `🌟 ${score}점`;
+    document.getElementById("comboText").textContent = `연속 점프: ${combo}회 🌿`;
+    setTimeout(() => {
+      cur += 1;
+      if (cur >= stages.length) {
+        document.getElementById("finishDesc").textContent = `10번의 연못 점프를 모두 성공했어요! 총점 🌟 ${score}점!`;
+        document.getElementById("finishModal").classList.add("show");
+      } else {
+        renderStage();
+      }
+    }, 800);
+  } else {
+    btn.classList.add("wrong");
+    combo = 0;
+    beep(240, 180);
+    document.getElementById("guideMsg").textContent = `${given} + ${picked} = ${given + picked}이에요! 노란 빈칸을 세어 볼까요?`;
+    document.getElementById("comboText").textContent = `연속 점프: 0회 🌿`;
+  }
+}
+
+document.getElementById("countHintBtn").addEventListener("click", () => {
+  if (busy) return;
+  const given = stages[cur];
+  const need = 10 - given;
+  beep(500, 120);
+  const empties = document.querySelectorAll(".dot.empty");
+  empties.forEach((el, idx) => { el.textContent = idx + 1; });
+  document.getElementById("guideMsg").textContent = `💡 노란 빈칸이 모두 ${need}개 있어요!`;
+});
+
+document.getElementById("againBtn").addEventListener("click", initGame);
+initGame();
+</script>
+</body>
+</html>

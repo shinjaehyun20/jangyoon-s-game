@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>여우 탐정의 수수께끼 단어장</title>
+<style>
+  :root {
+    --bg1: #FFF8EC;
+    --bg2: #FFE5B4;
+    --card: #FFFFFF;
+    --accent: #FF7A2F;
+    --accent-dark: #D95B16;
+    --text: #2D231E;
+    --sub: #6E5A4F;
+    --good: #2EB872;
+    --bad: #E8505B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+    color: var(--text);
+    display: flex; justify-content: center; align-items: center;
+  }
+  .app {
+    width: min(100vw, 460px); height: 100dvh;
+    padding: 12px 14px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.9);
+    padding: 8px 12px; border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  .home-btn {
+    text-decoration: none; font-weight: 800; font-size: 0.92rem;
+    color: var(--accent-dark); background: #FFF0E5;
+    padding: 6px 11px; border-radius: 12px; border: 2px solid #FFD2B3;
+  }
+  .stats { display: flex; gap: 10px; font-weight: 800; font-size: 0.95rem; }
+  .badge { background: #FFF4CC; padding: 5px 10px; border-radius: 12px; border: 2px solid #FFE082; }
+  .mascot-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); padding: 12px 14px; border-radius: 20px;
+    box-shadow: 0 6px 16px rgba(217,91,22,0.1);
+    border: 3px solid #FFD8BE;
+  }
+  .fox-avatar {
+    width: 62px; height: 62px; border-radius: 50%;
+    background: #FFE8D6; display: flex; align-items: center; justify-content: center;
+    font-size: 2.3rem; flex-shrink: 0; border: 2px solid #FFB07C;
+  }
+  .speech { font-size: 0.98rem; font-weight: 700; line-height: 1.38; word-break: keep-all; }
+  .riddle-box {
+    background: #FFFFFF; border-radius: 24px; padding: 16px 16px;
+    border: 3px dashed var(--accent);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    text-align: center; display: flex; flex-direction: column; gap: 10px;
+  }
+  .riddle-step {
+    align-self: center; background: #FFEDD8; color: var(--accent-dark);
+    font-weight: 800; font-size: 0.88rem; padding: 4px 12px; border-radius: 999px;
+  }
+  .clues {
+    display: flex; flex-direction: column; gap: 6px;
+    font-size: 1.08rem; font-weight: 800; color: var(--text);
+    line-height: 1.4; word-break: keep-all;
+  }
+  .clue-item {
+    background: #FFFDF9; padding: 8px 10px; border-radius: 12px;
+    border: 1.5px solid #FFE4C4;
+  }
+  .choices {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .choice-btn {
+    background: #FFFFFF; border: 3px solid #FFD0B0; border-radius: 18px;
+    padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; transition: transform 0.12s, background 0.15s;
+    box-shadow: 0 5px 0 #F2B890;
+  }
+  .choice-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #F2B890; }
+  .choice-emoji { font-size: 2rem; }
+  .choice-word { font-size: 1.15rem; font-weight: 900; color: var(--text); }
+  .choice-btn.correct { background: #E6F9EE; border-color: var(--good); box-shadow: 0 5px 0 #23965B; }
+  .choice-btn.wrong { background: #FFEAEc; border-color: var(--bad); box-shadow: 0 5px 0 #C43B46; }
+  .bottom-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.85); padding: 8px 14px; border-radius: 16px;
+    font-size: 0.9rem; font-weight: 800; color: var(--sub);
+  }
+  .hint-btn {
+    background: var(--accent); color: #FFF; border: none; border-radius: 12px;
+    padding: 7px 13px; font-weight: 800; font-size: 0.9rem; cursor: pointer;
+  }
+  .modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    display: none; justify-content: center; align-items: center; padding: 16px; z-index: 20;
+  }
+  .modal.show { display: flex; }
+  .modal-card {
+    background: #FFF; width: min(92vw, 380px); border-radius: 26px;
+    padding: 22px 18px; text-align: center; border: 4px solid var(--accent);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .modal-title { font-size: 1.45rem; font-weight: 900; color: var(--accent-dark); }
+  .modal-desc { font-size: 1rem; font-weight: 700; line-height: 1.45; word-break: keep-all; }
+  .restart-btn {
+    background: var(--accent); color: #FFF; border: none; border-radius: 16px;
+    padding: 13px; font-size: 1.1rem; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-bar">
+    <a class="home-btn" href="../index.html">🏠 홈으로</a>
+    <div class="stats">
+      <span class="badge" id="stageText">1 / 8 문제</span>
+      <span class="badge" id="scoreText">⭐ 0점</span>
+    </div>
+  </div>
+
+  <div class="mascot-row">
+    <div class="fox-avatar" id="foxFace">🦊</div>
+    <div class="speech" id="foxSpeech">장윤 탐정님! 세 가지 단서를 읽고 어떤 낱말인지 맞혀 볼까요?</div>
+  </div>
+
+  <div class="riddle-box">
+    <div class="riddle-step" id="categoryTag">🔍 초1 국어 수수께끼 탐정</div>
+    <div class="clues" id="clueList"></div>
+  </div>
+
+  <div class="choices" id="choiceGrid"></div>
+
+  <div class="bottom-bar">
+    <span id="streakText">연속 정답: 0연속 🔥</span>
+    <button class="hint-btn" id="hintBtn" type="button">💡 첫 글자 힌트</button>
+  </div>
+</div>
+
+<div class="modal" id="resultModal">
+  <div class="modal-card">
+    <div style="font-size:3rem;">🏆🦊✨</div>
+    <div class="modal-title" id="modalTitle">명탐정 장윤이 최고!</div>
+    <div class="modal-desc" id="modalDesc">수수께끼 단어장을 모두 풀었어요!</div>
+    <button class="restart-btn" id="restartBtn" type="button">🔄 새로운 순서로 다시 하기</button>
+  </div>
+</div>
+
+<script>
+const RIDDLES = [
+  {
+    category: "날씨와 생활",
+    clues: ["1. 비가 오는 날에 꼭 챙겨요.", "2. 손잡이를 잡고 활짝 펼쳐요.", "3. 내 몸이 비에 젖지 않게 막아 줘요."],
+    answer: "우산",
+    hint: "첫 글자는 '우'예요!",
+    options: [
+      { word: "우산", emoji: "☂️" },
+      { word: "장화", emoji: "🥾" },
+      { word: "모자", emoji: "🧢" },
+      { word: "안경", emoji: "👓" }
+    ]
+  },
+  {
+    category: "학교 물건",
+    clues: ["1. 연필과 단짝 친구예요.", "2. 틀린 글씨를 쓱싹 문질러요.", "3. 글씨가 깨끗하게 사라져요."],
+    answer: "지우개",
+    hint: "첫 글자는 '지'예요!",
+    options: [
+      { word: "지우개", emoji: "🧽" },
+      { word: "가위", emoji: "✂️" },
+      { word: "크레파스", emoji: "🖍️" },
+      { word: "공책", emoji: "📓" }
+    ]
+  },
+  {
+    category: "동물 친구",
+    clues: ["1. 두 귀가 쫑긋하고 아주 길어요.", "2. 깡충깡충 높이 뛰어다녀요.", "3. 아삭아삭 당근을 정말 좋아해요."],
+    answer: "토끼",
+    hint: "첫 글자는 '토'예요!",
+    options: [
+      { word: "토끼", emoji: "🐰" },
+      { word: "거북이", emoji: "🐢" },
+      { word: "강아지", emoji: "🐶" },
+      { word: "다람쥐", emoji: "🐿️" }
+    ]
+  },
+  {
+    category: "과일 나라",
+    clues: ["1. 겉은 초록색에 줄무늬가 있어요.", "2. 속을 자르면 빨갛고 까만 씨가 있어요.", "3. 더운 여름에 시원하게 먹어요."],
+    answer: "수박",
+    hint: "첫 글자는 '수'예요!",
+    options: [
+      { word: "수박", emoji: "🍉" },
+      { word: "바나나", emoji: "🍌" },
+      { word: "포도", emoji: "🍇" },
+      { word: "귤", emoji: "🍊" }
+    ]
+  },
+  {
+    category: "우리 교실",
+    clues: ["1. 째깍째깍 쉬지 않고 움직여요.", "2. 긴 바늘과 짧은 바늘이 있어요.", "3. 지금이 몇 시인지 알려 줘요."],
+    answer: "시계",
+    hint: "첫 글자는 '시'예요!",
+    options: [
+      { word: "시계", emoji: "⏰" },
+      { word: "달력", emoji: "📅" },
+      { word: "거울", emoji: "🪞" },
+      { word: "창문", emoji: "🪟" }
+    ]
+  },
+  {
+    category: "하늘과 자연",
+    clues: ["1. 비가 그친 뒤 하늘에 나타나요.", "2. 빨주노초파남보 일곱 빛깔이에요.", "3. 동그란 다리처럼 반짝여요."],
+    answer: "무지개",
+    hint: "첫 글자는 '무'예요!",
+    options: [
+      { word: "무지개", emoji: "🌈" },
+      { word: "구름", emoji: "☁️" },
+      { word: "번개", emoji: "⚡" },
+      { word: "눈사람", emoji: "⛄" }
+    ]
+  },
+  {
+    category: "탈것 친구",
+    clues: ["1. 빨간 불이 번쩍번쩍 빛나요.", "2. 애앵애앵 큰 소리로 달려가요.", "3. 불이 났을 때 물을 뿌려 불을 꺼요."],
+    answer: "소방차",
+    hint: "첫 글자는 '소'예요!",
+    options: [
+      { word: "소방차", emoji: "🚒" },
+      { word: "자전거", emoji: "🚲" },
+      { word: "비행기", emoji: "✈️" },
+      { word: "기차", emoji: "🚂" }
+    ]
+  },
+  {
+    category: "곤충 친구",
+    clues: ["1. 애벌레에서 번데기를 거쳐 자라요.", "2. 알록달록 예쁜 날개가 두 쌍 있어요.", "3. 꽃밭에서 팔랑팔랑 춤을 춰요."],
+    answer: "나비",
+    hint: "첫 글자는 '나'예요!",
+    options: [
+      { word: "나비", emoji: "🦋" },
+      { word: "개미", emoji: "🐜" },
+      { word: "무당벌레", emoji: "🐞" },
+      { word: "잠자리", emoji: "🪽" }
+    ]
+  }
+];
+
+let deck = [];
+let idx = 0;
+let score = 0;
+let streak = 0;
+let locked = false;
+
+function playTone(freq, dur) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = "triangle";
+    gain.gain.value = 0.12;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    setTimeout(() => { osc.stop(); ctx.close(); }, dur);
+  } catch (e) {}
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  deck = shuffle(RIDDLES);
+  idx = 0;
+  score = 0;
+  streak = 0;
+  locked = false;
+  document.getElementById("resultModal").classList.remove("show");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  locked = false;
+  const q = deck[idx];
+  document.getElementById("stageText").textContent = `${idx + 1} / ${deck.length} 문제`;
+  document.getElementById("scoreText").textContent = `⭐ ${score}점`;
+  document.getElementById("streakText").textContent = `연속 정답: ${streak}연속 🔥`;
+  document.getElementById("categoryTag").textContent = `🔍 단서 카드 · ${q.category}`;
+  document.getElementById("foxFace").textContent = "🦊";
+  document.getElementById("foxSpeech").textContent = "세 가지 설명을 읽고 알맞은 낱말 카드를 눌러 보세요!";
+
+  const clueList = document.getElementById("clueList");
+  clueList.innerHTML = "";
+  q.clues.forEach(c => {
+    const d = document.createElement("div");
+    d.className = "clue-item";
+    d.textContent = c;
+    clueList.appendChild(d);
+  });
+
+  const grid = document.getElementById("choiceGrid");
+  grid.innerHTML = "";
+  shuffle(q.options).forEach(opt => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "choice-btn";
+    btn.innerHTML = `<span class="choice-emoji">${opt.emoji}</span><span class="choice-word">${opt.word}</span>`;
+    btn.addEventListener("click", () => handleChoice(btn, opt.word, q.answer));
+    grid.appendChild(btn);
+  });
+}
+
+function handleChoice(btn, picked, answer) {
+  if (locked) return;
+  if (picked === answer) {
+    locked = true;
+    btn.classList.add("correct");
+    streak += 1;
+    score += 10 + Math.min(streak * 2, 10);
+    playTone(660, 140);
+    setTimeout(() => playTone(880, 180), 120);
+    document.getElementById("foxFace").textContent = "🥳";
+    document.getElementById("foxSpeech").textContent = `정답이에요! '${answer}' 맞았어요! 참 잘했어요!`;
+    document.getElementById("scoreText").textContent = `⭐ ${score}점`;
+    document.getElementById("streakText").textContent = `연속 정답: ${streak}연속 🔥`;
+    setTimeout(() => {
+      idx += 1;
+      if (idx >= deck.length) {
+        showFinish();
+      } else {
+        renderQuestion();
+      }
+    }, 850);
+  } else {
+    btn.classList.add("wrong");
+    streak = 0;
+    playTone(260, 200);
+    document.getElementById("foxFace").textContent = "🦊💡";
+    document.getElementById("foxSpeech").textContent = `아깝다! '${picked}' 말고 단서를 다시 한번 읽어 볼까요?`;
+    document.getElementById("streakText").textContent = `연속 정답: 0연속 🔥`;
+  }
+}
+
+document.getElementById("hintBtn").addEventListener("click", () => {
+  if (locked) return;
+  const q = deck[idx];
+  playTone(520, 120);
+  document.getElementById("foxSpeech").textContent = `💡 여우 탐정 힌트: ${q.hint}`;
+});
+
+function showFinish() {
+  document.getElementById("modalTitle").textContent = "명탐정 장윤이 수료 완료!";
+  document.getElementById("modalDesc").textContent = `8개의 수수께끼 낱말을 모두 찾았어요! 최종 점수 ⭐ ${score}점!`;
+  document.getElementById("resultModal").classList.add("show");
+}
+
+document.getElementById("restartBtn").addEventListener("click", startGame);
+startGame();
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+  <defs>
+    <linearGradient id="pondBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D8F6FF"/>
+      <stop offset="100%" stop-color="#9BE0F5"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" rx="24" fill="url(#pondBg)"/>
+  <ellipse cx="95" cy="128" rx="62" ry="38" fill="#4CD97B" stroke="#259F50" stroke-width="4"/>
+  <circle cx="76" cy="82" r="14" fill="#38C169" stroke="#1E7E40" stroke-width="3"/>
+  <circle cx="114" cy="82" r="14" fill="#38C169" stroke="#1E7E40" stroke-width="3"/>
+  <ellipse cx="95" cy="105" rx="38" ry="28" fill="#4CD97B" stroke="#1E7E40" stroke-width="3"/>
+  <circle cx="76" cy="80" r="5" fill="#163A24"/>
+  <circle cx="114" cy="80" r="5" fill="#163A24"/>
+  <path d="M 80 112 Q 95 124 110 112" fill="none" stroke="#163A24" stroke-width="4" stroke-linecap="round"/>
+  <rect x="166" y="42" width="136" height="116" rx="18" fill="#FFFFFF" stroke="#259F50" stroke-width="4"/>
+  <text x="234" y="78" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#166E3D">개구리 10 만들기</text>
+  <text x="234" y="110" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="900" fill="#D98200">3 + 7 = 10</text>
+  <text x="234" y="138" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#2D5A40">초1 수학 10의 보수</text>
+</svg>

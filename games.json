@@ -1,5 +1,29 @@
 [
   {
+    "id": "korean-riddle-detective-fox",
+    "title": "여우 탐정의 수수께끼 단어장",
+    "description": "초1 국어 (설명 읽고 알맞은 낱말 추리하기)",
+    "category": "korean",
+    "date": "2026-11-12",
+    "path": "korean-riddle-detective-fox/index.html",
+    "thumb": "korean-riddle-detective-fox/thumb.svg",
+    "title_ko": "🎮 여우 탐정의 수수께끼 단어장",
+    "thumbnail": "korean-riddle-detective-fox/thumb.svg",
+    "created": "2026-11-12"
+  },
+  {
+    "id": "ten-make-frog-pond",
+    "title": "개구리 연못 10 만들기 점프",
+    "description": "초1 수학 (텐프레임과 함께 합이 10이 되는 짝 찾기)",
+    "category": "math",
+    "date": "2026-11-12",
+    "path": "ten-make-frog-pond/index.html",
+    "thumb": "ten-make-frog-pond/thumb.svg",
+    "title_ko": "🎮 개구리 연못 10 만들기 점프",
+    "thumbnail": "ten-make-frog-pond/thumb.svg",
+    "created": "2026-11-12"
+  },
+  {
     "id": "shape-pattern-hedgehog",
     "title": "고슴도치 모양 규칙 찾기",
     "description": "동그라미, 세모, 네모, 별 모양이 어떤 순서로 줄을 섰는지 규칙을 찾아 빈칸을 채워요!",
