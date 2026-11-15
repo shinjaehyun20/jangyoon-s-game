@@ -1,5 +1,29 @@
 [
   {
+    "id": "vowel-cookie-bakery",
+    "title": "곰돌이 빵집 모음 과자 만들기",
+    "description": "1학년 2학기 국어 (기본모음·이중모음 낱말 완성)",
+    "category": "korean",
+    "date": "2026-11-15",
+    "path": "vowel-cookie-bakery/index.html",
+    "thumb": "vowel-cookie-bakery/thumb.svg",
+    "title_ko": "🎮 곰돌이 빵집 모음 과자 만들기",
+    "thumbnail": "vowel-cookie-bakery/thumb.svg",
+    "created": "2026-11-15"
+  },
+  {
+    "id": "addition-balloon-penguin",
+    "title": "펭귄의 풍선 더하기 축제",
+    "description": "1학년 2학기 수학 (수 모으기와 두 자리 수+한 자리 수 덧셈)",
+    "category": "math",
+    "date": "2026-11-15",
+    "path": "addition-balloon-penguin/index.html",
+    "thumb": "addition-balloon-penguin/thumb.svg",
+    "title_ko": "🎮 펭귄의 풍선 더하기 축제",
+    "thumbnail": "addition-balloon-penguin/thumb.svg",
+    "created": "2026-11-15"
+  },
+  {
     "id": "korean-riddle-detective-fox",
     "title": "여우 탐정의 수수께끼 단어장",
     "description": "초1 국어 (설명 읽고 알맞은 낱말 추리하기)",

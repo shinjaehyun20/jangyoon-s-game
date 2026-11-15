@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 347개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 349개.
 
-[![Games](https://img.shields.io/badge/games-347-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-349-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![347개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![349개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 347개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 349개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -376,6 +376,8 @@
 | [🎮 고슴도치 모양 규칙 찾기 (shape-pattern-hedgehog)](./shape-pattern-hedgehog/index.html) | 동그라미, 세모, 네모, 별 모양이 어떤 순서로 줄을 섰는지 규칙을 찾아 빈칸을 채워요! | 어린이/아케이드 |
 | [🎮 개구리 연못 10 만들기 점프 (ten-make-frog-pond)](./ten-make-frog-pond/index.html) | 초1 수학 (텐프레임과 함께 합이 10이 되는 짝 찾기) | 어린이/아케이드 |
 | [🎮 여우 탐정의 수수께끼 단어장 (korean-riddle-detective-fox)](./korean-riddle-detective-fox/index.html) | 초1 국어 (설명 읽고 알맞은 낱말 추리하기) | 어린이/아케이드 |
+| [🎮 펭귄의 풍선 더하기 축제 (addition-balloon-penguin)](./addition-balloon-penguin/index.html) | 1학년 2학기 수학 (수 모으기와 두 자리 수+한 자리 수 덧셈) | 어린이/아케이드 |
+| [🎮 곰돌이 빵집 모음 과자 만들기 (vowel-cookie-bakery)](./vowel-cookie-bakery/index.html) | 1학년 2학기 국어 (기본모음·이중모음 낱말 완성) | 어린이/아케이드 |
 
 </details>
 
@@ -543,6 +545,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-11)
+- 2026-11-15: [🎮 곰돌이 빵집 모음 과자 만들기](vowel-cookie-bakery/index.html), [🎮 펭귄의 풍선 더하기 축제](addition-balloon-penguin/index.html) (총 349개)
+
 - 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 347개)
 
 - 2026-11-11: [🎮 고슴도치 모양 규칙 찾기](shape-pattern-hedgehog/index.html), [🎮 칙칙폭폭 끝말잇기 기차](syllable-train-rabbit/index.html) (총 345개)

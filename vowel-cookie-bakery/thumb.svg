@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF5E1"/>
+      <stop offset="100%" stop-color="#FFD494"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="28" fill="url(#bg1)"/>
+  <rect x="24" y="22" width="352" height="54" rx="16" fill="#FFFFFF" stroke="#E08E26" stroke-width="4"/>
+  <text x="200" y="57" text-anchor="middle" font-family="sans-serif" font-size="24" font-weight="900" fill="#B85D00">곰돌이 빵집 모음 과자</text>
+  <circle cx="115" cy="165" r="56" fill="#F2A950" stroke="#B85D00" stroke-width="5"/>
+  <text x="115" y="182" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="900" fill="#4A2C11">사</text>
+  <circle cx="265" cy="165" r="56" fill="#FFFDF7" stroke="#FF6B35" stroke-width="5" stroke-dasharray="10 6"/>
+  <text x="265" y="182" text-anchor="middle" font-family="sans-serif" font-size="44" font-weight="900" fill="#FF6B35">ㅈ+ㅏ</text>
+  <rect x="60" y="242" width="280" height="38" rx="12" fill="#FF6B35"/>
+  <text x="200" y="267" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="800" fill="#FFFFFF">1학년 한글 모음 조합 놀이</text>
+</svg>

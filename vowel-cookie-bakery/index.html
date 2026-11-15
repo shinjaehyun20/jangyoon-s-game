@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>곰돌이 빵집 모음 과자 만들기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; background: linear-gradient(180deg, #FFF7E8 0%, #FFE2B8 100%); font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: #4A2C11; }
+  .app { width: 100%; height: 100%; max-width: 540px; margin: 0 auto; display: flex; flex-direction: column; justify-content: space-between; padding: 12px 14px; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border: 3px solid #F2A950; border-radius: 18px; padding: 8px 14px; box-shadow: 0 4px 0 #E08E26; }
+  .title-badge { font-size: 1.05rem; font-weight: 800; color: #B85D00; }
+  .stats { display: flex; gap: 10px; font-size: 0.95rem; font-weight: 800; }
+  .stat-pill { background: #FFF0D4; padding: 4px 10px; border-radius: 999px; border: 2px solid #F2A950; }
+  .bakery-stage { flex: 1; display: flex; flex-direction: column; justify-content: space-around; align-items: center; background: rgba(255,255,255,0.86); border: 3px solid #F2A950; border-radius: 24px; margin: 10px 0; padding: 12px; position: relative; }
+  .chef-row { display: flex; align-items: center; gap: 12px; width: 100%; background: #FFF8EC; border-radius: 16px; padding: 8px 12px; border: 2px dashed #F2A950; }
+  .chef-icon { font-size: 2.4rem; line-height: 1; }
+  .speech { font-size: 0.98rem; font-weight: 700; line-height: 1.35; color: #5C3716; word-break: keep-all; }
+  .word-card { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .hint-emoji { font-size: 3.4rem; line-height: 1.1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08)); }
+  .word-meaning { font-size: 1.05rem; font-weight: 800; color: #8C4A08; background: #FFE8C2; padding: 4px 14px; border-radius: 999px; }
+  .cookie-tray { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 4px; }
+  .syllable-box { width: 84px; height: 84px; border-radius: 20px; background: #FFF2D9; border: 4px solid #D97917; display: flex; align-items: center; justify-content: center; font-size: 2.3rem; font-weight: 900; color: #4A2C11; box-shadow: inset 0 -4px 0 #F3D19E; }
+  .syllable-box.target { background: #FFFDF7; border: 4px dashed #FF6B35; color: #FF6B35; animation: pulse 1.2s infinite ease-in-out; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  .recipe-guide { font-size: 1.02rem; font-weight: 800; color: #6E3B0C; background: #FFF3DC; padding: 6px 14px; border-radius: 12px; }
+  .choices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
+  .choice-btn { height: 64px; border-radius: 18px; border: 3px solid #D97917; background: #FFFFFF; font-size: 1.55rem; font-weight: 900; color: #4A2C11; box-shadow: 0 5px 0 #D97917; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.08s; }
+  .choice-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #D97917; }
+  .choice-sub { font-size: 0.9rem; font-weight: 700; color: #8C4A08; background: #FFF0D4; padding: 2px 8px; border-radius: 8px; }
+  .bottom-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .action-btn { flex: 1; height: 48px; border-radius: 14px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; background: #FF8A3D; color: #FFFFFF; box-shadow: 0 4px 0 #C85A11; }
+  .action-btn.secondary { background: #8D6E63; box-shadow: 0 4px 0 #5D4037; }
+  .overlay { position: fixed; inset: 0; background: rgba(74, 44, 17, 0.72); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 20; }
+  .overlay.hidden { display: none; }
+  .modal { background: #FFFDF9; border: 4px solid #F2A950; border-radius: 26px; padding: 22px 18px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 0 #C86D14; }
+  .modal h2 { font-size: 1.5rem; color: #B85D00; margin-bottom: 10px; }
+  .modal p { font-size: 1.02rem; line-height: 1.45; color: #4A2C11; margin-bottom: 16px; font-weight: 700; word-break: keep-all; }
+  .start-btn { width: 100%; height: 54px; border-radius: 16px; border: none; background: #FF6B35; color: #FFFFFF; font-size: 1.2rem; font-weight: 900; box-shadow: 0 5px 0 #C44518; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-bar">
+    <div class="title-badge">🐻 곰돌이 빵집 모음 과자</div>
+    <div class="stats">
+      <div class="stat-pill" id="stageText">1 / 8단계</div>
+      <div class="stat-pill" id="scoreText">⭐ 0점</div>
+    </div>
+  </div>
+
+  <div class="bakery-stage">
+    <div class="chef-row">
+      <div class="chef-icon" id="chefFace">🐻‍❄️</div>
+      <div class="speech" id="guideSpeech">빈칸에 알맞은 모음 과자를 골라 맛있는 낱말 빵을 완성해 보자!</div>
+    </div>
+
+    <div class="word-card">
+      <div class="hint-emoji" id="wordEmoji">🦁</div>
+      <div class="word-meaning" id="wordMeaning">갈기가 멋진 백수의 왕</div>
+      <div class="cookie-tray" id="cookieTray"></div>
+    </div>
+
+    <div class="recipe-guide" id="recipeGuide">자음 [ ㅈ ] + 모음 [ ? ] = 어떤 글자일까?</div>
+
+    <div class="choices-grid" id="choicesGrid"></div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="action-btn secondary" id="hintBtn">💡 초성·모음 힌트</button>
+    <button class="action-btn" id="restartBtn">🔄 처음부터</button>
+  </div>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <div class="modal">
+    <h2>🍪 곰돌이 빵집 모음 과자 만들기</h2>
+    <p>장윤이 환영해요! 자음 반죽에 알맞은 <b>모음 과자(ㅏ, ㅓ, ㅗ, ㅜ, ㅐ, ㅘ 등)</b>를 쏙 넣어 맛있는 낱말 쿠키 8개를 구워 보아요!</p>
+    <button class="start-btn" id="startGameBtn">빵 굽기 시작!</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="clearOverlay">
+  <div class="modal">
+    <h2>🎉 최고예요! 제빵왕 등극!</h2>
+    <p id="clearMessage">8가지 모음 과자를 모두 알맞게 구웠어요!</p>
+    <button class="start-btn" id="playAgainBtn">한 번 더 굽기!</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const PROBLEMS = [
+    { emoji: "🦁", meaning: "갈기가 멋진 동물", syllables: ["사", "자"], targetIdx: 1, consonant: "ㅈ", answerVowel: "ㅏ", answerSyllable: "자", choices: [{v:"ㅏ", s:"자"}, {v:"ㅓ", s:"저"}, {v:"ㅗ", s:"조"}, {v:"ㅜ", s:"주"}], hint: "'사자'의 둘째 글자는 'ㅈ'에 밝은 소리 모음 'ㅏ'가 만나요!" },
+    { emoji: "🦋", meaning: "꽃밭을 날아다니는 곤충", syllables: ["나", "비"], targetIdx: 1, consonant: "ㅂ", answerVowel: "ㅣ", answerSyllable: "비", choices: [{v:"ㅣ", s:"비"}, {v:"ㅡ", s:"브"}, {v:"ㅏ", s:"바"}, {v:"ㅗ", s:"보"}], hint: "'나비'의 '비'는 기둥처럼 서 있는 모음 'ㅣ'가 들어가요!" },
+    { emoji: "🍇", meaning: "보라색 알갱이가 송이송이", syllables: ["포", "도"], targetIdx: 0, consonant: "ㅍ", answerVowel: "ㅗ", answerSyllable: "포", choices: [{v:"ㅗ", s:"포"}, {v:"ㅜ", s:"푸"}, {v:"ㅏ", s:"파"}, {v:"ㅓ", s:"퍼"}], hint: "입술을 동그랗게 오므리는 모음 'ㅗ'를 넣으면 '포도'가 돼요!" },
+    { emoji: "🦊", meaning: "복슬복슬 꼬리가 예쁜 동물", syllables: ["여", "우"], targetIdx: 0, consonant: "ㅇ", answerVowel: "ㅕ", answerSyllable: "여", choices: [{v:"ㅕ", s:"여"}, {v:"ㅑ", s:"야"}, {v:"ㅛ", s:"요"}, {v:"ㅠ", s:"유"}], hint: "'여우'의 첫 글자는 짧은 가로선이 두 개인 모음 'ㅕ'예요!" },
+    { emoji: "🥛", meaning: "고소하고 하얀 영양 간식", syllables: ["우", "유"], targetIdx: 1, consonant: "ㅇ", answerVowel: "ㅠ", answerSyllable: "유", choices: [{v:"ㅠ", s:"유"}, {v:"ㅛ", s:"요"}, {v:"ㅜ", s:"우"}, {v:"ㅡ", s:"으"}], hint: "'우유'의 둘째 글자는 아래로 기둥이 두 개 내려오는 모음 'ㅠ'예요!" },
+    { emoji: "🍎", meaning: "새콤달콤 아삭한 빨간 과일", syllables: ["사", "과"], targetIdx: 1, consonant: "ㄱ", answerVowel: "ㅘ", answerSyllable: "과", choices: [{v:"ㅘ", s:"과"}, {v:"가", s:"가"}, {v:"고", s:"고"}, {v:"구", s:"구"}], hint: "'ㅗ'와 'ㅏ'가 합쳐진 모음 'ㅘ'를 넣으면 '사과'가 완성돼요!" },
+    { emoji: "🦀", meaning: "집게발로 옆으로 걸어요", syllables: ["꽃", "게"], targetIdx: 1, consonant: "ㄱ", answerVowel: "ㅔ", answerSyllable: "게", choices: [{v:"ㅔ", s:"게"}, {v:"기", s:"기"}, {v:"고", s:"고"}, {v:"구", s:"구"}], hint: "'꽃게'의 '게'는 'ㅓ'와 'ㅣ'가 만난 모음 'ㅔ'예요!" },
+    { emoji: "🐷", meaning: "꿀꿀 귀엽게 노래하는 동물", syllables: ["돼", "지"], targetIdx: 0, consonant: "ㄷ", answerVowel: "ㅙ", answerSyllable: "돼", choices: [{v:"ㅙ", s:"돼"}, {v:"도", s:"도"}, {v:"두", s:"두"}, {v:"다", s:"다"}], hint: "'돼지'의 첫 글자는 'ㄷ'에 모음 'ㅙ'가 합쳐진 '돼'예요!" }
+  ];
+
+  let audioCtx = null;
+  function playTone(freq, dur, type) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type || "triangle";
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.16, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function playSuccessSound() {
+    playTone(523.25, 0.12, "sine");
+    setTimeout(() => playTone(659.25, 0.12, "sine"), 100);
+    setTimeout(() => playTone(783.99, 0.22, "triangle"), 200);
+  }
+
+  function playTryAgainSound() {
+    playTone(300, 0.16, "sine");
+    setTimeout(() => playTone(260, 0.2, "sine"), 130);
+  }
+
+  let currentIdx = 0;
+  let score = 0;
+  let locked = false;
+
+  const stageText = document.getElementById("stageText");
+  const scoreText = document.getElementById("scoreText");
+  const chefFace = document.getElementById("chefFace");
+  const guideSpeech = document.getElementById("guideSpeech");
+  const wordEmoji = document.getElementById("wordEmoji");
+  const wordMeaning = document.getElementById("wordMeaning");
+  const cookieTray = document.getElementById("cookieTray");
+  const recipeGuide = document.getElementById("recipeGuide");
+  const choicesGrid = document.getElementById("choicesGrid");
+  const startOverlay = document.getElementById("startOverlay");
+  const clearOverlay = document.getElementById("clearOverlay");
+  const clearMessage = document.getElementById("clearMessage");
+
+  function shuffle(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function renderStage() {
+    locked = false;
+    const item = PROBLEMS[currentIdx];
+    stageText.textContent = (currentIdx + 1) + " / " + PROBLEMS.length + "단계";
+    scoreText.textContent = "⭐ " + score + "점";
+    chefFace.textContent = "🐻‍❄️";
+    guideSpeech.textContent = "빈칸에 들어갈 모음 과자를 눌러 낱말 쿠키를 구워 주세요!";
+    wordEmoji.textContent = item.emoji;
+    wordMeaning.textContent = item.meaning;
+    recipeGuide.textContent = "자음 [ " + item.consonant + " ] + 모음 [ ? ] = 무슨 글자가 될까?";
+
+    cookieTray.innerHTML = "";
+    item.syllables.forEach((syl, idx) => {
+      const box = document.createElement("div");
+      if (idx === item.targetIdx) {
+        box.className = "syllable-box target";
+        box.textContent = item.consonant + "?";
+        box.id = "targetSyllableBox";
+      } else {
+        box.className = "syllable-box";
+        box.textContent = syl;
+      }
+      cookieTray.appendChild(box);
+    });
+
+    choicesGrid.innerHTML = "";
+    const shuffled = shuffle(item.choices);
+    shuffled.forEach((ch) => {
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.innerHTML = "<span>" + ch.s + "</span><span class='choice-sub'>모음 " + ch.v + "</span>";
+      btn.addEventListener("click", () => handleChoice(ch));
+      choicesGrid.appendChild(btn);
+    });
+  }
+
+  function handleChoice(ch) {
+    if (locked) return;
+    const item = PROBLEMS[currentIdx];
+    if (ch.s === item.answerSyllable) {
+      locked = true;
+      score += 100;
+      scoreText.textContent = "⭐ " + score + "점";
+      const targetBox = document.getElementById("targetSyllableBox");
+      if (targetBox) {
+        targetBox.className = "syllable-box";
+        targetBox.textContent = item.answerSyllable;
+      }
+      chefFace.textContent = "🥳";
+      guideSpeech.textContent = "노릇노릇 정답! '" + item.syllables.join("") + "' 쿠키가 완성되었어요!";
+      playSuccessSound();
+      setTimeout(() => {
+        currentIdx++;
+        if (currentIdx >= PROBLEMS.length) {
+          clearMessage.textContent = "총 " + score + "점으로 8가지 모음 과자 쿠키를 모두 완성했어요! 장윤이 최고!";
+          clearOverlay.classList.remove("hidden");
+        } else {
+          renderStage();
+        }
+      }, 950);
+    } else {
+      chefFace.textContent = "🐻";
+      guideSpeech.textContent = "앗, 그 과자는 '" + ch.s + "' 글자예요! 힌트를 보고 다시 골라 볼까요?";
+      playTryAgainSound();
+    }
+  }
+
+  document.getElementById("hintBtn").addEventListener("click", () => {
+    const item = PROBLEMS[currentIdx];
+    chefFace.textContent = "💡";
+    guideSpeech.textContent = item.hint;
+    playTone(440, 0.1, "sine");
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", () => {
+    currentIdx = 0;
+    score = 0;
+    renderStage();
+  });
+
+  document.getElementById("startGameBtn").addEventListener("click", () => {
+    startOverlay.classList.add("hidden");
+    currentIdx = 0;
+    score = 0;
+    renderStage();
+    playSuccessSound();
+  });
+
+  document.getElementById("playAgainBtn").addEventListener("click", () => {
+    clearOverlay.classList.add("hidden");
+    currentIdx = 0;
+    score = 0;
+    renderStage();
+    playSuccessSound();
+  });
+
+  renderStage();
+})();
+</script>
+</body>
+</html>

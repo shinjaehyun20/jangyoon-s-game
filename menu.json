@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "addition-balloon-penguin",
+        "title": "🎮 펭귄의 풍선 더하기 축제",
+        "path": "addition-balloon-penguin/index.html"
+      },
+      {
+        "id": "vowel-cookie-bakery",
+        "title": "🎮 곰돌이 빵집 모음 과자 만들기",
+        "path": "vowel-cookie-bakery/index.html"
+      },
+      {
         "id": "ten-make-frog-pond",
         "title": "🎮 개구리 연못 10 만들기 점프",
         "path": "ten-make-frog-pond/index.html"
