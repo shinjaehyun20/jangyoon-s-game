@@ -85,6 +85,39 @@ def menu_consistency_errors(games, menu):
     return errors
 
 
+def _resolve_github_token() -> str:
+    """Resolve an active GitHub token, preferring env vars then Git Credential Manager."""
+    for env_key in ("GH_TOKEN", "GITHUB_TOKEN"):
+        val = os.environ.get(env_key, "").strip()
+        if val:
+            return val
+    try:
+        cred = subprocess.run(
+            ["git", "credential", "fill"],
+            input="protocol=https\nhost=github.com\n\n",
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=10,
+        )
+        if cred.returncode == 0:
+            for line in cred.stdout.splitlines():
+                if line.startswith("password="):
+                    pw = line.split("=", 1)[1].strip()
+                    if pw:
+                        return pw
+    except Exception:
+        pass
+    try:
+        tok = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, timeout=5)
+        if tok.returncode == 0 and tok.stdout.strip():
+            return tok.stdout.strip()
+    except Exception:
+        pass
+    return ""
+
+
 def live_metadata_errors(games, live_games):
     local_ids = {g["id"] for g in games}
     live_by_id = {g["id"]: g for g in live_games}
@@ -338,33 +371,32 @@ def check_all(check_live=True):
     # [5] GitHub Pages 배포 브랜치 및 실서버 라이브 HTTP Read-Back 검증 (Live Verifier)
     if check_live:
         print("\n--- 🌐 GitHub Pages 배포 브랜치 및 실서버 라이브 HTTP Read-Back 검증 ---")
-        # 5-1. gh api 배포 소스 브랜치 확인
+        # 5-1. gh api 배포 소스 브랜치 확인 (gh keyring 만료 시 git credential fill 자동 폴백)
         try:
             gh_pages = subprocess.run(
                 ["gh", "api", "repos/shinjaehyun20/jangyoon-s-game/pages"],
                 capture_output=True, text=True, timeout=10
             )
             pages_info = None
+            fallback_error = ""
             if gh_pages.returncode == 0:
                 pages_info = json.loads(gh_pages.stdout)
             else:
-                # SSL / network fallback using gh auth token + urllib
-                token_run = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, timeout=5)
-                if token_run.returncode == 0 and token_run.stdout.strip():
-                    import ssl
-                    ctx = ssl.create_default_context()
-                    ctx.check_hostname = False
-                    ctx.verify_mode = ssl.CERT_NONE
-                    req_pages = urllib.request.Request(
-                        "https://api.github.com/repos/shinjaehyun20/jangyoon-s-game/pages",
-                        headers={
-                            "User-Agent": "Mozilla/5.0 JangyoonVerifier/1.0",
-                            "Authorization": f"Bearer {token_run.stdout.strip()}",
-                            "Accept": "application/vnd.github+json"
-                        }
-                    )
-                    with urllib.request.urlopen(req_pages, context=ctx, timeout=10) as r_pages:
-                        pages_info = json.loads(r_pages.read().decode("utf-8"))
+                token = _resolve_github_token()
+                if token:
+                    try:
+                        req_pages = urllib.request.Request(
+                            "https://api.github.com/repos/shinjaehyun20/jangyoon-s-game/pages",
+                            headers={
+                                "User-Agent": "jangyoon-integrity-verifier",
+                                "Authorization": f"Bearer {token}",
+                                "Accept": "application/vnd.github+json"
+                            }
+                        )
+                        with urllib.request.urlopen(req_pages, timeout=10) as r_pages:
+                            pages_info = json.loads(r_pages.read().decode("utf-8"))
+                    except Exception as api_err:
+                        fallback_error = f" / token fallback error: {api_err}"
 
             if pages_info:
                 source_branch = pages_info.get("source", {}).get("branch", "")
@@ -374,7 +406,10 @@ def check_all(check_live=True):
                 else:
                     print(f"[*] GitHub Pages 배포 브랜치 정상 확인 -> {source_branch} (status: {pages_status})")
             else:
-                errors.append(f"[실서버 라이브 검증] gh api repos/shinjaehyun20/jangyoon-s-game/pages 호출 실패 (코드 {gh_pages.returncode}): {gh_pages.stderr.strip()}")
+                errors.append(
+                    f"[실서버 라이브 검증] gh api repos/shinjaehyun20/jangyoon-s-game/pages 호출 실패 "
+                    f"(코드 {gh_pages.returncode}): {gh_pages.stderr.strip()}{fallback_error}"
+                )
         except Exception as e:
             errors.append(f"[실서버 라이브 검증] GitHub Pages 배포 소스 브랜치 조회 예외: {e}")
 
