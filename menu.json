@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "end-word-stepping-frog",
+        "title": "🎮 개구리 연잎 끝말잇기 징검다리",
+        "path": "end-word-stepping-frog/index.html"
+      },
+      {
+        "id": "number-split-acorn-squirrel",
+        "title": "🎮 다람쥐 도토리 가르기·모으기",
+        "path": "number-split-acorn-squirrel/index.html"
+      },
+      {
         "id": "consonant-acorn-train",
         "title": "🎮 다람쥐 초성 도토리 기차",
         "path": "consonant-acorn-train/index.html"

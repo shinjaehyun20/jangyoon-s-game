@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>개구리 연잎 끝말잇기 징검다리</title>
+<style>
+  :root {
+    --bg-top: #E6F9F0;
+    --bg-bottom: #B8EBD0;
+    --pond: #D2F1FF;
+    --leaf: #2E9E5B;
+    --leaf-dark: #1E703F;
+    --accent: #FF6B8B;
+    --text: #163A24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  html, body {
+    width: 100%; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    color: var(--text);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: rgba(255,255,255,0.9);
+    border-bottom: 2px solid #99DFB8; flex-shrink: 0;
+  }
+  .home-link {
+    text-decoration: none; color: var(--leaf-dark); font-weight: 800;
+    font-size: 0.95rem; padding: 8px 14px; border-radius: 999px;
+    background: #DCFAEA; border: 2px solid #7ED4A6; min-height: 44px;
+    display: inline-flex; align-items: center;
+  }
+  .score-box { display: flex; gap: 8px; font-weight: 800; font-size: 0.92rem; }
+  .badge {
+    background: #FFF; padding: 6px 12px; border-radius: 999px;
+    border: 2px solid #7ED4A6; color: var(--text);
+  }
+  .main-stage {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: space-evenly; padding: 8px 14px; max-width: 540px;
+    width: 100%; margin: 0 auto; overflow: hidden;
+  }
+  .title-banner { text-align: center; }
+  .title-banner h1 { font-size: 1.32rem; color: var(--leaf-dark); margin-bottom: 2px; }
+  .title-banner p { font-size: 0.88rem; color: #2B5B3E; font-weight: 600; }
+  .pond-card {
+    width: 100%; background: var(--pond); border-radius: 22px;
+    border: 3px solid #7BC8F6; padding: 14px;
+    box-shadow: 0 8px 18px rgba(30,112,63,0.12);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .frog-row {
+    display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;
+  }
+  .lily-pad {
+    background: #FFFFFF; border: 3px solid var(--leaf); border-radius: 20px;
+    padding: 12px 16px; min-width: 136px; text-align: center;
+    box-shadow: 0 5px 0 #82CFA1;
+  }
+  .lily-emoji { font-size: 2.2rem; display: block; margin-bottom: 2px; }
+  .lily-word { font-size: 1.45rem; font-weight: 900; letter-spacing: 1px; }
+  .last-char { color: #E0245E; text-decoration: underline; text-underline-offset: 4px; }
+  .arrow-bridge { font-size: 1.6rem; font-weight: 900; color: #1E703F; }
+  .target-pad {
+    background: #FFF9FB; border: 3px dashed #E0245E; border-radius: 20px;
+    padding: 12px 16px; min-width: 136px; text-align: center;
+  }
+  .target-Syllable {
+    font-size: 1.65rem; font-weight: 900; color: #E0245E;
+  }
+  .hint-pill {
+    background: rgba(255,255,255,0.92); padding: 6px 14px; border-radius: 999px;
+    font-size: 0.92rem; font-weight: 700; color: #194B2D;
+  }
+  .choices-grid {
+    width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  }
+  .choice-btn {
+    min-height: 58px; background: #FFFFFF; border: 3px solid var(--leaf);
+    border-radius: 18px; padding: 12px 10px; font-size: 1.28rem; font-weight: 900;
+    color: var(--text); cursor: pointer; box-shadow: 0 5px 0 #7AC99A;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .choice-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #7AC99A; }
+  .choice-btn.correct { background: #E3F9E9; border-color: #1E824C; color: #1E824C; }
+  .choice-btn.wrong { background: #FFE8E8; border-color: #D63939; color: #D63939; }
+  .feedback-bar {
+    min-height: 26px; font-size: 1rem; font-weight: 800; color: var(--leaf-dark); text-align: center;
+  }
+  .footer-bar {
+    padding: 8px 14px; text-align: center; font-size: 0.8rem; color: #2B5B3E;
+    background: rgba(255,255,255,0.75); flex-shrink: 0; font-weight: 600;
+  }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(22,58,36,0.72);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 20;
+  }
+  .overlay.hidden { display: none; }
+  .modal-card {
+    background: #FFF; border-radius: 24px; padding: 22px 18px; max-width: 360px; width: 100%;
+    text-align: center; border: 4px solid var(--leaf); box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+  }
+  .modal-card h2 { font-size: 1.4rem; color: var(--leaf-dark); margin-bottom: 8px; }
+  .modal-card p { font-size: 0.96rem; color: #365E46; margin-bottom: 16px; line-height: 1.45; font-weight: 600; }
+  .start-btn {
+    width: 100%; min-height: 52px; border: none; border-radius: 16px;
+    background: var(--leaf); color: #FFF; font-size: 1.15rem; font-weight: 900;
+    cursor: pointer; box-shadow: 0 4px 0 var(--leaf-dark);
+  }
+</style>
+</head>
+<body>
+  <header class="top-bar">
+    <a class="home-link" href="../index.html">← 홈으로</a>
+    <div class="score-box">
+      <span class="badge">🐸 징검다리 <strong id="scoreVal">0</strong>칸</span>
+      <span class="badge">🏆 최고 <strong id="bestVal">0</strong>칸</span>
+    </div>
+  </header>
+
+  <main class="main-stage">
+    <div class="title-banner">
+      <h1>🐸 개구리 연잎 끝말잇기 징검다리</h1>
+      <p>앞 낱말의 마지막 글자로 시작하는 연잎을 터치해 연못을 건너요!</p>
+    </div>
+
+    <section class="pond-card" aria-live="polite">
+      <div class="frog-row">
+        <div class="lily-pad">
+          <span class="lily-emoji" id="prevEmoji">🚂</span>
+          <div class="lily-word" id="prevWordHtml">기<span class="last-char">차</span></div>
+        </div>
+        <div class="arrow-bridge">➡</div>
+        <div class="target-pad" id="targetPad">
+          <span class="lily-emoji" id="nextEmoji">🐸❓</span>
+          <div class="target-Syllable" id="nextStartText">'차' 로 시작!</div>
+        </div>
+      </div>
+      <div class="hint-pill" id="hintPill">힌트: 기차를 탈 때 확인하는 표예요</div>
+    </section>
+
+    <div class="feedback-bar" id="feedbackBar">분홍색 끝 글자와 이어지는 낱말 연잎을 골라 보세요!</div>
+
+    <section class="choices-grid" id="choicesGrid"></section>
+  </main>
+
+  <footer class="footer-bar">
+    장윤이를 위한 국어 끝말잇기 어휘 놀이 · 연잎을 터치해 개구리를 점프시켜요!
+  </footer>
+
+  <div class="overlay" id="startOverlay">
+    <div class="modal-card">
+      <h2>🐸 개구리 연잎 끝말잇기</h2>
+      <p>앞 낱말의 마지막 글자(분홍색 글자)로 시작하는 다음 낱말 연잎을 터치하면 개구리가 폴짝 뛰어 징검다리를 건너요!</p>
+      <button type="button" class="start-btn" id="startBtn">연잎 징검다리 출발!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="modal-card">
+      <h2>🎉 연못 건너기 대성공!</h2>
+      <p id="endSummaryText">10개의 연잎 징검다리를 모두 건넜어요!</p>
+      <button type="button" class="start-btn" id="restartBtn">한 번 더 건너기!</button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const STORAGE_KEY = "end-word-stepping-frog_best";
+  constQUESTIONS = [
+    { prev: "기차", prevEmoji: "🚂", answer: "차표", nextEmoji: "🎫", hint: "기차나 버스를 탈 때 내는 표예요", choices: ["차표","사과","구름","바지"] },
+    { prev: "나비", prevEmoji: "🦋", answer: "비행기", nextEmoji: "✈️", hint: "하늘 높이 구름 위를 날아가는 탈것이에요", choices: ["비행기","자동차","자전거","강아지"] },
+    { prev: "비행기", prevEmoji: "✈️", answer: "기린", nextEmoji: "🦒", hint: "목이 아주 길고 나뭇잎을 좋아하는 동물이에요", choices: ["기린","코끼리","호랑이","다람쥐"] },
+    { prev: "사과", prevEmoji: "🍎", answer: "과자", nextEmoji: "🍪", hint: "바삭바삭 맛있게 먹는 간식이에요", choices: ["과자","우유","식빵","사탕"] },
+    { prev: "과자", prevEmoji: "🍪", answer: "자전거", nextEmoji: "🚲", hint: "두 바퀴 페달을 밟아 쌩쌩 달리는 탈것이에요", choices: ["자전거","비행기","유모차","킥보드"] },
+    { prev: "바나나", prevEmoji: "🍌", answer: "나무", nextEmoji: "🌳", hint: "숲속에 무성하게 자라는 초록 식물의 기둥이에요", choices: ["나무","꽃잎","잔디","열매"] },
+    { prev: "나무", prevEmoji: "🌳", answer: "무지개", nextEmoji: "🌈", hint: "비가 그친 뒤 하늘에 뜨는 일곱 빛깔 고리예요", choices: ["무지개","소나기","태양","달님"] },
+    { prev: "고양이", prevEmoji: "🐱", answer: "이불", nextEmoji: "🛌", hint: "밤에 잠을 잘 때 따뜻하게 덮는 것이에요", choices: ["이불","베개","침대","잠옷"] },
+    { prev: "포도", prevEmoji: "🍇", answer: "도토리", nextEmoji: "🌰", hint: "다람쥐가 좋아하는 동글동글 참나무 열매예요", choices: ["도토리","밤송이","옥수수","고구마"] },
+    { prev: "우산", prevEmoji: "☂️", answer: "산토끼", nextEmoji: "🐰", hint: "산속에서 깡충깡충 뛰어다니는 귀가 긴 동물이에요", choices: ["산토끼","거북이","다람쥐","부엉이"] },
+    { prev: "하마", prevEmoji: "🦛", answer: "마차", nextEmoji: "🐎", hint: "말이 끌어 주는 바퀴 달린 수레예요", choices: ["마차","기차","배","트럭"] },
+    { prev: "두부", prevEmoji: "🍲", answer: "부엉이", nextEmoji: "🦉", hint: "밤에 눈을 동그랗게 뜨고 부엉부엉 우는 새예요", choices: ["부엉이","참새","비둘기","병아리"] }
+  ];
+
+  let score = 0;
+  let best = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+  let idx = 0;
+  let locked = false;
+
+  const scoreVal = document.getElementById("scoreVal");
+  const bestVal = document.getElementById("bestVal");
+  const prevEmoji = document.getElementById("prevEmoji");
+  const prevWordHtml = document.getElementById("prevWordHtml");
+  const nextEmoji = document.getElementById("nextEmoji");
+  const nextStartText = document.getElementById("nextStartText");
+  const hintPill = document.getElementById("hintPill");
+  const choicesGrid = document.getElementById("choicesGrid");
+  const feedbackBar = document.getElementById("feedbackBar");
+  const startOverlay = document.getElementById("startOverlay");
+  const endOverlay = document.getElementById("endOverlay");
+  const endSummaryText = document.getElementById("endSummaryText");
+
+  bestVal.textContent = best;
+
+  function playTone(freq, dur) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.14, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderQuestion() {
+    locked = false;
+    const q = theQuestions[idx % theQuestions.length];
+    const head = q.prev.slice(0, -1);
+    const lastChar = q.prev.slice(-1);
+    prevEmoji.textContent = q.prevEmoji;
+    prevWordHtml.innerHTML = head + '<span class="last-char">' + lastChar + '</span>';
+    nextEmoji.textContent = "🐸❓";
+    nextStartText.textContent = "'" + lastChar + "' (으)로 시작!";
+    hintPill.textContent = "힌트: " + q.hint;
+    feedbackBar.textContent = "'" + lastChar + "' 글자로 시작하는 연잎을 터치해 보세요!";
+
+    choicesGrid.innerHTML = "";
+    shuffle(q.choices).forEach(ch => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice-btn";
+      btn.textContent = "🌿 " + ch;
+      btn.addEventListener("pointerdown", () => onSelect(btn, ch, q, lastChar));
+      choicesGrid.appendChild(btn);
+    });
+  }
+
+  let theQuestions = shuffle(constQUESTIONS);
+
+  function onSelect(btn, ch, q, lastChar) {
+    if (locked) return;
+    if (ch === q.answer) {
+      locked = true;
+      btn.classList.add("correct");
+      nextEmoji.textContent = q.nextEmoji;
+      nextStartText.textContent = q.answer;
+      score += 1;
+      scoreVal.textContent = score;
+      if (score > best) {
+        best = score;
+        bestVal.textContent = best;
+        try { localStorage.setItem(STORAGE_KEY, String(best)); } catch(e){}
+      }
+      feedbackBar.textContent = "폴짝! '" + q.prev + " ➡ " + q.answer + "' 끝말잇기 성공!";
+      playTone(640, 0.16);
+      setTimeout(() => playTone(880, 0.22), 110);
+      setTimeout(() => {
+        idx += 1;
+        if (idx > 0 && idx % 10 === 0) {
+          endSummaryText.textContent = "개구리가 " + score + "칸의 연잎 징검다리를 신나게 건넜어요!";
+          endOverlay.classList.remove("hidden");
+        } else {
+          renderQuestion();
+        }
+      }, 880);
+    } else {
+      btn.classList.add("wrong");
+      feedbackBar.textContent = "앗! '" + lastChar + "' 글자로 시작하는 낱말인지 다시 살펴볼까요?";
+      playTone(240, 0.2);
+    }
+  }
+
+  document.getElementById("startBtn").addEventListener("pointerdown", () => {
+    startOverlay.classList.add("hidden");
+    playTone(520, 0.12);
+    renderQuestion();
+  });
+
+  document.getElementById("restartBtn").addEventListener("pointerdown", () => {
+    endOverlay.classList.add("hidden");
+    theQuestions = shuffle(constQUESTIONS);
+    renderQuestion();
+  });
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>

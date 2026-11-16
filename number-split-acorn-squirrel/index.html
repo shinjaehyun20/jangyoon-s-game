@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>다람쥐 도토리 가르기·모으기</title>
+<style>
+  :root {
+    --bg-top: #FFF8EC;
+    --bg-bottom: #FCE1B6;
+    --primary: #C85A17;
+    --primary-dark: #8F3B08;
+    --accent: #2B8A3E;
+    --text: #381F0E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  html, body {
+    width: 100%; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    color: var(--text);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: rgba(255,255,255,0.9);
+    border-bottom: 2px solid #ECC389; flex-shrink: 0;
+  }
+  .home-link {
+    text-decoration: none; color: var(--primary-dark); font-weight: 800;
+    font-size: 0.95rem; padding: 8px 14px; border-radius: 999px;
+    background: #FFEAD0; border: 2px solid #E2B06D; min-height: 44px;
+    display: inline-flex; align-items: center;
+  }
+  .score-box { display: flex; gap: 8px; font-weight: 800; font-size: 0.92rem; }
+  .badge {
+    background: #FFF; padding: 6px 12px; border-radius: 999px;
+    border: 2px solid #E2B06D; color: var(--text);
+  }
+  .main-stage {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: space-evenly; padding: 8px 14px; max-width: 540px;
+    width: 100%; margin: 0 auto; overflow: hidden;
+  }
+  .title-banner { text-align: center; }
+  .title-banner h1 { font-size: 1.32rem; color: var(--primary-dark); margin-bottom: 2px; }
+  .title-banner p { font-size: 0.88rem; color: #6B3E1C; font-weight: 600; }
+  .tree-card {
+    width: 100%; background: #FFFFFF; border-radius: 22px;
+    border: 3px solid #DF9E52; padding: 14px;
+    box-shadow: 0 8px 18px rgba(143,59,8,0.12);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .top-basket {
+    background: #FFF4E2; border: 3px solid var(--primary); border-radius: 18px;
+    padding: 8px 18px; text-align: center; min-width: 180px;
+  }
+  .basket-label { font-size: 0.82rem; font-weight: 800; color: #7C471E; }
+  .basket-num { font-size: 1.8rem; font-weight: 900; color: var(--primary-dark); }
+  .acorn-icons { font-size: 1.15rem; letter-spacing: 2px; min-height: 24px; }
+  .branch-lines {
+    font-size: 1.35rem; font-weight: 900; color: var(--primary); line-height: 1;
+  }
+  .bottom-row {
+    display: flex; gap: 14px; width: 100%; justify-content: center;
+  }
+  .sub-basket {
+    flex: 1; max-width: 180px; background: #F9FBF7; border: 3px solid #52A464;
+    border-radius: 18px; padding: 8px 12px; text-align: center;
+  }
+  .sub-basket.mystery {
+    background: #FFF6F8; border: 3px dashed #E0245E;
+  }
+  .sub-num { font-size: 1.65rem; font-weight: 900; color: #1F6E32; }
+  .sub-basket.mystery .sub-num { color: #E0245E; }
+  .choices-grid {
+    width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  }
+  .choice-btn {
+    min-height: 58px; background: #FFFFFF; border: 3px solid #DF9E52;
+    border-radius: 18px; font-size: 1.45rem; font-weight: 900; color: var(--text);
+    cursor: pointer; box-shadow: 0 5px 0 #C88437;
+  }
+  .choice-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #C88437; }
+  .choice-btn.correct { background: #E3F9E9; border-color: #1E824C; color: #1E824C; }
+  .choice-btn.wrong { background: #FFE8E8; border-color: #D63939; color: #D63939; }
+  .feedback-bar {
+    min-height: 26px; font-size: 1rem; font-weight: 800; color: var(--primary-dark); text-align: center;
+  }
+  .footer-bar {
+    padding: 8px 14px; text-align: center; font-size: 0.8rem; color: #6B3E1C;
+    background: rgba(255,255,255,0.75); flex-shrink: 0; font-weight: 600;
+  }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(56,31,14,0.72);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 20;
+  }
+  .overlay.hidden { display: none; }
+  .modal-card {
+    background: #FFF; border-radius: 24px; padding: 22px 18px; max-width: 360px; width: 100%;
+    text-align: center; border: 4px solid var(--primary); box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+  }
+  .modal-card h2 { font-size: 1.4rem; color: var(--primary-dark); margin-bottom: 8px; }
+  .modal-card p { font-size: 0.96rem; color: #5C3618; margin-bottom: 16px; line-height: 1.45; font-weight: 600; }
+  .start-btn {
+    width: 100%; min-height: 52px; border: none; border-radius: 16px;
+    background: var(--primary); color: #FFF; font-size: 1.15rem; font-weight: 900;
+    cursor: pointer; box-shadow: 0 4px 0 var(--primary-dark);
+  }
+</style>
+</head>
+<body>
+  <header class="top-bar">
+    <a class="home-link" href="../index.html">← 홈으로</a>
+    <div class="score-box">
+      <span class="badge">🌰 도토리 <strong id="scoreVal">0</strong>개</span>
+      <span class="badge">🏆 최고 <strong id="bestVal">0</strong>개</span>
+    </div>
+  </header>
+
+  <main class="main-stage">
+    <div class="title-banner">
+      <h1>🐿️ 다람쥐 도토리 가르기·모으기</h1>
+      <p id="modeDesc">전체 도토리 개수를 보고 빈 바구니에 들어갈 알맞은 수를 골라요!</p>
+    </div>
+
+    <section class="tree-card" aria-live="polite">
+      <div class="top-basket" id="topBasket">
+        <div class="basket-label">전체 도토리 바구니</div>
+        <div class="basket-num" id="totalNum">7</div>
+        <div class="acorn-icons" id="totalIcons">🌰🌰🌰🌰🌰🌰🌰</div>
+      </div>
+      <div class="branch-lines">↙ &nbsp;&nbsp;&nbsp;&nbsp; ↘</div>
+      <div class="bottom-row">
+        <div class="sub-basket" id="leftBasket">
+          <div class="basket-label">왼쪽 바구니</div>
+          <div class="sub-num" id="leftNum">3</div>
+          <div class="acorn-icons" id="leftIcons">🌰🌰🌰</div>
+        </div>
+        <div class="sub-basket mystery" id="rightBasket">
+          <div class="basket-label">오른쪽 바구니</div>
+          <div class="sub-num" id="rightNum">?</div>
+          <div class="acorn-icons" id="rightIcons">❓</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="feedback-bar" id="feedbackBar">물음표 바구니에 들어갈 도토리는 몇 개일까요?</div>
+
+    <section class="choices-grid" id="choicesGrid"></section>
+  </main>
+
+  <footer class="footer-bar">
+    장윤이를 위한 수학 가르기·모으기 놀이 · 도토리를 세어 보고 숫자 버튼을 터치해요!
+  </footer>
+
+  <div class="overlay" id="startOverlay">
+    <div class="modal-card">
+      <h2>🐿️ 다람쥐 도토리 가르기·모으기</h2>
+      <p>아기 다람쥐가 도토리를 두 바구니에 나누어 담거나 한 바구니로 모으고 있어요. 물음표(?) 바구니에 알맞은 숫자를 터치해 주세요!</p>
+      <button type="button" class="start-btn" id="startBtn">도토리 바구니 놀이 시작!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="modal-card">
+      <h2>🎉 도토리 바구니 완성!</h2>
+      <p id="endSummaryText">10문제를 멋지게 해결했어요!</p>
+      <button type="button" class="start-btn" id="restartBtn">계속 놀이하기!</button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const STORAGE_KEY = "number-split-acorn-squirrel_best";
+  let score = 0;
+  let best = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+  let locked = false;
+  let currentProblem = null;
+
+  const scoreVal = document.getElementById("scoreVal");
+  const bestVal = document.getElementById("bestVal");
+  const totalNum = document.getElementById("totalNum");
+  const totalIcons = document.getElementById("totalIcons");
+  const leftNum = document.getElementById("leftNum");
+  const leftIcons = document.getElementById("leftIcons");
+  const rightNum = document.getElementById("rightNum");
+  const rightIcons = document.getElementById("rightIcons");
+  const topBasket = document.getElementById("topBasket");
+  const rightBasket = document.getElementById("rightBasket");
+  const choicesGrid = document.getElementById("choicesGrid");
+  const feedbackBar = document.getElementById("feedbackBar");
+  const startOverlay = document.getElementById("startOverlay");
+  const endOverlay = document.getElementById("endOverlay");
+  const endSummaryText = document.getElementById("endSummaryText");
+
+  bestVal.textContent = best;
+
+  function playTone(freq, dur) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.14, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function acorns(n) {
+    return "🌰".repeat(n);
+  }
+
+  function makeProblem() {
+    const total = Math.floor(Math.random() * 6) + 5; // 5 ~ 10
+    const left = Math.floor(Math.random() * (total - 1)) + 1;
+    const right = total - left;
+    const mode = Math.random() < 0.65 ? "split" : "merge";
+    const answer = mode === "split" ? right : total;
+    const choiceSet = new Set([answer]);
+    while (choiceSet.size < 4) {
+      const cand = Math.max(1, Math.min(10, answer + (Math.floor(Math.random() * 5) - 2)));
+      choiceSet.add(cand);
+    }
+    const choices = Array.from(choiceSet).sort((a,b) => a - b);
+    return { total, left, right, mode, answer, choices };
+  }
+
+  function renderProblem() {
+    locked = false;
+    currentProblem = makeProblem();
+    const p = currentProblem;
+    leftNum.textContent = p.left;
+    leftIcons.textContent = acorns(p.left);
+
+    if (p.mode === "split") {
+      topBasket.classList.remove("mystery");
+      rightBasket.classList.add("mystery");
+      totalNum.textContent = p.total;
+      totalIcons.textContent = acorns(p.total);
+      rightNum.textContent = "?";
+      rightIcons.textContent = "❓";
+      feedbackBar.textContent = "[가르기] 도토리 " + p.total + "개를 " + p.left + "개와 몇 개로 가를 수 있을까요?";
+    } else {
+      topBasket.classList.add("mystery");
+      rightBasket.classList.remove("mystery");
+      totalNum.textContent = "?";
+      totalIcons.textContent = "❓";
+      rightNum.textContent = p.right;
+      rightIcons.textContent = acorns(p.right);
+      feedbackBar.textContent = "[모으기] 도토리 " + p.left + "개와 " + p.right + "개를 모으면 모두 몇 개일까요?";
+    }
+
+    choicesGrid.innerHTML = "";
+    p.choices.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice-btn";
+      btn.textContent = num;
+      btn.addEventListener("pointerdown", () => onSelect(btn, num));
+      choicesGrid.appendChild(btn);
+    });
+  }
+
+  function onSelect(btn, num) {
+    if (locked) return;
+    const p = currentProblem;
+    if (num === p.answer) {
+      locked = true;
+      btn.classList.add("correct");
+      totalNum.textContent = p.total;
+      totalIcons.textContent = acorns(p.total);
+      rightNum.textContent = p.right;
+      rightIcons.textContent = acorns(p.right);
+      score += 1;
+      scoreVal.textContent = score;
+      if (score > best) {
+        best = score;
+        bestVal.textContent = best;
+        try { localStorage.setItem(STORAGE_KEY, String(best)); } catch(e){}
+      }
+      feedbackBar.textContent = "정답이에요! " + p.left + "개와 " + p.right + "개가 만나 도토리 " + p.total + "개 완성!";
+      playTone(660, 0.16);
+      setTimeout(() => playTone(880, 0.22), 110);
+      setTimeout(() => {
+        if (score > 0 && score % 10 === 0) {
+          endSummaryText.textContent = "도토리 바구니 " + score + "개를 정확하게 가르고 모았어요!";
+          endOverlay.classList.remove("hidden");
+        } else {
+          renderProblem();
+        }
+      }, 880);
+    } else {
+      btn.classList.add("wrong");
+      feedbackBar.textContent = "도토리 그림을 하나씩 짚어 보며 다시 세어 볼까요?";
+      playTone(240, 0.2);
+    }
+  }
+
+  document.getElementById("startBtn").addEventListener("pointerdown", () => {
+    startOverlay.classList.add("hidden");
+    playTone(520, 0.12);
+    renderProblem();
+  });
+
+  document.getElementById("restartBtn").addEventListener("pointerdown", () => {
+    endOverlay.classList.add("hidden");
+    renderProblem();
+  });
+
+  renderProblem();
+})();
+</script>
+</body>
+</html>

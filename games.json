@@ -1,5 +1,33 @@
 [
   {
+    "number": 58,
+    "id": "number-split-acorn-squirrel",
+    "title": "다람쥐 도토리 가르기·모으기",
+    "category": "수학·가르기와모으기",
+    "grade_target": "초1 맞춤형 (100% 한국어·시계 문항 배제·학년 라벨 미표기)",
+    "path": "number-split-acorn-squirrel/index.html",
+    "thumb": "number-split-acorn-squirrel/thumb.svg",
+    "description": "5~10개의 도토리를 두 바구니로 가르고 한 바구니로 모으는 1학년 수 감각 놀이 (100% 한국어·무스크롤 100dvh·포인터 이벤트 지원)",
+    "date": "2026-11-17",
+    "created": "2026-11-17",
+    "title_ko": "🎮 다람쥐 도토리 가르기·모으기",
+    "thumbnail": "number-split-acorn-squirrel/thumb.svg"
+  },
+  {
+    "number": 57,
+    "id": "end-word-stepping-frog",
+    "title": "개구리 연잎 끝말잇기 징검다리",
+    "category": "한글·끝말잇기",
+    "grade_target": "초1 맞춤형 (100% 한국어·시계 문항 배제·학년 라벨 미표기)",
+    "path": "end-word-stepping-frog/index.html",
+    "thumb": "end-word-stepping-frog/thumb.svg",
+    "description": "앞 낱말의 마지막 글자(분홍색 강조)로 시작하는 연잎을 터치해 아기 개구리가 연못 징검다리를 건너는 100% 한국어 무스크롤(100dvh) 터치 게임",
+    "date": "2026-11-17",
+    "created": "2026-11-17",
+    "title_ko": "🎮 개구리 연잎 끝말잇기 징검다리",
+    "thumbnail": "end-word-stepping-frog/thumb.svg"
+  },
+  {
     "number": 56,
     "id": "shape-symmetry-mirror-cat",
     "title": "아기 고양이 거울 모양 맞추기",
