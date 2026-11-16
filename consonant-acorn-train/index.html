@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>다람쥐 초성 도토리 기차</title>
+<style>
+  :root {
+    --bg-top: #FFF6E6;
+    --bg-bottom: #FDE2B8;
+    --card-bg: #FFFFFF;
+    --primary: #D96B27;
+    --primary-dark: #A84B12;
+    --accent: #2E8B57;
+    --text: #3B2314;
+    --correct: #238845;
+    --wrong: #D63939;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  html, body {
+    width: 100%; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    color: var(--text);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: rgba(255,255,255,0.88);
+    border-bottom: 2px solid #F0C999; flex-shrink: 0;
+  }
+  .home-link {
+    text-decoration: none; color: var(--primary-dark); font-weight: 800;
+    font-size: 0.95rem; padding: 6px 12px; border-radius: 999px;
+    background: #FFE8C8; border: 2px solid #E5B578;
+  }
+  .score-box {
+    display: flex; gap: 10px; font-weight: 800; font-size: 0.95rem;
+  }
+  .badge {
+    background: #FFF; padding: 5px 11px; border-radius: 999px;
+    border: 2px solid #E5B578; color: var(--text);
+  }
+  .main-stage {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: space-evenly; padding: 8px 14px; max-width: 540px;
+    width: 100%; margin: 0 auto; overflow: hidden;
+  }
+  .title-banner {
+    text-align: center;
+  }
+  .title-banner h1 {
+    font-size: 1.35rem; color: var(--primary-dark); margin-bottom: 2px;
+  }
+  .title-banner p {
+    font-size: 0.9rem; color: #6B4423; font-weight: 600;
+  }
+  .train-card {
+    width: 100%; background: var(--card-bg); border-radius: 22px;
+    border: 3px solid #E5A965; padding: 14px;
+    box-shadow: 0 8px 18px rgba(168,75,18,0.12);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .emoji-stage {
+    font-size: 3.6rem; line-height: 1.1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  }
+  .hint-text {
+    font-size: 1rem; font-weight: 700; color: #5C3A1D;
+    background: #FFF3DF; padding: 6px 14px; border-radius: 12px;
+  }
+  .slots-row {
+    display: flex; gap: 10px; align-items: center; justify-content: center;
+  }
+  .slot-box {
+    width: 74px; height: 74px; border-radius: 18px;
+    background: #FFF9F0; border: 3px dashed var(--primary);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .slot-chosung {
+    font-size: 1.75rem; font-weight: 900; color: var(--primary-dark);
+  }
+  .slot-full {
+    font-size: 1.7rem; font-weight: 900; color: var(--correct);
+  }
+  .train-track {
+    width: 100%; height: 22px; background: repeating-linear-gradient(90deg, #8C583A 0 18px, transparent 18px 32px);
+    border-top: 4px solid #5A3824; border-bottom: 4px solid #5A3824; border-radius: 4px;
+  }
+  .choices-grid {
+    width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  }
+  .choice-btn {
+    background: #FFFFFF; border: 3px solid #E0A96D; border-radius: 18px;
+    padding: 14px 10px; font-size: 1.35rem; font-weight: 900; color: var(--text);
+    cursor: pointer; box-shadow: 0 5px 0 #D49553; transition: transform 0.08s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .choice-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #D49553; }
+  .choice-btn.correct { background: #E3F9E9; border-color: var(--correct); color: var(--correct); box-shadow: 0 5px 0 #1B6B35; }
+  .choice-btn.wrong { background: #FFE8E8; border-color: var(--wrong); color: var(--wrong); box-shadow: 0 5px 0 #A82525; }
+  .feedback-bar {
+    min-height: 28px; font-size: 1.05rem; font-weight: 800; text-align: center;
+    color: var(--primary-dark);
+  }
+  .footer-bar {
+    padding: 8px 14px; text-align: center; font-size: 0.8rem; color: #7A5230;
+    background: rgba(255,255,255,0.7); flex-shrink: 0; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+  <header class="top-bar">
+    <a class="home-link" href="../index.html">← 홈으로</a>
+    <div class="score-box">
+      <span class="badge">🚂 기차 <strong id="scoreVal">0</strong>칸</span>
+      <span class="badge">🏆 최고 <strong id="bestVal">0</strong>칸</span>
+    </div>
+  </header>
+
+  <main class="main-stage">
+    <div class="title-banner">
+      <h1>🐿️ 다람쥐 초성 도토리 기차</h1>
+      <p>초성 힌트를 보고 알맞은 낱말 도토리를 골라 기차를 연결해요!</p>
+    </div>
+
+    <section class="train-card" aria-live="polite">
+      <div class="emoji-stage" id="emojiBox">🐿️</div>
+      <div class="hint-text" id="hintBox">숲속에서 도토리를 모으는 귀여운 동물</div>
+      <div class="slots-row" id="slotsRow"></div>
+      <div class="train-track"></div>
+    </section>
+
+    <div class="feedback-bar" id="feedbackBar">알맞은 낱말 버튼을 터치해 보세요!</div>
+
+    <section class="choices-grid" id="choicesGrid"></section>
+  </main>
+
+  <footer class="footer-bar">
+    장윤이를 위한 1학년 국어 자음·초성 어휘 놀이 · 터치 한 번으로 도토리 기차 출발!
+  </footer>
+
+<script>
+(function(){
+  const STORAGE_KEY = "jangyoon_consonant_acorn_train_best_v1";
+  const QUESTIONS = [
+    { word: "다람쥐", chosung: ["ㄷ","ㄹ","ㅈ"], emoji: "🐿️", hint: "숲속에서 도토리를 모으는 귀여운 동물", choices: ["다람쥐","강아지","호랑이","코끼리"] },
+    { word: "코끼리", chosung: ["ㅋ","ㄲ","ㄹ"], emoji: "🐘", hint: "코가 길고 귀가 커다란 동물", choices: ["코끼리","기린","얼룩말","원숭이"] },
+    { word: "호랑이", chosung: ["ㅎ","ㄹ","ㅇ"], emoji: "🐯", hint: "줄무늬가 멋진 숲속의 왕", choices: ["호랑이","사자","고양이","병아리"] },
+    { word: "거북이", chosung: ["ㄱ","ㅂ","ㅇ"], emoji: "🐢", hint: "등딱지가 단단하고 걸음이 느린 동물", choices: ["거북이","달팽이","개구리","두꺼비"] },
+    { word: "개구리", chosung: ["ㄱ","ㄱ","ㄹ"], emoji: "🐸", hint: "연못에서 개굴개굴 폴짝 뛰는 동물", choices: ["개구리","송아지","강아지","다람쥐"] },
+    { word: "복숭아", chosung: ["ㅂ","ㅅ","ㅇ"], emoji: "🍑", hint: "발그레하고 향기로운 달콤한 과일", choices: ["복숭아","바나나","오렌지","토마토"] },
+    { word: "바나나", chosung: ["ㅂ","ㄴ","ㄴ"], emoji: "🍌", hint: "노랗고 길쭉한 달콤한 과일", choices: ["바나나","복숭아","포도알","참외"] },
+    { word: "토마토", chosung: ["ㅌ","ㅁ","ㅌ"], emoji: "🍅", hint: "빨갛고 동그란 건강 채소 과일", choices: ["토마토","고구마","옥수수","감자"] },
+    { word: "옥수수", chosung: ["ㅇ","ㅅ","ㅅ"], emoji: "🌽", hint: "노란 알맹이가 톡톡 터지는 간식", choices: ["옥수수","고구마","완두콩","도토리"] },
+    { word: "무지개", chosung: ["ㅁ","ㅈ","ㄱ"], emoji: "🌈", hint: "비가 그친 뒤 하늘에 뜨는 일곱 빛깔 다리", choices: ["무지개","소나기","해바라기","구름"] },
+    { word: "해바라기", chosung: ["ㅎ","ㅂ","ㄹ","ㄱ"], emoji: "🌻", hint: "해를 바라보며 활짝 피는 노란 꽃", choices: ["해바라기","민들레","진달래","무궁화"] },
+    { word: "비행기", chosung: ["ㅂ","ㅎ","ㄱ"], emoji: "✈️", hint: "하늘 높이 구름 위를 날아가는 탈것", choices: ["비행기","자전거","자동차","기차"] }
+  ];
+
+  let score = 0;
+  let best = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+  let order = [];
+  let currentIdx = 0;
+  let locked = false;
+
+  const scoreVal = document.getElementById("scoreVal");
+  const bestVal = document.getElementById("bestVal");
+  const emojiBox = document.getElementById("emojiBox");
+  const hintBox = document.getElementById("hintBox");
+  const slotsRow = document.getElementById("slotsRow");
+  const choicesGrid = document.getElementById("choicesGrid");
+  const feedbackBar = document.getElementById("feedbackBar");
+
+  bestVal.textContent = best;
+
+  function playTone(freq, dur, type) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type || "triangle";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.14, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderSlots(q, revealed) {
+    slotsRow.innerHTML = "";
+    for (let i = 0; i < q.chosung.length; i++) {
+      const box = document.createElement("div");
+      box.className = "slot-box";
+      if (revealed) {
+        const sp = document.createElement("span");
+        sp.className = "slot-full";
+        sp.textContent = q.word[i];
+        box.appendChild(sp);
+      } else {
+        const sp = document.createElement("span");
+        sp.className = "slot-chosung";
+        sp.textContent = q.chosung[i];
+        box.appendChild(sp);
+      }
+      slotsRow.appendChild(box);
+    }
+  }
+
+  function loadNext() {
+    if (order.length === 0 || currentIdx >= order.length) {
+      order = shuffle(QUESTIONS);
+      currentIdx = 0;
+    }
+    locked = false;
+    const q = order[currentIdx];
+    emojiBox.textContent = q.emoji;
+    hintBox.textContent = q.hint;
+    renderSlots(q, false);
+    feedbackBar.textContent = "초성 [" + q.chosung.join(" ") + "] 에 맞는 낱말을 골라 보세요!";
+
+    const mixedChoices = shuffle(q.choices);
+    choicesGrid.innerHTML = "";
+    mixedChoices.forEach(choice => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice-btn";
+      btn.textContent = "🌰 " + choice;
+      btn.addEventListener("click", () => onSelect(btn, choice, q));
+      choicesGrid.appendChild(btn);
+    });
+  }
+
+  function onSelect(btn, choice, q) {
+    if (locked) return;
+    if (choice === q.word) {
+      locked = true;
+      btn.classList.add("correct");
+      renderSlots(q, true);
+      score += 1;
+      scoreVal.textContent = score;
+      if (score > best) {
+        best = score;
+        bestVal.textContent = best;
+        try { localStorage.setItem(STORAGE_KEY, String(best)); } catch(e){}
+      }
+      feedbackBar.textContent = "칙칙폭폭! '" + q.word + "' 도토리 기차 한 칸 연결 성공!";
+      playTone(660, 0.18, "triangle");
+      setTimeout(() => playTone(880, 0.22, "triangle"), 120);
+      setTimeout(() => {
+        currentIdx += 1;
+        loadNext();
+      }, 950);
+    } else {
+      btn.classList.add("wrong");
+      feedbackBar.textContent = "앗! 초성 [" + q.chosung.join(" ") + "] 소리글자를 다시 살펴볼까요?";
+      playTone(240, 0.2, "sawtooth");
+    }
+  }
+
+  loadNext();
+})();
+</script>
+</body>
+</html>

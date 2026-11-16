@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EEF6FF"/>
+      <stop offset="100%" stop-color="#CFE3FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" rx="18" fill="url(#bg2)"/>
+  <rect x="28" y="28" width="112" height="124" rx="14" fill="#FFF" stroke="#7AA7F5" stroke-width="3"/>
+  <rect x="180" y="28" width="112" height="124" rx="14" fill="#FFF" stroke="#7AA7F5" stroke-width="3"/>
+  <line x1="160" y1="20" x2="160" y2="160" stroke="#FF5C8A" stroke-width="6" stroke-dasharray="10 6"/>
+  <rect x="76" y="44" width="26" height="26" rx="6" fill="#FFE3EC" stroke="#FF5C8A" stroke-width="2"/>
+  <rect x="106" y="44" width="26" height="26" rx="6" fill="#FFE3EC" stroke="#FF5C8A" stroke-width="2"/>
+  <rect x="76" y="76" width="26" height="26" rx="6" fill="#FFE3EC" stroke="#FF5C8A" stroke-width="2"/>
+  <rect x="76" y="108" width="26" height="26" rx="6" fill="#FFE3EC" stroke="#FF5C8A" stroke-width="2"/>
+  <rect x="106" y="108" width="26" height="26" rx="6" fill="#FFE3EC" stroke="#FF5C8A" stroke-width="2"/>
+  <rect x="188" y="44" width="26" height="26" rx="6" fill="#DFF7E8" stroke="#269954" stroke-width="2"/>
+  <rect x="218" y="44" width="26" height="26" rx="6" fill="#DFF7E8" stroke="#269954" stroke-width="2"/>
+  <rect x="218" y="76" width="26" height="26" rx="6" fill="#DFF7E8" stroke="#269954" stroke-width="2"/>
+  <rect x="188" y="108" width="26" height="26" rx="6" fill="#DFF7E8" stroke="#269954" stroke-width="2"/>
+  <rect x="218" y="108" width="26" height="26" rx="6" fill="#DFF7E8" stroke="#269954" stroke-width="2"/>
+  <text x="54" y="96" font-size="24" text-anchor="middle">🐱</text>
+  <text x="266" y="96" font-size="24" text-anchor="middle">🐾</text>
+</svg>

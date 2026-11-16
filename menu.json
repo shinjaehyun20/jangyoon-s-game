@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "consonant-acorn-train",
+        "title": "🎮 다람쥐 초성 도토리 기차",
+        "path": "consonant-acorn-train/index.html"
+      },
+      {
+        "id": "shape-symmetry-mirror-cat",
+        "title": "🎮 아기 고양이 거울 모양 맞추기",
+        "path": "shape-symmetry-mirror-cat/index.html"
+      },
+      {
         "id": "addition-balloon-penguin",
         "title": "🎮 펭귄의 풍선 더하기 축제",
         "path": "addition-balloon-penguin/index.html"

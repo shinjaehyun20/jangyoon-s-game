@@ -1,5 +1,33 @@
 [
   {
+    "number": 56,
+    "id": "shape-symmetry-mirror-cat",
+    "title": "아기 고양이 거울 모양 맞추기",
+    "category": "수학·도형대칭",
+    "grade_target": "초1 맞춤형 (시계 문항 배제·학년 라벨 미표기)",
+    "path": "shape-symmetry-mirror-cat/index.html",
+    "thumb": "shape-symmetry-mirror-cat/thumb.svg",
+    "description": "가운데 분홍 거울선을 기준으로 왼쪽 3x3 격자 모양과 좌우 대칭이 되도록 오른쪽 칸을 터치해 완성하는 데칼코마니 도형 퍼즐",
+    "date": "2026-11-16",
+    "created": "2026-11-16",
+    "title_ko": "🎮 아기 고양이 거울 모양 맞추기",
+    "thumbnail": "shape-symmetry-mirror-cat/thumb.svg"
+  },
+  {
+    "number": 55,
+    "id": "consonant-acorn-train",
+    "title": "다람쥐 초성 도토리 기차",
+    "category": "한글·초성어휘",
+    "grade_target": "초1 맞춤형 (시계 문항 배제·학년 라벨 미표기)",
+    "path": "consonant-acorn-train/index.html",
+    "thumb": "consonant-acorn-train/thumb.svg",
+    "description": "초성 힌트(ㄷㄹㅈ, ㅋㄲㄹ 등)를 보고 알맞은 낱말 도토리를 골라 기차 칸을 연결하는 100% 한국어 원스크린 터치 게임",
+    "date": "2026-11-16",
+    "created": "2026-11-16",
+    "title_ko": "🎮 다람쥐 초성 도토리 기차",
+    "thumbnail": "consonant-acorn-train/thumb.svg"
+  },
+  {
     "id": "vowel-cookie-bakery",
     "title": "곰돌이 빵집 모음 과자 만들기",
     "description": "1학년 2학기 국어 (기본모음·이중모음 낱말 완성)",

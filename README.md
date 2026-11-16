@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 349개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 351개.
 
-[![Games](https://img.shields.io/badge/games-349-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-351-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![349개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![351개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 349개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 351개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -378,6 +378,8 @@
 | [🎮 여우 탐정의 수수께끼 단어장 (korean-riddle-detective-fox)](./korean-riddle-detective-fox/index.html) | 초1 국어 (설명 읽고 알맞은 낱말 추리하기) | 어린이/아케이드 |
 | [🎮 펭귄의 풍선 더하기 축제 (addition-balloon-penguin)](./addition-balloon-penguin/index.html) | 1학년 2학기 수학 (수 모으기와 두 자리 수+한 자리 수 덧셈) | 어린이/아케이드 |
 | [🎮 곰돌이 빵집 모음 과자 만들기 (vowel-cookie-bakery)](./vowel-cookie-bakery/index.html) | 1학년 2학기 국어 (기본모음·이중모음 낱말 완성) | 어린이/아케이드 |
+| [🎮 다람쥐 초성 도토리 기차 (consonant-acorn-train)](./consonant-acorn-train/index.html) | 초성 힌트(ㄷㄹㅈ, ㅋㄲㄹ 등)를 보고 알맞은 낱말 도토리를 골라 기차 칸을 연결하는 100% 한국어 원스크린 터치 게임 | 어린이/아케이드 |
+| [🎮 아기 고양이 거울 모양 맞추기 (shape-symmetry-mirror-cat)](./shape-symmetry-mirror-cat/index.html) | 가운데 분홍 거울선을 기준으로 왼쪽 3x3 격자 모양과 좌우 대칭이 되도록 오른쪽 칸을 터치해 완성하는 데칼코마니 도형 퍼즐 | 어린이/아케이드 |
 
 </details>
 
@@ -545,6 +547,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-11)
+- 2026-11-16: [🎮 아기 고양이 거울 모양 맞추기](shape-symmetry-mirror-cat/index.html), [🎮 다람쥐 초성 도토리 기차](consonant-acorn-train/index.html) (총 351개)
+
 - 2026-11-15: [🎮 곰돌이 빵집 모음 과자 만들기](vowel-cookie-bakery/index.html), [🎮 펭귄의 풍선 더하기 축제](addition-balloon-penguin/index.html) (총 349개)
 
 - 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 347개)
