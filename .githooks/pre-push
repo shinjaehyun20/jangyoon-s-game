@@ -1,0 +1,57 @@
+#!/bin/sh
+# .githooks/pre-push — 커밋된 HEAD에 대한 무결성 가드
+#
+# 목적: 게임 폴더가 games.json/menu.json 등록·7대 메타데이터 동기화보다 먼저 원격에 올라가
+#       CI 'Game Arcade Integrity Check'가 실패하는 순서(2449f7d, 92076f2)를 원천 차단한다.
+#       검증이 실패하면 푸시 자체를 중단하므로 원격 저장소는 항상 무결한 상태로만 갱신된다.
+#
+# 설치(클론당 1회):  git config core.hooksPath .githooks
+#                   (scripts/morning_publish.py 실행 시 자동 설정됨)
+# 우회(권장하지 않음): git push --no-verify
+
+set -u
+
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  echo "[pre-push] 저장소 루트를 찾을 수 없습니다. 푸시를 중단합니다." >&2
+  exit 1
+}
+
+PY=$(command -v python3 || command -v python)
+if [ -z "${PY}" ]; then
+  echo "[pre-push] python3/python 실행 파일을 찾을 수 없습니다. 푸시를 중단합니다." >&2
+  exit 1
+fi
+
+TMPBASE=${TMPDIR:-/tmp}
+WT=$(mktemp -d "${TMPBASE%/}/jsg-prepush.XXXXXX" 2>/dev/null) || {
+  echo "[pre-push] 임시 디렉터리를 만들 수 없습니다. 푸시를 중단합니다." >&2
+  exit 1
+}
+
+cleanup() {
+  git -C "${ROOT}" worktree remove --force "${WT}/wt" >/dev/null 2>&1
+  rm -rf "${WT}"
+}
+trap cleanup EXIT INT TERM
+
+# 커밋된 트리(HEAD)를 그대로 꺼내 검사한다 — 작업 트리에 남은 미커밋 변경은 검사 대상이 아니다.
+if ! git -C "${ROOT}" worktree add --quiet --detach "${WT}/wt" HEAD >/dev/null 2>&1; then
+  echo "[pre-push] HEAD 워크트리 생성 실패 — 푸시를 중단합니다." >&2
+  exit 1
+fi
+
+echo "[pre-push] 커밋된 HEAD 무결성 사전 검증 중... (게임 폴더 등록 + 7대 메타데이터 + 카운터)"
+if ( cd "${WT}/wt" && "${PY}" scripts/verify_integrity.py --skip-live >"${WT}/verify.log" 2>&1 ); then
+  echo "[pre-push] 통과 — 푸시를 진행합니다."
+  exit 0
+fi
+
+echo "" >&2
+echo "[pre-push] ❌ 무결성 검증 실패 — 푸시를 중단했습니다. 원격은 변경되지 않았습니다." >&2
+echo "[pre-push] --- 실패 사유 ---" >&2
+grep -E "\[!\]|❌|결함" "${WT}/verify.log" | head -20 >&2
+echo "[pre-push] -----------------" >&2
+echo "[pre-push] 올바른 순서로 다시 진행하세요:" >&2
+echo "[pre-push]   python scripts/morning_publish.py --message \"feat(morning): add <slug> ...\"" >&2
+echo "[pre-push] (게임 폴더 → games.json/menu.json 등록 → 7대 메타 동기화 → 검증 → 커밋·푸시 를 한 번에 처리)" >&2
+exit 1

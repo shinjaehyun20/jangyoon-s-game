@@ -39,7 +39,7 @@ HERO_SVG = REPO_ROOT / "docs" / "assets" / "portfolio-hero.svg"
 CHANGES_MD = REPO_ROOT / "CHANGES.md"
 
 REQUIRED_GAME_FIELDS = ["id", "title", "title_ko", "description", "thumbnail", "path"]
-EXCLUDED_DIRS = {".git", ".claude", ".github", "__pycache__", "_candidates", "docs", "games", "marketing", "output", "scripts"}
+EXCLUDED_DIRS = {".git", ".claude", ".github", ".githooks", "__pycache__", "_candidates", "docs", "games", "marketing", "output", "scripts"}
 
 def recent_games(games):
     """Prefer explicit creation dates; array position is not a chronology."""

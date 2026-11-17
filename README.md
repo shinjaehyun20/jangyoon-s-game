@@ -463,7 +463,15 @@ VS Code `Live Server` 확장을 써도 된다.
    }
    ```
 4. `menu.json`에도 사이드바 항목 추가
-5. 커밋 & 푸시 → GitHub Pages 자동 배포
+5. `python scripts/morning_publish.py --message "feat(morning): add new-game with 7-point sync"`
+   — 7대 메타데이터 동기화(README 배지·설명·히어로·summary·게임 표, `docs/github-about.md`, `index.html`,
+   `docs/assets/portfolio-hero.svg`, `CHANGES.md`)와 유·무결성 검증을 **먼저** 끝낸 뒤 `main`·`master`에
+   한 번에 커밋·푸시한다. 검증에 실패하면 커밋·푸시를 하지 않으므로 CI가 실패한 채로 배포되는 일이 없다.
+   (검증만 하려면 `--dry-run`, 푸시 후 CI 확인까지 하려면 `--wait-ci`)
+
+> 순서를 건너뛰고 게임 폴더만 먼저 푸시하면 `Game Arcade Integrity Check`가 “미등록 게임 폴더”·
+> “카운터 오류”로 실패한다. `.githooks/pre-push`(설치: `git config core.hooksPath .githooks`)를 걸어두면
+> 그런 푸시는 원격에 도달하기 전에 차단된다.
 
 외부 호스팅 게임은 `path`에 전체 URL을 적으면 되고, 목록 페이지가 자동으로 새 탭 열기 + ↗ 배지를 붙여준다.
 
@@ -554,27 +562,27 @@ VS Code `Live Server` 확장을 써도 된다.
 ## 최근 변경사항 (2026-11)
 - 2026-11-18: [🎮 10 만들기 별빛 기차](ten-make-starlight-train/index.html), [🎮 초성 도토리 빵집](consonant-acorn-bakery/index.html) (총 356개)
 
-- 2026-11-17: [🎮 다람쥐 도토리 가르기·모으기](number-split-acorn-squirrel/index.html), [🎮 개구리 연잎 끝말잇기 징검다리](end-word-stepping-frog/index.html) (총 354개)
+- 2026-11-17: [🎮 다람쥐 도토리 가르기·모으기](number-split-acorn-squirrel/index.html), [🎮 개구리 연잎 끝말잇기 징검다리](end-word-stepping-frog/index.html) (총 356개)
 
-- 2026-11-17: [🎂 생일 우주 대작전](birthday-space-math/index.html) (총 354개)
+- 2026-11-17: [🎂 생일 우주 대작전](birthday-space-math/index.html) (총 356개)
 
-- 2026-11-16: [🎮 아기 고양이 거울 모양 맞추기](shape-symmetry-mirror-cat/index.html), [🎮 다람쥐 초성 도토리 기차](consonant-acorn-train/index.html) (총 354개)
+- 2026-11-16: [🎮 아기 고양이 거울 모양 맞추기](shape-symmetry-mirror-cat/index.html), [🎮 다람쥐 초성 도토리 기차](consonant-acorn-train/index.html) (총 356개)
 
-- 2026-11-15: [🎮 곰돌이 빵집 모음 과자 만들기](vowel-cookie-bakery/index.html), [🎮 펭귄의 풍선 더하기 축제](addition-balloon-penguin/index.html) (총 354개)
+- 2026-11-15: [🎮 곰돌이 빵집 모음 과자 만들기](vowel-cookie-bakery/index.html), [🎮 펭귄의 풍선 더하기 축제](addition-balloon-penguin/index.html) (총 356개)
 
-- 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 354개)
+- 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 356개)
 
-- 2026-11-11: [🎮 고슴도치 모양 규칙 찾기](shape-pattern-hedgehog/index.html), [🎮 칙칙폭폭 끝말잇기 기차](syllable-train-rabbit/index.html) (총 354개)
+- 2026-11-11: [🎮 고슴도치 모양 규칙 찾기](shape-pattern-hedgehog/index.html), [🎮 칙칙폭폭 끝말잇기 기차](syllable-train-rabbit/index.html) (총 356개)
 
-- 2026-11-10: [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기](koala-eucalyptus-climb/index.html), [🐢 아기 바다거북의 산호초 바다 지킴이](sea-turtle-coral-cleaner/index.html) (총 354개)
+- 2026-11-10: [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기](koala-eucalyptus-climb/index.html), [🐢 아기 바다거북의 산호초 바다 지킴이](sea-turtle-coral-cleaner/index.html) (총 356개)
 
-- 2026-11-09: [🎮 알록달록 모양 블록 쌓기](rainbow-shape-stacker/index.html), [🎮 신비한 동물 발자국 사파리](animal-footprint-safari/index.html) (총 354개)
+- 2026-11-09: [🎮 알록달록 모양 블록 쌓기](rainbow-shape-stacker/index.html), [🎮 신비한 동물 발자국 사파리](animal-footprint-safari/index.html) (총 356개)
 
-- 2026-11-04: [🎮 데굴데굴 자음모음 눈사람](hangul-snowman-maker/index.html), [🎮 요리조리 거울 대칭 미술관](mirror-symmetry-art/index.html) (총 354개)
+- 2026-11-04: [🎮 데굴데굴 자음모음 눈사람](hangul-snowman-maker/index.html), [🎮 요리조리 거울 대칭 미술관](mirror-symmetry-art/index.html) (총 356개)
 
-- 2026-11-03: [또박또박 문장부호 탐험대](punctuation-train-safari/index.html), [알록달록 주사위 덧셈 보드](dice-ten-board/index.html) (총 354개)
+- 2026-11-03: [또박또박 문장부호 탐험대](punctuation-train-safari/index.html), [알록달록 주사위 덧셈 보드](dice-ten-board/index.html) (총 356개)
 
-- 2026-11-02: [송이송이 받침 포도 농장](final-consonant-grape/index.html), [영차영차 시소 무게 비교](seesaw-weight-safari/index.html) (총 354개)
+- 2026-11-02: [송이송이 받침 포도 농장](final-consonant-grape/index.html), [영차영차 시소 무게 비교](seesaw-weight-safari/index.html) (총 356개)
 
 
 ## 최근 변경사항 (2026-10)
