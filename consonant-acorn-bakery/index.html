@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>초성 도토리 빵집</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: linear-gradient(180deg, #FFF7E6 0%, #FFE0B2 100%); color: #3E2723; }
+  #app { width: 100%; height: 100dvh; max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; justify-content: space-between; padding: 12px 14px 16px; position: relative; }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 48px; }
+  .home-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px; border-radius: 14px; background: #FFFDF9; border: 2px solid #D7CCC8; color: #4E342E; font-weight: 800; font-size: 15px; text-decoration: none; box-shadow: 0 3px 0 #BCAAA4; }
+  .hud-pills { display: flex; gap: 8px; align-items: center; }
+  .pill { min-height: 40px; padding: 6px 12px; border-radius: 14px; background: #FFFDF9; border: 2px solid #FFCC80; font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 4px; box-shadow: 0 3px 0 #FFB74D; }
+  .stage-card { flex: 1; margin: 10px 0; background: #FFFDF9; border: 3px solid #FFB74D; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; box-shadow: 0 8px 0 #F57C00; position: relative; }
+  .baker-header { font-size: 18px; font-weight: 800; color: #E65100; background: #FFF3E0; padding: 8px 16px; border-radius: 999px; border: 2px solid #FFE0B2; }
+  .picture-emoji { font-size: 72px; line-height: 1.1; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.08)); }
+  .hint-desc { font-size: 18px; font-weight: 700; color: #5D4037; text-align: center; word-break: keep-all; }
+  .chosung-box { display: flex; gap: 12px; align-items: center; justify-content: center; }
+  .chosung-tile { width: 78px; height: 78px; border-radius: 20px; background: #FFF8E1; border: 3px dashed #FFA000; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 900; color: #D84315; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05); }
+  .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+  .choice-btn { min-height: 68px; border-radius: 20px; border: 3px solid #8D6E63; background: #FFFDF9; color: #3E2723; font-size: 24px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #6D4C41; transition: transform 0.08s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .choice-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #6D4C41; }
+  .choice-btn.correct { background: #E8F5E9; border-color: #2E7D32; color: #1B5E20; box-shadow: 0 5px 0 #2E7D32; }
+  .choice-btn.wrong { background: #FFEBEE; border-color: #C62828; color: #B71C1C; box-shadow: 0 5px 0 #C62828; }
+  .feedback-toast { min-height: 32px; font-size: 17px; font-weight: 800; color: #D84315; text-align: center; }
+  .overlay { position: fixed; inset: 0; background: rgba(62, 39, 35, 0.82); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+  .overlay.hidden { display: none; }
+  .modal-card { width: 100%; max-width: 400px; background: #FFFDF9; border: 4px solid #FFB300; border-radius: 28px; padding: 28px 22px; text-align: center; box-shadow: 0 10px 0 #FF8F00; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .modal-title { font-size: 30px; font-weight: 900; color: #E65100; word-break: keep-all; }
+  .modal-desc { font-size: 18px; font-weight: 700; color: #4E342E; line-height: 1.5; word-break: keep-all; }
+  .primary-btn { width: 100%; min-height: 58px; border-radius: 18px; border: none; background: #FF8F00; color: #FFFFFF; font-size: 22px; font-weight: 900; cursor: pointer; box-shadow: 0 6px 0 #E65100; }
+  .primary-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #E65100; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top-bar">
+    <a href="../../index.html" class="home-btn" aria-label="홈으로 이동">← 홈으로</a>
+    <div class="hud-pills">
+      <div class="pill">🥐 문제 <span id="qIndex">1</span>/10</div>
+      <div class="pill">⭐ 점수 <span id="scoreVal">0</span></div>
+    </div>
+  </div>
+
+  <div class="stage-card">
+    <div class="baker-header">🐿️ 다람쥐 제빵사의 초성 힌트</div>
+    <div class="picture-emoji" id="quizEmoji">🍎</div>
+    <div class="hint-desc" id="quizHint">아삭아삭 빨갛고 달콤한 과일</div>
+    <div class="chosung-box" id="chosungBox"></div>
+    <div class="feedback-toast" id="feedbackText">초성에 알맞은 낱말 빵을 골라 보세요!</div>
+  </div>
+
+  <div class="choices-grid" id="choicesGrid"></div>
+</div>
+
+<div id="startOverlay" class="overlay">
+  <div class="modal-card">
+    <div style="font-size:64px;">🐿️🥐</div>
+    <h1 class="modal-title">초성 도토리 빵집</h1>
+    <p class="modal-desc">다람쥐 제빵사가 구운 초성 쿠키를 보고<br>알맞은 한글 낱말 빵을 찾아 주세요!</p>
+    <button id="startBtn" class="primary-btn" type="button">빵 굽기 시작!</button>
+  </div>
+</div>
+
+<div id="endOverlay" class="overlay hidden">
+  <div class="modal-card">
+    <div style="font-size:64px;">🎉🥨</div>
+    <h2 class="modal-title" id="endTitle">고소한 한글 빵 완성!</h2>
+    <p class="modal-desc" id="endSummary">총 100점을 모았어요!</p>
+    <button id="retryBtn" class="primary-btn" type="button">다시 놀이하기</button>
+    <a href="../../index.html" class="home-btn" style="width:100%; margin-top:4px;">← 홈으로 돌아가기</a>
+  </div>
+</div>
+
+<script>
+(() => {
+  const QUESTIONS = [
+    { emoji: "🍎", hint: "아삭아삭 빨갛고 달콤한 과일", chosung: ["ㅅ", "ㄱ"], answer: "사과", choices: ["사과", "수박", "시계", "소풍"] },
+    { emoji: "🍌", hint: "길쭉하고 노란 달콤한 과일", chosung: ["ㅂ", "ㄴ", "ㄴ"], answer: "바나나", choices: ["바나나", "병아리", "비행기", "바구니"] },
+    { emoji: "☂️", hint: "비가 오는 날 머리 위에 활짝 펴요", chosung: ["ㅇ", "ㅅ"], answer: "우산", choices: ["우산", "우유", "오리", "안경"] },
+    { emoji: "🎒", hint: "책을 넣고 어깨에 메고 다녀요", chosung: ["ㄱ", "ㅂ"], answer: "가방", choices: ["가방", "구름", "거북", "고래"] },
+    { emoji: "🦋", hint: "꽃밭을 훨훨 날아다니는 곤충", chosung: ["ㄴ", "ㅂ"], answer: "나비", choices: ["나비", "나무", "눈사람", "노래"] },
+    { emoji: "🍓", hint: "콕콕 씨가 박힌 새콤달콤 빨간 과일", chosung: ["ㄸ", "ㄱ"], answer: "딸기", choices: ["딸기", "땅콩", "떡국", "토끼"] },
+    { emoji: "🐰", hint: "귀가 쫑긋 길고 깡충깡충 뛰어요", chosung: ["ㅌ", "ㄲ"], answer: "토끼", choices: ["토끼", "타조", "태양", "코끼리"] },
+    { emoji: "🥛", hint: "뼈를 튼튼하게 해 주는 하얀 마실 거리", chosung: ["ㅇ", "ㅇ"], answer: "우유", choices: ["우유", "오이", "여우", "우산"] },
+    { emoji: "🌻", hint: "해를 바라보며 활짝 피는 노란 꽃", chosung: ["ㅎ", "ㅂ", "ㄹ", "ㄱ"], answer: "해바라기", choices: ["해바라기", "호랑이", "하마", "할머니"] },
+    { emoji: "🐿️", hint: "도토리를 좋아하는 숲속 귀여운 동물", chosung: ["ㄷ", "ㄹ", "ㅈ"], answer: "다람쥐", choices: ["다람쥐", "두꺼비", "독수리", "달팽이"] }
+  ];
+
+  let currentIdx = 0;
+  let score = 0;
+  let locked = false;
+  let audioCtx = null;
+
+  function playTone(freq, duration, type = "sine") {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {}
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderQuestion() {
+    locked = false;
+    const q = QUESTIONS[currentIdx];
+    document.getElementById("qIndex").textContent = String(currentIdx + 1);
+    document.getElementById("scoreVal").textContent = String(score);
+    document.getElementById("quizEmoji").textContent = q.emoji;
+    document.getElementById("quizHint").textContent = q.hint;
+    document.getElementById("feedbackText").textContent = "초성에 알맞은 낱말 빵을 골라 보세요!";
+
+    const box = document.getElementById("chosungBox");
+    box.innerHTML = "";
+    q.chosung.forEach(ch => {
+      const tile = document.createElement("div");
+      tile.className = "chosung-tile";
+      tile.textContent = ch;
+      box.appendChild(tile);
+    });
+
+    const grid = document.getElementById("choicesGrid");
+    grid.innerHTML = "";
+    shuffle(q.choices).forEach(choice => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice-btn";
+      btn.textContent = "🥖 " + choice;
+      btn.addEventListener("pointerdown", () => handleChoice(btn, choice, q));
+      grid.appendChild(btn);
+    });
+  }
+
+  function handleChoice(btn, selected, q) {
+    if (locked) return;
+    if (selected === q.answer) {
+      locked = true;
+      btn.classList.add("correct");
+      score += 10;
+      document.getElementById("scoreVal").textContent = String(score);
+      document.getElementById("feedbackText").textContent = "정답이에요! 맛있는 '" + q.answer + "' 빵이 구워졌어요!";
+      const tiles = document.querySelectorAll(".chosung-tile");
+      Array.from(q.answer).forEach((char, i) => {
+        if (tiles[i]) tiles[i].textContent = char;
+      });
+      playTone(587.33, 0.14, "triangle");
+      setTimeout(() => playTone(880, 0.22, "triangle"), 120);
+      setTimeout(() => {
+        currentIdx++;
+        if (currentIdx < QUESTIONS.length) {
+          renderQuestion();
+        } else {
+          showEnd();
+        }
+      }, 850);
+    } else {
+      btn.classList.add("wrong");
+      document.getElementById("feedbackText").textContent = "아차! 초성 글자를 다시 한번 살펴볼까요?";
+      playTone(220, 0.2, "sawtooth");
+    }
+  }
+
+  function showEnd() {
+    document.getElementById("endSummary").textContent = "10문제 중 " + (score / 10) + "개를 맞혀서 총 " + score + "점을 받았어요!";
+    document.getElementById("endOverlay").classList.remove("hidden");
+  }
+
+  document.getElementById("startBtn").addEventListener("pointerdown", () => {
+    currentIdx = 0;
+    score = 0;
+    document.getElementById("startOverlay").classList.add("hidden");
+    renderQuestion();
+  });
+
+  document.getElementById("retryBtn").addEventListener("pointerdown", () => {
+    currentIdx = 0;
+    score = 0;
+    document.getElementById("endOverlay").classList.add("hidden");
+    renderQuestion();
+  });
+})();
+</script>
+</body>
+</html>

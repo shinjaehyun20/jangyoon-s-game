@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>10 만들기 별빛 기차</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: linear-gradient(180deg, #E8EAF6 0%, #C5CAE9 100%); color: #1A237E; }
+  #app { width: 100%; height: 100dvh; max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; justify-content: space-between; padding: 12px 14px 16px; position: relative; }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 48px; }
+  .home-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px; border-radius: 14px; background: #FFFFFF; border: 2px solid #9FA8DA; color: #1A237E; font-weight: 800; font-size: 15px; text-decoration: none; box-shadow: 0 3px 0 #7986CB; }
+  .hud-pills { display: flex; gap: 8px; align-items: center; }
+  .pill { min-height: 40px; padding: 6px 12px; border-radius: 14px; background: #FFFFFF; border: 2px solid #7986CB; font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 4px; box-shadow: 0 3px 0 #5C6BC0; }
+  .stage-card { flex: 1; margin: 10px 0; background: #FFFFFF; border: 3px solid #5C6BC0; border-radius: 24px; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; box-shadow: 0 8px 0 #3949AB; }
+  .train-banner { font-size: 18px; font-weight: 800; color: #283593; background: #E8EAF6; padding: 7px 16px; border-radius: 999px; border: 2px solid #C5CAE9; }
+  .equation-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 34px; font-weight: 900; color: #1A237E; }
+  .car-box { min-width: 68px; height: 68px; border-radius: 18px; background: #FFF8E1; border: 3px solid #FFB300; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 900; color: #E65100; }
+  .car-box.mystery { background: #E8EAF6; border: 3px dashed #3949AB; color: #3949AB; }
+  .ten-frame { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; background: #F5F7FF; padding: 12px; border-radius: 18px; border: 2px solid #9FA8DA; width: 100%; max-width: 340px; }
+  .frame-cell { aspect-ratio: 1 / 1; border-radius: 12px; background: #FFFFFF; border: 2px solid #C5CAE9; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .frame-cell.filled { background: #FFF8E1; border-color: #FFB300; }
+  .frame-cell.needed { background: #E8EAF6; border-style: dashed; border-color: #5C6BC0; }
+  .feedback-toast { min-height: 28px; font-size: 17px; font-weight: 800; color: #283593; text-align: center; word-break: keep-all; }
+  .choices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
+  .choice-btn { min-height: 66px; border-radius: 20px; border: 3px solid #3949AB; background: #FFFFFF; color: #1A237E; font-size: 26px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #283593; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .choice-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #283593; }
+  .choice-btn.correct { background: #E8F5E9; border-color: #2E7D32; color: #1B5E20; box-shadow: 0 5px 0 #2E7D32; }
+  .choice-btn.wrong { background: #FFEBEE; border-color: #C62828; color: #B71C1C; box-shadow: 0 5px 0 #C62828; }
+  .overlay { position: fixed; inset: 0; background: rgba(26, 35, 126, 0.84); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+  .overlay.hidden { display: none; }
+  .modal-card { width: 100%; max-width: 400px; background: #FFFFFF; border: 4px solid #5C6BC0; border-radius: 28px; padding: 28px 22px; text-align: center; box-shadow: 0 10px 0 #283593; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .modal-title { font-size: 30px; font-weight: 900; color: #1A237E; word-break: keep-all; }
+  .modal-desc { font-size: 18px; font-weight: 700; color: #3949AB; line-height: 1.5; word-break: keep-all; }
+  .primary-btn { width: 100%; min-height: 58px; border-radius: 18px; border: none; background: #3949AB; color: #FFFFFF; font-size: 22px; font-weight: 900; cursor: pointer; box-shadow: 0 6px 0 #1A237E; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top-bar">
+    <a href="../../index.html" class="home-btn" aria-label="홈으로 이동">← 홈으로</a>
+    <div class="hud-pills">
+      <div class="pill">🚂 기차 <span id="qIndex">1</span>/10</div>
+      <div class="pill">🌟 점수 <span id="scoreVal">0</span></div>
+    </div>
+  </div>
+
+  <div class="stage-card">
+    <div class="train-banner">🚂 별빛 열 칸 기차를 10으로 채워요!</div>
+    <div class="equation-row">
+      <div class="car-box" id="givenNum">7</div>
+      <span>+</span>
+      <div class="car-box mystery" id="mysteryNum">?</div>
+      <span>=</span>
+      <div class="car-box" style="background:#E8F5E9;border-color:#2E7D32;color:#1B5E20;">10</div>
+    </div>
+    <div class="ten-frame" id="tenFrame"></div>
+    <div class="feedback-toast" id="feedbackText">빈칸에 별이 몇 개 더 있으면 10이 될까요?</div>
+  </div>
+
+  <div class="choices-grid" id="choicesGrid"></div>
+</div>
+
+<div id="startOverlay" class="overlay">
+  <div class="modal-card">
+    <div style="font-size:64px;">🚂🌟</div>
+    <h1 class="modal-title">10 만들기 별빛 기차</h1>
+    <p class="modal-desc">열 칸 기차에 노란 별이 타 있어요.<br>별이 몇 개 더 타면 10개가 될지 찾아 주세요!</p>
+    <button id="startBtn" class="primary-btn" type="button">기차 출발하기!</button>
+  </div>
+</div>
+
+<div id="endOverlay" class="overlay hidden">
+  <div class="modal-card">
+    <div style="font-size:64px;">🎆🚂</div>
+    <h2 class="modal-title">별빛 기차 운행 완료!</h2>
+    <p class="modal-desc" id="endSummary">총 100점을 모았어요!</p>
+    <button id="retryBtn" class="primary-btn" type="button">다시 출발하기</button>
+    <a href="../../index.html" class="home-btn" style="width:100%; margin-top:4px;">← 홈으로 돌아가기</a>
+  </div>
+</div>
+
+<script>
+(() => {
+  const LEVELS = [
+    { given: 7, answer: 3, choices: [2, 3, 4, 5] },
+    { given: 6, answer: 4, choices: [3, 4, 5, 6] },
+    { given: 8, answer: 2, choices: [1, 2, 3, 4] },
+    { given: 5, answer: 5, choices: [4, 5, 6, 7] },
+    { given: 9, answer: 1, choices: [1, 2, 3, 4] },
+    { given: 4, answer: 6, choices: [5, 6, 7, 8] },
+    { given: 3, answer: 7, choices: [6, 7, 8, 9] },
+    { given: 2, answer: 8, choices: [6, 7, 8, 9] },
+    { given: 1, answer: 9, choices: [6, 7, 8, 9] },
+    { given: 7, answer: 3, choices: [1, 3, 5, 7] }
+  ];
+
+  let idx = 0;
+  let score = 0;
+  let locked = false;
+  let audioCtx = null;
+
+  function beep(freq, dur) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function render() {
+    locked = false;
+    const lv = LEVELS[idx];
+    document.getElementById("qIndex").textContent = String(idx + 1);
+    document.getElementById("scoreVal").textContent = String(score);
+    document.getElementById("givenNum").textContent = String(lv.given);
+    document.getElementById("mysteryNum").textContent = "?";
+    document.getElementById("feedbackText").textContent = "빈칸(" + lv.answer + "칸)을 세어 보고 알맞은 숫자를 눌러 보세요!";
+
+    const frame = document.getElementById("tenFrame");
+    frame.innerHTML = "";
+    for (let i = 0; i < 10; i++) {
+      const cell = document.createElement("div");
+      if (i < lv.given) {
+        cell.className = "frame-cell filled";
+        cell.textContent = "⭐";
+      } else {
+        cell.className = "frame-cell needed";
+        cell.textContent = "✨";
+      }
+      frame.appendChild(cell);
+    }
+
+    const grid = document.getElementById("choicesGrid");
+    grid.innerHTML = "";
+    lv.choices.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice-btn";
+      btn.textContent = num + "개";
+      btn.addEventListener("pointerdown", () => choose(btn, num, lv));
+      grid.appendChild(btn);
+    });
+  }
+
+  function choose(btn, num, lv) {
+    if (locked) return;
+    if (num === lv.answer) {
+      locked = true;
+      btn.classList.add("correct");
+      score += 10;
+      document.getElementById("scoreVal").textContent = String(score);
+      document.getElementById("mysteryNum").textContent = String(lv.answer);
+      document.getElementById("feedbackText").textContent = "딩동댕! " + lv.given + "과 " + lv.answer + "이 모이면 10이 돼요!";
+      document.querySelectorAll(".frame-cell.needed").forEach(c => {
+        c.className = "frame-cell filled";
+        c.textContent = "🌟";
+      });
+      beep(659.25, 0.14);
+      setTimeout(() => beep(987.77, 0.22), 120);
+      setTimeout(() => {
+        idx++;
+        if (idx < LEVELS.length) render();
+        else {
+          document.getElementById("endSummary").textContent = "10문제 중 " + (score / 10) + "개를 맞혀서 총 " + score + "점을 모았어요!";
+          document.getElementById("endOverlay").classList.remove("hidden");
+        }
+      }, 850);
+    } else {
+      btn.classList.add("wrong");
+      document.getElementById("feedbackText").textContent = "반짝이는 빈칸이 몇 칸인지 하나씩 세어 볼까요?";
+      beep(220, 0.2);
+    }
+  }
+
+  document.getElementById("startBtn").addEventListener("pointerdown", () => {
+    idx = 0; score = 0;
+    document.getElementById("startOverlay").classList.add("hidden");
+    render();
+  });
+  document.getElementById("retryBtn").addEventListener("pointerdown", () => {
+    idx = 0; score = 0;
+    document.getElementById("endOverlay").classList.add("hidden");
+    render();
+  });
+})();
+</script>
+</body>
+</html>

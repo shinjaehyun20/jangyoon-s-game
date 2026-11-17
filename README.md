@@ -551,23 +551,23 @@ VS Code `Live Server` 확장을 써도 된다.
 ## 최근 변경사항 (2026-11)
 - 2026-11-17: [🎮 다람쥐 도토리 가르기·모으기](number-split-acorn-squirrel/index.html), [🎮 개구리 연잎 끝말잇기 징검다리](end-word-stepping-frog/index.html) (총 353개)
 
-- 2026-11-16: [🎮 아기 고양이 거울 모양 맞추기](shape-symmetry-mirror-cat/index.html), [🎮 다람쥐 초성 도토리 기차](consonant-acorn-train/index.html) (총 351개)
+- 2026-11-16: [🎮 아기 고양이 거울 모양 맞추기](shape-symmetry-mirror-cat/index.html), [🎮 다람쥐 초성 도토리 기차](consonant-acorn-train/index.html) (총 353개)
 
-- 2026-11-15: [🎮 곰돌이 빵집 모음 과자 만들기](vowel-cookie-bakery/index.html), [🎮 펭귄의 풍선 더하기 축제](addition-balloon-penguin/index.html) (총 349개)
+- 2026-11-15: [🎮 곰돌이 빵집 모음 과자 만들기](vowel-cookie-bakery/index.html), [🎮 펭귄의 풍선 더하기 축제](addition-balloon-penguin/index.html) (총 353개)
 
-- 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 347개)
+- 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 353개)
 
-- 2026-11-11: [🎮 고슴도치 모양 규칙 찾기](shape-pattern-hedgehog/index.html), [🎮 칙칙폭폭 끝말잇기 기차](syllable-train-rabbit/index.html) (총 345개)
+- 2026-11-11: [🎮 고슴도치 모양 규칙 찾기](shape-pattern-hedgehog/index.html), [🎮 칙칙폭폭 끝말잇기 기차](syllable-train-rabbit/index.html) (총 353개)
 
-- 2026-11-10: [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기](koala-eucalyptus-climb/index.html), [🐢 아기 바다거북의 산호초 바다 지킴이](sea-turtle-coral-cleaner/index.html) (총 343개)
+- 2026-11-10: [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기](koala-eucalyptus-climb/index.html), [🐢 아기 바다거북의 산호초 바다 지킴이](sea-turtle-coral-cleaner/index.html) (총 353개)
 
-- 2026-11-09: [🎮 알록달록 모양 블록 쌓기](rainbow-shape-stacker/index.html), [🎮 신비한 동물 발자국 사파리](animal-footprint-safari/index.html) (총 341개)
+- 2026-11-09: [🎮 알록달록 모양 블록 쌓기](rainbow-shape-stacker/index.html), [🎮 신비한 동물 발자국 사파리](animal-footprint-safari/index.html) (총 353개)
 
-- 2026-11-04: [🎮 데굴데굴 자음모음 눈사람](hangul-snowman-maker/index.html), [🎮 요리조리 거울 대칭 미술관](mirror-symmetry-art/index.html) (총 341개)
+- 2026-11-04: [🎮 데굴데굴 자음모음 눈사람](hangul-snowman-maker/index.html), [🎮 요리조리 거울 대칭 미술관](mirror-symmetry-art/index.html) (총 353개)
 
-- 2026-11-03: [또박또박 문장부호 탐험대](punctuation-train-safari/index.html), [알록달록 주사위 덧셈 보드](dice-ten-board/index.html) (총 341개)
+- 2026-11-03: [또박또박 문장부호 탐험대](punctuation-train-safari/index.html), [알록달록 주사위 덧셈 보드](dice-ten-board/index.html) (총 353개)
 
-- 2026-11-02: [송이송이 받침 포도 농장](final-consonant-grape/index.html), [영차영차 시소 무게 비교](seesaw-weight-safari/index.html) (총 341개)
+- 2026-11-02: [송이송이 받침 포도 농장](final-consonant-grape/index.html), [영차영차 시소 무게 비교](seesaw-weight-safari/index.html) (총 353개)
 
 
 ## 최근 변경사항 (2026-10)
