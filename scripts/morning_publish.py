@@ -92,9 +92,17 @@ def fail(msg, detail=""):
 
 
 def ensure_hooks_path():
-    """pre-push 훅이 실제로 걸리도록 core.hooksPath를 .githooks로 맞춘다."""
-    if not (REPO_ROOT / HOOKS_DIR / "pre-push").exists():
+    """pre-push 훅이 실제로 걸리도록 core.hooksPath를 .githooks로 맞추고 실행 권한을 보장한다.
+
+    git은 실행 권한(exec bit)이 없는 훅을 조용히 건너뛰므로 POSIX에서는 권한까지 확인한다
+    (Windows는 exec bit 개념이 없어 git이 그대로 실행한다).
+    """
+    hook = REPO_ROOT / HOOKS_DIR / "pre-push"
+    if not hook.exists():
         return
+    if os.name == "posix" and not os.access(hook, os.X_OK):
+        hook.chmod(0o755)
+        print(f"[*] pre-push 훅 실행 권한 부여: {HOOKS_DIR}/pre-push")
     rc, current = git("config", "--local", "core.hooksPath")
     current = current.strip()
     if rc == 0 and current == HOOKS_DIR:
