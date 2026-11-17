@@ -4,6 +4,21 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "consonant-acorn-bakery",
+        "title": "🎮 초성 도토리 빵집",
+        "path": "consonant-acorn-bakery/index.html"
+      },
+      {
+        "id": "ten-make-starlight-train",
+        "title": "🎮 10 만들기 별빛 기차",
+        "path": "ten-make-starlight-train/index.html"
+      },
+      {
+        "id": "birthday-space-math",
+        "title": "🎂 생일 우주 대작전",
+        "path": "birthday-space-math/index.html"
+      },
+      {
         "id": "end-word-stepping-frog",
         "title": "🎮 개구리 연잎 끝말잇기 징검다리",
         "path": "end-word-stepping-frog/index.html"

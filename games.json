@@ -1,5 +1,44 @@
 [
   {
+    "number": 60,
+    "id": "ten-make-starlight-train",
+    "title": "10 만들기 별빛 기차",
+    "category": "수감각·연산",
+    "path": "ten-make-starlight-train/index.html",
+    "thumb": "ten-make-starlight-train/thumb.svg",
+    "description": "열 칸 기차(텐프레임)에 채워진 노란 별과 반짝이는 빈칸을 세어 합이 10이 되는 짝꿍 수를 찾는 수감각 놀이",
+    "viewport": "100dvh_no_scroll",
+    "touch_target_min_px": 44,
+    "date": "2026-11-18",
+    "created": "2026-11-18",
+    "title_ko": "🎮 10 만들기 별빛 기차",
+    "thumbnail": "ten-make-starlight-train/thumb.svg"
+  },
+  {
+    "number": 59,
+    "id": "consonant-acorn-bakery",
+    "title": "초성 도토리 빵집",
+    "category": "한글·낱말",
+    "path": "consonant-acorn-bakery/index.html",
+    "thumb": "consonant-acorn-bakery/thumb.svg",
+    "description": "다람쥐 제빵사의 초성 쿠키와 그림 힌트를 보고 알맞은 한글 낱말 빵을 고르는 100% 한국어 낱말 놀이",
+    "viewport": "100dvh_no_scroll",
+    "touch_target_min_px": 44,
+    "date": "2026-11-18",
+    "created": "2026-11-18",
+    "title_ko": "🎮 초성 도토리 빵집",
+    "thumbnail": "consonant-acorn-bakery/thumb.svg"
+  },
+  {
+    "id": "birthday-space-math",
+    "title": "Birthday Space Math",
+    "title_ko": "생일 우주 대작전",
+    "description": "생일 케이크 촛불을 켜는 우주 수학 모험",
+    "thumbnail": "birthday-space-math/thumb.svg",
+    "path": "birthday-space-math/index.html",
+    "created": "2026-11-17"
+  },
+  {
     "number": 58,
     "id": "number-split-acorn-squirrel",
     "title": "다람쥐 도토리 가르기·모으기",
