@@ -29,6 +29,7 @@
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
+| [🎂 생일 우주 대작전 (birthday-space-math)](./birthday-space-math/index.html) | 덧셈·뺄셈·빈칸 문제를 풀어 로켓을 발사하고, 정답 풍선을 터뜨리고, 생일 케이크 촛불 7개를 하나씩 눌러 끄는 우주 수학 생일 모험입니다. | 어린이/아케이드 |
 | [🐢 아기 바다거북의 산호초 바다 지킴이 (sea-turtle-coral-cleaner)](./sea-turtle-coral-cleaner/index.html) | 푸르고 아름다운 산호초 바다를 헤엄치며 물 위에 떠다니는 플라스틱과 캔 쓰레기를 톡톡 터치해 바다 친구들과 산호를 지켜주는 친환경 바다 정화 터치 놀이입니다. | 어린이/아케이드 |
 | [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기 (koala-eucalyptus-climb)](./koala-eucalyptus-climb/index.html) | 귀여운 아기 코알라와 함께 높은 유칼립투스 나무를 타고 오르며 나뭇가지에 적힌 덧셈과 뺄셈 퀴즈를 맞추고 싱그러운 잎사귀를 모으는 재미있는 수학 클라이밍 놀이입니다. | 어린이/아케이드 |
 | [🐿️ 하늘다람쥐의 은하수 활강 비행 (flying-squirrel-star-glide)](./flying-squirrel-star-glide/index.html) | 반짝이는 보랏빛 은하수 밤하늘을 활공하는 날다람쥐를 조종해 별빛 구름 사이를 누비며 황금 도토리와 별사탕을 모으는 경쾌한 비행 아케이드 놀이입니다. | 어린이/아케이드 |
@@ -550,6 +551,8 @@ VS Code `Live Server` 확장을 써도 된다.
 
 ## 최근 변경사항 (2026-11)
 - 2026-11-17: [🎮 다람쥐 도토리 가르기·모으기](number-split-acorn-squirrel/index.html), [🎮 개구리 연잎 끝말잇기 징검다리](end-word-stepping-frog/index.html) (총 353개)
+
+- 2026-11-17: [🎂 생일 우주 대작전](birthday-space-math/index.html) (총 354개)
 
 - 2026-11-16: [🎮 아기 고양이 거울 모양 맞추기](shape-symmetry-mirror-cat/index.html), [🎮 다람쥐 초성 도토리 기차](consonant-acorn-train/index.html) (총 351개)
 

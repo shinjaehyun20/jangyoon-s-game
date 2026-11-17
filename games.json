@@ -1,5 +1,14 @@
 [
   {
+    "id": "birthday-space-math",
+    "title": "Birthday Space Math",
+    "title_ko": "생일 우주 대작전",
+    "description": "생일 케이크 촛불을 켜는 우주 수학 모험",
+    "thumbnail": "birthday-space-math/thumb.svg",
+    "path": "birthday-space-math/index.html",
+    "created": "2026-11-17"
+  },
+  {
     "number": 58,
     "id": "number-split-acorn-squirrel",
     "title": "다람쥐 도토리 가르기·모으기",

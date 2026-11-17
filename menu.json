@@ -4,6 +4,11 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "birthday-space-math",
+        "title": "🎂 생일 우주 대작전",
+        "path": "birthday-space-math/index.html"
+      },
+      {
         "id": "end-word-stepping-frog",
         "title": "🎮 개구리 연잎 끝말잇기 징검다리",
         "path": "end-word-stepping-frog/index.html"
