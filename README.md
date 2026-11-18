@@ -385,8 +385,8 @@
 | [생일 우주 대작전 (birthday-space-math)](./birthday-space-math/index.html) | 생일 케이크 촛불을 켜는 우주 수학 모험 | 어린이/아케이드 |
 | [🎮 초성 도토리 빵집 (consonant-acorn-bakery)](./consonant-acorn-bakery/index.html) | 다람쥐 제빵사의 초성 쿠키와 그림 힌트를 보고 알맞은 한글 낱말 빵을 고르는 100% 한국어 낱말 놀이 | 어린이/아케이드 |
 | [🎮 10 만들기 별빛 기차 (ten-make-starlight-train)](./ten-make-starlight-train/index.html) | 열 칸 기차(텐프레임)에 채워진 노란 별과 반짝이는 빈칸을 세어 합이 10이 되는 짝꿍 수를 찾는 수감각 놀이 | 어린이/아케이드 |
-| [🎮 글자 기차역 조립소 (syllable-train-station)](./) | 🎮 글자 기차역 조립소 인터랙티브 미니게임입니다. | 어린이/아케이드 |
-| [🎮 모양 규칙 보물섬 탐험대 (shape-pattern-treasure-island)](./) | 🎮 모양 규칙 보물섬 탐험대 인터랙티브 미니게임입니다. | 어린이/아케이드 |
+| [🎮 글자 기차역 조립소 (syllable-train-station)](./syllable-train-station/index.html) | 🎮 글자 기차역 조립소 인터랙티브 미니게임입니다. | 어린이/아케이드 |
+| [🎮 모양 규칙 보물섬 탐험대 (shape-pattern-treasure-island)](./shape-pattern-treasure-island/index.html) | 🎮 모양 규칙 보물섬 탐험대 인터랙티브 미니게임입니다. | 어린이/아케이드 |
 
 </details>
 
@@ -564,29 +564,29 @@ VS Code `Live Server` 확장을 써도 된다.
 ## 최근 변경사항 (2026-11)
 - 2026-11-19: [🎮 모양 규칙 보물섬 탐험대](shape-pattern-treasure-island/index.html), [🎮 글자 기차역 조립소](syllable-train-station/index.html) (총 358개)
 
-- 2026-11-18: [🎮 10 만들기 별빛 기차](ten-make-starlight-train/index.html), [🎮 초성 도토리 빵집](consonant-acorn-bakery/index.html) (총 356개)
+- 2026-11-18: [🎮 10 만들기 별빛 기차](ten-make-starlight-train/index.html), [🎮 초성 도토리 빵집](consonant-acorn-bakery/index.html) (총 358개)
 
-- 2026-11-17: [🎮 다람쥐 도토리 가르기·모으기](number-split-acorn-squirrel/index.html), [🎮 개구리 연잎 끝말잇기 징검다리](end-word-stepping-frog/index.html) (총 356개)
+- 2026-11-17: [🎮 다람쥐 도토리 가르기·모으기](number-split-acorn-squirrel/index.html), [🎮 개구리 연잎 끝말잇기 징검다리](end-word-stepping-frog/index.html) (총 358개)
 
-- 2026-11-17: [🎂 생일 우주 대작전](birthday-space-math/index.html) (총 356개)
+- 2026-11-17: [🎂 생일 우주 대작전](birthday-space-math/index.html) (총 358개)
 
-- 2026-11-16: [🎮 아기 고양이 거울 모양 맞추기](shape-symmetry-mirror-cat/index.html), [🎮 다람쥐 초성 도토리 기차](consonant-acorn-train/index.html) (총 356개)
+- 2026-11-16: [🎮 아기 고양이 거울 모양 맞추기](shape-symmetry-mirror-cat/index.html), [🎮 다람쥐 초성 도토리 기차](consonant-acorn-train/index.html) (총 358개)
 
-- 2026-11-15: [🎮 곰돌이 빵집 모음 과자 만들기](vowel-cookie-bakery/index.html), [🎮 펭귄의 풍선 더하기 축제](addition-balloon-penguin/index.html) (총 356개)
+- 2026-11-15: [🎮 곰돌이 빵집 모음 과자 만들기](vowel-cookie-bakery/index.html), [🎮 펭귄의 풍선 더하기 축제](addition-balloon-penguin/index.html) (총 358개)
 
-- 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 356개)
+- 2026-11-12: [🎮 여우 탐정의 수수께끼 단어장](korean-riddle-detective-fox/index.html), [🎮 개구리 연못 10 만들기 점프](ten-make-frog-pond/index.html) (총 358개)
 
-- 2026-11-11: [🎮 고슴도치 모양 규칙 찾기](shape-pattern-hedgehog/index.html), [🎮 칙칙폭폭 끝말잇기 기차](syllable-train-rabbit/index.html) (총 356개)
+- 2026-11-11: [🎮 고슴도치 모양 규칙 찾기](shape-pattern-hedgehog/index.html), [🎮 칙칙폭폭 끝말잇기 기차](syllable-train-rabbit/index.html) (총 358개)
 
-- 2026-11-10: [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기](koala-eucalyptus-climb/index.html), [🐢 아기 바다거북의 산호초 바다 지킴이](sea-turtle-coral-cleaner/index.html) (총 356개)
+- 2026-11-10: [🐨 쑥쑥 코알라의 유칼립투스 나무 오르기](koala-eucalyptus-climb/index.html), [🐢 아기 바다거북의 산호초 바다 지킴이](sea-turtle-coral-cleaner/index.html) (총 358개)
 
-- 2026-11-09: [🎮 알록달록 모양 블록 쌓기](rainbow-shape-stacker/index.html), [🎮 신비한 동물 발자국 사파리](animal-footprint-safari/index.html) (총 356개)
+- 2026-11-09: [🎮 알록달록 모양 블록 쌓기](rainbow-shape-stacker/index.html), [🎮 신비한 동물 발자국 사파리](animal-footprint-safari/index.html) (총 358개)
 
-- 2026-11-04: [🎮 데굴데굴 자음모음 눈사람](hangul-snowman-maker/index.html), [🎮 요리조리 거울 대칭 미술관](mirror-symmetry-art/index.html) (총 356개)
+- 2026-11-04: [🎮 데굴데굴 자음모음 눈사람](hangul-snowman-maker/index.html), [🎮 요리조리 거울 대칭 미술관](mirror-symmetry-art/index.html) (총 358개)
 
-- 2026-11-03: [또박또박 문장부호 탐험대](punctuation-train-safari/index.html), [알록달록 주사위 덧셈 보드](dice-ten-board/index.html) (총 356개)
+- 2026-11-03: [또박또박 문장부호 탐험대](punctuation-train-safari/index.html), [알록달록 주사위 덧셈 보드](dice-ten-board/index.html) (총 358개)
 
-- 2026-11-02: [송이송이 받침 포도 농장](final-consonant-grape/index.html), [영차영차 시소 무게 비교](seesaw-weight-safari/index.html) (총 356개)
+- 2026-11-02: [송이송이 받침 포도 농장](final-consonant-grape/index.html), [영차영차 시소 무게 비교](seesaw-weight-safari/index.html) (총 358개)
 
 
 ## 최근 변경사항 (2026-10)

@@ -7,15 +7,16 @@
     "target_grade": "초등학교 1학년 (부천 창영초 신장윤 맞춤)",
     "viewport": "100vw x 100dvh (Zero-scroll)",
     "language": "100% 한국어",
-    "entry_html": "games/shape-pattern-treasure-island/index.html",
-    "thumb_svg": "games/shape-pattern-treasure-island/thumb.svg",
+    "entry_html": "shape-pattern-treasure-island/index.html",
+    "thumb_svg": "shape-pattern-treasure-island/thumb.svg",
     "thumb_size": "320x180",
+    "path": "shape-pattern-treasure-island/index.html",
+    "thumb": "shape-pattern-treasure-island/thumb.svg",
+    "thumbnail": "shape-pattern-treasure-island/thumb.svg",
     "date": "2026-11-19",
     "created": "2026-11-19",
     "title_ko": "🎮 모양 규칙 보물섬 탐험대",
-    "description": "🎮 모양 규칙 보물섬 탐험대 인터랙티브 미니게임입니다.",
-    "thumbnail": "shape-pattern-treasure-island/thumb.svg",
-    "thumb": "shape-pattern-treasure-island/thumb.svg"
+    "description": "🎮 모양 규칙 보물섬 탐험대 인터랙티브 미니게임입니다."
   },
   {
     "game_no": 61,
@@ -25,15 +26,16 @@
     "target_grade": "초등학교 1학년 (부천 창영초 신장윤 맞춤)",
     "viewport": "100vw x 100dvh (Zero-scroll)",
     "language": "100% 한국어",
-    "entry_html": "games/syllable-train-station/index.html",
-    "thumb_svg": "games/syllable-train-station/thumb.svg",
+    "entry_html": "syllable-train-station/index.html",
+    "thumb_svg": "syllable-train-station/thumb.svg",
     "thumb_size": "320x180",
+    "path": "syllable-train-station/index.html",
+    "thumb": "syllable-train-station/thumb.svg",
+    "thumbnail": "syllable-train-station/thumb.svg",
     "date": "2026-11-19",
     "created": "2026-11-19",
     "title_ko": "🎮 글자 기차역 조립소",
-    "description": "🎮 글자 기차역 조립소 인터랙티브 미니게임입니다.",
-    "thumbnail": "syllable-train-station/thumb.svg",
-    "thumb": "syllable-train-station/thumb.svg"
+    "description": "🎮 글자 기차역 조립소 인터랙티브 미니게임입니다."
   },
   {
     "number": 60,
