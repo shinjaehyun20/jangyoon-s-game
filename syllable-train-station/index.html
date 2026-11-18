@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>칙칙폭폭 글자 기차역 조립소 (#061)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100vw; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, #E0F2FE 0%, #FEF3C7 68%, #DCFCE7 100%);
+    color: #1E293B;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 14px;
+  }
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.92); border: 3px solid #38BDF8;
+    border-radius: 18px; padding: 8px 14px; box-shadow: 0 4px 10px rgba(14,165,233,0.15);
+    height: 11dvh; min-height: 54px;
+  }
+  .title-box { display: flex; align-items: center; gap: 8px; }
+  .title-icon { font-size: 1.7rem; }
+  .title-text { font-size: 1.15rem; font-weight: 800; color: #0369A1; }
+  .score-group { display: flex; gap: 8px; align-items: center; }
+  .badge {
+    background: #FEF08A; border: 2px solid #F59E0B; border-radius: 14px;
+    padding: 5px 11px; font-weight: 800; font-size: 0.95rem; color: #B45309;
+  }
+  .btn-sound {
+    background: #E0E7FF; border: 2px solid #6366F1; border-radius: 12px;
+    padding: 6px 10px; font-weight: 800; font-size: 0.9rem; color: #4338CA; cursor: pointer;
+  }
+  .stage-area {
+    flex: 1; display: flex; flex-direction: column; justify-content: space-evenly;
+    align-items: center; padding: 6px 0;
+  }
+  .prompt-card {
+    width: 100%; max-width: 520px; background: #FFFFFF;
+    border: 4px solid #F59E0B; border-radius: 22px; padding: 12px 16px;
+    text-align: center; box-shadow: 0 6px 14px rgba(245,158,11,0.18);
+  }
+  .emoji-clue { font-size: 2.9rem; line-height: 1.1; margin-bottom: 4px; }
+  .word-hint { font-size: 1.35rem; font-weight: 900; color: #0F172A; margin-bottom: 4px; }
+  .sub-hint { font-size: 0.95rem; font-weight: 700; color: #475569; }
+  .train-track {
+    width: 100%; max-width: 520px; background: rgba(255,255,255,0.88);
+    border: 3px dashed #0284C7; border-radius: 22px; padding: 10px 12px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .locomotive {
+    background: #0284C7; color: #FFFFFF; border-radius: 16px;
+    padding: 10px 12px; font-weight: 900; font-size: 1.1rem;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .car-slot {
+    width: 76px; height: 76px; border-radius: 18px;
+    border: 3px solid #94A3B8; background: #F8FAFC;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 1.75rem; font-weight: 900; color: #0F172A; position: relative;
+  }
+  .car-slot.filled { border-color: #16A34A; background: #DCFCE7; color: #166534; }
+  .car-slot.active { border-color: #EA580C; background: #FFEDD5; box-shadow: 0 0 0 4px rgba(234,88,12,0.2); }
+  .slot-label { font-size: 0.72rem; font-weight: 800; color: #64748B; position: absolute; top: 4px; }
+  .result-preview {
+    width: 82px; height: 76px; border-radius: 18px;
+    border: 4px solid #7C3AED; background: #F3E8FF;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 2.0rem; font-weight: 900; color: #5B21B6;
+  }
+  .choice-panel {
+    width: 100%; max-width: 520px; background: rgba(255,255,255,0.95);
+    border: 3px solid #22C55E; border-radius: 22px; padding: 10px 12px;
+  }
+  .step-banner {
+    text-align: center; font-size: 1.05rem; font-weight: 900; color: #15803D; margin-bottom: 8px;
+  }
+  .btn-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .tile-btn {
+    height: 56px; border-radius: 16px; border: 3px solid #CBD5E1;
+    background: #FFFFFF; font-size: 1.55rem; font-weight: 900; color: #1E293B;
+    cursor: pointer; transition: transform 0.1s, background 0.15s;
+    box-shadow: 0 4px 0 #CBD5E1;
+  }
+  .tile-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #CBD5E1; }
+  .tile-btn.correct { background: #BBF7D0; border-color: #16A34A; color: #14532D; }
+  .tile-btn.wrong { background: #FECACA; border-color: #DC2626; color: #7F1D1D; }
+  .footer-bar {
+    height: 8dvh; min-height: 44px; display: flex; justify-content: space-between; align-items: center;
+    width: 100%; max-width: 520px; margin: 0 auto;
+  }
+  .msg-box { font-size: 1.0rem; font-weight: 800; color: #0369A1; }
+  .btn-reset {
+    background: #F97316; color: #FFFFFF; border: none; border-radius: 14px;
+    padding: 9px 16px; font-size: 0.95rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 3px 0 #C2410C;
+  }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="title-box">
+      <span class="title-icon">🚂</span>
+      <span class="title-text">글자 기차역 조립소</span>
+    </div>
+    <div class="score-group">
+      <div class="badge" id="stageBadge">1 / 8 역</div>
+      <div class="badge" id="scoreBadge">⭐ 0점</div>
+      <button class="btn-sound" id="soundBtn" onclick="toggleSound()">🔊 소리 켜짐</button>
+    </div>
+  </div>
+
+  <div class="stage-area">
+    <div class="prompt-card">
+      <div class="emoji-clue" id="clueEmoji">🎒</div>
+      <div class="word-hint" id="wordHint">[ ? ] 방 (학교에 메고 가요)</div>
+      <div class="sub-hint" id="subHint">첫소리(자음)와 가운뎃소리(모음) 기차 칸을 차례대로 골라 주세요!</div>
+    </div>
+
+    <div class="train-track">
+      <div class="locomotive"><span>🚂</span><span>기관차</span></div>
+      <div class="car-slot active" id="slotCho">
+        <span class="slot-label">1칸 자음</span>
+        <span id="valCho">?</span>
+      </div>
+      <div class="car-slot" id="slotJung">
+        <span class="slot-label">2칸 모음</span>
+        <span id="valJung">?</span>
+      </div>
+      <div class="car-slot" id="slotJong">
+        <span class="slot-label">3칸 받침</span>
+        <span id="valJong">-</span>
+      </div>
+      <div class="result-preview" id="resultChar">?</div>
+    </div>
+
+    <div class="choice-panel">
+      <div class="step-banner" id="stepBanner">1단계: 알맞은 첫소리(자음)를 눌러 보세요!</div>
+      <div class="btn-grid" id="choiceGrid"></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="msg-box" id="feedbackMsg">장윤아, 글자 기차를 출발시켜 볼까?</div>
+    <button class="btn-reset" onclick="restartGame()">처음부터 다시</button>
+  </div>
+
+<script>
+const STAGES = [
+  { emoji: "🎒", wordDisplay: "[ ? ] 방", desc: "학교에 메고 가는 가방", target: "가", cho: "ㄱ", jung: "ㅏ", jong: "없음", choPool: ["ㄱ","ㄴ","ㄷ","ㅁ"], jungPool: ["ㅏ","ㅓ","ㅗ","ㅜ"], jongPool: ["없음","ㄱ","ㄴ","ㅇ"] },
+  { emoji: "🦋", wordDisplay: "[ ? ] 비", desc: "꽃밭을 훨훨 날아다니는 나비", target: "나", cho: "ㄴ", jung: "ㅏ", jong: "없음", choPool: ["ㄱ","ㄴ","ㄹ","ㅂ"], jungPool: ["ㅏ","ㅑ","ㅓ","ㅗ"], jongPool: ["없음","ㄴ","ㄹ","ㅁ"] },
+  { emoji: "🌰", wordDisplay: "[ ? ] 토 리", desc: "다람쥐가 좋아하는 도토리", target: "도", cho: "ㄷ", jung: "ㅗ", jong: "없음", choPool: ["ㄷ","ㄹ","ㅅ","ㅈ"], jungPool: ["ㅏ","ㅓ","ㅗ","ㅜ"], jongPool: ["없음","ㄱ","ㅅ","ㅇ"] },
+  { emoji: "🐻", wordDisplay: "반 달 [ ? ]", desc: "숲속의 튼튼한 반달곰", target: "곰", cho: "ㄱ", jung: "ㅗ", jong: "ㅁ", choPool: ["ㄱ","ㄷ","ㅂ","ㅎ"], jungPool: ["ㅏ","ㅗ","ㅜ","ㅡ"], jongPool: ["없음","ㄴ","ㅁ","ㅇ"] },
+  { emoji: "⭐", wordDisplay: "반 짝 [ ? ]", desc: "밤하늘에 반짝이는 별", target: "별", cho: "ㅂ", jung: "ㅕ", jong: "ㄹ", choPool: ["ㅁ","ㅂ","ㅅ","ㅈ"], jungPool: ["ㅓ","ㅕ","ㅗ","ㅛ"], jongPool: ["없음","ㄴ","ㄹ","ㅇ"] },
+  { emoji: "☁️", wordDisplay: "뭉 게 구 [ ? ]", desc: "하늘에 둥실 떠 있는 구름", target: "름", cho: "ㄹ", jung: "ㅡ", jong: "ㅁ", choPool: ["ㄴ","ㄹ","ㅁ","ㅇ"], jungPool: ["ㅗ","ㅜ","ㅡ","ㅣ"], jongPool: ["없음","ㄱ","ㅁ","ㅂ"] },
+  { emoji: "🍉", wordDisplay: "시 원 한 수 [ ? ]", desc: "여름에 먹는 달콤한 수박", target: "박", cho: "ㅂ", jung: "ㅏ", jong: "ㄱ", choPool: ["ㄷ","ㅂ","ㅅ","ㅈ"], jungPool: ["ㅏ","ㅓ","ㅗ","ㅜ"], jongPool: ["없음","ㄱ","ㄴ","ㅇ"] },
+  { emoji: "🚂", wordDisplay: "칙 칙 폭 폭 기 [ ? ]", desc: "선로를 달리는 빠른 기차", target: "차", cho: "ㅊ", jung: "ㅏ", jong: "없음", choPool: ["ㅈ","ㅊ","ㅋ","ㅌ"], jungPool: ["ㅏ","ㅓ","ㅗ","ㅜ"], jongPool: ["없음","ㄱ","ㄴ","ㄹ"] }
+];
+
+let currentIdx = 0;
+let step = 0; // 0=cho, 1=jung, 2=jong
+let score = 0;
+let soundOn = true;
+let audioCtx = null;
+
+function playTone(freq, dur, type="sine") {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById("soundBtn").textContent = soundOn ? "🔊 소리 켜짐" : "🔇 소리 꺼짐";
+}
+
+function loadStage() {
+  const st = STAGES[currentIdx];
+  step = 0;
+  document.getElementById("stageBadge").textContent = `${currentIdx + 1} / ${STAGES.length} 역`;
+  document.getElementById("scoreBadge").textContent = `⭐ ${score}점`;
+  document.getElementById("clueEmoji").textContent = st.emoji;
+  document.getElementById("wordHint").textContent = `${st.wordDisplay} (${st.desc})`;
+  document.getElementById("valCho").textContent = "?";
+  document.getElementById("valJung").textContent = "?";
+  document.getElementById("valJong").textContent = "?";
+  document.getElementById("resultChar").textContent = "?";
+  document.getElementById("slotCho").className = "car-slot active";
+  document.getElementById("slotJung").className = "car-slot";
+  document.getElementById("slotJong").className = "car-slot";
+  renderChoices();
+}
+
+function renderChoices() {
+  const st = STAGES[currentIdx];
+  const grid = document.getElementById("choiceGrid");
+  grid.innerHTML = "";
+  let pool = [];
+  if (step === 0) {
+    document.getElementById("stepBanner").textContent = "1단계: 첫소리(자음) 기차 칸을 골라 주세요!";
+    pool = st.choPool;
+  } else if (step === 1) {
+    document.getElementById("stepBanner").textContent = "2단계: 가운뎃소리(모음) 기차 칸을 골라 주세요!";
+    pool = st.jungPool;
+  } else {
+    document.getElementById("stepBanner").textContent = "3단계: 끝소리(받침) 기차 칸을 골라 주세요!";
+    pool = st.jongPool;
+  }
+  pool.forEach(item => {
+    const btn = document.createElement("button");
+    btn.className = "tile-btn";
+    btn.textContent = item;
+    btn.onclick = () => handlePick(item, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function handlePick(val, btn) {
+  const st = STAGES[currentIdx];
+  const expected = step === 0 ? st.cho : (step === 1 ? st.jung : st.jong);
+  if (val === expected) {
+    btn.classList.add("correct");
+    playTone(587.33, 0.14, "triangle");
+    if (step === 0) {
+      document.getElementById("valCho").textContent = val;
+      document.getElementById("slotCho").className = "car-slot filled";
+      document.getElementById("slotJung").className = "car-slot active";
+      document.getElementById("feedbackMsg").textContent = `좋았어! 첫소리 '${val}' 연결 완료!`;
+      step = 1;
+      setTimeout(renderChoices, 220);
+    } else if (step === 1) {
+      document.getElementById("valJung").textContent = val;
+      document.getElementById("slotJung").className = "car-slot filled";
+      document.getElementById("slotJong").className = "car-slot active";
+      document.getElementById("feedbackMsg").textContent = `멋져요! 모음 '${val}' 연결 완료!`;
+      step = 2;
+      setTimeout(renderChoices, 220);
+    } else {
+      document.getElementById("valJong").textContent = val === "없음" ? "-" : val;
+      document.getElementById("slotJong").className = "car-slot filled";
+      document.getElementById("resultChar").textContent = st.target;
+      score += 100;
+      document.getElementById("scoreBadge").textContent = `⭐ ${score}점`;
+      document.getElementById("feedbackMsg").textContent = `칙칙폭폭! '${st.target}' 글자 기차 완성! 🎉`;
+      playTone(783.99, 0.25, "sine");
+      setTimeout(() => {
+        currentIdx++;
+        if (currentIdx < STAGES.length) {
+          loadStage();
+        } else {
+          document.getElementById("stepBanner").textContent = "🎊 8개 글자 기차역 모두 완주 성공! 장윤이 최고! 🎊";
+          document.getElementById("choiceGrid").innerHTML = "";
+        }
+      }, 900);
+    }
+  } else {
+    btn.classList.add("wrong");
+    playTone(220.0, 0.18, "sawtooth");
+    document.getElementById("feedbackMsg").textContent = "앗, 소리를 다시 생각하며 다른 칸을 눌러 볼까?";
+  }
+}
+
+function restartGame() {
+  currentIdx = 0;
+  score = 0;
+  document.getElementById("feedbackMsg").textContent = "새 기차가 출발합니다!";
+  loadStage();
+}
+
+window.onload = loadStage;
+</script>
+</body>
+</html>

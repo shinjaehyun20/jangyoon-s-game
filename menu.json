@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "syllable-train-station",
+        "title": "🎮 글자 기차역 조립소",
+        "path": "syllable-train-station/index.html"
+      },
+      {
+        "id": "shape-pattern-treasure-island",
+        "title": "🎮 모양 규칙 보물섬 탐험대",
+        "path": "shape-pattern-treasure-island/index.html"
+      },
+      {
         "id": "consonant-acorn-bakery",
         "title": "🎮 초성 도토리 빵집",
         "path": "consonant-acorn-bakery/index.html"

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>모양 규칙 보물섬 탐험대 (#062)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100vw; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, #DBEAFE 0%, #FEF9C3 65%, #FDE68A 100%);
+    color: #1E293B;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 14px;
+  }
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.94); border: 3px solid #F59E0B;
+    border-radius: 18px; padding: 8px 14px; box-shadow: 0 4px 10px rgba(245,158,11,0.16);
+    height: 11dvh; min-height: 54px;
+  }
+  .title-box { display: flex; align-items: center; gap: 8px; }
+  .title-text { font-size: 1.15rem; font-weight: 900; color: #B45309; }
+  .score-group { display: flex; gap: 8px; align-items: center; }
+  .badge {
+    background: #E0F2FE; border: 2px solid #0284C7; border-radius: 14px;
+    padding: 5px 11px; font-weight: 800; font-size: 0.95rem; color: #0369A1;
+  }
+  .btn-sound {
+    background: #FEF3C7; border: 2px solid #D97706; border-radius: 12px;
+    padding: 6px 10px; font-weight: 800; font-size: 0.9rem; color: #92400E; cursor: pointer;
+  }
+  .main-stage {
+    flex: 1; display: flex; flex-direction: column; justify-content: space-evenly;
+    align-items: center; padding: 6px 0;
+  }
+  .island-header {
+    width: 100%; max-width: 520px; background: #FFFFFF;
+    border: 4px solid #0284C7; border-radius: 22px; padding: 12px 16px;
+    text-align: center; box-shadow: 0 6px 14px rgba(2,132,199,0.14);
+  }
+  .rule-tag {
+    display: inline-block; background: #DBEAFE; color: #1D4ED8;
+    font-weight: 900; font-size: 0.9rem; padding: 4px 12px; border-radius: 999px; margin-bottom: 6px;
+  }
+  .rule-title { font-size: 1.25rem; font-weight: 900; color: #0F172A; }
+  .pattern-board {
+    width: 100%; max-width: 520px; background: rgba(255,255,255,0.92);
+    border: 4px solid #F59E0B; border-radius: 22px; padding: 14px 10px;
+    display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: nowrap;
+  }
+  .stone-tile {
+    width: 56px; height: 64px; border-radius: 16px;
+    background: #F8FAFC; border: 3px solid #CBD5E1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 1.7rem; font-weight: 900;
+  }
+  .stone-tile.mystery {
+    border: 4px dashed #EA580C; background: #FFEDD5; color: #C2410C;
+    animation: pulse 1.2s infinite alternate;
+  }
+  @keyframes pulse { from { transform: scale(1.0); } to { transform: scale(1.06); } }
+  .stone-label { font-size: 0.72rem; font-weight: 800; color: #475569; margin-top: 2px; }
+  .choices-card {
+    width: 100%; max-width: 520px; background: rgba(255,255,255,0.95);
+    border: 3px solid #16A34A; border-radius: 22px; padding: 12px;
+  }
+  .choice-label { text-align: center; font-size: 1.05rem; font-weight: 900; color: #15803D; margin-bottom: 8px; }
+  .choice-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .pick-btn {
+    height: 68px; border-radius: 18px; border: 3px solid #94A3B8;
+    background: #FFFFFF; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 1.65rem; font-weight: 900; box-shadow: 0 4px 0 #94A3B8;
+  }
+  .pick-btn span.txt { font-size: 0.78rem; font-weight: 800; color: #334155; margin-top: 2px; }
+  .pick-btn.correct { background: #BBF7D0; border-color: #16A34A; }
+  .pick-btn.wrong { background: #FECACA; border-color: #DC2626; }
+  .footer-bar {
+    height: 8dvh; min-height: 44px; display: flex; justify-content: space-between; align-items: center;
+    width: 100%; max-width: 520px; margin: 0 auto;
+  }
+  .msg-box { font-size: 1.0rem; font-weight: 800; color: #B45309; }
+  .btn-reset {
+    background: #0284C7; color: #FFFFFF; border: none; border-radius: 14px;
+    padding: 9px 16px; font-size: 0.95rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 3px 0 #0369A1;
+  }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="title-box">
+      <span style="font-size:1.7rem;">🏝️</span>
+      <span class="title-text">모양 규칙 보물섬 탐험대</span>
+    </div>
+    <div class="score-group">
+      <div class="badge" id="stageBadge">1 / 8 섬</div>
+      <div class="badge" id="scoreBadge">💎 0점</div>
+      <button class="btn-sound" id="soundBtn" onclick="toggleSound()">🔊 소리 켜짐</button>
+    </div>
+  </div>
+
+  <div class="main-stage">
+    <div class="island-header">
+      <div class="rule-tag" id="ruleTag">규칙 찾기 탐험</div>
+      <div class="rule-title" id="ruleTitle">물음표(?) 징검다리에 들어갈 알맞은 모양은 무엇일까요?</div>
+    </div>
+
+    <div class="pattern-board" id="patternBoard"></div>
+
+    <div class="choices-card">
+      <div class="choice-label">아래 보물 상자 모양 중에서 정답을 골라 눌러 보세요!</div>
+      <div class="choice-row" id="choiceRow"></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="msg-box" id="feedbackMsg">규칙을 찾아 보물섬 징검다리를 건너요!</div>
+    <button class="btn-reset" onclick="restartGame()">처음부터 다시</button>
+  </div>
+
+<script>
+const PUZZLES = [
+  {
+    tag: "두 개씩 반복 (ABAB)",
+    hint: "동그라미와 세모가 번갈아 나와요!",
+    seq: [
+      {icon:"🔴", name:"동그라미"}, {icon:"🔺", name:"세모"},
+      {icon:"🔴", name:"동그라미"}, {icon:"🔺", name:"세모"},
+      {icon:"🔴", name:"동그라미"}, {icon:"?", name:"물음표"}
+    ],
+    answer: "🔺",
+    options: [
+      {icon:"🔺", name:"세모"}, {icon:"🔴", name:"동그라미"},
+      {icon:"🟦", name:"네모"}, {icon:"⭐", name:"별"}
+    ]
+  },
+  {
+    tag: "두 개씩 짝지어 반복 (AABB)",
+    hint: "네모 두 번, 별 두 번씩 나와요!",
+    seq: [
+      {icon:"🟦", name:"네모"}, {icon:"🟦", name:"네모"},
+      {icon:"⭐", name:"별"}, {icon:"⭐", name:"별"},
+      {icon:"🟦", name:"네모"}, {icon:"?", name:"물음표"}
+    ],
+    answer: "🟦",
+    options: [
+      {icon:"🟦", name:"네모"}, {icon:"⭐", name:"별"},
+      {icon:"🔴", name:"동그라미"}, {icon:"🔺", name:"세모"}
+    ]
+  },
+  {
+    tag: "세 개씩 반복 (ABC)",
+    hint: "사과, 바나나, 포도 순서로 반복돼요!",
+    seq: [
+      {icon:"🍎", name:"사과"}, {icon:"🍌", name:"바나나"}, {icon:"🍇", name:"포도"},
+      {icon:"🍎", name:"사과"}, {icon:"🍌", name:"바나나"}, {icon:"?", name:"물음표"}
+    ],
+    answer: "🍇",
+    options: [
+      {icon:"🍇", name:"포도"}, {icon:"🍎", name:"사과"},
+      {icon:"🍌", name:"바나나"}, {icon:"🍉", name:"수박"}
+    ]
+  },
+  {
+    tag: "방향 회전 규칙",
+    hint: "화살표가 위 → 오른쪽 → 아래 → 왼쪽으로 돌아요!",
+    seq: [
+      {icon:"⬆️", name:"위"}, {icon:"➡️", name:"오른쪽"},
+      {icon:"⬇️", name:"아래"}, {icon:"⬅️", name:"왼쪽"},
+      {icon:"⬆️", name:"위"}, {icon:"?", name:"물음표"}
+    ],
+    answer: "➡️",
+    options: [
+      {icon:"➡️", name:"오른쪽"}, {icon:"⬇️", name:"아래"},
+      {icon:"⬅️", name:"왼쪽"}, {icon:"⬆️", name:"위"}
+    ]
+  },
+  {
+    tag: "개수 늘어나기 (+2 규칙)",
+    hint: "구슬 숫자가 2개씩 커지고 있어요!",
+    seq: [
+      {icon:"2️⃣", name:"2개"}, {icon:"4️⃣", name:"4개"},
+      {icon:"6️⃣", name:"6개"}, {icon:"8️⃣", name:"8개"},
+      {icon:"?", name:"물음표"}
+    ],
+    answer: "🔟",
+    options: [
+      {icon:"🔟", name:"10개"}, {icon:"9️⃣", name:"9개"},
+      {icon:"7️⃣", name:"7개"}, {icon:"5️⃣", name:"5개"}
+    ]
+  },
+  {
+    tag: "세 개 묶음 규칙 (ABA)",
+    hint: "해 - 달 - 해 - 달 순서예요!",
+    seq: [
+      {icon:"☀️", name:"해"}, {icon:"🌙", name:"달"},
+      {icon:"☀️", name:"해"}, {icon:"🌙", name:"달"},
+      {icon:"?", name:"물음표"}, {icon:"🌙", name:"달"}
+    ],
+    answer: "☀️",
+    options: [
+      {icon:"☀️", name:"해"}, {icon:"🌙", name:"달"},
+      {icon:"⭐", name:"별"}, {icon:"☁️", name:"구름"}
+    ]
+  },
+  {
+    tag: "점점 자라나는 식물",
+    hint: "씨앗 → 새싹 → 꽃 순서로 자라나요!",
+    seq: [
+      {icon:"🌰", name:"씨앗"}, {icon:"🌱", name:"새싹"}, {icon:"🌻", name:"꽃"},
+      {icon:"🌰", name:"씨앗"}, {icon:"?", name:"물음표"}, {icon:"🌻", name:"꽃"}
+    ],
+    answer: "🌱",
+    options: [
+      {icon:"🌱", name:"새싹"}, {icon:"🌰", name:"씨앗"},
+      {icon:"🌻", name:"꽃"}, {icon:"🌲", name:"나무"}
+    ]
+  },
+  {
+    tag: "보물섬 마지막 관문 (ABBA)",
+    hint: "보석 - 왕관 - 왕관 - 보석 규칙이에요!",
+    seq: [
+      {icon:"💎", name:"보석"}, {icon:"👑", name:"왕관"},
+      {icon:"👑", name:"왕관"}, {icon:"💎", name:"보석"},
+      {icon:"💎", name:"보석"}, {icon:"?", name:"물음표"}
+    ],
+    answer: "👑",
+    options: [
+      {icon:"👑", name:"왕관"}, {icon:"💎", name:"보석"},
+      {icon:"🗝️", name:"열쇠"}, {icon:"🪙", name:"금화"}
+    ]
+  }
+];
+
+let idx = 0;
+let score = 0;
+let soundOn = true;
+let audioCtx = null;
+
+function playBeep(freq, dur) {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById("soundBtn").textContent = soundOn ? "🔊 소리 켜짐" : "🔇 소리 꺼짐";
+}
+
+function renderPuzzle() {
+  const p = PUZZLES[idx];
+  document.getElementById("stageBadge").textContent = `${idx + 1} / ${PUZZLES.length} 섬`;
+  document.getElementById("scoreBadge").textContent = `💎 ${score}점`;
+  document.getElementById("ruleTag").textContent = p.tag;
+  document.getElementById("ruleTitle").textContent = p.hint;
+
+  const board = document.getElementById("patternBoard");
+  board.innerHTML = "";
+  p.seq.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "stone-tile" + (item.icon === "?" ? " mystery" : "");
+    div.innerHTML = `<span>${item.icon}</span><span class="stone-label">${item.name}</span>`;
+    board.appendChild(div);
+  });
+
+  const row = document.getElementById("choiceRow");
+  row.innerHTML = "";
+  p.options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "pick-btn";
+    btn.innerHTML = `<span>${opt.icon}</span><span class="txt">${opt.name}</span>`;
+    btn.onclick = () => checkAnswer(opt, btn);
+    row.appendChild(btn);
+  });
+}
+
+function checkAnswer(opt, btn) {
+  const p = PUZZLES[idx];
+  if (opt.icon === p.answer) {
+    btn.classList.add("correct");
+    playBeep(659.25, 0.22);
+    score += 100;
+    document.getElementById("scoreBadge").textContent = `💎 ${score}점`;
+    document.getElementById("feedbackMsg").textContent = `정답! '${opt.name}' 징검다리를 찾아 보물섬을 건넜어요! 🎉`;
+    const mys = document.querySelector(".stone-tile.mystery");
+    if (mys) {
+      mys.innerHTML = `<span>${opt.icon}</span><span class="stone-label">${opt.name}</span>`;
+      mys.classList.remove("mystery");
+    }
+    setTimeout(() => {
+      idx++;
+      if (idx < PUZZLES.length) {
+        renderPuzzle();
+      } else {
+        document.getElementById("ruleTitle").textContent = "🏆 보물섬 8개 관문 모두 통과! 장윤이 탐험대장 최고!";
+        document.getElementById("choiceRow").innerHTML = "";
+      }
+    }, 850);
+  } else {
+    btn.classList.add("wrong");
+    playBeep(220.0, 0.18);
+    document.getElementById("feedbackMsg").textContent = "앞에 나온 모양 순서를 다시 한번 살펴볼까요?";
+  }
+}
+
+function restartGame() {
+  idx = 0;
+  score = 0;
+  document.getElementById("feedbackMsg").textContent = "보물섬 첫 번째 징검다리부터 다시 출발!";
+  renderPuzzle();
+}
+
+window.onload = renderPuzzle;
+</script>
+</body>
+</html>
