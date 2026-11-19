@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "antonym-seesaw-playground",
+        "title": "🎮 출렁출렁 반대말 시소 놀이터",
+        "path": "antonym-seesaw-playground/index.html"
+      },
+      {
+        "id": "clock-train-departure",
+        "title": "🎮 칙칙폭폭 정각·30분 시계 기차 출발",
+        "path": "clock-train-departure/index.html"
+      },
+      {
         "id": "syllable-train-station",
         "title": "🎮 글자 기차역 조립소",
         "path": "syllable-train-station/index.html"

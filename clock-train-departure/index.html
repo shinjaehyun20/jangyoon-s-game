@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>칙칙폭폭 정각·30분 시계 기차 출발 (#064)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100vw; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, #EDE9FE 0%, #E0F2FE 65%, #DCFCE7 100%);
+    color: #0F172A;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 14px;
+  }
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.94); border: 3px solid #7C3AED;
+    border-radius: 18px; padding: 8px 14px; height: 11dvh; min-height: 54px;
+  }
+  .title-wrap { display: flex; align-items: center; gap: 8px; }
+  .title-text { font-size: 1.15rem; font-weight: 900; color: #5B21B6; }
+  .hud-group { display: flex; align-items: center; gap: 8px; }
+  .badge {
+    background: #FEF08A; border: 2px solid #F59E0B; border-radius: 14px;
+    padding: 5px 10px; font-weight: 800; font-size: 0.92rem; color: #B45309;
+  }
+  .btn-util {
+    background: #E0E7FF; border: 2px solid #4F46E5; border-radius: 12px;
+    padding: 6px 10px; font-weight: 800; font-size: 0.88rem; color: #3730A3; cursor: pointer;
+    min-height: 44px; display: inline-flex; align-items: center; text-decoration: none;
+  }
+  .stage {
+    flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center;
+  }
+  .clock-card {
+    width: 100%; max-width: 520px; background: #FFFFFF;
+    border: 4px solid #7C3AED; border-radius: 22px; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-around; gap: 14px;
+    box-shadow: 0 6px 14px rgba(124,58,237,0.16);
+  }
+  .clock-svg { width: 156px; height: 156px; flex-shrink: 0; }
+  .mission-box { text-align: left; }
+  .mission-tag {
+    display: inline-block; background: #F3E8FF; color: #6D28D9;
+    font-weight: 900; font-size: 0.9rem; padding: 4px 10px; border-radius: 10px; margin-bottom: 6px;
+  }
+  .mission-title { font-size: 1.25rem; font-weight: 900; color: #1E293B; margin-bottom: 6px; }
+  .mission-desc { font-size: 0.95rem; font-weight: 700; color: #475569; line-height: 1.4; }
+  .choices-wrap {
+    width: 100%; max-width: 520px; background: rgba(255,255,255,0.95);
+    border: 3px solid #0284C7; border-radius: 22px; padding: 12px;
+  }
+  .choices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .choice-btn {
+    min-height: 58px; border-radius: 16px; border: 3px solid #8B5CF6;
+    background: #F5F3FF; font-size: 1.2rem; font-weight: 900; color: #4C1D95;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .choice-btn:active { transform: scale(0.96); }
+  .feedback-bar {
+    height: 7dvh; min-height: 40px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 900; color: #047857; text-align: center;
+  }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.72);
+    display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px;
+  }
+  .overlay.hidden { display: none; }
+  .modal {
+    background: #FFFFFF; border: 5px solid #7C3AED; border-radius: 26px;
+    padding: 24px 20px; max-width: 420px; width: 100%; text-align: center;
+  }
+  .modal h1 { font-size: 1.55rem; color: #5B21B6; margin-bottom: 10px; }
+  .modal p { font-size: 1.05rem; color: #334155; font-weight: 700; line-height: 1.5; margin-bottom: 18px; }
+  .btn-start {
+    width: 100%; min-height: 54px; border-radius: 16px; border: none;
+    background: #7C3AED; color: #FFFFFF; font-size: 1.25rem; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="title-wrap">
+      <a href="../../index.html" class="btn-util">← 홈으로</a>
+      <span class="title-text">🚂 시계 기차 출발</span>
+    </div>
+    <div class="hud-group">
+      <span class="badge" id="progressBadge">1 / 8단계</span>
+      <span class="badge" id="scoreBadge">점수 0점</span>
+      <button class="btn-util" id="soundBtn" type="button">🔊 소리 켜짐</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="clock-card">
+      <svg class="clock-svg" viewBox="0 0 160 160" id="clockSvg"></svg>
+      <div class="mission-box">
+        <span class="mission-tag" id="stationTag">1번 플랫폼</span>
+        <div class="mission-title" id="missionTitle">기차역 시계가 몇 시 몇 분을 가리키고 있을까요?</div>
+        <div class="mission-desc" id="missionHint">긴바늘이 12를 가리키면 '정각(00분)', 6을 가리키면 '30분'이에요!</div>
+      </div>
+    </div>
+
+    <div class="choices-wrap">
+      <div class="choices-grid" id="choicesGrid"></div>
+    </div>
+  </div>
+
+  <div class="feedback-bar" id="feedbackBar">시계 바늘을 보고 출발 시각표를 터치해 주세요!</div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="modal">
+      <h1>🚂 칙칙폭폭 시계 기차 출발</h1>
+      <p>장윤이 역장님! 기차역 시계의 짧은바늘(시)과<br>긴바늘(정각·30분)을 읽고 알맞은 출발 시각표를 눌러 주세요!</p>
+      <button class="btn-start" id="startBtn" type="button">기차 출발 신호 보내기!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="modal">
+      <h1>🎉 꼬마 시계 역장님 임명!</h1>
+      <p id="endSummary">8대의 기차를 정확한 시각에 출발시켰어요!</p>
+      <button class="btn-start" id="restartBtn" type="button">한 번 더 운행하기</button>
+    </div>
+  </div>
+
+<script>
+const QUESTIONS = [
+  { h: 3, m: 0, ans: "3시 정각", station: "서울역 1번 홈", hint: "짧은바늘이 3, 긴바늘이 12를 가리켜요!", choices: ["3시 정각", "3시 30분", "12시 15분", "6시 정각"] },
+  { h: 7, m: 30, ans: "7시 30분", station: "부천역 2번 홈", hint: "짧은바늘이 7과 8 사이, 긴바늘이 6을 가리켜요!", choices: ["7시 정각", "7시 30분", "6시 30분", "8시 정각"] },
+  { h: 9, m: 0, ans: "9시 정각", station: "창영초 기차역", hint: "짧은바늘이 9, 긴바늘이 12를 가리켜요!", choices: ["12시 정각", "9시 30분", "9시 정각", "3시 정각"] },
+  { h: 1, m: 30, ans: "1시 30분", station: "무지개역 3번 홈", hint: "짧은바늘이 1과 2 사이, 긴바늘이 6을 가리켜요!", choices: ["1시 30분", "2시 30분", "1시 정각", "6시 정각"] },
+  { h: 11, m: 0, ans: "11시 정각", station: "별빛역 4번 홈", hint: "짧은바늘이 11, 긴바늘이 12를 가리켜요!", choices: ["10시 정각", "11시 30분", "12시 정각", "11시 정각"] },
+  { h: 4, m: 30, ans: "4시 30분", station: "도토리역 5번 홈", hint: "짧은바늘이 4와 5 사이, 긴바늘이 6을 가리켜요!", choices: ["4시 정각", "5시 30분", "4시 30분", "6시 20분"] },
+  { h: 6, m: 0, ans: "6시 정각", station: "해돋이역 6번 홈", hint: "짧은바늘이 아래쪽 6, 긴바늘이 위쪽 12를 가리켜요!", choices: ["12시 30분", "6시 정각", "6시 30분", "5시 정각"] },
+  { h: 10, m: 30, ans: "10시 30분", station: "보물섬 종착역", hint: "짧은바늘이 10과 11 사이, 긴바늘이 6을 가리켜요!", choices: ["10시 정각", "11시 30분", "10시 30분", "6시 50분"] }
+];
+
+let idx = 0, score = 0, soundOn = true, locked = false;
+const STORAGE_KEY = "clock-train-departure_best";
+let audioCtx = null;
+
+function playTone(freq, dur) {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    osc.type = "sine";
+    gain.gain.setValueAtTime(0.16, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function drawClock(h, m) {
+  const svg = document.getElementById("clockSvg");
+  let html = '<circle cx="80" cy="80" r="72" fill="#FEFCE8" stroke="#7C3AED" stroke-width="6"/>';
+  for (let n = 1; n <= 12; n++) {
+    const rad = ((n * 30) - 90) * Math.PI / 180;
+    const tx = 80 + 54 * Math.cos(rad);
+    const ty = 80 + 54 * Math.sin(rad) + 5;
+    html += '<text x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="middle" font-size="14" font-weight="900" fill="#1E293B">' + n + '</text>';
+  }
+  const mAngle = (m * 6) - 90;
+  const hAngle = ((h % 12) * 30 + (m * 0.5)) - 90;
+  const hRad = hAngle * Math.PI / 180;
+  const mRad = mAngle * Math.PI / 180;
+  const hx = 80 + 34 * Math.cos(hRad), hy = 80 + 34 * Math.sin(hRad);
+  const mx = 80 + 48 * Math.cos(mRad), my = 80 + 48 * Math.sin(mRad);
+  html += '<line x1="80" y1="80" x2="' + mx.toFixed(1) + '" y2="' + my.toFixed(1) + '" stroke="#0284C7" stroke-width="5" stroke-linecap="round"/>';
+  html += '<line x1="80" y1="80" x2="' + hx.toFixed(1) + '" y2="' + hy.toFixed(1) + '" stroke="#DC2626" stroke-width="7" stroke-linecap="round"/>';
+  html += '<circle cx="80" cy="80" r="6" fill="#1E293B"/>';
+  svg.innerHTML = html;
+}
+
+function renderQuestion() {
+  locked = false;
+  const q = QUESTIONS[idx];
+  document.getElementById("progressBadge").textContent = (idx + 1) + " / " + QUESTIONS.length + "단계";
+  document.getElementById("scoreBadge").textContent = "점수 " + score + "점";
+  document.getElementById("stationTag").textContent = q.station;
+  document.getElementById("missionHint").textContent = q.hint;
+  document.getElementById("feedbackBar").textContent = "시계를 읽고 알맞은 출발 시각 카드를 눌러 주세요!";
+  drawClock(q.h, q.m);
+
+  const grid = document.getElementById("choicesGrid");
+  grid.innerHTML = "";
+  q.choices.forEach(ch => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "choice-btn";
+    btn.textContent = "🕒 " + ch;
+    btn.addEventListener("pointerdown", () => handleChoice(ch));
+    grid.appendChild(btn);
+  });
+}
+
+function handleChoice(ch) {
+  if (locked) return;
+  const q = QUESTIONS[idx];
+  if (ch === q.ans) {
+    locked = true;
+    score += 10;
+    document.getElementById("scoreBadge").textContent = "점수 " + score + "점";
+    document.getElementById("feedbackBar").textContent = "칙칙폭폭! '" + ch + "' 기차가 정확히 출발합니다!";
+    playTone(587.33, 0.14); setTimeout(() => playTone(783.99, 0.18), 120);
+    setTimeout(() => {
+      idx++;
+      if (idx < QUESTIONS.length) {
+        renderQuestion();
+      } else {
+        const best = Math.max(score, Number(localStorage.getItem(STORAGE_KEY) || 0));
+        localStorage.setItem(STORAGE_KEY, String(best));
+        document.getElementById("endSummary").textContent = "최종 점수 " + score + "점! (최고 기록 " + best + "점) 정각과 30분 시계를 모두 완벽하게 읽었어요!";
+        document.getElementById("endOverlay").classList.remove("hidden");
+      }
+    }, 950);
+  } else {
+    playTone(220, 0.2);
+    document.getElementById("feedbackBar").textContent = "앗, 빨간 짧은바늘과 파란 긴바늘 위치를 다시 확인해 볼까요?";
+  }
+}
+
+document.getElementById("soundBtn").addEventListener("pointerdown", () => {
+  soundOn = !soundOn;
+  document.getElementById("soundBtn").textContent = soundOn ? "🔊 소리 켜짐" : "🔇 소리 꺼짐";
+});
+document.getElementById("startBtn").addEventListener("pointerdown", () => {
+  document.getElementById("startOverlay").classList.add("hidden");
+  idx = 0; score = 0; renderQuestion();
+});
+document.getElementById("restartBtn").addEventListener("pointerdown", () => {
+  document.getElementById("endOverlay").classList.add("hidden");
+  idx = 0; score = 0; renderQuestion();
+});
+</script>
+</body>
+</html>

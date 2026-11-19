@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 358개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 360개.
 
-[![Games](https://img.shields.io/badge/games-358-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-360-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![358개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![360개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 358개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 360개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -387,6 +387,8 @@
 | [🎮 10 만들기 별빛 기차 (ten-make-starlight-train)](./ten-make-starlight-train/index.html) | 열 칸 기차(텐프레임)에 채워진 노란 별과 반짝이는 빈칸을 세어 합이 10이 되는 짝꿍 수를 찾는 수감각 놀이 | 어린이/아케이드 |
 | [🎮 글자 기차역 조립소 (syllable-train-station)](./syllable-train-station/index.html) | 🎮 글자 기차역 조립소 인터랙티브 미니게임입니다. | 어린이/아케이드 |
 | [🎮 모양 규칙 보물섬 탐험대 (shape-pattern-treasure-island)](./shape-pattern-treasure-island/index.html) | 🎮 모양 규칙 보물섬 탐험대 인터랙티브 미니게임입니다. | 어린이/아케이드 |
+| [🎮 출렁출렁 반대말 시소 놀이터 (antonym-seesaw-playground)](./antonym-seesaw-playground/index.html) | 🎮 출렁출렁 반대말 시소 놀이터 인터랙티브 미니게임입니다. | 어린이/아케이드 |
+| [🎮 칙칙폭폭 정각·30분 시계 기차 출발 (clock-train-departure)](./clock-train-departure/index.html) | 🎮 칙칙폭폭 정각·30분 시계 기차 출발 인터랙티브 미니게임입니다. | 어린이/아케이드 |
 
 </details>
 
@@ -562,6 +564,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-11)
+- 2026-11-20: [🎮 칙칙폭폭 정각·30분 시계 기차 출발](clock-train-departure/index.html), [🎮 출렁출렁 반대말 시소 놀이터](antonym-seesaw-playground/index.html) (총 360개)
+
 - 2026-11-19: [🎮 모양 규칙 보물섬 탐험대](shape-pattern-treasure-island/index.html), [🎮 글자 기차역 조립소](syllable-train-station/index.html) (총 358개)
 
 - 2026-11-18: [🎮 10 만들기 별빛 기차](ten-make-starlight-train/index.html), [🎮 초성 도토리 빵집](consonant-acorn-bakery/index.html) (총 358개)
