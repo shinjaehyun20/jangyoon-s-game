@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "ten-frame-star-rocket",
+        "title": "🎮 별빛 텐프레임 10 만들기 우주 로켓",
+        "path": "ten-frame-star-rocket/index.html"
+      },
+      {
+        "id": "double-consonant-treasure-chest",
+        "title": "🎮 반짝반짝 쌍자음 보물상자 열쇠 찾기",
+        "path": "double-consonant-treasure-chest/index.html"
+      },
+      {
         "id": "antonym-seesaw-playground",
         "title": "🎮 출렁출렁 반대말 시소 놀이터",
         "path": "antonym-seesaw-playground/index.html"

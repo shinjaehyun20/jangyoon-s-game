@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>별빛 텐프레임 10 만들기 우주 로켓 (#065)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100vw; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, #DBEAFE 0%, #E0E7FF 55%, #FEF3C7 100%);
+    color: #0F172A;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 14px;
+  }
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.95); border: 3px solid #2563EB;
+    border-radius: 18px; padding: 8px 14px; height: 11dvh; min-height: 54px;
+  }
+  .title-wrap { display: flex; align-items: center; gap: 8px; }
+  .title-text { font-size: 1.12rem; font-weight: 900; color: #1D4ED8; }
+  .hud-group { display: flex; align-items: center; gap: 8px; }
+  .badge {
+    background: #FEF08A; border: 2px solid #F59E0B; border-radius: 14px;
+    padding: 5px 10px; font-weight: 800; font-size: 0.92rem; color: #B45309;
+  }
+  .btn-util {
+    background: #E0E7FF; border: 2px solid #4F46E5; border-radius: 12px;
+    padding: 6px 10px; font-weight: 800; font-size: 0.88rem; color: #3730A3; cursor: pointer;
+    min-height: 44px; display: inline-flex; align-items: center; text-decoration: none;
+  }
+  .stage {
+    flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center;
+  }
+  .question-card {
+    width: 100%; max-width: 520px; background: #FFFFFF;
+    border: 4px solid #2563EB; border-radius: 22px; padding: 12px 16px; text-align: center;
+    box-shadow: 0 6px 14px rgba(37,99,235,0.14);
+  }
+  .q-title { font-size: 1.22rem; font-weight: 900; color: #1E293B; margin-bottom: 4px; }
+  .q-sub { font-size: 0.95rem; font-weight: 700; color: #475569; }
+  .tenframe-box {
+    width: 100%; max-width: 520px; background: rgba(255,255,255,0.92);
+    border: 3px solid #F59E0B; border-radius: 22px; padding: 14px;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+  }
+  .cell {
+    height: 10.5dvh; min-height: 52px; max-height: 76px;
+    border: 3px solid #93C5FD; border-radius: 14px; background: #F8FAFC;
+    display: flex; align-items: center; justify-content: center; font-size: 1.85rem;
+  }
+  .cell.filled { background: #FEF9C3; border-color: #F59E0B; }
+  .cell.empty-slot { background: #EFF6FF; border-style: dashed; color: #94A3B8; font-size: 1.2rem; font-weight: 900; }
+  .choices-wrap {
+    width: 100%; max-width: 520px; background: rgba(255,255,255,0.95);
+    border: 3px solid #2563EB; border-radius: 22px; padding: 12px;
+  }
+  .choices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .choice-btn {
+    min-height: 58px; border-radius: 16px; border: 3px solid #60A5FA;
+    background: #EFF6FF; font-size: 1.22rem; font-weight: 900; color: #1E3A8A;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .choice-btn:active { transform: scale(0.96); }
+  .feedback-bar {
+    height: 7dvh; min-height: 40px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.08rem; font-weight: 900; color: #047857; text-align: center;
+  }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.72);
+    display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px;
+  }
+  .overlay.hidden { display: none; }
+  .modal {
+    background: #FFFFFF; border: 5px solid #2563EB; border-radius: 26px;
+    padding: 24px 20px; max-width: 420px; width: 100%; text-align: center;
+  }
+  .modal h1 { font-size: 1.55rem; color: #1D4ED8; margin-bottom: 10px; }
+  .modal p { font-size: 1.05rem; color: #334155; font-weight: 700; line-height: 1.5; margin-bottom: 18px; }
+  .btn-start {
+    width: 100%; min-height: 54px; border-radius: 16px; border: none;
+    background: #2563EB; color: #FFFFFF; font-size: 1.25rem; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="title-wrap">
+      <a href="../../index.html" class="btn-util">← 홈으로</a>
+      <span class="title-text">🚀 별빛 텐프레임 로켓</span>
+    </div>
+    <div class="hud-group">
+      <span class="badge" id="progressBadge">1 / 8단계</span>
+      <span class="badge" id="scoreBadge">점수 0점</span>
+      <button class="btn-util" id="soundBtn" type="button">🔊 소리 켜짐</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="question-card">
+      <div class="q-title" id="qTitle">별빛 연료 10칸을 가득 채우려면 별이 몇 개 더 필요할까요?</div>
+      <div class="q-sub" id="qHint">빈칸의 개수를 세어 10을 만들어 보세요!</div>
+    </div>
+
+    <div class="tenframe-box" id="tenframeBox"></div>
+
+    <div class="choices-wrap">
+      <div class="choices-grid" id="choicesGrid"></div>
+    </div>
+  </div>
+
+  <div class="feedback-bar" id="feedbackBar">알맞은 별 개수를 골라 로켓 연료를 채워 주세요!</div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="modal">
+      <h1>🚀 별빛 텐프레임 우주 로켓</h1>
+      <p>장윤이 우주 비행사님! 로켓이 출발하려면<br>10칸 연료 상자에 별빛을 가득 채워야 해요.<br>빈칸이 몇 개인지 찾아 10을 완성해 볼까요?</p>
+      <button class="btn-start" id="startBtn" type="button">우주 로켓 출발 준비!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="modal">
+      <h1>🎉 10 만들기 우주 비행 성공!</h1>
+      <p id="endSummary">8대의 우주 로켓을 모두 힘차게 발사했어요!</p>
+      <button class="btn-start" id="restartBtn" type="button">한 번 더 발사하기</button>
+    </div>
+  </div>
+
+<script>
+const QUESTIONS = [
+  { filled: 7, ans: 3, choices: [2, 3, 4, 5] },
+  { filled: 6, ans: 4, choices: [3, 4, 5, 6] },
+  { filled: 8, ans: 2, choices: [1, 2, 3, 4] },
+  { filled: 5, ans: 5, choices: [4, 5, 6, 7] },
+  { filled: 9, ans: 1, choices: [1, 2, 3, 4] },
+  { filled: 4, ans: 6, choices: [5, 6, 7, 8] },
+  { filled: 3, ans: 7, choices: [6, 7, 8, 9] },
+  { filled: 2, ans: 8, choices: [6, 7, 8, 9] }
+];
+
+let idx = 0, score = 0, soundOn = true, locked = false;
+const STORAGE_KEY = "ten-frame-star-rocket_best";
+let audioCtx = null;
+
+function playTone(freq, dur) {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    osc.type = "triangle";
+    gain.gain.setValueAtTime(0.16, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function drawTenFrame(filledCount, fillAll) {
+  const box = document.getElementById("tenframeBox");
+  box.innerHTML = "";
+  for (let i = 0; i < 10; i++) {
+    const cell = document.createElement("div");
+    if (i < filledCount) {
+      cell.className = "cell filled";
+      cell.textContent = "⭐";
+    } else if (fillAll) {
+      cell.className = "cell filled";
+      cell.textContent = "🌟";
+    } else {
+      cell.className = "cell empty-slot";
+      cell.textContent = "?";
+    }
+    box.appendChild(cell);
+  }
+}
+
+function renderQuestion() {
+  locked = false;
+  const q = QUESTIONS[idx];
+  document.getElementById("progressBadge").textContent = (idx + 1) + " / " + QUESTIONS.length + "단계";
+  document.getElementById("scoreBadge").textContent = "점수 " + score + "점";
+  document.getElementById("qTitle").textContent = "지금 별이 " + q.filled + "개 있어요. 10개가 되려면 몇 개 더 필요할까요?";
+  document.getElementById("qHint").textContent = "덧셈식: " + q.filled + " + ( ? ) = 10";
+  document.getElementById("feedbackBar").textContent = "점선으로 된 빈칸이 몇 개인지 세어 보세요!";
+  drawTenFrame(q.filled, false);
+
+  const grid = document.getElementById("choicesGrid");
+  grid.innerHTML = "";
+  q.choices.forEach(num => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "choice-btn";
+    btn.textContent = "🌟 별 " + num + "개";
+    btn.addEventListener("pointerdown", () => handleChoice(num));
+    grid.appendChild(btn);
+  });
+}
+
+function handleChoice(num) {
+  if (locked) return;
+  const q = QUESTIONS[idx];
+  if (num === q.ans) {
+    locked = true;
+    score += 10;
+    drawTenFrame(q.filled, true);
+    document.getElementById("scoreBadge").textContent = "점수 " + score + "점";
+    document.getElementById("feedbackBar").textContent = "정답! " + q.filled + " + " + num + " = 10! 로켓 연료 충전 완료!";
+    playTone(523.25, 0.14); setTimeout(() => playTone(659.25, 0.18), 120);
+    setTimeout(() => {
+      idx++;
+      if (idx < QUESTIONS.length) {
+        renderQuestion();
+      } else {
+        const best = Math.max(score, Number(localStorage.getItem(STORAGE_KEY) || 0));
+        localStorage.setItem(STORAGE_KEY, String(best));
+        document.getElementById("endSummary").textContent = "최종 점수 " + score + "점! (최고 기록 " + best + "점) 10 만들기 보수를 모두 마스터했어요!";
+        document.getElementById("endOverlay").classList.remove("hidden");
+      }
+    }, 950);
+  } else {
+    playTone(220, 0.2);
+    document.getElementById("feedbackBar").textContent = "아하, 빈칸(?)의 개수를 한 번 더 천천히 세어 볼까요?";
+  }
+}
+
+document.getElementById("soundBtn").addEventListener("pointerdown", () => {
+  soundOn = !soundOn;
+  document.getElementById("soundBtn").textContent = soundOn ? "🔊 소리 켜짐" : "🔇 소리 꺼짐";
+});
+document.getElementById("startBtn").addEventListener("pointerdown", () => {
+  document.getElementById("startOverlay").classList.add("hidden");
+  idx = 0; score = 0; renderQuestion();
+});
+document.getElementById("restartBtn").addEventListener("pointerdown", () => {
+  document.getElementById("endOverlay").classList.add("hidden");
+  idx = 0; score = 0; renderQuestion();
+});
+</script>
+</body>
+</html>

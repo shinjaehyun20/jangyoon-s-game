@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="bg65" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DBEAFE"/>
+      <stop offset="100%" stop-color="#FEF3C7"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" rx="18" fill="url(#bg65)"/>
+  <rect x="14" y="14" width="292" height="152" rx="14" fill="#FFFFFF" fill-opacity="0.9" stroke="#2563EB" stroke-width="3"/>
+  <text x="160" y="40" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#1D4ED8">별빛 텐프레임 로켓 (#065)</text>
+  <g transform="translate(35, 56)">
+    <rect x="0" y="0" width="44" height="38" rx="8" fill="#FEF9C3" stroke="#F59E0B" stroke-width="2"/>
+    <rect x="50" y="0" width="44" height="38" rx="8" fill="#FEF9C3" stroke="#F59E0B" stroke-width="2"/>
+    <rect x="100" y="0" width="44" height="38" rx="8" fill="#FEF9C3" stroke="#F59E0B" stroke-width="2"/>
+    <rect x="150" y="0" width="44" height="38" rx="8" fill="#FEF9C3" stroke="#F59E0B" stroke-width="2"/>
+    <rect x="200" y="0" width="44" height="38" rx="8" fill="#FEF9C3" stroke="#F59E0B" stroke-width="2"/>
+    <rect x="0" y="46" width="44" height="38" rx="8" fill="#FEF9C3" stroke="#F59E0B" stroke-width="2"/>
+    <rect x="50" y="46" width="44" height="38" rx="8" fill="#FEF9C3" stroke="#F59E0B" stroke-width="2"/>
+    <rect x="100" y="46" width="44" height="38" rx="8" fill="#EFF6FF" stroke="#60A5FA" stroke-width="2" stroke-dasharray="4,3"/>
+    <rect x="150" y="46" width="44" height="38" rx="8" fill="#EFF6FF" stroke="#60A5FA" stroke-width="2" stroke-dasharray="4,3"/>
+    <rect x="200" y="46" width="44" height="38" rx="8" fill="#EFF6FF" stroke="#60A5FA" stroke-width="2" stroke-dasharray="4,3"/>
+  </g>
+  <text x="160" y="156" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="900" fill="#047857">7 + 3 = 10 연료 충전 완료!</text>
+</svg>
