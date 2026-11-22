@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "hangul-spacing-train-69",
+        "title": "🎮 칙칙폭폭 띄어쓰기 기차여행",
+        "path": "hangul-spacing-train-69/index.html"
+      },
+      {
+        "id": "shadow-shape-detective-70",
+        "title": "🎮 요리조리 그림자 모양 탐정",
+        "path": "shadow-shape-detective-70/index.html"
+      },
+      {
         "id": "compass-treasure-island",
         "title": "🎮 동서남북 방위표 보물섬 탐험대",
         "path": "compass-treasure-island/index.html"

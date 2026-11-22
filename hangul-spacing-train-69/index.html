@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>칙칙폭폭 띄어쓰기 기차여행</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100vw; height: 100dvh; overflow: hidden;
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    background: linear-gradient(180deg, #E0F2FE 0%, #BAE6FD 52%, #DCFCE7 52%, #86EFAC 100%);
+    touch-action: manipulation;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 12px;
+  }
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.92); border-radius: 18px; padding: 10px 16px;
+    box-shadow: 0 4px 12px rgba(2,132,199,0.15); border: 3px solid #38BDF8;
+  }
+  .title-box { font-size: 1.25rem; font-weight: 900; color: #0369A1; }
+  .score-box { display: flex; gap: 10px; font-size: 1.05rem; font-weight: 800; color: #0F172A; }
+  .badge { background: #FEF08A; padding: 4px 12px; border-radius: 999px; border: 2px solid #FACC15; }
+  .stage-card {
+    background: rgba(255,255,255,0.95); border-radius: 24px; padding: 16px;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.12); border: 4px solid #0284C7;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    flex: 1; margin: 10px 0; justify-content: space-around;
+  }
+  .guide-text {
+    font-size: 1.15rem; font-weight: 800; color: #1E293B; text-align: center;
+    background: #F0F9FF; padding: 10px 18px; border-radius: 16px; border: 2px dashed #38BDF8;
+  }
+  .hint-meaning {
+    font-size: 1.05rem; font-weight: 700; color: #0369A1;
+  }
+  .train-track {
+    width: 100%; background: #475569; height: 14px; border-radius: 8px;
+    position: relative; margin-top: 4px;
+    border-bottom: 4px dashed #F8FAFC;
+  }
+  .train-wrap {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: 4px; padding: 10px 6px; width: 100%;
+  }
+  .char-car {
+    width: 48px; height: 58px; background: linear-gradient(180deg, #38BDF8, #0284C7);
+    color: #FFFFFF; font-size: 1.55rem; font-weight: 900;
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 0 #0369A1; position: relative;
+    border: 2px solid #E0F2FE;
+  }
+  .char-car::after {
+    content: ""; width: 12px; height: 12px; background: #1E293B;
+    border-radius: 50%; position: absolute; bottom: -7px; left: 8px;
+    box-shadow: 20px 0 0 #1E293B;
+  }
+  .connector-btn {
+    width: 30px; height: 48px; border-radius: 10px;
+    border: 2px dashed #94A3B8; background: #F1F5F9;
+    color: #64748B; font-size: 1.1rem; font-weight: 900;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .connector-btn.active {
+    width: 44px; background: #FEF08A; border: 3px solid #EAB308;
+    color: #B45309; transform: scale(1.06);
+  }
+  .preview-sentence {
+    font-size: 1.4rem; font-weight: 900; color: #0F172A;
+    background: #F8FAFC; padding: 12px 20px; border-radius: 16px;
+    border: 2px solid #CBD5E1; min-height: 54px; text-align: center;
+  }
+  .feedback-msg {
+    font-size: 1.2rem; font-weight: 900; min-height: 32px; text-align: center;
+  }
+  .controls-bar {
+    display: flex; gap: 12px; width: 100%; justify-content: center;
+  }
+  .action-btn {
+    flex: 1; max-width: 220px; padding: 14px 18px; font-size: 1.2rem; font-weight: 900;
+    border-radius: 18px; border: none; cursor: pointer;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.18);
+  }
+  .btn-hint { background: #FDE047; color: #854D0E; }
+  .btn-check { background: #22C55E; color: #FFFFFF; }
+  .btn-next { background: #0284C7; color: #FFFFFF; display: none; }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="title-box">🚂 칙칙폭폭 띄어쓰기 기차여행</div>
+    <div class="score-box">
+      <span class="badge" id="stepBadge">1 / 10단계</span>
+      <span class="badge" id="scoreBadge">🌟 0점</span>
+    </div>
+  </div>
+
+  <div class="stage-card">
+    <div class="guide-text" id="guideText">기차 칸 사이의 연결고리를 눌러 띄어쓰기(∨)를 만들어 주세요!</div>
+    <div class="hint-meaning" id="hintMeaning">💡 뜻: 아빠께서 방 안으로 들어가십니다.</div>
+    <div class="train-wrap" id="trainWrap"></div>
+    <div class="train-track"></div>
+    <div class="preview-sentence" id="previewSentence"></div>
+    <div class="feedback-msg" id="feedbackMsg">어디를 띄어 읽으면 바른 문장이 될까요?</div>
+    <div class="controls-bar">
+      <button class="action-btn btn-hint" id="hintBtn" type="button">💡 힌트 보기</button>
+      <button class="action-btn btn-check" id="checkBtn" type="button">✅ 출발 확인!</button>
+      <button class="action-btn btn-next" id="nextBtn" type="button">다음 기차 🚂</button>
+    </div>
+  </div>
+
+<script>
+const STAGES = [
+  { raw: "아빠가방에들어가신다", spaces: [3, 5], meaning: "아빠께서 방 안으로 들어가십니다.", answer: "아빠가 방에 들어가신다" },
+  { raw: "장윤이가학교에갑니다", spaces: [4, 7], meaning: "장윤이가 즐겁게 학교로 등교합니다.", answer: "장윤이가 학교에 갑니다" },
+  { raw: "예쁜꽃이활짝피었어요", spaces: [2, 4, 6], meaning: "화단에 예쁜 꽃이 활짝 피어났어요.", answer: "예쁜 꽃이 활짝 피었어요" },
+  { raw: "엄마와함께책을읽어요", spaces: [3, 5, 7], meaning: "엄마와 나란히 재미있는 동화책을 읽어요.", answer: "엄마와 함께 책을 읽어요" },
+  { raw: "파란하늘에구름이둥실", spaces: [2, 5, 8], meaning: "맑고 파란 하늘에 흰 구름이 떠 있어요.", answer: "파란 하늘에 구름이 둥실" },
+  { raw: "친구에게고마운마음전해요", spaces: [4, 7, 9], meaning: "친절한 친구에게 고마운 마음을 말해요.", answer: "친구에게 고마운 마음 전해요" },
+  { raw: "오늘급식밥이참맛있다", spaces: [2, 4, 6, 7], meaning: "학교에서 먹는 오늘 점심 급식이 정말 맛있어요.", answer: "오늘 급식 밥이 참 맛있다" },
+  { raw: "강아지가공원에서뛰어놀아요", spaces: [4, 8], meaning: "귀여운 강아지가 넓은 공원에서 신나게 달립니다.", answer: "강아지가 공원에서 뛰어놀아요" },
+  { raw: "횡단보도초록불에건너요", spaces: [4, 8], meaning: "안전하게 초록 신호등이 켜지면 길을 건너요.", answer: "횡단보도 초록불에 건너요" },
+  { raw: "스스로정리하는멋진일학년", spaces: [3, 7, 9], meaning: "내 물건을 스스로 정리하는 멋진 초등 1학년!", answer: "스스로 정리하는 멋진 일학년" }
+];
+
+let currentIdx = 0;
+let score = 0;
+let activeSpaces = new Set();
+let audioCtx = null;
+
+function playTone(freq, dur, type="sine") {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function buildSentenceText(raw, spaceSet) {
+  let out = "";
+  for (let i = 0; i < raw.length; i++) {
+    out += raw[i];
+    if (spaceSet.has(i + 1)) out += " ";
+  }
+  return out;
+}
+
+function renderStage() {
+  const st = STAGES[currentIdx];
+  activeSpaces.clear();
+  document.getElementById("stepBadge").textContent = (currentIdx + 1) + " / " + STAGES.length + "단계";
+  document.getElementById("scoreBadge").textContent = "🌟 " + score + "점";
+  document.getElementById("hintMeaning").textContent = "💡 뜻: " + st.meaning;
+  document.getElementById("feedbackMsg").textContent = "글자 칸 사이를 눌러 띄어쓰기(∨)를 넣어 보세요!";
+  document.getElementById("feedbackMsg").style.color = "#0369A1";
+  document.getElementById("checkBtn").style.display = "inline-block";
+  document.getElementById("nextBtn").style.display = "none";
+
+  const wrap = document.getElementById("trainWrap");
+  wrap.innerHTML = "";
+  const chars = Array.from(st.raw);
+  chars.forEach((ch, idx) => {
+    const car = document.createElement("div");
+    car.className = "char-car";
+    car.textContent = ch;
+    wrap.appendChild(car);
+
+    if (idx < chars.length - 1) {
+      const gapPos = idx + 1;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "connector-btn";
+      btn.textContent = "·";
+      btn.addEventListener("click", () => {
+        if (activeSpaces.has(gapPos)) {
+          activeSpaces.delete(gapPos);
+          btn.classList.remove("active");
+          btn.textContent = "·";
+          playTone(330, 0.08);
+        } else {
+          activeSpaces.add(gapPos);
+          btn.classList.add("active");
+          btn.textContent = "∨";
+          playTone(520, 0.09);
+        }
+        updatePreview();
+      });
+      wrap.appendChild(btn);
+    }
+  });
+  updatePreview();
+}
+
+function updatePreview() {
+  const st = STAGES[currentIdx];
+  document.getElementById("previewSentence").textContent = buildSentenceText(st.raw, activeSpaces);
+}
+
+document.getElementById("hintBtn").addEventListener("click", () => {
+  const st = STAGES[currentIdx];
+  const buttons = document.querySelectorAll(".connector-btn");
+  for (const pos of st.spaces) {
+    if (!activeSpaces.has(pos)) {
+      activeSpaces.add(pos);
+      if (buttons[pos - 1]) {
+        buttons[pos - 1].classList.add("active");
+        buttons[pos - 1].textContent = "∨";
+      }
+      break;
+    }
+  }
+  playTone(660, 0.12);
+  updatePreview();
+});
+
+document.getElementById("checkBtn").addEventListener("click", () => {
+  const st = STAGES[currentIdx];
+  const expected = st.spaces.slice().sort((a,b)=>a-b).join(",");
+  const actual = Array.from(activeSpaces).sort((a,b)=>a-b).join(",");
+  const fb = document.getElementById("feedbackMsg");
+  if (expected === actual) {
+    score += 10;
+    document.getElementById("scoreBadge").textContent = "🌟 " + score + "점";
+    fb.textContent = "🎉 정답이에요! '" + st.answer + "' 기차가 신나게 출발합니다!";
+    fb.style.color = "#15803D";
+    playTone(523, 0.1);
+    setTimeout(() => playTone(659, 0.12), 110);
+    setTimeout(() => playTone(784, 0.2), 230);
+    document.getElementById("checkBtn").style.display = "none";
+    document.getElementById("nextBtn").style.display = "inline-block";
+  } else {
+    fb.textContent = "앗! 띄어쓰기 위치(" + st.spaces.length + "곳)를 다시 한번 살펴볼까요?";
+    fb.style.color = "#B91C1C";
+    playTone(220, 0.18, "sawtooth");
+  }
+});
+
+document.getElementById("nextBtn").addEventListener("click", () => {
+  currentIdx = (currentIdx + 1) % STAGES.length;
+  renderStage();
+});
+
+renderStage();
+</script>
+</body>
+</html>
