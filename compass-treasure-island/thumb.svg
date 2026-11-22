@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="bg67" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E0F2FE"/>
+      <stop offset="100%" stop-color="#FEF3C7"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" rx="18" fill="url(#bg67)"/>
+  <rect x="14" y="14" width="292" height="152" rx="14" fill="#FFFFFF" fill-opacity="0.92" stroke="#0284C7" stroke-width="3"/>
+  <text x="160" y="38" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#0369A1">동서남북 보물섬 탐험 (#067)</text>
+  <circle cx="160" cy="96" r="42" fill="#F0F9FF" stroke="#0284C7" stroke-width="3"/>
+  <text x="160" y="70" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="900" fill="#DC2626">북(↑)</text>
+  <text x="160" y="130" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="900" fill="#2563EB">남(↓)</text>
+  <text x="128" y="101" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="#047857">서(←)</text>
+  <text x="192" y="101" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="#D97706">동(→)</text>
+  <text x="160" y="156" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="#0F172A">방위표를 보고 보물섬 위치를 찾아요!</text>
+</svg>

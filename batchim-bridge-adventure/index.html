@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>받침 징검다리 건너기 대모험 (#068)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100vw; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, #DCFCE7 0%, #E0F2FE 55%, #FEF3C7 100%);
+    color: #0F172A;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 14px;
+  }
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.95); border: 3px solid #16A34A;
+    border-radius: 18px; padding: 8px 14px; height: 11dvh; min-height: 54px;
+  }
+  .title-wrap { display: flex; align-items: center; gap: 8px; }
+  .title-text { font-size: 1.12rem; font-weight: 900; color: #15803D; }
+  .hud-group { display: flex; align-items: center; gap: 8px; }
+  .badge {
+    background: #FEF08A; border: 2px solid #F59E0B; border-radius: 14px;
+    padding: 5px 10px; font-weight: 800; font-size: 0.92rem; color: #B45309;
+  }
+  .btn-util {
+    background: #E0E7FF; border: 2px solid #4F46E5; border-radius: 12px;
+    padding: 6px 10px; font-weight: 800; font-size: 0.88rem; color: #3730A3; cursor: pointer;
+    min-height: 44px; display: inline-flex; align-items: center; text-decoration: none;
+  }
+  .stage {
+    flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center;
+  }
+  .word-card {
+    width: 100%; max-width: 520px; background: #FFFFFF;
+    border: 4px solid #16A34A; border-radius: 22px; padding: 14px 16px; text-align: center;
+    box-shadow: 0 6px 14px rgba(22,163,74,0.15);
+  }
+  .word-emoji { font-size: 3.1rem; line-height: 1.1; margin-bottom: 6px; }
+  .word-title { font-size: 1.28rem; font-weight: 900; color: #1E293B; margin-bottom: 4px; }
+  .word-desc { font-size: 0.95rem; font-weight: 700; color: #475569; }
+  .choices-wrap {
+    width: 100%; max-width: 520px; background: rgba(255,255,255,0.95);
+    border: 3px solid #16A34A; border-radius: 22px; padding: 12px;
+  }
+  .choices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .choice-btn {
+    min-height: 60px; border-radius: 16px; border: 3px solid #4ADE80;
+    background: #F0FDF4; font-size: 1.24rem; font-weight: 900; color: #14532D;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .choice-btn:active { transform: scale(0.96); }
+  .feedback-bar {
+    height: 7dvh; min-height: 40px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.08rem; font-weight: 900; color: #047857; text-align: center;
+  }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.72);
+    display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px;
+  }
+  .overlay.hidden { display: none; }
+  .modal {
+    background: #FFFFFF; border: 5px solid #16A34A; border-radius: 26px;
+    padding: 24px 20px; max-width: 420px; width: 100%; text-align: center;
+  }
+  .modal h1 { font-size: 1.55rem; color: #15803D; margin-bottom: 10px; }
+  .modal p { font-size: 1.05rem; color: #334155; font-weight: 700; line-height: 1.5; margin-bottom: 18px; }
+  .btn-start {
+    width: 100%; min-height: 54px; border-radius: 16px; border: none;
+    background: #16A34A; color: #FFFFFF; font-size: 1.25rem; font-weight: 900; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="title-wrap">
+      <a href="../../index.html" class="btn-util">← 홈으로</a>
+      <span class="title-text">🐸 받침 징검다리 모험</span>
+    </div>
+    <div class="hud-group">
+      <span class="badge" id="progressBadge">1 / 8단계</span>
+      <span class="badge" id="scoreBadge">점수 0점</span>
+      <button class="btn-util" id="soundBtn" type="button">🔊 소리 켜짐</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="word-card">
+      <div class="word-emoji" id="wordEmoji">☁️</div>
+      <div class="word-title" id="wordTitle">하늘에 둥실둥실 떠 있는 '구[ ? ]'</div>
+      <div class="word-desc" id="wordDesc">알맞은 받침(ㅁ, ㄴ, ㄹ, ㅇ, ㄱ, ㅂ)이 들어간 징검다리를 골라 주세요!</div>
+    </div>
+
+    <div class="choices-wrap">
+      <div class="choices-grid" id="choicesGrid"></div>
+    </div>
+  </div>
+
+  <div class="feedback-bar" id="feedbackBar">바른 받침 낱말 징검다리를 터치해 시냇물을 건너요!</div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="modal">
+      <h1>🐸 받침 징검다리 대모험</h1>
+      <p>장윤이 탐험가님! 시냇물을 건너려면<br>받침(ㄱ, ㄴ, ㄹ, ㅁ, ㅂ, ㅇ)이 바르게 들어간<br>튼튼한 낱말 징검다리를 골라야 해요!</p>
+      <button class="btn-start" id="startBtn" type="button">징검다리 건너기 출발!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="modal">
+      <h1>🎉 받침 징검다리 완주 성공!</h1>
+      <p id="endSummary">8개의 받침 징검다리를 모두 안전하게 건넜어요!</p>
+      <button class="btn-start" id="restartBtn" type="button">한 번 더 건너기</button>
+    </div>
+  </div>
+
+<script>
+const QUESTIONS = [
+  { emoji: "☁️", prompt: "하늘에 둥실둥실 떠 있는 하얀 것은?", desc: "'ㅁ(미음)' 받침이 들어가는 낱말을 찾아보세요!", ans: "구름", choices: ["구름", "구른", "구릉", "구릅"] },
+  { emoji: "☂️", prompt: "비가 올 때 활짝 펴고 쓰는 것은?", desc: "'ㄴ(니은)' 받침이 들어가는 낱말을 찾아보세요!", ans: "우산", choices: ["우살", "우산", "우삼", "우상"] },
+  { emoji: "🎒", prompt: "학교 갈 때 어깨에 메는 것은?", desc: "'ㅇ(이응)' 받침이 들어가는 낱말을 찾아보세요!", ans: "가방", choices: ["가반", "가발", "가방", "가밤"] },
+  { emoji: "🍉", prompt: "여름에 먹는 시원하고 빨간 과일은?", desc: "'ㄱ(기역)' 받침이 들어가는 낱말을 찾아보세요!", ans: "수박", choices: ["수반", "수박", "수발", "수방"] },
+  { emoji: "✏️", prompt: "공책에 글씨를 쓸 때 잡는 학용품은?", desc: "'ㄴ'과 'ㄹ' 받침이 들어가는 낱말을 찾아보세요!", ans: "연필", choices: ["열필", "연핀", "연필", "영필"] },
+  { emoji: "🐶", prompt: "멍멍! 꼬리를 흔드는 귀여운 동물은?", desc: "'ㅇ(이응)' 받침이 들어가는 낱말을 찾아보세요!", ans: "강아지", choices: ["간아지", "갈아지", "강아지", "감아지"] },
+  { emoji: "🐌", prompt: "등에 동그란 집을 지고 천천히 가는 친구는?", desc: "'ㄹ'과 'ㅇ' 받침이 들어가는 낱말을 찾아보세요!", ans: "달팽이", choices: ["단팽이", "달팽이", "담팽이", "달팬이"] },
+  { emoji: "🍚", prompt: "김치와 밥을 맛있게 볶아 만든 요리는?", desc: "'ㅂ(비읍)' 받침이 들어가는 낱말을 찾아보세요!", ans: "볶음밥", choices: ["볶음밤", "볶음반", "볶음밥", "볶음방"] }
+];
+
+let idx = 0, score = 0, soundOn = true, locked = false;
+const STORAGE_KEY = "batchim-bridge-adventure_best";
+let audioCtx = null;
+
+function playTone(freq, dur) {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    osc.type = "sine";
+    gain.gain.setValueAtTime(0.16, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function renderQuestion() {
+  locked = false;
+  const q = QUESTIONS[idx];
+  document.getElementById("progressBadge").textContent = (idx + 1) + " / " + QUESTIONS.length + "단계";
+  document.getElementById("scoreBadge").textContent = "점수 " + score + "점";
+  document.getElementById("wordEmoji").textContent = q.emoji;
+  document.getElementById("wordTitle").textContent = q.prompt;
+  document.getElementById("wordDesc").textContent = q.desc;
+  document.getElementById("feedbackBar").textContent = "바른 받침이 들어간 징검다리를 골라 보세요!";
+
+  const grid = document.getElementById("choicesGrid");
+  grid.innerHTML = "";
+  q.choices.forEach(word => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "choice-btn";
+    btn.textContent = "🪨 " + word;
+    btn.addEventListener("pointerdown", () => handleChoice(word));
+    grid.appendChild(btn);
+  });
+}
+
+function handleChoice(word) {
+  if (locked) return;
+  const q = QUESTIONS[idx];
+  if (word === q.ans) {
+    locked = true;
+    score += 10;
+    document.getElementById("scoreBadge").textContent = "점수 " + score + "점";
+    document.getElementById("feedbackBar").textContent = "폴짝! '" + word + "' 징검다리를 밟고 멋지게 건넜어요!";
+    playTone(587.33, 0.14); setTimeout(() => playTone(783.99, 0.18), 120);
+    setTimeout(() => {
+      idx++;
+      if (idx < QUESTIONS.length) {
+        renderQuestion();
+      } else {
+        const best = Math.max(score, Number(localStorage.getItem(STORAGE_KEY) || 0));
+        localStorage.setItem(STORAGE_KEY, String(best));
+        document.getElementById("endSummary").textContent = "최종 점수 " + score + "점! (최고 기록 " + best + "점) 받침 낱말 8개를 모두 마스터했어요!";
+        document.getElementById("endOverlay").classList.remove("hidden");
+      }
+    }, 900);
+  } else {
+    playTone(220, 0.2);
+    document.getElementById("feedbackBar").textContent = "아하, '" + word + "' 말고 받침 소리를 다시 한번 천천히 읽어 볼까요?";
+  }
+}
+
+document.getElementById("soundBtn").addEventListener("pointerdown", () => {
+  soundOn = !soundOn;
+  document.getElementById("soundBtn").textContent = soundOn ? "🔊 소리 켜짐" : "🔇 소리 꺼짐";
+});
+document.getElementById("startBtn").addEventListener("pointerdown", () => {
+  document.getElementById("startOverlay").classList.add("hidden");
+  idx = 0; score = 0; renderQuestion();
+});
+document.getElementById("restartBtn").addEventListener("pointerdown", () => {
+  document.getElementById("endOverlay").classList.add("hidden");
+  idx = 0; score = 0; renderQuestion();
+});
+</script>
+</body>
+</html>

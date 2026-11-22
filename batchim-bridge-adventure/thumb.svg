@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="bg68" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DCFCE7"/>
+      <stop offset="100%" stop-color="#E0F2FE"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" rx="18" fill="url(#bg68)"/>
+  <rect x="14" y="14" width="292" height="152" rx="14" fill="#FFFFFF" fill-opacity="0.92" stroke="#16A34A" stroke-width="3"/>
+  <text x="160" y="40" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#15803D">받침 징검다리 대모험 (#068)</text>
+  <rect x="38" y="62" width="244" height="44" rx="12" fill="#F0FDF4" stroke="#4ADE80" stroke-width="2.5"/>
+  <text x="160" y="90" text-anchor="middle" font-family="sans-serif" font-size="17" font-weight="900" fill="#14532D">ㄱ · ㄴ · ㄹ · ㅁ · ㅂ · ㅇ</text>
+  <text x="160" y="140" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="900" fill="#047857">구름 · 우산 · 가방 · 수박 · 연필</text>
+</svg>

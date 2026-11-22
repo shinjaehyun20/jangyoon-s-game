@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "compass-treasure-island",
+        "title": "🎮 동서남북 방위표 보물섬 탐험대",
+        "path": "compass-treasure-island/index.html"
+      },
+      {
+        "id": "batchim-bridge-adventure",
+        "title": "🎮 받침 징검다리 건너기 대모험",
+        "path": "batchim-bridge-adventure/index.html"
+      },
+      {
         "id": "ten-frame-star-rocket",
         "title": "🎮 별빛 텐프레임 10 만들기 우주 로켓",
         "path": "ten-frame-star-rocket/index.html"
