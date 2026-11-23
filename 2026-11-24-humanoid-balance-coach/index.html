@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>삐리릿! 휴머노이드 균형 코치</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100vw; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: linear-gradient(180deg, #E0F2FE 0%, #BAE6FD 55%, #F8FAFC 100%);
+    color: #0F172A;
+    display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+    padding: 10px 12px;
+  }
+  .top-bar {
+    width: 100%; max-width: 440px;
+    background: rgba(255,255,255,0.92);
+    border: 3px solid #38BDF8; border-radius: 18px;
+    padding: 8px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 4px 12px rgba(2,132,199,0.12);
+  }
+  .title-box { font-size: 1.05rem; font-weight: 800; color: #0369A1; }
+  .stats-box { display: flex; gap: 10px; font-size: 0.92rem; font-weight: 700; color: #0F172A; }
+  .badge { background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px; padding: 2px 8px; color: #B45309; }
+  .stage-area {
+    width: 100%; max-width: 440px; flex: 1; margin: 8px 0;
+    background: rgba(255,255,255,0.88);
+    border: 3px solid #7DD3FC; border-radius: 22px;
+    display: flex; flex-direction: column; justify-content: space-around; align-items: center;
+    padding: 10px; position: relative;
+    box-shadow: inset 0 2px 10px rgba(56,189,248,0.15);
+  }
+  .mission-banner {
+    background: #EFF6FF; border: 2px solid #60A5FA; border-radius: 14px;
+    padding: 6px 12px; font-size: 0.95rem; font-weight: 700; color: #1D4ED8;
+    text-align: center; width: 96%;
+  }
+  .robot-wrap {
+    width: 220px; height: 185px;
+    display: flex; justify-content: center; align-items: center;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .gauge-bar {
+    width: 92%; background: #E2E8F0; border-radius: 16px; height: 34px;
+    border: 2px solid #94A3B8; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
+    font-weight: 800; font-size: 0.92rem;
+  }
+  .gauge-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, #38BDF8, #22C55E);
+    width: 50%; transition: width 0.25s ease; z-index: 1; opacity: 0.35;
+  }
+  .gauge-text { position: relative; z-index: 2; width: 100%; display: flex; justify-content: space-between; }
+  .controls-area {
+    width: 100%; max-width: 440px;
+    background: rgba(255,255,255,0.95);
+    border: 3px solid #38BDF8; border-radius: 20px;
+    padding: 10px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .prompt-label { text-align: center; font-size: 0.95rem; font-weight: 800; color: #0F172A; }
+  .btn-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .num-btn {
+    height: 54px; border-radius: 16px; border: 3px solid #0284C7;
+    background: #F0F9FF; color: #0369A1;
+    font-size: 1.25rem; font-weight: 900;
+    cursor: pointer; transition: transform 0.1s, background 0.15s;
+    box-shadow: 0 4px 0 #0284C7;
+  }
+  .num-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #0284C7; background: #BAE6FD; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.72);
+    display: flex; justify-content: center; align-items: center; z-index: 50;
+    padding: 16px;
+  }
+  .modal-card {
+    width: 100%; max-width: 380px; background: #FFFFFF;
+    border: 4px solid #38BDF8; border-radius: 24px;
+    padding: 20px; text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  }
+  .modal-title { font-size: 1.35rem; font-weight: 900; color: #0284C7; margin-bottom: 8px; }
+  .modal-desc { font-size: 0.98rem; line-height: 1.45; color: #334155; margin-bottom: 16px; font-weight: 600; }
+  .start-btn {
+    width: 100%; height: 52px; border-radius: 16px; border: none;
+    background: linear-gradient(90deg, #0284C7, #2563EB);
+    color: #FFFFFF; font-size: 1.15rem; font-weight: 900; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="title-box">🤖 휴머노이드 균형 코치</div>
+    <div class="stats-box">
+      <span class="badge" id="stageText">1단계</span>
+      <span class="badge" id="scoreText">점수 0</span>
+    </div>
+  </div>
+
+  <div class="stage-area">
+    <div class="mission-banner" id="missionText">장윤 코치님! 양손 무게를 똑같이 맞춰 주세요!</div>
+    <div class="robot-wrap" id="robotWrap">
+      <svg width="200" height="175" viewBox="0 0 200 175" aria-label="카이로스 휴머노이드 로봇">
+        <!-- Left & Right Arms with Weights -->
+        <line x1="35" y1="85" x2="70" y2="75" stroke="#0284C7" stroke-width="10" stroke-linecap="round"/>
+        <line x1="130" y1="75" x2="165" y2="85" stroke="#0284C7" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="28" cy="95" r="22" fill="#FDE047" stroke="#CA8A04" stroke-width="4"/>
+        <text x="28" y="101" text-anchor="middle" font-size="16" font-weight="900" fill="#854D0E" id="leftWeightSvg">7</text>
+        <circle cx="172" cy="95" r="22" fill="#BFDBFE" stroke="#2563EB" stroke-width="4"/>
+        <text x="172" y="101" text-anchor="middle" font-size="15" font-weight="900" fill="#1E3A8A" id="rightWeightSvg">3+?</text>
+        <!-- Robot Head & Body -->
+        <rect x="72" y="18" width="56" height="44" rx="14" fill="#FFFFFF" stroke="#0284C7" stroke-width="4"/>
+        <circle cx="88" cy="38" r="6" fill="#0EA5E9"/>
+        <circle cx="112" cy="38" r="6" fill="#0EA5E9"/>
+        <path d="M 88 50 Q 100 58 112 50" stroke="#0284C7" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <line x1="100" y1="6" x2="100" y2="18" stroke="#F59E0B" stroke-width="4"/>
+        <circle cx="100" cy="6" r="5" fill="#F59E0B"/>
+        <rect x="66" y="66" width="68" height="60" rx="16" fill="#38BDF8" stroke="#0369A1" stroke-width="4"/>
+        <rect x="80" y="78" width="40" height="26" rx="8" fill="#E0F2FE"/>
+        <text x="100" y="96" text-anchor="middle" font-size="12" font-weight="900" fill="#0369A1" id="chestStatus">균형!</text>
+        <!-- Bipedal Legs -->
+        <rect x="76" y="128" width="16" height="34" rx="6" fill="#0284C7"/>
+        <rect x="108" y="128" width="16" height="34" rx="6" fill="#0284C7"/>
+        <rect x="70" y="156" width="24" height="12" rx="5" fill="#F59E0B"/>
+        <rect x="106" y="156" width="24" height="12" rx="5" fill="#F59E0B"/>
+      </svg>
+    </div>
+    <div class="gauge-bar">
+      <div class="gauge-fill" id="gaugeFill"></div>
+      <div class="gauge-text">
+        <span id="leftDesc">왼손 상자: 7kg</span>
+        <span id="rightDesc">오른손 상자: 3 + ? kg</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-area">
+    <div class="prompt-label" id="promptLabel">오른손에 몇 kg 블록을 더 실어야 똑같아질까요?</div>
+    <div class="btn-grid" id="btnGrid"></div>
+  </div>
+
+  <div class="overlay" id="modalOverlay">
+    <div class="modal-card">
+      <div class="modal-title" id="modalTitle">삐리릿! 휴머노이드 균형 코치</div>
+      <div class="modal-desc" id="modalDesc">
+        대전 로봇 연구소의 두 발 보행 로봇이 넘어지지 않게<br>
+        왼손과 오른손 무게를 똑같이 맞춰 주세요!<br>
+        <strong>총 9번</strong> 균형을 잡으면 마스터 코치 성공!
+      </div>
+      <button class="start-btn" id="startBtn">훈련 시작하기</button>
+    </div>
+  </div>
+
+<script>
+(function() {
+  const Missions = [
+    "우유 상자 옮기기: 양손 무게를 똑같이 맞춰요!",
+    "세탁 바구니 들기: 흔들리지 않게 덧셈해요!",
+    "장난감 정리하기: 두 발 로봇의 중심을 잡아요!"
+  ];
+  let score = 0;
+  let round = 0;
+  const totalRounds = 9;
+  let currentAnswer = 4;
+  let audioCtx = null;
+
+  function playTone(freq, dur, type) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function makeQuestion() {
+    const stage = Math.min(3, Math.floor(round / 3) + 1);
+    document.getElementById('stageText').textContent = stage + '단계 (' + (round + 1) + '/' + totalRounds + ')';
+    document.getElementById('missionText').textContent = Missions[stage - 1];
+
+    const maxSum = stage === 1 ? 10 : (stage === 2 ? 15 : 20);
+    const minSum = stage === 1 ? 5 : (stage === 2 ? 9 : 12);
+    const target = Math.floor(Math.random() * (maxSum - minSum + 1)) + minSum;
+    const base = Math.floor(Math.random() * (target - 2)) + 1;
+    currentAnswer = target - base;
+
+    document.getElementById('leftWeightSvg').textContent = target;
+    document.getElementById('rightWeightSvg').textContent = base + '+?';
+    document.getElementById('leftDesc').textContent = '왼손 무게: ' + target;
+    document.getElementById('rightDesc').textContent = '오른손: ' + base + ' + [ ? ]';
+    document.getElementById('chestStatus').textContent = '기우뚱!';
+    document.getElementById('robotWrap').style.transform = 'rotate(-11deg)';
+    document.getElementById('gaugeFill').style.width = Math.round((round / totalRounds) * 100) + '%';
+
+    const choices = new Set([currentAnswer]);
+    while (choices.size < 4) {
+      const cand = Math.max(1, currentAnswer + Math.floor(Math.random() * 7) - 3);
+      if (cand !== currentAnswer) choices.add(cand);
+    }
+    const sorted = Array.from(choices).sort((a, b) => a - b);
+    const grid = document.getElementById('btnGrid');
+    grid.innerHTML = '';
+    sorted.forEach(num => {
+      const btn = document.createElement('button');
+      btn.className = 'num-btn';
+      btn.textContent = num;
+      btn.onclick = () => checkAnswer(num);
+      grid.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(chosen) {
+    if (chosen === currentAnswer) {
+      score += 100;
+      round += 1;
+      document.getElementById('scoreText').textContent = '점수 ' + score;
+      document.getElementById('chestStatus').textContent = '성공!';
+      document.getElementById('robotWrap').style.transform = 'rotate(0deg) scale(1.06)';
+      playTone(523.25, 0.12, 'triangle');
+      setTimeout(() => playTone(659.25, 0.18, 'triangle'), 110);
+
+      if (round >= totalRounds) {
+        setTimeout(showVictory, 450);
+      } else {
+        setTimeout(makeQuestion, 520);
+      }
+    } else {
+      document.getElementById('chestStatus').textContent = '다시!';
+      document.getElementById('robotWrap').style.transform = 'rotate(14deg)';
+      playTone(220, 0.2, 'sawtooth');
+    }
+  }
+
+  function showVictory() {
+    document.getElementById('gaugeFill').style.width = '100%';
+    document.getElementById('modalTitle').textContent = '🎉 휴머노이드 마스터 코치 달성!';
+    document.getElementById('modalDesc').innerHTML =
+      '우와! 장윤 코치님 덕분에 두 발 로봇이 한 번도 넘어지지 않고<br>' +
+      '모든 심부름을 완벽하게 해냈어요!<br><strong>최종 점수: ' + score + '점</strong>';
+    document.getElementById('startBtn').textContent = '다시 훈련하기';
+    document.getElementById('modalOverlay').classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').onclick = () => {
+    score = 0;
+    round = 0;
+    document.getElementById('scoreText').textContent = '점수 0';
+    document.getElementById('modalOverlay').classList.add('hidden');
+    playTone(440, 0.1, 'sine');
+    makeQuestion();
+  };
+})();
+</script>
+</body>
+</html>

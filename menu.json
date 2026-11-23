@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "2026-11-24-humanoid-balance-coach",
+        "title": "🎮 삐리릿! 휴머노이드 균형 코치",
+        "path": "2026-11-24-humanoid-balance-coach/index.html"
+      },
+      {
+        "id": "2026-11-24-quantum-star-lock",
+        "title": "🎮 반짝반짝! 양자 별자리 자물쇠",
+        "path": "2026-11-24-quantum-star-lock/index.html"
+      },
+      {
         "id": "hangul-spacing-train-69",
         "title": "🎮 칙칙폭폭 띄어쓰기 기차여행",
         "path": "hangul-spacing-train-69/index.html"

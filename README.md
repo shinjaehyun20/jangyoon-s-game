@@ -1,13 +1,13 @@
 # 장윤이 게임 놀이터 · Jangyoon's Game Arcade
 
-> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 366개.
+> 설치 없이 바로 여는, 터치 중심 어린이 미니게임 368개.
 
-[![Games](https://img.shields.io/badge/games-366-6C5CE7)](games.json)
+[![Games](https://img.shields.io/badge/games-368-6C5CE7)](games.json)
 [![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-FFB703)](#프로젝트-구조)
 [![Pages](https://img.shields.io/badge/play-GitHub%20Pages-00B894)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[![366개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
+[![368개의 게임을 한 곳에서 고르는 장윤이 게임 놀이터](docs/assets/portfolio-hero.svg)](https://shinjaehyun20.github.io/jangyoon-s-game/)
 
 **[지금 게임 고르기](https://shinjaehyun20.github.io/jangyoon-s-game/)** · [처음이면 몬스터 파크](https://shinjaehyun20.github.io/jangyoon-s-game/monster-park/) · [학습 게임 달 로켓 수학](https://shinjaehyun20.github.io/jangyoon-s-game/moon-rocket-math/)
 
@@ -25,7 +25,7 @@
 ## 게임 목록
 
 <details>
-<summary><strong>전체 366개 게임 목록 펼치기</strong></summary>
+<summary><strong>전체 368개 게임 목록 펼치기</strong></summary>
 
 | 게임 | 설명 | 카테고리 |
 |---|---|---|
@@ -395,6 +395,8 @@
 | [🎮 받침 징검다리 건너기 대모험 (batchim-bridge-adventure)](./batchim-bridge-adventure/index.html) | 🎮 받침 징검다리 건너기 대모험 인터랙티브 미니게임입니다. | 어린이/아케이드 |
 | [🎮 칙칙폭폭 띄어쓰기 기차여행 (hangul-spacing-train-69)](./hangul-spacing-train-69/index.html) | 🎮 칙칙폭폭 띄어쓰기 기차여행 (초1국어·띄어쓰기·문장읽기·기차여행) 맞춤형 인터랙티브 학습·아케이드 미니게임입니다. | 어린이/아케이드 |
 | [🎮 요리조리 그림자 모양 탐정 (shadow-shape-detective-70)](./shadow-shape-detective-70/index.html) | 🎮 요리조리 그림자 모양 탐정 (초1수학·여러가지모양·상자모양·둥근기둥·공모양·그림자관찰) 맞춤형 인터랙티브 학습·아케이드 미니게임입니다. | 어린이/아케이드 |
+| [🎮 삐리릿! 휴머노이드 균형 코치 (2026-11-24-humanoid-balance-coach)](./2026-11-24-humanoid-balance-coach/index.html) | 두 발 보행 로봇 양손 덧셈 균형 맞추기 | 어린이/아케이드 |
+| [🎮 반짝반짝! 양자 별자리 자물쇠 (2026-11-24-quantum-star-lock)](./2026-11-24-quantum-star-lock/index.html) | 수열 규칙 찾기와 한글·숫자 양자 암호 퍼즐 | 어린이/아케이드 |
 
 </details>
 
@@ -570,6 +572,8 @@ VS Code `Live Server` 확장을 써도 된다.
 - **호스팅**: GitHub Pages (정적)
 
 ## 최근 변경사항 (2026-11)
+- 2026-11-24: [🎮 반짝반짝! 양자 별자리 자물쇠](2026-11-24-quantum-star-lock/index.html), [🎮 삐리릿! 휴머노이드 균형 코치](2026-11-24-humanoid-balance-coach/index.html) (총 368개)
+
 - 2026-11-23: [🎮 요리조리 그림자 모양 탐정](shadow-shape-detective-70/index.html), [🎮 칙칙폭폭 띄어쓰기 기차여행](hangul-spacing-train-69/index.html) (총 366개)
 
 - 2026-11-23: [🎮 받침 징검다리 건너기 대모험](batchim-bridge-adventure/index.html), [🎮 동서남북 방위표 보물섬 탐험대](compass-treasure-island/index.html) (총 364개)

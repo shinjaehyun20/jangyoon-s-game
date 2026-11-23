@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>반짝반짝! 양자 별자리 자물쇠</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100vw; height: 100dvh; overflow: hidden;
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: linear-gradient(180deg, #1E1B4B 0%, #312E81 55%, #1E293B 100%);
+    color: #F8FAFC;
+    display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+    padding: 10px 12px;
+  }
+  .top-bar {
+    width: 100%; max-width: 440px;
+    background: rgba(30,41,59,0.92);
+    border: 3px solid #818CF8; border-radius: 18px;
+    padding: 8px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .title-box { font-size: 1.05rem; font-weight: 800; color: #E0E7FF; }
+  .stats-box { display: flex; gap: 8px; font-size: 0.9rem; font-weight: 700; }
+  .badge { background: #312E81; border: 2px solid #A5B4FC; border-radius: 12px; padding: 2px 8px; color: #FDE047; }
+  .vault-area {
+    width: 100%; max-width: 440px; flex: 1; margin: 8px 0;
+    background: rgba(15,23,42,0.82);
+    border: 3px solid #6366F1; border-radius: 22px;
+    display: flex; flex-direction: column; justify-content: space-around; align-items: center;
+    padding: 12px;
+  }
+  .clue-banner {
+    background: rgba(79,70,229,0.35); border: 2px solid #A5B4FC; border-radius: 14px;
+    padding: 8px 12px; font-size: 0.96rem; font-weight: 700; color: #FEF08A;
+    text-align: center; width: 96%;
+  }
+  .slots-row {
+    display: flex; gap: 10px; justify-content: center; align-items: center;
+  }
+  .lock-slot {
+    width: 68px; height: 74px; border-radius: 18px;
+    background: #1E293B; border: 3px solid #818CF8;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1.55rem; font-weight: 900; color: #F8FAFC;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+  }
+  .lock-slot.mystery {
+    border-color: #FACC15; background: #312E81; color: #FDE047;
+    animation: pulse 1.2s infinite alternate;
+  }
+  @keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
+  }
+  .shield-status {
+    font-size: 0.92rem; font-weight: 700; color: #A5F3FC;
+  }
+  .controls-area {
+    width: 100%; max-width: 440px;
+    background: rgba(30,41,59,0.95);
+    border: 3px solid #818CF8; border-radius: 20px;
+    padding: 10px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .prompt-label { text-align: center; font-size: 0.95rem; font-weight: 800; color: #E0E7FF; }
+  .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .key-btn {
+    height: 54px; border-radius: 16px; border: 3px solid #F59E0B;
+    background: #FEF3C7; color: #92400E;
+    font-size: 1.25rem; font-weight: 900; cursor: pointer;
+    box-shadow: 0 4px 0 #D97706;
+  }
+  .key-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #D97706; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.82);
+    display: flex; justify-content: center; align-items: center; z-index: 50; padding: 16px;
+  }
+  .modal-card {
+    width: 100%; max-width: 380px; background: #1E293B;
+    border: 4px solid #FACC15; border-radius: 24px;
+    padding: 20px; text-align: center; color: #F8FAFC;
+  }
+  .modal-title { font-size: 1.35rem; font-weight: 900; color: #FDE047; margin-bottom: 8px; }
+  .modal-desc { font-size: 0.96rem; line-height: 1.45; color: #E2E8F0; margin-bottom: 16px; }
+  .start-btn {
+    width: 100%; height: 52px; border-radius: 16px; border: none;
+    background: linear-gradient(90deg, #F59E0B, #EA580C);
+    color: #FFFFFF; font-size: 1.15rem; font-weight: 900; cursor: pointer;
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="title-box">🔐 양자 별자리 자물쇠</div>
+    <div class="stats-box">
+      <span class="badge" id="stageText">1단계</span>
+      <span class="badge" id="scoreText">점수 0</span>
+    </div>
+  </div>
+
+  <div class="vault-area">
+    <div class="clue-banner" id="clueText">규칙을 찾아 별자리 자물쇠의 빈칸을 잠가 주세요!</div>
+    <svg width="120" height="105" viewBox="0 0 120 105" aria-label="별자리 보물 금고">
+      <polygon points="60,8 73,36 104,40 81,61 87,92 60,76 33,92 39,61 16,40 47,36" fill="#FACC15" stroke="#CA8A04" stroke-width="4"/>
+      <circle cx="60" cy="54" r="16" fill="#1E1B4B" stroke="#818CF8" stroke-width="3"/>
+      <text x="60" y="60" text-anchor="middle" font-size="14" font-weight="900" fill="#FDE047" id="vaultIcon">잠금</text>
+    </svg>
+    <div class="slots-row" id="slotsRow"></div>
+    <div class="shield-status" id="shieldStatus">우주 보물 금고 보호막 가동 중!</div>
+  </div>
+
+  <div class="controls-area">
+    <div class="prompt-label">노란색 물음표(?) 자리에 들어갈 알맞은 열쇠를 눌러 보세요!</div>
+    <div class="btn-grid" id="btnGrid"></div>
+  </div>
+
+  <div class="overlay" id="modalOverlay">
+    <div class="modal-card">
+      <div class="modal-title" id="modalTitle">반짝반짝! 양자 별자리 자물쇠</div>
+      <div class="modal-desc" id="modalDesc">
+        우주 해적 로봇이 별자리 보물 금고를 열지 못하게<br>
+        숫자와 한글 규칙에 맞는 <strong>양자 암호 열쇠</strong>를 찾아 주세요!<br>
+        총 <strong>9개 자물쇠</strong>를 잠그면 우주 보안 대장 성공!
+      </div>
+      <button class="start-btn" id="startBtn">금고 지키러 출발!</button>
+    </div>
+  </div>
+
+<script>
+(function() {
+  const Puzzles = [
+    { clue: "2씩 커지는 별자리 숫자 규칙이에요!", seq: ["2", "4", "6", "?"], ans: "8", opts: ["7", "8", "9", "10"] },
+    { clue: "글자 순서를 잘 보고 빈칸을 채워요!", seq: ["가", "나", "다", "?"], ans: "라", opts: ["라", "마", "바", "사"] },
+    { clue: "3씩 커지는 별자리 숫자 규칙이에요!", seq: ["3", "6", "9", "?"], ans: "12", opts: ["10", "11", "12", "13"] },
+    { clue: "반복되는 별자리 암호를 찾아봐요!", seq: ["별", "달", "별", "?"], ans: "달", opts: ["해", "달", "별", "구름"] },
+    { clue: "5씩 커지는 든든한 양자 숫자예요!", seq: ["5", "10", "15", "?"], ans: "20", opts: ["18", "19", "20", "25"] },
+    { clue: "거꾸로 작아지는 카운트다운 암호!", seq: ["10", "8", "6", "?"], ans: "4", opts: ["2", "3", "4", "5"] },
+    { clue: "받침이 있는 글자 규칙을 찾아봐요!", seq: ["강", "산", "강", "?"], ans: "산", opts: ["바", "산", "하", "들"] },
+    { clue: "10을 만드는 짝꿍 숫자 자물쇠예요!", seq: ["3", "+", "?", "=10"], ans: "7", opts: ["5", "6", "7", "8"] },
+    { clue: "마지막 최종 양자 보물 자물쇠예요!", seq: ["4", "8", "12", "?"], ans: "16", opts: ["14", "15", "16", "18"] }
+  ];
+
+  let idx = 0;
+  let score = 0;
+  let audioCtx = null;
+
+  function beep(freq, dur) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function renderPuzzle() {
+    const p = Puzzles[idx];
+    const stage = Math.floor(idx / 3) + 1;
+    document.getElementById('stageText').textContent = stage + '단계 (' + (idx + 1) + '/9)';
+    document.getElementById('clueText').textContent = p.clue;
+    document.getElementById('vaultIcon').textContent = '잠금중';
+
+    const row = document.getElementById('slotsRow');
+    row.innerHTML = '';
+    p.seq.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'lock-slot' + (item === '?' ? ' mystery' : '');
+      div.textContent = item;
+      row.appendChild(div);
+    });
+
+    const grid = document.getElementById('btnGrid');
+    grid.innerHTML = '';
+    p.opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'key-btn';
+      btn.textContent = opt;
+      btn.onclick = () => pickOption(opt);
+      grid.appendChild(btn);
+    });
+  }
+
+  function pickOption(opt) {
+    const p = Puzzles[idx];
+    if (opt === p.ans) {
+      score += 100;
+      document.getElementById('scoreText').textContent = '점수 ' + score;
+      document.getElementById('vaultIcon').textContent = '철컥!';
+      document.getElementById('shieldStatus').textContent = '야호! ' + (idx + 1) + '번째 양자 자물쇠 잠금 완료!';
+      beep(587.33, 0.12);
+      setTimeout(() => beep(880, 0.18), 110);
+      idx += 1;
+      if (idx >= Puzzles.length) {
+        setTimeout(finishGame, 460);
+      } else {
+        setTimeout(renderPuzzle, 480);
+      }
+    } else {
+      document.getElementById('shieldStatus').textContent = '앗! 다른 열쇠를 눌러 볼까요?';
+      beep(240, 0.2);
+    }
+  }
+
+  function finishGame() {
+    document.getElementById('modalTitle').textContent = '🌟 우주 양자 보안 대장 임명!';
+    document.getElementById('modalDesc').innerHTML =
+      '장윤 대장님이 9개의 별자리 양자 자물쇠를 모두 잠가서<br>' +
+      '보물 금고를 안전하게 지켰어요!<br><strong>최종 점수: ' + score + '점</strong>';
+    document.getElementById('startBtn').textContent = '한 번 더 지키기';
+    document.getElementById('modalOverlay').classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').onclick = () => {
+    idx = 0;
+    score = 0;
+    document.getElementById('scoreText').textContent = '점수 0';
+    document.getElementById('modalOverlay').classList.add('hidden');
+    beep(440, 0.1);
+    renderPuzzle();
+  };
+})();
+</script>
+</body>
+</html>
