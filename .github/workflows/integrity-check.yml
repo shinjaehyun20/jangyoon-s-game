@@ -47,9 +47,24 @@ jobs:
           python -m unittest discover -s scripts -p 'test_*.py'
           python scripts/verify_integrity.py --skip-live
 
-  deploy:
+  build:
     needs: verify
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -62,13 +77,8 @@ jobs:
       group: pages
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
       - name: Deploy verified site
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: ${{ needs.build.outputs.artifact_name }}
