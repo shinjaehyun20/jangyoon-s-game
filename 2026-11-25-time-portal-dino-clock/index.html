@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>째깍째깍! 타임포털 시계 탐험대</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: linear-gradient(180deg, #EDE9FE 0%, #DDD6FE 100%); color: #1E1B4B; }
+  .wrap { display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 500px; height: 100dvh; margin: 0 auto; padding: 12px 14px; }
+  .hud { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.92); border: 3px solid #7C3AED; border-radius: 16px; padding: 8px 14px; }
+  .title-box { font-size: 1.05rem; font-weight: 900; color: #5B21B6; }
+  .stats { display: flex; gap: 8px; font-size: 0.92rem; font-weight: 800; }
+  .badge { background: #F3E8FF; border: 2px solid #8B5CF6; color: #5B21B6; padding: 4px 10px; border-radius: 999px; }
+  .stage { flex: 1; margin: 10px 0; background: rgba(255,255,255,0.78); border: 3px solid #8B5CF6; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 12px; }
+  .story-banner { background: #5B21B6; color: #FFFFFF; padding: 8px 14px; border-radius: 14px; font-size: 1rem; font-weight: 800; text-align: center; width: 95%; }
+  .clock-svg { width: 190px; height: 190px; }
+  .hint-box { font-size: 1.02rem; font-weight: 800; color: #4C1D95; text-align: center; }
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-bottom: 4px; }
+  .btn { background: #FFFFFF; border: 4px solid #7C3AED; border-radius: 18px; padding: 14px 4px; font-size: 1.25rem; font-weight: 900; color: #4C1D95; cursor: pointer; box-shadow: 0 5px 0 #7C3AED; }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #7C3AED; }
+  .modal { position: fixed; inset: 0; background: rgba(30,27,75,0.75); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 20; }
+  .modal-card { background: #FFFFFF; border: 5px solid #8B5CF6; border-radius: 24px; padding: 24px 20px; text-align: center; max-width: 380px; width: 100%; }
+  .modal-title { font-size: 1.55rem; font-weight: 900; color: #5B21B6; margin-bottom: 10px; }
+  .modal-desc { font-size: 1.02rem; font-weight: 700; color: #334155; line-height: 1.5; margin-bottom: 18px; }
+  .start-btn { background: #7C3AED; color: #FFFFFF; border: none; border-radius: 16px; padding: 14px 28px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #5B21B6; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="title-box">🦕 타임포털 시계 탐험대</div>
+    <div class="stats">
+      <span class="badge" id="stepText">탐험 1 / 10</span>
+      <span class="badge" id="scoreText">🌟 0점</span>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="story-banner" id="storyText">아기 공룡 티라노가 시간 문 앞에 도착했어요!</div>
+    <svg class="clock-svg" viewBox="0 0 200 200" id="clockSvg">
+      <circle cx="100" cy="100" r="88" fill="#FFFFFF" stroke="#7C3AED" stroke-width="8"/>
+      <text x="100" y="34" text-anchor="middle" font-size="16" font-weight="900" fill="#1E1B4B">12</text>
+      <text x="134" y="43" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">1</text>
+      <text x="159" y="68" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">2</text>
+      <text x="170" y="106" text-anchor="middle" font-size="16" font-weight="900" fill="#1E1B4B">3</text>
+      <text x="159" y="142" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">4</text>
+      <text x="134" y="167" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">5</text>
+      <text x="100" y="178" text-anchor="middle" font-size="16" font-weight="900" fill="#1E1B4B">6</text>
+      <text x="66" y="167" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">7</text>
+      <text x="41" y="142" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">8</text>
+      <text x="30" y="106" text-anchor="middle" font-size="16" font-weight="900" fill="#1E1B4B">9</text>
+      <text x="41" y="68" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">10</text>
+      <text x="66" y="43" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">11</text>
+      <line id="minHand" x1="100" y1="100" x2="100" y2="36" stroke="#3B82F6" stroke-width="5" stroke-linecap="round"/>
+      <line id="hourHand" x1="100" y1="100" x2="146" y2="100" stroke="#EC4899" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="6" fill="#1E1B4B"/>
+    </svg>
+    <div class="hint-box" id="hintText">짧은 바늘(분홍)은 시, 긴 바늘(파랑)은 분을 가리켜요!</div>
+  </div>
+  <div class="choices" id="choicesBox">
+    <button class="btn" onclick="pickTime(0)">3시 정각</button>
+    <button class="btn" onclick="pickTime(1)">6시 정각</button>
+    <button class="btn" onclick="pickTime(2)">9시 30분</button>
+  </div>
+</div>
+
+<div class="modal" id="startModal">
+  <div class="modal-card">
+    <div class="modal-title">🦕 타임포털 시계 탐험대</div>
+    <div class="modal-desc">시계의 <b>짧은 바늘</b>과 <b>긴 바늘</b>을 보고 몇 시인지 맞히면 타임포털이 열려 공룡 친구들을 만날 수 있어요! (정각과 30분 읽기)</div>
+    <button class="start-btn" onclick="startGame()">시간 탐험 출발!</button>
+  </div>
+</div>
+
+<script>
+let step = 1;
+let score = 0;
+let correctLabel = '3시 정각';
+let options = [];
+let audioCtx = null;
+const STORIES = [
+  '아기 트리케라톱스가 아침 밥을 먹는 시각은?',
+  '익룡 프테라노돈이 하늘로 날아오른 시각은?',
+  '브라키오사우루스가 나뭇잎을 먹는 시각은?',
+  '벨로시랩터가 달리기 경주를 시작한 시각은?',
+  '스테고사우루스가 낮잠을 자는 시각은?'
+];
+
+function tone(freq, dur) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function formatLabel(h, m) {
+  return m === 0 ? (h + '시 정각') : (h + '시 30분');
+}
+
+function setHands(h, m) {
+  const minAngle = (m === 0 ? 0 : 180) * Math.PI / 180;
+  const hourDeg = ((h % 12) * 30) + (m === 30 ? 15 : 0);
+  const hourAngle = hourDeg * Math.PI / 180;
+  const mx = 100 + 62 * Math.sin(minAngle);
+  const my = 100 - 62 * Math.cos(minAngle);
+  const hx = 100 + 44 * Math.sin(hourAngle);
+  const hy = 100 - 44 * Math.cos(hourAngle);
+  document.getElementById('minHand').setAttribute('x2', mx.toFixed(1));
+  document.getElementById('minHand').setAttribute('y2', my.toFixed(1));
+  document.getElementById('hourHand').setAttribute('x2', hx.toFixed(1));
+  document.getElementById('hourHand').setAttribute('y2', hy.toFixed(1));
+}
+
+function startGame() {
+  step = 1;
+  score = 0;
+  document.getElementById('startModal').classList.add('hidden');
+  nextClock();
+}
+
+function nextClock() {
+  document.getElementById('stepText').textContent = '탐험 ' + step + ' / 10';
+  document.getElementById('scoreText').textContent = '🌟 ' + score + '점';
+  document.getElementById('storyText').textContent = STORIES[(step - 1) % STORIES.length];
+  const h = Math.floor(Math.random() * 12) + 1;
+  const m = (step <= 5) ? 0 : (Math.random() < 0.5 ? 0 : 30);
+  setHands(h, m);
+  correctLabel = formatLabel(h, m);
+  let set = new Set([correctLabel]);
+  while (set.size < 3) {
+    const rh = Math.floor(Math.random() * 12) + 1;
+    const rm = Math.random() < 0.5 ? 0 : 30;
+    set.add(formatLabel(rh, rm));
+  }
+  options = Array.from(set).sort(() => Math.random() - 0.5);
+  const btns = document.querySelectorAll('#choicesBox .btn');
+  btns.forEach((b, i) => { b.textContent = options[i]; });
+}
+
+function pickTime(idx) {
+  const hint = document.getElementById('hintText');
+  if (options[idx] === correctLabel) {
+    score += 10;
+    tone(720, 0.15);
+    hint.textContent = '✨ 정답! ' + correctLabel + ' 타임포털이 활짝 열렸어요!';
+    hint.style.color = '#15803D';
+    if (step >= 10) {
+      const modal = document.getElementById('startModal');
+      modal.querySelector('.modal-title').textContent = '🏆 타임포털 시계 박사님!';
+      modal.querySelector('.modal-desc').innerHTML = '대단해요 장윤이! 10개의 시계를 모두 읽고 <b>' + score + '점</b>으로 공룡 시간 탐험을 완주했어요!';
+      modal.querySelector('.start-btn').textContent = '한 번 더 탐험하기!';
+      modal.classList.remove('hidden');
+    } else {
+      step++;
+      setTimeout(nextClock, 450);
+    }
+  } else {
+    tone(250, 0.2);
+    hint.textContent = '짧은 분홍 바늘이 가리키는 숫자를 먼저 확인해 볼까요?';
+    hint.style.color = '#DC2626';
+  }
+}
+</script>
+</body>
+</html>

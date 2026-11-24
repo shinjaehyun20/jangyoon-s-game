@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "2026-11-25-smart-crane-block-tower",
+        "title": "🎮 영차영차! 스마트 건설 로봇 크레인",
+        "path": "2026-11-25-smart-crane-block-tower/index.html"
+      },
+      {
+        "id": "2026-11-25-time-portal-dino-clock",
+        "title": "🎮 째깍째깍! 타임포털 시계 탐험대",
+        "path": "2026-11-25-time-portal-dino-clock/index.html"
+      },
+      {
         "id": "2026-11-24-humanoid-balance-coach",
         "title": "🎮 삐리릿! 휴머노이드 균형 코치",
         "path": "2026-11-24-humanoid-balance-coach/index.html"

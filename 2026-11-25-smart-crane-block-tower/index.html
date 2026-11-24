@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>영차영차! 스마트 건설 로봇 크레인</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: linear-gradient(180deg, #E0F2FE 0%, #BAE6FD 72%, #CBD5E1 72%, #94A3B8 100%); color: #0F172A; }
+  .wrap { display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 500px; height: 100dvh; margin: 0 auto; padding: 12px 14px; }
+  .hud { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.92); border: 3px solid #0284C7; border-radius: 16px; padding: 8px 14px; box-shadow: 0 4px 12px rgba(2,132,199,0.15); }
+  .title-box { font-size: 1.05rem; font-weight: 900; color: #0369A1; }
+  .stats { display: flex; gap: 10px; font-size: 0.95rem; font-weight: 800; }
+  .badge { background: #FEF3C7; border: 2px solid #F59E0B; color: #B45309; padding: 4px 10px; border-radius: 999px; }
+  .stage { position: relative; flex: 1; margin: 10px 0; background: rgba(255,255,255,0.65); border: 3px solid #38BDF8; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 14px; overflow: hidden; }
+  .crane-bar { width: 92%; height: 16px; background: repeating-linear-gradient(45deg, #F59E0B, #F59E0B 12px, #FDE047 12px, #FDE047 24px); border-radius: 8px; border: 2px solid #B45309; position: relative; }
+  .hook-wrap { display: flex; flex-direction: column; align-items: center; transition: transform 0.25s ease; }
+  .cable { width: 4px; height: 34px; background: #334155; }
+  .hang-block { min-width: 140px; padding: 12px 18px; background: #0284C7; color: #FFFFFF; font-size: 1.55rem; font-weight: 900; border-radius: 16px; border: 4px solid #0369A1; text-align: center; box-shadow: 0 8px 16px rgba(2,132,199,0.25); }
+  .mission-card { background: #FFFFFF; border: 3px dashed #0284C7; border-radius: 16px; padding: 10px 16px; text-align: center; width: 94%; }
+  .mission-label { font-size: 0.95rem; font-weight: 800; color: #475569; margin-bottom: 4px; }
+  .mission-eq { font-size: 1.7rem; font-weight: 900; color: #0F172A; }
+  .tower-base { width: 88%; background: #22C55E; border: 4px solid #15803D; border-radius: 14px; padding: 10px; text-align: center; color: #FFFFFF; font-weight: 900; font-size: 1.15rem; box-shadow: 0 6px 0 #166534; }
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-bottom: 4px; }
+  .btn { background: #FFFFFF; border: 4px solid #0284C7; border-radius: 18px; padding: 14px 6px; font-size: 1.55rem; font-weight: 900; color: #0369A1; cursor: pointer; box-shadow: 0 5px 0 #0284C7; transition: transform 0.1s; }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #0284C7; }
+  .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.72); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 20; }
+  .modal-card { background: #FFFFFF; border: 5px solid #F59E0B; border-radius: 24px; padding: 24px 20px; text-align: center; max-width: 380px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+  .modal-title { font-size: 1.6rem; font-weight: 900; color: #B45309; margin-bottom: 10px; }
+  .modal-desc { font-size: 1.05rem; font-weight: 700; color: #334155; line-height: 1.5; margin-bottom: 18px; }
+  .start-btn { background: #F59E0B; color: #FFFFFF; border: none; border-radius: 16px; padding: 14px 28px; font-size: 1.25rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #B45309; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="title-box">🏗️ 로봇 크레인 10 만들기</div>
+    <div class="stats">
+      <span class="badge" id="floorText">1층 / 10층</span>
+      <span class="badge" id="scoreText">⭐ 0점</span>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="crane-bar"></div>
+    <div class="hook-wrap" id="hookWrap">
+      <div class="cable"></div>
+      <div class="hang-block" id="hangBlock">블록 4</div>
+    </div>
+    <div class="mission-card">
+      <div class="mission-label" id="feedbackText">두 블록을 합쳐 튼튼한 목표 숫자를 만들어요!</div>
+      <div class="mission-eq" id="equationText">4 + ? = 10</div>
+    </div>
+    <div class="tower-base" id="towerBase">🏢 스마트 안전 타워 (현재 0층 완공)</div>
+  </div>
+  <div class="choices" id="choicesBox">
+    <button class="btn" onclick="pickAnswer(0)">6</button>
+    <button class="btn" onclick="pickAnswer(1)">5</button>
+    <button class="btn" onclick="pickAnswer(2)">7</button>
+  </div>
+</div>
+
+<div class="modal" id="startModal">
+  <div class="modal-card">
+    <div class="modal-title">🏗️ 영차영차! 스마트 크레인</div>
+    <div class="modal-desc">장윤이 건축가님! 크레인이 들고 있는 숫자 블록과 합쳐서 <b>10</b> 또는 <b>20</b>이 되는 짝꿍 블록을 골라 10층 스마트 타워를 완성해 주세요!</div>
+    <button class="start-btn" onclick="startGame()">크레인 가동 시작!</button>
+  </div>
+</div>
+
+<script>
+let floor = 1;
+let score = 0;
+let currentAnswer = 6;
+let currentChoices = [6, 5, 7];
+let audioCtx = null;
+
+function beep(freq, dur) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function startGame() {
+  floor = 1;
+  score = 0;
+  document.getElementById('startModal').classList.add('hidden');
+  nextQuestion();
+}
+
+function nextQuestion() {
+  document.getElementById('floorText').textContent = floor + '층 / 10층';
+  document.getElementById('scoreText').textContent = '⭐ ' + score + '점';
+  document.getElementById('towerBase').textContent = '🏢 스마트 안전 타워 (현재 ' + (floor - 1) + '층 완공)';
+  const target = floor <= 6 ? 10 : 20;
+  const first = floor <= 6 ? (Math.floor(Math.random() * 8) + 1) : (Math.floor(Math.random() * 14) + 3);
+  currentAnswer = target - first;
+  document.getElementById('hangBlock').textContent = '블록 ' + first;
+  document.getElementById('equationText').textContent = first + ' + ? = ' + target;
+  let set = new Set([currentAnswer]);
+  while (set.size < 3) {
+    let cand = currentAnswer + (Math.floor(Math.random() * 5) - 2);
+    if (cand > 0 && cand !== currentAnswer) set.add(cand);
+  }
+  currentChoices = Array.from(set).sort(() => Math.random() - 0.5);
+  const btns = document.querySelectorAll('#choicesBox .btn');
+  btns.forEach((b, i) => { b.textContent = currentChoices[i]; });
+}
+
+function pickAnswer(idx) {
+  const picked = currentChoices[idx];
+  const fb = document.getElementById('feedbackText');
+  if (picked === currentAnswer) {
+    score += 10;
+    beep(660, 0.15);
+    fb.textContent = '🎉 딩동댕! 튼튼하게 ' + floor + '층 블록이 결합되었어요!';
+    fb.style.color = '#15803D';
+    if (floor >= 10) {
+      document.getElementById('towerBase').textContent = '🏢 스마트 안전 타워 10층 완공 성공!';
+      const modal = document.getElementById('startModal');
+      modal.querySelector('.modal-title').textContent = '🏆 10층 스마트 타워 완공!';
+      modal.querySelector('.modal-desc').innerHTML = '멋져요 장윤이! 모든 숫자 짝꿍 블록을 정확히 맞춰 <b>' + score + '점</b>으로 타워를 세웠어요!';
+      modal.querySelector('.start-btn').textContent = '다시 짓기!';
+      modal.classList.remove('hidden');
+    } else {
+      floor++;
+      setTimeout(nextQuestion, 450);
+    }
+  } else {
+    beep(240, 0.2);
+    fb.textContent = '앗! 다시 한 번 더해 볼까요? 할 수 있어요!';
+    fb.style.color = '#DC2626';
+  }
+}
+</script>
+</body>
+</html>
