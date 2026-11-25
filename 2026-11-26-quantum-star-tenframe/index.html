@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>반짝별 54! 양자 별자리 텐프레임</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: linear-gradient(180deg, #FEF3C7 0%, #FDE68A 100%); color: #451A03; }
+  .wrap { display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 500px; height: 100dvh; margin: 0 auto; padding: 10px 14px; }
+  .hud { display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border: 3px solid #D97706; border-radius: 16px; padding: 8px 12px; }
+  .title-box { font-size: 1rem; font-weight: 900; color: #B45309; }
+  .stats { display: flex; gap: 8px; font-size: 0.9rem; font-weight: 800; }
+  .badge { background: #FEF3C7; border: 2px solid #F59E0B; color: #92400E; padding: 4px 10px; border-radius: 999px; }
+  .stage { flex: 1; margin: 8px 0; background: rgba(255,255,255,0.9); border: 3px solid #F59E0B; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 12px; }
+  .mission { font-size: 1.05rem; font-weight: 900; color: #78350F; text-align: center; }
+  .tenframe { display: grid; grid-template-columns: repeat(5, 50px); grid-template-rows: repeat(2, 50px); gap: 6px; background: #FFFBEB; padding: 10px; border-radius: 16px; border: 3px solid #D97706; }
+  .slot { width: 50px; height: 50px; border-radius: 10px; background: #FFFFFF; border: 2px dashed #F59E0B; display: flex; align-items: center; justify-content: center; font-size: 1.55rem; }
+  .eq-box { font-size: 1.55rem; font-weight: 900; color: #92400E; background: #FEF3C7; padding: 8px 18px; border-radius: 14px; border: 2px solid #F59E0B; }
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-bottom: 4px; }
+  .btn { min-height: 52px; background: #FFFFFF; border: 4px solid #D97706; border-radius: 18px; font-size: 1.45rem; font-weight: 900; color: #92400E; cursor: pointer; box-shadow: 0 5px 0 #D97706; }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #D97706; }
+  .modal { position: fixed; inset: 0; background: rgba(69,26,3,0.75); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 30; }
+  .modal-card { background: #FFFFFF; border: 5px solid #F59E0B; border-radius: 24px; padding: 22px 18px; text-align: center; max-width: 380px; width: 100%; }
+  .modal-title { font-size: 1.5rem; font-weight: 900; color: #B45309; margin-bottom: 10px; }
+  .modal-desc { font-size: 1rem; font-weight: 700; color: #451A03; line-height: 1.5; margin-bottom: 16px; }
+  .start-btn { min-height: 48px; background: #D97706; color: #FFFFFF; border: none; border-radius: 16px; padding: 12px 26px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #92400E; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="title-box">🌟 양자 별자리 텐프레임</div>
+    <div class="stats">
+      <span class="badge" id="stepText">1 / 10별</span>
+      <span class="badge" id="scoreText">🌟 0점</span>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="mission" id="missionText">빈 칸에 초록 별을 몇 개 더 채우면 10개가 될까요?</div>
+    <div class="tenframe" id="tenFrame"></div>
+    <div class="eq-box" id="eqText">7 + ? = 10</div>
+    <div class="mission" id="bestText">🏆 최고 기록: 0점</div>
+  </div>
+  <div class="choices" id="choicesBox">
+    <button class="btn" onclick="pickStar(0)">3</button>
+    <button class="btn" onclick="pickStar(1)">4</button>
+    <button class="btn" onclick="pickStar(2)">2</button>
+  </div>
+</div>
+
+<div class="modal" id="startModal">
+  <div class="modal-card">
+    <div class="modal-title">🌟 반짝별 54! 양자 텐프레임</div>
+    <div class="modal-desc">서울 데이터센터에 도착한 양자 컴퓨터에 별 에너지를 채워 주세요! <b>10칸 상자(텐프레임)</b>에서 노란 별과 초록 별을 합쳐 숫자를 완성해 볼까요?</div>
+    <button class="start-btn" onclick="startGame()">별자리 충전 시작!</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = '2026-11-26-quantum-star-tenframe_best';
+let step = 1;
+let score = 0;
+let answer = 3;
+let choices = [3, 4, 2];
+let audioCtx = null;
+
+function tone(freq, dur) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function updateBest() {
+  const best = Number(localStorage.getItem(STORAGE_KEY) || 0);
+  if (score > best) localStorage.setItem(STORAGE_KEY, String(score));
+  document.getElementById('bestText').textContent = '🏆 내 최고 기록: ' + Math.max(best, score) + '점';
+}
+
+function startGame() {
+  step = 1;
+  score = 0;
+  document.getElementById('startModal').classList.add('hidden');
+  updateBest();
+  nextProblem();
+}
+
+function nextProblem() {
+  document.getElementById('stepText').textContent = step + ' / 10별';
+  document.getElementById('scoreText').textContent = '🌟 ' + score + '점';
+  const yellow = Math.floor(Math.random() * 8) + 1;
+  answer = 10 - yellow;
+  const tf = document.getElementById('tenFrame');
+  tf.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const s = document.createElement('div');
+    s.className = 'slot';
+    s.textContent = i < yellow ? '⭐' : '❔';
+    tf.appendChild(s);
+  }
+  document.getElementById('eqText').textContent = yellow + ' + ? = 10';
+  let set = new Set([answer]);
+  while (set.size < 3) {
+    const c = Math.floor(Math.random() * 9) + 1;
+    set.add(c);
+  }
+  choices = Array.from(set).sort(() => Math.random() - 0.5);
+  const btns = document.querySelectorAll('#choicesBox .btn');
+  btns.forEach((b, idx) => { b.textContent = choices[idx]; });
+}
+
+function pickStar(idx) {
+  const mt = document.getElementById('missionText');
+  if (choices[idx] === answer) {
+    score += 10;
+    tone(700, 0.15);
+    updateBest();
+    mt.textContent = '✨ 정답! 빈 칸 ' + answer + '개에 초록 별이 가득 찼어요!';
+    mt.style.color = '#15803D';
+    const slots = document.querySelectorAll('#tenFrame .slot');
+    slots.forEach(s => { if (s.textContent === '❔') s.textContent = '🟢'; });
+    if (step >= 10) {
+      const modal = document.getElementById('startModal');
+      modal.querySelector('.modal-title').textContent = '🏆 양자 별자리 박사님!';
+      modal.querySelector('.modal-desc').innerHTML = '최고예요 장윤이! 10개의 텐프레임 문제를 모두 맞혀 <b>' + score + '점</b>을 달성했어요!';
+      modal.querySelector('.start-btn').textContent = '다시 도전하기!';
+      modal.classList.remove('hidden');
+    } else {
+      step++;
+      setTimeout(nextProblem, 450);
+    }
+  } else {
+    tone(240, 0.2);
+    mt.textContent = '물음표(❔)가 그려진 빈 칸이 몇 개인지 하나씩 세어 볼까요?';
+    mt.style.color = '#DC2626';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>반짝반짝! 거울 미로 로봇 구출 작전</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: linear-gradient(180deg, #EFF6FF 0%, #DBEAFE 100%); color: #0F172A; }
+  .wrap { display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 500px; height: 100dvh; margin: 0 auto; padding: 10px 14px; }
+  .hud { display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border: 3px solid #2563EB; border-radius: 16px; padding: 8px 12px; }
+  .title-box { font-size: 1rem; font-weight: 900; color: #1D4ED8; }
+  .stats { display: flex; gap: 8px; font-size: 0.9rem; font-weight: 800; }
+  .badge { background: #DBEAFE; border: 2px solid #3B82F6; color: #1E40AF; padding: 4px 10px; border-radius: 999px; }
+  .stage { flex: 1; margin: 8px 0; background: rgba(255,255,255,0.88); border: 3px solid #60A5FA; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 10px; }
+  .guide { font-size: 0.98rem; font-weight: 800; color: #1E3A8A; text-align: center; background: #EFF6FF; padding: 8px 12px; border-radius: 12px; width: 96%; }
+  .mirror-arena { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; }
+  .board-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .board-label { font-size: 0.85rem; font-weight: 900; color: #334155; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px); gap: 5px; background: #E2E8F0; padding: 7px; border-radius: 14px; border: 3px solid #64748B; }
+  .cell { width: 44px; height: 44px; border-radius: 10px; background: #FFFFFF; border: 2px solid #CBD5E1; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 900; cursor: pointer; }
+  .cell.active-left { background: #3B82F6; border-color: #1D4ED8; color: #FFFFFF; }
+  .cell.active-right { background: #10B981; border-color: #047857; color: #FFFFFF; }
+  .mirror-line { width: 6px; height: 156px; background: repeating-linear-gradient(180deg, #3B82F6 0, #3B82F6 10px, #93C5FD 10px, #93C5FD 20px); border-radius: 4px; }
+  .action-row { display: flex; gap: 10px; width: 100%; }
+  .btn { flex: 1; min-height: 48px; background: #2563EB; color: #FFFFFF; border: none; border-radius: 16px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #1E40AF; }
+  .btn.clear-btn { background: #64748B; box-shadow: 0 4px 0 #334155; flex: 0.45; }
+  .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.75); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 30; }
+  .modal-card { background: #FFFFFF; border: 5px solid #2563EB; border-radius: 24px; padding: 22px 18px; text-align: center; max-width: 380px; width: 100%; }
+  .modal-title { font-size: 1.5rem; font-weight: 900; color: #1D4ED8; margin-bottom: 10px; }
+  .modal-desc { font-size: 1rem; font-weight: 700; color: #334155; line-height: 1.5; margin-bottom: 16px; }
+  .start-btn { min-height: 48px; background: #2563EB; color: #FFFFFF; border: none; border-radius: 16px; padding: 12px 26px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #1E40AF; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="title-box">🪞 거울 미로 로봇 구출</div>
+    <div class="stats">
+      <span class="badge" id="roundText">1 / 8단계</span>
+      <span class="badge" id="scoreText">⭐ 0점</span>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="guide" id="guideText">왼쪽 파란 로봇 별자리를 가운데 거울에 비친 것처럼 오른쪽에 똑같이 대칭으로 찍어 주세요!</div>
+    <div class="mirror-arena">
+      <div class="board-wrap">
+        <div class="board-label">🤖 왼쪽 원래 모양</div>
+        <div class="grid3" id="leftGrid"></div>
+      </div>
+      <div class="mirror-line"></div>
+      <div class="board-wrap">
+        <div class="board-label">🪞 오른쪽 거울 모양 (터치!)</div>
+        <div class="grid3" id="rightGrid"></div>
+      </div>
+    </div>
+    <div class="guide" id="BestText">최고 기록: 0점</div>
+  </div>
+  <div class="action-row">
+    <button class="btn clear-btn" onclick="resetRight()">지우기</button>
+    <button class="btn" onclick="checkMirror()">거울 대칭 완성! 확인하기</button>
+  </div>
+</div>
+
+<div class="modal" id="startModal">
+  <div class="modal-card">
+    <div class="modal-title">🪞 거울 미로 로봇 구출 작전</div>
+    <div class="modal-desc">로봇이 거울 방에 갇혔어요! 가운데 거울을 기준으로 <b>왼쪽과 오른쪽이 서로 마주 보도록(좌우 대칭)</b> 오른쪽 칸을 터치해 로봇을 구출해 주세요!</div>
+    <button class="start-btn" onclick="startGame()">로봇 구출 시작!</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = '2026-11-26-mirror-robot-rescue_best';
+let round = 1;
+let score = 0;
+let leftPattern = Array(9).fill(false);
+let rightPattern = Array(9).fill(false);
+let audioCtx = null;
+
+function playBeep(freq, dur) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function updateBestDisplay() {
+  const best = Number(localStorage.getItem(STORAGE_KEY) || 0);
+  if (score > best) localStorage.setItem(STORAGE_KEY, String(score));
+  document.getElementById('BestText').textContent = '🏆 내 최고 기록: ' + Math.max(best, score) + '점';
+}
+
+function startGame() {
+  round = 1;
+  score = 0;
+  document.getElementById('startModal').classList.add('hidden');
+  updateBestDisplay();
+  makePattern();
+}
+
+function makePattern() {
+  document.getElementById('roundText').textContent = round + ' / 8단계';
+  document.getElementById('scoreText').textContent = '⭐ ' + score + '점';
+  leftPattern = Array(9).fill(false);
+  rightPattern = Array(9).fill(false);
+  const count = round <= 3 ? 2 : (round <= 6 ? 3 : 4);
+  let picked = 0;
+  while (picked < count) {
+    const idx = Math.floor(Math.random() * 9);
+    if (!leftPattern[idx]) {
+      leftPattern[idx] = true;
+      picked++;
+    }
+  }
+  renderGrids();
+}
+
+function renderGrids() {
+  const lg = document.getElementById('leftGrid');
+  const rg = document.getElementById('rightGrid');
+  lg.innerHTML = '';
+  rg.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const lc = document.createElement('div');
+    lc.className = 'cell' + (leftPattern[i] ? ' active-left' : '');
+    lc.textContent = leftPattern[i] ? '🤖' : '';
+    lg.appendChild(lc);
+
+    const rc = document.createElement('div');
+    rc.className = 'cell' + (rightPattern[i] ? ' active-right' : '');
+    rc.textContent = rightPattern[i] ? '⭐' : '';
+    rc.addEventListener('pointerdown', () => {
+      rightPattern[i] = !rightPattern[i];
+      playBeep(520, 0.08);
+      renderGrids();
+    });
+    rg.appendChild(rc);
+  }
+}
+
+function resetRight() {
+  rightPattern = Array(9).fill(false);
+  playBeep(300, 0.1);
+  renderGrids();
+}
+
+function checkMirror() {
+  let ok = true;
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 3; c++) {
+      const leftIdx = r * 3 + c;
+      const mirrorIdx = r * 3 + (2 - c);
+      if (leftPattern[leftIdx] !== rightPattern[mirrorIdx]) {
+        ok = false;
+      }
+    }
+  }
+  const gt = document.getElementById('guideText');
+  if (ok) {
+    score += 15;
+    playBeep(740, 0.16);
+    updateBestDisplay();
+    gt.textContent = '🎉 딩동댕! 거울 대칭이 완벽해요! 로봇이 거울 미로를 통과했어요!';
+    gt.style.color = '#047857';
+    if (round >= 8) {
+      const modal = document.getElementById('startModal');
+      modal.querySelector('.modal-title').textContent = '🏆 거울 미로 구출 대성공!';
+      modal.querySelector('.modal-desc').innerHTML = '멋져요 장윤이! 8단계 거울 대칭 퍼즐을 모두 풀고 <b>' + score + '점</b>을 달성했어요!';
+      modal.querySelector('.start-btn').textContent = '한 번 더 구출하기!';
+      modal.classList.remove('hidden');
+    } else {
+      round++;
+      setTimeout(makePattern, 500);
+    }
+  } else {
+    playBeep(230, 0.2);
+    gt.textContent = '앗! 거울에 가까울수록 오른쪽에서도 거울과 가까운 칸에 찍어야 해요!';
+    gt.style.color = '#DC2626';
+  }
+}
+</script>
+</body>
+</html>

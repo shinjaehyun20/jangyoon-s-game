@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="mbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#DBEAFE"/>
+      <stop offset="100%" stop-color="#BFDBFE"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" rx="18" fill="url(#mbg)"/>
+  <line x1="160" y1="16" x2="160" y2="142" stroke="#3B82F6" stroke-width="4" stroke-dasharray="6,6"/>
+  <rect x="34" y="34" width="96" height="96" rx="14" fill="#FFFFFF" stroke="#2563EB" stroke-width="3"/>
+  <rect x="190" y="34" width="96" height="96" rx="14" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+  <circle cx="66" cy="66" r="14" fill="#F59E0B"/>
+  <rect x="88" y="88" width="24" height="24" rx="5" fill="#3B82F6"/>
+  <circle cx="254" cy="66" r="14" fill="#F59E0B"/>
+  <rect x="208" y="88" width="24" height="24" rx="5" fill="#3B82F6"/>
+  <rect x="14" y="148" width="292" height="24" rx="8" fill="#0F172A" opacity="0.86"/>
+  <text x="160" y="165" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="800" fill="#F8FAFC">반짝반짝! 거울 미로 로봇 구출 작전</text>
+</svg>

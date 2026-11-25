@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="qbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FEF3C7"/>
+      <stop offset="100%" stop-color="#FDE68A"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" rx="18" fill="url(#qbg)"/>
+  <rect x="24" y="26" width="272" height="110" rx="16" fill="#FFFFFF" stroke="#D97706" stroke-width="3"/>
+  <!-- 2x5 Ten-Frame preview -->
+  <g stroke="#F59E0B" stroke-width="2" fill="#FFFBEB">
+    <rect x="44" y="42" width="42" height="36" rx="6"/>
+    <rect x="90" y="42" width="42" height="36" rx="6"/>
+    <rect x="136" y="42" width="42" height="36" rx="6"/>
+    <rect x="182" y="42" width="42" height="36" rx="6"/>
+    <rect x="228" y="42" width="42" height="36" rx="6"/>
+    <rect x="44" y="82" width="42" height="36" rx="6"/>
+    <rect x="90" y="82" width="42" height="36" rx="6"/>
+    <rect x="136" y="82" width="42" height="36" rx="6"/>
+    <rect x="182" y="82" width="42" height="36" rx="6"/>
+    <rect x="228" y="82" width="42" height="36" rx="6"/>
+  </g>
+  <circle cx="65" cy="60" r="11" fill="#F59E0B"/>
+  <circle cx="111" cy="60" r="11" fill="#F59E0B"/>
+  <circle cx="157" cy="60" r="11" fill="#F59E0B"/>
+  <circle cx="203" cy="60" r="11" fill="#F59E0B"/>
+  <circle cx="249" cy="60" r="11" fill="#F59E0B"/>
+  <circle cx="65" cy="100" r="11" fill="#10B981"/>
+  <circle cx="111" cy="100" r="11" fill="#10B981"/>
+  <rect x="14" y="148" width="292" height="24" rx="8" fill="#78350F" opacity="0.9"/>
+  <text x="160" y="165" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="800" fill="#FFFFFF">반짝별 54! 양자 별자리 텐프레임</text>
+</svg>

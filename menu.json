@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "2026-11-26-mirror-robot-rescue",
+        "title": "🎮 반짝반짝! 거울 미로 로봇 구출 작전",
+        "path": "2026-11-26-mirror-robot-rescue/index.html"
+      },
+      {
+        "id": "2026-11-26-quantum-star-tenframe",
+        "title": "🎮 반짝별 54! 양자 별자리 텐프레임",
+        "path": "2026-11-26-quantum-star-tenframe/index.html"
+      },
+      {
         "id": "2026-11-25-smart-crane-block-tower",
         "title": "🎮 영차영차! 스마트 건설 로봇 크레인",
         "path": "2026-11-25-smart-crane-block-tower/index.html"
