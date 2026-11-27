@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>척척 로봇! 택배 상자 분류대</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: linear-gradient(180deg, #F0F9FF 0%, #E0F2FE 100%); color: #0F172A; }
+  .wrap { display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 500px; height: 100dvh; margin: 0 auto; padding: 10px 14px; }
+  .hud { display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border: 3px solid #0284C7; border-radius: 16px; padding: 8px 12px; }
+  .title-box { font-size: 1rem; font-weight: 900; color: #0369A1; }
+  .stats { display: flex; gap: 8px; font-size: 0.9rem; font-weight: 800; }
+  .badge { background: #E0F2FE; border: 2px solid #0284C7; color: #075985; padding: 4px 10px; border-radius: 999px; }
+  .stage { flex: 1; margin: 8px 0; background: rgba(255,255,255,0.92); border: 3px solid #38BDF8; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 12px; }
+  .rule-banner { font-size: 1rem; font-weight: 900; color: #0C4A6E; text-align: center; background: #E0F2FE; padding: 10px 14px; border-radius: 14px; width: 96%; border: 2px solid #7DD3FC; }
+  .conveyor { width: 92%; background: #334155; border-radius: 22px; padding: 18px 14px; display: flex; flex-direction: column; align-items: center; border-bottom: 8px solid #1E293B; }
+  .parcel-card { width: 170px; height: 150px; background: #FEF3C7; border: 5px solid #D97706; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 8px 0 rgba(0,0,0,0.18); }
+  .parcel-icon { font-size: 3.1rem; }
+  .parcel-tag { font-size: 1.05rem; font-weight: 900; color: #78350F; background: #FFFFFF; padding: 4px 12px; border-radius: 999px; border: 2px solid #F59E0B; }
+  .bins-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; padding-bottom: 4px; }
+  .bin-btn { min-height: 62px; background: #FFFFFF; border: 4px solid #0284C7; border-radius: 18px; font-size: 1.05rem; font-weight: 900; color: #0C4A6E; cursor: pointer; box-shadow: 0 5px 0 #0284C7; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 4px; }
+  .bin-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #0284C7; }
+  .best-bar { font-size: 0.92rem; font-weight: 800; color: #0369A1; }
+  .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.76); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 30; }
+  .modal-card { background: #FFFFFF; border: 5px solid #0284C7; border-radius: 24px; padding: 22px 18px; text-align: center; max-width: 380px; width: 100%; }
+  .modal-title { font-size: 1.5rem; font-weight: 900; color: #0369A1; margin-bottom: 10px; }
+  .modal-desc { font-size: 1rem; font-weight: 700; color: #334155; line-height: 1.5; margin-bottom: 16px; }
+  .start-btn { min-height: 50px; background: #0284C7; color: #FFFFFF; border: none; border-radius: 16px; padding: 12px 26px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #0369A1; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="title-box">🤖 택배 상자 분류대</div>
+    <div class="stats">
+      <span class="badge" id="stepText">1 / 10상자</span>
+      <span class="badge" id="scoreText">⭐ 0점</span>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="rule-banner" id="ruleText">상자에 적힌 스티커의 모양과 무게를 보고 알맞은 분류함을 터치하세요!</div>
+    <div class="conveyor">
+      <div class="parcel-card" id="parcelCard">
+        <div class="parcel-icon" id="parcelIcon">🔴</div>
+        <div class="parcel-tag" id="parcelTag">동그라미 · 가벼움</div>
+      </div>
+    </div>
+    <div class="best-bar" id="bestText">🏆 내 최고 기록: 0점</div>
+  </div>
+  <div class="bins-row" id="binsBox">
+    <button class="bin-btn" onclick="chooseBin(0)" id="bin0">🔴 동그라미 함</button>
+    <button class="bin-btn" onclick="chooseBin(1)" id="bin1">🟦 네모 함</button>
+    <button class="bin-btn" onclick="chooseBin(2)" id="bin2">🔺 세모 함</button>
+  </div>
+</div>
+
+<div class="modal" id="startModal">
+  <div class="modal-card">
+    <div class="modal-title">🤖 척척 로봇! 택배 상자 분류대</div>
+    <div class="modal-desc">독일 공장의 똑똑한 로봇 팔처럼 레일 위를 지나가는 택배 상자의 <b>모양·무게·숫자 규칙</b>을 보고 알맞은 바구니로 척척 분류해 주세요!</div>
+    <button class="start-btn" onclick="startGame()">로봇 분류 시작!</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = '2026-11-27-parcel-box-robot-sorter_best';
+let step = 1;
+let score = 0;
+let correctIdx = 0;
+let audioCtx = null;
+
+const PUZZLES = [
+  { rule: '모양 분류: 상자의 모양과 똑같은 바구니에 넣어 주세요!', icon: '🔴', tag: '빨간 동그라미 상자', bins: ['🔴 동그라미 함', '🟦 네모 함', '🔺 세모 함'], ans: 0 },
+  { rule: '모양 분류: 상자의 모양과 똑같은 바구니에 넣어 주세요!', icon: '🟦', tag: '파란 네모 상자', bins: ['🔴 동그라미 함', '🟦 네모 함', '🔺 세모 함'], ans: 1 },
+  { rule: '모양 분류: 상자의 모양과 똑같은 바구니에 넣어 주세요!', icon: '🔺', tag: '초록 세모 상자', bins: ['🔴 동그라미 함', '🟦 네모 함', '🔺 세모 함'], ans: 2 },
+  { rule: '무게 분류: 사과 2개는 어느 무게 바구니로 갈까요?', icon: '🍎🍎', tag: '사과 2개 상자', bins: ['🪶 1~3개 가벼움 함', '📦 4~6개 보통 함', '🏋️ 7~9개 무거움 함'], ans: 0 },
+  { rule: '무게 분류: 블록 5개는 어느 무게 바구니로 갈까요?', icon: '🧱5️⃣', tag: '블록 5개 상자', bins: ['🪶 1~3개 가벼움 함', '📦 4~6개 보통 함', '🏋️ 7~9개 무거움 함'], ans: 1 },
+  { rule: '무게 분류: 아령 8개는 어느 무게 바구니로 갈까요?', icon: '🏋️8️⃣', tag: '아령 8개 상자', bins: ['🪶 1~3개 가벼움 함', '📦 4~6개 보통 함', '🏋️ 7~9개 무거움 함'], ans: 2 },
+  { rule: '짝수·홀수 분류: 둘씩 짝이 딱 맞는 짝수 상자예요!', icon: '🧦4️⃣', tag: '양말 4켤레 상자', bins: ['✨ 짝수 바구니(2·4·6·8)', '🌟 홀수 바구니(1·3·5·7)', '🔟 10 이상 바구니'], ans: 0 },
+  { rule: '짝수·홀수 분류: 하나가 남는 홀수 상자예요!', icon: '🍓7️⃣', tag: '딸기 7개 상자', bins: ['✨ 짝수 바구니(2·4·6·8)', '🌟 홀수 바구니(1·3·5·7)', '🔟 10 이상 바구니'], ans: 1 },
+  { rule: '두 가지 규칙: 파란색이면서 네모 모양인 바구니를 찾아요!', icon: '📘', tag: '파란 네모 동화책', bins: ['🔴 빨간 동그라미 함', '🟦 파란 네모 함', '🟨 노란 세모 함'], ans: 1 },
+  { rule: '마지막 상자: 별이 딱 10개 들어 있는 만점 상자예요!', icon: '🌟🔟', tag: '반짝별 10개 상자', bins: ['✨ 5개 미만 바구니', '🌟 6~9개 바구니', '🏆 10개 만점 바구니'], ans: 2 }
+];
+
+function playSound(freq, dur) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function updateBest() {
+  const best = Number(localStorage.getItem(STORAGE_KEY) || 0);
+  if (score > best) localStorage.setItem(STORAGE_KEY, String(score));
+  document.getElementById('bestText').textContent = '🏆 내 최고 기록: ' + Math.max(best, score) + '점';
+}
+
+function startGame() {
+  step = 1;
+  score = 0;
+  document.getElementById('startModal').classList.add('hidden');
+  updateBest();
+  loadPuzzle();
+}
+
+function loadPuzzle() {
+  const p = PUZZLES[step - 1];
+  document.getElementById('stepText').textContent = step + ' / 10상자';
+  document.getElementById('scoreText').textContent = '⭐ ' + score + '점';
+  const rt = document.getElementById('ruleText');
+  rt.textContent = p.rule;
+  rt.style.color = '#0C4A6E';
+  document.getElementById('parcelIcon').textContent = p.icon;
+  document.getElementById('parcelTag').textContent = p.tag;
+  correctIdx = p.ans;
+  for (let i = 0; i < 3; i++) {
+    document.getElementById('bin' + i).textContent = p.bins[i];
+  }
+}
+
+function chooseBin(idx) {
+  const rt = document.getElementById('ruleText');
+  if (idx === correctIdx) {
+    score += 10;
+    playSound(720, 0.15);
+    updateBest();
+    rt.textContent = '🎉 철컥! 로봇 팔이 상자를 정확한 바구니에 분류했어요!';
+    rt.style.color = '#047857';
+    if (step >= 10) {
+      const modal = document.getElementById('startModal');
+      modal.querySelector('.modal-title').textContent = '🏆 척척 로봇 분류 대장!';
+      modal.querySelector('.modal-desc').innerHTML = '대단해요 장윤이! 10개의 택배 상자를 모두 정확하게 분류해 <b>' + score + '점</b>을 달성했어요!';
+      modal.querySelector('.start-btn').textContent = '다시 분류하기!';
+      modal.classList.remove('hidden');
+    } else {
+      step++;
+      setTimeout(loadPuzzle, 450);
+    }
+  } else {
+    playSound(230, 0.2);
+    rt.textContent = '앗! 상자의 스티커 이름표를 다시 한 번 자세히 살펴볼까요?';
+    rt.style.color = '#DC2626';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <defs>
+    <linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#EDE9FE"/>
+      <stop offset="100%" stop-color="#DDD6FE"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" rx="18" fill="url(#sbg)"/>
+  <line x1="30" y1="108" x2="290" y2="108" stroke="#6D28D9" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 56 104 Q 118 42 180 104" fill="none" stroke="#F59E0B" stroke-width="4" stroke-dasharray="6,4"/>
+  <circle cx="56" cy="108" r="13" fill="#FFFFFF" stroke="#6D28D9" stroke-width="3"/>
+  <circle cx="118" cy="108" r="13" fill="#FFFFFF" stroke="#6D28D9" stroke-width="3"/>
+  <circle cx="180" cy="108" r="15" fill="#F59E0B" stroke="#B45309" stroke-width="3"/>
+  <circle cx="242" cy="108" r="13" fill="#FFFFFF" stroke="#6D28D9" stroke-width="3"/>
+  <circle cx="118" cy="48" r="16" fill="#3B82F6"/>
+  <rect x="14" y="148" width="292" height="24" rx="8" fill="#4C1D95" opacity="0.9"/>
+  <text x="160" y="165" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="800" fill="#FFFFFF">별빛 다리! 점프점프 수직선 모험</text>
+</svg>

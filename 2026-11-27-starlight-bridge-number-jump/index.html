@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>별빛 다리! 점프점프 수직선 모험</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body { width: 100vw; height: 100dvh; overflow: hidden; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: linear-gradient(180deg, #F5F3FF 0%, #EDE9FE 100%); color: #2E1065; }
+  .wrap { display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 500px; height: 100dvh; margin: 0 auto; padding: 10px 14px; }
+  .hud { display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border: 3px solid #7C3AED; border-radius: 16px; padding: 8px 12px; }
+  .title-box { font-size: 1rem; font-weight: 900; color: #6D28D9; }
+  .stats { display: flex; gap: 8px; font-size: 0.9rem; font-weight: 800; }
+  .badge { background: #EDE9FE; border: 2px solid #8B5CF6; color: #5B21B6; padding: 4px 10px; border-radius: 999px; }
+  .stage { flex: 1; margin: 8px 0; background: rgba(255,255,255,0.92); border: 3px solid #A78BFA; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 12px; }
+  .mission { font-size: 1.02rem; font-weight: 900; color: #4C1D95; text-align: center; background: #F5F3FF; padding: 10px 14px; border-radius: 14px; width: 96%; border: 2px solid #C4B5FD; }
+  .bridge-box { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; flex-wrap: wrap; padding: 8px 2px; }
+  .stone { width: 52px; height: 52px; border-radius: 14px; background: #FFFFFF; border: 3px solid #7C3AED; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 900; color: #4C1D95; }
+  .stone.start-stone { background: #DDD6FE; border-color: #5B21B6; }
+  .stone.target-stone { background: #FEF3C7; border-color: #D97706; color: #B45309; font-size: 1.4rem; }
+  .formula-pill { font-size: 1.45rem; font-weight: 900; color: #5B21B6; background: #EDE9FE; padding: 8px 20px; border-radius: 16px; border: 3px solid #8B5CF6; }
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; padding-bottom: 4px; }
+  .btn { min-height: 54px; background: #FFFFFF; border: 4px solid #7C3AED; border-radius: 18px; font-size: 1.45rem; font-weight: 900; color: #5B21B6; cursor: pointer; box-shadow: 0 5px 0 #6D28D9; }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #6D28D9; }
+  .modal { position: fixed; inset: 0; background: rgba(46,16,101,0.76); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 30; }
+  .modal-card { background: #FFFFFF; border: 5px solid #7C3AED; border-radius: 24px; padding: 22px 18px; text-align: center; max-width: 380px; width: 100%; }
+  .modal-title { font-size: 1.5rem; font-weight: 900; color: #6D28D9; margin-bottom: 10px; }
+  .modal-desc { font-size: 1rem; font-weight: 700; color: #2E1065; line-height: 1.5; margin-bottom: 16px; }
+  .start-btn { min-height: 50px; background: #7C3AED; color: #FFFFFF; border: none; border-radius: 16px; padding: 12px 26px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #5B21B6; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="title-box">🌉 별빛 다리 수직선 점프</div>
+    <div class="stats">
+      <span class="badge" id="stepText">1 / 10다리</span>
+      <span class="badge" id="scoreText">🌟 0점</span>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="mission" id="missionText">출발 징검다리에서 오른쪽으로 점프하면 몇 번 다리에 도착할까요?</div>
+    <div class="bridge-box" id="bridgeBox"></div>
+    <div class="formula-pill" id="formulaText">4 + 3 = ?</div>
+    <div class="mission" id="bestText">🏆 내 최고 기록: 0점</div>
+  </div>
+  <div class="choices" id="choicesBox">
+    <button class="btn" onclick="pickNumber(0)">7</button>
+    <button class="btn" onclick="pickNumber(1)">6</button>
+    <button class="btn" onclick="pickNumber(2)">8</button>
+  </div>
+</div>
+
+<div class="modal" id="startModal">
+  <div class="modal-card">
+    <div class="modal-title">🌉 별빛 다리! 점프점프 수직선</div>
+    <div class="modal-desc">반짝이는 데이터 다리 위를 폴짝폴짝 뛰어 건너요! <b>출발 숫자에서 오른쪽(+)이나 왼쪽(-)으로 점프</b>하면 몇 번 징검다리에 도착할지 맞혀 보세요!</div>
+    <button class="start-btn" onclick="startGame()">별빛 점프 시작!</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = '2026-11-27-starlight-bridge-number-jump_best';
+let step = 1;
+let score = 0;
+let answer = 7;
+let choices = [7, 6, 8];
+let audioCtx = null;
+
+function beep(freq, dur) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function updateBest() {
+  const best = Number(localStorage.getItem(STORAGE_KEY) || 0);
+  if (score > best) localStorage.setItem(STORAGE_KEY, String(score));
+  document.getElementById('bestText').textContent = '🏆 내 최고 기록: ' + Math.max(best, score) + '점';
+}
+
+function startGame() {
+  step = 1;
+  score = 0;
+  document.getElementById('startModal').classList.add('hidden');
+  updateBest();
+  makeBridge();
+}
+
+function makeBridge() {
+  document.getElementById('stepText').textContent = step + ' / 10다리';
+  document.getElementById('scoreText').textContent = '🌟 ' + score + '점';
+  const isAdd = (step % 2 === 1);
+  let startNum, jump;
+  if (isAdd) {
+    startNum = Math.floor(Math.random() * 10) + 3;
+    jump = Math.floor(Math.random() * 4) + 2;
+    answer = startNum + jump;
+    document.getElementById('missionText').textContent = startNum + '번 다리에서 오른쪽으로 ' + jump + '칸 점프하면 몇 번 다리일까요?';
+    document.getElementById('formulaText').textContent = startNum + ' + ' + jump + ' = ?';
+  } else {
+    startNum = Math.floor(Math.random() * 8) + 8;
+    jump = Math.floor(Math.random() * 4) + 2;
+    answer = startNum - jump;
+    document.getElementById('missionText').textContent = startNum + '번 다리에서 왼쪽으로 ' + jump + '칸 뒤로 점프하면 몇 번일까요?';
+    document.getElementById('formulaText').textContent = startNum + ' - ' + jump + ' = ?';
+  }
+  document.getElementById('missionText').style.color = '#4C1D95';
+
+  const bb = document.getElementById('bridgeBox');
+  bb.innerHTML = '';
+  const minVal = Math.min(startNum, answer);
+  const maxVal = Math.max(startNum, answer);
+  for (let n = minVal; n <= maxVal; n++) {
+    const st = document.createElement('div');
+    if (n === answer) {
+      st.className = 'stone target-stone';
+      st.textContent = '❔';
+    } else if (n === startNum) {
+      st.className = 'stone start-stone';
+      st.textContent = '🚀' + n;
+    } else {
+      st.className = 'stone';
+      st.textContent = String(n);
+    }
+    bb.appendChild(st);
+  }
+
+  const s = new Set([answer]);
+  while (s.size < 3) {
+    const cand = Math.max(1, answer + (Math.floor(Math.random() * 5) - 2));
+    s.add(cand);
+  }
+  choices = Array.from(s).sort(() => Math.random() - 0.5);
+  const btns = document.querySelectorAll('#choicesBox .btn');
+  btns.forEach((b, idx) => { b.textContent = choices[idx]; });
+}
+
+function pickNumber(idx) {
+  const mt = document.getElementById('missionText');
+  if (choices[idx] === answer) {
+    score += 10;
+    beep(740, 0.15);
+    updateBest();
+    mt.textContent = '🎉 폴짝! ' + answer + '번 별빛 징검다리에 안전하게 착지했어요!';
+    mt.style.color = '#047857';
+    const target = document.querySelector('.target-stone');
+    if (target) target.textContent = '⭐' + answer;
+    if (step >= 10) {
+      const modal = document.getElementById('startModal');
+      modal.querySelector('.modal-title').textContent = '🏆 별빛 다리 점프 대장!';
+      modal.querySelector('.modal-desc').innerHTML = '멋져요 장윤이! 10개의 수직선 다리를 모두 건너 <b>' + score + '점</b>을 달성했어요!';
+      modal.querySelector('.start-btn').textContent = '한 번 더 건너기!';
+      modal.classList.remove('hidden');
+    } else {
+      step++;
+      setTimeout(makeBridge, 450);
+    }
+  } else {
+    beep(240, 0.2);
+    mt.textContent = '징검다리 숫자를 한 칸씩 손가락으로 짚으며 세어 볼까요?';
+    mt.style.color = '#DC2626';
+  }
+}
+</script>
+</body>
+</html>

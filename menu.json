@@ -4,6 +4,16 @@
     "label": "어린이 추천",
     "items": [
       {
+        "id": "2026-11-27-parcel-box-robot-sorter",
+        "title": "🎮 척척 로봇! 택배 상자 분류대",
+        "path": "2026-11-27-parcel-box-robot-sorter/index.html"
+      },
+      {
+        "id": "2026-11-27-starlight-bridge-number-jump",
+        "title": "🎮 별빛 다리! 점프점프 수직선 모험",
+        "path": "2026-11-27-starlight-bridge-number-jump/index.html"
+      },
+      {
         "id": "2026-11-26-mirror-robot-rescue",
         "title": "🎮 반짝반짝! 거울 미로 로봇 구출 작전",
         "path": "2026-11-26-mirror-robot-rescue/index.html"
